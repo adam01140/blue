@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forms - FormWiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #800F0F;
+            padding: 20px;
+            text-align: center;
+        }
+        header img {
+            width: 150px;
+        }
+        nav {
+            margin: 20px 0;
+            text-align: center;
+        }
+        nav a {
+            margin: 0 15px;
+            color: #F55139;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease; /* Smooth transition for color change */
+        }
+        nav a:hover {
+            color: #800F0F; /* Change color on hover */
+        }
+        section {
+            padding: 50px;
+            text-align: center;
+            flex: 1; /* Allow the section to grow and take up space */
+        }
+        section h1 {
+            color: #800F0F;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        section ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        section ul li {
+            margin: 10px;
+            width: 150px; /* Set width for square */
+            height: 150px; /* Set height for square */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #800F0F;
+            border-radius: 5px;
+            background-color: #EBE7D9;
+            transition: background-color 0.3s ease;
+            box-sizing: border-box;
+            padding: 10px; /* Add padding inside the list items */
+            text-align: center;
+        }
+        section ul li:hover {
+            background-color: #F55139;
+        }
+        section ul li a {
+            color: #800F0F;
+            text-decoration: none;
+            font-weight: bold;
+            display: block; /* Make the link take up the full space of the list item */
+            width: 100%; /* Ensure full width for padding effect */
+        }
+        section ul li:hover a {
+            color: #EBE7D9;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #800F0F;
+            color: #EBE7D9;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="logo.png" alt="FormWiz Logo">
+    </header>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="forms.html">Forms</a>
+        <a href="contact.html">Contact Us</a>
+    </nav>
+
+    <section>
+        <h1>Available Forms</h1>
+        <ul>
+            <li><a href="fee-waiver.html">Waive Court Fees Form</a></li>
+            <li><a href="#">Form 2</a></li>
+            <li><a href="#">Form 3</a></li>
+            <li><a href="#">Form 4</a></li>
+            <li><a href="#">Form 5</a></li>
+            <!-- Add more forms as needed -->
+        </ul>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 FormWiz. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
