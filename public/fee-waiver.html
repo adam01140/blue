@@ -7,6 +7,21 @@
     p {
         font-size: 23px; /* Change this value as needed */
     }
+	
+	
+	
+		
+		#questions {
+        position: relative;
+        border: 4px #ffffff;
+        border-radius: 10px;
+        padding: 0px;
+        margin: 10px auto;
+        background-color: #ffffff;
+        width: 100%;
+        height: 100%; /* Sets the height to 100% of the viewport height */
+		min-height: 88vh;
+		}
 
     select {
         text-align: center;
@@ -93,18 +108,7 @@
         margin-right: 0; /* No right margin on the amount field */
     }
 
-    #questions {
-        position: relative;
-        border: 4px #ffffff;
-        border-radius: 10px;
-        padding: 0px;
-        margin: 10px auto;
-        background-color: #ffffff;
-        width: 97%;
-        height: 88vh; /* Sets the height to 100% of the viewport height */
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
+    
 
     #navigation {
     position: absolute;
@@ -338,18 +342,7 @@
             padding-right: 30px; /* Adjust this value as needed */
         }
 
-        #questions {
-            position: relative;
-            border: 4px ffffff;
-            border-radius: 10px;
-            padding: 0px;
-            margin: 10px auto;
-            background-color: #ffffff;
-            width: 97%;
-            height: 83vh; /* Sets the height to 100% of the viewport height */
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
+        
 
          #navigation {
     position: absolute;
@@ -393,10 +386,9 @@
 
 .container2 {
     text-align: center;
-    width: 100vw;
-    height: fit-content;
-    max-width: 800px;
-    margin-top: 5vh; /* Adjusted to use vh unit */
+    width: 90vw;
+    height: 100%;
+    margin-top: 0vh; /* Adjusted to use vh unit */
     border-radius: 12px;
     background-color: white;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -408,7 +400,7 @@
 			width: 100%;
             text-align: center;
             max-width: 800px; /* Increased width */
-			height: 88vh;
+			height: 100%;
             padding: 40px;
             border-radius: 12px;
             background-color: white;
@@ -574,7 +566,14 @@
 
 
 
-		
+		<div id="navigation">
+    <button id="previous" style="display:none" class="next-button" onclick="showPrevious()">← Previous</button>
+    <button class="next-button" onclick="showNext()"> Next →</button>
+
+</div>
+
+
+<br><br>
         <div id="question1" class="questionBox">
 			
 			<center>
@@ -699,7 +698,7 @@
 		<p style="text-align: left;"><u> Slide 4</u></p>
         <p><strong>Is your gross monthly household income less than the amount listed: </strong></p>
         <center>
-        <img src="gross_monthly.jpg"  width="700" height="80">
+        <img src="gross_monthly.jpg"  width="50%" height="80">
         <br><br>
         <select id="LowIncomeStatus" name="LowIncomeStatus" required onchange="toggleSkipToEnd()">
             <option value="" disabled selected>Select</option>
@@ -877,6 +876,7 @@
 	<br><br>
 </div>
 </div>
+<br><br>
 </div>
 
 
@@ -1204,17 +1204,14 @@
 
 
 
-<div id="navigation">
-    <button id="previous" style="display:none" class="next-button" onclick="showPrevious()">← Previous</button>
-    <button class="next-button" onclick="showNext()"> Next →</button>
 
-</div>
 
         
    
         
     </div>
-  <br><br>
+
+
 </div>
 
 <div class="footer">
