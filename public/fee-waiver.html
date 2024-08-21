@@ -72,17 +72,18 @@
         }
 
        .nav-buttons-container {
-    position: absolute;
-    margin: 0px;
-    top: 30%; /* Center the buttons vertically */
-    left: 0;
-    right: 0;
-    width: 100%;
+
+    transform: translateX(-50%); /* Adjust for centering */
     display: flex;
-    justify-content: space-between;
-    transform: translateY(-50%);
-    z-index: 1; /* Set a lower z-index */
+    justify-content: center; /* Center the buttons next to each other */
+  
 }
+
+.back-button,
+.next-button {
+    margin: 0 5px; /* Adjusts spacing between buttons */
+}
+
 #deductions input[type="text"] {
         height: 15px; /* Adjust this value to decrease the height */
         padding: 4px 10px; /* Adjust padding to better fit the smaller height */
@@ -101,13 +102,7 @@
         overflow-x: hidden;
     }
 
-        .back-button {
-            margin-left: 100px; /* Adjust spacing as needed */
-        }
-
-        .next-button {
-            margin-right: 100px; /* Adjust spacing as needed */
-        }
+      
 
         select {
             text-align: center;
@@ -170,13 +165,7 @@
             margin-top: 20px;
         }
 
-        .next-button {
-            margin-left: auto; /* Pushes the button to the right */
-        }
-
-        .back-button {
-            margin-right: auto; /* Pushes the button to the left */
-        }
+      
 
         #benifits {
         border: 4px solid lightblue;
@@ -219,18 +208,7 @@
             margin-bottom: 10px; /* Space between rows */
         }
 
-        #box {
-            border: 4px solid lightblue;
-            border-color: #2c3e50;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 50px;
-            background-color: #ffffff;
-            width: auto;
-            height: auto; /* Allow the div to grow with its content */
-            min-width: 80vw;
-            min-height:60vh;
-        }
+  
 
         .button {
             font-size: 1.2em;
@@ -266,21 +244,48 @@
         }
 		
 		
-        .next-button, .back-button {
-            font-size: 20px;
-            background-color: #2c3e50; /* Button color */
-            color: white;
-            border: none;
-            border-radius: 25px; /* Less rounded corners */
-            padding: 10px 15px; /* Smaller padding to make the buttons less wide */
-            cursor: pointer;
-            height: 50px;
-            width: auto; /* Adjusts to content width */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s;
-        }
+
+#box {
+    border: 4px solid lightblue;
+    border-color: #2c3e50;
+    border-radius: 10px;
+    padding: 20px;
+    padding-bottom: 70px; /* Increase bottom padding to make space for buttons */
+    margin: 50px;
+    background-color: #ffffff;
+    width: auto;
+    height: auto; /* Allow the div to grow with its content */
+    min-width: 80vw;
+    min-height: 65vh;
+    position: relative;
+}
+
+.next-button, .back-button {
+    position: absolute;
+    bottom: 10px; /* Distance from the bottom of the .box */
+    font-size: 20px;
+    background-color: #2c3e50; /* Button color */
+    color: white;
+    border: none;
+    border-radius: 25px; /* Less rounded corners */
+    padding: 10px 15px; /* Smaller padding to make the buttons less wide */
+    cursor: pointer;
+    height: 50px;
+    width: auto; /* Adjusts to content width */
+    transition: background-color 0.3s;
+}
+
+.back-button {
+    left: 45%; /* Position the back button slightly left */
+    transform: translateX(-50%);
+}
+
+.next-button {
+    left: 55%; /* Position the next button slightly right */
+    transform: translateX(-50%);
+}
+
+
 
         .next-button:hover, .back-button:hover {
             background-color: #005bb5; /* Darker blue on hover */
@@ -315,10 +320,6 @@
     <div id="questions">
 	
 	
-	<div class="nav-buttons-container">
-        <button id="previous" style="display:none" class="back-button" onclick="showPrevious()">←</button>
-        <button class="next-button" onclick="showNext()">→</button>
-    </div>
 	
 	
         <div id="questions1">
@@ -354,6 +355,8 @@
                                 <option value="no">No</option>
                             </select>
                         </div>
+						
+						
                     </div>
                 </center>
             </div>
@@ -403,7 +406,13 @@
                             <p><strong>What's your phone number?</strong></p>
                             <input type="text" id="PetitionerTel[0]" name="PetitionerTel[0]" placeholder="Phone Number" required>
                             <br><br><br><br>
+						
+						<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+						<button class="next-button" onclick="showNext()">Next →</button>
+						
                         </div>
+						
+	
                     </center>
                 </center>
             </div>
@@ -430,6 +439,9 @@
            <br>
         </div>
 		
+		
+		<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
 		
 		
 		
@@ -477,8 +489,9 @@
 		<br>
         <label><input type="checkbox" id="noneApplyCheckbox" name="none" value="Yes" onchange="checkNoneApply()"> No, none of these apply to me</label>
 		
-        
-        <br><br>
+
+		<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
 		</div>
       
 		</div>
@@ -497,7 +510,8 @@
             <option value="yes">Yes</option>
             <option value="no">No</option>
         </select>
-		<p>
+		<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
         </div>
         </div>
 
@@ -526,6 +540,8 @@
 			<br>
 			<br>
         </div>
+		<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
         </div>
 		
         </div>
@@ -563,6 +579,8 @@
     <br>
     
 	</div>
+	<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
 	</div>
     </div>
     </div>
@@ -596,7 +614,9 @@
     <div id="dependencyInfo" style="display:none;">
 	<br><br>
 </div>
-<br>
+
+<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
 </div>
 </div>
 
@@ -665,8 +685,10 @@
     </div>
 	<br>
     <div id="bankAccountInfo" style="display:none;">
-	<br><br>
+
 </div>
+<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
 </div>
 
 </div>
@@ -698,7 +720,8 @@
     </div>
 	<br>
     <div id="vehicleInfo" style="display:none;"></div>
-	<br>
+	<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
 </div>
 </div>
 
@@ -726,7 +749,8 @@
 	<br>
 	
     <div id="realEstateInfo" style="display:none;"></div>
-	<br><br>
+	<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
 </div>
 </div>
 
@@ -756,7 +780,8 @@
     </div>
 	<br>
     <div id="personalPropertyInfo" style="display:none;"></div>
-	<br><br>
+	<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
 </div>
 </div>
 
@@ -785,7 +810,8 @@
     </div>
 	<br>
     <div id="payrollDeductionInfo" style="display:none;"></div>
-	<br><br>
+	<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
 </div>
 </div>
 
@@ -795,7 +821,7 @@
 
 <center><div id="box">
 
-<h1 style="color: #2c3e50;"><u>Monthly Deductions & Expenses</u></h1><br><p><strong>Mark All That Apply:</strong></p><br>
+<h1 style="color: #2c3e50;"><u>Monthly Deductions & Expenses</u></h1><p><strong>Mark All That Apply:</strong></p>
 
     
 	
@@ -850,7 +876,10 @@
         <input type="text" id="transportation_expense" name="transportation_expense" placeholder="Amount" style="display:none;">
     </label>
 	</div>
+	
 	<br>
+	<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
 	
 	</div>
 	</div>
@@ -879,7 +908,8 @@
     </div>
 	<br>
     <div id="installmentFieldsContainer"></div>
-	<br><br>
+	<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
 </div>
 </div>
 
@@ -897,7 +927,8 @@
     </select>
 	<br><br>
     <input type="text" id="withheld_earnings" name="withheld_earnings" placeholder="Amount" style="display:none;">
-	<br><br><br>
+	<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
 </div>
 </div>
 
@@ -926,7 +957,10 @@
     </div>
 	<br>
     <div id="otherExpenseFields"></div>
-	<br><br>
+	
+	
+	<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
 </div>
 </div>
 
@@ -969,6 +1003,8 @@
 					
                 </div>
                 </div>
+				<button id="previous" class="back-button" onclick="showPrevious()">← Back</button>
+		<button class="next-button" onclick="showNext()">Next →</button>
                 </div>
                 </div>
 
