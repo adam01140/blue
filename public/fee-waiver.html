@@ -1,138 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Waive Court Fees Form</title>
-<style>
-    p {
-        font-size: 23px; /* Change this value as needed */
-    }
-	
-	
-	
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waive Court Fees Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
 		
-		#questions {
-        position: relative;
-        border: 4px #ffffff;
-        border-radius: 10px;
-        padding: 0px;
-        margin: 10px auto;
-        background-color: #ffffff;
-        width: 100%;
-        height: 100%; /* Sets the height to 100% of the viewport height */
-		min-height: 88vh;
-		}
-
-    select {
-        text-align: center;
-        width: 200px;
-        height: 50px;
-        background-color: #64adc4;
-        color: white;
-        font-size: 16px;
-        border-radius: 40px;
-        padding-left: 10px;
-        border: 1px solid #3f77b8;
-        cursor: pointer;
+		.lawyer-info, .job-info, .income-info, .previous-request-info, .monthly-income-info {
+        display: none;
     }
-
-    input[type="text"], input[type="email"] {
-        text-align: center;
-        width: 170px;
-        height: 30px;
-        font-size: 16px;
-        border-radius: 40px;
-        padding-left: 10px;
-        border: 1px solid #3f77b8;
+		
+		 .checkbox-label, noneApplyCheckbox {
+        font-size: 18px; /* Increase font size as needed */
+        display: block;
+        text-align: left;
+        margin: 0 auto;
+        cursor: pointer; /* Changes cursor to pointer when hovering over the label */
     }
+	
+	
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #2c3e50;
+            padding: 40px; /* Increase padding to make the header taller */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        header img {
+            position: absolute;
+            left: 20px; /* Position the logo on the left */
+            cursor: pointer;
+        }
+        nav {
+            display: flex;
+            justify-content: center; /* Center the navigation links */
+        }
+        nav a {
+            margin: 0 15px;
+            color: #ffffff; /* Set default color to white */
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease; /* Smooth transition for color change */
+        }
+        nav a:hover {
+            color: #2980b9; /* Change color to light blue on hover */
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #2c3e50;
+            color: #EBE7D9;
+            margin-top: 20px;
+        }
 
-    option {
-        background-color: white;
-        color: black;
-    }
+        /* Existing styles from your form page */
+        p {
+            font-size: 23px; /* Change this value as needed */
+        }
 
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        background-color: #f4f4f9;
-        padding: 0px;
-        text-align: center;
-    }
-
-    button {
-        background-color: #4CAF50;
-        border: none;
-        color: white;
-        padding: 15px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-        width: 300px;
-        height: 40px;
-    }
-
-    #userProfile {
-        border: 4px solid lightblue;
-        border-radius: 10px;
-        padding: 20px;
-        margin: 10px auto;
-        background-color: #ffffff;
-        width: 50%;
-    }
-
-    .container {
-        display: flex;
-        justify-content: space-around;
-        align-items: start;
-        margin-top: 20px;
-    }
-
-    input::placeholder {
-        font-size: 17.5px; /* Adjust this value as needed */
-        color: #999; /* Light grey color, adjust as needed */
-    }
-
-    .income-field-container {
-        margin-bottom: 15px; /* Space between each pair of input fields */
-    }
-
-    .income-source, .income-amount {
-        width: 45%; /* Adjust width to fit in the container */
-        display: inline-block; /* Align inputs horizontally */
-        margin-right: 10px; /* Space between the inputs */
-    }
-
-    .income-amount {
-        margin-right: 0; /* No right margin on the amount field */
-    }
-
-    
-
-    #navigation {
+       .nav-buttons-container {
     position: absolute;
-    
+    margin: 0px;
+    top: 30%; /* Center the buttons vertically */
+    left: 0;
+    right: 0;
     width: 100%;
     display: flex;
-    justify-content: center;
-    gap: 20px; /* Adjust the space between buttons */
+    justify-content: space-between;
+    transform: translateY(-50%);
+    z-index: 1; /* Set a lower z-index */
 }
-
-
-    #benifits {
-        border: 4px solid lightblue;
-        border-radius: 10px;
-        padding: 20px;
-        margin: 10px;
-        background-color: #ffffff;
-        width: 55%;
-        height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-
-    #deductions input[type="text"] {
+#deductions input[type="text"] {
         height: 15px; /* Adjust this value to decrease the height */
         padding: 4px 10px; /* Adjust padding to better fit the smaller height */
         font-size: 10px; /* Optional: adjust font size to match the new height */
@@ -150,476 +101,317 @@
         overflow-x: hidden;
     }
 
-    .cash-savings-container {
-        display: flex; /* Uses Flexbox to align children inline */
-        align-items: center; /* Align items vertically */
-        gap: 0px; /* Adds space between the select and the div */
-        width: 200px;
-    }
+        .back-button {
+            margin-left: 100px; /* Adjust spacing as needed */
+        }
 
-   
+        .next-button {
+            margin-right: 100px; /* Adjust spacing as needed */
+        }
 
-    /* Reduce bottom margin/padding of the paragraph above the select element */
-    #question9 p {
-        margin-bottom: 0; /* Adjust or remove spacing */
-        padding-bottom: 0; /* Ensure no padding is adding extra space */
-    }
-
-    /* Ensure the container starts right after the paragraph */
-    .cash-savings-container {
-        margin-top: 0; /* Adjust top margin to pull it closer to the preceding element */
-    }
-
-     #box {
-        border: 4px solid lightblue;
-        border-color: #89CFF0;
-        border-radius: 10px;
-        padding-right: 20px;
-		padding-left: 20px;
-        margin: 50px;
-        background-color: #ffffff;
-        width: auto;
-        height: auto; /* Allow the div to grow with its content */
-    }
-
- 
-	
-	.button {
-            font-size: 1.2em;
-            font-weight: 600;
-            padding: 20px 40px;
-            border: none;
-            border-radius: 8px;
-            background-color: #007aff;
+        select {
+            text-align: center;
+            width: 200px;
+            height: 50px;
+            background-color: #2c3e50;
             color: white;
+            font-size: 16px;
+            border-radius: 40px;
+            padding-left: 10px;
+            border: 1px solid #3f77b8;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
-        .button:hover {
-            background-color: #005bb5;
+
+        input[type="text"], input[type="email"] {
+            text-align: center;
+            width: 170px;
+            height: 30px;
+            font-size: 16px;
+            border-radius: 10px;
+            padding-left: 10px;
+            border: 1px solid #2c3e50;
         }
-		
 
-    .next-button:active, .back-button:active {
-        background-color: #005bb5; /* Lighter shade of blue */
-        color: white; /* Extremely light cyan */
-        
-    }
+        option {
+            background-color: white;
+            color: black;
+        }
 
-    .next-button, .back-button {
-		font-size: 30px;
-		background-color: #007aff; /* Lighter shade of blue */
-        color: white; /* Extremely light cyan */
-     
-		transition: background-color 0.3s;
-        
-        border: none;
-        border-radius: 50px;
-        padding: 10px 20px;
-        margin-top: 10px;
-        cursor: pointer;
-        height: 55px;
-        align-items: center; /* Vertically center the text */
-        justify-content: center; /* Horizontally center the text */
-        display: flex;
-    }
-	
-	
+        .container {
+            display: flex;
+            justify-content: space-around;
+            align-items: start;
+            margin-top: 20px;
+        }
 
-    .pdf-container {
-        display: flex;
-        justify-content: space-around;
-        align-items: start;
-        margin-top: 20px;
-        height: 100%;
-        width: 100%;
-    }
+        input::placeholder {
+            font-size: 17.5px; /* Adjust this value as needed */
+            color: #999; /* Light grey color, adjust as needed */
+        }
 
-    #pdfPreview {
-        flex: 1;
-        border: 2px solid lightblue;
+        .income-field-container {
+            margin-bottom: 15px; /* Space between each pair of input fields */
+        }
+
+        .income-source, .income-amount {
+            width: 45%; /* Adjust width to fit in the container */
+            display: inline-block; /* Align inputs horizontally */
+            margin-right: 10px; /* Space between the inputs */
+        }
+
+        .income-amount {
+            margin-right: 0; /* No right margin on the amount field */
+        }
+
+        #navigation {
+            display: flex;
+            justify-content: space-between; /* Position buttons on the left and right */
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .next-button {
+            margin-left: auto; /* Pushes the button to the right */
+        }
+
+        .back-button {
+            margin-right: auto; /* Pushes the button to the left */
+        }
+
+        #benifits {
+        border: 4px solid lightblue;
+		border-color: #2c3e50;
         border-radius: 10px;
         padding: 20px;
+		padding-right: 100px;
+		padding-left: 100px;
         margin: 0px;
         background-color: #ffffff;
-        width: 100%;
-        height: 750px;
-        overflow-y: auto;
-        box-sizing: border-box;
-        display: none; /* Initially hidden */
-    }
-
-    #pdfFrame {
-        width: 100%;
+        width: fit-content;
         height: 100%;
-        border: none;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 
-    .lawyer-info, .job-info, .income-info, .previous-request-info, .monthly-income-info {
-        display: none;
-    }
 
-    .checkbox-label, noneApplyCheckbox {
-        font-size: 18px; /* Increase font size as needed */
-        display: block;
-        text-align: left;
-        margin: 0 auto;
-        cursor: pointer; /* Changes cursor to pointer when hovering over the label */
-    }
-
-    .dependency-details {
-        display: flex;
-        justify-content: center;
-        width: 60%; /* Adjust width as needed */
-        padding: 10px 0; /* Adds vertical padding */
-    }
-
-    .dependency-input {
-        flex: 1; /* Distributes space evenly */
-        margin-right: 10px; /* Adds space between inputs */
-    }
-
-    .dependency-input:last-child {
-        margin-right: 0; /* Removes margin from the last input */
-    }
-
-    .vehicle-field-container {
-        display: flex; /* Aligns children (input fields) inline */
-        justify-content: center; /* Aligns children at the start of the container */
-        margin-bottom: 10px; /* Space between rows */
-    }
-
-    .vehicle-detail input {
-        margin-right: 5px; /* Reduces space to the right of each input field */
-    }
-
-    .estate-field-container {
-        display: flex; /* Aligns children (input fields) inline */
-        justify-content: center; /* Aligns children at the start of the container */
-        margin-bottom: 10px; /* Space between rows */
-    }
-
-    .estate_detail input {
-        margin-right: 10px; /* Reduces space to the right of each input field */
-    }
-
-    .bank-field-container {
-        display: flex; /* Aligns children (input fields) inline */
-        justify-content: center; /* Aligns children at the start of the container */
-        margin-bottom: 10px; /* Space between rows */
-    }
-
-    .bank_detail input {
-        margin-right: 10px; /* Reduces space to the right of each input field */
-    }
-
-    .personal-field-container {
-        display: flex; /* Aligns children (input fields) inline */
-        justify-content: center; /* Aligns children at the start of the container */
-        margin-bottom: 10px; /* Space between rows */
-    }
-
-    .personal_detail input {
-        margin-right: 10px; /* Reduces space to the right of each input field */
-    }
-
-    .payment-field-container {
-        display: flex; /* Aligns children (input fields) inline */
-        justify-content: center; /* Aligns children at the start of the container */
-        margin-bottom: 10px; /* Space between rows */
-    }
-
-    .payment_detail input {
-        margin-right: 10px; /* Reduces space to the right of each input field */
-    }
-
-    /* Styles specific to devices with a viewport width of 600px or less (typically smartphones) */
-    @media (max-width: 1000px) {
-        select {
-            text-align-last: center; /* Align text in select for Android */
-            -moz-text-align-last: center; /* For Firefox versions */
-            text-align: center; /* For iOS and standard browsers */
-            padding-right: 30px; /* Adjust this value as needed */
+        #deductions {
+            width: 80%;
+            height: 100%;
         }
 
-        
-
-         #navigation {
-    position: absolute;
-    
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 20px; /* Adjust the space between buttons */
-}
-
-
-    }
-</style>
-</head>
-<body>
-<center>
-<style>
-  
-
-
-.navigation {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 20px; /* Adjust space between buttons */
-    }
-	
-	
-        body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center; /* Center content vertically */
-    min-height: 100vh; /* Ensure body takes at least full viewport height */
-    background-color: #f5f5f7;
-    color: #1d1d1f;
-}
-
-.container2 {
-    text-align: center;
-    width: 90vw;
-    height: 100%;
-    margin-top: 0vh; /* Adjusted to use vh unit */
-    border-radius: 12px;
-    background-color: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-  
-  
-		
-		.container3 {
-			width: 100%;
-            text-align: center;
-            max-width: 800px; /* Increased width */
-			height: 100%;
-            padding: 40px;
-            border-radius: 12px;
-            background-color: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        #pdfPreview {
+            width: 100%;
+            height: 750px;
+            box-sizing: border-box;
+            display: none; /* Initially hidden */
         }
-		
-		
-        .header {
-            font-size: 3.5em;
-            font-weight: 600;
-            margin-bottom: 30px;
+
+        #pdfFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
-        .description {
-            font-size: 1.5em;
-            color: #6e6e73;
-            margin-bottom: 50px;
+
+        /* Rest of your existing styles from the original form page */
+        .cash-savings-container, .vehicle-field-container, .estate-field-container, .bank-field-container, .personal-field-container, .payment-field-container, .dependency-details {
+            display: flex;
+            justify-content: center; /* Aligns children at the start of the container */
+            margin-bottom: 10px; /* Space between rows */
         }
+
+        #box {
+            border: 4px solid lightblue;
+            border-color: #2c3e50;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 50px;
+            background-color: #ffffff;
+            width: auto;
+            height: auto; /* Allow the div to grow with its content */
+            min-width: 80vw;
+            min-height:60vh;
+        }
+
         .button {
             font-size: 1.2em;
             font-weight: 600;
             padding: 20px 40px;
             border: none;
             border-radius: 8px;
-            background-color: #007aff;
+            background-color: #2c3e50;
             color: white;
             cursor: pointer;
             transition: background-color 0.3s;
         }
+
         .button:hover {
             background-color: #005bb5;
         }
-        .footer {
-            margin-top: 50px;
-            font-size: 1em;
-            color: #6e6e73;
-        }
-        nav {
+
+
+		.done-button {
+            font-size: 20px;
+            background-color: #2c3e50; /* Button color */
+            color: white;
+            border: none;
+            border-radius: 25px; /* Less rounded corners */
+            padding: 10px 15px; /* Smaller padding to make the buttons less wide */
+            cursor: pointer;
+            height: 50px;
+            width: auto; /* Adjusts to content width */
             display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .nav-link {
-            margin: 0 15px;
-            text-decoration: none;
-            color: #007aff;
-            font-weight: 600;
-        }
-        .nav-link:hover {
-            text-decoration: underline;
-        }
-        .form-list {
-            display: flex;
-            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
         }
-        .form-item {
-            margin-bottom: 30px;
-            text-align: center;
-            width: 100%;
-            max-width: 800px; /* Increased width */
-            padding: 30px; /* Increased padding */
-            border: 1px solid #d1d1d6;
-            border-radius: 8px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		
+		
+        .next-button, .back-button {
+            font-size: 20px;
+            background-color: #2c3e50; /* Button color */
+            color: white;
+            border: none;
+            border-radius: 25px; /* Less rounded corners */
+            padding: 10px 15px; /* Smaller padding to make the buttons less wide */
+            cursor: pointer;
+            height: 50px;
+            width: auto; /* Adjusts to content width */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
         }
-        .form-title {
-            font-size: 1.5em;
-            font-weight: 600;
-            margin-bottom: 10px;
+
+        .next-button:hover, .back-button:hover {
+            background-color: #005bb5; /* Darker blue on hover */
+        }
+
+        .next-button:active, .back-button:active {
+            background-color: #004080; /* Even darker blue when active */
+        }
+
+        /* Styles specific to devices with a viewport width of 600px or less (typically smartphones) */
+        @media (max-width: 1000px) {
+            select {
+                text-align-last: center; /* Align text in select for Android */
+                -moz-text-align-last: center; /* For Firefox versions */
+                text-align: center; /* For iOS and standard browsers */
+                padding-right: 30px; /* Adjust this value as needed */
+            }
         }
     </style>
-	
-	
-	
+</head>
+<body>
+
+    <header>
+        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="forms.html">Forms</a>
+            <a href="contact.html">Contact Us</a>
+        </nav>
+    </header>
 <div class="container2">
+    <div id="questions">
+	
+	
+	<div class="nav-buttons-container">
+        <button id="previous" style="display:none" class="back-button" onclick="showPrevious()">←</button>
+        <button class="next-button" onclick="showNext()">→</button>
+    </div>
+	
+	
+        <div id="questions1">
+            <h1></h1>
+            <input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">
+            <input type="text" id="dependency_income_total" name="dependency_income_total" style="display:none;">
+            <input type="text" id="total_combined_income" name="total_combined_income" style="display:none;">
+            <div id="gone" style="display:none">
+                <center>
+                    <div id="box">
+                        <p><strong>Do you have a lawyer?</strong></p>
+                        <select id="LawyerStatus" name="LawyerStatus" required onchange="toggleLawyerFields()">
+                            <option value="" disabled selected>Select</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                        <div class="lawyer-info" id="lawyerInfoFields">
+                            <br>
+                            <input type="text" id="LawyerName" name="LawyerName" placeholder="Lawyer's Full Name">
+                            <br>
+                            <input type="text" id="LawFirm" name="LawFirm" placeholder="Law Firm">
+                            <br>
+                            <input type="text" id="LawyerAddress" name="LawyerAddress" placeholder="Law Firm Address">
+                            <br>
+                            <input type="text" id="LawyerPhone" name="LawyerPhone" placeholder="Phone Number">
+                            <br>
+                            <input type="text" id="LawyerBarNumber" name="LawyerBarNumber" placeholder="State Bar Number">
+                            <br><br>
+                            <p><strong>Has your lawyer agreed to advance some of your fees or costs?</strong></p>
+                            <select id="LawyerAdvance" name="LawyerAdvance" required>
+                                <option value="" disabled selected>Select</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                    </div>
+                </center>
+            </div>
 
-<div id="questions">
-    
-	 <div style="line-height: 0.4;">
-	<br><br><br>
-<h1>Waive Court Fees Form</h1>
-<h3><i> Offered by Form Wiz </i></h3>
+            <div id="gone2" style="display:none">
+                <center>
+                    <div id="box">
+                        <p><strong>What court fees would you like waived?</strong></p>
+                        <select id="CourtType" name="CourtType" required>
+                            <option value="" disabled selected>Select</option>
+                            <option value="superior">Superior Court</option>
+                            <option value="supreme">Supreme Court</option>
+                            <option value="appeal">Court of Appeal</option>
+                            <option value="appellate_division">Appellate Division of Superior Court</option>
+                        </select>
+                    </div>
+                </center>
+            </div>
 
-</div>
-
-	<div id="questions1">
-        <h1></h1>
-        <input type="text" id="current_date" name="current_date" placeholder="current_date" style = "display:none">
-
-        <input type="text" id="dependency_income_total" name="dependency_income_total" style="display:none;">
-		<input type="text" id="total_combined_income" name="total_combined_income" style="display:none;">
-    
-
-
-
-    
-
-
-
-
-
-    
-    <div id="gone" style = "display:none">
-        <center><div id="box">
-        <p><strong>Do you have a lawyer?</strong></p>
-		
-		
-        <select id="LawyerStatus" name="LawyerStatus" required onchange="toggleLawyerFields()">
-            <option value="" disabled selected>Select</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-        </select>
-        <div class="lawyer-info" id="lawyerInfoFields">
           
-          <br>
-            <input type="text" id="LawyerName" name="LawyerName" placeholder="Lawyer's Full Name">
-            <br>
-            
-            <input type="text" id="LawFirm" name="LawFirm" placeholder="Law Firm">
-            <br>
-            
-            <input type="text" id="LawyerAddress" name="LawyerAddress" placeholder="Law Firm Address">
-            <br>
-            
-            <input type="text" id="LawyerPhone" name="LawyerPhone" placeholder="Phone Number">
-            <br>
-            
-            <input type="text" id="LawyerBarNumber" name="LawyerBarNumber" placeholder="State Bar Number">
-            
-            
-            
-            <br><br>
-            <p><strong>Has your lawyer agreed to advance some of your fees or costs?</strong></p>
-            <select id="LawyerAdvance" name="LawyerAdvance" required>
-                <option value="" disabled selected>Select</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-            </select>
-        </div>
-        </div>
-        </div>
 
+         
+            <div id="question1" class="questionBox">
+                <center>
+             
+                        <div id="box" style="line-height: 0.4;">
+                            <h1 style="color: #2c3e50;"><u>Demographics</u></h1><br><br>
 
+                            <form id="userForm">
+                                <p><strong>What's your full name?</strong></p>
+                                <input type="text" id="PetitionerName1[0]" name="PetitionerName1[0]" placeholder="Full name" required>
+                                <br><br>
 
-
-
-     <div id="gone2" style = "display:none">
-        <center><div id="box">
-        <p><strong>What court fees would you like waived?</strong></p>
-
-        <select id="CourtType" name="CourtType" required>
-            <option value="" disabled selected>Select</option>
-            <option value="superior">Superior Court</option>
-            <option value="supreme">Supreme Court</option>
-            <option value="appeal">Court of Appeal</option>
-            <option value="appellate_division">Appellate Division of Superior Court</option>
-        </select>
-
-        </div>
-        </div>
-       
-
-
-
-		<div id="navigation">
-    <button id="previous" style="display:none" class="next-button" onclick="showPrevious()">← Previous</button>
-    <button class="next-button" onclick="showNext()"> Next →</button>
-
-</div>
-
-
-<br><br>
-        <div id="question1" class="questionBox">
-			
-			<center>
-            <center><div id="box" style="line-height: 0.4;" >
-			<p style="text-align: left;"><u> Slide 1</u></p>
-			<form id="userForm">
-            <p><strong>What's your full name?</strong></p>
-            <input type="text" id="PetitionerName1[0]" name="PetitionerName1[0]" placeholder="Full name" required>
-            <br><br>
-			
-			
-            <form id="userForm">
-                <p><strong>What's your email? <br> <br><br> </strong> (Email will be linked to your account for future forms)</strong></p>
-                <input type="email" id="email" name="email" placeholder="Email" required>
-            </form><br>
-            
-			
-            
-        </form><br>
-        <p><strong>What's your street address?</strong></p>
-        <input type="text" id="Street" name="Street" placeholder="Street">
-        <input type="text" id="PetitionerCity[0]" name="PetitionerCity[0]" placeholder="City" required>
- <br><br>
-        <input type="text" id="County" name="County" placeholder="County" required>
-        
-        <input type="text" id="PetitionerState[0]" name="PetitionerState[0]" placeholder="State" required>
-      <br><br>
-        <input type="text" id="PetitionerZip[0]" name="PetitionerZip[0]" placeholder="Zip" required>
-        <br><br>
-       
-
-        <p><strong>What's your phone number?</strong></p>
-        <input type="text" id="PetitionerTel[0]" name="PetitionerTel[0]" placeholder="Phone Number" required><br>
-		<br><br>
-    <br><br>
+                                <p><strong>What's your email? <br> <br><br> </strong> (Email will be linked to your account for future forms)</strong></p>
+                                <input type="email" id="email" name="email" placeholder="Email" required>
+                                <br><br>
+                            </form>
+                            <p><strong>What's your street address?</strong></p>
+                            <input type="text" id="Street" name="Street" placeholder="Street">
+                            <input type="text" id="PetitionerCity[0]" name="PetitionerCity[0]" placeholder="City" required>
+                            <br><br>
+                            <input type="text" id="County" name="County" placeholder="County" required>
+                            <input type="text" id="PetitionerState[0]" name="PetitionerState[0]" placeholder="State" required>
+                            <br><br>
+                            <input type="text" id="PetitionerZip[0]" name="PetitionerZip[0]" placeholder="Zip" required>
+                            <br><br>
+                            <p><strong>What's your phone number?</strong></p>
+                            <input type="text" id="PetitionerTel[0]" name="PetitionerTel[0]" placeholder="Phone Number" required>
+                            <br><br><br><br>
+                        </div>
+                    </center>
+                </center>
             </div>
-            </div>
-
-
-
-            
 
 
 		<div id="question2" style = "display:none">
         <center><div id="box">
-		<p style="text-align: left;"><u> Slide 2</u></p>
+		<h1 style="color: #2c3e50;"><u>Employment Info</u></h1><br><br>
 		<p><strong>Are you currently employed?</strong></p>
         <select id="JobStatus" name="JobStatus" required onchange="toggleJobFields()">
             <option value="" disabled selected>Select</option>
@@ -661,7 +453,7 @@
 
     <div id="question4" style = "display:none">
         <center><div id="box">
-        <p style="text-align: left;"><u> Slide 3</u></p>
+        <h1 style="color: #2c3e50;"><u>Qualified Assistance</u></h1><br><br>
         <p><strong>Do you receive any of these benifits: </strong></p>
 		<p><strong>(Mark all that apply) </strong></p>
 		
@@ -695,10 +487,10 @@
 
     <div id="question5" style = "display:none">
         <center><div id="box">
-		<p style="text-align: left;"><u> Slide 4</u></p>
+		<h1 style="color: #2c3e50;"><u>Household Income Qualifications</u></h1><br><br>
         <p><strong>Is your gross monthly household income less than the amount listed: </strong></p>
         <center>
-        <img src="gross_monthly.jpg"  width="50%" height="80">
+        <img src="gross_monthly.jpg"  width="50%" height="100px">
         <br><br>
         <select id="LowIncomeStatus" name="LowIncomeStatus" required onchange="toggleSkipToEnd()">
             <option value="" disabled selected>Select</option>
@@ -713,7 +505,7 @@
 
     <div id="question6" style = "display:none">
         <center><div id="box">
-		<p style="text-align: left;"><u> Slide 5</u></p>
+		<h1 style="color: #2c3e50;"><u>Household Basic Needs</u></h1><br><br>
         <p><strong>Do you have enough income to pay for your household’s basic needs and the court fees?</strong></p>
         <select id="IncomePayStatus" name="IncomePayStatus" required onchange="toggleIncomeFields()">
             <option value="" disabled selected>Select</option>
@@ -735,13 +527,13 @@
 			<br>
         </div>
         </div>
-		<br>
+		
         </div>
      
 
 	<div id="question7" style = "display:none">
         <center><div id="box">
-		<p style="text-align: left;"><u> Slide 6</u></p>
+		<h1 style="color: #2c3e50;"><u>Income Sources</u></h1><br><br>
         <p><strong>Does your income change a lot from month to month?</strong></p>
         <select id="ChangingIncomeStatus" name="ChangingIncomeStatus" required onchange="toggleMonthlyIncomeFields()">
             <option value="" disabled selected>Select</option>
@@ -780,7 +572,7 @@
 
     <div id="question8" style = "display:none">
 <center><div id="box">
-<p style="text-align: left;"><u> Slide 7</u></p>
+<h1 style="color: #2c3e50;"><u>Living Conditions</u></h1><br><br>
     <p><strong>Do you have anybody else living in your home?</strong></p>
     <select id="hasDependents" name="hasDependents" required onchange="toggleDependencyFields()">
         <option value="" disabled selected>Select</option>
@@ -832,7 +624,7 @@
 
 <div id="question9" style = "display:none">
 <center><div id="box">
-	<p style="text-align: left;"><u> Slide 8</u></p>
+	<h1 style="color: #2c3e50;"><u>Financials</u></h1><br><br>
     <p><strong>Do you have any cash savings?</strong></p>
 	
 
@@ -876,7 +668,7 @@
 	<br><br>
 </div>
 </div>
-<br><br>
+
 </div>
 
 
@@ -884,7 +676,7 @@
 
 <div id="question10" style = "display:none">
 <center><div id="box">
-<p style="text-align: left;"><u> Slide 9</u></p>
+<h1 style="color: #2c3e50;"><u>Assets Owned</u></h1><br><br>
     <p><strong>Do you own any cars, boats, and other vehicles:</strong></p>
     <select id="hasVehicles" name="hasVehicles" required onchange="toggleVehicleFields()">
         <option value="" disabled selected>Select?</option>
@@ -915,7 +707,7 @@
 
 <div id="question11" style = "display:none">
 <center><div id="box">
-<p style="text-align: left;"><u> Slide 10</u></p>
+<h1 style="color: #2c3e50;"><u>Real Estate Assets</u></h1><br><br>
     <p><strong>Do you own any real estate:</strong></p>
     <select id="hasRealEstate" name="hasRealEstate" required onchange="toggleRealEstateFields()">
         <option value="" disabled selected>Select</option>
@@ -944,7 +736,7 @@
 
 <div id="question12" style = "display:none">
 <center><div id="box">
-<p style="text-align: left;"><u> Slide 11</u></p>
+<h1 style="color: #2c3e50;"><u>Personal Property</u></h1><br><br>
     <p><strong>Do you own any other personal property?</strong></p>
     <select id="hasPersonalProperty" name="hasPersonalProperty" required onchange="togglePersonalPropertyFields()">
         <option value="" disabled selected>Select</option>
@@ -973,7 +765,7 @@
 
 <div id="question13" style = "display:none">
 <center><div id="box">
-<p style="text-align: left;"><u> Slide 12</u></p>
+<h1 style="color: #2c3e50;"><u>Payroll Deductions</u></h1><br><br>
     <p><strong>Do you have any payroll deductions?</strong></p>
     <select id="hasPayrollDeductions" name="hasPayrollDeductions" required onchange="togglePayrollDeductionFields()">
         <option value="" disabled selected>Select</option>
@@ -1002,10 +794,12 @@
 <div id="question14" style = "display:none">
 
 <center><div id="box">
-<p style="text-align: left;"><u> Slide 13</u></p>
-    <p><strong>Mark All Monthly Deductions and Expenses:</strong></p>
+
+<h1 style="color: #2c3e50;"><u>Monthly Deductions & Expenses</u></h1><br><p><strong>Mark All That Apply:</strong></p><br>
+
+    
 	
-<div id="deductions">
+<div id="benifits">
     <label class="checkbox-label">
         <input type="checkbox" id="rent_expense_check" onchange="toggleField('rent_expense')"> Rent or house payment & maintenance:
         <input type="text" id="rent_expense" name="rent_expense" placeholder="Amount" style="display:none;">
@@ -1065,7 +859,7 @@
 	
 	<div id="question15" style = "display:none">
 	<center><div id="box">
-	<p style="text-align: left;"><u> Slide 14</u></p>
+	<h1 style="color: #2c3e50;"><u>Payment Installments</u></h1><br><br>
     <p><strong>Do you have any installment payments?</strong></p>
     <select id="hasInstallments" name="hasInstallments" required onchange="toggleInstallmentFields()">
         <option value="" disabled selected>Select</option>
@@ -1093,7 +887,7 @@
 
 <div id="question16" style = "display:none">
 <center><div id="box">
-<p style="text-align: left;"><u> Slide 15</u></p>
+<h1 style="color: #2c3e50;"><u>Wage Garnishments</u></h1><br><br>
     <p><strong>Do you have any wages/earnings withheld by the court:</strong></p>
 	
     <select id="hasWithheldEarnings" name="hasWithheldEarnings" required onchange="toggleWithheldEarningsField()">
@@ -1110,7 +904,7 @@
 
 <div id="question17" style = "display:none">
 <center><div id="box">
-<p style="text-align: left;"><u> Slide 16</u></p>
+<h1 style="color: #2c3e50;"><u>Other Expenses</u></h1><br><br>
     <p><strong>Do you have any other monthly expenses?</strong></p>
 	
     <select id="hasOtherExpenses" name="hasOtherExpenses" required onchange="toggleOtherExpenses()">
@@ -1138,9 +932,9 @@
 
 
 <div id="question18" style = "display:none">
-<p style="text-align: left;"><u> Slide 17</u></p>
-                <center><div id="box">
 
+                <center><div id="box">
+<h1 style="color: #2c3e50;"><u>CA Court Actions</u></h1><br><br>
 
                 <p><strong>Have you had, or currently have any pending filed actions with any court in CA?</strong></p> 
                 <select id="PendingActions" name="PendingActions" required onchange="togglePendingActions()">
@@ -1184,10 +978,12 @@
 
 <div id="question19" style = "display:none">
 <center><div id="box">
-    <p><strong>You're all done!</strong></p>
-    <button class="next-button" type="button" onclick="editPDF()"> Download From </h1></button>
+    <h1 style="color: #2c3e50;"><u>You're Done</u></h1><br><br>
+	
+	
+    <button class="done-button" type="button" onclick="editPDF()"> Download From </h1></button>
 	<br><br>
-	<button class="next-button" type="button" onclick="restart()"> Review Answers </h1></button>
+	<button class="done-button" type="button" onclick="restart()"> Review Answers </h1></button>
 	<br><br>
 </div>
 </div>
@@ -1203,7 +999,9 @@
 </div>
 
 
-
+<footer>
+        <p>&copy; 2024 FormWiz. All rights reserved.</p>
+    </footer>
 
 
         
@@ -1214,9 +1012,16 @@
 
 </div>
 
-<div class="footer">
-        © 2024 Form Wiz. All rights reserved.
-    </div>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
 <script>
 
