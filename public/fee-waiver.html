@@ -285,6 +285,57 @@
     transform: translateX(-50%);
 }
 
+.info-icon {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    background-color: grey;
+    color: white;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 12px;
+    line-height: 15px;
+    cursor: pointer;
+    margin-left: 10px;
+    position: relative;
+}
+
+.info-icon:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 210%; /* Position to the right of the icon */
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.75);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    white-space: normal; /* Allows text to wrap */
+    font-size: 12px;
+    z-index: 100;
+    opacity: 1;
+    visibility: visible;
+    width: 450px; /* Fixed width for the tooltip */
+    max-width: 450px; /* Ensure tooltip does not exceed this width */
+    box-sizing: border-box; /* Ensure padding is included in width */
+}
+
+.info-icon:hover::before {
+    content: '';
+    position: absolute;
+    left: 100%; /* Position arrow directly on the right edge */
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent rgba(0, 0, 0, 0.75);
+    z-index: 100;
+    opacity: 1;
+    visibility: visible;
+}
+
+
+
 
 footer {
             text-align: center;
@@ -396,9 +447,13 @@ footer {
                             <h1 style="color: #2c3e50;"><u>Demographics</u></h1><br><br>
 
                             <form id="userForm">
-                                <p><strong>What's your full name?</strong></p>
-                                <input type="text" id="PetitionerName1[0]" name="PetitionerName1[0]" placeholder="Full name" required>
-                                <br><br>
+                                <p><strong>What's your full name?</strong>
+								<span class="info-icon" data-tooltip="Please enter your full legal name exactly as it appears on your passport. This should include your first name, middle name(s), and last name, ensuring that all spelling and punctuation match your legal documents.">i</span>
+								</p>
+								<input type="text" id="PetitionerName1[0]" name="PetitionerName1[0]" placeholder="Full name" required>
+
+								
+								<br><br>
 
                                 <p><strong>What's your email? <br> <br><br> </strong> (Email will be linked to your account for future forms)</strong></p>
                                 <input type="email" id="email" name="email" placeholder="Email" required>
@@ -475,7 +530,7 @@ footer {
 
     <div id="question4" style = "display:none">
         <center><div id="box">
-        <h1 style="color: #2c3e50;"><u>Qualified Assistance</u></h1><br><br>
+        <h1 style="color: #2c3e50;"><u>Qualified Assistance</u></h1><br>
         <p><strong>Do you receive any of these benifits: </strong></p>
 		<p><strong>(Mark all that apply) </strong></p>
 		
