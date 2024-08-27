@@ -7,7 +7,8 @@ function addSection() {
     sectionBlock.className = 'section-block';
     sectionBlock.id = `sectionBlock${sectionCounter}`;
     sectionBlock.innerHTML = `
-        <h2>Section ${sectionCounter}</h2>
+        <label for="sectionName${sectionCounter}">Section Name: </label>
+        <input type="text" id="sectionName${sectionCounter}" placeholder="Enter section name"><br><br>
         <div id="questionsSection${sectionCounter}"></div>
         <button type="button" onclick="addQuestion(${sectionCounter})">Add Question to Section ${sectionCounter}</button>
         <button type="button" onclick="removeSection(${sectionCounter})">Remove Section</button>
@@ -23,7 +24,7 @@ function addQuestion(sectionId) {
     questionBlock.className = 'question-block';
     questionBlock.id = `questionBlock${questionCounter}`;
     questionBlock.innerHTML = `
-        <label>Question ${questionCounter}: </label>
+        <label>Question ${getQuestionNumber(sectionId)}: </label>
         <input type="text" placeholder="Enter your question" id="question${questionCounter}"><br><br>
         
         <label>Question Type: </label>
@@ -83,20 +84,28 @@ function addQuestion(sectionId) {
             </div>
         </div><br>
 
-        <button type="button" onclick="removeQuestion(${questionCounter})">Remove Question</button>
+        <button type="button" onclick="removeQuestion(${sectionId}, ${questionCounter})">Remove Question</button>
     `;
     questionsSection.appendChild(questionBlock);
-
-    // ** Populate Jump Logic Options for Yes/No Type **
-    if (document.getElementById(`questionType${questionCounter}`).value === 'radio') {
-        const jumpOptionSelect = document.getElementById(`jumpOption${questionCounter}`);
-        jumpOptionSelect.innerHTML = `
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-        `;
-    }
-
     questionCounter++;
+
+    updateQuestionNumbers(sectionId);
+}
+
+function getQuestionNumber(sectionId) {
+    const sectionBlock = document.getElementById(`sectionBlock${sectionId}`);
+    const questions = sectionBlock.querySelectorAll('.question-block');
+    return questions.length + 1;
+}
+
+function updateQuestionNumbers(sectionId) {
+    const sectionBlock = document.getElementById(`sectionBlock${sectionId}`);
+    const questions = sectionBlock.querySelectorAll('.question-block');
+
+    questions.forEach((questionBlock, index) => {
+        const label = questionBlock.querySelector('label');
+        label.textContent = `Question ${index + 1}: `;
+    });
 }
 
 function toggleOptions(questionId) {
@@ -134,6 +143,20 @@ function toggleOptions(questionId) {
 function removeSection(sectionId) {
     const sectionBlock = document.getElementById(`sectionBlock${sectionId}`);
     sectionBlock.remove();
+    updateSectionNumbers();
+}
+
+function updateSectionNumbers() {
+    const sections = document.querySelectorAll('.section-block');
+
+    sections.forEach((sectionBlock, index) => {
+        const sectionLabel = sectionBlock.querySelector('h2');
+        if (sectionLabel) sectionLabel.textContent = `Section ${index + 1}`;
+        sectionBlock.id = `sectionBlock${index + 1}`;
+        updateQuestionNumbers(index + 1);
+    });
+
+    sectionCounter = sections.length + 1;
 }
 
 function toggleLogic(questionId) {
@@ -225,9 +248,10 @@ function removeTextboxLabel(questionId, labelNumber) {
     labelDiv.remove();
 }
 
-function removeQuestion(questionId) {
+function removeQuestion(sectionId, questionId) {
     const questionBlock = document.getElementById(`questionBlock${questionId}`);
     questionBlock.remove();
+    updateQuestionNumbers(sectionId);
 }
 
 function generateAndDownloadForm() {
@@ -336,8 +360,10 @@ function generateAndDownloadForm() {
         const sectionBlock = document.getElementById(`sectionBlock${s}`);
         if (!sectionBlock) continue;
 
+        const sectionName = document.getElementById(`sectionName${s}`).value || `Section ${s}`;
+
         formHTML += `<div id="section${s}" class="section${s === 1 ? ' active' : ''}">`;
-        formHTML += `<h2>Section ${s}</h2>`;
+        formHTML += `<h2>${sectionName}</h2>`;
 
         const questionsSection = sectionBlock.querySelectorAll('.question-block');
         questionsSection.forEach((questionBlock) => {
@@ -603,8 +629,10 @@ function previewForm() {
         const sectionBlock = document.getElementById(`sectionBlock${s}`);
         if (!sectionBlock) continue;
 
+        const sectionName = document.getElementById(`sectionName${s}`).value || `Section ${s}`;
+
         formHTML += `<div id="section${s}" class="section${s === 1 ? ' active' : ''}">`;
-        formHTML += `<h2>Section ${s}</h2>`;
+        formHTML += `<h2>${sectionName}</h2>`;
 
         const questionsSection = sectionBlock.querySelectorAll('.question-block');
         questionsSection.forEach((questionBlock) => {
