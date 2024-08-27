@@ -34,6 +34,7 @@ function addQuestion(sectionId) {
             <option value="dropdown">Dropdown</option>
             <option value="checkbox">Checkbox</option>
             <option value="numberedDropdown">Numbered Dropdown</option>
+            <option value="address">Address</option>
         </select><br><br>
 
         <div id="optionsBlock${questionCounter}" class="dropdown-options" style="display: none;">
@@ -128,15 +129,8 @@ function toggleOptions(questionId) {
     } else if (questionType === 'numberedDropdown') {
         numberedDropdownBlock.style.display = 'block';
         jumpLogicContainer.style.display = 'none'; // Hide the jump logic for numbered dropdown type
-    }
-
-    // ** Populate Jump Logic Options for Yes/No Type **
-    if (questionType === 'radio') {
-        const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
-        jumpOptionSelect.innerHTML = `
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-        `;
+    } else if (questionType === 'address') {
+        jumpLogicContainer.style.display = 'none'; // Hide the jump logic for address type
     }
 }
 
@@ -437,6 +431,19 @@ function generateAndDownloadForm() {
                         }
                     }
                 <\/script>`;
+            } else if (questionType === 'address') {
+                formHTML += `
+                    <label for="street${questionId}">Street:</label>
+                    <input type="text" id="street${questionId}" name="street${questionId}"><br><br>
+                    <label for="city${questionId}">City:</label>
+                    <input type="text" id="city${questionId}" name="city${questionId}"><br><br>
+                    <label for="county${questionId}">County:</label>
+                    <input type="text" id="county${questionId}" name="county${questionId}"><br><br>
+                    <label for="state${questionId}">State:</label>
+                    <input type="text" id="state${questionId}" name="state${questionId}"><br><br>
+                    <label for="zip${questionId}">Zip:</label>
+                    <input type="text" id="zip${questionId}" name="zip${questionId}"><br><br>
+                `;
             }
 
             formHTML += `</div>`; // End question block
@@ -471,7 +478,11 @@ function generateAndDownloadForm() {
             formHTML += `<button type="button" onclick="navigateSection(${s - 1})">Back</button>`;
         }
 
-        formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
+        if (s === sectionCounter - 1) {
+            formHTML += `<button type="submit">Submit</button>`;
+        } else {
+            formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
+        }
 
         formHTML += `</div>`;
 
@@ -693,6 +704,19 @@ function previewForm() {
                         }
                     }
                 <\/script>`;
+            } else if (questionType === 'address') {
+                formHTML += `
+                    <label for="street${questionId}">Street:</label>
+                    <input type="text" id="street${questionId}" name="street${questionId}"><br><br>
+                    <label for="city${questionId}">City:</label>
+                    <input type="text" id="city${questionId}" name="city${questionId}"><br><br>
+                    <label for="county${questionId}">County:</label>
+                    <input type="text" id="county${questionId}" name="county${questionId}"><br><br>
+                    <label for="state${questionId}">State:</label>
+                    <input type="text" id="state${questionId}" name="state${questionId}"><br><br>
+                    <label for="zip${questionId}">Zip:</label>
+                    <input type="text" id="zip${questionId}" name="zip${questionId}"><br><br>
+                `;
             }
 
             // Add logic to show or hide the question based on previous answers
@@ -735,7 +759,11 @@ function previewForm() {
             formHTML += `<button type="button" onclick="navigateSection(${s - 1})">Back</button>`;
         }
 
-        formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
+        if (s === sectionCounter - 1) {
+            formHTML += `<button type="submit">Submit</button>`;
+        } else {
+            formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
+        }
 
         formHTML += `</div>`;
 
