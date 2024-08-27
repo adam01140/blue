@@ -50,7 +50,6 @@
     <script>
         let sectionCounter = 1;
         let questionCounter = 1;
-        let jumpTarget = null; // Ensure jumpTarget is defined globally
 
         function addSection() {
             const formBuilder = document.getElementById('formBuilder');
@@ -253,6 +252,8 @@
             <body>
                 <form id="customForm" onsubmit="return showThankYouMessage();">
             `;
+
+            formHTML += `<script>let jumpTarget = null;<\/script>`;  // Initialize jumpTarget globally
 
             for (let s = 1; s < sectionCounter; s++) {
                 const sectionBlock = document.getElementById(`sectionBlock${s}`);
