@@ -18,33 +18,30 @@
             <a href="contact.html">Contact Us</a>
         </nav>
     </header>
-	
-	<center>
-<h1>FormWiz Dveloper GUI</h1>
-
-    <section>
-        
-        <div class="container">
-            <div id="formBuilder">
-                
-            </div>
-			<button onclick="addSection()">Add Section</button>
-            <button onclick="generateAndDownloadForm()">Download Form as HTML</button>
-            <button onclick="previewForm()">Preview Form</button>
-        </div>
-    </section>
-	
-	<br>
-
-    <!-- Footer section -->
-    <footer>
-        &copy; 2024 Custom Form Builder. All rights reserved.
-    </footer>
-	
-	
-	<script src="gui.js"></script>
-	
-	
     
+    <center>
+        <h1>FormWiz Developer GUI</h1>
+
+        <section>
+            <div class="container">
+                <div id="formBuilder"></div>
+                <button onclick="addSection()">Add Section</button>
+                <button onclick="generateAndDownloadForm()">Download Form as HTML</button>
+                <button onclick="previewForm()">Preview Form</button>
+                <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importForm(event)">
+                <button onclick="document.getElementById('importFileInput').click();">Import Form</button>
+                <button onclick="exportForm()">Export Form as JSON</button>
+            </div>
+        </section>
+    
+        <br>
+
+        <!-- Footer section -->
+        <footer>
+            &copy; 2024 Custom Form Builder. All rights reserved.
+        </footer>
+    </center>
+
+    <script src="gui.js"></script>
 </body>
 </html>

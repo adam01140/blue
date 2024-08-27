@@ -917,3 +917,189 @@ function downloadHTML(content, filename) {
     a.click();
     URL.revokeObjectURL(url);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function importForm(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        const formData = JSON.parse(e.target.result);
+        loadForm(formData);
+    };
+    
+    if (file) {
+        reader.readAsText(file);
+    }
+}
+
+function loadForm(formData) {
+    // Reset the form builder
+    document.getElementById('formBuilder').innerHTML = '';
+    sectionCounter = 1;
+    questionCounter = 1;
+    globalQuestionCounter = 1;
+    
+    formData.sections.forEach(section => {
+        addSection();  // Add a new section
+        const currentSectionId = sectionCounter - 1;  // Get the latest section ID
+        
+        // Set section name
+        document.getElementById(`sectionName${currentSectionId}`).value = section.sectionName;
+        
+        // Load questions into the section
+        section.questions.forEach(question => {
+            addQuestion(currentSectionId);
+            const currentQuestionId = globalQuestionCounter - 1;  // Get the latest question ID
+            
+            document.getElementById(`question${currentQuestionId}`).value = question.questionText;
+            document.getElementById(`questionType${currentQuestionId}`).value = question.questionType;
+            toggleOptions(currentQuestionId);  // Ensure the correct options are shown
+            
+            // Handle specific question types
+            if (question.questionType === 'dropdown' || question.questionType === 'checkbox') {
+                question.options.forEach((option, index) => {
+                    if (question.questionType === 'dropdown') {
+                        addDropdownOption(currentQuestionId);
+                        document.getElementById(`option${currentQuestionId}_${index + 1}`).value = option;
+                    } else if (question.questionType === 'checkbox') {
+                        addCheckboxOption(currentQuestionId);
+                        document.getElementById(`checkboxOption${currentQuestionId}_${index + 1}`).value = option;
+                    }
+                });
+            } else if (question.questionType === 'numberedDropdown') {
+                document.getElementById(`numberRangeStart${currentQuestionId}`).value = question.rangeStart;
+                document.getElementById(`numberRangeEnd${currentQuestionId}`).value = question.rangeEnd;
+                question.labels.forEach((label, index) => {
+                    addTextboxLabel(currentQuestionId);
+                    document.getElementById(`label${currentQuestionId}_${index + 1}`).value = label;
+                });
+            }
+            
+            // Handle conditional logic
+            if (question.logicEnabled) {
+                document.getElementById(`logic${currentQuestionId}`).checked = true;
+                toggleLogic(currentQuestionId);
+                document.getElementById(`prevQuestion${currentQuestionId}`).value = question.logic.prevQuestion;
+                document.getElementById(`prevAnswer${currentQuestionId}`).value = question.logic.prevAnswer;
+            }
+            
+            if (question.checkboxLogicEnabled) {
+                document.getElementById(`checkboxLogic${currentQuestionId}`).checked = true;
+                toggleCheckboxLogic(currentQuestionId);
+                document.getElementById(`checkboxPrevQuestion${currentQuestionId}`).value = question.checkboxLogic.prevQuestion;
+                document.getElementById(`checkboxOptionNumber${currentQuestionId}`).value = question.checkboxLogic.optionNumber;
+            }
+            
+            // Handle jump logic
+            if (question.jumpLogicEnabled) {
+                document.getElementById(`enableJump${currentQuestionId}`).checked = true;
+                toggleJumpLogic(currentQuestionId);
+                document.getElementById(`jumpOption${currentQuestionId}`).value = question.jumpLogic.option;
+                document.getElementById(`jumpTo${currentQuestionId}`).value = question.jumpLogic.jumpTo;
+            }
+        });
+    });
+}
+
+function exportForm() {
+    const formData = {
+        sections: []
+    };
+    
+    for (let s = 1; s < sectionCounter; s++) {
+        const sectionBlock = document.getElementById(`sectionBlock${s}`);
+        if (!sectionBlock) continue;
+
+        const sectionName = document.getElementById(`sectionName${s}`).value;
+        const questionsSection = sectionBlock.querySelectorAll('.question-block');
+        
+        const sectionData = {
+            sectionName,
+            questions: []
+        };
+
+        questionsSection.forEach(questionBlock => {
+            const questionId = questionBlock.id.replace('questionBlock', '');
+            const questionText = document.getElementById(`question${questionId}`).value;
+            const questionType = document.getElementById(`questionType${questionId}`).value;
+            
+            const questionData = {
+                questionText,
+                questionType,
+                options: [],
+                logicEnabled: document.getElementById(`logic${questionId}`).checked,
+                checkboxLogicEnabled: document.getElementById(`checkboxLogic${questionId}`).checked,
+                jumpLogicEnabled: document.getElementById(`enableJump${questionId}`).checked
+            };
+            
+            if (questionType === 'dropdown') {
+                const options = document.querySelectorAll(`#dropdownOptions${questionId} input`);
+                options.forEach(option => {
+                    questionData.options.push(option.value);
+                });
+            } else if (questionType === 'checkbox') {
+                const options = document.querySelectorAll(`#checkboxOptions${questionId} input`);
+                options.forEach(option => {
+                    questionData.options.push(option.value);
+                });
+            } else if (questionType === 'numberedDropdown') {
+                questionData.rangeStart = document.getElementById(`numberRangeStart${questionId}`).value;
+                questionData.rangeEnd = document.getElementById(`numberRangeEnd${questionId}`).value;
+                questionData.labels = [];
+                const labels = document.querySelectorAll(`#textboxLabels${questionId} input`);
+                labels.forEach(label => {
+                    questionData.labels.push(label.value);
+                });
+            }
+
+            if (questionData.logicEnabled) {
+                questionData.logic = {
+                    prevQuestion: document.getElementById(`prevQuestion${questionId}`).value,
+                    prevAnswer: document.getElementById(`prevAnswer${questionId}`).value
+                };
+            }
+
+            if (questionData.checkboxLogicEnabled) {
+                questionData.checkboxLogic = {
+                    prevQuestion: document.getElementById(`checkboxPrevQuestion${questionId}`).value,
+                    optionNumber: document.getElementById(`checkboxOptionNumber${questionId}`).value
+                };
+            }
+
+            if (questionData.jumpLogicEnabled) {
+                questionData.jumpLogic = {
+                    option: document.getElementById(`jumpOption${questionId}`).value,
+                    jumpTo: document.getElementById(`jumpTo${questionId}`).value
+                };
+            }
+
+            sectionData.questions.push(questionData);
+        });
+        
+        formData.sections.push(sectionData);
+    }
+
+    const formJson = JSON.stringify(formData, null, 2);
+    const blob = new Blob([formJson], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "custom_form.json";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
