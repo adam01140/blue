@@ -26,11 +26,13 @@
             <div class="container">
                 <div id="formBuilder"></div>
                 <button onclick="addSection()">Add Section</button>
-                <button onclick="generateAndDownloadForm()">Download Form as HTML</button>
-                <button onclick="previewForm()">Preview Form</button>
+				<br>
+                <button onclick="generateAndDownloadForm()">Download Form HTML</button>
+                <button onclick="previewForm()">Preview Form HTML</button>
+				<br>
                 <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importForm(event)">
-                <button onclick="document.getElementById('importFileInput').click();">Import Form</button>
-                <button onclick="exportForm()">Export Form as JSON</button>
+                <button onclick="document.getElementById('importFileInput').click();">Import Form Json</button>
+                <button onclick="exportForm()">Export Form JSON</button>
             </div>
         </section>
     
