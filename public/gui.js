@@ -1,5 +1,6 @@
 let sectionCounter = 1;
 let questionCounter = 1;
+let globalQuestionCounter = 1;
 
 function addSection() {
     const formBuilder = document.getElementById('formBuilder');
@@ -22,13 +23,13 @@ function addQuestion(sectionId) {
     const questionsSection = document.getElementById(`questionsSection${sectionId}`);
     const questionBlock = document.createElement('div');
     questionBlock.className = 'question-block';
-    questionBlock.id = `questionBlock${questionCounter}`;
+    questionBlock.id = `questionBlock${globalQuestionCounter}`;
     questionBlock.innerHTML = `
-        <label>Question ${getQuestionNumber(sectionId)}: </label>
-        <input type="text" placeholder="Enter your question" id="question${questionCounter}"><br><br>
+        <label>Question ${globalQuestionCounter}: </label>
+        <input type="text" placeholder="Enter your question" id="question${globalQuestionCounter}"><br><br>
         
         <label>Question Type: </label>
-        <select id="questionType${questionCounter}" onchange="toggleOptions(${questionCounter})">
+        <select id="questionType${globalQuestionCounter}" onchange="toggleOptions(${globalQuestionCounter})">
             <option value="text">Text</option>
             <option value="radio">Yes/No</option>
             <option value="dropdown">Dropdown</option>
@@ -37,76 +38,81 @@ function addQuestion(sectionId) {
             <option value="address">Address</option>
         </select><br><br>
 
-        <div id="optionsBlock${questionCounter}" class="dropdown-options" style="display: none;">
+        <div id="optionsBlock${globalQuestionCounter}" class="dropdown-options" style="display: none;">
             <label>Options: </label>
-            <div id="dropdownOptions${questionCounter}"></div>
-            <button type="button" onclick="addDropdownOption(${questionCounter})">Add Option</button>
+            <div id="dropdownOptions${globalQuestionCounter}"></div>
+            <button type="button" onclick="addDropdownOption(${globalQuestionCounter})">Add Option</button>
         </div><br>
 
-        <div id="checkboxBlock${questionCounter}" class="checkbox-options" style="display: none;">
+        <div id="checkboxBlock${globalQuestionCounter}" class="checkbox-options" style="display: none;">
             <label>Checkbox Options: </label>
-            <div id="checkboxOptions${questionCounter}"></div>
-            <button type="button" onclick="addCheckboxOption(${questionCounter})">Add Option</button>
+            <div id="checkboxOptions${globalQuestionCounter}"></div>
+            <button type="button" onclick="addCheckboxOption(${globalQuestionCounter})">Add Option</button>
         </div><br>
 
-        <div id="numberedDropdownBlock${questionCounter}" class="numbered-dropdown-options" style="display: none;">
+        <div id="numberedDropdownBlock${globalQuestionCounter}" class="numbered-dropdown-options" style="display: none;">
             <label>Number Range: </label>
-            <input type="number" id="numberRangeStart${questionCounter}" placeholder="Start" min="1" style="width: 60px;">
-            <input type="number" id="numberRangeEnd${questionCounter}" placeholder="End" min="1" style="width: 60px;"><br><br>
+            <input type="number" id="numberRangeStart${globalQuestionCounter}" placeholder="Start" min="1" style="width: 60px;">
+            <input type="number" id="numberRangeEnd${globalQuestionCounter}" placeholder="End" min="1" style="width: 60px;"><br><br>
             <label>Textbox Labels:</label>
-            <div id="textboxLabels${questionCounter}"></div>
-            <button type="button" onclick="addTextboxLabel(${questionCounter})">Add Label</button>
+            <div id="textboxLabels${globalQuestionCounter}"></div>
+            <button type="button" onclick="addTextboxLabel(${globalQuestionCounter})">Add Label</button>
         </div><br>
 
-        <label>Conditional Logic: </label><br>
-        <input type="checkbox" id="logic${questionCounter}" onchange="toggleLogic(${questionCounter})">
-        <label for="logic${questionCounter}">Enable Logic</label><br><br>
+        <label>Conditional Yes/No Logic: </label><br>
+        <input type="checkbox" id="logic${globalQuestionCounter}" onchange="toggleLogic(${globalQuestionCounter})">
+        <label for="logic${globalQuestionCounter}">Enable Yes/No Logic</label><br><br>
 
-        <div id="logicBlock${questionCounter}" style="display: none;">
+        <div id="logicBlock${globalQuestionCounter}" style="display: none;">
             <label>Show this question if: </label><br>
-            <input type="number" placeholder="Previous question number" id="prevQuestion${questionCounter}"><br>
-            <select id="prevAnswer${questionCounter}">
+            <input type="number" placeholder="Previous question number" id="prevQuestion${globalQuestionCounter}"><br>
+            <select id="prevAnswer${globalQuestionCounter}">
                 <option value="yes">Answer is Yes</option>
                 <option value="no">Answer is No</option>
             </select>
         </div><br>
 
-        <div id="jumpLogicContainer${questionCounter}">
+        <label>Checkbox Conditional Logic: </label><br>
+        <input type="checkbox" id="checkboxLogic${globalQuestionCounter}" onchange="toggleCheckboxLogic(${globalQuestionCounter})">
+        <label for="checkboxLogic${globalQuestionCounter}">Enable Checkbox Logic</label><br><br>
+
+        <div id="checkboxLogicBlock${globalQuestionCounter}" style="display: none;">
+            <label>Show this question if a checkbox from a previous question is checked: </label><br>
+            <input type="number" placeholder="Previous question number" id="checkboxPrevQuestion${globalQuestionCounter}"><br>
+            <input type="number" placeholder="Checkbox option number" id="checkboxOptionNumber${globalQuestionCounter}"><br>
+        </div><br>
+
+        <div id="jumpLogicContainer${globalQuestionCounter}">
             <label>Jump Logic: </label><br>
-            <input type="checkbox" id="enableJump${questionCounter}" onchange="toggleJumpLogic(${questionCounter})">
-            <label for="enableJump${questionCounter}">Enable Jump Logic</label><br><br>
-            <div id="jumpBlock${questionCounter}" style="display: none;">
+            <input type="checkbox" id="enableJump${globalQuestionCounter}" onchange="toggleJumpLogic(${globalQuestionCounter})">
+            <label for="enableJump${globalQuestionCounter}">Enable Jump Logic</label><br><br>
+            <div id="jumpBlock${globalQuestionCounter}" style="display: none;">
                 <label>Select the option that triggers the jump:</label><br>
-                <select id="jumpOption${questionCounter}">
+                <select id="jumpOption${globalQuestionCounter}">
                     <!-- Options will be populated dynamically based on the question type -->
                 </select><br><br>
                 <label>Jump to (enter section number or 'end'):</label><br>
-                <input type="text" placeholder="Section number or 'end'" id="jumpTo${questionCounter}"><br>
+                <input type="text" placeholder="Section number or 'end'" id="jumpTo${globalQuestionCounter}"><br>
             </div>
         </div><br>
 
-        <button type="button" onclick="removeQuestion(${sectionId}, ${questionCounter})">Remove Question</button>
+        <button type="button" onclick="removeQuestion(${sectionId}, ${globalQuestionCounter})">Remove Question</button>
     `;
     questionsSection.appendChild(questionBlock);
+    globalQuestionCounter++;
     questionCounter++;
 
-    updateQuestionNumbers(sectionId);
+    updateQuestionNumbers();
 }
 
-function getQuestionNumber(sectionId) {
-    const sectionBlock = document.getElementById(`sectionBlock${sectionId}`);
-    const questions = sectionBlock.querySelectorAll('.question-block');
-    return questions.length + 1;
-}
-
-function updateQuestionNumbers(sectionId) {
-    const sectionBlock = document.getElementById(`sectionBlock${sectionId}`);
-    const questions = sectionBlock.querySelectorAll('.question-block');
-
+function updateQuestionNumbers() {
+    const questions = document.querySelectorAll('.question-block');
     questions.forEach((questionBlock, index) => {
         const label = questionBlock.querySelector('label');
         label.textContent = `Question ${index + 1}: `;
+        questionBlock.id = `questionBlock${index + 1}`;
     });
+    globalQuestionCounter = questions.length + 1;
 }
 
 function toggleOptions(questionId) {
@@ -147,16 +153,22 @@ function updateSectionNumbers() {
         const sectionLabel = sectionBlock.querySelector('h2');
         if (sectionLabel) sectionLabel.textContent = `Section ${index + 1}`;
         sectionBlock.id = `sectionBlock${index + 1}`;
-        updateQuestionNumbers(index + 1);
     });
 
     sectionCounter = sections.length + 1;
+    updateQuestionNumbers();
 }
 
 function toggleLogic(questionId) {
     const logicEnabled = document.getElementById(`logic${questionId}`).checked;
     const logicBlock = document.getElementById(`logicBlock${questionId}`);
     logicBlock.style.display = logicEnabled ? 'block' : 'none';
+}
+
+function toggleCheckboxLogic(questionId) {
+    const checkboxLogicEnabled = document.getElementById(`checkboxLogic${questionId}`).checked;
+    const checkboxLogicBlock = document.getElementById(`checkboxLogicBlock${questionId}`);
+    checkboxLogicBlock.style.display = checkboxLogicEnabled ? 'block' : 'none';
 }
 
 function toggleJumpLogic(questionId) {
@@ -245,7 +257,21 @@ function removeTextboxLabel(questionId, labelNumber) {
 function removeQuestion(sectionId, questionId) {
     const questionBlock = document.getElementById(`questionBlock${questionId}`);
     questionBlock.remove();
-    updateQuestionNumbers(sectionId);
+    updateQuestionNumbers();
+}
+
+function isSectionEmpty(sectionId) {
+    const sectionBlock = document.getElementById(`sectionBlock${sectionId}`);
+    const questions = sectionBlock.querySelectorAll('.question-block');
+    let visibleQuestions = 0;
+
+    questions.forEach(questionBlock => {
+        if (questionBlock.style.display !== 'none') {
+            visibleQuestions++;
+        }
+    });
+
+    return visibleQuestions === 0;
 }
 
 function generateAndDownloadForm() {
@@ -348,11 +374,27 @@ function generateAndDownloadForm() {
                 <form id="customForm" onsubmit="return showThankYouMessage();">
     `;
 
-    formHTML += `<script>let jumpTarget = null;<\/script>`;  // Initialize jumpTarget globally
+    formHTML += `<script>
+    let jumpTarget = null;
+
+    function isSectionEmpty(sectionId) {
+        const sectionBlock = document.getElementById('section' + sectionId);
+        const questions = sectionBlock.querySelectorAll('.question-block');
+        let visibleQuestions = 0;
+
+        questions.forEach(questionBlock => {
+            if (questionBlock.style.display !== 'none') {
+                visibleQuestions++;
+            }
+        });
+
+        return visibleQuestions === 0;
+    }
+    </script>`;
 
     for (let s = 1; s < sectionCounter; s++) {
         const sectionBlock = document.getElementById(`sectionBlock${s}`);
-        if (!sectionBlock) continue;
+        if (!sectionBlock || isSectionEmpty(s)) continue;
 
         const sectionName = document.getElementById(`sectionName${s}`).value || `Section ${s}`;
 
@@ -367,6 +409,9 @@ function generateAndDownloadForm() {
             const logicEnabled = questionBlock.querySelector(`#logic${questionId}`).checked;
             const prevQuestion = questionBlock.querySelector(`#prevQuestion${questionId}`).value;
             const prevAnswer = questionBlock.querySelector(`#prevAnswer${questionId}`).value;
+            const checkboxLogicEnabled = questionBlock.querySelector(`#checkboxLogic${questionId}`).checked;
+            const checkboxPrevQuestion = questionBlock.querySelector(`#checkboxPrevQuestion${questionId}`).value;
+            const checkboxOptionNumber = questionBlock.querySelector(`#checkboxOptionNumber${questionId}`).value;
 
             formHTML += `<div id="question${questionId}" class="question-block">`;
             formHTML += `<label>${questionText}</label><br>`;
@@ -469,6 +514,23 @@ function generateAndDownloadForm() {
                 <\/script>`;
             }
 
+            // Add logic to show or hide the question based on previous checkbox selection
+            if (checkboxLogicEnabled && checkboxPrevQuestion && checkboxOptionNumber) {
+                formHTML += `
+                <script>
+                    const question${questionId} = document.getElementById('question${questionId}');
+                    question${questionId}.style.display = 'none';
+                    const checkboxElement = document.getElementById('answer${checkboxPrevQuestion}_${checkboxOptionNumber}');
+                    checkboxElement.addEventListener('change', function() {
+                        if (this.checked) {
+                            question${questionId}.style.display = 'block';
+                        } else {
+                            question${questionId}.style.display = 'none';
+                        }
+                    });
+                <\/script>`;
+            }
+
         });
 
         formHTML += `
@@ -500,14 +562,11 @@ function generateAndDownloadForm() {
         <script>
             function handleNext(currentSection) {
                 const nextSection = currentSection + 1;
-                const isEmpty = window['isSection' + nextSection + 'Empty'];
-                if (jumpTarget === 'end') {
+                if (jumpTarget === 'end' || nextSection >= ${sectionCounter} || isSectionEmpty(nextSection)) {
                     document.getElementById('customForm').style.display = 'none';
                     document.getElementById('thankYouMessage').style.display = 'block';
                 } else if (jumpTarget) {
                     navigateSection(jumpTarget);
-                } else if (isEmpty && isEmpty()) {
-                    navigateSection(nextSection + 1); // Skip to the next non-empty section
                 } else {
                     navigateSection(nextSection); // Ensure it always moves to the next visible section
                 }
@@ -585,38 +644,38 @@ function previewForm() {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                text-align: center;
+                text-align: center.
             }
             section h1 {
                 color: #2980b9;
-                font-weight: normal;
+                font-weight: normal.
             }
             .container {
                 width: 50%;
-                margin: auto;
-                background-color: #ffffff;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                margin: auto.
+                background-color: #ffffff.
+                padding: 20px.
+                border-radius: 8px.
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1).
             }
             .section {
-                display: none;
+                display: none.
             }
             .section.active {
-                display: block;
+                display: block.
             }
             .thank-you-message {
-                display: none;
-                font-size: 20px;
-                font-weight: bold;
-                text-align: center;
-                margin-top: 20px;
+                display: none.
+                font-size: 20px.
+                font-weight: bold.
+                text-align: center.
+                margin-top: 20px.
             }
             footer {
-                text-align: center;
-                padding: 20px;
-                background-color: #2c3e50;
-                color: white;
+                text-align: center.
+                padding: 20px.
+                background-color: #2c3e50.
+                color: white.
             }
         </style>
     </head>
@@ -634,11 +693,27 @@ function previewForm() {
                 <form id="customForm" onsubmit="return showThankYouMessage();">
     `;
 
-    formHTML += `<script>let jumpTarget = null;<\/script>`;  // Initialize jumpTarget globally
+    formHTML += `<script>
+    let jumpTarget = null;
+
+    function isSectionEmpty(sectionId) {
+        const sectionBlock = document.getElementById('section' + sectionId);
+        const questions = sectionBlock.querySelectorAll('.question-block');
+        let visibleQuestions = 0;
+
+        questions.forEach(questionBlock => {
+            if (questionBlock.style.display !== 'none') {
+                visibleQuestions++;
+            }
+        });
+
+        return visibleQuestions === 0;
+    }
+    </script>`;
 
     for (let s = 1; s < sectionCounter; s++) {
         const sectionBlock = document.getElementById(`sectionBlock${s}`);
-        if (!sectionBlock) continue;
+        if (!sectionBlock || isSectionEmpty(s)) continue;
 
         const sectionName = document.getElementById(`sectionName${s}`).value || `Section ${s}`;
 
@@ -653,6 +728,9 @@ function previewForm() {
             const logicEnabled = questionBlock.querySelector(`#logic${questionBlock.id.replace('questionBlock', '')}`).checked;
             const prevQuestion = questionBlock.querySelector(`#prevQuestion${questionBlock.id.replace('questionBlock', '')}`).value;
             const prevAnswer = questionBlock.querySelector(`#prevAnswer${questionBlock.id.replace('questionBlock', '')}`).value;
+            const checkboxLogicEnabled = questionBlock.querySelector(`#checkboxLogic${questionBlock.id.replace('questionBlock', '')}`).checked;
+            const checkboxPrevQuestion = questionBlock.querySelector(`#checkboxPrevQuestion${questionBlock.id.replace('questionBlock', '')}`).value;
+            const checkboxOptionNumber = questionBlock.querySelector(`#checkboxOptionNumber${questionBlock.id.replace('questionBlock', '')}`).value;
             const jumpEnabled = questionBlock.querySelector(`#enableJump${questionBlock.id.replace('questionBlock', '')}`).checked;
             const jumpOption = questionBlock.querySelector(`#jumpOption${questionBlock.id.replace('questionBlock', '')}`).value;
             const jumpTo = questionBlock.querySelector(`#jumpTo${questionBlock.id.replace('questionBlock', '')}`).value;
@@ -735,6 +813,23 @@ function previewForm() {
                 `;
             }
 
+            // Add logic to show or hide the question based on previous checkbox selection
+            if (checkboxLogicEnabled && checkboxPrevQuestion && checkboxOptionNumber) {
+                formHTML += `
+                <script>
+                    const question${questionId} = document.getElementById('question${questionId}');
+                    question${questionId}.style.display = 'none';
+                    const checkboxElement = document.getElementById('answer${checkboxPrevQuestion}_${checkboxOptionNumber}');
+                    checkboxElement.addEventListener('change', function() {
+                        if (this.checked) {
+                            question${questionId}.style.display = 'block';
+                        } else {
+                            question${questionId}.style.display = 'none';
+                        }
+                    });
+                <\/script>`;
+            }
+
             // Handle jump logic for skipping to sections or ending the form
             if (jumpEnabled && jumpTo) {
                 formHTML += `
@@ -780,13 +875,14 @@ function previewForm() {
         </footer>
         <script>
             function handleNext(currentSection) {
-                if (jumpTarget === 'end') {
+                const nextSection = currentSection + 1;
+                if (jumpTarget === 'end' || nextSection >= ${sectionCounter} || isSectionEmpty(nextSection)) {
                     document.getElementById('customForm').style.display = 'none';
                     document.getElementById('thankYouMessage').style.display = 'block';
                 } else if (jumpTarget) {
                     navigateSection(jumpTarget);
                 } else {
-                    navigateSection(currentSection + 1); // Ensure it always moves to the next section if no jumpTarget
+                    navigateSection(nextSection); // Ensure it always moves to the next visible section
                 }
                 jumpTarget = null; // Reset jumpTarget after navigating
             }
