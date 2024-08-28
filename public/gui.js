@@ -94,12 +94,6 @@ function addQuestion(sectionId) {
                 <label>Jump to (enter section number or 'end'):</label><br>
                 <input type="text" placeholder="Section number or 'end'" id="jumpTo${globalQuestionCounter}"><br>
             </div>
-            <input type="checkbox" id="enableInfo${globalQuestionCounter}" onchange="toggleInfo(${globalQuestionCounter})">
-            <label for="enableInfo${globalQuestionCounter}">Add Info</label><br><br>
-            <div id="infoBlock${globalQuestionCounter}" style="display: none;">
-                <label>Info Text:</label><br>
-                <input type="text" id="infoText${globalQuestionCounter}" placeholder="Enter info text"><br><br>
-            </div>
         </div><br>
 
         <button type="button" onclick="removeQuestion(${sectionId}, ${globalQuestionCounter})">Remove Question</button>
@@ -110,7 +104,6 @@ function addQuestion(sectionId) {
 
     updateQuestionNumbers();
 }
-
 
 function updateQuestionNumbers() {
     const questions = document.querySelectorAll('.question-block');
@@ -183,13 +176,6 @@ function toggleJumpLogic(questionId) {
     const jumpBlock = document.getElementById(`jumpBlock${questionId}`);
     jumpBlock.style.display = jumpEnabled ? 'block' : 'none';
 }
-
-function toggleInfo(questionId) {
-    const infoEnabled = document.getElementById(`enableInfo${questionId}`).checked;
-    const infoBlock = document.getElementById(`infoBlock${questionId}`);
-    infoBlock.style.display = infoEnabled ? 'block' : 'none';
-}
-
 
 function addDropdownOption(questionId) {
     const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
@@ -288,44 +274,6 @@ function isSectionEmpty(sectionId) {
     return visibleQuestions === 0;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function generateAndDownloadForm() {
     let formHTML = `
     <!DOCTYPE html>
@@ -410,39 +358,6 @@ function generateAndDownloadForm() {
                 background-color: #2c3e50;
                 color: white;
             }
-            .info-icon {
-                display: inline-block;
-                width: 15px;
-                height: 15px;
-                background-color: grey;
-                color: white;
-                text-align: center;
-                border-radius: 50%;
-                font-size: 12px;
-                line-height: 15px;
-                cursor: pointer;
-                margin-left: 10px;
-                position: relative;
-            }
-            .info-icon::after {
-                content: attr(data-tooltip);
-                white-space: nowrap;
-                position: absolute;
-                left: 25px;
-                top: 50%;
-                transform: translateY(-50%);
-                background-color: #333;
-                color: #fff;
-                padding: 5px;
-                border-radius: 5px;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-                pointer-events: none;
-                font-size: 12px;
-            }
-            .info-icon:hover::after {
-                opacity: 1;
-            }
         </style>
     </head>
     <body>
@@ -459,9 +374,27 @@ function generateAndDownloadForm() {
                 <form id="customForm" onsubmit="return showThankYouMessage();">
     `;
 
+    formHTML += `<script>
+    let jumpTarget = null;
+
+    function isSectionEmpty(sectionId) {
+        const sectionBlock = document.getElementById('section' + sectionId);
+        const questions = sectionBlock.querySelectorAll('.question-block');
+        let visibleQuestions = 0;
+
+        questions.forEach(questionBlock => {
+            if (questionBlock.style.display !== 'none') {
+                visibleQuestions++;
+            }
+        });
+
+        return visibleQuestions === 0;
+    }
+    </script>`;
+
     for (let s = 1; s < sectionCounter; s++) {
         const sectionBlock = document.getElementById(`sectionBlock${s}`);
-        if (!sectionBlock) continue;
+        if (!sectionBlock || isSectionEmpty(s)) continue;
 
         const sectionName = document.getElementById(`sectionName${s}`).value || `Section ${s}`;
 
@@ -473,18 +406,15 @@ function generateAndDownloadForm() {
             const questionId = questionBlock.id.replace('questionBlock', '');
             const questionText = questionBlock.querySelector(`input[type="text"]`).value;
             const questionType = questionBlock.querySelector(`select`).value;
+            const logicEnabled = questionBlock.querySelector(`#logic${questionId}`).checked;
+            const prevQuestion = questionBlock.querySelector(`#prevQuestion${questionId}`).value;
+            const prevAnswer = questionBlock.querySelector(`#prevAnswer${questionId}`).value;
+            const checkboxLogicEnabled = questionBlock.querySelector(`#checkboxLogic${questionId}`).checked;
+            const checkboxPrevQuestion = questionBlock.querySelector(`#checkboxPrevQuestion${questionId}`).value;
+            const checkboxOptionNumber = questionBlock.querySelector(`#checkboxOptionNumber${questionId}`).value;
 
             formHTML += `<div id="question${questionId}" class="question-block">`;
-            formHTML += `<label>${questionText}</label>`;
-
-            const infoEnabled = document.getElementById(`enableInfo${questionId}`).checked;
-            const infoText = document.getElementById(`infoText${questionId}`)?.value;
-
-            if (infoEnabled && infoText) {
-                formHTML += `<span class="info-icon" data-tooltip="${infoText}">i</span>`;
-            }
-
-            formHTML += `<br>`;
+            formHTML += `<label>${questionText}</label><br>`;
 
             if (questionType === 'text') {
                 formHTML += `<input type="text" id="answer${questionId}"><br><br>`;
@@ -503,15 +433,30 @@ function generateAndDownloadForm() {
                 formHTML += `</select><br><br>`;
             } else if (questionType === 'checkbox') {
                 const options = questionBlock.querySelectorAll(`#checkboxOptions${questionId} input`);
-                options.forEach(option => {
-                    formHTML += `<input type="checkbox" name="answer${questionId}" value="${option.value}"> ${option.value}<br>`;
+                options.forEach((option, index) => {
+                    const jumpEnabled = document.getElementById(`enableJumpLogic${questionId}_${index + 1}`).checked;
+                    const jumpTo = document.getElementById(`jumpTo${questionId}_${index + 1}`).value;
+
+                    formHTML += `<input type="checkbox" id="answer${questionId}_${index + 1}" name="answer${questionId}" value="${option.value}"> ${option.value}<br>`;
+                    
+                    if (jumpEnabled && jumpTo) {
+                        formHTML += `<script>
+                            document.getElementById('answer${questionId}_${index + 1}').addEventListener('change', function() {
+                                if (this.checked) {
+                                    jumpTarget = '${jumpTo}';
+                                } else {
+                                    jumpTarget = null; // Reset jumpTarget if no option is selected
+                                }
+                            });
+                        <\/script>`;
+                    }
                 });
                 formHTML += `<br>`;
             } else if (questionType === 'numberedDropdown') {
                 const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
                 const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
                 const labels = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
-
+                
                 formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value, ${rangeStart}, ${rangeEnd})">`;
                 for (let i = rangeStart; i <= rangeEnd; i++) {
                     formHTML += `<option value="${i}">${i}</option>`;
@@ -546,30 +491,31 @@ function generateAndDownloadForm() {
                 `;
             }
 
+            formHTML += `</div>`; // End question block
+
             // Add logic to show or hide the question based on previous answers
-            const logicEnabled = document.getElementById(`logic${questionId}`).checked;
-            if (logicEnabled) {
-                const prevQuestion = document.getElementById(`prevQuestion${questionId}`).value;
-                const prevAnswer = document.getElementById(`prevAnswer${questionId}`).value;
+            if (logicEnabled && prevQuestion) {
                 formHTML += `
                 <script>
-                    document.getElementById('question${questionId}').style.display = 'none';
-                    document.getElementById('answer${prevQuestion}_${prevAnswer}').addEventListener('change', function() {
+                    const question${questionId} = document.getElementById('question${questionId}');
+                    question${questionId}.style.display = 'none';
+                    const prevAnswerElement = document.getElementById('answer${prevQuestion}_yes');
+                    const answer${prevQuestion}No = document.getElementById('answer${prevQuestion}_no');
+                    prevAnswerElement.addEventListener('change', function() {
                         if (this.checked) {
-                            document.getElementById('question${questionId}').style.display = 'block';
+                            question${questionId}.style.display = 'block';
                         } else {
-                            document.getElementById('question${questionId}').style.display = 'none';
+                            question${questionId}.style.display = 'none';
                         }
                     });
-                <\/script>
-                `;
+                    answer${prevQuestion}No.addEventListener('change', function() {
+                        question${questionId}.style.display = 'none';
+                    });
+                <\/script>`;
             }
 
             // Add logic to show or hide the question based on previous checkbox selection
-            const checkboxLogicEnabled = document.getElementById(`checkboxLogic${questionId}`).checked;
-            if (checkboxLogicEnabled) {
-                const checkboxPrevQuestion = document.getElementById(`checkboxPrevQuestion${questionId}`).value;
-                const checkboxOptionNumber = document.getElementById(`checkboxOptionNumber${questionId}`).value;
+            if (checkboxLogicEnabled && checkboxPrevQuestion && checkboxOptionNumber) {
                 formHTML += `
                 <script>
                     const question${questionId} = document.getElementById('question${questionId}');
@@ -585,25 +531,6 @@ function generateAndDownloadForm() {
                 <\/script>`;
             }
 
-            // Handle jump logic for skipping to sections or ending the form
-            const jumpEnabled = document.getElementById(`enableJump${questionId}`).checked;
-            if (jumpEnabled) {
-                const jumpOption = document.getElementById(`jumpOption${questionId}`).value;
-                const jumpTo = document.getElementById(`jumpTo${questionId}`).value;
-                formHTML += `
-                <script>
-                    document.getElementById('answer${questionId}_${jumpOption}').addEventListener('change', function() {
-                        if (this.checked) {
-                            jumpTarget = '${jumpTo}';
-                        } else {
-                            jumpTarget = null; // Reset jumpTarget if no option is selected
-                        }
-                    });
-                <\/script>
-                `;
-            }
-
-            formHTML += `</div>`; // End question block
         });
 
         formHTML += `
@@ -664,31 +591,6 @@ function generateAndDownloadForm() {
 
     downloadHTML(formHTML, "custom_form.html");
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function previewForm() {
     let formHTML = `
@@ -1044,97 +946,6 @@ function importForm(event) {
     }
 }
 
-
-
-function exportForm() {
-    const formData = {
-        sections: []
-    };
-    
-    for (let s = 1; s < sectionCounter; s++) {
-        const sectionBlock = document.getElementById(`sectionBlock${s}`);
-        if (!sectionBlock) continue;
-
-        const sectionName = document.getElementById(`sectionName${s}`).value;
-        const questionsSection = sectionBlock.querySelectorAll('.question-block');
-        
-        const sectionData = {
-            sectionName,
-            questions: []
-        };
-
-        questionsSection.forEach(questionBlock => {
-            const questionId = questionBlock.id.replace('questionBlock', '');
-            const questionText = document.getElementById(`question${questionId}`).value;
-            const questionType = document.getElementById(`questionType${questionId}`).value;
-            
-            const questionData = {
-                questionText,
-                questionType,
-                options: [],
-                logicEnabled: document.getElementById(`logic${questionId}`).checked,
-                checkboxLogicEnabled: document.getElementById(`checkboxLogic${questionId}`).checked,
-                jumpLogicEnabled: document.getElementById(`enableJump${questionId}`).checked,
-                infoText: document.getElementById(`infoText${questionId}`)?.value || ''
-            };
-            
-            if (questionType === 'dropdown') {
-                const options = document.querySelectorAll(`#dropdownOptions${questionId} input`);
-                options.forEach(option => {
-                    questionData.options.push(option.value);
-                });
-            } else if (questionType === 'checkbox') {
-                const options = document.querySelectorAll(`#checkboxOptions${questionId} input`);
-                options.forEach(option => {
-                    questionData.options.push(option.value);
-                });
-            } else if (questionType === 'numberedDropdown') {
-                questionData.rangeStart = document.getElementById(`numberRangeStart${questionId}`).value;
-                questionData.rangeEnd = document.getElementById(`numberRangeEnd${questionId}`).value;
-                questionData.labels = [];
-                const labels = document.querySelectorAll(`#textboxLabels${questionId} input`);
-                labels.forEach(label => {
-                    questionData.labels.push(label.value);
-                });
-            }
-
-            if (questionData.logicEnabled) {
-                questionData.logic = {
-                    prevQuestion: document.getElementById(`prevQuestion${questionId}`).value,
-                    prevAnswer: document.getElementById(`prevAnswer${questionId}`).value
-                };
-            }
-
-            if (questionData.checkboxLogicEnabled) {
-                questionData.checkboxLogic = {
-                    prevQuestion: document.getElementById(`checkboxPrevQuestion${questionId}`).value,
-                    optionNumber: document.getElementById(`checkboxOptionNumber${questionId}`).value
-                };
-            }
-
-            if (questionData.jumpLogicEnabled) {
-                questionData.jumpLogic = {
-                    option: document.getElementById(`jumpOption${questionId}`).value,
-                    jumpTo: document.getElementById(`jumpTo${questionId}`).value
-                };
-            }
-
-            sectionData.questions.push(questionData);
-        });
-        
-        formData.sections.push(sectionData);
-    }
-
-    const formJson = JSON.stringify(formData, null, 2);
-    const blob = new Blob([formJson], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "custom_form.json";
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
 function loadForm(formData) {
     // Reset the form builder
     document.getElementById('formBuilder').innerHTML = '';
@@ -1200,13 +1011,94 @@ function loadForm(formData) {
                 document.getElementById(`jumpOption${currentQuestionId}`).value = question.jumpLogic.option;
                 document.getElementById(`jumpTo${currentQuestionId}`).value = question.jumpLogic.jumpTo;
             }
-
-            // Handle info text
-            if (question.infoText) {
-                document.getElementById(`enableInfo${currentQuestionId}`).checked = true;
-                toggleInfo(currentQuestionId);
-                document.getElementById(`infoText${currentQuestionId}`).value = question.infoText;
-            }
         });
     });
+}
+
+function exportForm() {
+    const formData = {
+        sections: []
+    };
+    
+    for (let s = 1; s < sectionCounter; s++) {
+        const sectionBlock = document.getElementById(`sectionBlock${s}`);
+        if (!sectionBlock) continue;
+
+        const sectionName = document.getElementById(`sectionName${s}`).value;
+        const questionsSection = sectionBlock.querySelectorAll('.question-block');
+        
+        const sectionData = {
+            sectionName,
+            questions: []
+        };
+
+        questionsSection.forEach(questionBlock => {
+            const questionId = questionBlock.id.replace('questionBlock', '');
+            const questionText = document.getElementById(`question${questionId}`).value;
+            const questionType = document.getElementById(`questionType${questionId}`).value;
+            
+            const questionData = {
+                questionText,
+                questionType,
+                options: [],
+                logicEnabled: document.getElementById(`logic${questionId}`).checked,
+                checkboxLogicEnabled: document.getElementById(`checkboxLogic${questionId}`).checked,
+                jumpLogicEnabled: document.getElementById(`enableJump${questionId}`).checked
+            };
+            
+            if (questionType === 'dropdown') {
+                const options = document.querySelectorAll(`#dropdownOptions${questionId} input`);
+                options.forEach(option => {
+                    questionData.options.push(option.value);
+                });
+            } else if (questionType === 'checkbox') {
+                const options = document.querySelectorAll(`#checkboxOptions${questionId} input`);
+                options.forEach(option => {
+                    questionData.options.push(option.value);
+                });
+            } else if (questionType === 'numberedDropdown') {
+                questionData.rangeStart = document.getElementById(`numberRangeStart${questionId}`).value;
+                questionData.rangeEnd = document.getElementById(`numberRangeEnd${questionId}`).value;
+                questionData.labels = [];
+                const labels = document.querySelectorAll(`#textboxLabels${questionId} input`);
+                labels.forEach(label => {
+                    questionData.labels.push(label.value);
+                });
+            }
+
+            if (questionData.logicEnabled) {
+                questionData.logic = {
+                    prevQuestion: document.getElementById(`prevQuestion${questionId}`).value,
+                    prevAnswer: document.getElementById(`prevAnswer${questionId}`).value
+                };
+            }
+
+            if (questionData.checkboxLogicEnabled) {
+                questionData.checkboxLogic = {
+                    prevQuestion: document.getElementById(`checkboxPrevQuestion${questionId}`).value,
+                    optionNumber: document.getElementById(`checkboxOptionNumber${questionId}`).value
+                };
+            }
+
+            if (questionData.jumpLogicEnabled) {
+                questionData.jumpLogic = {
+                    option: document.getElementById(`jumpOption${questionId}`).value,
+                    jumpTo: document.getElementById(`jumpTo${questionId}`).value
+                };
+            }
+
+            sectionData.questions.push(questionData);
+        });
+        
+        formData.sections.push(sectionData);
+    }
+
+    const formJson = JSON.stringify(formData, null, 2);
+    const blob = new Blob([formJson], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "custom_form.json";
+    a.click();
+    URL.revokeObjectURL(url);
 }
