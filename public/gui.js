@@ -19,6 +19,43 @@ function addSection() {
     sectionCounter++;
 }
 
+function toggleOptions(questionId) {
+    const questionType = document.getElementById(`questionType${questionId}`).value;
+    const optionsBlock = document.getElementById(`optionsBlock${questionId}`);
+    const checkboxBlock = document.getElementById(`checkboxBlock${questionId}`);
+    const numberedDropdownBlock = document.getElementById(`numberedDropdownBlock${questionId}`);
+    const jumpLogicContainer = document.getElementById(`jumpLogicContainer${questionId}`);
+    const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
+
+    optionsBlock.style.display = 'none';
+    checkboxBlock.style.display = 'none';
+    numberedDropdownBlock.style.display = 'none';
+    jumpLogicContainer.style.display = 'block';
+    jumpOptionSelect.innerHTML = ''; // Clear existing options
+
+    if (questionType === 'checkbox') {
+        checkboxBlock.style.display = 'block';
+        jumpLogicContainer.style.display = 'none'; // Hide the jump logic section for checkbox type
+    } else if (questionType === 'dropdown') {
+        optionsBlock.style.display = 'block';
+    } else if (questionType === 'numberedDropdown') {
+        numberedDropdownBlock.style.display = 'block';
+        jumpLogicContainer.style.display = 'none'; // Hide the jump logic for numbered dropdown type
+    } else if (questionType === 'radio') {
+        const yesOption = document.createElement('option');
+        yesOption.value = 'yes';
+        yesOption.text = 'Yes';
+        jumpOptionSelect.appendChild(yesOption);
+
+        const noOption = document.createElement('option');
+        noOption.value = 'no';
+        noOption.text = 'No';
+        jumpOptionSelect.appendChild(noOption);
+    } else if (questionType === 'address') {
+        jumpLogicContainer.style.display = 'none'; // Hide the jump logic for address type
+    }
+}
+
 function addQuestion(sectionId) {
     const questionsSection = document.getElementById(`questionsSection${sectionId}`);
     const questionBlock = document.createElement('div');
@@ -115,30 +152,6 @@ function updateQuestionNumbers() {
     globalQuestionCounter = questions.length + 1;
 }
 
-function toggleOptions(questionId) {
-    const questionType = document.getElementById(`questionType${questionId}`).value;
-    const optionsBlock = document.getElementById(`optionsBlock${questionId}`);
-    const checkboxBlock = document.getElementById(`checkboxBlock${questionId}`);
-    const numberedDropdownBlock = document.getElementById(`numberedDropdownBlock${questionId}`);
-    const jumpLogicContainer = document.getElementById(`jumpLogicContainer${questionId}`);
-
-    optionsBlock.style.display = 'none';
-    checkboxBlock.style.display = 'none';
-    numberedDropdownBlock.style.display = 'none';
-    jumpLogicContainer.style.display = 'block';
-
-    if (questionType === 'checkbox') {
-        checkboxBlock.style.display = 'block';
-        jumpLogicContainer.style.display = 'none'; // Hide the jump logic section for checkbox type
-    } else if (questionType === 'dropdown') {
-        optionsBlock.style.display = 'block';
-    } else if (questionType === 'numberedDropdown') {
-        numberedDropdownBlock.style.display = 'block';
-        jumpLogicContainer.style.display = 'none'; // Hide the jump logic for numbered dropdown type
-    } else if (questionType === 'address') {
-        jumpLogicContainer.style.display = 'none'; // Hide the jump logic for address type
-    }
-}
 
 function removeSection(sectionId) {
     const sectionBlock = document.getElementById(`sectionBlock${sectionId}`);
@@ -215,6 +228,9 @@ function addCheckboxOption(questionId) {
     `;
     checkboxOptionsDiv.appendChild(optionDiv);
 }
+
+
+
 
 function addTextboxLabel(questionId) {
     const textboxLabelsDiv = document.getElementById(`textboxLabels${questionId}`);
@@ -432,18 +448,21 @@ function generateAndDownloadForm() {
                 });
                 formHTML += `</select><br><br>`;
             } else if (questionType === 'checkbox') {
-                const options = questionBlock.querySelectorAll(`#checkboxOptions${questionId} input`);
+                const options = questionBlock.querySelectorAll(`#checkboxOptions${questionId} input[type="text"]`);
                 options.forEach((option, index) => {
-                    const jumpEnabled = document.getElementById(`enableJumpLogic${questionId}_${index + 1}`).checked;
-                    const jumpTo = document.getElementById(`jumpTo${questionId}_${index + 1}`).value;
+                    const checkboxId = `answer${questionId}_${index + 1}`;
+                    const jumpEnabled = document.getElementById(`enableJumpLogic${questionId}_${index + 1}`);
+                    const jumpTo = document.getElementById(`jumpTo${questionId}_${index + 1}`);
 
-                    formHTML += `<input type="checkbox" id="answer${questionId}_${index + 1}" name="answer${questionId}" value="${option.value}"> ${option.value}<br>`;
-                    
-                    if (jumpEnabled && jumpTo) {
+                    if (option.value.trim()) {
+                        formHTML += `<input type="checkbox" id="${checkboxId}" name="answer${questionId}" value="${option.value}"> ${option.value}<br>`;
+                    }
+
+                    if (jumpEnabled && jumpTo && jumpEnabled.checked && jumpTo.value.trim()) {
                         formHTML += `<script>
-                            document.getElementById('answer${questionId}_${index + 1}').addEventListener('change', function() {
+                            document.getElementById('${checkboxId}').addEventListener('change', function() {
                                 if (this.checked) {
-                                    jumpTarget = '${jumpTo}';
+                                    jumpTarget = '${jumpTo.value}';
                                 } else {
                                     jumpTarget = null; // Reset jumpTarget if no option is selected
                                 }
@@ -521,13 +540,15 @@ function generateAndDownloadForm() {
                     const question${questionId} = document.getElementById('question${questionId}');
                     question${questionId}.style.display = 'none';
                     const checkboxElement = document.getElementById('answer${checkboxPrevQuestion}_${checkboxOptionNumber}');
-                    checkboxElement.addEventListener('change', function() {
-                        if (this.checked) {
-                            question${questionId}.style.display = 'block';
-                        } else {
-                            question${questionId}.style.display = 'none';
-                        }
-                    });
+                    if(checkboxElement) {
+                        checkboxElement.addEventListener('change', function() {
+                            if (this.checked) {
+                                question${questionId}.style.display = 'block';
+                            } else {
+                                question${questionId}.style.display = 'none';
+                            }
+                        });
+                    }
                 <\/script>`;
             }
 
@@ -591,6 +612,19 @@ function generateAndDownloadForm() {
 
     downloadHTML(formHTML, "custom_form.html");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function previewForm() {
     let formHTML = `
