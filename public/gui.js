@@ -1,33 +1,46 @@
 let sectionCounter = 1;
 let questionCounter = 1;
 
-function addSection() {
+function addSection(sectionId = null) {
     const formBuilder = document.getElementById('formBuilder');
     const sectionBlock = document.createElement('div');
+    
+    // Use provided sectionId or default to sectionCounter
+    const currentSectionId = sectionId || sectionCounter;
+
     sectionBlock.className = 'section-block';
-    sectionBlock.id = `sectionBlock${sectionCounter}`;
+    sectionBlock.id = `sectionBlock${currentSectionId}`;
     sectionBlock.innerHTML = `
-        <h2>Section ${sectionCounter}</h2>
-        <div id="questionsSection${sectionCounter}"></div>
-        <button type="button" onclick="addQuestion(${sectionCounter})">Add Question to Section ${sectionCounter}</button>
-        <button type="button" onclick="removeSection(${sectionCounter})">Remove Section</button>
+        <h2>Section ${currentSectionId}</h2>
+        <div id="questionsSection${currentSectionId}"></div>
+        <button type="button" onclick="addQuestion(${currentSectionId})">Add Question to Section ${currentSectionId}</button>
+        <button type="button" onclick="removeSection(${currentSectionId})">Remove Section</button>
         <hr>
     `;
     formBuilder.appendChild(sectionBlock);
-    sectionCounter++;
+
+    // Increment sectionCounter only if not loading from JSON
+    if (!sectionId) {
+        sectionCounter++;
+    }
 }
 
-function addQuestion(sectionId) {
+
+function addQuestion(sectionId, questionId = null) {
     const questionsSection = document.getElementById(`questionsSection${sectionId}`);
     const questionBlock = document.createElement('div');
+    
+    // Use provided questionId or default to questionCounter
+    const currentQuestionId = questionId || questionCounter;
+
     questionBlock.className = 'question-block';
-    questionBlock.id = `questionBlock${questionCounter}`;
+    questionBlock.id = `questionBlock${currentQuestionId}`;
     questionBlock.innerHTML = `
-        <label>Question ${questionCounter}: </label>
-        <input type="text" placeholder="Enter your question" id="question${questionCounter}"><br><br>
+        <label>Question ${currentQuestionId}: </label>
+        <input type="text" placeholder="Enter your question" id="question${currentQuestionId}"><br><br>
         
         <label>Question Type: </label>
-        <select id="questionType${questionCounter}" onchange="toggleOptions(${questionCounter})">
+        <select id="questionType${currentQuestionId}" onchange="toggleOptions(${currentQuestionId})">
             <option value="text">Text</option>
             <option value="radio">Yes/No</option>
             <option value="dropdown">Dropdown</option>
@@ -35,63 +48,55 @@ function addQuestion(sectionId) {
             <option value="numberedDropdown">Numbered Dropdown</option>
         </select><br><br>
 
-        <div id="optionsBlock${questionCounter}" class="dropdown-options" style="display: none;">
+        <div id="optionsBlock${currentQuestionId}" class="dropdown-options" style="display: none;">
             <label>Options: </label>
-            <div id="dropdownOptions${questionCounter}"></div>
-            <button type="button" onclick="addDropdownOption(${questionCounter})">Add Option</button>
+            <div id="dropdownOptions${currentQuestionId}"></div>
+            <button type="button" onclick="addDropdownOption(${currentQuestionId})">Add Option</button>
         </div><br>
 
-        <div id="checkboxBlock${questionCounter}" class="checkbox-options" style="display: none;">
+        <div id="checkboxBlock${currentQuestionId}" class="checkbox-options" style="display: none;">
             <label>Checkbox Options: </label>
-            <div id="checkboxOptions${questionCounter}"></div>
-            <button type="button" onclick="addCheckboxOption(${questionCounter})">Add Option</button>
-            <div style="margin-top: 10px;">
-                <input type="checkbox" id="noneOfTheAbove${questionCounter}">
-                <label for="noneOfTheAbove${questionCounter}">Include "None of the above" option</label>
-            </div>
-        </div><br>
-
-        <div id="numberedDropdownBlock${questionCounter}" class="numbered-dropdown-options" style="display: none;">
-            <label>Number Range: </label>
-            <input type="number" id="numberRangeStart${questionCounter}" placeholder="Start" min="1" style="width: 60px;">
-            <input type="number" id="numberRangeEnd${questionCounter}" placeholder="End" min="1" style="width: 60px;"><br><br>
-            <label>Textbox Labels:</label>
-            <div id="textboxLabels${questionCounter}"></div>
-            <button type="button" onclick="addTextboxLabel(${questionCounter})">Add Label</button>
+            <div id="checkboxOptions${currentQuestionId}"></div>
+            <button type="button" onclick="addCheckboxOption(${currentQuestionId})">Add Option</button>
         </div><br>
 
         <label>Conditional Logic: </label><br>
-        <input type="checkbox" id="logic${questionCounter}" onchange="toggleLogic(${questionCounter})">
-        <label for="logic${questionCounter}">Enable Logic</label><br><br>
+        <input type="checkbox" id="logic${currentQuestionId}" onchange="toggleLogic(${currentQuestionId})">
+        <label for="logic${currentQuestionId}">Enable Logic</label><br><br>
 
-        <div id="logicBlock${questionCounter}" style="display: none;">
+        <div id="logicBlock${currentQuestionId}" style="display: none;">
             <label>Show this question if: </label><br>
-            <input type="number" placeholder="Previous question number" id="prevQuestion${questionCounter}"><br>
-            <select id="prevAnswer${questionCounter}">
+            <input type="number" placeholder="Previous question number" id="prevQuestion${currentQuestionId}"><br>
+            <select id="prevAnswer${currentQuestionId}">
                 <option value="Yes">Answer is Yes</option>
                 <option value="No">Answer is No</option>
             </select>
         </div><br>
 
         <label>Jump Logic: </label><br>
-        <div id="jumpLogic${questionCounter}">
-            <input type="checkbox" id="enableJump${questionCounter}" onchange="toggleJumpLogic(${questionCounter})">
-            <label for="enableJump${questionCounter}">Enable Jump Logic</label><br><br>
-            <div id="jumpBlock${questionCounter}" style="display: none;">
-                <label id="jumpOptionLabel${questionCounter}" style="text-align: center;">Select the option that triggers the jump:</label><br>
-                <select id="jumpOption${questionCounter}" style="display: block; margin: 0 auto;">
+        <div id="jumpLogic${currentQuestionId}">
+            <input type="checkbox" id="enableJump${currentQuestionId}" onchange="toggleJumpLogic(${currentQuestionId})">
+            <label for="enableJump${currentQuestionId}">Enable Jump Logic</label><br><br>
+            <div id="jumpBlock${currentQuestionId}" style="display: none;">
+                <label>Select the option that triggers the jump:</label><br>
+                <select id="jumpOption${currentQuestionId}">
                     <!-- Options will be populated dynamically based on the question type -->
                 </select><br><br>
                 <label>Jump to (enter section number or 'end'):</label><br>
-                <input type="text" placeholder="Section number or 'end'" id="jumpTo${questionCounter}"><br>
+                <input type="text" placeholder="Section number or 'end'" id="jumpTo${currentQuestionId}"><br>
             </div>
         </div><br>
 
-        <button type="button" onclick="removeQuestion(${questionCounter})">Remove Question</button>
+        <button type="button" onclick="removeQuestion(${currentQuestionId})">Remove Question</button>
     `;
     questionsSection.appendChild(questionBlock);
-    questionCounter++;
+
+    // Increment questionCounter only if not loading from JSON
+    if (!questionId) {
+        questionCounter++;
+    }
 }
+
 
 function toggleOptions(questionId) {
     const questionType = document.getElementById(`questionType${questionId}`).value;
@@ -101,9 +106,10 @@ function toggleOptions(questionId) {
     const jumpOptionLabel = document.getElementById(`jumpOptionLabel${questionId}`);
     const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
 
+    
     optionsBlock.style.display = 'none';
     checkboxBlock.style.display = 'none';
-    numberedDropdownBlock.style.display = 'none';
+    if (numberedDropdownBlock) numberedDropdownBlock.style.display = 'none'; // Check if numberedDropdownBlock exists before accessing it
     jumpOptionLabel.style.display = 'none';
     jumpOptionSelect.style.display = 'none';
 
@@ -118,9 +124,10 @@ function toggleOptions(questionId) {
     } else if (questionType === 'checkbox') {
         checkboxBlock.style.display = 'block';
     } else if (questionType === 'numberedDropdown') {
-        numberedDropdownBlock.style.display = 'block';
+        if (numberedDropdownBlock) numberedDropdownBlock.style.display = 'block'; // Check if numberedDropdownBlock exists before setting its display style
     }
 }
+
 
 function toggleLogic(questionId) {
     const logicEnabled = document.getElementById(`logic${questionId}`).checked;
@@ -431,12 +438,4 @@ function generateAndDownloadForm() {
     downloadHTML(formHTML, "custom_form.html");
 }
 
-function downloadHTML(content, filename) {
-    const blob = new Blob([content], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-}
+
