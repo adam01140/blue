@@ -64,8 +64,8 @@ function addQuestion(sectionId) {
             <input type="checkbox" id="enableJump${questionCounter}" onchange="toggleJumpLogic(${questionCounter})">
             <label for="enableJump${questionCounter}">Enable Jump Logic</label><br><br>
             <div id="jumpBlock${questionCounter}" style="display: none;">
-                <label>Select the option that triggers the jump:</label><br>
-                <select id="jumpOption${questionCounter}">
+                <label id="jumpOptionLabel${questionCounter}" style="text-align: center;">Select the option that triggers the jump:</label><br>
+                <select id="jumpOption${questionCounter}" style="display: block; margin: 0 auto;">
                     <!-- Options will be populated dynamically based on the question type -->
                 </select><br><br>
                 <label>Jump to (enter section number or 'end'):</label><br>
@@ -88,6 +88,7 @@ function toggleOptions(questionId) {
     const questionType = document.getElementById(`questionType${questionId}`).value;
     const optionsBlock = document.getElementById(`optionsBlock${questionId}`);
     const checkboxBlock = document.getElementById(`checkboxBlock${questionId}`);
+    const jumpOptionLabel = document.getElementById(`jumpOptionLabel${questionId}`);
     const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
     jumpOptionSelect.innerHTML = ""; // Clear previous options
 
@@ -102,9 +103,22 @@ function toggleOptions(questionId) {
         noOption.value = 'No';
         noOption.text = 'No';
         jumpOptionSelect.appendChild(noOption);
-    } else if (questionType === 'dropdown' || questionType === 'checkbox') {
-        optionsBlock.style.display = questionType === 'dropdown' ? 'block' : 'none';
-        checkboxBlock.style.display = questionType === 'checkbox' ? 'block' : 'none';
+        jumpOptionLabel.style.display = 'block';
+        jumpOptionSelect.style.display = 'block';
+    } else if (questionType === 'dropdown') {
+        optionsBlock.style.display = 'block';
+        jumpOptionLabel.style.display = 'block';
+        jumpOptionSelect.style.display = 'block';
+    } else if (questionType === 'checkbox') {
+        checkboxBlock.style.display = 'block';
+        // Hide the jump option selector for checkboxes
+        jumpOptionLabel.style.display = 'none';
+        jumpOptionSelect.style.display = 'none';
+    } else {
+        optionsBlock.style.display = 'none';
+        checkboxBlock.style.display = 'none';
+        jumpOptionLabel.style.display = 'none';
+        jumpOptionSelect.style.display = 'none';
     }
 }
 
@@ -124,8 +138,8 @@ function toggleJumpLogic(questionId) {
         if (questionType === 'radio') {
             // Populate jump options with Yes/No
             updateJumpOptionsForRadio(questionId);
-        } else {
-            // Update the jump options when jump logic is enabled for other types
+        } else if (questionType === 'dropdown') {
+            // Update the jump options when jump logic is enabled for dropdown type
             updateJumpOptions(questionId);
         }
     }
@@ -188,7 +202,6 @@ function addDropdownOption(questionId) {
 
 function addCheckboxOption(questionId) {
     const checkboxOptionsDiv = document.getElementById(`checkboxOptions${questionId}`);
-    const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
     const optionCount = checkboxOptionsDiv.children.length + 1;
 
     const optionDiv = document.createElement('div');
@@ -198,11 +211,6 @@ function addCheckboxOption(questionId) {
         <button type="button" onclick="removeCheckboxOption(${questionId}, ${optionCount})">Remove</button>
     `;
     checkboxOptionsDiv.appendChild(optionDiv);
-
-    const opt = document.createElement('option');
-    opt.value = `option${optionCount}`;
-    opt.text = `Option ${optionCount}`;
-    jumpOptionSelect.appendChild(opt);
 }
 
 function removeDropdownOption(questionId, optionNumber) {
@@ -215,8 +223,6 @@ function removeDropdownOption(questionId, optionNumber) {
 function removeCheckboxOption(questionId, optionNumber) {
     const optionDiv = document.querySelector(`#checkboxOptions${questionId} .option${optionNumber}`);
     optionDiv.remove();
-    const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
-    jumpOptionSelect.querySelector(`option[value="option${optionNumber}"]`).remove();
 }
 
 function removeQuestion(questionId) {
@@ -263,36 +269,38 @@ function generateAndDownloadForm() {
 
         const questionsSection = sectionBlock.querySelectorAll('.question-block');
         questionsSection.forEach((questionBlock) => {
+            const questionId = questionBlock.id.replace('questionBlock', '');
             const questionText = questionBlock.querySelector(`input[type="text"]`).value;
             const questionType = questionBlock.querySelector(`select`).value;
-            const logicEnabled = questionBlock.querySelector(`#logic${questionBlock.id.replace('questionBlock', '')}`).checked;
-            const prevQuestion = questionBlock.querySelector(`#prevQuestion${questionBlock.id.replace('questionBlock', '')}`).value;
-            const prevAnswer = questionBlock.querySelector(`#prevAnswer${questionBlock.id.replace('questionBlock', '')}`).value;
-            const jumpEnabled = questionBlock.querySelector(`#enableJump${questionBlock.id.replace('questionBlock', '')}`).checked;
-            const jumpOption = questionBlock.querySelector(`#jumpOption${questionBlock.id.replace('questionBlock', '')}`).value;
-            const jumpTo = questionBlock.querySelector(`#jumpTo${questionBlock.id.replace('questionBlock', '')}`).value;
+            const logicEnabled = questionBlock.querySelector(`#logic${questionId}`).checked;
+            const prevQuestion = questionBlock.querySelector(`#prevQuestion${questionId}`).value;
+            const prevAnswer = questionBlock.querySelector(`#prevAnswer${questionId}`).value;
+            const jumpEnabled = questionBlock.querySelector(`#enableJump${questionId}`).checked;
+            const jumpOption = questionBlock.querySelector(`#jumpOption${questionId}`).value;
+            const jumpTo = questionBlock.querySelector(`#jumpTo${questionId}`).value;
 
             formHTML += `<label>${questionText}</label><br>`;
 
             if (questionType === 'text') {
-                formHTML += `<input type="text" id="answer${questionBlock.id.replace('questionBlock', '')}"><br><br>`;
+                formHTML += `<input type="text" id="answer${questionId}"><br><br>`;
             } else if (questionType === 'radio') {
                 // Generate select dropdown for Yes/No questions
-                formHTML += `<select id="answer${questionBlock.id.replace('questionBlock', '')}">
+                formHTML += `<select id="answer${questionId}">
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
                             </select><br><br>`;
             } else if (questionType === 'dropdown') {
-                formHTML += `<select id="answer${questionBlock.id.replace('questionBlock', '')}">`;
-                const options = questionBlock.querySelectorAll(`#dropdownOptions${questionBlock.id.replace('questionBlock', '')} input`);
+                formHTML += `<select id="answer${questionId}">`;
+                const options = questionBlock.querySelectorAll(`#dropdownOptions${questionId} input`);
                 options.forEach(option => {
                     formHTML += `<option value="${option.value}">${option.value}</option>`;
                 });
                 formHTML += `</select><br><br>`;
             } else if (questionType === 'checkbox') {
-                const options = questionBlock.querySelectorAll(`#checkboxOptions${questionBlock.id.replace('questionBlock', '')} input`);
-                options.forEach(option => {
-                    formHTML += `<input type="checkbox" name="answer${questionBlock.id.replace('questionBlock', '')}" value="${option.value}"> ${option.value}<br>`;
+                const options = questionBlock.querySelectorAll(`#checkboxOptions${questionId} input`);
+                formHTML += `<br>`;
+                options.forEach((option, index) => {
+                    formHTML += `<input type="checkbox" id="answer${questionId}_${index + 1}" name="answer${questionId}" value="${option.value}"> ${option.value}<br>`;
                 });
                 formHTML += `<br>`;
             }
@@ -301,12 +309,12 @@ function generateAndDownloadForm() {
             if (logicEnabled && prevQuestion) {
                 formHTML += `
                 <script>
-                    document.getElementById('question${questionBlock.id.replace('questionBlock', '')}').style.display = 'none';
+                    document.getElementById('question${questionId}').style.display = 'none';
                     document.getElementById('answer${prevQuestion}_${prevAnswer}').addEventListener('change', function() {
                         if (this.checked) {
-                            document.getElementById('question${questionBlock.id.replace('questionBlock', '')}').style.display = 'block';
+                            document.getElementById('question${questionId}').style.display = 'block';
                         } else {
-                            document.getElementById('question${questionBlock.id.replace('questionBlock', '')}').style.display = 'none';
+                            document.getElementById('question${questionId}').style.display = 'none';
                         }
                     });
                 <\/script>
@@ -314,17 +322,36 @@ function generateAndDownloadForm() {
             }
 
             if (jumpEnabled && jumpTo) {
-                formHTML += `
-                <script>
-                    document.getElementById('answer${questionBlock.id.replace('questionBlock', '')}').addEventListener('change', function() {
-                        if (this.value === '${jumpOption}') {
-                            jumpTarget = '${jumpTo}';
-                        } else {
-                            jumpTarget = null; // Reset jumpTarget if no option is selected
-                        }
+                if (questionType === 'checkbox') {
+                    // Handle jump logic for all checkbox options
+                    const options = questionBlock.querySelectorAll(`#checkboxOptions${questionId} input`);
+                    options.forEach((option, index) => {
+                        formHTML += `
+                        <script>
+                            document.getElementById('answer${questionId}_${index + 1}').addEventListener('change', function() {
+                                if (this.checked) {
+                                    jumpTarget = '${jumpTo}';
+                                } else {
+                                    jumpTarget = null; // Reset jumpTarget if no option is selected
+                                }
+                            });
+                        <\/script>
+                        `;
                     });
-                <\/script>
-                `;
+                } else {
+                    // Handle jump logic for other types (e.g., radio, dropdown)
+                    formHTML += `
+                    <script>
+                        document.getElementById('answer${questionId}').addEventListener('change', function() {
+                            if (this.value === '${jumpOption}') {
+                                jumpTarget = '${jumpTo}';
+                            } else {
+                                jumpTarget = null; // Reset jumpTarget if no option is selected
+                            }
+                        });
+                    <\/script>
+                    `;
+                }
             }
 
         });
