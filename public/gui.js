@@ -91,64 +91,73 @@ function updateQuestionsInSection(oldSectionId, newSectionId) {
 function addQuestion(sectionId, questionId = null) {
     const questionsSection = document.getElementById(`questionsSection${sectionId}`);
     const questionBlock = document.createElement('div');
-    
+
     // Use provided questionId or default to questionCounter
     const currentQuestionId = questionId || questionCounter;
 
     questionBlock.className = 'question-block';
     questionBlock.id = `questionBlock${currentQuestionId}`;
     questionBlock.innerHTML = `
-        <label>Question ${questionCounter}: </label>
-        <input type="text" placeholder="Enter your question" id="question${questionCounter}"><br><br>
-       
+        <label>Question ${currentQuestionId}: </label>
+        <input type="text" placeholder="Enter your question" id="question${currentQuestionId}"><br><br>
+
         <label>Question Type: </label>
-        <select id="questionType${questionCounter}" onchange="toggleOptions(${questionCounter})">
+        <select id="questionType${currentQuestionId}" onchange="toggleOptions(${currentQuestionId})">
             <option value="text">Text</option>
             <option value="radio">Yes/No</option>
             <option value="dropdown">Dropdown</option>
             <option value="checkbox">Checkbox</option>
         </select><br><br>
 
-        <div id="optionsBlock${questionCounter}" class="dropdown-options" style="display: none;">
+        <div id="optionsBlock${currentQuestionId}" class="dropdown-options" style="display: none;">
             <label>Options: </label>
-            <div id="dropdownOptions${questionCounter}"></div>
-            <button type="button" onclick="addDropdownOption(${questionCounter})">Add Option</button>
+            <div id="dropdownOptions${currentQuestionId}"></div>
+            <button type="button" onclick="addDropdownOption(${currentQuestionId})">Add Option</button>
+        </div><br>
+		
+		<div id="numberedDropdownBlock${questionCounter}" class="numbered-dropdown-options" style="display: none;">
+            <label>Number Range: </label>
+            <input type="number" id="numberRangeStart${questionCounter}" placeholder="Start" min="1" style="width: 60px;">
+            <input type="number" id="numberRangeEnd${questionCounter}" placeholder="End" min="1" style="width: 60px;"><br><br>
+            <label>Textbox Labels:</label>
+            <div id="textboxLabels${questionCounter}"></div>
+            <button type="button" onclick="addTextboxLabel(${questionCounter})">Add Label</button>
         </div><br>
 
-        <div id="checkboxBlock${questionCounter}" class="checkbox-options" style="display: none;">
+        <div id="checkboxBlock${currentQuestionId}" class="checkbox-options" style="display: none;">
             <label>Checkbox Options: </label>
-            <div id="checkboxOptions${questionCounter}"></div>
-            <button type="button" onclick="addCheckboxOption(${questionCounter})">Add Option</button>
+            <div id="checkboxOptions${currentQuestionId}"></div>
+            <button type="button" onclick="addCheckboxOption(${currentQuestionId})">Add Option</button>
             <div style="margin-top: 10px;">
-                <input type="checkbox" id="noneOfTheAbove${questionCounter}">
-                <label for="noneOfTheAbove${questionCounter}">Include "None of the above" option</label>
+                <input type="checkbox" id="noneOfTheAbove${currentQuestionId}">
+                <label for="noneOfTheAbove${currentQuestionId}">Include "None of the above" option</label>
             </div>
         </div><br>
 
         <label>Conditional Logic: </label><br>
-        <input type="checkbox" id="logic${questionCounter}" onchange="toggleLogic(${questionCounter})">
-        <label for="logic${questionCounter}">Enable Logic</label><br><br>
+        <input type="checkbox" id="logic${currentQuestionId}" onchange="toggleLogic(${currentQuestionId})">
+        <label for="logic${currentQuestionId}">Enable Logic</label><br><br>
 
-        <div id="logicBlock${questionCounter}" style="display: none;">
+        <div id="logicBlock${currentQuestionId}" style="display: none;">
             <label>Show this question if: </label><br>
-            <input type="number" placeholder="Previous question number" id="prevQuestion${questionCounter}"><br>
-            <select id="prevAnswer${questionCounter}">
+            <input type="number" placeholder="Previous question number" id="prevQuestion${currentQuestionId}"><br>
+            <select id="prevAnswer${currentQuestionId}">
                 <option value="Yes">Answer is Yes</option>
                 <option value="No">Answer is No</option>
             </select>
         </div><br>
 
         <label>Jump Logic: </label><br>
-        <div id="jumpLogic${questionCounter}">
-            <input type="checkbox" id="enableJump${questionCounter}" onchange="toggleJumpLogic(${questionCounter})">
-            <label for="enableJump${questionCounter}">Enable Jump Logic</label><br><br>
-            <div id="jumpBlock${questionCounter}" style="display: none;">
-                <label id="jumpOptionLabel${questionCounter}" style="text-align: center;">Select the option that triggers the jump:</label><br>
-                <select id="jumpOption${questionCounter}" style="display: block; margin: 0 auto;">
+        <div id="jumpLogic${currentQuestionId}">
+            <input type="checkbox" id="enableJump${currentQuestionId}" onchange="toggleJumpLogic(${currentQuestionId})">
+            <label for="enableJump${currentQuestionId}">Enable Jump Logic</label><br><br>
+            <div id="jumpBlock${currentQuestionId}" style="display: none;">
+                <label id="jumpOptionLabel${currentQuestionId}" style="text-align: center;">Select the option that triggers the jump:</label><br>
+                <select id="jumpOption${currentQuestionId}" style="display: block; margin: 0 auto;">
                     <!-- Options will be populated dynamically based on the question type -->
                 </select><br><br>
                 <label>Jump to (enter section number or 'end'):</label><br>
-                <input type="text" placeholder="Section number or 'end'" id="jumpTo${questionCounter}"><br>
+                <input type="text" placeholder="Section number or 'end'" id="jumpTo${currentQuestionId}"><br>
             </div>
         </div><br>
 
@@ -162,41 +171,46 @@ function addQuestion(sectionId, questionId = null) {
     }
 }
 
+
 function toggleOptions(questionId) {
-    const questionType = document.getElementById(`questionType${questionId}`).value;
+    const questionTypeSelect = document.getElementById(`questionType${questionId}`);
+    if (!questionTypeSelect) return; // Prevent errors if element is not found
+
+    const questionType = questionTypeSelect.value;
     const optionsBlock = document.getElementById(`optionsBlock${questionId}`);
     const checkboxBlock = document.getElementById(`checkboxBlock${questionId}`);
-    const numberedDropdownBlock = document.getElementById(`numberedDropdownBlock${questionId}`);
     const jumpOptionLabel = document.getElementById(`jumpOptionLabel${questionId}`);
     const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
 
     // Hide all blocks initially
     if (optionsBlock) optionsBlock.style.display = 'none';
     if (checkboxBlock) checkboxBlock.style.display = 'none';
-    if (numberedDropdownBlock) numberedDropdownBlock.style.display = 'none';
     if (jumpOptionLabel) jumpOptionLabel.style.display = 'none';
     if (jumpOptionSelect) jumpOptionSelect.style.display = 'none';
 
     // Show and update specific blocks based on question type
-    if (questionType === 'radio') {
-        if (jumpOptionLabel) jumpOptionLabel.style.display = 'block';
-        if (jumpOptionSelect) {
-            jumpOptionSelect.style.display = 'block';
-            updateJumpOptionsForRadio(questionId);
-        }
-    } else if (questionType === 'dropdown') {
-        if (optionsBlock) optionsBlock.style.display = 'block';
-        if (jumpOptionLabel) jumpOptionLabel.style.display = 'block';
-        if (jumpOptionSelect) {
-            jumpOptionSelect.style.display = 'block';
-            updateJumpOptions(questionId);
-        }
-    } else if (questionType === 'checkbox') {
-        if (checkboxBlock) checkboxBlock.style.display = 'block';
-    } else if (questionType === 'numberedDropdown') {
-        if (numberedDropdownBlock) numberedDropdownBlock.style.display = 'block';
+    switch (questionType) {
+        case 'radio':
+            if (jumpOptionLabel) jumpOptionLabel.style.display = 'block';
+            if (jumpOptionSelect) {
+                jumpOptionSelect.style.display = 'block';
+                updateJumpOptionsForRadio(questionId);
+            }
+            break;
+        case 'dropdown':
+            if (optionsBlock) optionsBlock.style.display = 'block';
+            if (jumpOptionLabel) jumpOptionLabel.style.display = 'block';
+            if (jumpOptionSelect) {
+                jumpOptionSelect.style.display = 'block';
+                updateJumpOptions(questionId);
+            }
+            break;
+        case 'checkbox':
+            if (checkboxBlock) checkboxBlock.style.display = 'block';
+            break;
     }
 }
+
 
 
 function toggleLogic(questionId) {
