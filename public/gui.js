@@ -44,6 +44,10 @@ function addQuestion(sectionId) {
             <label>Checkbox Options: </label>
             <div id="checkboxOptions${questionCounter}"></div>
             <button type="button" onclick="addCheckboxOption(${questionCounter})">Add Option</button>
+            <div style="margin-top: 10px;">
+                <input type="checkbox" id="noneOfTheAbove${questionCounter}">
+                <label for="noneOfTheAbove${questionCounter}">Include "None of the above" option</label>
+            </div>
         </div><br>
 
         <label>Conditional Logic: </label><br>
@@ -93,7 +97,6 @@ function toggleOptions(questionId) {
     jumpOptionSelect.innerHTML = ""; // Clear previous options
 
     if (questionType === 'radio') {
-        // For Yes/No, populate jump options with a dropdown
         const yesOption = document.createElement('option');
         yesOption.value = 'Yes';
         yesOption.text = 'Yes';
@@ -111,7 +114,6 @@ function toggleOptions(questionId) {
         jumpOptionSelect.style.display = 'block';
     } else if (questionType === 'checkbox') {
         checkboxBlock.style.display = 'block';
-        // Hide the jump option selector for checkboxes
         jumpOptionLabel.style.display = 'none';
         jumpOptionSelect.style.display = 'none';
     } else {
@@ -136,10 +138,8 @@ function toggleJumpLogic(questionId) {
     if (jumpEnabled) {
         const questionType = document.getElementById(`questionType${questionId}`).value;
         if (questionType === 'radio') {
-            // Populate jump options with Yes/No
             updateJumpOptionsForRadio(questionId);
         } else if (questionType === 'dropdown') {
-            // Update the jump options when jump logic is enabled for dropdown type
             updateJumpOptions(questionId);
         }
     }
@@ -164,16 +164,14 @@ function updateJumpOptions(questionId) {
     const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
     const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
 
-    // Clear all existing options in jumpOptionSelect
     jumpOptionSelect.innerHTML = '';
 
-    // Add each option from the dropdown input
     dropdownOptionsDiv.querySelectorAll('input[type="text"]').forEach(optionInput => {
-        const fullValue = optionInput.value.trim();  // Get the full input value
+        const fullValue = optionInput.value.trim();
         if (fullValue) {
             const opt = document.createElement('option');
-            opt.value = fullValue;  // Set the entire input as the value
-            opt.text = fullValue;   // Update the display text with the full value
+            opt.value = fullValue;
+            opt.text = fullValue;
             jumpOptionSelect.appendChild(opt);
         }
     });
@@ -193,9 +191,8 @@ function addDropdownOption(questionId) {
     `;
     dropdownOptionsDiv.appendChild(optionDiv);
 
-    // Create an empty option in the jump logic dropdown
     const opt = document.createElement('option');
-    opt.value = optionId;  // Placeholder value
+    opt.value = optionId;
     opt.text = `Option ${optionCount}`;
     jumpOptionSelect.appendChild(opt);
 }
@@ -302,6 +299,13 @@ function generateAndDownloadForm() {
                 options.forEach((option, index) => {
                     formHTML += `<input type="checkbox" id="answer${questionId}_${index + 1}" name="answer${questionId}" value="${option.value}"> ${option.value}<br>`;
                 });
+
+                // Add "None of the above" option if selected
+                const noneOfTheAboveSelected = document.getElementById(`noneOfTheAbove${questionId}`).checked;
+                if (noneOfTheAboveSelected) {
+                    formHTML += `<input type="checkbox" id="answer${questionId}_none" name="answer${questionId}" value="None of the above"> None of the above<br>`;
+                }
+
                 formHTML += `<br>`;
             }
 
@@ -329,9 +333,9 @@ function generateAndDownloadForm() {
                         formHTML += `
                         <script>
                             document.getElementById('answer${questionId}_${index + 1}').addEventListener('change', function() {
-                                if (this.checked) {
+                                if (this.checked && this.value !== "None of the above") {
                                     jumpTarget = '${jumpTo}';
-                                } else {
+                                } else if (!this.checked) {
                                     jumpTarget = null; // Reset jumpTarget if no option is selected
                                 }
                             });
