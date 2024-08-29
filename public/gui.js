@@ -25,6 +25,68 @@ function addSection(sectionId = null) {
     }
 }
 
+function removeSection(sectionId) {
+    const sectionBlock = document.getElementById(`sectionBlock${sectionId}`);
+    sectionBlock.remove();
+
+    // Update IDs and headers of all subsequent sections
+    const remainingSections = document.querySelectorAll('.section-block');
+    let newSectionIndex = sectionId;
+    remainingSections.forEach(block => {
+        if (parseInt(block.id.replace('sectionBlock', '')) > sectionId) {
+            const oldSectionId = block.id.replace('sectionBlock', '');
+            block.id = `sectionBlock${newSectionIndex}`;
+            block.querySelector('h2').innerText = `Section ${newSectionIndex}`;
+            
+            // Update questions within this section
+            updateQuestionsInSection(oldSectionId, newSectionIndex);
+
+            // Update the section-related buttons (Add/Remove Question)
+            block.querySelectorAll('button').forEach(button => {
+                const onclickAttr = button.getAttribute('onclick');
+                button.setAttribute('onclick', onclickAttr.replace(/\d+/, newSectionIndex));
+                if (button.textContent.includes('Add Question to Section')) {
+                    button.textContent = `Add Question to Section ${newSectionIndex}`;
+                }
+                if (button.textContent.includes('Remove Section')) {
+                    button.textContent = `Remove Section`;
+                }
+            });
+
+            newSectionIndex++;
+        }
+    });
+
+    sectionCounter = newSectionIndex;  // Reset sectionCounter to the new highest index
+}
+
+
+function updateQuestionsInSection(oldSectionId, newSectionId) {
+    const questionsInSection = document.querySelectorAll(`#questionsSection${oldSectionId} .question-block`);
+    let newQuestionIndex = 1;
+    questionsInSection.forEach(question => {
+        const oldQuestionId = question.id.replace('questionBlock', '');
+        question.id = `questionBlock${newQuestionIndex}`;
+        question.querySelector('label').innerText = `Question ${newQuestionIndex}:`;
+        // Update IDs in inputs, selects, etc.
+        question.querySelectorAll('input, select, div, label').forEach(input => {
+            const oldId = input.id;
+            input.id = oldId.replace(/\d+$/, newQuestionIndex);
+            if (input.tagName === 'LABEL' && input.getAttribute('for')) {
+                input.setAttribute('for', input.getAttribute('for').replace(/\d+$/, newQuestionIndex));
+            }
+        });
+
+        // Update container div ID for the questions section
+        question.parentNode.id = `questionsSection${newSectionId}`;
+
+        newQuestionIndex++;
+    });
+    questionCounter = newQuestionIndex;  // Reset questionCounter to the new highest index + 1
+}
+
+
+
 
 function addQuestion(sectionId, questionId = null) {
     const questionsSection = document.getElementById(`questionsSection${sectionId}`);
@@ -78,7 +140,7 @@ function addQuestion(sectionId, questionId = null) {
             <input type="checkbox" id="enableJump${currentQuestionId}" onchange="toggleJumpLogic(${currentQuestionId})">
             <label for="enableJump${currentQuestionId}">Enable Jump Logic</label><br><br>
             <div id="jumpBlock${currentQuestionId}" style="display: none;">
-                <label>Select the option that triggers the jump:</label><br>
+                <label>Select the option that triggers the jump:</label><br><center>
                 <select id="jumpOption${currentQuestionId}">
                     <!-- Options will be populated dynamically based on the question type -->
                 </select><br><br>
@@ -272,8 +334,27 @@ function removeTextboxLabel(questionId, labelNumber) {
 
 function removeQuestion(questionId) {
     const questionBlock = document.getElementById(`questionBlock${questionId}`);
+    const sectionId = questionBlock.closest('.section-block').id.replace('sectionBlock', '');
     questionBlock.remove();
+
+    // Update IDs of subsequent questions
+    const remainingQuestions = document.querySelectorAll(`#questionsSection${sectionId} .question-block`);
+    let newIndex = questionId;
+    remainingQuestions.forEach(block => {
+        if (parseInt(block.id.replace('questionBlock', '')) > questionId) {
+            block.id = `questionBlock${newIndex}`;
+            block.querySelector('label').innerText = `Question ${newIndex}:`;
+            block.querySelectorAll('input, select, div').forEach(input => {
+                const oldId = input.id;
+                input.id = oldId.replace(/\d+$/, newIndex);
+            });
+            newIndex++;
+        }
+    });
+
+    questionCounter = newIndex;  // Reset questionCounter to the new highest index + 1
 }
+
 
 
 
@@ -285,13 +366,21 @@ function generateAndDownloadForm() {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Custom Form</title>
-        <style>
-            .section { display: none; }
-            .section.active { display: block; }
-            .thank-you-message { display: none; font-size: 20px; font-weight: bold; text-align: center; margin-top: 20px; }
-        </style>
+		<link rel="stylesheet" href="new.css">
     </head>
     <body>
+	
+	<header>
+        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="forms.html">Forms</a>
+            <a href="contact.html">Contact Us</a>
+        </nav>
+    </header>
+	
+	<section>
+	
         <form id="customForm" onsubmit="return showThankYouMessage();">
         <script>let jumpTarget = null;<\/script>`;
 
@@ -319,7 +408,7 @@ function generateAndDownloadForm() {
 
             // Form HTML for different types of questions
             if (questionType === 'text') {
-                formHTML += `<input type="text" id="answer${questionId}"><br><br>`;
+                formHTML += `<br><input type="text" id="answer${questionId}"><br><br>`;
             } else if (questionType === 'radio') {
                 formHTML += `
                     <input type="radio" id="answer${questionId}_yes" name="answer${questionId}" value="Yes">
@@ -390,7 +479,8 @@ function generateAndDownloadForm() {
             formHTML += `<button type="button" onclick="navigateSection(${s - 1})">Back</button>`;
         }
         formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
-        formHTML += `</div></div>`;
+        formHTML += `</div></div><br>`;
+		
     }
 
     formHTML += `
@@ -421,6 +511,12 @@ function generateAndDownloadForm() {
                 return false; // Prevent actual form submission
             }
         <\/script>
+		
+		</section>
+
+    <footer>
+        &copy; 2024 FormWiz. All rights reserved.
+    </footer>
     </body>
     </html>
     `;
