@@ -9,6 +9,20 @@
             color: #333;
             background-color: #f4f4f4;
         }
+		
+		.section {
+                display: none;
+            }
+            .section.active {
+                display: block;
+            }
+            .thank-you-message {
+                display: none;
+                font-size: 20px;
+                font-weight: bold;
+                text-align: center;
+                margin-top: 20px;
+            }
 
         /* Header styling to match the provided design */
         header {
