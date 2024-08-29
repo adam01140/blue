@@ -102,18 +102,13 @@ function addQuestion(sectionId, questionId = null) {
         <input type="text" placeholder="Enter your question" id="question${currentQuestionId}"><br><br>
 
         <label>Question Type: </label>
-        <select id="questionType${currentQuestionId}" onchange="toggleOptions(${currentQuestionId})">
+        <select id="questionType${questionCounter}" onchange="toggleOptions(${questionCounter})">
             <option value="text">Text</option>
             <option value="radio">Yes/No</option>
             <option value="dropdown">Dropdown</option>
             <option value="checkbox">Checkbox</option>
+            <option value="numberedDropdown">Numbered Dropdown</option>
         </select><br><br>
-
-        <div id="optionsBlock${currentQuestionId}" class="dropdown-options" style="display: none;">
-            <label>Options: </label>
-            <div id="dropdownOptions${currentQuestionId}"></div>
-            <button type="button" onclick="addDropdownOption(${currentQuestionId})">Add Option</button>
-        </div><br>
 		
 		<div id="numberedDropdownBlock${questionCounter}" class="numbered-dropdown-options" style="display: none;">
             <label>Number Range: </label>
@@ -122,6 +117,12 @@ function addQuestion(sectionId, questionId = null) {
             <label>Textbox Labels:</label>
             <div id="textboxLabels${questionCounter}"></div>
             <button type="button" onclick="addTextboxLabel(${questionCounter})">Add Label</button>
+        </div><br>
+
+        <div id="optionsBlock${currentQuestionId}" class="dropdown-options" style="display: none;">
+            <label>Options: </label>
+            <div id="dropdownOptions${currentQuestionId}"></div>
+            <button type="button" onclick="addDropdownOption(${currentQuestionId})">Add Option</button>
         </div><br>
 
         <div id="checkboxBlock${currentQuestionId}" class="checkbox-options" style="display: none;">
@@ -172,19 +173,22 @@ function addQuestion(sectionId, questionId = null) {
 }
 
 
+
 function toggleOptions(questionId) {
     const questionTypeSelect = document.getElementById(`questionType${questionId}`);
-    if (!questionTypeSelect) return; // Prevent errors if element is not found
+    if (!questionTypeSelect) return; // Prevent errors if the element is not found
 
     const questionType = questionTypeSelect.value;
     const optionsBlock = document.getElementById(`optionsBlock${questionId}`);
     const checkboxBlock = document.getElementById(`checkboxBlock${questionId}`);
+    const numberedDropdownBlock = document.getElementById(`numberedDropdownBlock${questionId}`); // Ensure this element exists in your HTML
     const jumpOptionLabel = document.getElementById(`jumpOptionLabel${questionId}`);
     const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
 
     // Hide all blocks initially
     if (optionsBlock) optionsBlock.style.display = 'none';
     if (checkboxBlock) checkboxBlock.style.display = 'none';
+    if (numberedDropdownBlock) numberedDropdownBlock.style.display = 'none'; // Handling the visibility of numberedDropdown block
     if (jumpOptionLabel) jumpOptionLabel.style.display = 'none';
     if (jumpOptionSelect) jumpOptionSelect.style.display = 'none';
 
@@ -208,8 +212,12 @@ function toggleOptions(questionId) {
         case 'checkbox':
             if (checkboxBlock) checkboxBlock.style.display = 'block';
             break;
+        case 'numberedDropdown':
+            if (numberedDropdownBlock) numberedDropdownBlock.style.display = 'block'; // Display the numberedDropdown options block
+            break;
     }
 }
+
 
 
 
@@ -376,7 +384,7 @@ function removeQuestion(questionId) {
 
 
 function generateAndDownloadForm() {
-    let formHTML = `
+     let formHTML = `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -398,9 +406,8 @@ function generateAndDownloadForm() {
 	
 	<section>
 	<div id="box">
-	
         <form id="customForm" onsubmit="return showThankYouMessage();">
-        <script>let jumpTarget = null;<\/script>`;
+    `;
 
     formHTML += `<script>let jumpTarget = null;<\/script>`;  // Initialize jumpTarget globally
 
@@ -429,10 +436,11 @@ function generateAndDownloadForm() {
                 formHTML += `<input type="text" id="answer${questionId}"><br><br>`;
             } else if (questionType === 'radio') {
                 // Generate select dropdown for Yes/No questions
-                formHTML += `<select id="answer${questionId}">
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select><br><br>`;
+                formHTML += `
+                    <select id="answer${questionId}">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select><br><br>`;
             } else if (questionType === 'dropdown') {
                 formHTML += `<select id="answer${questionId}">`;
                 const options = questionBlock.querySelectorAll(`#dropdownOptions${questionId} input`);
@@ -442,7 +450,6 @@ function generateAndDownloadForm() {
                 formHTML += `</select><br><br>`;
             } else if (questionType === 'checkbox') {
                 const options = questionBlock.querySelectorAll(`#checkboxOptions${questionId} input`);
-                formHTML += `<br>`;
                 options.forEach((option, index) => {
                     formHTML += `<input type="checkbox" id="answer${questionId}_${index + 1}" name="answer${questionId}" value="${option.value}"> ${option.value}<br>`;
                 });
@@ -454,6 +461,30 @@ function generateAndDownloadForm() {
                 }
 
                 formHTML += `<br>`;
+            } else if (questionType === 'numberedDropdown') {
+                const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
+                const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
+                const labels = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
+                
+                formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value, ${rangeStart}, ${rangeEnd})">`;
+                for (let i = rangeStart; i <= rangeEnd; i++) {
+                    formHTML += `<option value="${i}">${i}</option>`;
+                }
+                formHTML += `</select><br><br>`;
+
+                formHTML += `<div id="labelContainer${questionId}"></div>`;
+
+                formHTML += `<script>
+                    function showTextboxLabels(questionId, count, rangeStart, rangeEnd) {
+                        const container = document.getElementById('labelContainer' + questionId);
+                        container.innerHTML = '';
+                        for (let i = 1; i <= count; i++) {
+                            ${Array.from(labels).map(label => `
+                                container.innerHTML += '<label>${label.value} ' + i + ':</label><input type="text" id="label' + questionId + '_' + i + '${label.value.replace(/\s+/g, '')}"><br>';
+                            `).join('')}
+                        }
+                    }
+                <\/script>`;
             }
 
             // Add logic to show or hide the question based on previous answers
@@ -473,36 +504,17 @@ function generateAndDownloadForm() {
             }
 
             if (jumpEnabled && jumpTo) {
-                if (questionType === 'checkbox') {
-                    // Handle jump logic for all checkbox options
-                    const options = questionBlock.querySelectorAll(`#checkboxOptions${questionId} input`);
-                    options.forEach((option, index) => {
-                        formHTML += `
-                        <script>
-                            document.getElementById('answer${questionId}_${index + 1}').addEventListener('change', function() {
-                                if (this.checked && this.value !== "None of the above") {
-                                    jumpTarget = '${jumpTo}';
-                                } else if (!this.checked) {
-                                    jumpTarget = null; // Reset jumpTarget if no option is selected
-                                }
-                            });
-                        <\/script>
-                        `;
+                formHTML += `
+                <script>
+                    document.getElementById('answer${questionId}').addEventListener('change', function() {
+                        if (this.value === '${jumpOption}') {
+                            jumpTarget = '${jumpTo}';
+                        } else {
+                            jumpTarget = null; // Reset jumpTarget if no option is selected
+                        }
                     });
-                } else {
-                    // Handle jump logic for other types (e.g., radio, dropdown)
-                    formHTML += `
-                    <script>
-                        document.getElementById('answer${questionId}').addEventListener('change', function() {
-                            if (this.value === '${jumpOption}') {
-                                jumpTarget = '${jumpTo}';
-                            } else {
-                                jumpTarget = null; // Reset jumpTarget if no option is selected
-                            }
-                        });
-                    <\/script>
-                    `;
-                }
+                <\/script>
+                `;
             }
 
         });
@@ -555,8 +567,6 @@ function generateAndDownloadForm() {
     <footer>
         &copy; 2024 FormWiz. All rights reserved.
     </footer>
-	
-	
     </body>
     </html>
     `;
