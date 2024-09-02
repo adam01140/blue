@@ -382,20 +382,19 @@ function removeQuestion(questionId) {
 
 
 
-
 function generateAndDownloadForm() {
-     let formHTML = `
+    let formHTML = `
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Custom Form</title>
-		<link rel="stylesheet" href="new.css">
+        <link rel="stylesheet" href="new.css">
     </head>
     <body>
-	
-	<header>
+    
+    <header>
         <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
         <nav>
             <a href="index.html">Home</a>
@@ -403,13 +402,11 @@ function generateAndDownloadForm() {
             <a href="contact.html">Contact Us</a>
         </nav>
     </header>
-	
-	<section>
-	<div id="box">
+    
+    <section>
+    <div id="box">
         <form id="customForm" onsubmit="return showThankYouMessage();">
     `;
-
-    formHTML += `<script>let jumpTarget = null;<\/script>`;  // Initialize jumpTarget globally
 
     for (let s = 1; s < sectionCounter; s++) {
         const sectionBlock = document.getElementById(`sectionBlock${s}`);
@@ -435,7 +432,6 @@ function generateAndDownloadForm() {
             if (questionType === 'text') {
                 formHTML += `<input type="text" id="answer${questionId}"><br><br>`;
             } else if (questionType === 'radio') {
-                // Generate select dropdown for Yes/No questions
                 formHTML += `
                     <select id="answer${questionId}">
                         <option value="Yes">Yes</option>
@@ -454,124 +450,82 @@ function generateAndDownloadForm() {
                     formHTML += `<input type="checkbox" id="answer${questionId}_${index + 1}" name="answer${questionId}" value="${option.value}"> ${option.value}<br>`;
                 });
 
-                // Add "None of the above" option if selected
                 const noneOfTheAboveSelected = document.getElementById(`noneOfTheAbove${questionId}`).checked;
                 if (noneOfTheAboveSelected) {
                     formHTML += `<input type="checkbox" id="answer${questionId}_none" name="answer${questionId}" value="None of the above"> None of the above<br>`;
                 }
 
                 formHTML += `<br>`;
-            } else if (questionType === 'numberedDropdown') {
-                const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
-                const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
-                const labels = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
-                
-                formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value, ${rangeStart}, ${rangeEnd})">`;
-                for (let i = rangeStart; i <= rangeEnd; i++) {
-                    formHTML += `<option value="${i}">${i}</option>`;
-                }
-                formHTML += `</select><br><br>`;
-
-                formHTML += `<div id="labelContainer${questionId}"></div>`;
-
-                formHTML += `<script>
-                    function showTextboxLabels(questionId, count, rangeStart, rangeEnd) {
-                        const container = document.getElementById('labelContainer' + questionId);
-                        container.innerHTML = '';
-                        for (let i = 1; i <= count; i++) {
-                            ${Array.from(labels).map(label => `
-                                container.innerHTML += '<label>${label.value} ' + i + ':</label><input type="text" id="label' + questionId + '_' + i + '${label.value.replace(/\s+/g, '')}"><br>';
-                            `).join('')}
-                        }
-                    }
-                <\/script>`;
             }
 
-            // Add logic to show or hide the question based on previous answers
-            if (logicEnabled && prevQuestion) {
-                formHTML += `
-                <script>
-                    document.getElementById('question${questionId}').style.display = 'none';
-                    document.getElementById('answer${prevQuestion}_${prevAnswer}').addEventListener('change', function() {
-                        if (this.checked) {
-                            document.getElementById('question${questionId}').style.display = 'block';
-                        } else {
-                            document.getElementById('question${questionId}').style.display = 'none';
-                        }
-                    });
-                <\/script>
-                `;
+            // Add navigation buttons for each section
+            formHTML += `
+            <div class="navigation-buttons">`;
+
+            if (s > 1) {
+                formHTML += `<button type="button" onclick="navigateSection(${s - 1})">Back</button>`;
             }
 
-            if (jumpEnabled && jumpTo) {
-                formHTML += `
-                <script>
-                    document.getElementById('answer${questionId}').addEventListener('change', function() {
-                        if (this.value === '${jumpOption}') {
-                            jumpTarget = '${jumpTo}';
-                        } else {
-                            jumpTarget = null; // Reset jumpTarget if no option is selected
-                        }
-                    });
-                <\/script>
-                `;
-            }
+            formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
 
+            formHTML += `</div>`;
+            formHTML += `</div>`;
         });
-
-        // Add navigation buttons for each section
-        formHTML += `
-        <div class="navigation-buttons">`;
-
-        if (s > 1) {
-            formHTML += `<button type="button" onclick="navigateSection(${s - 1})">Back</button>`;
-        }
-
-        formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
-
-        formHTML += `</div>`;
-
-        formHTML += `</div>`;
     }
 
     formHTML += `
         </form>
         <div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
-        <script>
-            function handleNext(currentSection) {
-                if (jumpTarget === 'end') {
-                    document.getElementById('customForm').style.display = 'none';
-                    document.getElementById('thankYouMessage').style.display = 'block';
-                } else if (jumpTarget) {
-                    navigateSection(jumpTarget);
-                } else {
-                    navigateSection(currentSection + 1); // Ensure it always moves to the next section if no jumpTarget
-                }
-                jumpTarget = null; // Reset jumpTarget after navigating
-            }
-
-            function navigateSection(sectionNumber) {
-                const sections = document.querySelectorAll('.section');
-                sections.forEach(section => section.classList.remove('active'));
-                document.getElementById('section' + sectionNumber).classList.add('active');
-            }
-
-            function showThankYouMessage() {
-                document.getElementById('customForm').style.display = 'none';
-                document.getElementById('thankYouMessage').style.display = 'block';
-                return false; // Prevent actual form submission
-            }
-        <\/script>
-		</section>
-</div>
+    </section>
+    </div>
     <footer>
         &copy; 2024 FormWiz. All rights reserved.
     </footer>
+    
+    <script>
+        let jumpTarget = null;
+
+        // Attach event listeners to all checkboxes dynamically
+        document.querySelectorAll('input[name^="answer"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                if (this.value === 'None of the above') {
+                    jumpTarget = null;
+                } else if (this.checked) {
+                    jumpTarget = 'end';
+                }
+            });
+        });
+
+        function handleNext(currentSection) {
+            if (jumpTarget === 'end') {
+                document.getElementById('customForm').style.display = 'none';
+                document.getElementById('thankYouMessage').style.display = 'block';
+            } else if (jumpTarget) {
+                navigateSection(jumpTarget);
+            } else {
+                navigateSection(currentSection + 1);
+            }
+            jumpTarget = null; // Reset jumpTarget after navigating
+        }
+
+        function navigateSection(sectionNumber) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById('section' + sectionNumber).classList.add('active');
+        }
+
+        function showThankYouMessage() {
+            document.getElementById('customForm').style.display = 'none';
+            document.getElementById('thankYouMessage').style.display = 'block';
+            return false; // Prevent actual form submission
+        }
+    </script>
     </body>
     </html>
     `;
 
     downloadHTML(formHTML, "custom_form.html");
 }
+
 
 
