@@ -87,6 +87,7 @@ function updateQuestionsInSection(oldSectionId, newSectionId) {
 
 
 
+
 function addQuestion(sectionId, questionId = null) {
     const questionsSection = document.getElementById(`questionsSection${sectionId}`);
     const questionBlock = document.createElement('div');
@@ -108,7 +109,16 @@ function addQuestion(sectionId, questionId = null) {
             <option value="checkbox">Checkbox</option>
             <option value="numberedDropdown">Numbered Dropdown</option>
         </select><br><br>
-		
+
+        <div id="numberedDropdownBlock${currentQuestionId}" class="numbered-dropdown-options" style="display: none;">
+            <label>Number Range: </label>
+            <input type="number" id="numberRangeStart${currentQuestionId}" placeholder="Start" min="1" style="width: 60px;">
+            <input type="number" id="numberRangeEnd${currentQuestionId}" placeholder="End" min="1" style="width: 60px;"><br><br>
+            <label>Textbox Labels:</label>
+            <div id="textboxLabels${currentQuestionId}"></div>
+            <button type="button" onclick="addTextboxLabel(${currentQuestionId})">Add Label</button>
+        </div><br>
+
         <div id="optionsBlock${currentQuestionId}" class="dropdown-options" style="display: none;">
             <label>Options: </label>
             <div id="dropdownOptions${currentQuestionId}"></div>
@@ -122,6 +132,33 @@ function addQuestion(sectionId, questionId = null) {
             <div style="margin-top: 10px;">
                 <input type="checkbox" id="noneOfTheAbove${currentQuestionId}">
                 <label for="noneOfTheAbove${currentQuestionId}">Include "None of the above" option</label>
+            </div>
+        </div><br>
+
+        <label>Conditional Logic: </label><br>
+        <input type="checkbox" id="logic${currentQuestionId}" onchange="toggleLogic(${currentQuestionId})">
+        <label for="logic${currentQuestionId}">Enable Logic</label><br><br>
+
+        <div id="logicBlock${currentQuestionId}" style="display: none;">
+            <label>Show this question if: </label><br>
+            <input type="number" placeholder="Previous question number" id="prevQuestion${currentQuestionId}"><br>
+            <select id="prevAnswer${currentQuestionId}">
+                <option value="Yes">Answer is Yes</option>
+                <option value="No">Answer is No</option>
+            </select>
+        </div><br>
+
+        <label>Jump Logic: </label><br>
+        <div id="jumpLogic${currentQuestionId}">
+            <input type="checkbox" id="enableJump${currentQuestionId}" onchange="toggleJumpLogic(${currentQuestionId})">
+            <label for="enableJump${currentQuestionId}">Enable Jump Logic</label><br><br>
+            <div id="jumpBlock${currentQuestionId}" style="display: none;">
+                <label id="jumpOptionLabel${currentQuestionId}" style="text-align: center;">Select the option that triggers the jump:</label><br>
+                <select id="jumpOption${currentQuestionId}" style="display: block; margin: 0 auto;">
+                    <!-- Options will be populated dynamically based on the question type -->
+                </select><br><br>
+                <label>Jump to (enter section number or 'end'):</label><br>
+                <input type="text" placeholder="Section number or 'end'" id="jumpTo${currentQuestionId}"><br>
             </div>
         </div><br>
 
