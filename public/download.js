@@ -164,9 +164,26 @@ function loadFormData(formData) {
                     dropdownOptionsDiv.appendChild(optionDiv);
                 });
             }
+
+            // Load logic settings
+            if (question.logic.enabled) {
+                questionBlock.querySelector(`#logic${question.questionId}`).checked = true;
+                toggleLogic(question.questionId); // Ensure logic UI is visible
+                questionBlock.querySelector(`#prevQuestion${question.questionId}`).value = question.logic.prevQuestion;
+                questionBlock.querySelector(`#prevAnswer${question.questionId}`).value = question.logic.prevAnswer;
+            }
+
+            // Load jump logic settings
+            if (question.jump.enabled) {
+                questionBlock.querySelector(`#enableJump${question.questionId}`).checked = true;
+                toggleJumpLogic(question.questionId); // Ensure jump logic UI is visible
+                questionBlock.querySelector(`#jumpOption${question.questionId}`).value = question.jump.option;
+                questionBlock.querySelector(`#jumpTo${question.questionId}`).value = question.jump.to;
+            }
         });
     });
 }
+
 
 
 

@@ -7,6 +7,12 @@ function generateAndDownloadForm() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Custom Form</title>
         <link rel="stylesheet" href="new.css">
+        <style>
+            .section { display: none; }
+            .section.active { display: block; }
+            .thank-you-message { display: none; font-size: 20px; font-weight: bold; text-align: center; margin-top: 20px; }
+            .hidden { display: none; }
+        </style>
     </head>
     <body>
     
@@ -37,6 +43,7 @@ function generateAndDownloadForm() {
             const questionText = questionBlock.querySelector(`input[type="text"]`).value;
             const questionType = questionBlock.querySelector(`select`).value;
 
+            formHTML += `<div id="question-container-${questionId}">`;
             formHTML += `<label>${questionText}</label><br>`;
 
             if (questionType === 'text') {
@@ -66,7 +73,39 @@ function generateAndDownloadForm() {
                 }
 
                 formHTML += `<br>`;
+            } else if (questionType === 'numberedDropdown') {
+                const start = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
+                const end = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
+                const labels = Array.from(questionBlock.querySelectorAll(`#textboxLabels${questionId} input`)).map(label => label.value);
+
+                formHTML += `<select id="answer${questionId}">`;
+                for (let i = parseInt(start); i <= parseInt(end); i++) {
+                    formHTML += `<option value="${i}">${i}</option>`;
+                }
+                formHTML += `</select><br><br>`;
+
+                // Generate labeled textboxes based on selected value
+                formHTML += `
+                <div id="labeledTextboxes${questionId}">
+                    <script>
+                        document.getElementById('answer${questionId}').addEventListener('change', function() {
+                            const container = document.getElementById('labeledTextboxes${questionId}');
+                            container.innerHTML = ''; // Clear existing textboxes
+                            const selectedValue = this.value;
+                            const labels = ${JSON.stringify(labels)};
+
+                            for (let i = 1; i <= selectedValue; i++) {
+                                labels.forEach(label => {
+                                    container.innerHTML += '<label>' + label + i + ':</label><input type="text" id="textbox_' + label + i + '"><br>';
+                                });
+                                container.innerHTML += '<br>';
+                            }
+                        });
+                    </script>
+                </div>`;
             }
+
+            formHTML += `</div>`; // Close question container
         });
 
         // Add navigation buttons for each section only once
