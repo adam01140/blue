@@ -47,6 +47,7 @@ function generateAndDownloadForm() {
             const prevAnswer = questionBlock.querySelector(`#prevAnswer${questionId}`).value;
             const jumpEnabled = questionBlock.querySelector(`#enableJump${questionId}`).checked;
             const jumpTo = questionBlock.querySelector(`#jumpTo${questionId}`).value;
+            const jumpOption = questionBlock.querySelector(`#jumpOption${questionId}`).value;
 
             formHTML += `<div id="question-container-${questionId}" ${logicEnabled ? 'class="hidden"' : ''}>`;
             formHTML += `<label>${questionText}</label><br>`;
@@ -132,8 +133,8 @@ function generateAndDownloadForm() {
                 formHTML += `
                 <script>
                     document.getElementById('answer${questionId}').addEventListener('change', function() {
-                        if (this.value === '${jumpTo}') {
-                            jumpTarget = 'end';
+                        if (this.value === '${jumpOption}') {
+                            jumpTarget = '${jumpTo}';
                         } else {
                             jumpTarget = null; // Reset jumpTarget if no option is selected
                         }
@@ -172,7 +173,7 @@ function generateAndDownloadForm() {
         // Attach event listeners to dropdowns and checkboxes dynamically
         document.querySelectorAll('select[id^="answer"], input[name^="answer"]').forEach(input => {
             input.addEventListener('change', function () {
-                if (this.tagName === 'SELECT' && this.value === 'opt 1') {
+                if (this.tagName === 'SELECT' && this.value === 'Yes') {
                     jumpTarget = 'end';
                 } else if (this.tagName === 'INPUT' && this.type === 'checkbox') {
                     if (this.value === 'None of the above') {
