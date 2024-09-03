@@ -42,8 +42,13 @@ function generateAndDownloadForm() {
             const questionId = questionBlock.id.replace('questionBlock', '');
             const questionText = questionBlock.querySelector(`input[type="text"]`).value;
             const questionType = questionBlock.querySelector(`select`).value;
+            const logicEnabled = questionBlock.querySelector(`#logic${questionId}`).checked;
+            const prevQuestionId = questionBlock.querySelector(`#prevQuestion${questionId}`).value;
+            const prevAnswer = questionBlock.querySelector(`#prevAnswer${questionId}`).value;
+            const jumpEnabled = questionBlock.querySelector(`#enableJump${questionId}`).checked;
+            const jumpTo = questionBlock.querySelector(`#jumpTo${questionId}`).value;
 
-            formHTML += `<div id="question-container-${questionId}">`;
+            formHTML += `<div id="question-container-${questionId}" ${logicEnabled ? 'class="hidden"' : ''}>`;
             formHTML += `<label>${questionText}</label><br>`;
 
             if (questionType === 'text') {
@@ -106,6 +111,35 @@ function generateAndDownloadForm() {
             }
 
             formHTML += `</div>`; // Close question container
+
+            // Conditional Logic Script for Yes/No Questions
+            if (logicEnabled && prevQuestionId) {
+                formHTML += `
+                <script>
+                    document.getElementById('answer${prevQuestionId}').addEventListener('change', function() {
+                        const questionElement = document.getElementById('question-container-${questionId}');
+                        if (this.value === '${prevAnswer}') {
+                            questionElement.classList.remove('hidden');
+                        } else {
+                            questionElement.classList.add('hidden');
+                        }
+                    });
+                </script>`;
+            }
+
+            // Jump Logic Script
+            if (jumpEnabled && jumpTo) {
+                formHTML += `
+                <script>
+                    document.getElementById('answer${questionId}').addEventListener('change', function() {
+                        if (this.value === '${jumpTo}') {
+                            jumpTarget = 'end';
+                        } else {
+                            jumpTarget = null; // Reset jumpTarget if no option is selected
+                        }
+                    });
+                </script>`;
+            }
         });
 
         // Add navigation buttons for each section only once
