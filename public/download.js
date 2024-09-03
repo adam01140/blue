@@ -115,7 +115,6 @@ function importForm(event) {
 
 
 
-
 function loadFormData(formData) {
     // Clear existing form
     document.getElementById('formBuilder').innerHTML = '';
@@ -131,7 +130,9 @@ function loadFormData(formData) {
             const questionBlock = document.getElementById(`questionBlock${question.questionId}`);
             questionBlock.querySelector(`input[type="text"]`).value = question.text;
             questionBlock.querySelector(`select`).value = question.type;
-            toggleOptions(question.questionId); // Ensure correct options are shown
+
+            // Trigger the toggleOptions function to ensure options menu is shown
+            toggleOptions(question.questionId);
 
             // Populate options for checkbox or dropdown
             if (question.type === 'checkbox') {
@@ -148,10 +149,25 @@ function loadFormData(formData) {
                     `;
                     checkboxOptionsDiv.appendChild(optionDiv);
                 });
+            } else if (question.type === 'dropdown') {
+                const dropdownOptionsDiv = document.getElementById(`dropdownOptions${question.questionId}`);
+                dropdownOptionsDiv.innerHTML = ''; // Clear any existing options
+
+                // Add each option from the JSON data
+                question.options.forEach(option => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = `option${dropdownOptionsDiv.children.length + 1}`;
+                    optionDiv.innerHTML = `
+                        <input type="text" value="${option}" placeholder="Option ${dropdownOptionsDiv.children.length + 1}">
+                        <button type="button" onclick="removeDropdownOption(${question.questionId}, ${dropdownOptionsDiv.children.length + 1})">Remove</button>
+                    `;
+                    dropdownOptionsDiv.appendChild(optionDiv);
+                });
             }
         });
     });
 }
+
 
 
 

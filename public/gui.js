@@ -87,7 +87,6 @@ function updateQuestionsInSection(oldSectionId, newSectionId) {
 
 
 
-
 function addQuestion(sectionId, questionId = null) {
     const questionsSection = document.getElementById(`questionsSection${sectionId}`);
     const questionBlock = document.createElement('div');
@@ -102,7 +101,7 @@ function addQuestion(sectionId, questionId = null) {
         <input type="text" placeholder="Enter your question" id="question${currentQuestionId}"><br><br>
 
         <label>Question Type: </label>
-        <select id="questionType${questionCounter}" onchange="toggleOptions(${questionCounter})">
+        <select id="questionType${currentQuestionId}" onchange="toggleOptions(${currentQuestionId})">
             <option value="text">Text</option>
             <option value="radio">Yes/No</option>
             <option value="dropdown">Dropdown</option>
@@ -110,15 +109,6 @@ function addQuestion(sectionId, questionId = null) {
             <option value="numberedDropdown">Numbered Dropdown</option>
         </select><br><br>
 		
-		<div id="numberedDropdownBlock${questionCounter}" class="numbered-dropdown-options" style="display: none;">
-            <label>Number Range: </label>
-            <input type="number" id="numberRangeStart${questionCounter}" placeholder="Start" min="1" style="width: 60px;">
-            <input type="number" id="numberRangeEnd${questionCounter}" placeholder="End" min="1" style="width: 60px;"><br><br>
-            <label>Textbox Labels:</label>
-            <div id="textboxLabels${questionCounter}"></div>
-            <button type="button" onclick="addTextboxLabel(${questionCounter})">Add Label</button>
-        </div><br>
-
         <div id="optionsBlock${currentQuestionId}" class="dropdown-options" style="display: none;">
             <label>Options: </label>
             <div id="dropdownOptions${currentQuestionId}"></div>
@@ -135,42 +125,19 @@ function addQuestion(sectionId, questionId = null) {
             </div>
         </div><br>
 
-        <label>Conditional Logic: </label><br>
-        <input type="checkbox" id="logic${currentQuestionId}" onchange="toggleLogic(${currentQuestionId})">
-        <label for="logic${currentQuestionId}">Enable Logic</label><br><br>
-
-        <div id="logicBlock${currentQuestionId}" style="display: none;">
-            <label>Show this question if: </label><br>
-            <input type="number" placeholder="Previous question number" id="prevQuestion${currentQuestionId}"><br>
-            <select id="prevAnswer${currentQuestionId}">
-                <option value="Yes">Answer is Yes</option>
-                <option value="No">Answer is No</option>
-            </select>
-        </div><br>
-
-        <label>Jump Logic: </label><br>
-        <div id="jumpLogic${currentQuestionId}">
-            <input type="checkbox" id="enableJump${currentQuestionId}" onchange="toggleJumpLogic(${currentQuestionId})">
-            <label for="enableJump${currentQuestionId}">Enable Jump Logic</label><br><br>
-            <div id="jumpBlock${currentQuestionId}" style="display: none;">
-                <label id="jumpOptionLabel${currentQuestionId}" style="text-align: center;">Select the option that triggers the jump:</label><br>
-                <select id="jumpOption${currentQuestionId}" style="display: block; margin: 0 auto;">
-                    <!-- Options will be populated dynamically based on the question type -->
-                </select><br><br>
-                <label>Jump to (enter section number or 'end'):</label><br>
-                <input type="text" placeholder="Section number or 'end'" id="jumpTo${currentQuestionId}"><br>
-            </div>
-        </div><br>
-
         <button type="button" onclick="removeQuestion(${currentQuestionId})">Remove Question</button>
     `;
     questionsSection.appendChild(questionBlock);
+
+    // Ensure the correct options menu is displayed based on the selected type
+    toggleOptions(currentQuestionId);
 
     // Increment questionCounter only if not loading from JSON
     if (!questionId) {
         questionCounter++;
     }
 }
+
 
 
 
