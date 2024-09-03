@@ -420,12 +420,6 @@ function generateAndDownloadForm() {
             const questionId = questionBlock.id.replace('questionBlock', '');
             const questionText = questionBlock.querySelector(`input[type="text"]`).value;
             const questionType = questionBlock.querySelector(`select`).value;
-            const logicEnabled = questionBlock.querySelector(`#logic${questionId}`).checked;
-            const prevQuestion = questionBlock.querySelector(`#prevQuestion${questionId}`).value;
-            const prevAnswer = questionBlock.querySelector(`#prevAnswer${questionId}`).value;
-            const jumpEnabled = questionBlock.querySelector(`#enableJump${questionId}`).checked;
-            const jumpOption = questionBlock.querySelector(`#jumpOption${questionId}`).value;
-            const jumpTo = questionBlock.querySelector(`#jumpTo${questionId}`).value;
 
             formHTML += `<label>${questionText}</label><br>`;
 
@@ -457,20 +451,21 @@ function generateAndDownloadForm() {
 
                 formHTML += `<br>`;
             }
-
-            // Add navigation buttons for each section
-            formHTML += `
-            <div class="navigation-buttons">`;
-
-            if (s > 1) {
-                formHTML += `<button type="button" onclick="navigateSection(${s - 1})">Back</button>`;
-            }
-
-            formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
-
-            formHTML += `</div>`;
-            formHTML += `</div>`;
         });
+
+        // Add navigation buttons for each section only once
+        formHTML += `
+        <div class="navigation-buttons">`;
+
+        if (s > 1) {
+            formHTML += `<button type="button" onclick="navigateSection(${s - 1})">Back</button>`;
+        }
+
+        formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
+
+        formHTML += `</div>`; // Close navigation-buttons div
+
+        formHTML += `</div>`; // Close section div
     }
 
     formHTML += `
