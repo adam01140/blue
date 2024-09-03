@@ -1,4 +1,3 @@
-
 function generateAndDownloadForm() {
     let formHTML = `
     <!DOCTYPE html>
@@ -97,13 +96,17 @@ function generateAndDownloadForm() {
     <script>
         let jumpTarget = null;
 
-        // Attach event listeners to all checkboxes dynamically
-        document.querySelectorAll('input[name^="answer"]').forEach(checkbox => {
-            checkbox.addEventListener('change', function () {
-                if (this.value === 'None of the above') {
-                    jumpTarget = null;
-                } else if (this.checked) {
+        // Attach event listeners to dropdowns and checkboxes dynamically
+        document.querySelectorAll('select[id^="answer"], input[name^="answer"]').forEach(input => {
+            input.addEventListener('change', function () {
+                if (this.tagName === 'SELECT' && this.value === 'opt 1') {
                     jumpTarget = 'end';
+                } else if (this.tagName === 'INPUT' && this.type === 'checkbox') {
+                    if (this.value === 'None of the above') {
+                        jumpTarget = null;
+                    } else if (this.checked) {
+                        jumpTarget = 'end';
+                    }
                 }
             });
         });
