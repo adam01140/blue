@@ -162,6 +162,10 @@ function addQuestion(sectionId, questionId = null) {
             </div>
         </div><br>
 
+        <!-- Add buttons to move questions up or down -->
+        <button type="button" onclick="moveQuestionUp(${currentQuestionId}, ${sectionId})">Push Question Up</button>
+        <button type="button" onclick="moveQuestionDown(${currentQuestionId}, ${sectionId})">Push Question Down</button><br><br>
+
         <button type="button" onclick="removeQuestion(${currentQuestionId})">Remove Question</button>
     `;
     questionsSection.appendChild(questionBlock);
@@ -174,6 +178,51 @@ function addQuestion(sectionId, questionId = null) {
         questionCounter++;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function moveQuestionUp(questionId, sectionId) {
+    const questionBlock = document.getElementById(`questionBlock${questionId}`);
+    const previousSibling = questionBlock.previousElementSibling;
+
+    if (previousSibling && previousSibling.classList.contains('question-block')) {
+        questionBlock.parentNode.insertBefore(questionBlock, previousSibling);
+        updateQuestionLabels(sectionId);
+    }
+}
+
+function moveQuestionDown(questionId, sectionId) {
+    const questionBlock = document.getElementById(`questionBlock${questionId}`);
+    const nextSibling = questionBlock.nextElementSibling;
+
+    if (nextSibling && nextSibling.classList.contains('question-block')) {
+        questionBlock.parentNode.insertBefore(nextSibling, questionBlock);
+        updateQuestionLabels(sectionId);
+    }
+}
+
+
+function updateQuestionLabels(sectionId) {
+    const questionsSection = document.getElementById(`questionsSection${sectionId}`);
+    const questionBlocks = questionsSection.querySelectorAll('.question-block');
+
+    questionBlocks.forEach((block, index) => {
+        const questionLabel = block.querySelector('label');
+        questionLabel.textContent = `Question ${index + 1}: `;
+    });
+}
+
 
 
 
