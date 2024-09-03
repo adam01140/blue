@@ -173,14 +173,16 @@ function generateAndDownloadForm() {
         // Attach event listeners to dropdowns and checkboxes dynamically
         document.querySelectorAll('select[id^="answer"], input[name^="answer"]').forEach(input => {
             input.addEventListener('change', function () {
-                if (this.tagName === 'SELECT' && this.value === 'Yes') {
+                if (this.tagName === 'SELECT' && this.value === 'Yes' && jumpTarget) {
                     jumpTarget = 'end';
                 } else if (this.tagName === 'INPUT' && this.type === 'checkbox') {
                     if (this.value === 'None of the above') {
                         jumpTarget = null;
-                    } else if (this.checked) {
+                    } else if (this.checked && jumpTarget) {
                         jumpTarget = 'end';
                     }
+                } else {
+                    jumpTarget = null;
                 }
             });
         });
