@@ -19,37 +19,6 @@ function downloadHTML(content, filename) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function exportForm() {
     const formData = {
         sections: [],
@@ -147,11 +116,6 @@ function importForm(event) {
 
 
 
-
-
-
-
-
 function loadFormData(formData) {
     // Clear existing form
     document.getElementById('formBuilder').innerHTML = '';
@@ -169,21 +133,26 @@ function loadFormData(formData) {
             questionBlock.querySelector(`select`).value = question.type;
             toggleOptions(question.questionId); // Ensure correct options are shown
 
-            // Populate logic and jump logic as required
-            if (question.logic.enabled) {
-                const logicCheckbox = questionBlock.querySelector(`#logic${question.questionId}`);
-                logicCheckbox.checked = true;
-                toggleLogic(question.questionId);
-            }
+            // Populate options for checkbox or dropdown
+            if (question.type === 'checkbox') {
+                const checkboxOptionsDiv = document.getElementById(`checkboxOptions${question.questionId}`);
+                checkboxOptionsDiv.innerHTML = ''; // Clear any existing options
 
-            if (question.jump.enabled) {
-                const jumpCheckbox = questionBlock.querySelector(`#enableJump${question.questionId}`);
-                jumpCheckbox.checked = true;
-                toggleJumpLogic(question.questionId);
+                // Add each option from the JSON data
+                question.options.forEach(option => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = `option${checkboxOptionsDiv.children.length + 1}`;
+                    optionDiv.innerHTML = `
+                        <input type="text" value="${option}" placeholder="Option ${checkboxOptionsDiv.children.length + 1}">
+                        <button type="button" onclick="removeCheckboxOption(${question.questionId}, ${checkboxOptionsDiv.children.length + 1})">Remove</button>
+                    `;
+                    checkboxOptionsDiv.appendChild(optionDiv);
+                });
             }
         });
     });
 }
+
 
 
 
