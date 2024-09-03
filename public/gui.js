@@ -15,6 +15,8 @@ function addSection(sectionId = null) {
         <div id="questionsSection${currentSectionId}"></div>
         <button type="button" onclick="addQuestion(${currentSectionId})">Add Question to Section ${currentSectionId}</button>
         <button type="button" onclick="removeSection(${currentSectionId})">Remove Section</button>
+        <button type="button" onclick="moveSectionUp(${currentSectionId})">Push Section Up</button>
+        <button type="button" onclick="moveSectionDown(${currentSectionId})">Push Section Down</button>
         <hr>
     `;
     formBuilder.appendChild(sectionBlock);
@@ -24,6 +26,124 @@ function addSection(sectionId = null) {
         sectionCounter++;
     }
 }
+
+function moveSectionUp(sectionId) {
+    const sectionBlock = document.getElementById(`sectionBlock${sectionId}`);
+    const previousSibling = sectionBlock.previousElementSibling;
+
+    if (previousSibling && previousSibling.classList.contains('section-block')) {
+        sectionBlock.parentNode.insertBefore(sectionBlock, previousSibling);
+        updateSectionLabels();
+    }
+}
+
+
+function moveSectionDown(sectionId) {
+    const sectionBlock = document.getElementById(`sectionBlock${sectionId}`);
+    const nextSibling = sectionBlock.nextElementSibling;
+
+    if (nextSibling && nextSibling.classList.contains('section-block')) {
+        sectionBlock.parentNode.insertBefore(nextSibling, sectionBlock);
+        updateSectionLabels();
+    }
+}
+
+function updateSectionLabels() {
+    const sections = document.querySelectorAll('.section-block');
+
+    sections.forEach((block, sectionIndex) => {
+        const sectionId = sectionIndex + 1;
+        const sectionLabel = block.querySelector('h2');
+        sectionLabel.textContent = `Section ${sectionId}`;
+        
+        // Update section-related IDs and event handlers
+        block.id = `sectionBlock${sectionId}`;
+        block.querySelector('button[onclick*="addQuestion"]').setAttribute('onclick', `addQuestion(${sectionId})`);
+        block.querySelector('button[onclick*="removeSection"]').setAttribute('onclick', `removeSection(${sectionId})`);
+        block.querySelector('button[onclick*="moveSectionUp"]').setAttribute('onclick', `moveSectionUp(${sectionId})`);
+        block.querySelector('button[onclick*="moveSectionDown"]').setAttribute('onclick', `moveSectionDown(${sectionId})`);
+    });
+
+    // Update global question labels across all sections
+    updateGlobalQuestionLabels();
+
+    sectionCounter = sections.length + 1; // Update sectionCounter
+}
+
+function updateGlobalQuestionLabels() {
+    const sections = document.querySelectorAll('.section-block');
+    let globalQuestionIndex = 1;
+
+    sections.forEach((block, sectionIndex) => {
+        const sectionId = sectionIndex + 1;
+        const questionsInSection = block.querySelectorAll('.question-block');
+
+        questionsInSection.forEach(questionBlock => {
+            // Update the question label
+            questionBlock.querySelector('label').innerText = `Question ${globalQuestionIndex}:`;
+            
+            // Update question-related IDs and event handlers
+            questionBlock.id = `questionBlock${globalQuestionIndex}`;
+            questionBlock.querySelectorAll('input, select, button').forEach(input => {
+                const oldId = input.id;
+                if (oldId) {
+                    const newId = oldId.replace(/\d+$/, globalQuestionIndex);
+                    input.id = newId;
+                    if (input.tagName === 'LABEL' && input.getAttribute('for')) {
+                        input.setAttribute('for', newId);
+                    }
+                }
+            });
+            
+            // Update buttons' onclick attributes
+            const moveUpButton = questionBlock.querySelector('button[onclick*="moveQuestionUp"]');
+            const moveDownButton = questionBlock.querySelector('button[onclick*="moveQuestionDown"]');
+            const removeButton = questionBlock.querySelector('button[onclick*="removeQuestion"]');
+            
+            moveUpButton.setAttribute('onclick', `moveQuestionUp(${globalQuestionIndex}, ${sectionId})`);
+            moveDownButton.setAttribute('onclick', `moveQuestionDown(${globalQuestionIndex}, ${sectionId})`);
+            removeButton.setAttribute('onclick', `removeQuestion(${globalQuestionIndex})`);
+
+            globalQuestionIndex++;
+        });
+    });
+
+    questionCounter = globalQuestionIndex;  // Reset questionCounter to the new highest index + 1
+}
+
+
+function updateQuestionsInSection(sectionId) {
+    const questionsInSection = document.querySelectorAll(`#questionsSection${sectionId} .question-block`);
+    let newQuestionIndex = 1;
+    questionsInSection.forEach(questionBlock => {
+        questionBlock.id = `questionBlock${newQuestionIndex}`;
+        questionBlock.querySelector('label').innerText = `Question ${newQuestionIndex}:`;
+        
+        // Update IDs in inputs, selects, etc.
+        questionBlock.querySelectorAll('input, select, div, label').forEach(input => {
+            const oldId = input.id;
+            input.id = oldId.replace(/\d+$/, newQuestionIndex);
+            if (input.tagName === 'LABEL' && input.getAttribute('for')) {
+                input.setAttribute('for', input.getAttribute('for').replace(/\d+$/, newQuestionIndex));
+            }
+        });
+
+        // Update buttons' onclick attributes
+        const moveUpButton = questionBlock.querySelector('button[onclick*="moveQuestionUp"]');
+        const moveDownButton = questionBlock.querySelector('button[onclick*="moveQuestionDown"]');
+        const removeButton = questionBlock.querySelector('button[onclick*="removeQuestion"]');
+        
+        moveUpButton.setAttribute('onclick', `moveQuestionUp(${newQuestionIndex}, ${sectionId})`);
+        moveDownButton.setAttribute('onclick', `moveQuestionDown(${newQuestionIndex}, ${sectionId})`);
+        removeButton.setAttribute('onclick', `removeQuestion(${newQuestionIndex})`);
+
+        newQuestionIndex++;
+    });
+    questionCounter = newQuestionIndex;  // Reset questionCounter to the new highest index + 1
+}
+
+
+
 
 function removeSection(sectionId) {
     const sectionBlock = document.getElementById(`sectionBlock${sectionId}`);
