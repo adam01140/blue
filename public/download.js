@@ -68,11 +68,19 @@ function exportForm() {
                 options.forEach(option => {
                     questionData.options.push(option.value);
                 });
-                // Add 'None of the above' as an option if it exists
                 const noneOfTheAbove = document.getElementById(`noneOfTheAbove${questionId}`);
                 if (noneOfTheAbove && noneOfTheAbove.checked) {
                     questionData.options.push('None of the above');
                 }
+            } else if (questionType === 'numberedDropdown') {
+                const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
+                const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
+                const labels = Array.from(questionBlock.querySelectorAll(`#textboxLabels${questionId} input`))
+                    .map(label => label.value);
+
+                questionData.min = rangeStart;
+                questionData.max = rangeEnd;
+                questionData.labels = labels; // Store labels for each numbered dropdown
             }
 
             sectionData.questions.push(questionData);
@@ -84,6 +92,7 @@ function exportForm() {
     const jsonString = JSON.stringify(formData, null, 2);
     downloadJSON(jsonString, "form_data.json");
 }
+
 
 
 
@@ -121,10 +130,8 @@ function importForm(event) {
 
 
 function loadFormData(formData) {
-    // Clear existing form
     document.getElementById('formBuilder').innerHTML = '';
 
-    // Set counters from the imported data
     sectionCounter = formData.sectionCounter;
     questionCounter = formData.questionCounter;
 
@@ -136,58 +143,55 @@ function loadFormData(formData) {
             questionBlock.querySelector(`input[type="text"]`).value = question.text;
             questionBlock.querySelector(`select`).value = question.type;
 
-            // Trigger the toggleOptions function to ensure options menu is shown
             toggleOptions(question.questionId);
 
-            // Populate options for checkbox or dropdown
             if (question.type === 'checkbox') {
                 const checkboxOptionsDiv = document.getElementById(`checkboxOptions${question.questionId}`);
-                checkboxOptionsDiv.innerHTML = ''; // Clear any existing options
+                checkboxOptionsDiv.innerHTML = '';
 
-                // Add each option from the JSON data
                 question.options.forEach(option => {
                     const optionDiv = document.createElement('div');
-                    optionDiv.className = `option${checkboxOptionsDiv.children.length + 1}`;
                     optionDiv.innerHTML = `
-                        <input type="text" value="${option}" placeholder="Option ${checkboxOptionsDiv.children.length + 1}">
+                        <input type="text" value="${option}" placeholder="Option">
                         <button type="button" onclick="removeCheckboxOption(${question.questionId}, ${checkboxOptionsDiv.children.length + 1})">Remove</button>
                     `;
                     checkboxOptionsDiv.appendChild(optionDiv);
                 });
-            } else if (question.type === 'dropdown') {
-                const dropdownOptionsDiv = document.getElementById(`dropdownOptions${question.questionId}`);
-                dropdownOptionsDiv.innerHTML = ''; // Clear any existing options
+            } else if (question.type === 'numberedDropdown') {
+                const rangeStart = questionBlock.querySelector(`#numberRangeStart${question.questionId}`);
+                const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${question.questionId}`);
+                rangeStart.value = question.min;
+                rangeEnd.value = question.max;
 
-                // Add each option from the JSON data
-                question.options.forEach(option => {
-                    const optionDiv = document.createElement('div');
-                    optionDiv.className = `option${dropdownOptionsDiv.children.length + 1}`;
-                    optionDiv.innerHTML = `
-                        <input type="text" value="${option}" placeholder="Option ${dropdownOptionsDiv.children.length + 1}">
-                        <button type="button" onclick="removeDropdownOption(${question.questionId}, ${dropdownOptionsDiv.children.length + 1})">Remove</button>
+                const labelsDiv = document.getElementById(`textboxLabels${question.questionId}`);
+                labelsDiv.innerHTML = '';
+                question.labels.forEach((label, index) => {
+                    const labelDiv = document.createElement('div');
+                    labelDiv.innerHTML = `
+                        <input type="text" value="${label}" placeholder="Label ${index + 1}">
+                        <button type="button" onclick="removeTextboxLabel(${question.questionId}, ${index + 1})">Remove</button>
                     `;
-                    dropdownOptionsDiv.appendChild(optionDiv);
+                    labelsDiv.appendChild(labelDiv);
                 });
             }
 
-            // Load logic settings
             if (question.logic.enabled) {
                 questionBlock.querySelector(`#logic${question.questionId}`).checked = true;
-                toggleLogic(question.questionId); // Ensure logic UI is visible
+                toggleLogic(question.questionId);
                 questionBlock.querySelector(`#prevQuestion${question.questionId}`).value = question.logic.prevQuestion;
                 questionBlock.querySelector(`#prevAnswer${question.questionId}`).value = question.logic.prevAnswer;
             }
 
-            // Load jump logic settings
             if (question.jump.enabled) {
                 questionBlock.querySelector(`#enableJump${question.questionId}`).checked = true;
-                toggleJumpLogic(question.questionId); // Ensure jump logic UI is visible
+                toggleJumpLogic(question.questionId);
                 questionBlock.querySelector(`#jumpOption${question.questionId}`).value = question.jump.option;
                 questionBlock.querySelector(`#jumpTo${question.questionId}`).value = question.jump.to;
             }
         });
     });
 }
+
 
 
 
