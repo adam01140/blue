@@ -99,22 +99,27 @@ function generateAndDownloadForm() {
                 </script>`;
             }
 
-			// Jump Logic Script for Checkbox
-            if (jumpEnabled && jumpTo && questionType === 'checkbox') {
-                formHTML += `
-                <script>
-                    document.querySelectorAll('input[name="answer${questionId}"]').forEach(checkbox => {
-                        checkbox.addEventListener('change', function() {
-                            const checkedOptions = Array.from(document.querySelectorAll('input[name="answer${questionId}"]:checked')).map(c => c.value);
-                            if (checkedOptions.length > 0) {  // If any checkbox is checked, trigger jump
-                                jumpTarget = '${jumpTo}';
-                            } else {
-                                jumpTarget = null;
-                            }
-                        });
-                    });
-                </script>`;
-            } else if (jumpEnabled && jumpTo) {
+
+if (jumpEnabled && jumpTo && questionType === 'checkbox') {
+    formHTML += `
+    <script>
+        document.querySelectorAll('input[name="answer${questionId}"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const checkedOptions = Array.from(document.querySelectorAll('input[name="answer${questionId}"]:checked')).map(c => c.value);
+                
+                // If 'None of the above' is selected, it should not trigger jump logic
+                const noneSelected = document.getElementById('answer${questionId}_none') && document.getElementById('answer${questionId}_none').checked;
+                const validOptions = checkedOptions.filter(option => option !== 'None of the above');
+
+                if (validOptions.length > 0 && !noneSelected) {
+                    jumpTarget = '${jumpTo}';
+                } else {
+                    jumpTarget = null; // Reset jumpTarget if no valid options are selected
+                }
+            });
+        });
+    </script>`;
+} else if (jumpEnabled && jumpTo) {
                 formHTML += `
                 <script>
                     document.getElementById('answer${questionId}').addEventListener('change', function() {

@@ -18,7 +18,6 @@ function downloadHTML(content, filename) {
 
 
 
-
 function exportForm() {
     const formData = {
         sections: [],
@@ -64,11 +63,16 @@ function exportForm() {
                 options: []
             };
 
-            if (questionType === 'dropdown' || questionType === 'checkbox') {
-                const options = questionBlock.querySelectorAll(questionType === 'dropdown' ? `#dropdownOptions${questionId} input` : `#checkboxOptions${questionId} input`);
+            if (questionType === 'checkbox') {
+                const options = questionBlock.querySelectorAll(`#checkboxOptions${questionId} input`);
                 options.forEach(option => {
                     questionData.options.push(option.value);
                 });
+                // Add 'None of the above' as an option if it exists
+                const noneOfTheAbove = document.getElementById(`noneOfTheAbove${questionId}`);
+                if (noneOfTheAbove && noneOfTheAbove.checked) {
+                    questionData.options.push('None of the above');
+                }
             }
 
             sectionData.questions.push(questionData);
@@ -80,6 +84,7 @@ function exportForm() {
     const jsonString = JSON.stringify(formData, null, 2);
     downloadJSON(jsonString, "form_data.json");
 }
+
 
 
 function downloadJSON(content, filename) {
