@@ -52,6 +52,7 @@ function generateAndDownloadForm() {
             formHTML += `<div id="question-container-${questionId}" ${logicEnabled ? 'class="hidden"' : ''}>`;
             formHTML += `<label>${questionText}</label><br>`;
 
+            // Handle the different question types
             if (questionType === 'text') {
                 formHTML += `<input type="text" id="answer${questionId}"><br><br>`;
             } else if (questionType === 'radio') {
@@ -79,36 +80,6 @@ function generateAndDownloadForm() {
                 }
 
                 formHTML += `<br>`;
-            } else if (questionType === 'numberedDropdown') {
-                const start = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
-                const end = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
-                const labels = Array.from(questionBlock.querySelectorAll(`#textboxLabels${questionId} input`)).map(label => label.value);
-
-                formHTML += `<select id="answer${questionId}">`;
-                for (let i = parseInt(start); i <= parseInt(end); i++) {
-                    formHTML += `<option value="${i}">${i}</option>`;
-                }
-                formHTML += `</select><br><br>`;
-
-                // Generate labeled textboxes based on selected value
-                formHTML += `
-                <div id="labeledTextboxes${questionId}">
-                    <script>
-                        document.getElementById('answer${questionId}').addEventListener('change', function() {
-                            const container = document.getElementById('labeledTextboxes${questionId}');
-                            container.innerHTML = ''; // Clear existing textboxes
-                            const selectedValue = this.value;
-                            const labels = ${JSON.stringify(labels)};
-
-                            for (let i = 1; i <= selectedValue; i++) {
-                                labels.forEach(label => {
-                                    container.innerHTML += '<label>' + label + i + ':</label><input type="text" id="textbox_' + label + i + '"><br>';
-                                });
-                                container.innerHTML += '<br>';
-                            }
-                        });
-                    </script>
-                </div>`;
             }
 
             formHTML += `</div>`; // Close question container
@@ -128,25 +99,22 @@ function generateAndDownloadForm() {
                 </script>`;
             }
 
-            // Jump Logic Script
+            // Jump Logic Script if enabled
             if (jumpEnabled && jumpTo) {
                 formHTML += `
                 <script>
-                    document.querySelectorAll('input[name="answer${questionId}"], select#answer${questionId}').forEach(input => {
-                        input.addEventListener('change', function() {
-                            if ((this.tagName === 'SELECT' && this.value === '${jumpOption}') || 
-                                (this.tagName === 'INPUT' && this.checked && this.value === '${jumpOption}')) {
-                                jumpTarget = '${jumpTo}';
-                            } else {
-                                jumpTarget = null; // Reset jumpTarget if no option is selected
-                            }
-                        });
+                    document.getElementById('answer${questionId}').addEventListener('change', function() {
+                        if (this.value === '${jumpOption}') {
+                            jumpTarget = '${jumpTo}';
+                        } else {
+                            jumpTarget = null; // Reset jumpTarget if no option is selected
+                        }
                     });
                 </script>`;
             }
         });
 
-        // Add navigation buttons for each section only once
+        // Add navigation buttons for each section
         formHTML += `
         <div class="navigation-buttons">`;
 
@@ -172,25 +140,6 @@ function generateAndDownloadForm() {
     
     <script>
         let jumpTarget = null;
-
-        // Attach event listeners to dropdowns and checkboxes dynamically
-        document.querySelectorAll('select[id^="answer"], input[name^="answer"]').forEach(input => {
-            input.addEventListener('change', function () {
-                if (this.tagName === 'SELECT' && this.value === 'Yes') {
-                    jumpTarget = 'end';
-                } else if (this.tagName === 'INPUT' && this.type === 'checkbox') {
-                    if (this.value === 'None of the above') {
-                        jumpTarget = null;
-                    } else if (this.checked && this.value === 'opt1') { // Example logic, can be customized
-                        jumpTarget = 'end';
-                    } else if (this.checked && this.value === 'opt2') { // Example logic, can be customized
-                        jumpTarget = 'end';
-                    }
-                } else {
-                    jumpTarget = null;
-                }
-            });
-        });
 
         function handleNext(currentSection) {
             if (jumpTarget === 'end') {

@@ -207,7 +207,6 @@ function updateQuestionsInSection(oldSectionId, newSectionId) {
 
 
 
-
 function addQuestion(sectionId, questionId = null) {
     const questionsSection = document.getElementById(`questionsSection${sectionId}`);
     const questionBlock = document.createElement('div');
@@ -281,13 +280,8 @@ function addQuestion(sectionId, questionId = null) {
                 <input type="text" placeholder="Section number or 'end'" id="jumpTo${currentQuestionId}"><br>
             </div>
         </div><br>
-
-        <!-- Add buttons to move questions up or down -->
-        <button type="button" onclick="moveQuestionUp(${currentQuestionId}, ${sectionId})">Push Question Up</button>
-        <button type="button" onclick="moveQuestionDown(${currentQuestionId}, ${sectionId})">Push Question Down</button><br><br>
-
-        <button type="button" onclick="removeQuestion(${currentQuestionId})">Remove Question</button>
     `;
+
     questionsSection.appendChild(questionBlock);
 
     // Ensure the correct options menu is displayed based on the selected type
@@ -298,6 +292,7 @@ function addQuestion(sectionId, questionId = null) {
         questionCounter++;
     }
 }
+
 
 
 
@@ -552,5 +547,7 @@ function removeQuestion(questionId) {
 
     questionCounter = newIndex;  // Reset questionCounter to the new highest index + 1
 }
+
+
 
 
