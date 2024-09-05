@@ -425,9 +425,25 @@ function toggleJumpLogic(questionId) {
             updateJumpOptionsForRadio(questionId);
         } else if (questionType === 'dropdown') {
             updateJumpOptions(questionId);
+        } else if (questionType === 'checkbox') {
+            // For checkbox, set the jump options to the values of the checkboxes
+            const checkboxOptionsDiv = document.getElementById(`checkboxOptions${questionId}`);
+            const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
+            jumpOptionSelect.innerHTML = ''; // Clear previous options
+
+            checkboxOptionsDiv.querySelectorAll('input[type="text"]').forEach(optionInput => {
+                const value = optionInput.value.trim();
+                if (value) {
+                    const opt = document.createElement('option');
+                    opt.value = value;
+                    opt.text = value;
+                    jumpOptionSelect.appendChild(opt);
+                }
+            });
         }
     }
 }
+
 
 
 function updateJumpOptionsForRadio(questionId) {
