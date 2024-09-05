@@ -80,6 +80,30 @@ function generateAndDownloadForm() {
                 }
 
                 formHTML += `<br>`;
+            } else if (questionType === 'numberedDropdown') {
+                const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
+                const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
+                const labels = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
+                
+                formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value, ${rangeStart}, ${rangeEnd})">`;
+                for (let i = rangeStart; i <= rangeEnd; i++) {
+                    formHTML += `<option value="${i}">${i}</option>`;
+                }
+                formHTML += `</select><br><br>`;
+
+                formHTML += `<div id="labelContainer${questionId}"></div>`;
+
+                formHTML += `<script>
+                    function showTextboxLabels(questionId, count, rangeStart, rangeEnd) {
+                        const container = document.getElementById('labelContainer' + questionId);
+                        container.innerHTML = '';
+                        for (let i = 1; i <= count; i++) {
+                            ${Array.from(labels).map(label => `
+                                container.innerHTML += '<label>${label.value} ' + i + ':</label><input type="text" id="label' + questionId + '_' + i + '${label.value.replace(/\s+/g, '')}"><br>';
+                            `).join('')}
+                        }
+                    }
+                <\/script>`;
             }
 
             formHTML += `</div>`; // Close question container
