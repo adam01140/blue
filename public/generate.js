@@ -84,7 +84,7 @@ function generateAndDownloadForm() {
                 const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
                 const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
                 const labels = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
-                
+
                 formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value, ${rangeStart}, ${rangeEnd})">`;
                 for (let i = rangeStart; i <= rangeEnd; i++) {
                     formHTML += `<option value="${i}">${i}</option>`;
@@ -99,11 +99,18 @@ function generateAndDownloadForm() {
                         container.innerHTML = '';
                         for (let i = 1; i <= count; i++) {
                             ${Array.from(labels).map(label => `
-                                container.innerHTML += '<label>${label.value} ' + i + ':</label><input type="text" id="label' + questionId + '_' + i + '${label.value.replace(/\s+/g, '')}"><br>';
+                                container.innerHTML += '<label>${label.value} ' + i + ':</label><input type="text" id="label' + questionId + '_' + i + '${label.value.replace(/\\s+/g, '')}"><br>';
                             `).join('')}
                         }
                     }
                 <\/script>`;
+            } else if (questionType === 'multipleTextboxes') {
+                const multipleTextboxesOptionsDiv = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} input`);
+                multipleTextboxesOptionsDiv.forEach((input, index) => {
+                    const labelText = input.value;
+                    formHTML += `<label>${labelText}</label><br>`;
+                    formHTML += `<input type="text" id="answer${questionId}_${index + 1}"><br><br>`;
+                });
             }
 
             formHTML += `</div>`; // Close question container
@@ -123,37 +130,34 @@ function generateAndDownloadForm() {
                 </script>`;
             }
 
-
-if (jumpEnabled && jumpTo && questionType === 'checkbox') {
-    formHTML += `
-    <script>
-        document.querySelectorAll('input[name="answer${questionId}"]').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const checkedOptions = Array.from(document.querySelectorAll('input[name="answer${questionId}"]:checked')).map(c => c.value);
-                
-                // If 'None of the above' is selected, it should not trigger jump logic
-                const noneSelected = document.getElementById('answer${questionId}_none') && document.getElementById('answer${questionId}_none').checked;
-                const validOptions = checkedOptions.filter(option => option !== 'None of the above');
-
-                if (validOptions.length > 0 && !noneSelected) {
-                    jumpTarget = '${jumpTo}';
-                } else {
-                    jumpTarget = null; // Reset jumpTarget if no valid options are selected
+            // Jump Logic Scripts
+            if (jumpEnabled && jumpTo) {
+                if (questionType === 'radio' || questionType === 'dropdown') {
+                    formHTML += `
+                    <script>
+                        document.getElementById('answer${questionId}').addEventListener('change', function() {
+                            if (this.value === '${jumpOption}') {
+                                jumpTarget = '${jumpTo}';
+                            } else {
+                                jumpTarget = null;
+                            }
+                        });
+                    </script>`;
+                } else if (questionType === 'checkbox') {
+                    formHTML += `
+                    <script>
+                        document.querySelectorAll('input[name="answer${questionId}"]').forEach(checkbox => {
+                            checkbox.addEventListener('change', function() {
+                                const checkedOptions = Array.from(document.querySelectorAll('input[name="answer${questionId}"]:checked')).map(c => c.value);
+                                if (checkedOptions.includes('${jumpOption}')) {
+                                    jumpTarget = '${jumpTo}';
+                                } else {
+                                    jumpTarget = null;
+                                }
+                            });
+                        });
+                    </script>`;
                 }
-            });
-        });
-    </script>`;
-} else if (jumpEnabled && jumpTo) {
-                formHTML += `
-                <script>
-                    document.getElementById('answer${questionId}').addEventListener('change', function() {
-                        if (this.value === '${jumpOption}') {
-                            jumpTarget = '${jumpTo}';
-                        } else {
-                            jumpTarget = null; // Reset jumpTarget if no option is selected
-                        }
-                    });
-                </script>`;
             }
         });
 
@@ -180,7 +184,7 @@ if (jumpEnabled && jumpTo && questionType === 'checkbox') {
     <footer>
         &copy; 2024 FormWiz. All rights reserved.
     </footer>
-    
+
     <script>
         let jumpTarget = null;
 

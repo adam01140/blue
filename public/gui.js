@@ -227,8 +227,10 @@ function addQuestion(sectionId, questionId = null) {
             <option value="dropdown">Dropdown</option>
             <option value="checkbox">Checkbox</option>
             <option value="numberedDropdown">Numbered Dropdown</option>
+            <option value="multipleTextboxes">Multiple Textboxes</option>
         </select><br><br>
 
+        <!-- Numbered Dropdown Options -->
         <div id="numberedDropdownBlock${currentQuestionId}" class="numbered-dropdown-options" style="display: none;">
             <label>Number Range: </label>
             <input type="number" id="numberRangeStart${currentQuestionId}" placeholder="Start" min="1" style="width: 60px;">
@@ -238,12 +240,14 @@ function addQuestion(sectionId, questionId = null) {
             <button type="button" onclick="addTextboxLabel(${currentQuestionId})">Add Label</button>
         </div><br>
 
+        <!-- Dropdown Options -->
         <div id="optionsBlock${currentQuestionId}" class="dropdown-options" style="display: none;">
             <label>Options: </label>
             <div id="dropdownOptions${currentQuestionId}"></div>
             <button type="button" onclick="addDropdownOption(${currentQuestionId})">Add Option</button>
         </div><br>
 
+        <!-- Checkbox Options -->
         <div id="checkboxBlock${currentQuestionId}" class="checkbox-options" style="display: none;">
             <label>Checkbox Options: </label>
             <div id="checkboxOptions${currentQuestionId}"></div>
@@ -254,6 +258,14 @@ function addQuestion(sectionId, questionId = null) {
             </div>
         </div><br>
 
+        <!-- Multiple Textboxes Options -->
+        <div id="multipleTextboxesBlock${currentQuestionId}" class="multiple-textboxes-options" style="display: none;">
+            <label>Textbox Options: </label>
+            <div id="multipleTextboxesOptions${currentQuestionId}"></div>
+            <button type="button" onclick="addMultipleTextboxOption(${currentQuestionId})">Add Textbox</button>
+        </div><br>
+
+        <!-- Conditional Logic -->
         <label>Conditional Logic: </label><br>
         <input type="checkbox" id="logic${currentQuestionId}" onchange="toggleLogic(${currentQuestionId})">
         <label for="logic${currentQuestionId}">Enable Logic</label><br><br>
@@ -267,6 +279,7 @@ function addQuestion(sectionId, questionId = null) {
             </select>
         </div><br>
 
+        <!-- Jump Logic -->
         <label>Jump Logic: </label><br>
         <div id="jumpLogic${currentQuestionId}">
             <input type="checkbox" id="enableJump${currentQuestionId}" onchange="toggleJumpLogic(${currentQuestionId})">
@@ -280,6 +293,11 @@ function addQuestion(sectionId, questionId = null) {
                 <input type="text" placeholder="Section number or 'end'" id="jumpTo${currentQuestionId}"><br>
             </div>
         </div><br>
+
+        <!-- Question Controls -->
+        <button type="button" onclick="moveQuestionUp(${currentQuestionId}, ${sectionId})">Move Question Up</button>
+        <button type="button" onclick="moveQuestionDown(${currentQuestionId}, ${sectionId})">Move Question Down</button>
+        <button type="button" onclick="removeQuestion(${currentQuestionId})">Remove Question</button>
     `;
 
     questionsSection.appendChild(questionBlock);
@@ -292,6 +310,8 @@ function addQuestion(sectionId, questionId = null) {
         questionCounter++;
     }
 }
+
+
 
 
 
@@ -349,14 +369,16 @@ function toggleOptions(questionId) {
     const questionType = questionTypeSelect.value;
     const optionsBlock = document.getElementById(`optionsBlock${questionId}`);
     const checkboxBlock = document.getElementById(`checkboxBlock${questionId}`);
-    const numberedDropdownBlock = document.getElementById(`numberedDropdownBlock${questionId}`); // Ensure this element exists in your HTML
+    const numberedDropdownBlock = document.getElementById(`numberedDropdownBlock${questionId}`);
+    const multipleTextboxesBlock = document.getElementById(`multipleTextboxesBlock${questionId}`); // New block for multiple textboxes
     const jumpOptionLabel = document.getElementById(`jumpOptionLabel${questionId}`);
     const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
 
     // Hide all blocks initially
     if (optionsBlock) optionsBlock.style.display = 'none';
     if (checkboxBlock) checkboxBlock.style.display = 'none';
-    if (numberedDropdownBlock) numberedDropdownBlock.style.display = 'none'; // Handling the visibility of numberedDropdown block
+    if (numberedDropdownBlock) numberedDropdownBlock.style.display = 'none';
+    if (multipleTextboxesBlock) multipleTextboxesBlock.style.display = 'none'; // Hide multiple textboxes block
     if (jumpOptionLabel) jumpOptionLabel.style.display = 'none';
     if (jumpOptionSelect) jumpOptionSelect.style.display = 'none';
 
@@ -381,10 +403,38 @@ function toggleOptions(questionId) {
             if (checkboxBlock) checkboxBlock.style.display = 'block';
             break;
         case 'numberedDropdown':
-            if (numberedDropdownBlock) numberedDropdownBlock.style.display = 'block'; // Display the numberedDropdown options block
+            if (numberedDropdownBlock) numberedDropdownBlock.style.display = 'block';
+            break;
+        case 'multipleTextboxes':
+            if (multipleTextboxesBlock) multipleTextboxesBlock.style.display = 'block';
             break;
     }
 }
+
+
+function addMultipleTextboxOption(questionId) {
+    const multipleTextboxesOptionsDiv = document.getElementById(`multipleTextboxesOptions${questionId}`);
+    const optionCount = multipleTextboxesOptionsDiv.children.length + 1;
+
+    const optionDiv = document.createElement('div');
+    optionDiv.className = `option${optionCount}`;
+    optionDiv.innerHTML = `
+        <input type="text" id="multipleTextboxLabel${questionId}_${optionCount}" placeholder="Label ${optionCount}">
+        <button type="button" onclick="removeMultipleTextboxOption(${questionId}, ${optionCount})">Remove</button>
+    `;
+    multipleTextboxesOptionsDiv.appendChild(optionDiv);
+}
+
+
+
+function removeMultipleTextboxOption(questionId, optionNumber) {
+    const optionDiv = document.querySelector(`#multipleTextboxesOptions${questionId} .option${optionNumber}`);
+    if (optionDiv) {
+        optionDiv.remove();
+    }
+}
+
+
 
 
 

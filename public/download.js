@@ -81,6 +81,13 @@ function exportForm() {
                 questionData.min = rangeStart;
                 questionData.max = rangeEnd;
                 questionData.labels = labels; // Store labels for each numbered dropdown
+            } else if (questionType === 'multipleTextboxes') {
+                const multipleTextboxesOptionsDiv = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} input`);
+                const labels = [];
+                multipleTextboxesOptionsDiv.forEach(input => {
+                    labels.push(input.value);
+                });
+                questionData.labels = labels;
             }
 
             sectionData.questions.push(questionData);
@@ -92,6 +99,7 @@ function exportForm() {
     const jsonString = JSON.stringify(formData, null, 2);
     downloadJSON(jsonString, "form_data.json");
 }
+
 
 
 
@@ -150,12 +158,16 @@ function loadFormData(formData) {
                 checkboxOptionsDiv.innerHTML = '';
 
                 question.options.forEach(option => {
-                    const optionDiv = document.createElement('div');
-                    optionDiv.innerHTML = `
-                        <input type="text" value="${option}" placeholder="Option">
-                        <button type="button" onclick="removeCheckboxOption(${question.questionId}, ${checkboxOptionsDiv.children.length + 1})">Remove</button>
-                    `;
-                    checkboxOptionsDiv.appendChild(optionDiv);
+                    if (option === 'None of the above') {
+                        document.getElementById(`noneOfTheAbove${question.questionId}`).checked = true;
+                    } else {
+                        const optionDiv = document.createElement('div');
+                        optionDiv.innerHTML = `
+                            <input type="text" value="${option}" placeholder="Option">
+                            <button type="button" onclick="removeCheckboxOption(${question.questionId}, ${checkboxOptionsDiv.children.length + 1})">Remove</button>
+                        `;
+                        checkboxOptionsDiv.appendChild(optionDiv);
+                    }
                 });
             } else if (question.type === 'numberedDropdown') {
                 const rangeStart = questionBlock.querySelector(`#numberRangeStart${question.questionId}`);
@@ -172,6 +184,19 @@ function loadFormData(formData) {
                         <button type="button" onclick="removeTextboxLabel(${question.questionId}, ${index + 1})">Remove</button>
                     `;
                     labelsDiv.appendChild(labelDiv);
+                });
+            } else if (question.type === 'multipleTextboxes') {
+                const multipleTextboxesOptionsDiv = document.getElementById(`multipleTextboxesOptions${question.questionId}`);
+                multipleTextboxesOptionsDiv.innerHTML = '';
+
+                question.labels.forEach((labelText, index) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = `option${index + 1}`;
+                    optionDiv.innerHTML = `
+                        <input type="text" id="multipleTextboxLabel${question.questionId}_${index + 1}" value="${labelText}" placeholder="Label ${index + 1}">
+                        <button type="button" onclick="removeMultipleTextboxOption(${question.questionId}, ${index + 1})">Remove</button>
+                    `;
+                    multipleTextboxesOptionsDiv.appendChild(optionDiv);
                 });
             }
 
@@ -191,6 +216,7 @@ function loadFormData(formData) {
         });
     });
 }
+
 
 
 
