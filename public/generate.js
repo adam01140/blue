@@ -108,8 +108,8 @@ function generateAndDownloadForm() {
                 const multipleTextboxesOptionsDiv = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} input`);
                 multipleTextboxesOptionsDiv.forEach((input, index) => {
                     const labelText = input.value;
-                    formHTML += `<label>${labelText}</label><br>`;
-                    formHTML += `<input type="text" id="answer${questionId}_${index + 1}"><br><br>`;
+                    // Modified code: Use placeholder and center the text
+                    formHTML += `<input type="text" id="answer${questionId}_${index + 1}" placeholder="${labelText}" style="text-align:center;"><br><br>`;
                 });
             }
 
@@ -127,7 +127,7 @@ function generateAndDownloadForm() {
                             questionElement.classList.add('hidden');
                         }
                     });
-                </script>`;
+                <\/script>`;
             }
 
             // Jump Logic Scripts
@@ -142,7 +142,7 @@ function generateAndDownloadForm() {
                                 jumpTarget = null;
                             }
                         });
-                    </script>`;
+                    <\/script>`;
                 } else if (questionType === 'checkbox') {
                     formHTML += `
                     <script>
@@ -156,7 +156,7 @@ function generateAndDownloadForm() {
                                 }
                             });
                         });
-                    </script>`;
+                    <\/script>`;
                 }
             }
         });
@@ -169,7 +169,12 @@ function generateAndDownloadForm() {
             formHTML += `<button type="button" onclick="navigateSection(${s - 1})">Back</button>`;
         }
 
-        formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
+        // Check if it's the last section
+        if (s === sectionCounter - 1) {
+            formHTML += `<button type="submit">Submit</button>`;
+        } else {
+            formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
+        }
 
         formHTML += `</div>`; // Close navigation-buttons div
 
@@ -211,7 +216,7 @@ function generateAndDownloadForm() {
             document.getElementById('thankYouMessage').style.display = 'block';
             return false; // Prevent actual form submission
         }
-    </script>
+    <\/script>
     </body>
     </html>
     `;

@@ -1,0 +1,592 @@
+{
+  "sections": [
+    {
+      "sectionId": 1,
+      "questions": [
+        {
+          "questionId": 1,
+          "text": "Plaintiff's Names (list all):",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 2,
+          "text": "Case Number:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 3,
+          "text": "Plaintiff's Contact Information",
+          "type": "label",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 4,
+          "text": "Name:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 5,
+          "text": "Phone:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 6,
+          "text": "Street Address:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 7,
+          "text": "City:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 8,
+          "text": "State:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 9,
+          "text": "Zip Code:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 10,
+          "text": "Mailing Address (if different):",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 11,
+          "text": "Mailing City:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 12,
+          "text": "Mailing State:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 13,
+          "text": "Mailing Zip Code:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 14,
+          "text": "Email Address (if available):",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 15,
+          "text": "Is there a second plaintiff?",
+          "type": "radio",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": true,
+            "option": "Yes",
+            "to": "2"
+          },
+          "options": ["Yes", "No"]
+        },
+        {
+          "questionId": 16,
+          "text": "Is any plaintiff doing business under a fictitious name?",
+          "type": "checkbox",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": ["Yes"]
+        },
+        {
+          "questionId": 17,
+          "text": "Is any plaintiff a licensee or payday lender under financial regulations?",
+          "type": "checkbox",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": ["Yes"]
+        }
+      ]
+    },
+    {
+      "sectionId": 2,
+      "questions": [
+        {
+          "questionId": 18,
+          "text": "Second Plaintiff's Name:",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "15",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 19,
+          "text": "Second Plaintiff's Phone:",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "15",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 20,
+          "text": "Second Plaintiff's Street Address:",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "15",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 21,
+          "text": "Second Plaintiff's City:",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "15",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 22,
+          "text": "Second Plaintiff's State:",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "15",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 23,
+          "text": "Second Plaintiff's Zip Code:",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "15",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        }
+      ]
+    },
+    {
+      "sectionId": 3,
+      "questions": [
+        {
+          "questionId": 24,
+          "text": "Defendant's Name:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 25,
+          "text": "Defendant's Phone:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 26,
+          "text": "Defendant's Street Address:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 27,
+          "text": "Defendant's City:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 28,
+          "text": "Defendant's State:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 29,
+          "text": "Defendant's Zip Code:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 30,
+          "text": "Is there a second defendant?",
+          "type": "radio",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": true,
+            "option": "Yes",
+            "to": "4"
+          },
+          "options": ["Yes", "No"]
+        },
+        {
+          "questionId": 31,
+          "text": "Is any defendant on active military duty?",
+          "type": "checkbox",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": ["Yes"]
+        }
+      ]
+    },
+    {
+      "sectionId": 4,
+      "questions": [
+        {
+          "questionId": 32,
+          "text": "Second Defendant's Name:",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "30",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 33,
+          "text": "Second Defendant's Phone:",
+          "type": "text",
+          "logic": {
+            "enabled": true,
+            "prevQuestion": "30",
+            "prevAnswer": "Yes"
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        }
+       
+      ]
+    },
+    {
+      "sectionId": 5,
+      "questions": [
+        {
+          "questionId": 34,
+          "text": "Amount the defendant owes you ($):",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 35,
+          "text": "Explain why the defendant owes you money:",
+          "type": "textarea",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        }
+      ]
+    }
+  ],
+  "sectionCounter": 6,
+  "questionCounter": 36
+}
