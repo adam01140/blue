@@ -12,6 +12,19 @@ function generateAndDownloadForm() {
             .section.active { display: block; }
             .thank-you-message { display: none; font-size: 20px; font-weight: bold; text-align: center; margin-top: 20px; }
             .hidden { display: none; }
+            
+			
+			
+			.checkbox-label, noneApplyCheckbox {
+		width: fit-content;
+        font-size: 18px; /* Increase font size as needed */
+        display: block;
+        text-align: left;
+        margin: 0 auto;
+        cursor: pointer; /* Changes cursor to pointer when hovering over the label */
+    }
+	
+	
         </style>
     </head>
     <body>
@@ -72,6 +85,7 @@ function generateAndDownloadForm() {
                 formHTML += `</select><br><br>`;
             } else if (questionType === 'checkbox') {
                 const options = questionBlock.querySelectorAll(`#checkboxOptions${questionId} input`);
+                formHTML += `<label class="checkbox-label"><div class="checkbox-container">`; // Add consistent indent
                 options.forEach((option, index) => {
                     formHTML += `<input type="checkbox" id="answer${questionId}_${index + 1}" name="answer${questionId}" value="${option.value}"> ${option.value}<br>`;
                 });
@@ -80,8 +94,7 @@ function generateAndDownloadForm() {
                 if (noneOfTheAboveSelected) {
                     formHTML += `<input type="checkbox" id="answer${questionId}_none" name="answer${questionId}" value="None of the above"> None of the above<br>`;
                 }
-
-                formHTML += `<br>`;
+                formHTML += `</div></div><br>`; // Close checkbox container
             } else if (questionType === 'numberedDropdown') {
                 const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
                 const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
