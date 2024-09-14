@@ -58,11 +58,13 @@ function generateAndDownloadForm() {
             } else if (questionType === 'radio') {
                 formHTML += `
                     <select id="answer${questionId}">
+                        <option value="" disabled selected>Select an option</option>
                         <option value="Yes">Yes</option>
                         <option value="No">No</option>
                     </select><br><br>`;
             } else if (questionType === 'dropdown') {
                 formHTML += `<select id="answer${questionId}">`;
+                formHTML += `<option value="" disabled selected>Select an option</option>`;
                 const options = questionBlock.querySelectorAll(`#dropdownOptions${questionId} input`);
                 options.forEach(option => {
                     formHTML += `<option value="${option.value}">${option.value}</option>`;
@@ -86,6 +88,7 @@ function generateAndDownloadForm() {
                 const labels = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
 
                 formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value, ${rangeStart}, ${rangeEnd})">`;
+                formHTML += `<option value="" disabled selected>Select an option</option>`;
                 for (let i = rangeStart; i <= rangeEnd; i++) {
                     formHTML += `<option value="${i}">${i}</option>`;
                 }
@@ -108,7 +111,7 @@ function generateAndDownloadForm() {
                 const multipleTextboxesOptionsDiv = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} input`);
                 multipleTextboxesOptionsDiv.forEach((input, index) => {
                     const labelText = input.value;
-                    // Modified code: Use placeholder and center the text
+                    // Use placeholder and center the text
                     formHTML += `<input type="text" id="answer${questionId}_${index + 1}" placeholder="${labelText}" style="text-align:center;"><br><br>`;
                 });
             }
