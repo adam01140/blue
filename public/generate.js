@@ -8,24 +8,22 @@ function generateAndDownloadForm() {
         <title>Custom Form</title>
         <link rel="stylesheet" href="new.css">
         <style>
-           .section { display: none; }
+            .section { display: none; }
             .section.active { display: block; }
             .thank-you-message { display: none; font-size: 20px; font-weight: bold; text-align: center; margin-top: 20px; }
             .hidden { display: none; }
            
-	#checkmark {
-  
-        width: fit-content;
-        
-    }
-	
-	 .checkbox-label, noneApplyCheckbox {
-        font-size: 18px; /* Increase font size as needed */
-        display: block;
-        text-align: left;
-        margin: 0 auto;
-        cursor: pointer; /* Changes cursor to pointer when hovering over the label */
-    }
+            #checkmark {
+                width: fit-content;
+            }
+    
+            .checkbox-label, noneApplyCheckbox {
+                font-size: 18px; /* Increase font size as needed */
+                display: block;
+                text-align: left;
+                margin: 0 auto;
+                cursor: pointer; /* Changes cursor to pointer when hovering over the label */
+            }
         </style>
     </head>
     <body>
@@ -136,6 +134,9 @@ function generateAndDownloadForm() {
                     // Use placeholder and center the text
                     formHTML += `<input type="text" id="answer${questionId}_${index + 1}" placeholder="${labelText}" style="text-align:center;"><br><br>`;
                 });
+            } else if (questionType === 'money') { // New case for Money type
+                formHTML += `<label for="money${questionId}">Enter amount:</label><br>`;
+                formHTML += `<input type="number" id="money${questionId}" min="0" step="0.01" placeholder="Enter currency amount"><br><br>`;
             }
 
             formHTML += `</div>`; // Close question container
