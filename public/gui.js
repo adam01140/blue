@@ -228,6 +228,7 @@ function addQuestion(sectionId, questionId = null) {
             <option value="checkbox">Checkbox</option>
             <option value="numberedDropdown">Numbered Dropdown</option>
             <option value="multipleTextboxes">Multiple Textboxes</option>
+            <option value="money">Money</option> <!-- New Money option -->
         </select><br><br>
 
         <!-- Numbered Dropdown Options -->
@@ -327,6 +328,8 @@ function addQuestion(sectionId, questionId = null) {
 
 
 
+
+
 function moveQuestionUp(questionId, sectionId) {
     const questionBlock = document.getElementById(`questionBlock${questionId}`);
     const previousSibling = questionBlock.previousElementSibling;
@@ -373,7 +376,7 @@ function toggleOptions(questionId) {
     const multipleTextboxesBlock = document.getElementById(`multipleTextboxesBlock${questionId}`); // New block for multiple textboxes
     const jumpOptionLabel = document.getElementById(`jumpOptionLabel${questionId}`);
     const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
-
+    
     // Hide all blocks initially
     if (optionsBlock) optionsBlock.style.display = 'none';
     if (checkboxBlock) checkboxBlock.style.display = 'none';
@@ -408,8 +411,13 @@ function toggleOptions(questionId) {
         case 'multipleTextboxes':
             if (multipleTextboxesBlock) multipleTextboxesBlock.style.display = 'block';
             break;
+        case 'money': // New case for Money type
+            // No additional options to show for Money type, so nothing extra here
+            break;
     }
 }
+
+
 
 
 function addMultipleTextboxOption(questionId) {
