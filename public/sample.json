@@ -5,7 +5,7 @@
       "questions": [
         {
           "questionId": 1,
-          "text": "Plaintiff's Names (list all):",
+          "text": "What is your case number?",
           "type": "text",
           "logic": {
             "enabled": false,
@@ -21,7 +21,7 @@
         },
         {
           "questionId": 2,
-          "text": "Case Number:",
+          "text": "What is your name?",
           "type": "text",
           "logic": {
             "enabled": false,
@@ -37,8 +37,8 @@
         },
         {
           "questionId": 3,
-          "text": "Plaintiff's Contact Information",
-          "type": "label",
+          "text": "What is your phone number?",
+          "type": "text",
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -53,8 +53,9 @@
         },
         {
           "questionId": 4,
-          "text": "Name:",
-          "type": "text",
+          "text": "What is your street address?",
+          "type": "multipleTextboxes",
+          "labels": ["Street", "City", "State", "Zip"],
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -64,13 +65,13 @@
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
+          }
         },
         {
           "questionId": 5,
-          "text": "Phone:",
-          "type": "text",
+          "text": "Is your mailing address different than your street address?",
+          "type": "radio",
+          "options": ["Yes", "No"],
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -80,28 +81,27 @@
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
+          }
         },
         {
           "questionId": 6,
-          "text": "Street Address:",
-          "type": "text",
+          "text": "What is your mailing address?",
+          "type": "multipleTextboxes",
+          "labels": ["Street", "City", "State", "Zip"],
           "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
+            "enabled": true,
+            "prevQuestion": "5",
+            "prevAnswer": "Yes"
           },
           "jump": {
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
+          }
         },
         {
           "questionId": 7,
-          "text": "City:",
+          "text": "What is your email?",
           "type": "text",
           "logic": {
             "enabled": false,
@@ -117,8 +117,9 @@
         },
         {
           "questionId": 8,
-          "text": "State:",
-          "type": "text",
+          "text": "Are you the only one suing?",
+          "type": "radio",
+          "options": ["Yes", "No"],
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -128,17 +129,16 @@
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
+          }
         },
         {
           "questionId": 9,
-          "text": "Zip Code:",
+          "text": "What is the second plaintiff’s name?",
           "type": "text",
           "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
+            "enabled": true,
+            "prevQuestion": "8",
+            "prevAnswer": "No"
           },
           "jump": {
             "enabled": false,
@@ -149,12 +149,12 @@
         },
         {
           "questionId": 10,
-          "text": "Mailing Address (if different):",
+          "text": "What is the second plaintiff’s phone number?",
           "type": "text",
           "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
+            "enabled": true,
+            "prevQuestion": "8",
+            "prevAnswer": "No"
           },
           "jump": {
             "enabled": false,
@@ -165,60 +165,60 @@
         },
         {
           "questionId": 11,
-          "text": "Mailing City:",
-          "type": "text",
+          "text": "What is the second plaintiff’s street address?",
+          "type": "multipleTextboxes",
+          "labels": ["Street", "City", "State", "Zip"],
           "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
+            "enabled": true,
+            "prevQuestion": "8",
+            "prevAnswer": "No"
           },
           "jump": {
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
+          }
         },
         {
           "questionId": 12,
-          "text": "Mailing State:",
-          "type": "text",
+          "text": "Is the second plaintiff’s mailing address different than your street address?",
+          "type": "radio",
+          "options": ["Yes", "No"],
           "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
+            "enabled": true,
+            "prevQuestion": "8",
+            "prevAnswer": "No"
           },
           "jump": {
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
+          }
         },
         {
           "questionId": 13,
-          "text": "Mailing Zip Code:",
-          "type": "text",
+          "text": "What is the second plaintiff’s mailing address?",
+          "type": "multipleTextboxes",
+          "labels": ["Street", "City", "State", "Zip"],
           "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
+            "enabled": true,
+            "prevQuestion": "12",
+            "prevAnswer": "Yes"
           },
           "jump": {
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
+          }
         },
         {
           "questionId": 14,
-          "text": "Email Address (if available):",
+          "text": "What is the second plaintiff’s email?",
           "type": "text",
           "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
+            "enabled": true,
+            "prevQuestion": "8",
+            "prevAnswer": "No"
           },
           "jump": {
             "enabled": false,
@@ -229,24 +229,13 @@
         },
         {
           "questionId": 15,
-          "text": "Is there a second plaintiff?",
-          "type": "radio",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": true,
-            "option": "Yes",
-            "to": "2"
-          },
-          "options": ["Yes", "No"]
-        },
-        {
-          "questionId": 16,
-          "text": "Is any plaintiff doing business under a fictitious name?",
+          "text": "Please mark all that apply",
           "type": "checkbox",
+          "options": [
+            "Check here if more than two plaintiffs",
+            "Check here if either plaintiff is doing business under a fictitious name",
+            "Check here if either plaintiff is a “licensee” or “deferred deposit originator”"
+          ],
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -256,24 +245,7 @@
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": ["Yes"]
-        },
-        {
-          "questionId": 17,
-          "text": "Is any plaintiff a licensee or payday lender under financial regulations?",
-          "type": "checkbox",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": ["Yes"]
+          }
         }
       ]
     },
@@ -281,13 +253,13 @@
       "sectionId": 2,
       "questions": [
         {
-          "questionId": 18,
-          "text": "Second Plaintiff's Name:",
+          "questionId": 16,
+          "text": "What is the name of the person you are suing?",
           "type": "text",
           "logic": {
-            "enabled": true,
-            "prevQuestion": "15",
-            "prevAnswer": "Yes"
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
           },
           "jump": {
             "enabled": false,
@@ -295,86 +267,90 @@
             "to": ""
           },
           "options": []
+        },
+        {
+          "questionId": 17,
+          "text": "What is the phone number of the person you are suing?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": []
+        },
+        {
+          "questionId": 18,
+          "text": "What is the street address of the person you are suing?",
+          "type": "multipleTextboxes",
+          "labels": ["Street", "City", "State", "Zip"],
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          }
         },
         {
           "questionId": 19,
-          "text": "Second Plaintiff's Phone:",
-          "type": "text",
+          "text": "Is the mailing address of the person you are suing different than their street address?",
+          "type": "radio",
+          "options": ["Yes", "No"],
           "logic": {
-            "enabled": true,
-            "prevQuestion": "15",
-            "prevAnswer": "Yes"
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
           },
           "jump": {
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
+          }
         },
         {
           "questionId": 20,
-          "text": "Second Plaintiff's Street Address:",
-          "type": "text",
+          "text": "What is their mailing address?",
+          "type": "multipleTextboxes",
+          "labels": ["Street", "City", "State", "Zip"],
           "logic": {
             "enabled": true,
-            "prevQuestion": "15",
+            "prevQuestion": "19",
             "prevAnswer": "Yes"
           },
           "jump": {
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
+          }
         },
         {
           "questionId": 21,
-          "text": "Second Plaintiff's City:",
-          "type": "text",
+          "text": "Please mark all that apply",
+          "type": "checkbox",
+          "options": [
+            "Check here if more than two plaintiffs",
+            "Check here if your case is against more than one defendant",
+            "Check here if any defendant is on active military duty"
+          ],
           "logic": {
-            "enabled": true,
-            "prevQuestion": "15",
-            "prevAnswer": "Yes"
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
           },
           "jump": {
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
-        },
-        {
-          "questionId": 22,
-          "text": "Second Plaintiff's State:",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "prevQuestion": "15",
-            "prevAnswer": "Yes"
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": []
-        },
-        {
-          "questionId": 23,
-          "text": "Second Plaintiff's Zip Code:",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "prevQuestion": "15",
-            "prevAnswer": "Yes"
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": []
+          }
         }
       ]
     },
@@ -382,9 +358,9 @@
       "sectionId": 3,
       "questions": [
         {
-          "questionId": 24,
-          "text": "Defendant's Name:",
-          "type": "text",
+          "questionId": 22,
+          "text": "How much are you claiming that the defendant owes you?",
+          "type": "money",
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -394,61 +370,88 @@
             "enabled": false,
             "option": "",
             "to": ""
+          }
+        },
+        {
+          "questionId": 23,
+          "text": "Why do they owe you this money?",
+          "type": "bigParagraph",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
           },
-          "options": []
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          }
+        },
+        {
+          "questionId": 24,
+          "text": "Did this event occur in one day or over a stretch of time?",
+          "type": "dropdown",
+          "options": ["One day", "Over a stretch of time"],
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          }
         },
         {
           "questionId": 25,
-          "text": "Defendant's Phone:",
-          "type": "text",
+          "text": "When did this event happen?",
+          "type": "date",
           "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
+            "enabled": true,
+            "prevQuestion": "24",
+            "prevAnswer": "One day"
           },
           "jump": {
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
+          }
         },
         {
           "questionId": 26,
-          "text": "Defendant's Street Address:",
-          "type": "text",
+          "text": "Date it started",
+          "type": "date",
           "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
+            "enabled": true,
+            "prevQuestion": "24",
+            "prevAnswer": "Over a stretch of time"
           },
           "jump": {
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
+          }
         },
         {
           "questionId": 27,
-          "text": "Defendant's City:",
-          "type": "text",
+          "text": "Date it ended",
+          "type": "date",
           "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
+            "enabled": true,
+            "prevQuestion": "24",
+            "prevAnswer": "Over a stretch of time"
           },
           "jump": {
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
+          }
         },
         {
           "questionId": 28,
-          "text": "Defendant's State:",
-          "type": "text",
+          "text": "How did you calculate the money owed to you?",
+          "type": "bigParagraph",
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -458,56 +461,7 @@
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
-        },
-        {
-          "questionId": 29,
-          "text": "Defendant's Zip Code:",
-          "type": "text",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": []
-        },
-        {
-          "questionId": 30,
-          "text": "Is there a second defendant?",
-          "type": "radio",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": true,
-            "option": "Yes",
-            "to": "4"
-          },
-          "options": ["Yes", "No"]
-        },
-        {
-          "questionId": 31,
-          "text": "Is any defendant on active military duty?",
-          "type": "checkbox",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": ["Yes"]
+          }
         }
       ]
     },
@@ -515,47 +469,10 @@
       "sectionId": 4,
       "questions": [
         {
-          "questionId": 32,
-          "text": "Second Defendant's Name:",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "prevQuestion": "30",
-            "prevAnswer": "Yes"
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": []
-        },
-        {
-          "questionId": 33,
-          "text": "Second Defendant's Phone:",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "prevQuestion": "30",
-            "prevAnswer": "Yes"
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": []
-        }
-       
-      ]
-    },
-    {
-      "sectionId": 5,
-      "questions": [
-        {
-          "questionId": 34,
-          "text": "Amount the defendant owes you ($):",
-          "type": "text",
+          "questionId": 29,
+          "text": "Have you asked the defendant to pay you?",
+          "type": "radio",
+          "options": ["Yes", "No"],
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -565,28 +482,26 @@
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
+          }
         },
         {
-          "questionId": 35,
-          "text": "Explain why the defendant owes you money:",
-          "type": "textarea",
+          "questionId": 30,
+          "text": "Explain why you haven’t:",
+          "type": "bigParagraph",
           "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
+            "enabled": true,
+            "prevQuestion": "29",
+            "prevAnswer": "No"
           },
           "jump": {
             "enabled": false,
             "option": "",
             "to": ""
-          },
-          "options": []
+          }
         }
       ]
     }
   ],
-  "sectionCounter": 6,
-  "questionCounter": 36
+  "sectionCounter": 5,
+  "questionCounter": 31
 }

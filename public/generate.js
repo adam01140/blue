@@ -18,11 +18,11 @@ function generateAndDownloadForm() {
             }
     
             .checkbox-label, noneApplyCheckbox {
-                font-size: 18px; /* Increase font size as needed */
+                font-size: 18px;
                 display: block;
                 text-align: left;
                 margin: 0 auto;
-                cursor: pointer; /* Changes cursor to pointer when hovering over the label */
+                cursor: pointer;
             }
         </style>
     </head>
@@ -67,6 +67,8 @@ function generateAndDownloadForm() {
             // Handle the different question types
             if (questionType === 'text') {
                 formHTML += `<input type="text" id="answer${questionId}"><br><br>`;
+            } else if (questionType === 'bigParagraph') { // New case for Big Paragraph type
+                formHTML += `<textarea id="answer${questionId}" rows="5" cols="50" placeholder="Enter a longer response here"></textarea><br><br>`;
             } else if (questionType === 'radio') {
                 formHTML += `
                     <select id="answer${questionId}">
@@ -131,12 +133,14 @@ function generateAndDownloadForm() {
                 const multipleTextboxesOptionsDiv = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} input`);
                 multipleTextboxesOptionsDiv.forEach((input, index) => {
                     const labelText = input.value;
-                    // Use placeholder and center the text
                     formHTML += `<input type="text" id="answer${questionId}_${index + 1}" placeholder="${labelText}" style="text-align:center;"><br><br>`;
                 });
-            } else if (questionType === 'money') { // New case for Money type
+            } else if (questionType === 'money') {
                 formHTML += `<label for="money${questionId}">Enter amount:</label><br>`;
                 formHTML += `<input type="number" id="money${questionId}" min="0" step="0.01" placeholder="Enter currency amount"><br><br>`;
+            } else if (questionType === 'date') {
+                formHTML += `<label for="date${questionId}">Enter date:</label><br>`;
+                formHTML += `<input type="date" id="date${questionId}" placeholder="Enter a date"><br><br>`;
             }
 
             formHTML += `</div>`; // Close question container

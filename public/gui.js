@@ -228,7 +228,9 @@ function addQuestion(sectionId, questionId = null) {
             <option value="checkbox">Checkbox</option>
             <option value="numberedDropdown">Numbered Dropdown</option>
             <option value="multipleTextboxes">Multiple Textboxes</option>
-            <option value="money">Money</option> <!-- New Money option -->
+            <option value="money">Money</option>
+            <option value="date">Date</option>
+            <option value="bigParagraph">Big Paragraph</option> <!-- New Big Paragraph option -->
         </select><br><br>
 
         <!-- Numbered Dropdown Options -->
@@ -311,6 +313,8 @@ function addQuestion(sectionId, questionId = null) {
         questionCounter++;
     }
 }
+
+
 
 
 
