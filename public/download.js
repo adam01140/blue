@@ -72,6 +72,12 @@ function exportForm() {
                 if (noneOfTheAbove && noneOfTheAbove.checked) {
                     questionData.options.push('None of the above');
                 }
+            } else if (questionType === 'dropdown') {
+                // **Add this block to handle dropdown options**
+                const options = questionBlock.querySelectorAll(`#dropdownOptions${questionId} input`);
+                options.forEach(option => {
+                    questionData.options.push(option.value);
+                });
             } else if (questionType === 'numberedDropdown') {
                 const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
                 const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
@@ -99,6 +105,7 @@ function exportForm() {
     const jsonString = JSON.stringify(formData, null, 2);
     downloadJSON(jsonString, "form_data.json");
 }
+
 
 
 
@@ -157,17 +164,33 @@ function loadFormData(formData) {
                 const checkboxOptionsDiv = document.getElementById(`checkboxOptions${question.questionId}`);
                 checkboxOptionsDiv.innerHTML = '';
 
-                question.options.forEach(option => {
+                question.options.forEach((option, index) => {
                     if (option === 'None of the above') {
                         document.getElementById(`noneOfTheAbove${question.questionId}`).checked = true;
                     } else {
                         const optionDiv = document.createElement('div');
+                        optionDiv.className = `option${index + 1}`;
                         optionDiv.innerHTML = `
-                            <input type="text" value="${option}" placeholder="Option">
-                            <button type="button" onclick="removeCheckboxOption(${question.questionId}, ${checkboxOptionsDiv.children.length + 1})">Remove</button>
+                            <input type="text" value="${option}" placeholder="Option ${index + 1}">
+                            <button type="button" onclick="removeCheckboxOption(${question.questionId}, ${index + 1})">Remove</button>
                         `;
                         checkboxOptionsDiv.appendChild(optionDiv);
                     }
+                });
+            } else if (question.type === 'dropdown') {
+                // **Add this block to handle dropdown options**
+                const dropdownOptionsDiv = document.getElementById(`dropdownOptions${question.questionId}`);
+                dropdownOptionsDiv.innerHTML = '';
+
+                question.options.forEach((optionText, index) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = `option${index + 1}`;
+                    const optionId = `option${question.questionId}_${index + 1}`;
+                    optionDiv.innerHTML = `
+                        <input type="text" id="${optionId}" value="${optionText}" placeholder="Option ${index + 1}">
+                        <button type="button" onclick="removeDropdownOption(${question.questionId}, ${index + 1})">Remove</button>
+                    `;
+                    dropdownOptionsDiv.appendChild(optionDiv);
                 });
             } else if (question.type === 'numberedDropdown') {
                 const rangeStart = questionBlock.querySelector(`#numberRangeStart${question.questionId}`);
@@ -216,6 +239,7 @@ function loadFormData(formData) {
         });
     });
 }
+
 
 
 
