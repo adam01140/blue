@@ -17,7 +17,7 @@ function generateAndDownloadForm() {
                 width: fit-content;
             }
     
-            .checkbox-label, noneApplyCheckbox {
+            .checkbox-label, .noneApplyCheckbox {
                 font-size: 18px;
                 display: block;
                 text-align: left;
@@ -67,7 +67,7 @@ function generateAndDownloadForm() {
             // Handle the different question types
             if (questionType === 'text') {
                 formHTML += `<input type="text" id="answer${questionId}"><br><br>`;
-            } else if (questionType === 'bigParagraph') { // New case for Big Paragraph type
+            } else if (questionType === 'bigParagraph') {
                 formHTML += `<textarea id="answer${questionId}" rows="5" cols="50" placeholder="Enter a longer response here"></textarea><br><br>`;
             } else if (questionType === 'radio') {
                 formHTML += `
@@ -90,8 +90,10 @@ function generateAndDownloadForm() {
                 options.forEach((option, index) => {
                     formHTML += `
                         <span class="checkbox-inline">
-                            <label class="checkbox-label"><input type="checkbox" id="answer${questionId}_${index + 1}" name="answer${questionId}" value="${option.value}">
-                            <label for="answer${questionId}_${index + 1}">${option.value}</label></label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="answer${questionId}_${index + 1}" name="answer${questionId}" value="${option.value}">
+                                ${option.value}
+                            </label>
                         </span>`;
                 });
 
@@ -99,8 +101,10 @@ function generateAndDownloadForm() {
                 if (noneOfTheAboveSelected) {
                     formHTML += `
                         <span class="checkbox-inline">
-                            <label class="checkbox-label"><input type="checkbox" id="answer${questionId}_none" name="answer${questionId}" value="None of the above">
-                            <label for="answer${questionId}_none">None of the above</label></label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="answer${questionId}_none" name="answer${questionId}" value="None of the above">
+                                None of the above
+                            </label>
                         </span>`;
                 }
                 formHTML += `</div><br></div>`;
@@ -123,9 +127,9 @@ function generateAndDownloadForm() {
                         const container = document.getElementById('labelContainer' + questionId);
                         container.innerHTML = '';
                         for (let i = 1; i <= count; i++) {
-                            ${Array.from(labels).map(label => `
-                                container.innerHTML += '<label>${label.value} ' + i + ':</label><input type="text" id="label' + questionId + '_' + i + '${label.value.replace(/\\s+/g, '')}"><br>';
-                            `).join('')}
+                            ${Array.from(labels).map(label =>
+                                `container.innerHTML += '<label>${label.value} ' + i + ':</label><input type="text" id="label' + questionId + '_' + i + '${label.value.replace(/\\s+/g, '')}"><br>';`
+                            ).join('')}
                         }
                     }
                 <\/script>`;
@@ -137,21 +141,22 @@ function generateAndDownloadForm() {
                 });
             } else if (questionType === 'money') {
                 formHTML += `<label for="money${questionId}">Enter amount:</label><br>`;
-                formHTML += `<input type="number" id="money${questionId}" min="0" step="0.01" placeholder="Enter currency amount"><br><br>`;
+                formHTML += `<input type="number" id="answer${questionId}" min="0" step="0.01" placeholder="Enter currency amount"><br><br>`;
             } else if (questionType === 'date') {
                 formHTML += `<label for="date${questionId}">Enter date:</label><br>`;
-                formHTML += `<input type="date" id="date${questionId}" placeholder="Enter a date"><br><br>`;
+                formHTML += `<input type="date" id="answer${questionId}" placeholder="Enter a date"><br><br>`;
             }
 
             formHTML += `</div>`; // Close question container
 
-            // Conditional Logic Script for Yes/No Questions
-            if (logicEnabled && prevQuestionId) {
+            // Conditional Logic Script
+            if (logicEnabled && prevQuestionId && prevAnswer) {
                 formHTML += `
                 <script>
                     document.getElementById('answer${prevQuestionId}').addEventListener('change', function() {
                         const questionElement = document.getElementById('question-container-${questionId}');
-                        if (this.value === '${prevAnswer}') {
+                        const selectedAnswer = this.value;
+                        if (selectedAnswer.trim().toLowerCase() === '${prevAnswer.trim().toLowerCase()}') {
                             questionElement.classList.remove('hidden');
                         } else {
                             questionElement.classList.add('hidden');

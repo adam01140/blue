@@ -230,7 +230,7 @@ function addQuestion(sectionId, questionId = null) {
             <option value="multipleTextboxes">Multiple Textboxes</option>
             <option value="money">Money</option>
             <option value="date">Date</option>
-            <option value="bigParagraph">Big Paragraph</option> <!-- New Big Paragraph option -->
+            <option value="bigParagraph">Big Paragraph</option>
         </select><br><br>
 
         <!-- Numbered Dropdown Options -->
@@ -276,10 +276,7 @@ function addQuestion(sectionId, questionId = null) {
         <div id="logicBlock${currentQuestionId}" style="display: none;">
             <label>Show this question if: </label><br>
             <input type="number" placeholder="Previous question number" id="prevQuestion${currentQuestionId}"><br>
-            <select id="prevAnswer${currentQuestionId}">
-                <option value="Yes">Answer is Yes</option>
-                <option value="No">Answer is No</option>
-            </select>
+            <input type="text" placeholder="Answer value" id="prevAnswer${currentQuestionId}"><br>
         </div><br>
 
         <!-- Jump Logic -->
@@ -313,6 +310,7 @@ function addQuestion(sectionId, questionId = null) {
         questionCounter++;
     }
 }
+
 
 
 
@@ -457,23 +455,38 @@ function toggleLogic(questionId) {
     logicBlock.style.display = logicEnabled ? 'block' : 'none';
 
     if (logicEnabled) {
-        // Additional logic to manage the display of this question based on previous answers
-        const prevQuestionId = document.getElementById(`prevQuestion${questionId}`).value;
-        const prevAnswer = document.getElementById(`prevAnswer${questionId}`).value;
-        
-        if (prevQuestionId) {
-            document.getElementById(`answer${prevQuestionId}`).addEventListener('change', function() {
-                const selectedAnswer = this.value;
-                const currentQuestionBlock = document.getElementById(`questionBlock${questionId}`);
-                if (selectedAnswer === prevAnswer) {
-                    currentQuestionBlock.style.display = 'block';
-                } else {
-                    currentQuestionBlock.style.display = 'none';
+        const prevQuestionInput = document.getElementById(`prevQuestion${questionId}`);
+        const prevAnswerInput = document.getElementById(`prevAnswer${questionId}`);
+
+        function updateLogic() {
+            const prevQuestionId = prevQuestionInput.value;
+            const prevAnswer = prevAnswerInput.value;
+
+            if (prevQuestionId && prevAnswer) {
+                const prevAnswerElement = document.getElementById(`answer${prevQuestionId}`);
+                if (prevAnswerElement) {
+                    prevAnswerElement.addEventListener('change', function() {
+                        const selectedAnswer = this.value;
+                        const currentQuestionContainer = document.getElementById(`question-container-${questionId}`);
+                        if (selectedAnswer.trim().toLowerCase() === prevAnswer.trim().toLowerCase()) {
+                            currentQuestionContainer.classList.remove('hidden');
+                        } else {
+                            currentQuestionContainer.classList.add('hidden');
+                        }
+                    });
                 }
-            });
+            }
         }
+
+        // Update logic when inputs change
+        prevQuestionInput.addEventListener('input', updateLogic);
+        prevAnswerInput.addEventListener('input', updateLogic);
+
+        // Initialize logic
+        updateLogic();
     }
 }
+
 
 
 function toggleJumpLogic(questionId) {
