@@ -96,52 +96,71 @@ function exportForm() {
     }
 
     // Export hidden fields with autofill logic and conditional logic
-    const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
-    if (hiddenFieldsContainer) {
-        const hiddenFieldBlocks = hiddenFieldsContainer.querySelectorAll('.hidden-field-block');
-        hiddenFieldBlocks.forEach((fieldBlock) => {
-            const hiddenFieldId = fieldBlock.id.replace('hiddenFieldBlock', '');
-            const fieldType = document.getElementById(`hiddenFieldType${hiddenFieldId}`).value;
-            const fieldName = document.getElementById(`hiddenFieldName${hiddenFieldId}`).value.trim();
-            const isChecked = document.getElementById(`hiddenFieldChecked${hiddenFieldId}`)?.checked || false;
+    // Export hidden fields with autofill logic and conditional logic
+const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
+if (hiddenFieldsContainer) {
+    const hiddenFieldBlocks = hiddenFieldsContainer.querySelectorAll('.hidden-field-block');
+    hiddenFieldBlocks.forEach((fieldBlock) => {
+        const hiddenFieldId = fieldBlock.id.replace('hiddenFieldBlock', '');
+        const fieldType = document.getElementById(`hiddenFieldType${hiddenFieldId}`).value;
+        const fieldName = document.getElementById(`hiddenFieldName${hiddenFieldId}`).value.trim();
+        const isChecked = document.getElementById(`hiddenFieldChecked${hiddenFieldId}`)?.checked || false;
 
-            const hiddenFieldData = {
-                hiddenFieldId: hiddenFieldId,
-                type: fieldType,
-                name: fieldName,
-                checked: isChecked
-            };
+        const hiddenFieldData = {
+            hiddenFieldId: hiddenFieldId,
+            type: fieldType,
+            name: fieldName,
+            checked: isChecked
+        };
 
-            if (fieldType === 'text') {
-                // Include autofillQuestionId
-                const autofillQuestionId = document.getElementById(`hiddenFieldAutofill${hiddenFieldId}`).value;
-                hiddenFieldData.autofillQuestionId = autofillQuestionId;
+        if (fieldType === 'checkbox') {
+            // Collect conditional logic for checkboxes
+            const conditions = [];
+            const conditionalAutofillDiv = document.getElementById(`conditionalAutofillForCheckbox${hiddenFieldId}`);
+            const conditionDivs = conditionalAutofillDiv.querySelectorAll('div[class^="condition"]');
+            conditionDivs.forEach(conditionDiv => {
+                const conditionId = conditionDiv.className.replace('condition', '');
+                const questionId = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`).value;
+                const answerValue = document.getElementById(`conditionAnswer${hiddenFieldId}_${conditionId}`).value;
+                const autofillValue = document.getElementById(`conditionValue${hiddenFieldId}_${conditionId}`).value;
 
-                // Collect conditional autofill logic
-                const conditions = [];
-                const conditionalAutofillDiv = document.getElementById(`conditionalAutofill${hiddenFieldId}`);
-                const conditionDivs = conditionalAutofillDiv.querySelectorAll('div[class^="condition"]');
-                conditionDivs.forEach(conditionDiv => {
-                    const conditionId = conditionDiv.className.replace('condition', '');
-                    const questionId = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`).value;
-                    const answerValue = document.getElementById(`conditionAnswer${hiddenFieldId}_${conditionId}`).value;
-                    const autofillValue = document.getElementById(`conditionValue${hiddenFieldId}_${conditionId}`).value;
+                if (questionId && answerValue && autofillValue) {
+                    conditions.push({
+                        questionId: questionId,
+                        answerValue: answerValue,
+                        autofillValue: autofillValue
+                    });
+                }
+            });
 
-                    if (questionId && answerValue && autofillValue) {
-                        conditions.push({
-                            questionId: questionId,
-                            answerValue: answerValue,
-                            autofillValue: autofillValue
-                        });
-                    }
-                });
+            hiddenFieldData.conditions = conditions; // Add conditions to the exported data
+        } else if (fieldType === 'text') {
+    // Collect conditional logic for textboxes
+    const conditions = [];
+    const conditionalAutofillDiv = document.getElementById(`conditionalAutofill${hiddenFieldId}`);
+    const conditionDivs = conditionalAutofillDiv.querySelectorAll('div[class^="condition"]');
+    conditionDivs.forEach(conditionDiv => {
+        const conditionId = conditionDiv.className.replace('condition', '');
+        const questionId = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`).value;
+        const answerValue = document.getElementById(`conditionAnswer${hiddenFieldId}_${conditionId}`).value;
+        const autofillValue = document.getElementById(`conditionValue${hiddenFieldId}_${conditionId}`).value;
 
-                hiddenFieldData.conditions = conditions;
-            }
+        if (questionId && answerValue && autofillValue) {
+            conditions.push({
+                questionId: questionId,
+                answerValue: answerValue,
+                autofillValue: autofillValue
+            });
+        }
+    });
 
-            formData.hiddenFields.push(hiddenFieldData);
-        });
-    }
+    hiddenFieldData.conditions = conditions; // Add conditions to the exported data for textboxes
+}
+
+        formData.hiddenFields.push(hiddenFieldData);
+    });
+}
+
 
     const jsonString = JSON.stringify(formData, null, 2);
     downloadJSON(jsonString, "form_data.json");
@@ -309,17 +328,11 @@ function addHiddenFieldWithData(hiddenField) {
 
     if (hiddenField.type === 'checkbox') {
         document.getElementById(`hiddenFieldChecked${currentHiddenFieldId}`).checked = hiddenField.checked;
-    } else if (hiddenField.type === 'text') {
-        // Set the autofillQuestionId
-        if (hiddenField.autofillQuestionId) {
-            const autofillSelect = document.getElementById(`hiddenFieldAutofill${currentHiddenFieldId}`);
-            autofillSelect.value = hiddenField.autofillQuestionId;
-        }
 
-        // Recreate conditions
+        // Load conditions for checkboxes
         if (hiddenField.conditions && hiddenField.conditions.length > 0) {
             hiddenField.conditions.forEach((condition, index) => {
-                addConditionalAutofill(currentHiddenFieldId);
+                addConditionalAutofillForCheckbox(currentHiddenFieldId);
                 const conditionId = index + 1;
                 document.getElementById(`conditionQuestion${currentHiddenFieldId}_${conditionId}`).value = condition.questionId;
                 updateConditionAnswers(currentHiddenFieldId, conditionId);
@@ -327,5 +340,26 @@ function addHiddenFieldWithData(hiddenField) {
                 document.getElementById(`conditionValue${currentHiddenFieldId}_${conditionId}`).value = condition.autofillValue;
             });
         }
+    } else if (hiddenField.type === 'text') {
+        // Set autofillQuestionId if available
+        if (hiddenField.autofillQuestionId) {
+            const autofillSelect = document.getElementById(`hiddenFieldAutofill${currentHiddenFieldId}`);
+            autofillSelect.value = hiddenField.autofillQuestionId;
+        }
+
+        // Load conditions for textboxes
+        if (hiddenField.conditions && hiddenField.conditions.length > 0) {
+            hiddenField.conditions.forEach((condition, index) => {
+                addConditionalAutofill(currentHiddenFieldId);
+                const conditionId = index + 1;
+                document.getElementById(`conditionQuestion${currentHiddenFieldId}_${conditionId}`).value = condition.questionId;
+                updateConditionAnswers(currentHiddenFieldId, conditionId); // Populate the answer dropdown
+                document.getElementById(`conditionAnswer${currentHiddenFieldId}_${conditionId}`).value = condition.answerValue;
+                document.getElementById(`conditionValue${currentHiddenFieldId}_${conditionId}`).value = condition.autofillValue;
+            });
+        }
     }
 }
+
+
+

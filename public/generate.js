@@ -465,7 +465,7 @@ select:focus {
 // Updated function to generate the hidden PDF fields
 function generateHiddenPDFFields() {
     let hiddenFieldsHTML = `
-    <div id="hidden_pdf_fields" style="display:none;">
+    <div id="hidden_pdf_fields">
     `;
 
     let autofillMappings = []; // Array to store autofill mappings
@@ -479,6 +479,7 @@ function generateHiddenPDFFields() {
             const fieldType = document.getElementById(`hiddenFieldType${hiddenFieldId}`).value;
             const fieldName = document.getElementById(`hiddenFieldName${hiddenFieldId}`).value.trim();
             const autofillQuestionId = document.getElementById(`hiddenFieldAutofill${hiddenFieldId}`)?.value;
+            const isCheckedByDefault = document.getElementById(`hiddenFieldChecked${hiddenFieldId}`)?.checked;
 
             if (fieldType === 'text' && fieldName) {
                 hiddenFieldsHTML += `
@@ -491,7 +492,7 @@ function generateHiddenPDFFields() {
                     });
                 }
 
-                // Build conditional logic
+                // Build conditional logic for text fields
                 const conditionalAutofillDiv = document.getElementById(`conditionalAutofill${hiddenFieldId}`);
                 const conditionDivs = conditionalAutofillDiv.querySelectorAll('div[class^="condition"]');
                 conditionDivs.forEach(conditionDiv => {
@@ -509,9 +510,13 @@ function generateHiddenPDFFields() {
                     }
                 });
             } else if (fieldType === 'checkbox' && fieldName) {
-                hiddenFieldsHTML += `<label class="checkbox-label"><input type="checkbox" id="${fieldName}" name="${fieldName}">${fieldName}</label>`;
+                hiddenFieldsHTML += `
+    <label class="checkbox-label">
+        <input type="checkbox" id="${fieldName}" name="${fieldName}" ${isCheckedByDefault ? 'checked' : ''}>
+        ${fieldName}
+    </label>`;
 
-                // Handle conditional logic for checkboxes
+                // Build conditional logic for checkboxes
                 const conditionalAutofillDiv = document.getElementById(`conditionalAutofillForCheckbox${hiddenFieldId}`);
                 const conditionDivs = conditionalAutofillDiv.querySelectorAll('div[class^="condition"]');
                 conditionDivs.forEach(conditionDiv => {
@@ -523,7 +528,7 @@ function generateHiddenPDFFields() {
                     if (questionId && answerValue) {
                         conditionalAutofillLogic += `
                             if (document.getElementById('answer${questionId}').value === '${answerValue}') {
-                                document.getElementById('${fieldName}').checked = '${valueToSet === 'checked' ? true : false}';
+                                document.getElementById('${fieldName}').checked = ${valueToSet === 'checked' ? true : false};
                             }
                         `;
                     }
@@ -539,4 +544,5 @@ function generateHiddenPDFFields() {
     // Return the hidden fields HTML, the autofill mappings, and the conditional autofill logic
     return { hiddenFieldsHTML, autofillMappings, conditionalAutofillLogic };
 }
+
 
