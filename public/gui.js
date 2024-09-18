@@ -246,6 +246,9 @@ function addQuestion(sectionId, questionId = null) {
     // Ensure the correct options menu is displayed based on the selected type
     toggleOptions(currentQuestionId);
 
+    // Update autofill options in hidden fields
+    updateAutofillOptions();
+
     // Increment questionCounter only if not loading from JSON
     if (!questionId) {
         questionCounter++;
@@ -259,6 +262,7 @@ function moveQuestionUp(questionId, sectionId) {
     if (previousSibling && previousSibling.classList.contains('question-block')) {
         questionBlock.parentNode.insertBefore(questionBlock, previousSibling);
         updateQuestionLabels(sectionId);
+        updateAutofillOptions();
     }
 }
 
@@ -269,6 +273,7 @@ function moveQuestionDown(questionId, sectionId) {
     if (nextSibling && nextSibling.classList.contains('question-block')) {
         questionBlock.parentNode.insertBefore(nextSibling, questionBlock);
         updateQuestionLabels(sectionId);
+        updateAutofillOptions();
     }
 }
 
@@ -332,6 +337,9 @@ function toggleOptions(questionId) {
             // No additional options to show for Money type, so nothing extra here
             break;
     }
+
+    // Update autofill options in hidden fields
+    updateAutofillOptions();
 }
 
 function addMultipleTextboxOption(questionId) {
@@ -465,6 +473,9 @@ function removeQuestion(questionId) {
 
     // Update IDs of subsequent questions
     updateGlobalQuestionLabels();
+
+    // Update autofill options in hidden fields
+    updateAutofillOptions();
 }
 
 // New functions for Hidden PDF Fields module
@@ -500,13 +511,13 @@ function addHiddenField() {
             <option value="checkbox">Checkbox</option>
         </select><br><br>
         <div id="hiddenFieldOptions${currentHiddenFieldId}">
-            <label>Name/ID: </label>
-            <input type="text" id="hiddenFieldName${currentHiddenFieldId}" placeholder="Enter field name"><br><br>
+            <!-- Options will be populated based on the type -->
         </div>
         <button type="button" onclick="removeHiddenField(${currentHiddenFieldId})">Remove Hidden Field</button>
         <hr>
     `;
     hiddenFieldsContainer.appendChild(hiddenFieldBlock);
+    toggleHiddenFieldOptions(currentHiddenFieldId); // Initialize options
     hiddenFieldCounter++;
 }
 
@@ -521,6 +532,11 @@ function toggleHiddenFieldOptions(hiddenFieldId) {
         hiddenFieldOptions.innerHTML = `
             <label>Name/ID: </label>
             <input type="text" id="hiddenFieldName${hiddenFieldId}" placeholder="Enter field name"><br><br>
+            <label>Autofill from question:</label><br>
+            <select id="hiddenFieldAutofill${hiddenFieldId}">
+                <option value="">-- Select a question --</option>
+                ${generateQuestionOptions()}
+            </select><br><br>
         `;
     } else if (fieldType === 'checkbox') {
         hiddenFieldOptions.innerHTML = `
@@ -532,8 +548,85 @@ function toggleHiddenFieldOptions(hiddenFieldId) {
     }
 }
 
+function generateQuestionOptions() {
+    let optionsHTML = '';
+    const questionBlocks = document.querySelectorAll('.question-block');
+
+    questionBlocks.forEach(questionBlock => {
+        const questionId = questionBlock.id.replace('questionBlock', '');
+        const questionText = questionBlock.querySelector(`input[type="text"]`).value;
+        const questionType = questionBlock.querySelector(`select`).value;
+
+        // Only include question types that produce single text values
+        if (['text', 'bigParagraph', 'money', 'date'].includes(questionType)) {
+            optionsHTML += `<option value="${questionId}">Question ${questionId}: ${questionText}</option>`;
+        }
+    });
+
+    return optionsHTML;
+}
+
+function updateAutofillOptions() {
+    const hiddenFieldBlocks = document.querySelectorAll('.hidden-field-block');
+    hiddenFieldBlocks.forEach(hiddenFieldBlock => {
+        const hiddenFieldId = hiddenFieldBlock.id.replace('hiddenFieldBlock', '');
+        const fieldType = document.getElementById(`hiddenFieldType${hiddenFieldId}`).value;
+
+        if (fieldType === 'text') {
+            const autofillSelect = document.getElementById(`hiddenFieldAutofill${hiddenFieldId}`);
+            if (autofillSelect) {
+                const previousValue = autofillSelect.value;
+                autofillSelect.innerHTML = `
+                    <option value="">-- Select a question --</option>
+                    ${generateQuestionOptions()}
+                `;
+                // Restore previous selection if still valid
+                if (Array.from(autofillSelect.options).some(option => option.value === previousValue)) {
+                    autofillSelect.value = previousValue;
+                }
+            }
+        }
+    });
+}
+
 function removeHiddenField(hiddenFieldId) {
     const hiddenFieldBlock = document.getElementById(`hiddenFieldBlock${hiddenFieldId}`);
     hiddenFieldBlock.remove();
 }
 
+// New function to add a hidden field with data (used during import)
+function addHiddenFieldWithData(hiddenField) {
+    const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
+    const hiddenFieldBlock = document.createElement('div');
+    const currentHiddenFieldId = hiddenField.hiddenFieldId;
+
+    hiddenFieldBlock.className = 'hidden-field-block';
+    hiddenFieldBlock.id = `hiddenFieldBlock${currentHiddenFieldId}`;
+    hiddenFieldBlock.innerHTML = `
+        <label>Hidden Field ${currentHiddenFieldId}: </label>
+        <select id="hiddenFieldType${currentHiddenFieldId}" onchange="toggleHiddenFieldOptions(${currentHiddenFieldId})">
+            <option value="text" ${hiddenField.type === 'text' ? 'selected' : ''}>Textbox</option>
+            <option value="checkbox" ${hiddenField.type === 'checkbox' ? 'selected' : ''}>Checkbox</option>
+        </select><br><br>
+        <div id="hiddenFieldOptions${currentHiddenFieldId}">
+            <!-- Options will be populated based on the type -->
+        </div>
+        <button type="button" onclick="removeHiddenField(${currentHiddenFieldId})">Remove Hidden Field</button>
+        <hr>
+    `;
+    hiddenFieldsContainer.appendChild(hiddenFieldBlock);
+
+    toggleHiddenFieldOptions(currentHiddenFieldId);
+
+    document.getElementById(`hiddenFieldName${currentHiddenFieldId}`).value = hiddenField.name;
+
+    if (hiddenField.type === 'checkbox') {
+        document.getElementById(`hiddenFieldChecked${currentHiddenFieldId}`).checked = hiddenField.checked;
+    } else if (hiddenField.type === 'text') {
+        // Set autofillQuestionId if available
+        if (hiddenField.autofillQuestionId) {
+            const autofillSelect = document.getElementById(`hiddenFieldAutofill${currentHiddenFieldId}`);
+            autofillSelect.value = hiddenField.autofillQuestionId;
+        }
+    }
+}

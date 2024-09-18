@@ -3,10 +3,11 @@ function generateAndDownloadForm() {
     <!DOCTYPE html>
     <html lang="en">
     <head>
+        <!-- ... existing head content ... -->
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Custom Form</title>
-        <style>
+       <style>
 		
 	input[type="text"], select {
     background-color: #e6f4ff; /* Light blue background */
@@ -219,12 +220,7 @@ select:focus {
     <body>
     
     <header>
-        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="forms.html">Forms</a>
-            <a href="contact.html">Contact Us</a>
-        </nav>
+        <!-- ... existing header content ... -->
     </header>
     
     <section>
@@ -404,8 +400,11 @@ select:focus {
         formHTML += `</div>`; // Close section div
     }
 
+    // Get the hidden fields HTML and the autofill mappings
+    const { hiddenFieldsHTML, autofillMappings } = generateHiddenPDFFields();
+
     // Add the hidden PDF fields to the formHTML
-    formHTML += generateHiddenPDFFields();
+    formHTML += hiddenFieldsHTML;
 
     formHTML += `
         </form>
@@ -418,8 +417,18 @@ select:focus {
 
     <script>
         let jumpTarget = null;
+        const autofillMappings = ${JSON.stringify(autofillMappings)};
 
         function handleNext(currentSection) {
+            // Autofill hidden fields before navigating
+            autofillMappings.forEach(mapping => {
+                const sourceElement = document.getElementById(mapping.questionAnswerId);
+                const targetElement = document.getElementById(mapping.hiddenFieldName);
+                if (sourceElement && targetElement) {
+                    targetElement.value = sourceElement.value || '';
+                }
+            });
+
             if (jumpTarget === 'end') {
                 document.getElementById('customForm').style.display = 'none';
                 document.getElementById('thankYouMessage').style.display = 'block';
@@ -450,11 +459,13 @@ select:focus {
     downloadHTML(formHTML, "custom_form.html");
 }
 
-// New function to generate the hidden PDF fields
+// Updated function to generate the hidden PDF fields
 function generateHiddenPDFFields() {
     let hiddenFieldsHTML = `
     <div id="hidden_pdf_fields" style="display:none;">
     `;
+
+    let autofillMappings = []; // Array to store autofill mappings
 
     const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
     if (hiddenFieldsContainer) {
@@ -463,11 +474,18 @@ function generateHiddenPDFFields() {
             const hiddenFieldId = fieldBlock.id.replace('hiddenFieldBlock', '');
             const fieldType = document.getElementById(`hiddenFieldType${hiddenFieldId}`).value;
             const fieldName = document.getElementById(`hiddenFieldName${hiddenFieldId}`).value.trim();
+            const autofillQuestionId = document.getElementById(`hiddenFieldAutofill${hiddenFieldId}`)?.value;
 
             if (fieldType === 'text' && fieldName) {
                 hiddenFieldsHTML += `
     <input type="text" id="${fieldName}" name="${fieldName}" placeholder="${fieldName}">
                 `;
+                if (autofillQuestionId) {
+                    autofillMappings.push({
+                        hiddenFieldName: fieldName,
+                        questionAnswerId: `answer${autofillQuestionId}`
+                    });
+                }
             } else if (fieldType === 'checkbox' && fieldName) {
                 const isChecked = document.getElementById(`hiddenFieldChecked${hiddenFieldId}`)?.checked ? 'checked' : '';
                 hiddenFieldsHTML += `
@@ -484,6 +502,6 @@ function generateHiddenPDFFields() {
     </div>
     `;
 
-    return hiddenFieldsHTML;
+    // Return both the hidden fields HTML and the autofill mappings
+    return { hiddenFieldsHTML, autofillMappings };
 }
-
