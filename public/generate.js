@@ -7,7 +7,7 @@ function generateAndDownloadForm() {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Custom Form</title>
-       <style>
+        <style>
 		
 	input[type="text"], select {
     background-color: #e6f4ff; /* Light blue background */
@@ -401,7 +401,7 @@ select:focus {
     }
 
     // Get the hidden fields HTML and the autofill mappings
-    const { hiddenFieldsHTML, autofillMappings } = generateHiddenPDFFields();
+    const { hiddenFieldsHTML, autofillMappings, conditionalAutofillLogic } = generateHiddenPDFFields();
 
     // Add the hidden PDF fields to the formHTML
     formHTML += hiddenFieldsHTML;
@@ -428,6 +428,9 @@ select:focus {
                     targetElement.value = sourceElement.value || '';
                 }
             });
+
+            // Execute conditional autofill logic
+            ${conditionalAutofillLogic}
 
             if (jumpTarget === 'end') {
                 document.getElementById('customForm').style.display = 'none';
@@ -466,6 +469,7 @@ function generateHiddenPDFFields() {
     `;
 
     let autofillMappings = []; // Array to store autofill mappings
+    let conditionalAutofillLogic = ''; // String to store conditional logic scripts
 
     const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
     if (hiddenFieldsContainer) {
@@ -486,6 +490,24 @@ function generateHiddenPDFFields() {
                         questionAnswerId: `answer${autofillQuestionId}`
                     });
                 }
+
+                // Build conditional logic
+                const conditionalAutofillDiv = document.getElementById(`conditionalAutofill${hiddenFieldId}`);
+                const conditionDivs = conditionalAutofillDiv.querySelectorAll('div[class^="condition"]');
+                conditionDivs.forEach(conditionDiv => {
+                    const conditionId = conditionDiv.className.replace('condition', '');
+                    const questionId = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`).value;
+                    const answerValue = document.getElementById(`conditionAnswer${hiddenFieldId}_${conditionId}`).value;
+                    const autofillValue = document.getElementById(`conditionValue${hiddenFieldId}_${conditionId}`).value;
+
+                    if (questionId && answerValue && autofillValue) {
+                        conditionalAutofillLogic += `
+        if (document.getElementById('answer${questionId}').value === '${answerValue}') {
+            document.getElementById('${fieldName}').value = '${autofillValue}';
+        }
+                        `;
+                    }
+                });
             } else if (fieldType === 'checkbox' && fieldName) {
                 const isChecked = document.getElementById(`hiddenFieldChecked${hiddenFieldId}`)?.checked ? 'checked' : '';
                 hiddenFieldsHTML += `
@@ -502,6 +524,6 @@ function generateHiddenPDFFields() {
     </div>
     `;
 
-    // Return both the hidden fields HTML and the autofill mappings
-    return { hiddenFieldsHTML, autofillMappings };
+    // Return the hidden fields HTML, the autofill mappings, and the conditional autofill logic
+    return { hiddenFieldsHTML, autofillMappings, conditionalAutofillLogic };
 }

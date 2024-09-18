@@ -478,7 +478,7 @@ function removeQuestion(questionId) {
     updateAutofillOptions();
 }
 
-// New functions for Hidden PDF Fields module
+// Hidden PDF Fields Module
 
 function initializeHiddenPDFFieldsModule() {
     const formBuilder = document.getElementById('formBuilder');
@@ -533,10 +533,14 @@ function toggleHiddenFieldOptions(hiddenFieldId) {
             <label>Name/ID: </label>
             <input type="text" id="hiddenFieldName${hiddenFieldId}" placeholder="Enter field name"><br><br>
             <label>Autofill from question:</label><br>
-            <select id="hiddenFieldAutofill${hiddenFieldId}">
+            <select id="hiddenFieldAutofill${hiddenFieldId}" style="width: 300px;">
                 <option value="">-- Select a question --</option>
                 ${generateQuestionOptions()}
             </select><br><br>
+            <!-- Conditional Autofill Logic -->
+            <label>Conditional Autofill Logic:</label><br>
+            <div id="conditionalAutofill${hiddenFieldId}"></div>
+            <button type="button" onclick="addConditionalAutofill(${hiddenFieldId})">Add Conditional Logic</button><br><br>
         `;
     } else if (fieldType === 'checkbox') {
         hiddenFieldOptions.innerHTML = `
@@ -566,6 +570,93 @@ function generateQuestionOptions() {
     return optionsHTML;
 }
 
+// Updated function to only include specific question types for conditional logic
+function generateAllQuestionOptions() {
+    let optionsHTML = '';
+    const questionBlocks = document.querySelectorAll('.question-block');
+
+    questionBlocks.forEach(questionBlock => {
+        const questionId = questionBlock.id.replace('questionBlock', '');
+        const questionText = questionBlock.querySelector(`input[type="text"]`).value;
+        const questionType = questionBlock.querySelector(`select`).value;
+
+        // Only include questions suitable for conditional logic (dropdown, radio, checkbox)
+        if (['dropdown', 'radio', 'checkbox'].includes(questionType)) {
+            optionsHTML += `<option value="${questionId}">Question ${questionId}: ${questionText}</option>`;
+        }
+    });
+
+    return optionsHTML;
+}
+
+function addConditionalAutofill(hiddenFieldId) {
+    const conditionalAutofillDiv = document.getElementById(`conditionalAutofill${hiddenFieldId}`);
+    const conditionId = conditionalAutofillDiv.children.length + 1;
+
+    const conditionDiv = document.createElement('div');
+    conditionDiv.className = `condition${conditionId}`;
+    conditionDiv.innerHTML = `
+        <label>Condition ${conditionId}:</label><br>
+        <label>Question:</label>
+        <select id="conditionQuestion${hiddenFieldId}_${conditionId}" onchange="updateConditionAnswers(${hiddenFieldId}, ${conditionId})" style="width: 300px;">
+            <option value="">-- Select a question --</option>
+            ${generateAllQuestionOptions()}
+        </select><br>
+        <label>Answer:</label>
+        <select id="conditionAnswer${hiddenFieldId}_${conditionId}" style="width: 300px;">
+            <option value="">-- Select an answer --</option>
+        </select><br>
+        <label>Value to Autofill:</label>
+        <input type="text" id="conditionValue${hiddenFieldId}_${conditionId}" placeholder="Enter value"><br>
+        <button type="button" onclick="removeConditionalAutofill(${hiddenFieldId}, ${conditionId})">Remove Condition</button>
+        <hr>
+    `;
+    conditionalAutofillDiv.appendChild(conditionDiv);
+}
+
+function removeConditionalAutofill(hiddenFieldId, conditionId) {
+    const conditionDiv = document.querySelector(`#conditionalAutofill${hiddenFieldId} .condition${conditionId}`);
+    conditionDiv.remove();
+}
+
+function updateConditionAnswers(hiddenFieldId, conditionId) {
+    const questionSelect = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`);
+    const answerSelect = document.getElementById(`conditionAnswer${hiddenFieldId}_${conditionId}`);
+    const selectedQuestionId = questionSelect.value;
+
+    // Clear existing options
+    answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+
+    // Get the selected question type and options
+    const questionBlock = document.getElementById(`questionBlock${selectedQuestionId}`);
+    if (questionBlock) {
+        const questionType = questionBlock.querySelector(`select`).value;
+
+        if (questionType === 'radio') {
+            answerSelect.innerHTML += `
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+            `;
+        } else if (questionType === 'dropdown') {
+            const options = questionBlock.querySelectorAll(`#dropdownOptions${selectedQuestionId} input`);
+            options.forEach(option => {
+                answerSelect.innerHTML += `<option value="${option.value}">${option.value}</option>`;
+            });
+        } else if (questionType === 'checkbox') {
+            const options = questionBlock.querySelectorAll(`#checkboxOptions${selectedQuestionId} input`);
+            options.forEach(option => {
+                answerSelect.innerHTML += `<option value="${option.value}">${option.value}</option>`;
+            });
+
+            // Include "None of the above" if selected
+            const noneOfTheAboveSelected = document.getElementById(`noneOfTheAbove${selectedQuestionId}`).checked;
+            if (noneOfTheAboveSelected) {
+                answerSelect.innerHTML += `<option value="None of the above">None of the above</option>`;
+            }
+        }
+    }
+}
+
 function updateAutofillOptions() {
     const hiddenFieldBlocks = document.querySelectorAll('.hidden-field-block');
     hiddenFieldBlocks.forEach(hiddenFieldBlock => {
@@ -585,6 +676,26 @@ function updateAutofillOptions() {
                     autofillSelect.value = previousValue;
                 }
             }
+
+            // Update conditional logic question options
+            const conditionalAutofillDiv = document.getElementById(`conditionalAutofill${hiddenFieldId}`);
+            const conditionDivs = conditionalAutofillDiv.querySelectorAll('div[class^="condition"]');
+            conditionDivs.forEach(conditionDiv => {
+                const conditionId = conditionDiv.className.replace('condition', '');
+                const questionSelect = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`);
+                const previousQuestionValue = questionSelect.value;
+
+                questionSelect.innerHTML = `
+                    <option value="">-- Select a question --</option>
+                    ${generateAllQuestionOptions()}
+                `;
+
+                // Restore previous selection if still valid
+                if (Array.from(questionSelect.options).some(option => option.value === previousQuestionValue)) {
+                    questionSelect.value = previousQuestionValue;
+                    updateConditionAnswers(hiddenFieldId, conditionId);
+                }
+            });
         }
     });
 }
@@ -594,7 +705,6 @@ function removeHiddenField(hiddenFieldId) {
     hiddenFieldBlock.remove();
 }
 
-// New function to add a hidden field with data (used during import)
 function addHiddenFieldWithData(hiddenField) {
     const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
     const hiddenFieldBlock = document.createElement('div');
@@ -627,6 +737,17 @@ function addHiddenFieldWithData(hiddenField) {
         if (hiddenField.autofillQuestionId) {
             const autofillSelect = document.getElementById(`hiddenFieldAutofill${currentHiddenFieldId}`);
             autofillSelect.value = hiddenField.autofillQuestionId;
+        }
+        // Load conditions
+        if (hiddenField.conditions && hiddenField.conditions.length > 0) {
+            hiddenField.conditions.forEach((condition, index) => {
+                addConditionalAutofill(currentHiddenFieldId);
+                const conditionId = index + 1;
+                document.getElementById(`conditionQuestion${currentHiddenFieldId}_${conditionId}`).value = condition.questionId;
+                updateConditionAnswers(currentHiddenFieldId, conditionId);
+                document.getElementById(`conditionAnswer${currentHiddenFieldId}_${conditionId}`).value = condition.answerValue;
+                document.getElementById(`conditionValue${currentHiddenFieldId}_${conditionId}`).value = condition.autofillValue;
+            });
         }
     }
 }
