@@ -562,7 +562,8 @@ function addConditionalAutofillForCheckbox(hiddenFieldId) {
     const conditionId = conditionalAutofillDiv.children.length + 1;
 
     const conditionDiv = document.createElement('div');
-    conditionDiv.className = `condition${conditionId}`;
+    conditionDiv.className = `condition`;
+    conditionDiv.id = `condition${hiddenFieldId}_${conditionId}`; // Set a unique ID
     conditionDiv.innerHTML = `
         <label>Condition ${conditionId}:</label><br>
         <label>Question:</label>
@@ -584,6 +585,7 @@ function addConditionalAutofillForCheckbox(hiddenFieldId) {
     `;
     conditionalAutofillDiv.appendChild(conditionDiv);
 }
+
 
 
 
@@ -629,7 +631,8 @@ function addConditionalAutofill(hiddenFieldId) {
     const conditionId = conditionalAutofillDiv.children.length + 1;
 
     const conditionDiv = document.createElement('div');
-    conditionDiv.className = `condition${conditionId}`;
+    conditionDiv.className = `condition`;
+    conditionDiv.id = `condition${hiddenFieldId}_${conditionId}`; // Set a unique ID
     conditionDiv.innerHTML = `
         <label>Condition ${conditionId}:</label><br>
         <label>Question:</label>
@@ -649,10 +652,16 @@ function addConditionalAutofill(hiddenFieldId) {
     conditionalAutofillDiv.appendChild(conditionDiv);
 }
 
+
 function removeConditionalAutofill(hiddenFieldId, conditionId) {
-    const conditionDiv = document.querySelector(`#conditionalAutofill${hiddenFieldId} .condition${conditionId}`);
-    conditionDiv.remove();
+    const conditionDiv = document.getElementById(`condition${hiddenFieldId}_${conditionId}`);
+    if (conditionDiv) {
+        conditionDiv.remove();
+    } else {
+        console.error(`Condition div with ID condition${hiddenFieldId}_${conditionId} not found.`);
+    }
 }
+
 
 function updateConditionAnswers(hiddenFieldId, conditionId) {
     const questionSelect = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`);
