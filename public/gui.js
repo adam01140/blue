@@ -548,9 +548,44 @@ function toggleHiddenFieldOptions(hiddenFieldId) {
             <input type="text" id="hiddenFieldName${hiddenFieldId}" placeholder="Enter field name"><br><br>
             <label>Checked by default: </label>
             <input type="checkbox" id="hiddenFieldChecked${hiddenFieldId}"><br><br>
+			
+			<label>Conditional Autofill Logic:</label><br>
+            <div id="conditionalAutofillForCheckbox${hiddenFieldId}"></div>
+            <button type="button" onclick="addConditionalAutofillForCheckbox(${hiddenFieldId})">Add Conditional Logic</button><br><br>
         `;
     }
 }
+
+
+function addConditionalAutofillForCheckbox(hiddenFieldId) {
+    const conditionalAutofillDiv = document.getElementById(`conditionalAutofillForCheckbox${hiddenFieldId}`);
+    const conditionId = conditionalAutofillDiv.children.length + 1;
+
+    const conditionDiv = document.createElement('div');
+    conditionDiv.className = `condition${conditionId}`;
+    conditionDiv.innerHTML = `
+        <label>Condition ${conditionId}:</label><br>
+        <label>Question:</label>
+        <select id="conditionQuestion${hiddenFieldId}_${conditionId}" onchange="updateConditionAnswers(${hiddenFieldId}, ${conditionId})" style="width: 300px;">
+            <option value="">-- Select a question --</option>
+            ${generateAllQuestionOptions()}
+        </select><br>
+        <label>Answer:</label>
+        <select id="conditionAnswer${hiddenFieldId}_${conditionId}" style="width: 300px;">
+            <option value="">-- Select an answer --</option>
+        </select><br>
+        <label>Value:</label>
+        <select id="conditionValue${hiddenFieldId}_${conditionId}" style="width: 300px;">
+            <option value="checked">Checked</option>
+            <option value="unchecked">Unchecked</option>
+        </select><br>
+        <button type="button" onclick="removeConditionalAutofill(${hiddenFieldId}, ${conditionId})">Remove Condition</button>
+        <hr>
+    `;
+    conditionalAutofillDiv.appendChild(conditionDiv);
+}
+
+
 
 function generateQuestionOptions() {
     let optionsHTML = '';

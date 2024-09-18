@@ -509,13 +509,25 @@ function generateHiddenPDFFields() {
                     }
                 });
             } else if (fieldType === 'checkbox' && fieldName) {
-                const isChecked = document.getElementById(`hiddenFieldChecked${hiddenFieldId}`)?.checked ? 'checked' : '';
-                hiddenFieldsHTML += `
-    <label class="checkbox-label">
-        <input type="checkbox" id="${fieldName}" name="${fieldName}" value="No" ${isChecked}>
-        ${fieldName}
-    </label>
-                `;
+                hiddenFieldsHTML += `<label class="checkbox-label"><input type="checkbox" id="${fieldName}" name="${fieldName}">${fieldName}</label>`;
+
+                // Handle conditional logic for checkboxes
+                const conditionalAutofillDiv = document.getElementById(`conditionalAutofillForCheckbox${hiddenFieldId}`);
+                const conditionDivs = conditionalAutofillDiv.querySelectorAll('div[class^="condition"]');
+                conditionDivs.forEach(conditionDiv => {
+                    const conditionId = conditionDiv.className.replace('condition', '');
+                    const questionId = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`).value;
+                    const answerValue = document.getElementById(`conditionAnswer${hiddenFieldId}_${conditionId}`).value;
+                    const valueToSet = document.getElementById(`conditionValue${hiddenFieldId}_${conditionId}`).value;
+
+                    if (questionId && answerValue) {
+                        conditionalAutofillLogic += `
+                            if (document.getElementById('answer${questionId}').value === '${answerValue}') {
+                                document.getElementById('${fieldName}').checked = '${valueToSet === 'checked' ? true : false}';
+                            }
+                        `;
+                    }
+                });
             }
         });
     }
@@ -527,3 +539,4 @@ function generateHiddenPDFFields() {
     // Return the hidden fields HTML, the autofill mappings, and the conditional autofill logic
     return { hiddenFieldsHTML, autofillMappings, conditionalAutofillLogic };
 }
+
