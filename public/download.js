@@ -8,21 +8,13 @@ function downloadHTML(content, filename) {
     URL.revokeObjectURL(url);
 }
 
-
-
-
-
-
-
-
-
-
-
 function exportForm() {
     const formData = {
         sections: [],
+        hiddenFields: [], // Include hidden fields in the exported data
         sectionCounter: sectionCounter,
-        questionCounter: questionCounter
+        questionCounter: questionCounter,
+        hiddenFieldCounter: hiddenFieldCounter // Include hiddenFieldCounter
     };
 
     for (let s = 1; s < sectionCounter; s++) {
@@ -73,7 +65,6 @@ function exportForm() {
                     questionData.options.push('None of the above');
                 }
             } else if (questionType === 'dropdown') {
-                // **Add this block to handle dropdown options**
                 const options = questionBlock.querySelectorAll(`#dropdownOptions${questionId} input`);
                 options.forEach(option => {
                     questionData.options.push(option.value);
@@ -86,7 +77,7 @@ function exportForm() {
 
                 questionData.min = rangeStart;
                 questionData.max = rangeEnd;
-                questionData.labels = labels; // Store labels for each numbered dropdown
+                questionData.labels = labels;
             } else if (questionType === 'multipleTextboxes') {
                 const multipleTextboxesOptionsDiv = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} input`);
                 const labels = [];
@@ -102,14 +93,30 @@ function exportForm() {
         formData.sections.push(sectionData);
     }
 
+    // Export hidden fields
+    const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
+    if (hiddenFieldsContainer) {
+        const hiddenFieldBlocks = hiddenFieldsContainer.querySelectorAll('.hidden-field-block');
+        hiddenFieldBlocks.forEach((fieldBlock) => {
+            const hiddenFieldId = fieldBlock.id.replace('hiddenFieldBlock', '');
+            const fieldType = document.getElementById(`hiddenFieldType${hiddenFieldId}`).value;
+            const fieldName = document.getElementById(`hiddenFieldName${hiddenFieldId}`).value.trim();
+            const isChecked = document.getElementById(`hiddenFieldChecked${hiddenFieldId}`)?.checked || false;
+
+            const hiddenFieldData = {
+                hiddenFieldId: hiddenFieldId,
+                type: fieldType,
+                name: fieldName,
+                checked: isChecked
+            };
+
+            formData.hiddenFields.push(hiddenFieldData);
+        });
+    }
+
     const jsonString = JSON.stringify(formData, null, 2);
     downloadJSON(jsonString, "form_data.json");
 }
-
-
-
-
-
 
 function downloadJSON(content, filename) {
     const blob = new Blob([content], { type: "application/json" });
@@ -133,22 +140,22 @@ function importForm(event) {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
 function loadFormData(formData) {
     document.getElementById('formBuilder').innerHTML = '';
 
     sectionCounter = formData.sectionCounter;
     questionCounter = formData.questionCounter;
+    hiddenFieldCounter = formData.hiddenFieldCounter || 1; // Use 1 if not present
+
+    // Initialize the Hidden PDF Fields module
+    initializeHiddenPDFFieldsModule();
+
+    // Load hidden fields if any
+    if (formData.hiddenFields && formData.hiddenFields.length > 0) {
+        formData.hiddenFields.forEach(hiddenField => {
+            addHiddenFieldWithData(hiddenField);
+        });
+    }
 
     formData.sections.forEach(section => {
         addSection(section.sectionId);
@@ -178,7 +185,6 @@ function loadFormData(formData) {
                     }
                 });
             } else if (question.type === 'dropdown') {
-                // **Add this block to handle dropdown options**
                 const dropdownOptionsDiv = document.getElementById(`dropdownOptions${question.questionId}`);
                 dropdownOptionsDiv.innerHTML = '';
 
@@ -202,8 +208,9 @@ function loadFormData(formData) {
                 labelsDiv.innerHTML = '';
                 question.labels.forEach((label, index) => {
                     const labelDiv = document.createElement('div');
+                    labelDiv.className = `label${index + 1}`;
                     labelDiv.innerHTML = `
-                        <input type="text" value="${label}" placeholder="Label ${index + 1}">
+                        <input type="text" id="label${question.questionId}_${index + 1}" value="${label}" placeholder="Label ${index + 1}">
                         <button type="button" onclick="removeTextboxLabel(${question.questionId}, ${index + 1})">Remove</button>
                     `;
                     labelsDiv.appendChild(labelDiv);
@@ -240,11 +247,33 @@ function loadFormData(formData) {
     });
 }
 
+// New function to add a hidden field with data
+function addHiddenFieldWithData(hiddenField) {
+    const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
+    const hiddenFieldBlock = document.createElement('div');
+    const currentHiddenFieldId = hiddenField.hiddenFieldId;
 
+    hiddenFieldBlock.className = 'hidden-field-block';
+    hiddenFieldBlock.id = `hiddenFieldBlock${currentHiddenFieldId}`;
+    hiddenFieldBlock.innerHTML = `
+        <label>Hidden Field ${currentHiddenFieldId}: </label>
+        <select id="hiddenFieldType${currentHiddenFieldId}" onchange="toggleHiddenFieldOptions(${currentHiddenFieldId})">
+            <option value="text" ${hiddenField.type === 'text' ? 'selected' : ''}>Textbox</option>
+            <option value="checkbox" ${hiddenField.type === 'checkbox' ? 'selected' : ''}>Checkbox</option>
+        </select><br><br>
+        <div id="hiddenFieldOptions${currentHiddenFieldId}">
+            <!-- Options will be populated based on the type -->
+        </div>
+        <button type="button" onclick="removeHiddenField(${currentHiddenFieldId})">Remove Hidden Field</button>
+        <hr>
+    `;
+    hiddenFieldsContainer.appendChild(hiddenFieldBlock);
 
+    toggleHiddenFieldOptions(currentHiddenFieldId);
 
+    document.getElementById(`hiddenFieldName${currentHiddenFieldId}`).value = hiddenField.name;
 
-
-
-
-
+    if (hiddenField.type === 'checkbox') {
+        document.getElementById(`hiddenFieldChecked${currentHiddenFieldId}`).checked = hiddenField.checked;
+    }
+}

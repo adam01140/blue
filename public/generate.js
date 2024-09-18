@@ -6,7 +6,173 @@ function generateAndDownloadForm() {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Custom Form</title>
-        <link rel="stylesheet" href="new.css">
+        <style>
+		
+	input[type="text"], select {
+    background-color: #e6f4ff; /* Light blue background */
+    border: 2px solid #2980b9; /* Matching border color */
+    border-radius: 10px; /* Rounded borders */
+    padding: 8px; /* Padding inside the input */
+    box-sizing: border-box; /* Include padding and border in the width */
+    transition: border-color 0.3s ease; /* Smooth transition for border color */
+}
+
+input[type="text"]:focus, select:focus {
+    border-color: #1c598a; /* Darker blue when focused */
+    outline: none; /* Removes the default focus outline */
+}
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #2c3e50;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+		
+		#box {
+    border: 4px solid lightblue;
+    border-color: #2c3e50;
+    border-radius: 10px;
+    padding: 20px;
+    padding-bottom: 70px; /* Increase bottom padding to make space for buttons */
+    margin: 50px;
+    background-color: #ffffff;
+    width: auto;
+    height: auto; /* Allow the div to grow with its content */
+
+    position: relative;
+	
+		}
+		
+		  .section { display: none; }
+            .section.active { display: block; }
+            .thank-you-message { display: none; font-size: 20px; font-weight: bold; text-align: center; margin-top: 20px; }
+			
+			
+			
+        header img {
+            cursor: pointer;
+        }
+        nav {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        nav a:hover {
+            color: #2980b9;
+        }
+        section {
+            padding: 50px;
+            text-align: center;
+            flex: 1;
+            display: grid;
+            gap: 20px;
+        }
+        section h1 {
+            color: #2980b9;
+            font-weight: normal;
+        }
+        section p {
+            margin-bottom: 20px;
+        }
+       /* Apply button style globally to all button elements */
+button {
+    background-color: #2980b9;
+    color: #ffffff;
+    padding: 5px 30px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+/* Hover effect for all buttons */
+button:hover {
+    background-color: #1c598a;
+}
+
+		
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(150px, 1fr));
+            justify-items: center;
+            gap: 10px;
+            max-width: 800px; /* Adjust the max-width to bring them closer */
+            margin: 0 auto; /* Center the steps container */
+        }
+        .step {
+            text-align: center;
+        }
+		
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #2c3e50;
+            color: white;
+        }
+		
+		.section {
+                display: none;
+            }
+            .section.active {
+                display: block;
+            }
+            .thank-you-message {
+                display: none;
+                font-size: 20px;
+                font-weight: bold;
+                text-align: center;
+                margin-top: 20px;
+            }
+			
+			
+			
+			
+			
+        /* Media query for smaller screens */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 10px;
+            }
+            nav {
+                position: static;
+                transform: none;
+                margin-top: 10px;
+            }
+            .steps {
+                grid-template-columns: 1fr;
+                max-width: 100%; /* Full width on smaller screens */
+            }
+        }
+		
+		
+		
+		<style>
         <style>
             .section { display: none; }
             .section.active { display: block; }
@@ -24,6 +190,30 @@ function generateAndDownloadForm() {
                 margin: 0 auto;
                 cursor: pointer;
             }
+			
+			
+			input[type="text"],
+input[type="number"],
+textarea,
+select {
+    background-color: #e6f4ff; /* Light blue background */
+    border: 2px solid #2980b9; /* Matching border color */
+    border-radius: 10px; /* Rounded borders */
+    padding: 8px; /* Padding inside the input */
+    box-sizing: border-box; /* Include padding and border in the width */
+    transition: border-color 0.3s ease; /* Smooth transition for border color */
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #1c598a; /* Darker blue when focused */
+    outline: none; /* Removes the default focus outline */
+}
+
+
+
         </style>
     </head>
     <body>
@@ -62,13 +252,13 @@ function generateAndDownloadForm() {
             const jumpOption = questionBlock.querySelector(`#jumpOption${questionId}`).value;
 
             formHTML += `<div id="question-container-${questionId}" ${logicEnabled ? 'class="hidden"' : ''}>`;
-            formHTML += `<label>${questionText}</label><br>`;
+            formHTML += `<label><h3>${questionText}</h3></label><br><br>`;
 
             // Handle the different question types
             if (questionType === 'text') {
                 formHTML += `<input type="text" id="answer${questionId}"><br><br>`;
             } else if (questionType === 'bigParagraph') {
-                formHTML += `<textarea id="answer${questionId}" rows="5" cols="50" placeholder="Enter a longer response here"></textarea><br><br>`;
+                formHTML += `<textarea id="answer${questionId}" rows="5" cols="50" placeholder="Enter a response here"></textarea><br><br>`;
             } else if (questionType === 'radio') {
                 formHTML += `
                     <select id="answer${questionId}">
@@ -128,7 +318,7 @@ function generateAndDownloadForm() {
                         container.innerHTML = '';
                         for (let i = 1; i <= count; i++) {
                             ${Array.from(labels).map(label =>
-                                `container.innerHTML += '<label>${label.value} ' + i + ':</label><input type="text" id="label' + questionId + '_' + i + '${label.value.replace(/\\s+/g, '')}"><br>';`
+                                `container.innerHTML += '<label><h3>${label.value} ' + i + ':</h3></label><input type="text" id="label' + questionId + '_' + i + '${label.value.replace(/\\s+/g, '')}"><br>';`
                             ).join('')}
                         }
                     }
@@ -140,10 +330,8 @@ function generateAndDownloadForm() {
                     formHTML += `<input type="text" id="answer${questionId}_${index + 1}" placeholder="${labelText}" style="text-align:center;"><br><br>`;
                 });
             } else if (questionType === 'money') {
-                formHTML += `<label for="money${questionId}">Enter amount:</label><br>`;
-                formHTML += `<input type="number" id="answer${questionId}" min="0" step="0.01" placeholder="Enter currency amount"><br><br>`;
+                formHTML += `<input type="number" id="answer${questionId}" min="0" step="0.01" placeholder="Enter amount"><br><br>`;
             } else if (questionType === 'date') {
-                formHTML += `<label for="date${questionId}">Enter date:</label><br>`;
                 formHTML += `<input type="date" id="answer${questionId}" placeholder="Enter a date"><br><br>`;
             }
 
@@ -216,6 +404,9 @@ function generateAndDownloadForm() {
         formHTML += `</div>`; // Close section div
     }
 
+    // Add the hidden PDF fields to the formHTML
+    formHTML += generateHiddenPDFFields();
+
     formHTML += `
         </form>
         <div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
@@ -258,3 +449,41 @@ function generateAndDownloadForm() {
 
     downloadHTML(formHTML, "custom_form.html");
 }
+
+// New function to generate the hidden PDF fields
+function generateHiddenPDFFields() {
+    let hiddenFieldsHTML = `
+    <div id="hidden_pdf_fields" style="display:none;">
+    `;
+
+    const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
+    if (hiddenFieldsContainer) {
+        const hiddenFieldBlocks = hiddenFieldsContainer.querySelectorAll('.hidden-field-block');
+        hiddenFieldBlocks.forEach((fieldBlock) => {
+            const hiddenFieldId = fieldBlock.id.replace('hiddenFieldBlock', '');
+            const fieldType = document.getElementById(`hiddenFieldType${hiddenFieldId}`).value;
+            const fieldName = document.getElementById(`hiddenFieldName${hiddenFieldId}`).value.trim();
+
+            if (fieldType === 'text' && fieldName) {
+                hiddenFieldsHTML += `
+    <input type="text" id="${fieldName}" name="${fieldName}" placeholder="${fieldName}">
+                `;
+            } else if (fieldType === 'checkbox' && fieldName) {
+                const isChecked = document.getElementById(`hiddenFieldChecked${hiddenFieldId}`)?.checked ? 'checked' : '';
+                hiddenFieldsHTML += `
+    <label class="checkbox-label">
+        <input type="checkbox" id="${fieldName}" name="${fieldName}" value="No" ${isChecked}>
+        ${fieldName}
+    </label>
+                `;
+            }
+        });
+    }
+
+    hiddenFieldsHTML += `
+    </div>
+    `;
+
+    return hiddenFieldsHTML;
+}
+

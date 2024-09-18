@@ -1,5 +1,6 @@
 let sectionCounter = 1;
 let questionCounter = 1;
+let hiddenFieldCounter = 1; // Counter for hidden fields
 
 function addSection(sectionId = null) {
     const formBuilder = document.getElementById('formBuilder');
@@ -36,7 +37,6 @@ function moveSectionUp(sectionId) {
         updateSectionLabels();
     }
 }
-
 
 function moveSectionDown(sectionId) {
     const sectionBlock = document.getElementById(`sectionBlock${sectionId}`);
@@ -84,7 +84,7 @@ function updateGlobalQuestionLabels() {
             
             // Update question-related IDs and event handlers
             questionBlock.id = `questionBlock${globalQuestionIndex}`;
-            questionBlock.querySelectorAll('input, select, button').forEach(input => {
+            questionBlock.querySelectorAll('input, select, button, div').forEach(input => {
                 const oldId = input.id;
                 if (oldId) {
                     const newId = oldId.replace(/\d+$/, globalQuestionIndex);
@@ -111,101 +111,42 @@ function updateGlobalQuestionLabels() {
     questionCounter = globalQuestionIndex;  // Reset questionCounter to the new highest index + 1
 }
 
-
-function updateQuestionsInSection(sectionId) {
-    const questionsInSection = document.querySelectorAll(`#questionsSection${sectionId} .question-block`);
-    let newQuestionIndex = 1;
-    questionsInSection.forEach(questionBlock => {
-        questionBlock.id = `questionBlock${newQuestionIndex}`;
-        questionBlock.querySelector('label').innerText = `Question ${newQuestionIndex}:`;
-        
-        // Update IDs in inputs, selects, etc.
-        questionBlock.querySelectorAll('input, select, div, label').forEach(input => {
-            const oldId = input.id;
-            input.id = oldId.replace(/\d+$/, newQuestionIndex);
-            if (input.tagName === 'LABEL' && input.getAttribute('for')) {
-                input.setAttribute('for', input.getAttribute('for').replace(/\d+$/, newQuestionIndex));
-            }
-        });
-
-        // Update buttons' onclick attributes
-        const moveUpButton = questionBlock.querySelector('button[onclick*="moveQuestionUp"]');
-        const moveDownButton = questionBlock.querySelector('button[onclick*="moveQuestionDown"]');
-        const removeButton = questionBlock.querySelector('button[onclick*="removeQuestion"]');
-        
-        moveUpButton.setAttribute('onclick', `moveQuestionUp(${newQuestionIndex}, ${sectionId})`);
-        moveDownButton.setAttribute('onclick', `moveQuestionDown(${newQuestionIndex}, ${sectionId})`);
-        removeButton.setAttribute('onclick', `removeQuestion(${newQuestionIndex})`);
-
-        newQuestionIndex++;
-    });
-    questionCounter = newQuestionIndex;  // Reset questionCounter to the new highest index + 1
-}
-
-
-
-
 function removeSection(sectionId) {
     const sectionBlock = document.getElementById(`sectionBlock${sectionId}`);
     sectionBlock.remove();
 
     // Update IDs and headers of all subsequent sections
     const remainingSections = document.querySelectorAll('.section-block');
-    let newSectionIndex = sectionId;
+    let newSectionIndex = 1;
     remainingSections.forEach(block => {
-        if (parseInt(block.id.replace('sectionBlock', '')) > sectionId) {
-            const oldSectionId = block.id.replace('sectionBlock', '');
-            block.id = `sectionBlock${newSectionIndex}`;
-            block.querySelector('h2').innerText = `Section ${newSectionIndex}`;
-            
-            // Update questions within this section
-            updateQuestionsInSection(oldSectionId, newSectionIndex);
-
-            // Update the section-related buttons (Add/Remove Question)
-            block.querySelectorAll('button').forEach(button => {
-                const onclickAttr = button.getAttribute('onclick');
-                button.setAttribute('onclick', onclickAttr.replace(/\d+/, newSectionIndex));
-                if (button.textContent.includes('Add Question to Section')) {
-                    button.textContent = `Add Question to Section ${newSectionIndex}`;
-                }
-                if (button.textContent.includes('Remove Section')) {
-                    button.textContent = `Remove Section`;
-                }
-            });
-
-            newSectionIndex++;
+        block.id = `sectionBlock${newSectionIndex}`;
+        block.querySelector('h2').innerText = `Section ${newSectionIndex}`;
+        
+        // Update questions within this section
+        const questionsSection = block.querySelector('.questionsSection');
+        if (questionsSection) {
+            questionsSection.id = `questionsSection${newSectionIndex}`;
         }
-    });
 
-    sectionCounter = newSectionIndex;  // Reset sectionCounter to the new highest index
-}
-
-
-function updateQuestionsInSection(oldSectionId, newSectionId) {
-    const questionsInSection = document.querySelectorAll(`#questionsSection${oldSectionId} .question-block`);
-    let newQuestionIndex = 1;
-    questionsInSection.forEach(question => {
-        const oldQuestionId = question.id.replace('questionBlock', '');
-        question.id = `questionBlock${newQuestionIndex}`;
-        question.querySelector('label').innerText = `Question ${newQuestionIndex}:`;
-        // Update IDs in inputs, selects, etc.
-        question.querySelectorAll('input, select, div, label').forEach(input => {
-            const oldId = input.id;
-            input.id = oldId.replace(/\d+$/, newQuestionIndex);
-            if (input.tagName === 'LABEL' && input.getAttribute('for')) {
-                input.setAttribute('for', input.getAttribute('for').replace(/\d+$/, newQuestionIndex));
+        block.querySelectorAll('button').forEach(button => {
+            const onclickAttr = button.getAttribute('onclick');
+            if (onclickAttr) {
+                button.setAttribute('onclick', onclickAttr.replace(/\d+/, newSectionIndex));
+            }
+            if (button.textContent.includes('Add Question to Section')) {
+                button.textContent = `Add Question to Section ${newSectionIndex}`;
+            }
+            if (button.textContent.includes('Remove Section')) {
+                button.textContent = `Remove Section`;
             }
         });
 
-        // Update container div ID for the questions section
-        question.parentNode.id = `questionsSection${newSectionId}`;
-
-        newQuestionIndex++;
+        newSectionIndex++;
     });
-    questionCounter = newQuestionIndex;  // Reset questionCounter to the new highest index + 1
+
+    sectionCounter = newSectionIndex;  // Reset sectionCounter to the new highest index
+    updateGlobalQuestionLabels();
 }
-
-
 
 function addQuestion(sectionId, questionId = null) {
     const questionsSection = document.getElementById(`questionsSection${sectionId}`);
@@ -311,27 +252,6 @@ function addQuestion(sectionId, questionId = null) {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function moveQuestionUp(questionId, sectionId) {
     const questionBlock = document.getElementById(`questionBlock${questionId}`);
     const previousSibling = questionBlock.previousElementSibling;
@@ -352,7 +272,6 @@ function moveQuestionDown(questionId, sectionId) {
     }
 }
 
-
 function updateQuestionLabels(sectionId) {
     const questionsSection = document.getElementById(`questionsSection${sectionId}`);
     const questionBlocks = questionsSection.querySelectorAll('.question-block');
@@ -362,10 +281,6 @@ function updateQuestionLabels(sectionId) {
         questionLabel.textContent = `Question ${index + 1}: `;
     });
 }
-
-
-
-
 
 function toggleOptions(questionId) {
     const questionTypeSelect = document.getElementById(`questionType${questionId}`);
@@ -419,9 +334,6 @@ function toggleOptions(questionId) {
     }
 }
 
-
-
-
 function addMultipleTextboxOption(questionId) {
     const multipleTextboxesOptionsDiv = document.getElementById(`multipleTextboxesOptions${questionId}`);
     const optionCount = multipleTextboxesOptionsDiv.children.length + 1;
@@ -435,8 +347,6 @@ function addMultipleTextboxOption(questionId) {
     multipleTextboxesOptionsDiv.appendChild(optionDiv);
 }
 
-
-
 function removeMultipleTextboxOption(questionId, optionNumber) {
     const optionDiv = document.querySelector(`#multipleTextboxesOptions${questionId} .option${optionNumber}`);
     if (optionDiv) {
@@ -444,82 +354,17 @@ function removeMultipleTextboxOption(questionId, optionNumber) {
     }
 }
 
-
-
-
-
-
 function toggleLogic(questionId) {
     const logicEnabled = document.getElementById(`logic${questionId}`).checked;
     const logicBlock = document.getElementById(`logicBlock${questionId}`);
     logicBlock.style.display = logicEnabled ? 'block' : 'none';
-
-    if (logicEnabled) {
-        const prevQuestionInput = document.getElementById(`prevQuestion${questionId}`);
-        const prevAnswerInput = document.getElementById(`prevAnswer${questionId}`);
-
-        function updateLogic() {
-            const prevQuestionId = prevQuestionInput.value;
-            const prevAnswer = prevAnswerInput.value;
-
-            if (prevQuestionId && prevAnswer) {
-                const prevAnswerElement = document.getElementById(`answer${prevQuestionId}`);
-                if (prevAnswerElement) {
-                    prevAnswerElement.addEventListener('change', function() {
-                        const selectedAnswer = this.value;
-                        const currentQuestionContainer = document.getElementById(`question-container-${questionId}`);
-                        if (selectedAnswer.trim().toLowerCase() === prevAnswer.trim().toLowerCase()) {
-                            currentQuestionContainer.classList.remove('hidden');
-                        } else {
-                            currentQuestionContainer.classList.add('hidden');
-                        }
-                    });
-                }
-            }
-        }
-
-        // Update logic when inputs change
-        prevQuestionInput.addEventListener('input', updateLogic);
-        prevAnswerInput.addEventListener('input', updateLogic);
-
-        // Initialize logic
-        updateLogic();
-    }
 }
-
-
 
 function toggleJumpLogic(questionId) {
     const jumpEnabled = document.getElementById(`enableJump${questionId}`).checked;
     const jumpBlock = document.getElementById(`jumpBlock${questionId}`);
     jumpBlock.style.display = jumpEnabled ? 'block' : 'none';
-
-    if (jumpEnabled) {
-        const questionType = document.getElementById(`questionType${questionId}`).value;
-        if (questionType === 'radio') {
-            updateJumpOptionsForRadio(questionId);
-        } else if (questionType === 'dropdown') {
-            updateJumpOptions(questionId);
-        } else if (questionType === 'checkbox') {
-            // For checkbox, set the jump options to the values of the checkboxes
-            const checkboxOptionsDiv = document.getElementById(`checkboxOptions${questionId}`);
-            const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
-            jumpOptionSelect.innerHTML = ''; // Clear previous options
-
-            checkboxOptionsDiv.querySelectorAll('input[type="text"]').forEach(optionInput => {
-                const value = optionInput.value.trim();
-                if (value) {
-                    const opt = document.createElement('option');
-                    opt.value = value;
-                    opt.text = value;
-                    jumpOptionSelect.appendChild(opt);
-                }
-            });
-        }
-    }
 }
-
-
 
 function updateJumpOptionsForRadio(questionId) {
     const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
@@ -555,7 +400,6 @@ function updateJumpOptions(questionId) {
 
 function addDropdownOption(questionId) {
     const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
-    const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
     const optionCount = dropdownOptionsDiv.children.length + 1;
 
     const optionDiv = document.createElement('div');
@@ -567,10 +411,15 @@ function addDropdownOption(questionId) {
     `;
     dropdownOptionsDiv.appendChild(optionDiv);
 
-    const opt = document.createElement('option');
-    opt.value = optionId;
-    opt.text = `Option ${optionCount}`;
-    jumpOptionSelect.appendChild(opt);
+    // Update jump options if necessary
+    updateJumpOptions(questionId);
+}
+
+function removeDropdownOption(questionId, optionNumber) {
+    const optionDiv = document.querySelector(`#dropdownOptions${questionId} .option${optionNumber}`);
+    optionDiv.remove();
+    // Update jump options
+    updateJumpOptions(questionId);
 }
 
 function addCheckboxOption(questionId) {
@@ -586,6 +435,11 @@ function addCheckboxOption(questionId) {
     checkboxOptionsDiv.appendChild(optionDiv);
 }
 
+function removeCheckboxOption(questionId, optionNumber) {
+    const optionDiv = document.querySelector(`#checkboxOptions${questionId} .option${optionNumber}`);
+    optionDiv.remove();
+}
+
 function addTextboxLabel(questionId) {
     const textboxLabelsDiv = document.getElementById(`textboxLabels${questionId}`);
     const labelCount = textboxLabelsDiv.children.length + 1;
@@ -599,18 +453,6 @@ function addTextboxLabel(questionId) {
     textboxLabelsDiv.appendChild(labelDiv);
 }
 
-function removeDropdownOption(questionId, optionNumber) {
-    const optionDiv = document.querySelector(`#dropdownOptions${questionId} .option${optionNumber}`);
-    optionDiv.remove();
-    const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
-    jumpOptionSelect.querySelector(`option[value="option${optionNumber}"]`).remove();
-}
-
-function removeCheckboxOption(questionId, optionNumber) {
-    const optionDiv = document.querySelector(`#checkboxOptions${questionId} .option${optionNumber}`);
-    optionDiv.remove();
-}
-
 function removeTextboxLabel(questionId, labelNumber) {
     const labelDiv = document.querySelector(`#textboxLabels${questionId} .label${labelNumber}`);
     labelDiv.remove();
@@ -622,23 +464,76 @@ function removeQuestion(questionId) {
     questionBlock.remove();
 
     // Update IDs of subsequent questions
-    const remainingQuestions = document.querySelectorAll(`#questionsSection${sectionId} .question-block`);
-    let newIndex = questionId;
-    remainingQuestions.forEach(block => {
-        if (parseInt(block.id.replace('questionBlock', '')) > questionId) {
-            block.id = `questionBlock${newIndex}`;
-            block.querySelector('label').innerText = `Question ${newIndex}:`;
-            block.querySelectorAll('input, select, div').forEach(input => {
-                const oldId = input.id;
-                input.id = oldId.replace(/\d+$/, newIndex);
-            });
-            newIndex++;
-        }
-    });
-
-    questionCounter = newIndex;  // Reset questionCounter to the new highest index + 1
+    updateGlobalQuestionLabels();
 }
 
+// New functions for Hidden PDF Fields module
 
+function initializeHiddenPDFFieldsModule() {
+    const formBuilder = document.getElementById('formBuilder');
 
+    const hiddenFieldsModule = document.createElement('div');
+    hiddenFieldsModule.id = 'hiddenFieldsModule';
+    hiddenFieldsModule.innerHTML = `
+        <h2>Hidden PDF Fields</h2>
+        <div id="hiddenFieldsContainer"></div>
+        <button type="button" onclick="addHiddenField()">Add Hidden Field</button>
+        <hr>
+    `;
+    formBuilder.appendChild(hiddenFieldsModule);
+}
+
+// Call the function to initialize the Hidden PDF Fields module
+initializeHiddenPDFFieldsModule();
+
+function addHiddenField() {
+    const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
+    const hiddenFieldBlock = document.createElement('div');
+    const currentHiddenFieldId = hiddenFieldCounter;
+
+    hiddenFieldBlock.className = 'hidden-field-block';
+    hiddenFieldBlock.id = `hiddenFieldBlock${currentHiddenFieldId}`;
+    hiddenFieldBlock.innerHTML = `
+        <label>Hidden Field ${currentHiddenFieldId}: </label>
+        <select id="hiddenFieldType${currentHiddenFieldId}" onchange="toggleHiddenFieldOptions(${currentHiddenFieldId})">
+            <option value="text">Textbox</option>
+            <option value="checkbox">Checkbox</option>
+        </select><br><br>
+        <div id="hiddenFieldOptions${currentHiddenFieldId}">
+            <label>Name/ID: </label>
+            <input type="text" id="hiddenFieldName${currentHiddenFieldId}" placeholder="Enter field name"><br><br>
+        </div>
+        <button type="button" onclick="removeHiddenField(${currentHiddenFieldId})">Remove Hidden Field</button>
+        <hr>
+    `;
+    hiddenFieldsContainer.appendChild(hiddenFieldBlock);
+    hiddenFieldCounter++;
+}
+
+function toggleHiddenFieldOptions(hiddenFieldId) {
+    const fieldType = document.getElementById(`hiddenFieldType${hiddenFieldId}`).value;
+    const hiddenFieldOptions = document.getElementById(`hiddenFieldOptions${hiddenFieldId}`);
+
+    // Clear existing options
+    hiddenFieldOptions.innerHTML = '';
+
+    if (fieldType === 'text') {
+        hiddenFieldOptions.innerHTML = `
+            <label>Name/ID: </label>
+            <input type="text" id="hiddenFieldName${hiddenFieldId}" placeholder="Enter field name"><br><br>
+        `;
+    } else if (fieldType === 'checkbox') {
+        hiddenFieldOptions.innerHTML = `
+            <label>Name/ID: </label>
+            <input type="text" id="hiddenFieldName${hiddenFieldId}" placeholder="Enter field name"><br><br>
+            <label>Checked by default: </label>
+            <input type="checkbox" id="hiddenFieldChecked${hiddenFieldId}"><br><br>
+        `;
+    }
+}
+
+function removeHiddenField(hiddenFieldId) {
+    const hiddenFieldBlock = document.getElementById(`hiddenFieldBlock${hiddenFieldId}`);
+    hiddenFieldBlock.remove();
+}
 
