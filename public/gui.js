@@ -174,6 +174,15 @@ function addQuestion(sectionId, questionId = null) {
             <option value="bigParagraph">Big Paragraph</option>
         </select><br><br>
 
+        <!-- Name/ID and Placeholder for Textbox -->
+        <div id="textboxOptions${currentQuestionId}" class="textbox-options" style="display: none;">
+            <label>Name/ID: </label>
+            <input type="text" id="textboxName${currentQuestionId}" placeholder="Enter field name"><br><br>
+
+            <label>Placeholder: </label>
+            <input type="text" id="textboxPlaceholder${currentQuestionId}" placeholder="Enter placeholder"><br><br>
+        </div>
+
         <!-- Numbered Dropdown Options -->
         <div id="numberedDropdownBlock${currentQuestionId}" class="numbered-dropdown-options" style="display: none;">
             <label>Number Range: </label>
@@ -255,6 +264,7 @@ function addQuestion(sectionId, questionId = null) {
     }
 }
 
+
 function moveQuestionUp(questionId, sectionId) {
     const questionBlock = document.getElementById(`questionBlock${questionId}`);
     const previousSibling = questionBlock.previousElementSibling;
@@ -295,20 +305,25 @@ function toggleOptions(questionId) {
     const optionsBlock = document.getElementById(`optionsBlock${questionId}`);
     const checkboxBlock = document.getElementById(`checkboxBlock${questionId}`);
     const numberedDropdownBlock = document.getElementById(`numberedDropdownBlock${questionId}`);
-    const multipleTextboxesBlock = document.getElementById(`multipleTextboxesBlock${questionId}`); // New block for multiple textboxes
+    const multipleTextboxesBlock = document.getElementById(`multipleTextboxesBlock${questionId}`);
+    const textboxOptionsBlock = document.getElementById(`textboxOptions${questionId}`); // Block for Name/ID and Placeholder for textboxes
     const jumpOptionLabel = document.getElementById(`jumpOptionLabel${questionId}`);
     const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
     
     // Hide all blocks initially
+    if (textboxOptionsBlock) textboxOptionsBlock.style.display = 'none';
     if (optionsBlock) optionsBlock.style.display = 'none';
     if (checkboxBlock) checkboxBlock.style.display = 'none';
     if (numberedDropdownBlock) numberedDropdownBlock.style.display = 'none';
-    if (multipleTextboxesBlock) multipleTextboxesBlock.style.display = 'none'; // Hide multiple textboxes block
+    if (multipleTextboxesBlock) multipleTextboxesBlock.style.display = 'none';
     if (jumpOptionLabel) jumpOptionLabel.style.display = 'none';
     if (jumpOptionSelect) jumpOptionSelect.style.display = 'none';
 
     // Show and update specific blocks based on question type
     switch (questionType) {
+        case 'text':
+            if (textboxOptionsBlock) textboxOptionsBlock.style.display = 'block'; // Show Name/ID and Placeholder
+            break;
         case 'radio':
             if (jumpOptionLabel) jumpOptionLabel.style.display = 'block';
             if (jumpOptionSelect) {
@@ -333,14 +348,17 @@ function toggleOptions(questionId) {
         case 'multipleTextboxes':
             if (multipleTextboxesBlock) multipleTextboxesBlock.style.display = 'block';
             break;
-        case 'money': // New case for Money type
-            // No additional options to show for Money type, so nothing extra here
+        case 'money':
+        case 'date':
+        case 'bigParagraph':
+            // No additional options to show for these types, so nothing extra here
             break;
     }
 
     // Update autofill options in hidden fields
     updateAutofillOptions();
 }
+
 
 function addMultipleTextboxOption(questionId) {
     const multipleTextboxesOptionsDiv = document.getElementById(`multipleTextboxesOptions${questionId}`);
@@ -562,8 +580,8 @@ function addConditionalAutofillForCheckbox(hiddenFieldId) {
     const conditionId = conditionalAutofillDiv.children.length + 1;
 
     const conditionDiv = document.createElement('div');
-    conditionDiv.className = `condition`;
-    conditionDiv.id = `condition${hiddenFieldId}_${conditionId}`; // Set a unique ID
+    conditionDiv.className = `condition${conditionId}`;
+	conditionDiv.id = `condition${hiddenFieldId}_${conditionId}`; // Set a unique ID
     conditionDiv.innerHTML = `
         <label>Condition ${conditionId}:</label><br>
         <label>Question:</label>
@@ -585,7 +603,6 @@ function addConditionalAutofillForCheckbox(hiddenFieldId) {
     `;
     conditionalAutofillDiv.appendChild(conditionDiv);
 }
-
 
 
 

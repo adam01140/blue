@@ -3,7 +3,6 @@ function generateAndDownloadForm() {
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <!-- ... existing head content ... -->
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Custom Form</title>
@@ -220,9 +219,14 @@ select:focus {
     <body>
     
     <header>
-        <!-- ... existing header content ... -->
+        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="forms.html">Forms</a>
+            <a href="contact.html">Contact Us</a>
+        </nav>
     </header>
-    
+
     <section>
     <div id="box">
         <form id="customForm" onsubmit="return showThankYouMessage();">
@@ -252,7 +256,9 @@ select:focus {
 
             // Handle the different question types
             if (questionType === 'text') {
-                formHTML += `<input type="text" id="answer${questionId}"><br><br>`;
+                const nameId = questionBlock.querySelector(`#textboxName${questionId}`).value || `answer${questionId}`;
+                const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`).value || '';
+                formHTML += `<input type="text" id="${nameId}" name="${nameId}" placeholder="${placeholder}"><br><br>`;
             } else if (questionType === 'bigParagraph') {
                 formHTML += `<textarea id="answer${questionId}" rows="5" cols="50" placeholder="Enter a response here"></textarea><br><br>`;
             } else if (questionType === 'radio') {
@@ -461,6 +467,26 @@ select:focus {
 
     downloadHTML(formHTML, "custom_form.html");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Updated function to generate the hidden PDF fields
 function generateHiddenPDFFields() {
