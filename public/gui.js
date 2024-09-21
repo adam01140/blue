@@ -177,10 +177,10 @@ function addQuestion(sectionId, questionId = null) {
         <!-- Name/ID and Placeholder for Textbox -->
         <div id="textboxOptions${currentQuestionId}" class="textbox-options" style="display: none;">
             
-			<!--
+		
 			<label>Name/ID: </label>
             <input type="text" id="textboxName${currentQuestionId}" placeholder="Enter field name"><br><br>
--->
+
             <label>Placeholder: </label>
             <input type="text" id="textboxPlaceholder${currentQuestionId}" placeholder="Enter placeholder"><br><br>
         </div>

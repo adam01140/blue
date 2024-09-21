@@ -607,4 +607,3 @@ function generateHiddenPDFFields() {
     return { hiddenFieldsHTML, autofillMappings, conditionalAutofillLogic };
 }
 
-
