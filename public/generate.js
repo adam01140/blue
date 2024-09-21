@@ -226,8 +226,24 @@ select:focus {
             <a href="contact.html">Contact Us</a>
         </nav>
     </header>
-
+<div id="result"></div>
     <section>
+	
+	<script>
+        window.onload = function() {
+            // Select all textboxes and checkboxes
+            const inputs = document.querySelectorAll('input[type="text"], input[type="checkbox"]');
+            // Create an array to store the IDs
+            let ids = [];
+            // Iterate through each input and push its ID to the array
+            inputs.forEach(input => {
+                ids.push(input.id);
+            });
+            // Join all IDs into one big paragraph and alert
+            alert('IDs of all inputs: ' + ids.join(', '));
+        };
+		
+	</script>
     <div id="box">
         <form id="customForm" onsubmit="return showThankYouMessage();">
     `;
@@ -313,8 +329,28 @@ select:focus {
                 formHTML += `</select><br><br>`;
 
                 formHTML += `<div id="labelContainer${questionId}"></div>`;
-
+				
                 formHTML += `<script>
+				
+				
+				function displayIDs() {
+            const inputs = document.querySelectorAll('input[type="text"], input[type="checkbox"]');
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';  // Clear previous results
+
+            inputs.forEach(input => {
+                if (input.id) {
+                    resultDiv.innerHTML += '<p>ID: ${input.id}</p>;
+                   
+                }   
+            });
+            
+            alert(resultDiv.innerHTML);
+        }
+        
+        
+        displayIDs();
+		
                     function showTextboxLabels(questionId, count, rangeStart, rangeEnd) {
                         const container = document.getElementById('labelContainer' + questionId);
                         container.innerHTML = '';

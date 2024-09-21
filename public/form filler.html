@@ -19,18 +19,28 @@
         </nav>
     </header>
     
-    <center>
-        <h1>FormWiz Developer GUI</h1>
+    
 
+<section>
+<div class="container">
+
+<center>
+        <h2>FormWiz Developer GUI</h2>
+		
+		
+		<button onclick="generateAndDownloadForm()">Download Form HTML</button>
+                <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importForm(event)">
+                <button onclick="document.getElementById('importFileInput').click();">Import Form Json</button>
+              <button onclick="exportForm()">Export Form JSON</button>
+ </div> 
+ 
+</section>		
+			
         <section>
             <div class="container">
                 <div id="formBuilder"></div>
                 <button onclick="addSection()">Add Section</button>
 				<br>
-                <button onclick="generateAndDownloadForm()">Download Form HTML</button>
-                <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importForm(event)">
-                <button onclick="document.getElementById('importFileInput').click();">Import Form Json</button>
-                <button onclick="exportForm()">Export Form JSON</button>
             </div>
         </section>
     
