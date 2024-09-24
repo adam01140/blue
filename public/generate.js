@@ -226,6 +226,14 @@ select:focus {
             <a href="contact.html">Contact Us</a>
         </nav>
     </header>
+	
+	<div id="pdfPreview" style="display:none;">
+    <iframe id="pdfFrame" style = "display:none"></iframe>
+</div>	
+<input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">	
+<script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+
+
 <div id="result"></div>
     <section>
 	
@@ -490,8 +498,115 @@ select:focus {
             sections.forEach(section => section.classList.remove('active'));
             document.getElementById('section' + sectionNumber).classList.add('active');
         }
+		
+		
+		let uploadedPdfFile = null;
+
+function downloadPDF() {
+    var iframe = document.getElementById('pdfFrame');
+    var url = iframe.src;
+    var downloadLink = document.createElement("a");
+    downloadLink.href = url;
+    downloadLink.download = "ModifiedDocument.pdf";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
+function loadDefaultPDF() {
+    const defaultUrl = 'http://localhost:3000/sc100.pdf';
+    fetch(defaultUrl)
+        .then(response => response.blob())
+        .then(blob => {
+            uploadedPdfFile = blob;
+            displayPDF(blob);
+        })
+        .catch(error => {
+            console.error('Error loading default PDF:', error);
+           // alert('Error loading default PDF: ' + error.message);
+        });
+}
+
+function displayPDF(pdfBlob) {
+    var url = URL.createObjectURL(pdfBlob);
+    document.getElementById('pdfFrame').src = url;
+    //document.getElementById('pdfPreview').style.display = 'block';
+}
+
+
+var formData = new FormData();
+
+//edit pdf code
+async function editPDF() {
+    
+	
+	formData = new FormData(); // Reset formData for fresh use each time the function is called.
+
+    if (!uploadedPdfFile) {
+        //alert('No PDF file is loaded for editing. Please upload the file again.');
+        return;
+    }
+
+    // Collect inputs from the form
+    const inputs = document.querySelectorAll('#questions input, #questions select');
+    inputs.forEach(input => {
+        if (input.type === 'checkbox') {
+            formData.append(input.name, input.checked ? 'Yes' : 'No');
+        } else {
+            formData.append(input.name, input.value);
+        }
+    });
+	
+	
+	
+	
+    // Append the PDF file to formData
+    formData.append('pdf', uploadedPdfFile);
+
+    // Debugging: Log the form data
+    console.log('FormData contents:');
+
+    // Send the formData to the server
+    fetch('/edit_pdf', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => {
+        
+        return response.blob();
+    })
+    .then(blob => {
+        var url = window.URL.createObjectURL(blob);
+        document.getElementById('pdfFrame').src = url;
+        //document.getElementById('pdfPreview').style.display = 'block';
+        downloadPDF();
+    })
+    .catch(error => {
+        console.error('Error updating PDF:', error);
+        //alert('Error updating PDF: ' + error.message);
+    });
+}
+
+
+function setCurrentDate() {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+    today = yyyy + '-' + mm + '-' + dd;
+    document.getElementById('current_date').value = today;
+}
+
+
+window.onload = function() {
+    loadDefaultPDF();
+    setCurrentDate();
+};
+
 
         function showThankYouMessage() {
+			
+			editPDF();
             document.getElementById('customForm').style.display = 'none';
             document.getElementById('thankYouMessage').style.display = 'block';
             return false; // Prevent actual form submission
