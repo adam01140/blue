@@ -237,21 +237,7 @@ select:focus {
 <div id="result"></div>
     <section>
 	
-	<script>
-        window.onload = function() {
-            // Select all textboxes and checkboxes
-            const inputs = document.querySelectorAll('input[type="text"], input[type="checkbox"]');
-            // Create an array to store the IDs
-            let ids = [];
-            // Iterate through each input and push its ID to the array
-            inputs.forEach(input => {
-                ids.push(input.id);
-            });
-            // Join all IDs into one big paragraph and alert
-            alert('IDs of all inputs: ' + ids.join(', '));
-        };
-		
-	</script>
+
     <div id="box">
         <form id="customForm" onsubmit="return showThankYouMessage();">
     `;
@@ -370,12 +356,20 @@ select:focus {
                     }
                 <\/script>`;
             } else if (questionType === 'multipleTextboxes') {
-                const multipleTextboxesOptionsDiv = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} input`);
-                multipleTextboxesOptionsDiv.forEach((input, index) => {
-                    const labelText = input.value;
-                    formHTML += `<input type="text" id="answer${questionId}_${index + 1}" placeholder="${labelText}" style="text-align:center;"><br><br>`;
-                });
-            } else if (questionType === 'money') {
+    const multipleTextboxesOptionsDiv = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
+    multipleTextboxesOptionsDiv.forEach((optionDiv, index) => {
+        const labelInput = optionDiv.querySelector(`#multipleTextboxLabel${questionId}_${index + 1}`);
+        const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
+        const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
+
+        const labelText = labelInput.value || `Textbox ${index + 1}`;
+        const nameId = nameIdInput.value || `answer${questionId}_${index + 1}`;
+        const placeholder = placeholderInput.value || '';
+
+        formHTML += `<label><h3>${labelText}</h3></label><br>`;
+        formHTML += `<input type="text" id="${nameId}" name="${nameId}" placeholder="${placeholder}" style="text-align:center;"><br><br>`;
+    });
+} else if (questionType === 'money') {
                 formHTML += `<input type="number" id="answer${questionId}" min="0" step="0.01" placeholder="Enter amount"><br><br>`;
             } else if (questionType === 'date') {
                 formHTML += `<input type="date" id="answer${questionId}" placeholder="Enter a date"><br><br>`;
@@ -469,6 +463,24 @@ select:focus {
         let jumpTarget = null;
         const autofillMappings = ${JSON.stringify(autofillMappings)};
 
+
+
+		alert('hey');
+	
+       
+            // Select all textboxes and checkboxes
+            const inputs = document.querySelectorAll('input[type="text"], input[type="checkbox"]');
+            // Create an array to store the IDs
+            let ids = [];
+            // Iterate through each input and push its ID to the array
+            inputs.forEach(input => {
+                ids.push(input.id);
+            });
+            // Join all IDs into one big paragraph and alert
+            alert('IDs of all inputs: ' + ids.join(', '));
+       
+	   
+	   
         function handleNext(currentSection) {
             // Autofill hidden fields before navigating
             autofillMappings.forEach(mapping => {
@@ -523,7 +535,7 @@ function loadDefaultPDF() {
         })
         .catch(error => {
             console.error('Error loading default PDF:', error);
-           // alert('Error loading default PDF: ' + error.message);
+           alert('Error loading default PDF: ' + error.message);
         });
 }
 
@@ -617,7 +629,7 @@ window.onload = function() {
     `;
 
     downloadHTML(formHTML, "custom_form.html");
-}
+}  
 
 
 

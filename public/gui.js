@@ -174,11 +174,9 @@ function addQuestion(sectionId, questionId = null) {
             <option value="bigParagraph">Big Paragraph</option>
         </select><br><br>
 
-        <!-- Name/ID and Placeholder for Textbox -->
+        <!-- Name/ID and Placeholder for Textbox and Big Paragraph -->
         <div id="textboxOptions${currentQuestionId}" class="textbox-options" style="display: none;">
-            
-		
-			<label>Name/ID: </label>
+            <label>Name/ID: </label>
             <input type="text" id="textboxName${currentQuestionId}" placeholder="Enter field name"><br><br>
 
             <label>Placeholder: </label>
@@ -267,6 +265,8 @@ function addQuestion(sectionId, questionId = null) {
 }
 
 
+
+
 function moveQuestionUp(questionId, sectionId) {
     const questionBlock = document.getElementById(`questionBlock${questionId}`);
     const previousSibling = questionBlock.previousElementSibling;
@@ -308,10 +308,10 @@ function toggleOptions(questionId) {
     const checkboxBlock = document.getElementById(`checkboxBlock${questionId}`);
     const numberedDropdownBlock = document.getElementById(`numberedDropdownBlock${questionId}`);
     const multipleTextboxesBlock = document.getElementById(`multipleTextboxesBlock${questionId}`);
-    const textboxOptionsBlock = document.getElementById(`textboxOptions${questionId}`); // Block for Name/ID and Placeholder for textboxes
+    const textboxOptionsBlock = document.getElementById(`textboxOptions${questionId}`); // Block for Name/ID and Placeholder
     const jumpOptionLabel = document.getElementById(`jumpOptionLabel${questionId}`);
     const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
-    
+
     // Hide all blocks initially
     if (textboxOptionsBlock) textboxOptionsBlock.style.display = 'none';
     if (optionsBlock) optionsBlock.style.display = 'none';
@@ -324,7 +324,11 @@ function toggleOptions(questionId) {
     // Show and update specific blocks based on question type
     switch (questionType) {
         case 'text':
+        case 'bigParagraph':
             if (textboxOptionsBlock) textboxOptionsBlock.style.display = 'block'; // Show Name/ID and Placeholder
+            break;
+        case 'multipleTextboxes':
+            if (multipleTextboxesBlock) multipleTextboxesBlock.style.display = 'block';
             break;
         case 'radio':
             if (jumpOptionLabel) jumpOptionLabel.style.display = 'block';
@@ -347,19 +351,17 @@ function toggleOptions(questionId) {
         case 'numberedDropdown':
             if (numberedDropdownBlock) numberedDropdownBlock.style.display = 'block';
             break;
-        case 'multipleTextboxes':
-            if (multipleTextboxesBlock) multipleTextboxesBlock.style.display = 'block';
-            break;
         case 'money':
         case 'date':
-        case 'bigParagraph':
-            // No additional options to show for these types, so nothing extra here
+            // No additional options to show for these types
             break;
     }
 
     // Update autofill options in hidden fields
     updateAutofillOptions();
 }
+
+
 
 
 function addMultipleTextboxOption(questionId) {
@@ -369,18 +371,38 @@ function addMultipleTextboxOption(questionId) {
     const optionDiv = document.createElement('div');
     optionDiv.className = `option${optionCount}`;
     optionDiv.innerHTML = `
-        <input type="text" id="multipleTextboxLabel${questionId}_${optionCount}" placeholder="Label ${optionCount}">
-        <button type="button" onclick="removeMultipleTextboxOption(${questionId}, ${optionCount})">Remove</button>
+        <h4>Textbox ${optionCount}</h4>
+        <label>Label:</label>
+        <input type="text" id="multipleTextboxLabel${questionId}_${optionCount}" placeholder="Label ${optionCount}"><br><br>
+        <label>Name/ID:</label>
+        <input type="text" id="multipleTextboxName${questionId}_${optionCount}" placeholder="Name/ID ${optionCount}"><br><br>
+        <label>Placeholder:</label>
+        <input type="text" id="multipleTextboxPlaceholder${questionId}_${optionCount}" placeholder="Placeholder ${optionCount}"><br><br>
+        <button type="button" onclick="removeMultipleTextboxOption(${questionId}, ${optionCount})">Remove Textbox</button>
+        <hr>
     `;
     multipleTextboxesOptionsDiv.appendChild(optionDiv);
 }
+
+
 
 function removeMultipleTextboxOption(questionId, optionNumber) {
     const optionDiv = document.querySelector(`#multipleTextboxesOptions${questionId} .option${optionNumber}`);
     if (optionDiv) {
         optionDiv.remove();
+        // Re-index the remaining options
+        const options = document.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
+        options.forEach((option, index) => {
+            option.className = `option${index + 1}`;
+            option.querySelector('h4').innerText = `Textbox ${index + 1}`;
+            option.querySelector('input[id^="multipleTextboxLabel"]').id = `multipleTextboxLabel${questionId}_${index + 1}`;
+            option.querySelector('input[id^="multipleTextboxName"]').id = `multipleTextboxName${questionId}_${index + 1}`;
+            option.querySelector('input[id^="multipleTextboxPlaceholder"]').id = `multipleTextboxPlaceholder${questionId}_${index + 1}`;
+            option.querySelector('button').setAttribute('onclick', `removeMultipleTextboxOption(${questionId}, ${index + 1})`);
+        });
     }
 }
+
 
 function toggleLogic(questionId) {
     const logicEnabled = document.getElementById(`logic${questionId}`).checked;
@@ -617,14 +639,25 @@ function generateQuestionOptions() {
         const questionText = questionBlock.querySelector(`input[type="text"]`).value;
         const questionType = questionBlock.querySelector(`select`).value;
 
-        // Only include question types that produce single text values
+        // Include question types that produce single text values
         if (['text', 'bigParagraph', 'money', 'date'].includes(questionType)) {
             optionsHTML += `<option value="${questionId}">Question ${questionId}: ${questionText}</option>`;
+        }
+
+        // Optionally include multiple textboxes
+        if (questionType === 'multipleTextboxes') {
+            const textboxes = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} .option`);
+            textboxes.forEach((textbox, idx) => {
+                const label = textbox.querySelector(`input[id^="multipleTextboxLabel"]`).value || `Textbox ${idx + 1}`;
+                optionsHTML += `<option value="${questionId}_${idx + 1}">Question ${questionId} - ${label}</option>`;
+            });
         }
     });
 
     return optionsHTML;
 }
+
+
 
 // Updated function to only include specific question types for conditional logic
 function generateAllQuestionOptions() {
@@ -636,7 +669,7 @@ function generateAllQuestionOptions() {
         const questionText = questionBlock.querySelector(`input[type="text"]`).value;
         const questionType = questionBlock.querySelector(`select`).value;
 
-        // Only include questions suitable for conditional logic (dropdown, radio, checkbox)
+        // Include questions suitable for conditional logic
         if (['dropdown', 'radio', 'checkbox'].includes(questionType)) {
             optionsHTML += `<option value="${questionId}">Question ${questionId}: ${questionText}</option>`;
         }
@@ -644,6 +677,7 @@ function generateAllQuestionOptions() {
 
     return optionsHTML;
 }
+
 
 function addConditionalAutofill(hiddenFieldId) {
     const conditionalAutofillDiv = document.getElementById(`conditionalAutofill${hiddenFieldId}`);
@@ -744,7 +778,7 @@ function updateAutofillOptions() {
             const conditionalAutofillDiv = document.getElementById(`conditionalAutofill${hiddenFieldId}`);
             const conditionDivs = conditionalAutofillDiv.querySelectorAll('div[class^="condition"]');
             conditionDivs.forEach(conditionDiv => {
-                const conditionId = conditionDiv.className.replace('condition', '');
+                const conditionId = conditionDiv.id.split('_')[1];
                 const questionSelect = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`);
                 const previousQuestionValue = questionSelect.value;
 
@@ -762,6 +796,7 @@ function updateAutofillOptions() {
         }
     });
 }
+
 
 function removeHiddenField(hiddenFieldId) {
     const hiddenFieldBlock = document.getElementById(`hiddenFieldBlock${hiddenFieldId}`);
