@@ -2,6 +2,7 @@
   "sections": [
     {
       "sectionId": 1,
+      "sectionName": "Section 1",
       "questions": [
         {
           "questionId": 1,
@@ -39,7 +40,7 @@
           "options": [],
           "labels": [],
           "nameId": "yourName",
-          "placeholder": "Name"
+          "placeholder": "Your Name"
         },
         {
           "questionId": 3,
@@ -98,22 +99,22 @@
           "textboxes": [
             {
               "label": "",
-              "nameId": "streetAddress",
+              "nameId": "yourStreet",
               "placeholder": "Street"
             },
             {
               "label": "",
-              "nameId": "city",
+              "nameId": "yourCity",
               "placeholder": "City"
             },
             {
               "label": "",
-              "nameId": "state",
+              "nameId": "yourState",
               "placeholder": "State"
             },
             {
               "label": "",
-              "nameId": "zipCode",
+              "nameId": "yourZip",
               "placeholder": "Zip"
             }
           ]
@@ -122,6 +123,7 @@
     },
     {
       "sectionId": 2,
+      "sectionName": "Section 2",
       "questions": [
         {
           "questionId": 6,
@@ -186,6 +188,7 @@
     },
     {
       "sectionId": 3,
+      "sectionName": "Section 3",
       "questions": [
         {
           "questionId": 8,
@@ -243,7 +246,7 @@
           "options": [],
           "labels": [],
           "nameId": "secondPlaintiffPhone",
-          "placeholder": "Phone Number"
+          "placeholder": "Second Plaintiff's Phone Number"
         },
         {
           "questionId": 11,
@@ -263,22 +266,22 @@
           "labels": [],
           "textboxes": [
             {
-              "label": "Street",
+              "label": "",
               "nameId": "secondPlaintiffStreet",
               "placeholder": "Street"
             },
             {
-              "label": "City",
+              "label": "",
               "nameId": "secondPlaintiffCity",
               "placeholder": "City"
             },
             {
-              "label": "State",
+              "label": "",
               "nameId": "secondPlaintiffState",
               "placeholder": "State"
             },
             {
-              "label": "Zip",
+              "label": "",
               "nameId": "secondPlaintiffZip",
               "placeholder": "Zip"
             }
@@ -360,12 +363,13 @@
           "options": [],
           "labels": [],
           "nameId": "secondPlaintiffEmail",
-          "placeholder": "Email"
+          "placeholder": "Second Plaintiff's Email"
         }
       ]
     },
     {
       "sectionId": 4,
+      "sectionName": "Section 4",
       "questions": [
         {
           "questionId": 15,
@@ -382,9 +386,21 @@
             "to": ""
           },
           "options": [
-            "Check here if more than two plaintiffs",
-            "Check here if either plaintiff is doing business under a fictitious name",
-            "Check here if either plaintiff is a 'licensee' or 'deferred deposit originator'"
+            {
+              "label": "Check here if more than two plaintiffs",
+              "nameId": "moreThanTwoPlaintiffs",
+              "value": "More than two plaintiffs"
+            },
+            {
+              "label": "Check here if either plaintiff is doing business under a fictitious name",
+              "nameId": "plaintiffFictitiousName",
+              "value": "Plaintiff using fictitious name"
+            },
+            {
+              "label": "Check here if either plaintiff is a “licensee” or “deferred deposit originator”",
+              "nameId": "plaintiffLicenseeOrOriginator",
+              "value": "Plaintiff is licensee or deferred deposit originator"
+            }
           ],
           "labels": []
         }
@@ -392,6 +408,7 @@
     },
     {
       "sectionId": 5,
+      "sectionName": "Section 5",
       "questions": [
         {
           "questionId": 16,
@@ -429,7 +446,7 @@
           "options": [],
           "labels": [],
           "nameId": "defendantPhone",
-          "placeholder": "Phone Number"
+          "placeholder": "Defendant's Phone Number"
         },
         {
           "questionId": 18,
@@ -474,6 +491,7 @@
     },
     {
       "sectionId": 6,
+      "sectionName": "Section 6",
       "questions": [
         {
           "questionId": 19,
@@ -513,22 +531,22 @@
           "labels": [],
           "textboxes": [
             {
-              "label": "Street",
+              "label": "",
               "nameId": "defendantMailingStreet",
               "placeholder": "Street"
             },
             {
-              "label": "City",
+              "label": "",
               "nameId": "defendantMailingCity",
               "placeholder": "City"
             },
             {
-              "label": "State",
+              "label": "",
               "nameId": "defendantMailingState",
               "placeholder": "State"
             },
             {
-              "label": "Zip",
+              "label": "",
               "nameId": "defendantMailingZip",
               "placeholder": "Zip"
             }
@@ -549,9 +567,21 @@
             "to": ""
           },
           "options": [
-            "Check here if more than two plaintiffs",
-            "Check here if your case is against more than one defendant",
-            "Check here if any defendant is on active military duty"
+            {
+              "label": "Check here if more than two defendants",
+              "nameId": "moreThanTwoDefendants",
+              "value": "More than two defendants"
+            },
+            {
+              "label": "Check here if your case is against more than one defendant",
+              "nameId": "multipleDefendants",
+              "value": "Case against multiple defendants"
+            },
+            {
+              "label": "Check here if any defendant is on active military duty",
+              "nameId": "defendantActiveMilitary",
+              "value": "Defendant on active military duty"
+            }
           ],
           "labels": []
         }
@@ -559,6 +589,7 @@
     },
     {
       "sectionId": 7,
+      "sectionName": "Section 7",
       "questions": [
         {
           "questionId": 22,
@@ -593,7 +624,7 @@
           },
           "options": [],
           "labels": [],
-          "nameId": "reasonForMoneyOwed",
+          "nameId": "reasonForClaim",
           "placeholder": "Explain the reason"
         },
         {
@@ -690,6 +721,7 @@
     },
     {
       "sectionId": 8,
+      "sectionName": "Section 8",
       "questions": [
         {
           "questionId": 29,
@@ -713,7 +745,7 @@
         },
         {
           "questionId": 30,
-          "text": "Explain why you haven’t:",
+          "text": "Explain why you haven’t",
           "type": "bigParagraph",
           "logic": {
             "enabled": true,
@@ -727,13 +759,14 @@
           },
           "options": [],
           "labels": [],
-          "nameId": "whyNotAskedDefendant",
+          "nameId": "whyNotAsked",
           "placeholder": "Explain why you haven't asked"
         }
       ]
     },
     {
       "sectionId": 9,
+      "sectionName": "Section 9",
       "questions": [
         {
           "questionId": 31,
@@ -750,14 +783,46 @@
             "to": ""
           },
           "options": [
-            "Where the defendant lives or does business.",
-            "Where the plaintiff’s property was damaged",
-            "Where the plaintiff was injured.",
-            "Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.",
-            "Where the buyer or lessee signed the contract, lives now, or lived when the contract was made",
-            "Where the buyer signed the contract, lives now, or lived when the contract was made, if this claim is about a retail installment contract",
-            "Where the buyer signed the contract, lives now, or lived when the contract was made, or where the vehicle is permanently garaged, if this claim is about a vehicle finance sale",
-            "Other"
+            {
+              "label": "Where the defendant lives or does business.",
+              "nameId": "reasonDefendantLives",
+              "value": "Defendant's location"
+            },
+            {
+              "label": "Where the plaintiff’s property was damaged",
+              "nameId": "reasonPropertyDamaged",
+              "value": "Property damaged"
+            },
+            {
+              "label": "Where the plaintiff was injured.",
+              "nameId": "reasonPlaintiffInjured",
+              "value": "Plaintiff injured"
+            },
+            {
+              "label": "Where a contract was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.",
+              "nameId": "reasonContractLocation",
+              "value": "Contract location"
+            },
+            {
+              "label": "Where the buyer or lessee signed the contract, lives now, or lived when the contract was made",
+              "nameId": "reasonBuyerLocation",
+              "value": "Buyer location"
+            },
+            {
+              "label": "Where the buyer signed the contract, lives now, or lived when the contract was made, if this claim is about a retail installment contract",
+              "nameId": "reasonRetailContract",
+              "value": "Retail installment contract"
+            },
+            {
+              "label": "Where the buyer signed the contract, lives now, or lived when the contract was made, or where the vehicle is permanently garaged, if this claim is about a vehicle finance sale",
+              "nameId": "reasonVehicleFinance",
+              "value": "Vehicle finance sale"
+            },
+            {
+              "label": "Other",
+              "nameId": "reasonOther",
+              "value": "Other"
+            }
           ],
           "labels": []
         },
@@ -784,6 +849,7 @@
     },
     {
       "sectionId": 10,
+      "sectionName": "Section 10",
       "questions": [
         {
           "questionId": 33,
@@ -926,6 +992,7 @@
     },
     {
       "sectionId": 11,
+      "sectionName": "Section 11",
       "questions": [
         {
           "questionId": 40,

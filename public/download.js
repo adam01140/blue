@@ -26,6 +26,7 @@ function exportForm() {
 
         const sectionData = {
             sectionId: s,
+            sectionName: document.getElementById(`sectionName${s}`).value || `Section ${s}`,
             questions: []
         };
 
@@ -34,12 +35,18 @@ function exportForm() {
             const questionId = parseInt(questionBlock.id.replace('questionBlock', ''));
             const questionText = questionBlock.querySelector(`#question${questionId}`).value;
             const questionType = questionBlock.querySelector(`#questionType${questionId}`).value;
-            const logicEnabled = questionBlock.querySelector(`#logic${questionId}`).checked;
-            const prevQuestion = questionBlock.querySelector(`#prevQuestion${questionId}`).value;
-            const prevAnswer = questionBlock.querySelector(`#prevAnswer${questionId}`).value;
-            const jumpEnabled = questionBlock.querySelector(`#enableJump${questionId}`).checked;
-            const jumpOption = questionBlock.querySelector(`#jumpOption${questionId}`).value;
-            const jumpTo = questionBlock.querySelector(`#jumpTo${questionId}`).value;
+            const logicCheckbox = questionBlock.querySelector(`#logic${questionId}`);
+            const logicEnabled = logicCheckbox ? logicCheckbox.checked : false;
+            const prevQuestionInput = questionBlock.querySelector(`#prevQuestion${questionId}`);
+            const prevAnswerInput = questionBlock.querySelector(`#prevAnswer${questionId}`);
+            const prevQuestion = prevQuestionInput ? prevQuestionInput.value : "";
+            const prevAnswer = prevAnswerInput ? prevAnswerInput.value : "";
+            const jumpCheckbox = questionBlock.querySelector(`#enableJump${questionId}`);
+            const jumpEnabled = jumpCheckbox ? jumpCheckbox.checked : false;
+            const jumpOptionSelect = questionBlock.querySelector(`#jumpOption${questionId}`);
+            const jumpToInput = questionBlock.querySelector(`#jumpTo${questionId}`);
+            const jumpOption = jumpOptionSelect ? jumpOptionSelect.value : "";
+            const jumpTo = jumpToInput ? jumpToInput.value : "";
 
             const questionData = {
                 questionId: questionId,
@@ -61,13 +68,30 @@ function exportForm() {
 
             // Collect question-specific options
             if (questionType === 'checkbox') {
-                const options = questionBlock.querySelectorAll(`#checkboxOptions${questionId} input`);
-                options.forEach(option => {
-                    questionData.options.push(option.value);
+                const optionsDivs = questionBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
+                optionsDivs.forEach((optionDiv, index) => {
+                    const optionTextInput = optionDiv.querySelector(`#checkboxOptionText${questionId}_${index + 1}`);
+                    const optionNameInput = optionDiv.querySelector(`#checkboxOptionName${questionId}_${index + 1}`);
+                    const optionValueInput = optionDiv.querySelector(`#checkboxOptionValue${questionId}_${index + 1}`);
+
+                    const optionText = optionTextInput ? optionTextInput.value.trim() : `Option ${index + 1}`;
+                    const optionNameId = optionNameInput ? optionNameInput.value.trim() : `answer${questionId}_${index + 1}`;
+                    const optionValue = optionValueInput ? optionValueInput.value.trim() : optionText;
+
+                    questionData.options.push({
+                        label: optionText,
+                        nameId: optionNameId,
+                        value: optionValue
+                    });
                 });
+
                 const noneOfTheAbove = document.getElementById(`noneOfTheAbove${questionId}`);
                 if (noneOfTheAbove && noneOfTheAbove.checked) {
-                    questionData.options.push('None of the above');
+                    questionData.options.push({
+                        label: "None of the above",
+                        nameId: `answer${questionId}_none`,
+                        value: "None of the above"
+                    });
                 }
             } else if (questionType === 'dropdown') {
                 const options = questionBlock.querySelectorAll(`#dropdownOptions${questionId} input`);
@@ -84,25 +108,24 @@ function exportForm() {
                 questionData.max = rangeEnd;
                 questionData.labels = labels;
             } else if (questionType === 'multipleTextboxes') {
-    const options = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
-    questionData.textboxes = []; // Array to store the textboxes data
-    options.forEach((optionDiv, index) => {
-        const labelInput = optionDiv.querySelector(`#multipleTextboxLabel${questionId}_${index + 1}`);
-        const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
-        const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
+                const options = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
+                questionData.textboxes = []; // Array to store the textboxes data
+                options.forEach((optionDiv, index) => {
+                    const labelInput = optionDiv.querySelector(`#multipleTextboxLabel${questionId}_${index + 1}`);
+                    const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
+                    const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
 
-        const labelText = labelInput.value.trim(); // Do not assign default label
-        const nameId = nameIdInput.value || `answer${questionId}_${index + 1}`;
-        const placeholder = placeholderInput.value || '';
+                    const labelText = labelInput.value.trim(); // Do not assign default label
+                    const nameId = nameIdInput.value || `answer${questionId}_${index + 1}`;
+                    const placeholder = placeholderInput.value || '';
 
-        questionData.textboxes.push({
-            label: labelText,
-            nameId: nameId,
-            placeholder: placeholder
-        });
-    });
-}
-
+                    questionData.textboxes.push({
+                        label: labelText,
+                        nameId: nameId,
+                        placeholder: placeholder
+                    });
+                });
+            }
 
             // Handle Text and Big Paragraph question types
             if (questionType === 'text' || questionType === 'bigParagraph') {
@@ -222,6 +245,10 @@ function loadFormData(formData) {
     // Load sections and questions first
     formData.sections.forEach(section => {
         addSection(section.sectionId);
+        // Set the custom section name
+        document.getElementById(`sectionName${section.sectionId}`).value = section.sectionName || `Section ${section.sectionId}`;
+        updateSectionName(section.sectionId);
+
         section.questions.forEach(question => {
             addQuestion(section.sectionId, question.questionId);
             const questionBlock = document.getElementById(`questionBlock${question.questionId}`);
@@ -235,18 +262,20 @@ function loadFormData(formData) {
                 const checkboxOptionsDiv = document.getElementById(`checkboxOptions${question.questionId}`);
                 checkboxOptionsDiv.innerHTML = '';
 
-                question.options.forEach((option, index) => {
-                    if (option === 'None of the above') {
-                        document.getElementById(`noneOfTheAbove${question.questionId}`).checked = true;
-                    } else {
-                        const optionDiv = document.createElement('div');
-                        optionDiv.className = `option${index + 1}`;
-                        optionDiv.innerHTML = `
-                            <input type="text" id="checkboxOption${question.questionId}_${index + 1}" value="${option}" placeholder="Option ${index + 1}">
-                            <button type="button" onclick="removeCheckboxOption(${question.questionId}, ${index + 1})">Remove</button>
-                        `;
-                        checkboxOptionsDiv.appendChild(optionDiv);
-                    }
+                question.options.forEach((optionData, index) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = `option${index + 1}`;
+                    optionDiv.innerHTML = `
+                        <label>Option ${index + 1} Text:</label>
+                        <input type="text" id="checkboxOptionText${question.questionId}_${index + 1}" value="${optionData.label}" placeholder="Enter option text"><br><br>
+                        <label>Name/ID:</label>
+                        <input type="text" id="checkboxOptionName${question.questionId}_${index + 1}" value="${optionData.nameId}" placeholder="Enter Name/ID"><br><br>
+                        <label>Value (optional):</label>
+                        <input type="text" id="checkboxOptionValue${question.questionId}_${index + 1}" value="${optionData.value}" placeholder="Enter Value"><br><br>
+                        <button type="button" onclick="removeCheckboxOption(${question.questionId}, ${index + 1})">Remove</button>
+                        <hr>
+                    `;
+                    checkboxOptionsDiv.appendChild(optionDiv);
                 });
             } else if (question.type === 'dropdown') {
                 const dropdownOptionsDiv = document.getElementById(`dropdownOptions${question.questionId}`);
@@ -313,14 +342,16 @@ function loadFormData(formData) {
                 }
             }
 
-            if (question.logic.enabled) {
+            // Check for logic before accessing its properties
+            if (question.logic && question.logic.enabled) {
                 questionBlock.querySelector(`#logic${question.questionId}`).checked = true;
                 toggleLogic(question.questionId);
                 questionBlock.querySelector(`#prevQuestion${question.questionId}`).value = question.logic.prevQuestion;
                 questionBlock.querySelector(`#prevAnswer${question.questionId}`).value = question.logic.prevAnswer;
             }
 
-            if (question.jump.enabled) {
+            // Check for jump before accessing its properties
+            if (question.jump && question.jump.enabled) {
                 questionBlock.querySelector(`#enableJump${question.questionId}`).checked = true;
                 toggleJumpLogic(question.questionId);
                 questionBlock.querySelector(`#jumpOption${question.questionId}`).value = question.jump.option;

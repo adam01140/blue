@@ -292,30 +292,39 @@ select:focus {
                 });
                 formHTML += `</select><br>`;
             } else if (questionType === 'checkbox') {
-                const options = questionBlock.querySelectorAll(`#checkboxOptions${questionId} input`);
-                formHTML += `<div><center><div id="checkmark">`;
-                options.forEach((option, index) => {
-                    formHTML += `
-                        <span class="checkbox-inline">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="answer${questionId}_${index + 1}" name="answer${questionId}" value="${option.value}">
-                                ${option.value}
-                            </label>
-                        </span>`;
-                });
+    const optionsDivs = questionBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
+    formHTML += `<div><center><div id="checkmark">`;
+    optionsDivs.forEach((optionDiv, index) => {
+        const optionTextInput = optionDiv.querySelector(`#checkboxOptionText${questionId}_${index + 1}`);
+        const optionNameInput = optionDiv.querySelector(`#checkboxOptionName${questionId}_${index + 1}`);
+        const optionValueInput = optionDiv.querySelector(`#checkboxOptionValue${questionId}_${index + 1}`);
 
-                const noneOfTheAboveSelected = document.getElementById(`noneOfTheAbove${questionId}`).checked;
-                if (noneOfTheAboveSelected) {
-                    formHTML += `
-                        <span class="checkbox-inline">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="answer${questionId}_none" name="answer${questionId}" value="None of the above">
-                                None of the above
-                            </label>
-                        </span>`;
-                }
-                formHTML += `</div><br></div>`;
-            } else if (questionType === 'numberedDropdown') {
+        const optionText = optionTextInput ? optionTextInput.value.trim() : `Option ${index + 1}`;
+        const optionNameId = optionNameInput ? optionNameInput.value.trim() : `answer${questionId}_${index + 1}`;
+        const optionValue = optionValueInput ? optionValueInput.value.trim() : optionText;
+
+        formHTML += `
+            <span class="checkbox-inline">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="${optionNameId}" name="${optionNameId}" value="${optionValue}">
+                    ${optionText}
+                </label>
+            </span>`;
+    });
+
+    const noneOfTheAboveSelected = questionBlock.querySelector(`#noneOfTheAbove${questionId}`).checked;
+    if (noneOfTheAboveSelected) {
+        formHTML += `
+            <span class="checkbox-inline">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="answer${questionId}_none" name="answer${questionId}_none" value="None of the above">
+                    None of the above
+                </label>
+            </span>`;
+    }
+    formHTML += `</div><br></div>`;
+}
+ else if (questionType === 'numberedDropdown') {
                 const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
                 const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
                 const labels = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);

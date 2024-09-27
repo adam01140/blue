@@ -487,16 +487,37 @@ function addCheckboxOption(questionId) {
     const optionDiv = document.createElement('div');
     optionDiv.className = `option${optionCount}`;
     optionDiv.innerHTML = `
-        <input type="text" id="checkboxOption${questionId}_${optionCount}" placeholder="Option ${optionCount}">
+        <label>Option ${optionCount} Text:</label>
+        <input type="text" id="checkboxOptionText${questionId}_${optionCount}" placeholder="Enter option text"><br><br>
+        <label>Name/ID:</label>
+        <input type="text" id="checkboxOptionName${questionId}_${optionCount}" placeholder="Enter Name/ID"><br><br>
+        <label>Value (optional):</label>
+        <input type="text" id="checkboxOptionValue${questionId}_${optionCount}" placeholder="Enter Value"><br><br>
         <button type="button" onclick="removeCheckboxOption(${questionId}, ${optionCount})">Remove</button>
+        <hr>
     `;
     checkboxOptionsDiv.appendChild(optionDiv);
 }
 
+
 function removeCheckboxOption(questionId, optionNumber) {
     const optionDiv = document.querySelector(`#checkboxOptions${questionId} .option${optionNumber}`);
-    optionDiv.remove();
+    if (optionDiv) {
+        optionDiv.remove();
+        // Re-index the remaining options
+        const options = document.querySelectorAll(`#checkboxOptions${questionId} > div`);
+        options.forEach((option, index) => {
+            const newOptionNumber = index + 1;
+            option.className = `option${newOptionNumber}`;
+            option.querySelector('label').innerText = `Option ${newOptionNumber} Text:`;
+            option.querySelector(`input[id^="checkboxOptionText"]`).id = `checkboxOptionText${questionId}_${newOptionNumber}`;
+            option.querySelector(`input[id^="checkboxOptionName"]`).id = `checkboxOptionName${questionId}_${newOptionNumber}`;
+            option.querySelector(`input[id^="checkboxOptionValue"]`).id = `checkboxOptionValue${questionId}_${newOptionNumber}`;
+            option.querySelector('button').setAttribute('onclick', `removeCheckboxOption(${questionId}, ${newOptionNumber})`);
+        });
+    }
 }
+
 
 function addTextboxLabel(questionId) {
     const textboxLabelsDiv = document.getElementById(`textboxLabels${questionId}`);
