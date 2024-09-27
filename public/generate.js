@@ -233,7 +233,7 @@ select:focus {
 <input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">	
 <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
 
-
+<div id="questions">
 <div id="result"></div>
     <section>
 	
@@ -270,7 +270,9 @@ select:focus {
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`).value || '';
                 formHTML += `<input type="text" id="${nameId}" name="${nameId}" placeholder="${placeholder}"><br><br>`;
             } else if (questionType === 'bigParagraph') {
-                formHTML += `<textarea id="answer${questionId}" rows="5" cols="50" placeholder="Enter a response here"></textarea><br><br>`;
+                const nameId = questionBlock.querySelector(`#textboxName${questionId}`).value || `answer${questionId}`;
+                const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`).value || '';
+                formHTML += `<textarea id="${nameId}" name="${nameId}" rows="5" cols="50" placeholder="${placeholder}"></textarea><br><br>`;
             } else if (questionType === 'radio') {
                 formHTML += `
                     <select id="answer${questionId}">
@@ -455,6 +457,7 @@ select:focus {
         <div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
     </section>
     </div>
+	</div>
     <footer>
         &copy; 2024 FormWiz. All rights reserved.
     </footer>
