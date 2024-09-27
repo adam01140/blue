@@ -262,7 +262,7 @@ select:focus {
             const jumpOption = questionBlock.querySelector(`#jumpOption${questionId}`).value;
 
             formHTML += `<div id="question-container-${questionId}" ${logicEnabled ? 'class="hidden"' : ''}>`;
-            formHTML += `<label><h3>${questionText}</h3></label><br><br>`;
+            formHTML += `<label><h3>${questionText}</h3></label>`;
 
             // Handle the different question types
             if (questionType === 'text') {
@@ -272,14 +272,14 @@ select:focus {
             } else if (questionType === 'bigParagraph') {
                 const nameId = questionBlock.querySelector(`#textboxName${questionId}`).value || `answer${questionId}`;
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`).value || '';
-                formHTML += `<textarea id="${nameId}" name="${nameId}" rows="5" cols="50" placeholder="${placeholder}"></textarea><br><br>`;
+                formHTML += `<textarea id="${nameId}" name="${nameId}" rows="5" cols="50" placeholder="${placeholder}"></textarea><br>`;
             } else if (questionType === 'radio') {
                 formHTML += `
                     <select id="answer${questionId}">
                         <option value="" disabled selected>Select an option</option>
                         <option value="Yes">Yes</option>
                         <option value="No">No</option>
-                    </select><br><br>`;
+                    </select><br>`;
             } else if (questionType === 'dropdown') {
                 formHTML += `<select id="answer${questionId}">`;
                 formHTML += `<option value="" disabled selected>Select an option</option>`;
@@ -287,7 +287,7 @@ select:focus {
                 options.forEach(option => {
                     formHTML += `<option value="${option.value}">${option.value}</option>`;
                 });
-                formHTML += `</select><br><br>`;
+                formHTML += `</select><br>`;
             } else if (questionType === 'checkbox') {
                 const options = questionBlock.querySelectorAll(`#checkboxOptions${questionId} input`);
                 formHTML += `<div><center><div id="checkmark">`;
@@ -322,7 +322,7 @@ select:focus {
                 for (let i = rangeStart; i <= rangeEnd; i++) {
                     formHTML += `<option value="${i}">${i}</option>`;
                 }
-                formHTML += `</select><br><br>`;
+                formHTML += `</select><br>`;
 
                 formHTML += `<div id="labelContainer${questionId}"></div>`;
 				
@@ -369,12 +369,12 @@ select:focus {
         const placeholder = placeholderInput.value || '';
 
         formHTML += `<label><h3>${labelText}</h3></label><br>`;
-        formHTML += `<input type="text" id="${nameId}" name="${nameId}" placeholder="${placeholder}" style="text-align:center;"><br><br>`;
+        formHTML += `<input type="text" id="${nameId}" name="${nameId}" placeholder="${placeholder}" style="text-align:center;"><br>`;
     });
 } else if (questionType === 'money') {
-                formHTML += `<input type="number" id="answer${questionId}" min="0" step="0.01" placeholder="Enter amount"><br><br>`;
+                formHTML += `<input type="number" id="answer${questionId}" min="0" step="0.01" placeholder="Enter amount"><br>`;
             } else if (questionType === 'date') {
-                formHTML += `<input type="date" id="answer${questionId}" placeholder="Enter a date"><br><br>`;
+                formHTML += `<input type="date" id="answer${questionId}" placeholder="Enter a date"><br>`;
             }
 
             formHTML += `</div>`; // Close question container
@@ -468,7 +468,7 @@ select:focus {
 
 
 
-		alert('hey');
+		
 	
        
             // Select all textboxes and checkboxes
@@ -480,7 +480,7 @@ select:focus {
                 ids.push(input.id);
             });
             // Join all IDs into one big paragraph and alert
-            alert('IDs of all inputs: ' + ids.join(', '));
+            //alert('IDs of all inputs: ' + ids.join(', '));
        
 	   
 	   
