@@ -84,9 +84,31 @@ function exportForm() {
                 questionData.max = rangeEnd;
                 questionData.labels = labels;
             } else if (questionType === 'multipleTextboxes') {
-                const labels = Array.from(questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} input`))
-                    .map(input => input.value);
-                questionData.labels = labels;
+                const options = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
+                questionData.textboxes = []; // Array to store the textboxes data
+                options.forEach((optionDiv, index) => {
+                    const labelInput = optionDiv.querySelector(`#multipleTextboxLabel${questionId}_${index + 1}`);
+                    const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
+                    const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
+
+                    const labelText = labelInput.value || `Textbox ${index + 1}`;
+                    const nameId = nameIdInput.value || `answer${questionId}_${index + 1}`;
+                    const placeholder = placeholderInput.value || '';
+
+                    questionData.textboxes.push({
+                        label: labelText,
+                        nameId: nameId,
+                        placeholder: placeholder
+                    });
+                });
+            }
+
+            // Handle Text and Big Paragraph question types
+            if (questionType === 'text' || questionType === 'bigParagraph') {
+                const nameId = questionBlock.querySelector(`#textboxName${questionId}`).value || `answer${questionId}`;
+                const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`).value || '';
+                questionData.nameId = nameId;
+                questionData.placeholder = placeholder;
             }
 
             sectionData.questions.push(questionData);
@@ -96,71 +118,69 @@ function exportForm() {
     }
 
     // Export hidden fields with autofill logic and conditional logic
-    // Export hidden fields with autofill logic and conditional logic
-const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
-if (hiddenFieldsContainer) {
-    const hiddenFieldBlocks = hiddenFieldsContainer.querySelectorAll('.hidden-field-block');
-    hiddenFieldBlocks.forEach((fieldBlock) => {
-        const hiddenFieldId = fieldBlock.id.replace('hiddenFieldBlock', '');
-        const fieldType = document.getElementById(`hiddenFieldType${hiddenFieldId}`).value;
-        const fieldName = document.getElementById(`hiddenFieldName${hiddenFieldId}`).value.trim();
-        const isChecked = document.getElementById(`hiddenFieldChecked${hiddenFieldId}`)?.checked || false;
+    const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
+    if (hiddenFieldsContainer) {
+        const hiddenFieldBlocks = hiddenFieldsContainer.querySelectorAll('.hidden-field-block');
+        hiddenFieldBlocks.forEach((fieldBlock) => {
+            const hiddenFieldId = fieldBlock.id.replace('hiddenFieldBlock', '');
+            const fieldType = document.getElementById(`hiddenFieldType${hiddenFieldId}`).value;
+            const fieldName = document.getElementById(`hiddenFieldName${hiddenFieldId}`).value.trim();
+            const isChecked = document.getElementById(`hiddenFieldChecked${hiddenFieldId}`)?.checked || false;
 
-        const hiddenFieldData = {
-            hiddenFieldId: hiddenFieldId,
-            type: fieldType,
-            name: fieldName,
-            checked: isChecked
-        };
+            const hiddenFieldData = {
+                hiddenFieldId: hiddenFieldId,
+                type: fieldType,
+                name: fieldName,
+                checked: isChecked
+            };
 
-        if (fieldType === 'checkbox') {
-            // Collect conditional logic for checkboxes
-            const conditions = [];
-            const conditionalAutofillDiv = document.getElementById(`conditionalAutofillForCheckbox${hiddenFieldId}`);
-            const conditionDivs = conditionalAutofillDiv.querySelectorAll('div[class^="condition"]');
-            conditionDivs.forEach(conditionDiv => {
-                const conditionId = conditionDiv.className.replace('condition', '');
-                const questionId = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`).value;
-                const answerValue = document.getElementById(`conditionAnswer${hiddenFieldId}_${conditionId}`).value;
-                const autofillValue = document.getElementById(`conditionValue${hiddenFieldId}_${conditionId}`).value;
+            if (fieldType === 'checkbox') {
+                // Collect conditional logic for checkboxes
+                const conditions = [];
+                const conditionalAutofillDiv = document.getElementById(`conditionalAutofillForCheckbox${hiddenFieldId}`);
+                const conditionDivs = conditionalAutofillDiv.querySelectorAll('div[class^="condition"]');
+                conditionDivs.forEach(conditionDiv => {
+                    const conditionId = conditionDiv.className.replace('condition', '');
+                    const questionId = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`).value;
+                    const answerValue = document.getElementById(`conditionAnswer${hiddenFieldId}_${conditionId}`).value;
+                    const autofillValue = document.getElementById(`conditionValue${hiddenFieldId}_${conditionId}`).value;
 
-                if (questionId && answerValue && autofillValue) {
-                    conditions.push({
-                        questionId: questionId,
-                        answerValue: answerValue,
-                        autofillValue: autofillValue
-                    });
-                }
-            });
+                    if (questionId && answerValue && autofillValue) {
+                        conditions.push({
+                            questionId: questionId,
+                            answerValue: answerValue,
+                            autofillValue: autofillValue
+                        });
+                    }
+                });
 
-            hiddenFieldData.conditions = conditions; // Add conditions to the exported data
-        } else if (fieldType === 'text') {
-    // Collect conditional logic for textboxes
-    const conditions = [];
-    const conditionalAutofillDiv = document.getElementById(`conditionalAutofill${hiddenFieldId}`);
-    const conditionDivs = conditionalAutofillDiv.querySelectorAll('div[class^="condition"]');
-    conditionDivs.forEach(conditionDiv => {
-        const conditionId = conditionDiv.className.replace('condition', '');
-        const questionId = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`).value;
-        const answerValue = document.getElementById(`conditionAnswer${hiddenFieldId}_${conditionId}`).value;
-        const autofillValue = document.getElementById(`conditionValue${hiddenFieldId}_${conditionId}`).value;
+                hiddenFieldData.conditions = conditions; // Add conditions to the exported data
+            } else if (fieldType === 'text') {
+                // Collect conditional logic for textboxes
+                const conditions = [];
+                const conditionalAutofillDiv = document.getElementById(`conditionalAutofill${hiddenFieldId}`);
+                const conditionDivs = conditionalAutofillDiv.querySelectorAll('div[class^="condition"]');
+                conditionDivs.forEach(conditionDiv => {
+                    const conditionId = conditionDiv.className.replace('condition', '');
+                    const questionId = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`).value;
+                    const answerValue = document.getElementById(`conditionAnswer${hiddenFieldId}_${conditionId}`).value;
+                    const autofillValue = document.getElementById(`conditionValue${hiddenFieldId}_${conditionId}`).value;
 
-        if (questionId && answerValue && autofillValue) {
-            conditions.push({
-                questionId: questionId,
-                answerValue: answerValue,
-                autofillValue: autofillValue
-            });
-        }
-    });
+                    if (questionId && answerValue && autofillValue) {
+                        conditions.push({
+                            questionId: questionId,
+                            answerValue: answerValue,
+                            autofillValue: autofillValue
+                        });
+                    }
+                });
 
-    hiddenFieldData.conditions = conditions; // Add conditions to the exported data for textboxes
-}
+                hiddenFieldData.conditions = conditions; // Add conditions to the exported data for textboxes
+            }
 
-        formData.hiddenFields.push(hiddenFieldData);
-    });
-}
-
+            formData.hiddenFields.push(hiddenFieldData);
+        });
+    }
 
     const jsonString = JSON.stringify(formData, null, 2);
     downloadJSON(jsonString, "form_data.json");
@@ -262,15 +282,34 @@ function loadFormData(formData) {
                 const multipleTextboxesOptionsDiv = document.getElementById(`multipleTextboxesOptions${question.questionId}`);
                 multipleTextboxesOptionsDiv.innerHTML = '';
 
-                question.labels.forEach((labelText, index) => {
+                question.textboxes.forEach((textboxData, index) => {
                     const optionDiv = document.createElement('div');
                     optionDiv.className = `option${index + 1}`;
                     optionDiv.innerHTML = `
-                        <input type="text" id="multipleTextboxLabel${question.questionId}_${index + 1}" value="${labelText}" placeholder="Label ${index + 1}">
-                        <button type="button" onclick="removeMultipleTextboxOption(${question.questionId}, ${index + 1})">Remove</button>
+                        <h4>Textbox ${index + 1}</h4>
+                        <label>Label:</label>
+                        <input type="text" id="multipleTextboxLabel${question.questionId}_${index + 1}" value="${textboxData.label}" placeholder="Label ${index + 1}"><br><br>
+                        <label>Name/ID:</label>
+                        <input type="text" id="multipleTextboxName${question.questionId}_${index + 1}" value="${textboxData.nameId}" placeholder="Name/ID ${index + 1}"><br><br>
+                        <label>Placeholder:</label>
+                        <input type="text" id="multipleTextboxPlaceholder${question.questionId}_${index + 1}" value="${textboxData.placeholder}" placeholder="Placeholder ${index + 1}"><br><br>
+                        <button type="button" onclick="removeMultipleTextboxOption(${question.questionId}, ${index + 1})">Remove Textbox</button>
+                        <hr>
                     `;
                     multipleTextboxesOptionsDiv.appendChild(optionDiv);
                 });
+            }
+
+            // Restore Name/ID and Placeholder for Text and Big Paragraph
+            if (question.type === 'text' || question.type === 'bigParagraph') {
+                const nameIdInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
+                const placeholderInput = questionBlock.querySelector(`#textboxPlaceholder${question.questionId}`);
+                if (nameIdInput && question.nameId) {
+                    nameIdInput.value = question.nameId;
+                }
+                if (placeholderInput && question.placeholder) {
+                    placeholderInput.value = question.placeholder;
+                }
             }
 
             if (question.logic.enabled) {
@@ -360,6 +399,3 @@ function addHiddenFieldWithData(hiddenField) {
         }
     }
 }
-
-
-
