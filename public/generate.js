@@ -244,10 +244,13 @@ select:focus {
 
     for (let s = 1; s < sectionCounter; s++) {
         const sectionBlock = document.getElementById(`sectionBlock${s}`);
-        if (!sectionBlock) continue;
+    if (!sectionBlock) continue;
 
-        formHTML += `<div id="section${s}" class="section${s === 1 ? ' active' : ''}">`;
-        formHTML += `<h2>Section ${s}</h2>`;
+    const sectionNameInput = sectionBlock.querySelector(`#sectionName${s}`);
+    const sectionName = sectionNameInput ? sectionNameInput.value : `Section ${s}`;
+
+    formHTML += `<div id="section${s}" class="section${s === 1 ? ' active' : ''}">`;
+    formHTML += `<h2>${sectionName}</h2>`;
 
         const questionsSection = sectionBlock.querySelectorAll('.question-block');
         questionsSection.forEach((questionBlock) => {
@@ -430,7 +433,7 @@ select:focus {
 
         // Add navigation buttons for each section
         formHTML += `
-        <div class="navigation-buttons">`;
+        <br><br><div class="navigation-buttons">`;
 
         if (s > 1) {
             formHTML += `<button type="button" onclick="navigateSection(${s - 1})">Back</button>`;
@@ -540,7 +543,7 @@ function loadDefaultPDF() {
         })
         .catch(error => {
             console.error('Error loading default PDF:', error);
-           alert('Error loading default PDF: ' + error.message);
+           //alert('Error loading default PDF: ' + error.message);
         });
 }
 

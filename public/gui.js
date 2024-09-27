@@ -12,14 +12,17 @@ function addSection(sectionId = null) {
     sectionBlock.className = 'section-block';
     sectionBlock.id = `sectionBlock${currentSectionId}`;
     sectionBlock.innerHTML = `
-        <h2>Section ${currentSectionId}</h2>
-        <div id="questionsSection${currentSectionId}"></div>
-        <button type="button" onclick="addQuestion(${currentSectionId})">Add Question to Section ${currentSectionId}</button>
-        <button type="button" onclick="removeSection(${currentSectionId})">Remove Section</button>
-        <button type="button" onclick="moveSectionUp(${currentSectionId})">Push Section Up</button>
-        <button type="button" onclick="moveSectionDown(${currentSectionId})">Push Section Down</button>
-        <hr>
-    `;
+    <h2 id="sectionLabel${currentSectionId}">Section ${currentSectionId}</h2>
+    <label>Section Name: </label>
+    <input type="text" id="sectionName${currentSectionId}" placeholder="Enter section name" value="Section ${currentSectionId}" oninput="updateSectionName(${currentSectionId})"><br><br>
+    <div id="questionsSection${currentSectionId}"></div>
+    <button type="button" onclick="addQuestion(${currentSectionId})">Add Question to Section</button>
+    <button type="button" onclick="removeSection(${currentSectionId})">Remove Section</button>
+    <button type="button" onclick="moveSectionUp(${currentSectionId})">Push Section Up</button>
+    <button type="button" onclick="moveSectionDown(${currentSectionId})">Push Section Down</button>
+    <hr>
+`;
+
     formBuilder.appendChild(sectionBlock);
 
     // Increment sectionCounter only if not loading from JSON
@@ -48,20 +51,52 @@ function moveSectionDown(sectionId) {
     }
 }
 
+
+function updateSectionName(sectionId) {
+    const sectionNameInput = document.getElementById(`sectionName${sectionId}`);
+    const sectionLabel = document.getElementById(`sectionLabel${sectionId}`);
+    if (sectionLabel && sectionNameInput) {
+        sectionLabel.textContent = sectionNameInput.value;
+    }
+}
+
+
 function updateSectionLabels() {
     const sections = document.querySelectorAll('.section-block');
 
-    sections.forEach((block, sectionIndex) => {
-        const sectionId = sectionIndex + 1;
-        const sectionLabel = block.querySelector('h2');
-        sectionLabel.textContent = `Section ${sectionId}`;
-        
-        // Update section-related IDs and event handlers
-        block.id = `sectionBlock${sectionId}`;
-        block.querySelector('button[onclick*="addQuestion"]').setAttribute('onclick', `addQuestion(${sectionId})`);
-        block.querySelector('button[onclick*="removeSection"]').setAttribute('onclick', `removeSection(${sectionId})`);
-        block.querySelector('button[onclick*="moveSectionUp"]').setAttribute('onclick', `moveSectionUp(${sectionId})`);
-        block.querySelector('button[onclick*="moveSectionDown"]').setAttribute('onclick', `moveSectionDown(${sectionId})`);
+    sections.forEach((block, index) => {
+        const oldSectionId = block.id.replace('sectionBlock', '');
+        const newSectionId = index + 1;
+
+        // Update block ID
+        block.id = `sectionBlock${newSectionId}`;
+
+        // Update IDs of section label and input
+        const sectionLabel = block.querySelector(`#sectionLabel${oldSectionId}`);
+        if (sectionLabel) {
+            sectionLabel.id = `sectionLabel${newSectionId}`;
+        }
+
+        const sectionNameInput = block.querySelector(`#sectionName${oldSectionId}`);
+        if (sectionNameInput) {
+            sectionNameInput.id = `sectionName${newSectionId}`;
+            sectionNameInput.setAttribute('oninput', `updateSectionName(${newSectionId})`);
+        }
+
+        // Update questions section ID
+        const questionsSection = block.querySelector(`#questionsSection${oldSectionId}`);
+        if (questionsSection) {
+            questionsSection.id = `questionsSection${newSectionId}`;
+        }
+
+        // Update buttons' onclick attributes
+        block.querySelectorAll('button').forEach(button => {
+            const onclickAttr = button.getAttribute('onclick');
+            if (onclickAttr) {
+                const updatedOnclickAttr = onclickAttr.replace(/\d+/, newSectionId);
+                button.setAttribute('onclick', updatedOnclickAttr);
+            }
+        });
     });
 
     // Update global question labels across all sections
@@ -69,6 +104,7 @@ function updateSectionLabels() {
 
     sectionCounter = sections.length + 1; // Update sectionCounter
 }
+
 
 function updateGlobalQuestionLabels() {
     const sections = document.querySelectorAll('.section-block');
@@ -116,37 +152,9 @@ function removeSection(sectionId) {
     sectionBlock.remove();
 
     // Update IDs and headers of all subsequent sections
-    const remainingSections = document.querySelectorAll('.section-block');
-    let newSectionIndex = 1;
-    remainingSections.forEach(block => {
-        block.id = `sectionBlock${newSectionIndex}`;
-        block.querySelector('h2').innerText = `Section ${newSectionIndex}`;
-        
-        // Update questions within this section
-        const questionsSection = block.querySelector('.questionsSection');
-        if (questionsSection) {
-            questionsSection.id = `questionsSection${newSectionIndex}`;
-        }
-
-        block.querySelectorAll('button').forEach(button => {
-            const onclickAttr = button.getAttribute('onclick');
-            if (onclickAttr) {
-                button.setAttribute('onclick', onclickAttr.replace(/\d+/, newSectionIndex));
-            }
-            if (button.textContent.includes('Add Question to Section')) {
-                button.textContent = `Add Question to Section ${newSectionIndex}`;
-            }
-            if (button.textContent.includes('Remove Section')) {
-                button.textContent = `Remove Section`;
-            }
-        });
-
-        newSectionIndex++;
-    });
-
-    sectionCounter = newSectionIndex;  // Reset sectionCounter to the new highest index
-    updateGlobalQuestionLabels();
+    updateSectionLabels();
 }
+
 
 function addQuestion(sectionId, questionId = null) {
     const questionsSection = document.getElementById(`questionsSection${sectionId}`);

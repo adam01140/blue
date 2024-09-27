@@ -322,22 +322,22 @@
           "labels": [],
           "textboxes": [
             {
-              "label": "Street",
+              "label": "",
               "nameId": "secondPlaintiffMailingStreet",
               "placeholder": "Street"
             },
             {
-              "label": "City",
+              "label": "",
               "nameId": "secondPlaintiffMailingCity",
               "placeholder": "City"
             },
             {
-              "label": "State",
+              "label": "",
               "nameId": "secondPlaintiffMailingState",
               "placeholder": "State"
             },
             {
-              "label": "Zip",
+              "label": "",
               "nameId": "secondPlaintiffMailingZip",
               "placeholder": "Zip"
             }
@@ -449,22 +449,22 @@
           "labels": [],
           "textboxes": [
             {
-              "label": "Street",
+              "label": "",
               "nameId": "defendantStreet",
               "placeholder": "Street"
             },
             {
-              "label": "City",
+              "label": "",
               "nameId": "defendantCity",
               "placeholder": "City"
             },
             {
-              "label": "State",
+              "label": "",
               "nameId": "defendantState",
               "placeholder": "State"
             },
             {
-              "label": "Zip",
+              "label": "",
               "nameId": "defendantZip",
               "placeholder": "Zip"
             }
