@@ -97,22 +97,22 @@
           "labels": [],
           "textboxes": [
             {
-              "label": "Street",
+              "label": "",
               "nameId": "streetAddress",
               "placeholder": "Street"
             },
             {
-              "label": "City",
+              "label": "",
               "nameId": "city",
               "placeholder": "City"
             },
             {
-              "label": "State",
+              "label": "",
               "nameId": "state",
               "placeholder": "State"
             },
             {
-              "label": "Zip",
+              "label": "",
               "nameId": "zipCode",
               "placeholder": "Zip"
             }
@@ -137,10 +137,11 @@
             "option": "",
             "to": ""
           },
-          "options": ["Yes", "No"],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": []
         },
         {
           "questionId": 7,
@@ -160,22 +161,22 @@
           "labels": [],
           "textboxes": [
             {
-              "label": "Street",
+              "label": "",
               "nameId": "mailingStreet",
               "placeholder": "Street"
             },
             {
-              "label": "City",
+              "label": "",
               "nameId": "mailingCity",
               "placeholder": "City"
             },
             {
-              "label": "State",
+              "label": "",
               "nameId": "mailingState",
               "placeholder": "State"
             },
             {
-              "label": "Zip",
+              "label": "",
               "nameId": "mailingZip",
               "placeholder": "Zip"
             }
@@ -200,10 +201,11 @@
             "option": "",
             "to": ""
           },
-          "options": ["Yes", "No"],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": []
         },
         {
           "questionId": 9,
@@ -296,10 +298,11 @@
             "option": "",
             "to": ""
           },
-          "options": ["Yes", "No"],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": []
         },
         {
           "questionId": 13,
@@ -383,9 +386,7 @@
             "Check here if either plaintiff is doing business under a fictitious name",
             "Check here if either plaintiff is a 'licensee' or 'deferred deposit originator'"
           ],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "labels": []
         }
       ]
     },
@@ -488,10 +489,11 @@
             "option": "",
             "to": ""
           },
-          "options": ["Yes", "No"],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": []
         },
         {
           "questionId": 20,
@@ -551,9 +553,7 @@
             "Check here if your case is against more than one defendant",
             "Check here if any defendant is on active military duty"
           ],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "labels": []
         }
       ]
     },
@@ -575,9 +575,7 @@
             "to": ""
           },
           "options": [],
-          "labels": [],
-          "nameId": "claimAmount",
-          "placeholder": "Amount in USD"
+          "labels": []
         },
         {
           "questionId": 23,
@@ -612,10 +610,11 @@
             "option": "",
             "to": ""
           },
-          "options": ["One day", "Over a stretch of time"],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "options": [
+            "One day",
+            "Over a stretch of time"
+          ],
+          "labels": []
         },
         {
           "questionId": 25,
@@ -632,9 +631,7 @@
             "to": ""
           },
           "options": [],
-          "labels": [],
-          "nameId": "eventDate",
-          "placeholder": ""
+          "labels": []
         },
         {
           "questionId": 26,
@@ -651,9 +648,7 @@
             "to": ""
           },
           "options": [],
-          "labels": [],
-          "nameId": "eventStartDate",
-          "placeholder": ""
+          "labels": []
         },
         {
           "questionId": 27,
@@ -670,9 +665,7 @@
             "to": ""
           },
           "options": [],
-          "labels": [],
-          "nameId": "eventEndDate",
-          "placeholder": ""
+          "labels": []
         },
         {
           "questionId": 28,
@@ -712,10 +705,11 @@
             "option": "",
             "to": ""
           },
-          "options": ["Yes", "No"],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": []
         },
         {
           "questionId": 30,
@@ -765,9 +759,7 @@
             "Where the buyer signed the contract, lives now, or lived when the contract was made, or where the vehicle is permanently garaged, if this claim is about a vehicle finance sale",
             "Other"
           ],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "labels": []
         },
         {
           "questionId": 32,
@@ -807,10 +799,11 @@
             "option": "",
             "to": ""
           },
-          "options": ["Yes", "No"],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": []
         },
         {
           "questionId": 34,
@@ -826,10 +819,11 @@
             "option": "",
             "to": ""
           },
-          "options": ["Yes", "No"],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": []
         },
         {
           "questionId": 35,
@@ -845,10 +839,11 @@
             "option": "",
             "to": ""
           },
-          "options": ["Yes", "No"],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": []
         },
         {
           "questionId": 36,
@@ -864,10 +859,11 @@
             "option": "",
             "to": ""
           },
-          "options": ["Yes", "No"],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": []
         },
         {
           "questionId": 37,
@@ -884,9 +880,7 @@
             "to": ""
           },
           "options": [],
-          "labels": [],
-          "nameId": "writtenClaimDate",
-          "placeholder": ""
+          "labels": []
         },
         {
           "questionId": 38,
@@ -902,10 +896,11 @@
             "option": "",
             "to": ""
           },
-          "options": ["Yes", "No"],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": []
         },
         {
           "questionId": 39,
@@ -921,10 +916,11 @@
             "option": "",
             "to": ""
           },
-          "options": ["Yes", "No"],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": []
         }
       ]
     },
@@ -945,10 +941,11 @@
             "option": "",
             "to": ""
           },
-          "options": ["Yes", "No"],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": []
         },
         {
           "questionId": 41,
@@ -964,10 +961,11 @@
             "option": "",
             "to": ""
           },
-          "options": ["Yes", "No"],
-          "labels": [],
-          "nameId": "",
-          "placeholder": ""
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "labels": []
         }
       ]
     }

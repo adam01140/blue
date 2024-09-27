@@ -84,24 +84,25 @@ function exportForm() {
                 questionData.max = rangeEnd;
                 questionData.labels = labels;
             } else if (questionType === 'multipleTextboxes') {
-                const options = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
-                questionData.textboxes = []; // Array to store the textboxes data
-                options.forEach((optionDiv, index) => {
-                    const labelInput = optionDiv.querySelector(`#multipleTextboxLabel${questionId}_${index + 1}`);
-                    const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
-                    const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
+    const options = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
+    questionData.textboxes = []; // Array to store the textboxes data
+    options.forEach((optionDiv, index) => {
+        const labelInput = optionDiv.querySelector(`#multipleTextboxLabel${questionId}_${index + 1}`);
+        const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
+        const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
 
-                    const labelText = labelInput.value || `Textbox ${index + 1}`;
-                    const nameId = nameIdInput.value || `answer${questionId}_${index + 1}`;
-                    const placeholder = placeholderInput.value || '';
+        const labelText = labelInput.value.trim(); // Do not assign default label
+        const nameId = nameIdInput.value || `answer${questionId}_${index + 1}`;
+        const placeholder = placeholderInput.value || '';
 
-                    questionData.textboxes.push({
-                        label: labelText,
-                        nameId: nameId,
-                        placeholder: placeholder
-                    });
-                });
-            }
+        questionData.textboxes.push({
+            label: labelText,
+            nameId: nameId,
+            placeholder: placeholder
+        });
+    });
+}
+
 
             // Handle Text and Big Paragraph question types
             if (questionType === 'text' || questionType === 'bigParagraph') {

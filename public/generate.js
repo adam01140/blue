@@ -364,11 +364,13 @@ select:focus {
         const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
         const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
 
-        const labelText = labelInput.value || `Textbox ${index + 1}`;
+        const labelText = labelInput.value.trim(); // Do not assign default label
         const nameId = nameIdInput.value || `answer${questionId}_${index + 1}`;
         const placeholder = placeholderInput.value || '';
 
-        formHTML += `<label><h3>${labelText}</h3></label><br>`;
+        if (labelText) {
+            formHTML += `<label><h3>${labelText}</h3></label><br>`;
+        }
         formHTML += `<input type="text" id="${nameId}" name="${nameId}" placeholder="${placeholder}" style="text-align:center;"><br>`;
     });
 } else if (questionType === 'money') {
