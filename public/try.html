@@ -16,6 +16,12 @@
     transition: border-color 0.3s ease; /* Smooth transition for border color */
 }
 
+/* Center the placeholder text */
+input[type="text"]::placeholder, input[type="email"]::placeholder {
+    text-align: center;
+}
+
+
 input[type="text"]:focus, select:focus {
     border-color: #1c598a; /* Darker blue when focused */
     outline: none; /* Removes the default focus outline */
@@ -516,9 +522,7 @@ select:focus {
     <script>
 	
 	
-	
-	
-function setCookie(name, value, days) {
+	function setCookie(name, value, days) {
         var expires = "";
         if (days) {
             var date = new Date();
@@ -564,6 +568,8 @@ function setCookie(name, value, days) {
             input.addEventListener('input', saveFormInputs);
         });
     });
+	
+	
         let jumpTarget = null;
         const autofillMappings = [];
 

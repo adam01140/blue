@@ -170,6 +170,7 @@ function addQuestion(sectionId, questionId = null) {
         <input type="text" placeholder="Enter your question" id="question${currentQuestionId}"><br><br>
 
         <label>Question Type: </label>
+		<center>
         <select id="questionType${currentQuestionId}" onchange="toggleOptions(${currentQuestionId})">
             <option value="text">Text</option>
             <option value="radio">Yes/No</option>
@@ -188,7 +189,7 @@ function addQuestion(sectionId, questionId = null) {
             <input type="text" id="textboxName${currentQuestionId}" placeholder="Enter field name"><br><br>
 
             <label>Placeholder: </label>
-            <input type="text" id="textboxPlaceholder${currentQuestionId}" placeholder="Enter placeholder"><br><br>
+            <input type="text" id="textboxPlaceholder${currentQuestionId}" placeholder="Enter placeholder">
         </div>
 
         <!-- Numbered Dropdown Options -->
@@ -227,9 +228,9 @@ function addQuestion(sectionId, questionId = null) {
         </div><br>
 
         <!-- Conditional Logic -->
-        <label>Conditional Logic: </label><br>
+        <label>Enable Conditional Logic: </label>
         <input type="checkbox" id="logic${currentQuestionId}" onchange="toggleLogic(${currentQuestionId})">
-        <label for="logic${currentQuestionId}">Enable Logic</label><br><br>
+        
 
         <div id="logicBlock${currentQuestionId}" style="display: none;">
             <label>Show this question if: </label><br>
@@ -238,10 +239,10 @@ function addQuestion(sectionId, questionId = null) {
         </div><br>
 
         <!-- Jump Logic -->
-        <label>Jump Logic: </label><br>
+        <label>Enable Jump Logic: </label>
         <div id="jumpLogic${currentQuestionId}">
             <input type="checkbox" id="enableJump${currentQuestionId}" onchange="toggleJumpLogic(${currentQuestionId})">
-            <label for="enableJump${currentQuestionId}">Enable Jump Logic</label><br><br>
+            
             <div id="jumpBlock${currentQuestionId}" style="display: none;">
                 <label id="jumpOptionLabel${currentQuestionId}" style="text-align: center;">Select the option that triggers the jump:</label><br>
                 <select id="jumpOption${currentQuestionId}" style="display: block; margin: 0 auto;">
@@ -385,7 +386,7 @@ function addMultipleTextboxOption(questionId) {
         <label>Name/ID:</label>
         <input type="text" id="multipleTextboxName${questionId}_${optionCount}" placeholder="Name/ID ${optionCount}"><br><br>
         <label>Placeholder:</label>
-        <input type="text" id="multipleTextboxPlaceholder${questionId}_${optionCount}" placeholder="Placeholder ${optionCount}"><br><br>
+        <input type="text" id="multipleTextboxPlaceholder${questionId}_${optionCount}" placeholder="Placeholder ${optionCount}">
         <button type="button" onclick="removeMultipleTextboxOption(${questionId}, ${optionCount})">Remove Textbox</button>
         <hr>
     `;

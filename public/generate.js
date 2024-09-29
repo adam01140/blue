@@ -17,6 +17,12 @@ function generateAndDownloadForm() {
     transition: border-color 0.3s ease; /* Smooth transition for border color */
 }
 
+/* Center the placeholder text */
+input[type="text"]::placeholder, input[type="email"]::placeholder {
+    text-align: center;
+}
+
+
 input[type="text"]:focus, select:focus {
     border-color: #1c598a; /* Darker blue when focused */
     outline: none; /* Removes the default focus outline */
@@ -477,6 +483,56 @@ select:focus {
     </footer>
 
     <script>
+	
+	
+	function setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+
+    function saveFormInputs() {
+        const inputs = document.querySelectorAll('input[type="text"], input[type="email"], select');
+        inputs.forEach(input => {
+            setCookie(input.name, input.value, 7);
+        });
+    }
+
+    function loadSavedInputs() {
+        const inputs = document.querySelectorAll('input[type="text"], input[type="email"], select');
+        inputs.forEach(input => {
+            const savedValue = getCookie(input.name);
+            if (savedValue) {
+                input.value = savedValue;
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        loadSavedInputs();
+
+        const inputs = document.querySelectorAll('input[type="text"], input[type="email"], select');
+        inputs.forEach(input => {
+            input.addEventListener('input', saveFormInputs);
+        });
+    });
+	
+	
         let jumpTarget = null;
         const autofillMappings = ${JSON.stringify(autofillMappings)};
 
