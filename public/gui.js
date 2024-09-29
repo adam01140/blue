@@ -558,7 +558,7 @@ function initializeHiddenPDFFieldsModule() {
     const hiddenFieldsModule = document.createElement('div');
     hiddenFieldsModule.id = 'hiddenFieldsModule';
     hiddenFieldsModule.innerHTML = `
-        <h2>Hidden PDF Fields</h2>
+        <h2>Form Editor</h2>
         <div id="hiddenFieldsContainer"></div>
         <button type="button" onclick="addHiddenField()">Add Hidden Field</button>
         <hr>

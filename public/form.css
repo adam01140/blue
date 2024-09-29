@@ -153,6 +153,8 @@ input[type="checkbox"]:checked::before {
     font-size: 16px;
 }
 
+
+
 /* Styling for "Previous question number" input */
 input[type="number"] {
     appearance: none;
