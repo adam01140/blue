@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forms - FormWiz</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -100,11 +99,7 @@
 <body>
 
     <header>
-	
-
-        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" href="index.html">
-  
-       
+        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';" style="cursor: pointer;">
         <nav>
             <a href="index.html">Home</a>
             <a href="forms.html">Forms</a>
@@ -112,14 +107,23 @@
         </nav>
     </header>
 
-    <section>
+    <!-- My Forms Section -->
+    <section class="forms-section">
+        <h1>My Forms</h1>
+        <ul id="my-forms-list" class="forms-list">
+            <!-- User's forms will be dynamically inserted here -->
+        </ul>
+    </section>
+
+    <!-- Available Forms Section -->
+    <section class="forms-section">
         <h1>Available Forms</h1>
-        <ul>
-            <li><a href="fee-waiver.html">Court Fees Waiver</a></li>
-            <li><a href="form%20filler.html">Developer GUI</a></li>
-            <li><a href="#">Form 3</a></li>
-            <li><a href="#">Form 4</a></li>
-            <li><a href="#">Form 5</a></li>
+        <ul id="available-forms-list" class="forms-list">
+            <li><a href="#" data-form-id="fee-waiver.html">Court Fees Waiver</a></li>
+            <li><a href="#" data-form-id="form-filler.html">Developer GUI</a></li>
+            <li><a href="#" data-form-id="form3.html">Form 3</a></li>
+            <li><a href="#" data-form-id="form4.html">Form 4</a></li>
+            <li><a href="#" data-form-id="form5.html">Form 5</a></li>
             <!-- Add more forms as needed -->
         </ul>
     </section>
@@ -127,6 +131,94 @@
     <footer>
         &copy; 2024 FormWiz. All rights reserved.
     </footer>
+
+    <!-- Include Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+            authDomain: "formwiz-3f4fd.firebaseapp.com",
+            projectId: "formwiz-3f4fd",
+            storageBucket: "formwiz-3f4fd.appspot.com",
+            messagingSenderId: "404259212529",
+            appId: "1:404259212529:web:15a33bce82383b21cfed50",
+            measurementId: "G-P07YEN0HPD"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.firestore();
+
+        // Check if user is authenticated
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in, proceed to fetch and display forms
+                const userId = user.uid;
+                const myFormsList = document.getElementById('my-forms-list');
+                const availableFormsList = document.getElementById('available-forms-list');
+
+                // Function to render My Forms
+                function renderMyForms(forms) {
+                    myFormsList.innerHTML = ''; // Clear existing forms
+                    forms.forEach((form) => {
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.href = form.url;
+                        a.textContent = form.name;
+                        li.appendChild(a);
+                        myFormsList.appendChild(li);
+                    });
+                }
+
+                // Fetch user's forms from Firestore
+                db.collection('users').doc(userId).collection('myForms').get()
+                    .then((querySnapshot) => {
+                        const forms = [];
+                        querySnapshot.forEach((doc) => {
+                            forms.push(doc.data());
+                        });
+                        renderMyForms(forms);
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching user forms:', error);
+                    });
+
+                // Add click event listeners to available forms
+                availableFormsList.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (e.target && e.target.nodeName === 'A') {
+                        const formId = e.target.getAttribute('data-form-id');
+                        const formName = e.target.textContent;
+                        const formUrl = formId; // Assuming formId is the URL
+
+                        // Add form to user's My Forms in Firestore
+                        db.collection('users').doc(userId).collection('myForms').doc(formId).set({
+                            name: formName,
+                            url: formUrl
+                        })
+                        .then(() => {
+                            // Update My Forms section
+                            const li = document.createElement('li');
+                            const a = document.createElement('a');
+                            a.href = formUrl;
+                            a.textContent = formName;
+                            li.appendChild(a);
+                            myFormsList.appendChild(li);
+                        })
+                        .catch((error) => {
+                            console.error('Error adding form to My Forms:', error);
+                        });
+                    }
+                });
+            } else {
+                // No user is signed in, redirect to login page
+                window.location.href = 'account.html';
+            }
+        });
+    </script>
 
 </body>
 </html>
