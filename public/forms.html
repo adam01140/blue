@@ -18,7 +18,7 @@
         }
         header {
             background-color: #2c3e50;
-            padding: 40px; /* Increase padding to make the header taller */
+            padding: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -26,26 +26,27 @@
         }
         header img {
             position: absolute;
-            left: 20px; /* Position the logo on the left */
+            left: 20px;
+            cursor: pointer;
         }
         nav {
             display: flex;
-            justify-content: center; /* Center the navigation links */
+            justify-content: center;
         }
         nav a {
             margin: 0 15px;
-            color: #ffffff; /* Set default color to white */
+            color: #ffffff;
             text-decoration: none;
             font-weight: bold;
-            transition: color 0.3s ease; /* Smooth transition for color change */
+            transition: color 0.3s ease;
         }
         nav a:hover {
-            color: #2980b9; /* Change color to light blue on hover */
+            color: #2980b9;
         }
         section {
             padding: 50px;
             text-align: center;
-            flex: 1; /* Allow the section to grow and take up space */
+            flex: 1;
         }
         section h1 {
             color: #2980b9;
@@ -61,8 +62,8 @@
         }
         section ul li {
             margin: 10px;
-            width: 150px; /* Set width for square */
-            height: 150px; /* Set height for square */
+            width: 150px;
+            height: 150px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -71,7 +72,7 @@
             background-color: #EBE7D9;
             transition: background-color 0.3s ease;
             box-sizing: border-box;
-            padding: 10px; /* Add padding inside the list items */
+            padding: 10px;
             text-align: center;
         }
         section ul li:hover {
@@ -81,8 +82,8 @@
             color: #2980b9;
             text-decoration: none;
             font-weight: bold;
-            display: block; /* Make the link take up the full space of the list item */
-            width: 100%; /* Ensure full width for padding effect */
+            display: block;
+            width: 100%;
         }
         section ul li:hover a {
             color: #EBE7D9;
@@ -99,7 +100,7 @@
 <body>
 
     <header>
-        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';" style="cursor: pointer;">
+        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
         <nav>
             <a href="index.html">Home</a>
             <a href="forms.html">Forms</a>
@@ -119,11 +120,11 @@
     <section class="forms-section">
         <h1>Available Forms</h1>
         <ul id="available-forms-list" class="forms-list">
-            <li><a href="#" data-form-id="fee-waiver.html">Court Fees Waiver</a></li>
-            <li><a href="#" data-form-id="form-filler.html">Developer GUI</a></li>
-            <li><a href="#" data-form-id="example.html">Example</a></li>
-            <li><a href="#" data-form-id="form4.html">Form 4</a></li>
-            <li><a href="#" data-form-id="form5.html">Form 5</a></li>
+            <li><a href="#" data-form-id="fee-waiver" data-form-url="fee-waiver.html?formId=fee-waiver">Court Fees Waiver</a></li>
+            <li><a href="#" data-form-id="form-filler" data-form-url="form-filler.html?formId=form-filler">Developer GUI</a></li>
+            <li><a href="#" data-form-id="example" data-form-url="example.html?formId=example">Example</a></li>
+            <li><a href="#" data-form-id="example2" data-form-url="example2.html?formId=example2">Example2</a></li>
+            <li><a href="#" data-form-id="form5" data-form-url="form5.html?formId=form5">Form 5</a></li>
             <!-- Add more forms as needed -->
         </ul>
     </section>
@@ -191,8 +192,8 @@
                     e.preventDefault();
                     if (e.target && e.target.nodeName === 'A') {
                         const formId = e.target.getAttribute('data-form-id');
+                        const formUrl = e.target.getAttribute('data-form-url');
                         const formName = e.target.textContent;
-                        const formUrl = formId; // Assuming formId is the URL
 
                         // Add form to user's My Forms in Firestore
                         db.collection('users').doc(userId).collection('myForms').doc(formId).set({
