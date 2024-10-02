@@ -330,7 +330,7 @@ select:focus {
     }
     formHTML += `</div><br></div>`;
 }
- else if (questionType === 'numberedDropdown') {
+else if (questionType === 'numberedDropdown') {
     const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
     const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
     const labels = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
@@ -338,8 +338,8 @@ select:focus {
     // Extract label values
     const labelValues = Array.from(labels).map(label => label.value);
 
-    formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value, ${rangeStart}, ${rangeEnd})">`;
-    formHTML += `<option value="" disabled selected>Select an option</option>`;
+    formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value)">
+                    <option value="" disabled selected>Select an option</option>`;
     for (let i = rangeStart; i <= rangeEnd; i++) {
         formHTML += `<option value="${i}">${i}</option>`;
     }
@@ -347,20 +347,24 @@ select:focus {
 
     formHTML += `<div id="labelContainer${questionId}"></div>`;
 
+    // Include the labels in the script
     formHTML += `<script>
-        var labels = ${JSON.stringify(labelValues)};
-        function showTextboxLabels(questionId, count, rangeStart, rangeEnd) {
+        var labels${questionId} = ${JSON.stringify(labelValues)};
+        function showTextboxLabels(questionId, count) {
             const container = document.getElementById('labelContainer' + questionId);
             container.innerHTML = '';
-            for (let i = 1; i <= count; i++) {
-                labels.forEach(function(label) {
-                    container.innerHTML += '<label><h3>' + label + ' ' + i + ':</h3></label>' +
-                    '<input type="text" id="label' + questionId + '_' + i + '_' + label.replace(/\\s+/g, '') + '"><br>';
+            for (let j = 1; j <= count; j++) {
+                labels${questionId}.forEach(function(label) {
+                    // Create unique ID for each input
+                    const inputId = 'label' + questionId + '_' + j + '_' + label.replace(/\\s+/g, '');
+                    container.innerHTML += '<input type="text" id="' + inputId + '" name="' + inputId + '" placeholder="' + label + '" style="text-align:center;"><br>';
                 });
             }
         }
     <\/script>`;
 }
+
+
  else if (questionType === 'multipleTextboxes') {
     const multipleTextboxesOptionsDiv = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
     multipleTextboxesOptionsDiv.forEach((optionDiv, index) => {
