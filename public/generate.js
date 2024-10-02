@@ -331,51 +331,37 @@ select:focus {
     formHTML += `</div><br></div>`;
 }
  else if (questionType === 'numberedDropdown') {
-                const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
-                const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
-                const labels = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
+    const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
+    const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
+    const labels = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
 
-                formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value, ${rangeStart}, ${rangeEnd})">`;
-                formHTML += `<option value="" disabled selected>Select an option</option>`;
-                for (let i = rangeStart; i <= rangeEnd; i++) {
-                    formHTML += `<option value="${i}">${i}</option>`;
-                }
-                formHTML += `</select><br>`;
+    // Extract label values
+    const labelValues = Array.from(labels).map(label => label.value);
 
-                formHTML += `<div id="labelContainer${questionId}"></div>`;
-				
-                formHTML += `<script>
-				
-				
-				function displayIDs() {
-            const inputs = document.querySelectorAll('input[type="text"], input[type="checkbox"]');
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '';  // Clear previous results
+    formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value, ${rangeStart}, ${rangeEnd})">`;
+    formHTML += `<option value="" disabled selected>Select an option</option>`;
+    for (let i = rangeStart; i <= rangeEnd; i++) {
+        formHTML += `<option value="${i}">${i}</option>`;
+    }
+    formHTML += `</select><br>`;
 
-            inputs.forEach(input => {
-                if (input.id) {
-                    resultDiv.innerHTML += '<p>ID: ${input.id}</p>;
-                   
-                }   
-            });
-            
-            alert(resultDiv.innerHTML);
+    formHTML += `<div id="labelContainer${questionId}"></div>`;
+
+    formHTML += `<script>
+        var labels = ${JSON.stringify(labelValues)};
+        function showTextboxLabels(questionId, count, rangeStart, rangeEnd) {
+            const container = document.getElementById('labelContainer' + questionId);
+            container.innerHTML = '';
+            for (let i = 1; i <= count; i++) {
+                labels.forEach(function(label) {
+                    container.innerHTML += '<label><h3>' + label + ' ' + i + ':</h3></label>' +
+                    '<input type="text" id="label' + questionId + '_' + i + '_' + label.replace(/\\s+/g, '') + '"><br>';
+                });
+            }
         }
-        
-        
-        displayIDs();
-		
-                    function showTextboxLabels(questionId, count, rangeStart, rangeEnd) {
-                        const container = document.getElementById('labelContainer' + questionId);
-                        container.innerHTML = '';
-                        for (let i = 1; i <= count; i++) {
-                            ${Array.from(labels).map(label =>
-                                `container.innerHTML += '<label><h3>${label.value} ' + i + ':</h3></label><input type="text" id="label' + questionId + '_' + i + '${label.value.replace(/\\s+/g, '')}"><br>';`
-                            ).join('')}
-                        }
-                    }
-                <\/script>`;
-            } else if (questionType === 'multipleTextboxes') {
+    <\/script>`;
+}
+ else if (questionType === 'multipleTextboxes') {
     const multipleTextboxesOptionsDiv = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
     multipleTextboxesOptionsDiv.forEach((optionDiv, index) => {
         const labelInput = optionDiv.querySelector(`#multipleTextboxLabel${questionId}_${index + 1}`);
