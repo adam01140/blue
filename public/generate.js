@@ -355,14 +355,15 @@ else if (questionType === 'numberedDropdown') {
             container.innerHTML = '';
             for (let j = 1; j <= count; j++) {
                 labels${questionId}.forEach(function(label) {
-                    // Create unique ID for each input
-                    const inputId = 'label' + questionId + '_' + j + '_' + label.replace(/\\s+/g, '');
+                    // Create ID and name as label + iteration number (e.g., 'a1', 'b1')
+                    const inputId = label.replace(/\\s+/g, '') + j;
                     container.innerHTML += '<input type="text" id="' + inputId + '" name="' + inputId + '" placeholder="' + label + '" style="text-align:center;"><br>';
                 });
             }
         }
     <\/script>`;
 }
+
 
 
  else if (questionType === 'multipleTextboxes') {
@@ -540,7 +541,7 @@ else if (questionType === 'numberedDropdown') {
                 ids.push(input.id);
             });
             // Join all IDs into one big paragraph and alert
-            //alert('IDs of all inputs: ' + ids.join(', '));
+            alert('IDs of all inputs: ' + ids.join(', '));
        
 	   
 	   

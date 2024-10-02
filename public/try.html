@@ -242,270 +242,37 @@ select:focus {
 <div id="result"></div>
     <section>
 	
-
+	<input type="text" id="b1" name="b1" placeholder="b1" style="text-align:center;">
+	<input type="text" id="SC-100[0].Page2[0].List1[0].Item1[0].PlaintiffAddress1[0]" name="SC-100[0].Page2[0].List1[0].Item1[0].PlaintiffAddress1[0]" placeholder="Full name" required>
+	
     <div id="box">
         <form id="customForm" onsubmit="return showThankYouMessage();">
-    <div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1" ><label><h3>What is your case number?</h3></label><input type="text" id="caseNumber" name="caseNumber" placeholder="Case Number"><br><br></div><div id="question-container-2" ><label><h3>What is your name?</h3></label><input type="text" id="yourName" name="yourName" placeholder="Your Name"><br><br></div><div id="question-container-3" ><label><h3>What is your phone number?</h3></label><input type="text" id="yourPhoneNumber" name="yourPhoneNumber" placeholder="Phone Number"><br><br></div><div id="question-container-4" ><label><h3>What is your email?</h3></label><input type="text" id="yourEmail" name="yourEmail" placeholder="Email"><br><br></div><div id="question-container-5" ><label><h3>What is your street address?</h3></label><input type="text" id="yourStreet" name="yourStreet" placeholder="Street" style="text-align:center;"><br><input type="text" id="yourCity" name="yourCity" placeholder="City" style="text-align:center;"><br><input type="text" id="yourState" name="yourState" placeholder="State" style="text-align:center;"><br><input type="text" id="yourZip" name="yourZip" placeholder="Zip" style="text-align:center;"><br></div>
-        <br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><h2>Section 2</h2><div id="question-container-6" ><label><h3>Is your mailing address different than your street address?</h3></label><select id="answer6"><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div><div id="question-container-7" class="hidden"><label><h3>What is your mailing address?</h3></label><input type="text" id="mailingStreet" name="mailingStreet" placeholder="Street" style="text-align:center;"><br><input type="text" id="mailingCity" name="mailingCity" placeholder="City" style="text-align:center;"><br><input type="text" id="mailingState" name="mailingState" placeholder="State" style="text-align:center;"><br><input type="text" id="mailingZip" name="mailingZip" placeholder="Zip" style="text-align:center;"><br></div>
-                <script>
-                    document.getElementById('answer6').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-7');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'yes') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script>
-        <br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(1)">Back</button><button type="button" onclick="handleNext(2)">Next</button></div></div><div id="section3" class="section"><h2>Section 3</h2><div id="question-container-8" ><label><h3>Are you the only one suing?</h3></label><select id="answer8"><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div><div id="question-container-9" class="hidden"><label><h3>What is the second plaintiff’s name?</h3></label><input type="text" id="secondPlaintiffName" name="secondPlaintiffName" placeholder="Second Plaintiff's Name"><br><br></div>
-                <script>
-                    document.getElementById('answer8').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-9');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'no') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script><div id="question-container-10" class="hidden"><label><h3>What is the second plaintiff’s phone number?</h3></label><input type="text" id="secondPlaintiffPhone" name="secondPlaintiffPhone" placeholder="Second Plaintiff's Phone Number"><br><br></div>
-                <script>
-                    document.getElementById('answer8').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-10');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'no') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script><div id="question-container-11" class="hidden"><label><h3>What is the second plaintiff’s street address?</h3></label><input type="text" id="secondPlaintiffStreet" name="secondPlaintiffStreet" placeholder="Street" style="text-align:center;"><br><input type="text" id="secondPlaintiffCity" name="secondPlaintiffCity" placeholder="City" style="text-align:center;"><br><input type="text" id="secondPlaintiffState" name="secondPlaintiffState" placeholder="State" style="text-align:center;"><br><input type="text" id="secondPlaintiffZip" name="secondPlaintiffZip" placeholder="Zip" style="text-align:center;"><br></div>
-                <script>
-                    document.getElementById('answer8').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-11');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'no') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script><div id="question-container-12" class="hidden"><label><h3>Is the second plaintiff’s mailing address different than their street address?</h3></label><select id="answer12"><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div>
-                <script>
-                    document.getElementById('answer8').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-12');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'no') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script><div id="question-container-13" class="hidden"><label><h3>What is the second plaintiff’s mailing address?</h3></label><input type="text" id="secondPlaintiffMailingStreet" name="secondPlaintiffMailingStreet" placeholder="Street" style="text-align:center;"><br><input type="text" id="secondPlaintiffMailingCity" name="secondPlaintiffMailingCity" placeholder="City" style="text-align:center;"><br><input type="text" id="secondPlaintiffMailingState" name="secondPlaintiffMailingState" placeholder="State" style="text-align:center;"><br><input type="text" id="secondPlaintiffMailingZip" name="secondPlaintiffMailingZip" placeholder="Zip" style="text-align:center;"><br></div>
-                <script>
-                    document.getElementById('answer12').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-13');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'yes') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script><div id="question-container-14" class="hidden"><label><h3>What is the second plaintiff’s email?</h3></label><input type="text" id="secondPlaintiffEmail" name="secondPlaintiffEmail" placeholder="Second Plaintiff's Email"><br><br></div>
-                <script>
-                    document.getElementById('answer8').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-14');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'no') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script>
-        <br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(2)">Back</button><button type="button" onclick="handleNext(3)">Next</button></div></div><div id="section4" class="section"><h2>Section 4</h2><div id="question-container-15" ><label><h3>Please mark all that apply</h3></label><div><center><div id="checkmark">
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="moreThanTwoPlaintiffs" name="moreThanTwoPlaintiffs" value="More than two plaintiffs">
-                    Check here if more than two plaintiffs
-                </label>
-            </span>
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="plaintiffFictitiousName" name="plaintiffFictitiousName" value="Plaintiff using fictitious name">
-                    Check here if either plaintiff is doing business under a fictitious name
-                </label>
-            </span>
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="plaintiffLicenseeOrOriginator" name="plaintiffLicenseeOrOriginator" value="Plaintiff is licensee or deferred deposit originator">
-                    Check here if either plaintiff is a “licensee” or “deferred deposit originator”
-                </label>
-            </span></div><br></div></div>
-        <br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(3)">Back</button><button type="button" onclick="handleNext(4)">Next</button></div></div><div id="section5" class="section"><h2>Section 5</h2><div id="question-container-16" ><label><h3>What is the name of the person you are suing?</h3></label><input type="text" id="defendantName" name="defendantName" placeholder="Defendant's Name"><br><br></div><div id="question-container-17" ><label><h3>What is the phone number of the person you are suing?</h3></label><input type="text" id="defendantPhone" name="defendantPhone" placeholder="Defendant's Phone Number"><br><br></div><div id="question-container-18" ><label><h3>What is the street address of the person you are suing?</h3></label><input type="text" id="defendantStreet" name="defendantStreet" placeholder="Street" style="text-align:center;"><br><input type="text" id="defendantCity" name="defendantCity" placeholder="City" style="text-align:center;"><br><input type="text" id="defendantState" name="defendantState" placeholder="State" style="text-align:center;"><br><input type="text" id="defendantZip" name="defendantZip" placeholder="Zip" style="text-align:center;"><br></div>
-        <br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(4)">Back</button><button type="button" onclick="handleNext(5)">Next</button></div></div><div id="section6" class="section"><h2>Section 6</h2><div id="question-container-19" ><label><h3>Is the mailing address of the person you are suing different than their street address?</h3></label><select id="answer19"><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div><div id="question-container-20" class="hidden"><label><h3>What is their mailing address?</h3></label><input type="text" id="defendantMailingStreet" name="defendantMailingStreet" placeholder="Street" style="text-align:center;"><br><input type="text" id="defendantMailingCity" name="defendantMailingCity" placeholder="City" style="text-align:center;"><br><input type="text" id="defendantMailingState" name="defendantMailingState" placeholder="State" style="text-align:center;"><br><input type="text" id="defendantMailingZip" name="defendantMailingZip" placeholder="Zip" style="text-align:center;"><br></div>
-                <script>
-                    document.getElementById('answer19').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-20');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'yes') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script><div id="question-container-21" ><label><h3>Please mark all that apply</h3></label><div><center><div id="checkmark">
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="moreThanTwoDefendants" name="moreThanTwoDefendants" value="More than two defendants">
-                    Check here if more than two defendants
-                </label>
-            </span>
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="multipleDefendants" name="multipleDefendants" value="Case against multiple defendants">
-                    Check here if your case is against more than one defendant
-                </label>
-            </span>
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="defendantActiveMilitary" name="defendantActiveMilitary" value="Defendant on active military duty">
-                    Check here if any defendant is on active military duty
-                </label>
-            </span></div><br></div></div>
-        <br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(5)">Back</button><button type="button" onclick="handleNext(6)">Next</button></div></div><div id="section7" class="section"><h2>Section 7</h2><div id="question-container-22" ><label><h3>How much are you claiming that the defendant owes you?</h3></label><input type="number" id="answer22" min="0" step="0.01" placeholder="Enter amount"><br></div><div id="question-container-23" ><label><h3>Why do they owe you this money?</h3></label><textarea id="reasonForClaim" name="reasonForClaim" rows="5" cols="50" placeholder="Explain the reason"></textarea><br></div><div id="question-container-24" ><label><h3>Did this event occur in one day or over a stretch of time?</h3></label><select id="answer24"><option value="" disabled selected>Select an option</option><option value="One day">One day</option><option value="Over a stretch of time">Over a stretch of time</option></select><br></div><div id="question-container-25" class="hidden"><label><h3>When did this event happen?</h3></label><input type="date" id="answer25" placeholder="Enter a date"><br></div>
-                <script>
-                    document.getElementById('answer24').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-25');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'one day') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script><div id="question-container-26" class="hidden"><label><h3>Date it started</h3></label><input type="date" id="answer26" placeholder="Enter a date"><br></div>
-                <script>
-                    document.getElementById('answer24').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-26');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'over a stretch of time') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script><div id="question-container-27" class="hidden"><label><h3>Date it ended</h3></label><input type="date" id="answer27" placeholder="Enter a date"><br></div>
-                <script>
-                    document.getElementById('answer24').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-27');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'over a stretch of time') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script><div id="question-container-28" ><label><h3>How did you calculate the money owed to you?</h3></label><textarea id="calculationExplanation" name="calculationExplanation" rows="5" cols="50" placeholder="Explain your calculation"></textarea><br></div>
-        <br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(6)">Back</button><button type="button" onclick="handleNext(7)">Next</button></div></div><div id="section8" class="section"><h2>Section 8</h2><div id="question-container-29" ><label><h3>Have you asked the defendant to pay you?</h3></label><select id="answer29"><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div><div id="question-container-30" class="hidden"><label><h3>Explain why you haven’t</h3></label><textarea id="whyNotAsked" name="whyNotAsked" rows="5" cols="50" placeholder="Explain why you haven't asked"></textarea><br></div>
-                <script>
-                    document.getElementById('answer29').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-30');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'no') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script>
-        <br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(7)">Back</button><button type="button" onclick="handleNext(8)">Next</button></div></div><div id="section9" class="section"><h2>Section 9</h2><div id="question-container-31" ><label><h3>Why are you filing your claim at this courthouse?</h3></label><div><center><div id="checkmark">
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="reasonDefendantLives" name="reasonDefendantLives" value="Defendant's location">
-                    Where the defendant lives or does business.
-                </label>
-            </span>
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="reasonPropertyDamaged" name="reasonPropertyDamaged" value="Property damaged">
-                    Where the plaintiff’s property was damaged
-                </label>
-            </span>
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="reasonPlaintiffInjured" name="reasonPlaintiffInjured" value="Plaintiff injured">
-                    Where the plaintiff was injured.
-                </label>
-            </span>
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="reasonContractLocation" name="reasonContractLocation" value="Contract location">
-                    Where a contract was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.
-                </label>
-            </span>
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="reasonBuyerLocation" name="reasonBuyerLocation" value="Buyer location">
-                    Where the buyer or lessee signed the contract, lives now, or lived when the contract was made
-                </label>
-            </span>
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="reasonRetailContract" name="reasonRetailContract" value="Retail installment contract">
-                    Where the buyer signed the contract, lives now, or lived when the contract was made, if this claim is about a retail installment contract
-                </label>
-            </span>
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="reasonVehicleFinance" name="reasonVehicleFinance" value="Vehicle finance sale">
-                    Where the buyer signed the contract, lives now, or lived when the contract was made, or where the vehicle is permanently garaged, if this claim is about a vehicle finance sale
-                </label>
-            </span>
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="reasonOther" name="reasonOther" value="Other">
-                    Other
-                </label>
-            </span></div><br></div></div><div id="question-container-32" ><label><h3>List the zip code of the location correlating with your checkbox</h3></label><input type="text" id="locationZipCode" name="locationZipCode" placeholder="Zip Code"><br><br></div>
-        <br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(8)">Back</button><button type="button" onclick="handleNext(9)">Next</button></div></div><div id="section10" class="section"><h2>Section 10</h2><div id="question-container-33" ><label><h3>Is your claim about an attorney-client fee dispute?</h3></label><select id="answer33"><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div><div id="question-container-34" class="hidden"><label><h3>Have you had arbitration?</h3></label><select id="answer34"><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div>
-                <script>
-                    document.getElementById('answer33').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-34');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'yes') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script><div id="question-container-35" ><label><h3>Are you suing a public entity?</h3></label><select id="answer35"><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div><div id="question-container-36" class="hidden"><label><h3>Have you filed a written claim with the entity first?</h3></label><select id="answer36"><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div>
-                <script>
-                    document.getElementById('answer35').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-36');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'yes') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script><div id="question-container-37" class="hidden"><label><h3>What date was your written claim filed?</h3></label><input type="date" id="answer37" placeholder="Enter a date"><br></div>
-                <script>
-                    document.getElementById('answer36').addEventListener('change', function() {
-                        const questionElement = document.getElementById('question-container-37');
-                        const selectedAnswer = this.value;
-                        if (selectedAnswer.trim().toLowerCase() === 'yes') {
-                            questionElement.classList.remove('hidden');
-                        } else {
-                            questionElement.classList.add('hidden');
-                        }
-                    });
-                </script><div id="question-container-38" ><label><h3>Have you filed more than 12 other small claims within the last 12 months in California?</h3></label><select id="answer38"><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div><div id="question-container-39" ><label><h3>Is your claim for more than $2,500?</h3></label><select id="answer39"><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div>
-        <br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(9)">Back</button><button type="button" onclick="handleNext(10)">Next</button></div></div><div id="section11" class="section"><h2>Section 11</h2><div id="question-container-40" ><label><h3>Do you understand that by filing a claim in small claims court, you have no right to appeal this claim?</h3></label><select id="answer40"><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div><div id="question-container-41" ><label><h3>I declare under penalty of perjury under the laws of the State of California that the information above and on any attachments to this form is true and correct</h3></label><select id="answer41"><option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div>
-        <br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(10)">Back</button><button type="submit">Submit</button></div></div>
+    <div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1" ><label><h3>q1</h3></label><select id="answer1" onchange="showTextboxLabels(1, this.value)">
+                    <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option></select><br><div id="labelContainer1"></div>
+       <script>
+    var labels1 = ["a","b"];
+    function showTextboxLabels(questionId, count) {
+        const container = document.getElementById('labelContainer' + questionId);
+        container.innerHTML = '';
+        for (let j = 1; j <= count; j++) {
+            labels1.forEach(function(label) {
+                // Create ID and name as label + iteration number (e.g., 'a1', 'b1')
+                const inputId = label.replace(/\s+/g, '') + j;
+                container.innerHTML += '<input type="text" id="' + inputId + '" name="' + inputId + '" placeholder="' + label + '" style="text-align:center;"><br>';
+            });
+        }
+        // Collect IDs of generated inputs
+        const inputs = container.querySelectorAll('input[type="text"]');
+        let ids = [];
+        inputs.forEach(input => {
+            ids.push(input.id);
+        });
+        // Alert the IDs
+        alert('IDs of generated inputs: ' + ids.join(', '));
+    }
+</script>
+</div>
+        <br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div>
     <div id="hidden_pdf_fields">
     
     </div>
@@ -587,7 +354,7 @@ select:focus {
                 ids.push(input.id);
             });
             // Join all IDs into one big paragraph and alert
-            //alert('IDs of all inputs: ' + ids.join(', '));
+            alert('IDs of all inputs: ' + ids.join(', '));
        
 	   
 	   
