@@ -475,7 +475,8 @@ select:focus {
     <script>
 	
 	
-	const firebaseConfig = {
+	 // ----- Firebase Configuration -----
+    const firebaseConfig = {
         apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
         authDomain: "formwiz-3f4fd.firebaseapp.com",
         projectId: "formwiz-3f4fd",
@@ -487,6 +488,8 @@ select:focus {
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+
+    // ----- Form Logic -----
 
     // Get formId from URL parameters
     const urlParams = new URLSearchParams(window.location.search);
@@ -517,12 +520,16 @@ select:focus {
         const formData = {};
         const inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' select, #' + sectionId + ' textarea');
         inputs.forEach(input => {
-            formData[input.name] = input.type === 'checkbox' ? input.checked : input.value;
+            if (input.tagName === 'INPUT' && input.type === 'checkbox') {
+                formData[input.name] = input.checked;
+            } else {
+                formData[input.name] = input.value;
+            }
         });
 
         db.collection('users').doc(userId).collection('forms').doc(formId).collection('formAnswers').doc(sectionId).set(formData)
         .then(() => {
-            console.log('Form data saved successfully.');
+            console.log('Form data saved successfully for ' + sectionId);
         })
         .catch(error => {
             console.error('Error saving form data: ', error);
@@ -538,16 +545,16 @@ select:focus {
                 for (const [key, value] of Object.entries(savedData)) {
                     const input = document.querySelector('[name="' + key + '"]');
                     if (input) {
-                        if (input.type === 'checkbox') {
+                        if (input.tagName === 'INPUT' && input.type === 'checkbox') {
                             input.checked = value;
                         } else {
                             input.value = value;
                         }
                     }
                 }
-                console.log('Form data loaded successfully.');
+                console.log('Form data loaded successfully for ' + sectionId);
             } else {
-                console.log('No saved form data found.');
+                console.log('No saved form data found for ' + sectionId);
             }
         })
         .catch(error => {
@@ -562,52 +569,26 @@ select:focus {
             input.addEventListener('change', () => saveFormData(sectionId));
         });
     }
-	
-	
-        let jumpTarget = null;
-        const autofillMappings = ${JSON.stringify(autofillMappings)};
 
-        // Select all textboxes and checkboxes
-        const inputs = document.querySelectorAll('input[type="text"], input[type="checkbox"]');
-        // Create an array to store the IDs
-        let ids = [];
-        // Iterate through each input and push its ID to the array
-        inputs.forEach(input => {
-            ids.push(input.id);
-        });
-        // Join all IDs into one big paragraph and alert
-        alert('IDs of all inputs: ' + ids.join(', '));
-   
-   
-        function handleNext(currentSection) {
-            // Autofill hidden fields before navigating
-            autofillMappings.forEach(mapping => {
-                const sourceElement = document.getElementById(mapping.questionAnswerId);
-                const targetElement = document.getElementById(mapping.hiddenFieldName);
-                if (sourceElement && targetElement) {
-                    targetElement.value = sourceElement.value || '';
-                }
-            });
+    // Handle Next button click
+    function handleNext(currentSection) {
+        // Save current section data before navigating
+        saveFormData('section' + currentSection);
+        // Navigate to next section
+        navigateSection(currentSection + 1);
+    }
 
-            // Execute conditional autofill logic
-            ${conditionalAutofillLogic}
+    // Navigate between sections
+    function navigateSection(sectionNumber) {
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => section.classList.remove('active'));
+        document.getElementById('section' + sectionNumber).classList.add('active');
+        // Load data and enable auto-save for the new section
+        loadFormData('section' + sectionNumber);
+        autoSaveForm('section' + sectionNumber);
+    }
 
-            if (jumpTarget === 'end') {
-                document.getElementById('customForm').style.display = 'none';
-                document.getElementById('thankYouMessage').style.display = 'block';
-            } else if (jumpTarget) {
-                navigateSection(jumpTarget);
-            } else {
-                navigateSection(currentSection + 1);
-            }
-            jumpTarget = null; // Reset jumpTarget after navigating
-        }
-
-        function navigateSection(sectionNumber) {
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => section.classList.remove('active'));
-            document.getElementById('section' + sectionNumber).classList.add('active');
-        }
+  
 		
 		
 		let uploadedPdfFile = null;
@@ -727,6 +708,17 @@ window.onload = function() {
     `;
 
     downloadHTML(formHTML, "custom_form.html");
+	
+	// Copy the HTML to the clipboard
+    navigator.clipboard.writeText(formHTML)
+        .then(() => {
+            //alert("Form HTML copied to clipboard.");
+        })
+        .catch(err => {
+            console.error('Could not copy text: ', err);
+        });
+		
+		
 }
 
 // Updated function to generate the hidden PDF fields
