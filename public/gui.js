@@ -5,23 +5,23 @@ let hiddenFieldCounter = 1; // Counter for hidden fields
 function addSection(sectionId = null) {
     const formBuilder = document.getElementById('formBuilder');
     const sectionBlock = document.createElement('div');
-    
+
     // Use provided sectionId or default to sectionCounter
     const currentSectionId = sectionId || sectionCounter;
 
     sectionBlock.className = 'section-block';
     sectionBlock.id = `sectionBlock${currentSectionId}`;
     sectionBlock.innerHTML = `
-    <h2 id="sectionLabel${currentSectionId}">Section ${currentSectionId}</h2>
-    <label>Section Name: </label>
-    <input type="text" id="sectionName${currentSectionId}" placeholder="Enter section name" value="Section ${currentSectionId}" oninput="updateSectionName(${currentSectionId})"><br><br>
-    <div id="questionsSection${currentSectionId}"></div>
-    <button type="button" onclick="addQuestion(${currentSectionId})">Add Question to Section</button>
-    <button type="button" onclick="removeSection(${currentSectionId})">Remove Section</button>
-    <button type="button" onclick="moveSectionUp(${currentSectionId})">Push Section Up</button>
-    <button type="button" onclick="moveSectionDown(${currentSectionId})">Push Section Down</button>
-    <hr>
-`;
+        <h2 id="sectionLabel${currentSectionId}">Section ${currentSectionId}</h2>
+        <label>Section Name: </label>
+        <input type="text" id="sectionName${currentSectionId}" placeholder="Enter section name" value="Section ${currentSectionId}" oninput="updateSectionName(${currentSectionId})"><br><br>
+        <div id="questionsSection${currentSectionId}"></div>
+        <button type="button" onclick="addQuestion(${currentSectionId})">Add Question to Section</button>
+        <button type="button" onclick="removeSection(${currentSectionId})">Remove Section</button>
+        <button type="button" onclick="moveSectionUp(${currentSectionId})">Push Section Up</button>
+        <button type="button" onclick="moveSectionDown(${currentSectionId})">Push Section Down</button>
+        <hr>
+    `;
 
     formBuilder.appendChild(sectionBlock);
 
@@ -51,7 +51,6 @@ function moveSectionDown(sectionId) {
     }
 }
 
-
 function updateSectionName(sectionId) {
     const sectionNameInput = document.getElementById(`sectionName${sectionId}`);
     const sectionLabel = document.getElementById(`sectionLabel${sectionId}`);
@@ -59,7 +58,6 @@ function updateSectionName(sectionId) {
         sectionLabel.textContent = sectionNameInput.value;
     }
 }
-
 
 function updateSectionLabels() {
     const sections = document.querySelectorAll('.section-block');
@@ -105,7 +103,6 @@ function updateSectionLabels() {
     sectionCounter = sections.length + 1; // Update sectionCounter
 }
 
-
 function updateGlobalQuestionLabels() {
     const sections = document.querySelectorAll('.section-block');
     let globalQuestionIndex = 1;
@@ -117,7 +114,7 @@ function updateGlobalQuestionLabels() {
         questionsInSection.forEach(questionBlock => {
             // Update the question label
             questionBlock.querySelector('label').innerText = `Question ${globalQuestionIndex}:`;
-            
+
             // Update question-related IDs and event handlers
             questionBlock.id = `questionBlock${globalQuestionIndex}`;
             questionBlock.querySelectorAll('input, select, button, div').forEach(input => {
@@ -130,12 +127,12 @@ function updateGlobalQuestionLabels() {
                     }
                 }
             });
-            
+
             // Update buttons' onclick attributes
             const moveUpButton = questionBlock.querySelector('button[onclick*="moveQuestionUp"]');
             const moveDownButton = questionBlock.querySelector('button[onclick*="moveQuestionDown"]');
             const removeButton = questionBlock.querySelector('button[onclick*="removeQuestion"]');
-            
+
             moveUpButton.setAttribute('onclick', `moveQuestionUp(${globalQuestionIndex}, ${sectionId})`);
             moveDownButton.setAttribute('onclick', `moveQuestionDown(${globalQuestionIndex}, ${sectionId})`);
             removeButton.setAttribute('onclick', `removeQuestion(${globalQuestionIndex})`);
@@ -155,7 +152,6 @@ function removeSection(sectionId) {
     updateSectionLabels();
 }
 
-
 function addQuestion(sectionId, questionId = null) {
     const questionsSection = document.getElementById(`questionsSection${sectionId}`);
     const questionBlock = document.createElement('div');
@@ -170,7 +166,7 @@ function addQuestion(sectionId, questionId = null) {
         <input type="text" placeholder="Enter your question" id="question${currentQuestionId}"><br><br>
 
         <label>Question Type: </label>
-		<center>
+        <center>
         <select id="questionType${currentQuestionId}" onchange="toggleOptions(${currentQuestionId})">
             <option value="text">Text</option>
             <option value="radio">Yes/No</option>
@@ -183,7 +179,7 @@ function addQuestion(sectionId, questionId = null) {
             <option value="bigParagraph">Big Paragraph</option>
         </select><br><br>
 
-        <!-- Name/ID and Placeholder for Textbox and Big Paragraph -->
+        <!-- Name/ID and Placeholder for Textbox, Big Paragraph, Radio, and Dropdown -->
         <div id="textboxOptions${currentQuestionId}" class="textbox-options" style="display: none;">
             <label>Name/ID: </label>
             <input type="text" id="textboxName${currentQuestionId}" placeholder="Enter field name"><br><br>
@@ -230,7 +226,7 @@ function addQuestion(sectionId, questionId = null) {
         <!-- Conditional Logic -->
         <label>Enable Conditional Logic: </label>
         <input type="checkbox" id="logic${currentQuestionId}" onchange="toggleLogic(${currentQuestionId})">
-        
+
 
         <div id="logicBlock${currentQuestionId}" style="display: none;">
             <label>Show this question if: </label><br>
@@ -242,7 +238,7 @@ function addQuestion(sectionId, questionId = null) {
         <label>Enable Jump Logic: </label>
         <div id="jumpLogic${currentQuestionId}">
             <input type="checkbox" id="enableJump${currentQuestionId}" onchange="toggleJumpLogic(${currentQuestionId})">
-            
+
             <div id="jumpBlock${currentQuestionId}" style="display: none;">
                 <label id="jumpOptionLabel${currentQuestionId}" style="text-align: center;">Select the option that triggers the jump:</label><br>
                 <select id="jumpOption${currentQuestionId}" style="display: block; margin: 0 auto;">
@@ -272,9 +268,6 @@ function addQuestion(sectionId, questionId = null) {
         questionCounter++;
     }
 }
-
-
-
 
 function moveQuestionUp(questionId, sectionId) {
     const questionBlock = document.getElementById(`questionBlock${questionId}`);
@@ -334,25 +327,26 @@ function toggleOptions(questionId) {
     switch (questionType) {
         case 'text':
         case 'bigParagraph':
+        case 'radio':
+        case 'dropdown':
             if (textboxOptionsBlock) textboxOptionsBlock.style.display = 'block'; // Show Name/ID and Placeholder
+            if (questionType === 'radio' || questionType === 'dropdown') {
+                if (jumpOptionLabel) jumpOptionLabel.style.display = 'block';
+                if (jumpOptionSelect) {
+                    jumpOptionSelect.style.display = 'block';
+                    if (questionType === 'radio') {
+                        updateJumpOptionsForRadio(questionId);
+                    } else {
+                        updateJumpOptions(questionId);
+                    }
+                }
+            }
+            if (questionType === 'dropdown') {
+                if (optionsBlock) optionsBlock.style.display = 'block';
+            }
             break;
         case 'multipleTextboxes':
             if (multipleTextboxesBlock) multipleTextboxesBlock.style.display = 'block';
-            break;
-        case 'radio':
-            if (jumpOptionLabel) jumpOptionLabel.style.display = 'block';
-            if (jumpOptionSelect) {
-                jumpOptionSelect.style.display = 'block';
-                updateJumpOptionsForRadio(questionId);
-            }
-            break;
-        case 'dropdown':
-            if (optionsBlock) optionsBlock.style.display = 'block';
-            if (jumpOptionLabel) jumpOptionLabel.style.display = 'block';
-            if (jumpOptionSelect) {
-                jumpOptionSelect.style.display = 'block';
-                updateJumpOptions(questionId);
-            }
             break;
         case 'checkbox':
             if (checkboxBlock) checkboxBlock.style.display = 'block';
@@ -369,9 +363,6 @@ function toggleOptions(questionId) {
     // Update autofill options in hidden fields
     updateAutofillOptions();
 }
-
-
-
 
 function addMultipleTextboxOption(questionId) {
     const multipleTextboxesOptionsDiv = document.getElementById(`multipleTextboxesOptions${questionId}`);
@@ -393,8 +384,6 @@ function addMultipleTextboxOption(questionId) {
     multipleTextboxesOptionsDiv.appendChild(optionDiv);
 }
 
-
-
 function removeMultipleTextboxOption(questionId, optionNumber) {
     const optionDiv = document.querySelector(`#multipleTextboxesOptions${questionId} .option${optionNumber}`);
     if (optionDiv) {
@@ -411,7 +400,6 @@ function removeMultipleTextboxOption(questionId, optionNumber) {
         });
     }
 }
-
 
 function toggleLogic(questionId) {
     const logicEnabled = document.getElementById(`logic${questionId}`).checked;
@@ -476,7 +464,17 @@ function addDropdownOption(questionId) {
 
 function removeDropdownOption(questionId, optionNumber) {
     const optionDiv = document.querySelector(`#dropdownOptions${questionId} .option${optionNumber}`);
-    optionDiv.remove();
+    if (optionDiv) {
+        optionDiv.remove();
+        // Re-index options
+        const options = document.querySelectorAll(`#dropdownOptions${questionId} > div`);
+        options.forEach((option, index) => {
+            option.className = `option${index + 1}`;
+            option.querySelector('input').id = `option${questionId}_${index + 1}`;
+            option.querySelector('button').setAttribute('onclick', `removeDropdownOption(${questionId}, ${index + 1})`);
+        });
+    }
+
     // Update jump options
     updateJumpOptions(questionId);
 }
@@ -500,7 +498,6 @@ function addCheckboxOption(questionId) {
     checkboxOptionsDiv.appendChild(optionDiv);
 }
 
-
 function removeCheckboxOption(questionId, optionNumber) {
     const optionDiv = document.querySelector(`#checkboxOptions${questionId} .option${optionNumber}`);
     if (optionDiv) {
@@ -519,7 +516,6 @@ function removeCheckboxOption(questionId, optionNumber) {
     }
 }
 
-
 function addTextboxLabel(questionId) {
     const textboxLabelsDiv = document.getElementById(`textboxLabels${questionId}`);
     const labelCount = textboxLabelsDiv.children.length + 1;
@@ -535,7 +531,18 @@ function addTextboxLabel(questionId) {
 
 function removeTextboxLabel(questionId, labelNumber) {
     const labelDiv = document.querySelector(`#textboxLabels${questionId} .label${labelNumber}`);
-    labelDiv.remove();
+    if (labelDiv) {
+        labelDiv.remove();
+        // Re-index labels
+        const labels = document.querySelectorAll(`#textboxLabels${questionId} > div`);
+        labels.forEach((label, index) => {
+            const newLabelNumber = index + 1;
+            label.className = `label${newLabelNumber}`;
+            label.querySelector('input').id = `label${questionId}_${newLabelNumber}`;
+            label.querySelector('input').placeholder = `Label ${newLabelNumber}`;
+            label.querySelector('button').setAttribute('onclick', `removeTextboxLabel(${questionId}, ${newLabelNumber})`);
+        });
+    }
 }
 
 function removeQuestion(questionId) {
@@ -620,14 +627,12 @@ function toggleHiddenFieldOptions(hiddenFieldId) {
             <input type="text" id="hiddenFieldName${hiddenFieldId}" placeholder="Enter field name"><br><br>
             <label>Checked by default: </label>
             <input type="checkbox" id="hiddenFieldChecked${hiddenFieldId}"><br><br>
-			
-			<label>Conditional Autofill Logic:</label><br>
+            <label>Conditional Autofill Logic:</label><br>
             <div id="conditionalAutofillForCheckbox${hiddenFieldId}"></div>
             <button type="button" onclick="addConditionalAutofillForCheckbox(${hiddenFieldId})">Add Conditional Logic</button><br><br>
         `;
     }
 }
-
 
 function addConditionalAutofillForCheckbox(hiddenFieldId) {
     const conditionalAutofillDiv = document.getElementById(`conditionalAutofillForCheckbox${hiddenFieldId}`);
@@ -635,7 +640,7 @@ function addConditionalAutofillForCheckbox(hiddenFieldId) {
 
     const conditionDiv = document.createElement('div');
     conditionDiv.className = `condition${conditionId}`;
-	conditionDiv.id = `condition${hiddenFieldId}_${conditionId}`; // Set a unique ID
+    conditionDiv.id = `condition${hiddenFieldId}_${conditionId}`; // Set a unique ID
     conditionDiv.innerHTML = `
         <label>Condition ${conditionId}:</label><br>
         <label>Question:</label>
@@ -658,19 +663,17 @@ function addConditionalAutofillForCheckbox(hiddenFieldId) {
     conditionalAutofillDiv.appendChild(conditionDiv);
 }
 
-
-
 function generateQuestionOptions() {
     let optionsHTML = '';
     const questionBlocks = document.querySelectorAll('.question-block');
 
     questionBlocks.forEach(questionBlock => {
         const questionId = questionBlock.id.replace('questionBlock', '');
-        const questionText = questionBlock.querySelector(`input[type="text"]`).value;
-        const questionType = questionBlock.querySelector(`select`).value;
+        const questionText = questionBlock.querySelector('input[type="text"]').value;
+        const questionType = questionBlock.querySelector('select').value;
 
         // Include question types that produce single text values
-        if (['text', 'bigParagraph', 'money', 'date'].includes(questionType)) {
+        if (['text', 'bigParagraph', 'money', 'date', 'radio', 'dropdown'].includes(questionType)) {
             optionsHTML += `<option value="${questionId}">Question ${questionId}: ${questionText}</option>`;
         }
 
@@ -679,7 +682,8 @@ function generateQuestionOptions() {
             const textboxes = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} .option`);
             textboxes.forEach((textbox, idx) => {
                 const label = textbox.querySelector(`input[id^="multipleTextboxLabel"]`).value || `Textbox ${idx + 1}`;
-                optionsHTML += `<option value="${questionId}_${idx + 1}">Question ${questionId} - ${label}</option>`;
+                const nameId = textbox.querySelector(`input[id^="multipleTextboxName"]`).value || `answer${questionId}_${idx + 1}`;
+                optionsHTML += `<option value="${questionId}_${idx + 1}">Question ${questionId} - ${label} (${nameId})</option>`;
             });
         }
     });
@@ -687,17 +691,14 @@ function generateQuestionOptions() {
     return optionsHTML;
 }
 
-
-
-// Updated function to only include specific question types for conditional logic
 function generateAllQuestionOptions() {
     let optionsHTML = '';
     const questionBlocks = document.querySelectorAll('.question-block');
 
     questionBlocks.forEach(questionBlock => {
         const questionId = questionBlock.id.replace('questionBlock', '');
-        const questionText = questionBlock.querySelector(`input[type="text"]`).value;
-        const questionType = questionBlock.querySelector(`select`).value;
+        const questionText = questionBlock.querySelector('input[type="text"]').value;
+        const questionType = questionBlock.querySelector('select').value;
 
         // Include questions suitable for conditional logic
         if (['dropdown', 'radio', 'checkbox'].includes(questionType)) {
@@ -708,13 +709,12 @@ function generateAllQuestionOptions() {
     return optionsHTML;
 }
 
-
 function addConditionalAutofill(hiddenFieldId) {
     const conditionalAutofillDiv = document.getElementById(`conditionalAutofill${hiddenFieldId}`);
     const conditionId = conditionalAutofillDiv.children.length + 1;
 
     const conditionDiv = document.createElement('div');
-    conditionDiv.className = `condition`;
+    conditionDiv.className = 'condition';
     conditionDiv.id = `condition${hiddenFieldId}_${conditionId}`; // Set a unique ID
     conditionDiv.innerHTML = `
         <label>Condition ${conditionId}:</label><br>
@@ -735,7 +735,6 @@ function addConditionalAutofill(hiddenFieldId) {
     conditionalAutofillDiv.appendChild(conditionDiv);
 }
 
-
 function removeConditionalAutofill(hiddenFieldId, conditionId) {
     const conditionDiv = document.getElementById(`condition${hiddenFieldId}_${conditionId}`);
     if (conditionDiv) {
@@ -744,7 +743,6 @@ function removeConditionalAutofill(hiddenFieldId, conditionId) {
         console.error(`Condition div with ID condition${hiddenFieldId}_${conditionId} not found.`);
     }
 }
-
 
 function updateConditionAnswers(hiddenFieldId, conditionId) {
     const questionSelect = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`);
@@ -757,7 +755,7 @@ function updateConditionAnswers(hiddenFieldId, conditionId) {
     // Get the selected question type and options
     const questionBlock = document.getElementById(`questionBlock${selectedQuestionId}`);
     if (questionBlock) {
-        const questionType = questionBlock.querySelector(`select`).value;
+        const questionType = questionBlock.querySelector('select').value;
 
         if (questionType === 'radio') {
             answerSelect.innerHTML += `
@@ -826,7 +824,6 @@ function updateAutofillOptions() {
         }
     });
 }
-
 
 function removeHiddenField(hiddenFieldId) {
     const hiddenFieldBlock = document.getElementById(`hiddenFieldBlock${hiddenFieldId}`);
