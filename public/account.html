@@ -129,6 +129,14 @@
 </script>
 
 <script>
+    // Check if user is already logged in
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            // User is signed in, redirect to forms.html
+            window.location.href = 'forms.html';
+        }
+    });
+
     // Toggle between login and signup forms
     const loginContainer = document.getElementById('login-container');
     const signupContainer = document.getElementById('signup-container');
