@@ -7,7 +7,7 @@ function generateAndDownloadForm() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Custom Form</title>
         <style>
-		
+	
 	input[type="text"], select {
     background-color: #e6f4ff; /* Light blue background */
     border: 2px solid #2980b9; /* Matching border color */
@@ -159,6 +159,7 @@ button:hover {
 			
 			
 			
+			
         /* Media query for smaller screens */
         @media (max-width: 768px) {
             header {
@@ -234,11 +235,14 @@ select:focus {
     </header>
 	
 	<div id="pdfPreview" style="display:none;">
-    <iframe id="pdfFrame" style = "display:none"></iframe>
+    <iframe id="pdfFrame" style="display:none"></iframe>
 </div>	
 <input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">	
 <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
-
+<!-- Include Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <div id="questions">
 <div id="result"></div>
     <section>
@@ -250,13 +254,13 @@ select:focus {
 
     for (let s = 1; s < sectionCounter; s++) {
         const sectionBlock = document.getElementById(`sectionBlock${s}`);
-    if (!sectionBlock) continue;
+        if (!sectionBlock) continue;
 
-    const sectionNameInput = sectionBlock.querySelector(`#sectionName${s}`);
-    const sectionName = sectionNameInput ? sectionNameInput.value : `Section ${s}`;
+        const sectionNameInput = sectionBlock.querySelector(`#sectionName${s}`);
+        const sectionName = sectionNameInput ? sectionNameInput.value : `Section ${s}`;
 
-    formHTML += `<div id="section${s}" class="section${s === 1 ? ' active' : ''}">`;
-    formHTML += `<h2>${sectionName}</h2>`;
+        formHTML += `<div id="section${s}" class="section${s === 1 ? ' active' : ''}">`;
+        formHTML += `<h2>${sectionName}</h2>`;
 
         const questionsSection = sectionBlock.querySelectorAll('.question-block');
         questionsSection.forEach((questionBlock) => {
@@ -298,91 +302,86 @@ select:focus {
                 });
                 formHTML += `</select><br>`;
             } else if (questionType === 'checkbox') {
-    const optionsDivs = questionBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
-    formHTML += `<div><center><div id="checkmark">`;
-    optionsDivs.forEach((optionDiv, index) => {
-        const optionTextInput = optionDiv.querySelector(`#checkboxOptionText${questionId}_${index + 1}`);
-        const optionNameInput = optionDiv.querySelector(`#checkboxOptionName${questionId}_${index + 1}`);
-        const optionValueInput = optionDiv.querySelector(`#checkboxOptionValue${questionId}_${index + 1}`);
+                const optionsDivs = questionBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
+                formHTML += `<div><center><div id="checkmark">`;
+                optionsDivs.forEach((optionDiv, index) => {
+                    const optionTextInput = optionDiv.querySelector(`#checkboxOptionText${questionId}_${index + 1}`);
+                    const optionNameInput = optionDiv.querySelector(`#checkboxOptionName${questionId}_${index + 1}`);
+                    const optionValueInput = optionDiv.querySelector(`#checkboxOptionValue${questionId}_${index + 1}`);
 
-        const optionText = optionTextInput ? optionTextInput.value.trim() : `Option ${index + 1}`;
-        const optionNameId = optionNameInput ? optionNameInput.value.trim() : `answer${questionId}_${index + 1}`;
-        const optionValue = optionValueInput ? optionValueInput.value.trim() : optionText;
+                    const optionText = optionTextInput ? optionTextInput.value.trim() : `Option ${index + 1}`;
+                    const optionNameId = optionNameInput ? optionNameInput.value.trim() : `answer${questionId}_${index + 1}`;
+                    const optionValue = optionValueInput ? optionValueInput.value.trim() : optionText;
 
-        formHTML += `
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="${optionNameId}" name="${optionNameId}" value="${optionValue}">
-                    ${optionText}
-                </label>
-            </span>`;
-    });
-
-    const noneOfTheAboveSelected = questionBlock.querySelector(`#noneOfTheAbove${questionId}`).checked;
-    if (noneOfTheAboveSelected) {
-        formHTML += `
-            <span class="checkbox-inline">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="answer${questionId}_none" name="answer${questionId}_none" value="None of the above">
-                    None of the above
-                </label>
-            </span>`;
-    }
-    formHTML += `</div><br></div>`;
-}
-else if (questionType === 'numberedDropdown') {
-    const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
-    const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
-    const labels = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
-
-    // Extract label values
-    const labelValues = Array.from(labels).map(label => label.value);
-
-    formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value)">
-                    <option value="" disabled selected>Select an option</option>`;
-    for (let i = rangeStart; i <= rangeEnd; i++) {
-        formHTML += `<option value="${i}">${i}</option>`;
-    }
-    formHTML += `</select><br>`;
-
-    formHTML += `<div id="labelContainer${questionId}"></div>`;
-
-    // Include the labels in the script
-    formHTML += `<script>
-        var labels${questionId} = ${JSON.stringify(labelValues)};
-        function showTextboxLabels(questionId, count) {
-            const container = document.getElementById('labelContainer' + questionId);
-            container.innerHTML = '';
-            for (let j = 1; j <= count; j++) {
-                labels${questionId}.forEach(function(label) {
-                    // Create ID and name as label + iteration number (e.g., 'a1', 'b1')
-                    const inputId = label.replace(/\\s+/g, '') + j;
-                    container.innerHTML += '<input type="text" id="' + inputId + '" name="' + inputId + '" placeholder="' + label + '" style="text-align:center;"><br>';
+                    formHTML += `
+                        <span class="checkbox-inline">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="${optionNameId}" name="${optionNameId}" value="${optionValue}">
+                                ${optionText}
+                            </label>
+                        </span>`;
                 });
-            }
-        }
-    <\/script>`;
-}
 
+                const noneOfTheAboveSelected = questionBlock.querySelector(`#noneOfTheAbove${questionId}`).checked;
+                if (noneOfTheAboveSelected) {
+                    formHTML += `
+                        <span class="checkbox-inline">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="answer${questionId}_none" name="answer${questionId}_none" value="None of the above">
+                                None of the above
+                            </label>
+                        </span>`;
+                }
+                formHTML += `</div><br></div>`;
+            } else if (questionType === 'numberedDropdown') {
+                const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`).value;
+                const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
+                const labels = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
 
+                // Extract label values
+                const labelValues = Array.from(labels).map(label => label.value);
 
- else if (questionType === 'multipleTextboxes') {
-    const multipleTextboxesOptionsDiv = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
-    multipleTextboxesOptionsDiv.forEach((optionDiv, index) => {
-        const labelInput = optionDiv.querySelector(`#multipleTextboxLabel${questionId}_${index + 1}`);
-        const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
-        const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
+                formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value)">
+                                <option value="" disabled selected>Select an option</option>`;
+                for (let i = rangeStart; i <= rangeEnd; i++) {
+                    formHTML += `<option value="${i}">${i}</option>`;
+                }
+                formHTML += `</select><br>`;
 
-        const labelText = labelInput.value.trim(); // Do not assign default label
-        const nameId = nameIdInput.value || `answer${questionId}_${index + 1}`;
-        const placeholder = placeholderInput.value || '';
+                formHTML += `<div id="labelContainer${questionId}"></div>`;
 
-        if (labelText) {
-            formHTML += `<label><h3>${labelText}</h3></label><br>`;
-        }
-        formHTML += `<input type="text" id="${nameId}" name="${nameId}" placeholder="${placeholder}" style="text-align:center;"><br>`;
-    });
-} else if (questionType === 'money') {
+                // Include the labels in the script
+                formHTML += `<script>
+                    var labels${questionId} = ${JSON.stringify(labelValues)};
+                    function showTextboxLabels(questionId, count) {
+                        const container = document.getElementById('labelContainer' + questionId);
+                        container.innerHTML = '';
+                        for (let j = 1; j <= count; j++) {
+                            labels${questionId}.forEach(function(label) {
+                                // Create ID and name as label + iteration number (e.g., 'a1', 'b1')
+                                const inputId = label.replace(/\\s+/g, '') + j;
+                                container.innerHTML += '<input type="text" id="' + inputId + '" name="' + inputId + '" placeholder="' + label + '" style="text-align:center;"><br>';
+                            });
+                        }
+                    }
+                </` + `script>`;
+            } else if (questionType === 'multipleTextboxes') {
+                const multipleTextboxesOptionsDiv = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
+                multipleTextboxesOptionsDiv.forEach((optionDiv, index) => {
+                    const labelInput = optionDiv.querySelector(`#multipleTextboxLabel${questionId}_${index + 1}`);
+                    const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
+                    const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
+
+                    const labelText = labelInput.value.trim(); // Do not assign default label
+                    const nameId = nameIdInput.value || `answer${questionId}_${index + 1}`;
+                    const placeholder = placeholderInput.value || '';
+
+                    if (labelText) {
+                        formHTML += `<label><h3>${labelText}</h3></label><br>`;
+                    }
+                    formHTML += `<input type="text" id="${nameId}" name="${nameId}" placeholder="${placeholder}" style="text-align:center;"><br>`;
+                });
+            } else if (questionType === 'money') {
                 formHTML += `<input type="number" id="answer${questionId}" min="0" step="0.01" placeholder="Enter amount"><br>`;
             } else if (questionType === 'date') {
                 formHTML += `<input type="date" id="answer${questionId}" placeholder="Enter a date"><br>`;
@@ -403,7 +402,7 @@ else if (questionType === 'numberedDropdown') {
                             questionElement.classList.add('hidden');
                         }
                     });
-                <\/script>`;
+                </` + `script>`;
             }
 
             // Jump Logic Scripts
@@ -418,7 +417,7 @@ else if (questionType === 'numberedDropdown') {
                                 jumpTarget = null;
                             }
                         });
-                    <\/script>`;
+                    </` + `script>`;
                 } else if (questionType === 'checkbox') {
                     formHTML += `
                     <script>
@@ -432,7 +431,7 @@ else if (questionType === 'numberedDropdown') {
                                 }
                             });
                         });
-                    <\/script>`;
+                    </` + `script>`;
                 }
             }
         });
@@ -476,75 +475,110 @@ else if (questionType === 'numberedDropdown') {
     <script>
 	
 	
-	function setCookie(name, value, days) {
-        var expires = "";
-        if (days) {
-            var date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            expires = "; expires=" + date.toUTCString();
+	const firebaseConfig = {
+        apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+        authDomain: "formwiz-3f4fd.firebaseapp.com",
+        projectId: "formwiz-3f4fd",
+        storageBucket: "formwiz-3f4fd.appspot.com",
+        messagingSenderId: "404259212529",
+        appId: "1:404259212529:web:15a33bce82383b21cfed50",
+        measurementId: "G-P07YEN0HPD"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Get formId from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const formId = urlParams.get('formId');
+
+    if (!formId) {
+        alert('No form ID provided.');
+        window.location.href = 'forms.html';
+    }
+
+    // Assuming user is logged in and we have their userId
+    let userId = null;
+
+    // Check for user authentication state and set userId
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            userId = user.uid;
+            loadFormData('section1');  // Load data for section 1 on page load
+            autoSaveForm('section1');  // Enable auto-saving
+        } else {
+            console.log("User not logged in.");
+            window.location.href = 'account.html';
         }
-        document.cookie = name + "=" + (value || "") + expires + "; path=/";
-    }
-
-    function getCookie(name) {
-        var nameEQ = name + "=";
-        var ca = document.cookie.split(';');
-        for (var i = 0; i < ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-        }
-        return null;
-    }
-
-    function saveFormInputs() {
-        const inputs = document.querySelectorAll('input[type="text"], input[type="email"], select');
-        inputs.forEach(input => {
-            setCookie(input.name, input.value, 7);
-        });
-    }
-
-    function loadSavedInputs() {
-        const inputs = document.querySelectorAll('input[type="text"], input[type="email"], select');
-        inputs.forEach(input => {
-            const savedValue = getCookie(input.name);
-            if (savedValue) {
-                input.value = savedValue;
-            }
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', (event) => {
-        loadSavedInputs();
-
-        const inputs = document.querySelectorAll('input[type="text"], input[type="email"], select');
-        inputs.forEach(input => {
-            input.addEventListener('input', saveFormInputs);
-        });
     });
+
+    // Save form data to Firestore
+    function saveFormData(sectionId) {
+        const formData = {};
+        const inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' select, #' + sectionId + ' textarea');
+        inputs.forEach(input => {
+            formData[input.name] = input.type === 'checkbox' ? input.checked : input.value;
+        });
+
+        db.collection('users').doc(userId).collection('forms').doc(formId).collection('formAnswers').doc(sectionId).set(formData)
+        .then(() => {
+            console.log('Form data saved successfully.');
+        })
+        .catch(error => {
+            console.error('Error saving form data: ', error);
+        });
+    }
+
+    // Load saved form data from Firestore
+    function loadFormData(sectionId) {
+        db.collection('users').doc(userId).collection('forms').doc(formId).collection('formAnswers').doc(sectionId).get()
+        .then(doc => {
+            if (doc.exists) {
+                const savedData = doc.data();
+                for (const [key, value] of Object.entries(savedData)) {
+                    const input = document.querySelector('[name="' + key + '"]');
+                    if (input) {
+                        if (input.type === 'checkbox') {
+                            input.checked = value;
+                        } else {
+                            input.value = value;
+                        }
+                    }
+                }
+                console.log('Form data loaded successfully.');
+            } else {
+                console.log('No saved form data found.');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading form data: ', error);
+        });
+    }
+
+    // Auto-save form data in real-time
+    function autoSaveForm(sectionId) {
+        const inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' select, #' + sectionId + ' textarea');
+        inputs.forEach(input => {
+            input.addEventListener('change', () => saveFormData(sectionId));
+        });
+    }
 	
 	
         let jumpTarget = null;
         const autofillMappings = ${JSON.stringify(autofillMappings)};
 
-
-
-		
-	
-       
-            // Select all textboxes and checkboxes
-            const inputs = document.querySelectorAll('input[type="text"], input[type="checkbox"]');
-            // Create an array to store the IDs
-            let ids = [];
-            // Iterate through each input and push its ID to the array
-            inputs.forEach(input => {
-                ids.push(input.id);
-            });
-            // Join all IDs into one big paragraph and alert
-            alert('IDs of all inputs: ' + ids.join(', '));
-       
-	   
-	   
+        // Select all textboxes and checkboxes
+        const inputs = document.querySelectorAll('input[type="text"], input[type="checkbox"]');
+        // Create an array to store the IDs
+        let ids = [];
+        // Iterate through each input and push its ID to the array
+        inputs.forEach(input => {
+            ids.push(input.id);
+        });
+        // Join all IDs into one big paragraph and alert
+        alert('IDs of all inputs: ' + ids.join(', '));
+   
+   
         function handleNext(currentSection) {
             // Autofill hidden fields before navigating
             autofillMappings.forEach(mapping => {
@@ -687,33 +721,13 @@ window.onload = function() {
             document.getElementById('thankYouMessage').style.display = 'block';
             return false; // Prevent actual form submission
         }
-    <\/script>
+    </` + `script>
     </body>
     </html>
     `;
 
     downloadHTML(formHTML, "custom_form.html");
-}  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 // Updated function to generate the hidden PDF fields
 function generateHiddenPDFFields() {
@@ -797,4 +811,3 @@ function generateHiddenPDFFields() {
     // Return the hidden fields HTML, the autofill mappings, and the conditional autofill logic
     return { hiddenFieldsHTML, autofillMappings, conditionalAutofillLogic };
 }
-
