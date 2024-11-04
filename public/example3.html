@@ -488,197 +488,137 @@
     <footer>
         &copy; 2024 FormWiz. All rights reserved.
     </footer>
+	
+	<div class="download-buttons">
+    <button onclick="downloadPDF('form1.pdf')">Download Form 1</button>
+    <button onclick="downloadPDF('form2.pdf')">Download Form 2</button>
+</div>
 
-    <script>
-        // ----- Firebase Configuration -----
-        const firebaseConfig = {
-            apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
-            authDomain: "formwiz-3f4fd.firebaseapp.com",
-            projectId: "formwiz-3f4fd",
-            storageBucket: "formwiz-3f4fd.appspot.com",
-            messagingSenderId: "404259212529",
-            appId: "1:404259212529:web:15a33bce82383b21cfed50",
-            measurementId: "G-P07YEN0HPD"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+<script>
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+        authDomain: "formwiz-3f4fd.firebaseapp.com",
+        projectId: "formwiz-3f4fd",
+        storageBucket: "formwiz-3f4fd.appspot.com",
+        messagingSenderId: "404259212529",
+        appId: "1:404259212529:web:15a33bce82383b21cfed50",
+        measurementId: "G-P07YEN0HPD"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-        // ----- Form Logic -----
-        const urlParams = new URLSearchParams(window.location.search);
-        const formId = urlParams.get('formId');
+    // PDF Download Function
+    function downloadPDF(fileName) {
+        const pdfUrl = `http://localhost:3000/${fileName}`;
+        fetch(pdfUrl)
+            .then(response => response.blob())
+            .then(blob => {
+                const downloadLink = document.createElement("a");
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = fileName;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            })
+            .catch(error => {
+                console.error(`Error downloading ${fileName}:`, error);
+            });
+    }
 
-        if (!formId) {
-            alert('No form ID provided.');
-            window.location.href = 'forms.html';
+    // Other JavaScript functions related to form handling
+    const urlParams = new URLSearchParams(window.location.search);
+    const formId = urlParams.get('formId');
+
+    if (!formId) {
+        alert('No form ID provided.');
+        window.location.href = 'forms.html';
+    }
+
+    let userId = null;
+
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            userId = user.uid;
+            loadFormData('section1');
+            autoSaveForm('section1');
+        } else {
+            console.log("User not logged in.");
+            window.location.href = 'account.html';
         }
+    });
 
-        let userId = null;
-
-        firebase.auth().onAuthStateChanged(user => {
-            if (user) {
-                userId = user.uid;
-                loadFormData('section1');
-                autoSaveForm('section1');
+    function saveFormData(sectionId) {
+        const formData = {};
+        const inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' select, #' + sectionId + ' textarea');
+        inputs.forEach(input => {
+            if (input.tagName === 'INPUT' && input.type === 'checkbox') {
+                formData[input.name] = input.checked;
             } else {
-                console.log("User not logged in.");
-                window.location.href = 'account.html';
+                formData[input.name] = input.value;
             }
         });
 
-        function saveFormData(sectionId) {
-            const formData = {};
-            const inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' select, #' + sectionId + ' textarea');
-            inputs.forEach(input => {
-                if (input.tagName === 'INPUT' && input.type === 'checkbox') {
-                    formData[input.name] = input.checked;
-                } else {
-                    formData[input.name] = input.value;
-                }
-            });
+        db.collection('users').doc(userId).collection('forms').doc(formId).collection('formAnswers').doc(sectionId).set(formData)
+        .then(() => {
+            console.log('Form data saved successfully for ' + sectionId);
+        })
+        .catch(error => {
+            console.error('Error saving form data: ', error);
+        });
+    }
 
-            db.collection('users').doc(userId).collection('forms').doc(formId).collection('formAnswers').doc(sectionId).set(formData)
-            .then(() => {
-                console.log('Form data saved successfully for ' + sectionId);
-            })
-            .catch(error => {
-                console.error('Error saving form data: ', error);
-            });
-        }
-
-        function loadFormData(sectionId) {
-            db.collection('users').doc(userId).collection('forms').doc(formId).collection('formAnswers').doc(sectionId).get()
-            .then(doc => {
-                if (doc.exists) {
-                    const savedData = doc.data();
-                    for (const [key, value] of Object.entries(savedData)) {
-                        const input = document.querySelector('[name="' + key + '"]');
-                        if (input) {
-                            if (input.tagName === 'INPUT' && input.type === 'checkbox') {
-                                input.checked = value;
-                            } else {
-                                input.value = value;
-                            }
+    function loadFormData(sectionId) {
+        db.collection('users').doc(userId).collection('forms').doc(formId).collection('formAnswers').doc(sectionId).get()
+        .then(doc => {
+            if (doc.exists) {
+                const savedData = doc.data();
+                for (const [key, value] of Object.entries(savedData)) {
+                    const input = document.querySelector('[name="' + key + '"]');
+                    if (input) {
+                        if (input.tagName === 'INPUT' && input.type === 'checkbox') {
+                            input.checked = value;
+                        } else {
+                            input.value = value;
                         }
                     }
-                    console.log('Form data loaded successfully for ' + sectionId);
-                } else {
-                    console.log('No saved form data found for ' + sectionId);
                 }
-            })
-            .catch(error => {
-                console.error('Error loading form data: ', error);
-            });
-        }
-
-        function autoSaveForm(sectionId) {
-            const inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' select, #' + sectionId + ' textarea');
-            inputs.forEach(input => {
-                input.addEventListener('change', () => saveFormData(sectionId));
-            });
-        }
-
-        function handleNext(currentSection) {
-            saveFormData('section' + currentSection);
-            navigateSection(currentSection + 1);
-        }
-
-        function navigateSection(sectionNumber) {
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => section.classList.remove('active'));
-            document.getElementById('section' + sectionNumber).classList.add('active');
-            loadFormData('section' + sectionNumber);
-            autoSaveForm('section' + sectionNumber);
-        }
-
-        let uploadedPdfFile = null;
-
-        function downloadPDF() {
-            var iframe = document.getElementById('pdfFrame');
-            var url = iframe.src;
-            var downloadLink = document.createElement("a");
-            downloadLink.href = url;
-            downloadLink.download = "ModifiedDocument.pdf";
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-        }
-
-        function loadDefaultPDF() {
-            const defaultUrl = 'http://localhost:3000/form1.pdf';
-            fetch(defaultUrl)
-                .then(response => response.blob())
-                .then(blob => {
-                    uploadedPdfFile = blob;
-                    displayPDF(blob);
-                })
-                .catch(error => {
-                    console.error('Error loading default PDF:', error);
-                });
-        }
-
-        function displayPDF(pdfBlob) {
-            var url = URL.createObjectURL(pdfBlob);
-            document.getElementById('pdfFrame').src = url;
-        }
-
-        var formData = new FormData();
-
-        async function editPDF() {
-            formData = new FormData();
-
-            if (!uploadedPdfFile) {
-                return;
+                console.log('Form data loaded successfully for ' + sectionId);
+            } else {
+                console.log('No saved form data found for ' + sectionId);
             }
+        })
+        .catch(error => {
+            console.error('Error loading form data: ', error);
+        });
+    }
 
-            const inputs = document.querySelectorAll('#questions input, #questions select');
-            inputs.forEach(input => {
-                if (input.type === 'checkbox') {
-                    formData.append(input.name, input.checked ? 'Yes' : 'No');
-                } else {
-                    formData.append(input.name, input.value);
-                }
-            });
+    function autoSaveForm(sectionId) {
+        const inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' select, #' + sectionId + ' textarea');
+        inputs.forEach(input => {
+            input.addEventListener('change', () => saveFormData(sectionId));
+        });
+    }
 
-            formData.append('pdf', uploadedPdfFile);
+    function handleNext(currentSection) {
+        saveFormData('section' + currentSection);
+        navigateSection(currentSection + 1);
+    }
 
-            fetch('/edit_pdf', {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => {
-                return response.blob();
-            })
-            .then(blob => {
-                var url = window.URL.createObjectURL(blob);
-                document.getElementById('pdfFrame').src = url;
-                downloadPDF();
-            })
-            .catch(error => {
-                console.error('Error updating PDF:', error);
-            });
-        }
+    function navigateSection(sectionNumber) {
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => section.classList.remove('active'));
+        document.getElementById('section' + sectionNumber).classList.add('active');
+        loadFormData('section' + sectionNumber);
+        autoSaveForm('section' + sectionNumber);
+    }
 
-        function setCurrentDate() {
-            var today = new Date();
-            var dd = String(today.getDate()).padStart(2, '0');
-            var mm = String(today.getMonth() + 1).padStart(2, '0');
-            var yyyy = today.getFullYear();
-            today = yyyy + '-' + mm + '-' + dd;
-            document.getElementById('current_date').value = today;
-        }
-
-        window.onload = function() {
-            loadDefaultPDF();
-            setCurrentDate();
-        };
-
-        function showThankYouMessage() {
-            editPDF();
-            document.getElementById('customForm').style.display = 'none';
-            document.getElementById('thankYouMessage').style.display = 'block';
-            return false;
-        }
-    </script>
-    </body>
-    </html>
-      
+    function showThankYouMessage() {
+        editPDF();
+        document.getElementById('customForm').style.display = 'none';
+        document.getElementById('thankYouMessage').style.display = 'block';
+        return false;
+    }
+</script>
+</body>
+</html>
