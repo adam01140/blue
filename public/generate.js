@@ -1,3 +1,5 @@
+// generate.js
+
 function generateAndDownloadForm() {
     let formHTML = `
     <!DOCTYPE html>
@@ -5,171 +7,7 @@ function generateAndDownloadForm() {
     <head>
         <meta charset="UTF-8">
         <title>Custom Form</title>
-        <style>
-            /* Input Styles */
-            input[type="text"],
-            input[type="number"],
-            textarea,
-            select {
-                background-color: #e6f4ff;
-                border: 2px solid #2980b9;
-                border-radius: 10px;
-                padding: 8px;
-                box-sizing: border-box;
-                transition: border-color 0.3s ease;
-            }
-            input[type="text"]::placeholder,
-            input[type="email"]::placeholder {
-                text-align: center;
-            }
-            input[type="text"]:focus,
-            input[type="number"]:focus,
-            textarea:focus,
-            select:focus {
-                border-color: #1c598a;
-                outline: none;
-            }
-            /* General Styles */
-            html, body {
-                height: 100%;
-                margin: 0;
-                display: flex;
-                flex-direction: column;
-                font-family: 'Montserrat', sans-serif;
-                color: #333;
-                background-color: #f4f4f4;
-            }
-            header {
-                background-color: #2c3e50;
-                padding: 20px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                position: relative;
-            }
-            #box {
-                border: 4px solid lightblue;
-                border-color: #2c3e50;
-                border-radius: 10px;
-                padding: 20px;
-                padding-bottom: 70px;
-                margin: 50px;
-                background-color: #ffffff;
-                width: auto;
-                height: auto;
-                position: relative;
-            }
-            .section {
-                display: none;
-            }
-            .section.active {
-                display: block;
-            }
-            .thank-you-message {
-                display: none;
-                font-size: 20px;
-                font-weight: bold;
-                text-align: center;
-                margin-top: 20px;
-            }
-            header img {
-                cursor: pointer;
-            }
-            nav {
-                position: absolute;
-                left: 50%;
-                transform: translateX(-50%);
-                display: flex;
-                gap: 15px;
-            }
-            nav a {
-                color: #ffffff;
-                text-decoration: none;
-                font-weight: bold;
-                transition: color 0.3s ease;
-            }
-            nav a:hover {
-                color: #2980b9;
-            }
-            section {
-                padding: 50px;
-                text-align: center;
-                flex: 1;
-                display: grid;
-                gap: 20px;
-            }
-            section h1 {
-                color: #2980b9;
-                font-weight: normal;
-            }
-            section p {
-                margin-bottom: 20px;
-            }
-            button {
-                background-color: #2980b9;
-                color: #ffffff;
-                padding: 5px 30px;
-                text-decoration: none;
-                font-weight: bold;
-                border-radius: 5px;
-                transition: background-color 0.3s ease;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: fit-content;
-                margin: 0 auto;
-                border: none;
-                cursor: pointer;
-            }
-            button:hover {
-                background-color: #1c598a;
-            }
-            .steps {
-                display: grid;
-                grid-template-columns: repeat(3, minmax(150px, 1fr));
-                justify-items: center;
-                gap: 10px;
-                max-width: 800px;
-                margin: 0 auto;
-            }
-            .step {
-                text-align: center;
-            }
-            footer {
-                text-align: center;
-                padding: 20px;
-                background-color: #2c3e50;
-                color: white;
-            }
-            .hidden {
-                display: none;
-            }
-            #checkmark {
-                width: fit-content;
-            }
-            .checkbox-label, .noneApplyCheckbox {
-                font-size: 18px;
-                display: block;
-                text-align: left;
-                margin: 0 auto;
-                cursor: pointer;
-            }
-            @media (max-width: 768px) {
-                header {
-                    flex-direction: column;
-                    padding: 10px;
-                }
-                nav {
-                    position: static;
-                    transform: none;
-                    margin-top: 10px;
-                }
-                .steps {
-                    grid-template-columns: 1fr;
-                    max-width: 100%;
-                }
-            }
-        </style>
+        <link rel="stylesheet" href="generate.css">
     </head>
     <body>
     <header>
@@ -184,7 +22,6 @@ function generateAndDownloadForm() {
         <iframe id="pdfFrame" style="display:none"></iframe>
     </div>
     <input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">
-    <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
     <!-- Include Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -197,6 +34,13 @@ function generateAndDownloadForm() {
     `;
 
     let questionNameIds = {};
+
+    // Capture the PDF form name from the GUI input
+    const pdfFormNameInput = document.getElementById('formPDFName').value.trim();
+    const pdfFormName = pdfFormNameInput || 'default.pdf'; // Default to 'default.pdf' if none provided
+
+    // Escape any special characters in pdfFormName for inclusion in a JavaScript string
+    const escapedPdfFormName = pdfFormName.replace(/\\/g, '\\\\').replace(/'/g, '\\\'').replace(/"/g, '\\"');
 
     for (let s = 1; s < sectionCounter; s++) {
         const sectionBlock = document.getElementById(`sectionBlock${s}`);
@@ -211,8 +55,8 @@ function generateAndDownloadForm() {
         const questionsSection = sectionBlock.querySelectorAll('.question-block');
         questionsSection.forEach((questionBlock) => {
             const questionId = questionBlock.id.replace('questionBlock', '');
-            const questionText = questionBlock.querySelector(`input[type="text"]`).value;
-            const questionType = questionBlock.querySelector(`select`).value;
+            const questionText = questionBlock.querySelector(`#question${questionId}`).value;
+            const questionType = questionBlock.querySelector(`#questionType${questionId}`).value;
             const logicEnabled = questionBlock.querySelector(`#logic${questionId}`).checked;
             const prevQuestionId = questionBlock.querySelector(`#prevQuestion${questionId}`).value;
             const prevAnswer = questionBlock.querySelector(`#prevAnswer${questionId}`).value;
@@ -223,6 +67,7 @@ function generateAndDownloadForm() {
             formHTML += `<div id="question-container-${questionId}" ${logicEnabled ? 'class="hidden"' : ''}>`;
             formHTML += `<label><h3>${questionText}</h3></label>`;
 
+            // Generate form inputs based on question type
             if (questionType === 'text') {
                 const nameId = questionBlock.querySelector(`#textboxName${questionId}`).value || `answer${questionId}`;
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`).value || '';
@@ -308,7 +153,7 @@ function generateAndDownloadForm() {
                         for (let j = 1; j <= count; j++) {
                             labels${questionId}.forEach(function(label) {
                                 const inputId = label.replace(/\\s+/g, '') + j;
-                                container.innerHTML += '<input type="text" id="' + inputId + '" name="' + inputId + '" placeholder="' + label + '" style="text-align:center;"><br>';
+                                container.innerHTML += '<input type="text" id="' + inputId + '" name="' + inputId + '" placeholder="' + label + ' ' + j + '" style="text-align:center;"><br>';
                             });
                         }
                     }
@@ -337,6 +182,7 @@ function generateAndDownloadForm() {
 
             formHTML += `</div>`;
 
+            // Handle conditional logic
             if (logicEnabled && prevQuestionId && prevAnswer) {
                 const prevQuestionNameId = questionNameIds[prevQuestionId] || `answer${prevQuestionId}`;
                 formHTML += `
@@ -353,6 +199,7 @@ function generateAndDownloadForm() {
                 </` + `script>`;
             }
 
+            // Handle jump logic
             if (jumpEnabled && jumpTo) {
                 const currentQuestionNameId = questionNameIds[questionId] || `answer${questionId}`;
                 if (questionType === 'radio' || questionType === 'dropdown') {
@@ -360,9 +207,7 @@ function generateAndDownloadForm() {
                     <script>
                         document.getElementById('${currentQuestionNameId}').addEventListener('change', function() {
                             if (this.value === '${jumpOption}') {
-                                jumpTarget = '${jumpTo}';
-                            } else {
-                                jumpTarget = null;
+                                navigateSection(${jumpTo});
                             }
                         });
                     </` + `script>`;
@@ -373,9 +218,7 @@ function generateAndDownloadForm() {
                             checkbox.addEventListener('change', function() {
                                 const checkedOptions = Array.from(document.querySelectorAll('input[name^="answer${questionId}_"]:checked')).map(c => c.value);
                                 if (checkedOptions.includes('${jumpOption}')) {
-                                    jumpTarget = '${jumpTo}';
-                                } else {
-                                    jumpTarget = null;
+                                    navigateSection(${jumpTo});
                                 }
                             });
                         });
@@ -401,6 +244,7 @@ function generateAndDownloadForm() {
         formHTML += `</div>`;
     }
 
+    // Generate hidden fields (if any)
     const { hiddenFieldsHTML, autofillMappings, conditionalAutofillLogic } = generateHiddenPDFFields();
 
     formHTML += hiddenFieldsHTML;
@@ -516,48 +360,23 @@ function generateAndDownloadForm() {
             autoSaveForm('section' + sectionNumber);
         }
 
-        let uploadedPdfFile = null;
+        // Set the pdfFormName variable in the generated HTML
+        var pdfFormName = '${escapedPdfFormName}';
 
-        function downloadPDF() {
-            var iframe = document.getElementById('pdfFrame');
-            var url = iframe.src;
-            var downloadLink = document.createElement("a");
-            downloadLink.href = url;
-            downloadLink.download = "ModifiedDocument.pdf";
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
+        function downloadPDF(url, filename) {
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
-        function loadDefaultPDF() {
-            const defaultUrl = 'http://localhost:3000/sc100.pdf';
-            fetch(defaultUrl)
-                .then(response => response.blob())
-                .then(blob => {
-                    uploadedPdfFile = blob;
-                    displayPDF(blob);
-                })
-                .catch(error => {
-                    console.error('Error loading default PDF:', error);
-                });
-        }
+        // Edit and download specific PDF
+        async function editAndDownloadPDF(pdfName) {
+            const formData = new FormData();
 
-        function displayPDF(pdfBlob) {
-            var url = URL.createObjectURL(pdfBlob);
-            document.getElementById('pdfFrame').src = url;
-        }
-
-        var formData = new FormData();
-
-        async function editPDF() {
-            formData = new FormData();
-
-            if (!uploadedPdfFile) {
-                return;
-            }
-
-            const inputs = document.querySelectorAll('#questions input, #questions select');
-            inputs.forEach(input => {
+            document.querySelectorAll('#questions input, #questions select, #questions textarea').forEach(input => {
                 if (input.type === 'checkbox') {
                     formData.append(input.name, input.checked ? 'Yes' : 'No');
                 } else {
@@ -565,23 +384,14 @@ function generateAndDownloadForm() {
                 }
             });
 
-            formData.append('pdf', uploadedPdfFile);
-
-            fetch('/edit_pdf', {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => {
-                return response.blob();
-            })
-            .then(blob => {
-                var url = window.URL.createObjectURL(blob);
-                document.getElementById('pdfFrame').src = url;
-                downloadPDF();
-            })
-            .catch(error => {
-                console.error('Error updating PDF:', error);
-            });
+            // Send to edit specified PDF
+            return fetch('/edit_pdf?pdf=' + pdfName, { method: 'POST', body: formData })
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    downloadPDF(url, 'Edited_' + pdfName + '.pdf');
+                })
+                .catch(error => console.error('Error updating ' + pdfName + ':', error));
         }
 
         function setCurrentDate() {
@@ -594,15 +404,18 @@ function generateAndDownloadForm() {
         }
 
         window.onload = function() {
-            loadDefaultPDF();
             setCurrentDate();
         };
 
         function showThankYouMessage() {
-            editPDF();
-            document.getElementById('customForm').style.display = 'none';
-            document.getElementById('thankYouMessage').style.display = 'block';
-            return false;
+            // Remove '.pdf' extension for consistency with server expectations
+            const pdfName = pdfFormName.replace('.pdf', '');
+            editAndDownloadPDF(pdfName).then(() => {
+                document.getElementById('customForm').style.display = 'none';
+                document.getElementById('thankYouMessage').style.display = 'block';
+            });
+
+            return false; // Prevent form submission
         }
     </` + `script>
     </body>
@@ -610,15 +423,4 @@ function generateAndDownloadForm() {
     `;
 
     downloadHTML(formHTML, "custom_form.html");
-
-    navigator.clipboard.writeText(formHTML)
-        .then(() => {
-            //alert("Form HTML copied to clipboard.");
-        })
-        .catch(err => {
-            console.error('Could not copy text: ', err);
-        });
 }
-
-
-

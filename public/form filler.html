@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Custom Form Builder</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="form.css">
@@ -18,43 +17,42 @@
             <a href="contact.html">Contact Us</a>
         </nav>
     </header>
-    
-    
 
-<section>
-<div class="container">
+    <section>
+        <div class="container">
+            <center>
+                <h2>FormWiz Developer GUI</h2>
 
-<center>
-        <h2>FormWiz Developer GUI</h2>
-		
-		
-		<button onclick="generateAndDownloadForm()">Download HTML</button>
+                <!-- New input field for choosing PDF form -->
+                <label>Choose Form PDF:</label>
+                <input type="text" id="formPDFName" placeholder="Enter PDF form name (e.g., sc100.pdf)"><br><br>
+
+                <button onclick="generateAndDownloadForm()">Download HTML</button>
                 <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importForm(event)">
                 <button onclick="document.getElementById('importFileInput').click();">Import JSON</button>
-              <button onclick="exportForm()">Export JSON</button>
- </div> 
- 
-</section>		
-			
-        <section>
-            <div class="container">
-                <div id="formBuilder"></div>
-                <button onclick="addSection()">Add Section</button>
-				<br>
-            </div>
-        </section>
-    
-        <br>
+                <button onclick="exportForm()">Export JSON</button>
+            </center>
+        </div>
+    </section>
 
-        <!-- Footer section -->
-        <footer>
-            &copy; 2024 Custom Form Builder. All rights reserved.
-        </footer>
-    </center>
+    <section>
+        <div class="container">
+            <div id="formBuilder"></div>
+            <button onclick="addSection()">Add Section</button>
+            <br>
+        </div>
+    </section>
+
+    <br>
+
+    <!-- Footer section -->
+    <footer>
+        &copy; 2024 Custom Form Builder. All rights reserved.
+    </footer>
 
     <script src="gui.js"></script>
-	<script src="generate.js"></script>
-	<script src="download.js"></script>
-	<script src="hidden.js"></script>
+    <script src="generate.js"></script>
+    <script src="download.js"></script>
+    <script src="hidden.js"></script>
 </body>
 </html>
