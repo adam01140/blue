@@ -1,3 +1,5 @@
+// server.js
+
 const express = require('express');
 const dotenv = require('dotenv');
 const admin = require('firebase-admin');
@@ -7,15 +9,15 @@ const path = require('path');
 const { PDFDocument, StandardFonts } = require('pdf-lib');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
+const fs = require('fs'); // Required to read PDF files from disk
 
 dotenv.config();
 
 const app = express();
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); // To parse URL-encoded data
 app.use(fileUpload());
 app.use(cors());
-
-require('dotenv').config();
 
 admin.initializeApp({
   credential: admin.credential.cert(require('./firebaseAdminKey.json')),
@@ -28,19 +30,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'adamchaabane1234@gmail.com',
+        user: 'your-email@gmail.com', // Replace with your email
         pass: process.env.EMAIL_PASSWORD // Use environment variable for security
     }
 });
 
+// Endpoint to send email
 app.post('/send-email', async (req, res) => {
     const { name, email, message } = req.body;
     const mailOptions = {
-        from: 'adamchaabane1234@gmail.com',
+        from: 'your-email@gmail.com', // Replace with your email
         to: email, // Email recipient
         subject: 'New Ticket Submission',
         text: `Hello ${name},\n\nThank you for reaching out. Here is your message:\n\n${message}\n\nWe will get back to you shortly.`,
-        replyTo: 'adamchaabane1234@gmail.com'
+        replyTo: 'your-email@gmail.com' // Replace with your email
     };
 
     try {
@@ -52,6 +55,7 @@ app.post('/send-email', async (req, res) => {
     }
 });
 
+// Endpoint to add user
 app.post('/addUser', async (req, res) => {
   const { name, email } = req.body;
   if (!name || !email) {
@@ -66,35 +70,67 @@ app.post('/addUser', async (req, res) => {
   }
 });
 
-// Endpoint to handle PDF upload
-app.post('/upload', async (req, res) => {
-  if (!req.files || !req.files.pdf) {
-    return res.status(400).send('No PDF file uploaded.');
-  }
-  const pdfFile = req.files.pdf;
-  res.json({ message: 'PDF uploaded successfully.', fields: [] });
-});
+// List of field names that exist in the PDFs
+const pdfFieldNames = [
+  // Add all the field names from both sc100.pdf and form2.pdf
+  'case_number',
+  'case_number69',
+  'current_date',
+  'answer2',
+  'q1',
+  // Include all other field names used in your PDFs
+];
 
+// Endpoint to edit PDF
 app.post('/edit_pdf', async (req, res) => {
-  if (!req.files || !req.files.pdf) {
-    return res.status(400).send('No PDF file uploaded.');
+  // Get pdfName from query parameters
+  const pdfName = req.query.pdf;
+
+  // Define the path to the PDF file based on pdfName
+  let pdfPath;
+  if (pdfName === 'sc100') {
+    pdfPath = path.join(__dirname, 'public', 'sc100.pdf');
+  } else if (pdfName === 'form2') {
+    pdfPath = path.join(__dirname, 'public', 'form2.pdf');
+  } else {
+    return res.status(400).send('Invalid PDF name.');
   }
-  const pdfFile = req.files.pdf;
-  const pdfBytes = pdfFile.data;
-  if (!pdfBytes) {
-    return res.status(400).send('PDF file is empty.');
+
+  // Load the PDF from disk
+  let pdfBytes;
+  try {
+    pdfBytes = await fs.promises.readFile(pdfPath);
+  } catch (error) {
+    console.error(`Error reading PDF file ${pdfPath}:`, error);
+    return res.status(500).send('Error reading PDF file.');
   }
 
   const pdfDoc = await PDFDocument.load(pdfBytes);
   const form = pdfDoc.getForm();
   const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
+  // Process form data
   pdfFieldNames.forEach(key => {
     if (req.body[key] !== undefined) {
       try {
-        const field = form.getTextField(key);
-        if (field) {
-          field.setText(req.body[key]);
+        const value = req.body[key];
+
+        // Handle checkboxes
+        if (['checkbox_field_name1', 'checkbox_field_name2'].includes(key)) {
+          const field = form.getCheckBox(key);
+          if (value === 'Yes') {
+            field.check();
+          } else {
+            field.uncheck();
+          }
+        }
+        // Handle text fields
+        else {
+          const field = form.getTextField(key);
+          if (field) {
+            field.setText(value);
+            field.updateAppearances(helveticaFont);
+          }
         }
       } catch (e) {
         console.error(`No such field in the PDF: ${key}`);
@@ -105,18 +141,9 @@ app.post('/edit_pdf', async (req, res) => {
   const updatedPdfBytes = await pdfDoc.save();
   res.set({
     'Content-Type': 'application/pdf',
-    'Content-Disposition': 'attachment; filename=updated.pdf',
+    'Content-Disposition': `attachment; filename=Edited_${pdfName}.pdf`,
   });
   res.send(Buffer.from(updatedPdfBytes));
-});
-
-// Serve static PDF files
-app.get('/form1.pdf', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/form1.pdf'));
-});
-
-app.get('/form2.pdf', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/form2.pdf'));
 });
 
 const PORT = process.env.PORT || 3000;
