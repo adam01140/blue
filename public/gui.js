@@ -249,6 +249,22 @@ function addQuestion(sectionId, questionId = null) {
             </div>
         </div><br>
 
+        <!-- Conditional PDF Logic -->
+        <div id="conditionalPDFLogic${currentQuestionId}" style="display: none;">
+            <label>Enable Conditional PDF: </label>
+            <input type="checkbox" id="enableConditionalPDF${currentQuestionId}" onchange="toggleConditionalPDFLogic(${currentQuestionId})"><br><br>
+
+            <div id="conditionalPDFBlock${currentQuestionId}" style="display: none;">
+                <label>PDF Name:</label>
+                <input type="text" id="conditionalPDFName${currentQuestionId}" placeholder="Enter PDF name (e.g., sc-100.pdf)"><br><br>
+                <label>Attach PDF if the answer is:</label>
+                <select id="conditionalPDFAnswer${currentQuestionId}">
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select><br>
+            </div>
+        </div><br>
+
         <!-- Question Controls -->
         <button type="button" onclick="moveQuestionUp(${currentQuestionId}, ${sectionId})">Move Question Up</button>
         <button type="button" onclick="moveQuestionDown(${currentQuestionId}, ${sectionId})">Move Question Down</button>
@@ -268,6 +284,14 @@ function addQuestion(sectionId, questionId = null) {
         questionCounter++;
     }
 }
+
+function toggleConditionalPDFLogic(questionId) {
+    const conditionalPDFEnabled = document.getElementById(`enableConditionalPDF${questionId}`).checked;
+    const conditionalPDFBlock = document.getElementById(`conditionalPDFBlock${questionId}`);
+    conditionalPDFBlock.style.display = conditionalPDFEnabled ? 'block' : 'none';
+}
+
+
 
 function moveQuestionUp(questionId, sectionId) {
     const questionBlock = document.getElementById(`questionBlock${questionId}`);
@@ -313,6 +337,7 @@ function toggleOptions(questionId) {
     const textboxOptionsBlock = document.getElementById(`textboxOptions${questionId}`); // Block for Name/ID and Placeholder
     const jumpOptionLabel = document.getElementById(`jumpOptionLabel${questionId}`);
     const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
+    const conditionalPDFLogicDiv = document.getElementById(`conditionalPDFLogic${questionId}`); // New
 
     // Hide all blocks initially
     if (textboxOptionsBlock) textboxOptionsBlock.style.display = 'none';
@@ -322,6 +347,7 @@ function toggleOptions(questionId) {
     if (multipleTextboxesBlock) multipleTextboxesBlock.style.display = 'none';
     if (jumpOptionLabel) jumpOptionLabel.style.display = 'none';
     if (jumpOptionSelect) jumpOptionSelect.style.display = 'none';
+    if (conditionalPDFLogicDiv) conditionalPDFLogicDiv.style.display = 'none'; // Hide conditional PDF logic by default
 
     // Show and update specific blocks based on question type
     switch (questionType) {
@@ -344,6 +370,9 @@ function toggleOptions(questionId) {
             if (questionType === 'dropdown') {
                 if (optionsBlock) optionsBlock.style.display = 'block';
             }
+            if (questionType === 'radio') {
+                if (conditionalPDFLogicDiv) conditionalPDFLogicDiv.style.display = 'block';
+            }
             break;
         case 'multipleTextboxes':
             if (multipleTextboxesBlock) multipleTextboxesBlock.style.display = 'block';
@@ -363,6 +392,7 @@ function toggleOptions(questionId) {
     // Update autofill options in hidden fields
     updateAutofillOptions();
 }
+
 
 function addMultipleTextboxOption(questionId) {
     const multipleTextboxesOptionsDiv = document.getElementById(`multipleTextboxesOptions${questionId}`);

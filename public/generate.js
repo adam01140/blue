@@ -34,12 +34,10 @@ function generateAndDownloadForm() {
     `;
 
     let questionNameIds = {};
+    let conditionalPDFs = [];
 
-    // Capture the PDF form name from the GUI input
     const pdfFormNameInput = document.getElementById('formPDFName').value.trim();
-    const pdfFormName = pdfFormNameInput || 'default.pdf'; // Default to 'default.pdf' if none provided
-
-    // Escape any special characters in pdfFormName for inclusion in a JavaScript string
+    const pdfFormName = pdfFormNameInput || 'default.pdf';
     const escapedPdfFormName = pdfFormName.replace(/\\/g, '\\\\').replace(/'/g, '\\\'').replace(/"/g, '\\"');
 
     for (let s = 1; s < sectionCounter; s++) {
@@ -63,11 +61,13 @@ function generateAndDownloadForm() {
             const jumpEnabled = questionBlock.querySelector(`#enableJump${questionId}`).checked;
             const jumpTo = questionBlock.querySelector(`#jumpTo${questionId}`).value;
             const jumpOption = questionBlock.querySelector(`#jumpOption${questionId}`).value;
+            const conditionalPDFEnabled = questionBlock.querySelector(`#enableConditionalPDF${questionId}`)?.checked;
+            const conditionalPDFName = questionBlock.querySelector(`#conditionalPDFName${questionId}`)?.value;
+            const conditionalPDFAnswer = questionBlock.querySelector(`#conditionalPDFAnswer${questionId}`)?.value;
 
             formHTML += `<div id="question-container-${questionId}" ${logicEnabled ? 'class="hidden"' : ''}>`;
             formHTML += `<label><h3>${questionText}</h3></label>`;
 
-            // Generate form inputs based on question type
             if (questionType === 'text') {
                 const nameId = questionBlock.querySelector(`#textboxName${questionId}`).value || `answer${questionId}`;
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`).value || '';
@@ -87,6 +87,15 @@ function generateAndDownloadForm() {
                         <option value="Yes">Yes</option>
                         <option value="No">No</option>
                     </select><br>`;
+
+                if (conditionalPDFEnabled) {
+                    conditionalPDFs.push({
+                        questionId: questionId,
+                        questionNameId: nameId,
+                        conditionalAnswer: conditionalPDFAnswer,
+                        pdfName: conditionalPDFName
+                    });
+                }
             } else if (questionType === 'dropdown') {
                 const nameId = questionBlock.querySelector(`#textboxName${questionId}`).value || `answer${questionId}`;
                 questionNameIds[questionId] = nameId;
@@ -182,7 +191,6 @@ function generateAndDownloadForm() {
 
             formHTML += `</div>`;
 
-            // Handle conditional logic
             if (logicEnabled && prevQuestionId && prevAnswer) {
                 const prevQuestionNameId = questionNameIds[prevQuestionId] || `answer${prevQuestionId}`;
                 formHTML += `
@@ -199,7 +207,6 @@ function generateAndDownloadForm() {
                 </` + `script>`;
             }
 
-            // Handle jump logic
             if (jumpEnabled && jumpTo) {
                 const currentQuestionNameId = questionNameIds[questionId] || `answer${questionId}`;
                 if (questionType === 'radio' || questionType === 'dropdown') {
@@ -244,7 +251,6 @@ function generateAndDownloadForm() {
         formHTML += `</div>`;
     }
 
-    // Generate hidden fields (if any)
     const { hiddenFieldsHTML, autofillMappings, conditionalAutofillLogic } = generateHiddenPDFFields();
 
     formHTML += hiddenFieldsHTML;
@@ -260,7 +266,6 @@ function generateAndDownloadForm() {
     </footer>
 
     <script>
-        // ----- Firebase Configuration -----
         const firebaseConfig = {
             apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
             authDomain: "formwiz-3f4fd.firebaseapp.com",
@@ -273,7 +278,6 @@ function generateAndDownloadForm() {
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ----- Form Logic -----
         const urlParams = new URLSearchParams(window.location.search);
         const formId = urlParams.get('formId');
 
@@ -360,7 +364,6 @@ function generateAndDownloadForm() {
             autoSaveForm('section' + sectionNumber);
         }
 
-        // Set the pdfFormName variable in the generated HTML
         var pdfFormName = '${escapedPdfFormName}';
 
         function downloadPDF(url, filename) {
@@ -372,7 +375,6 @@ function generateAndDownloadForm() {
             document.body.removeChild(link);
         }
 
-        // Edit and download specific PDF
         async function editAndDownloadPDF(pdfName) {
             const formData = new FormData();
 
@@ -384,7 +386,6 @@ function generateAndDownloadForm() {
                 }
             });
 
-            // Send to edit specified PDF
             return fetch('/edit_pdf?pdf=' + pdfName, { method: 'POST', body: formData })
                 .then(response => response.blob())
                 .then(blob => {
@@ -407,15 +408,22 @@ function generateAndDownloadForm() {
             setCurrentDate();
         };
 
+        var conditionalPDFs = ${JSON.stringify(conditionalPDFs)};
+
         function showThankYouMessage() {
-            // Remove '.pdf' extension for consistency with server expectations
             const pdfName = pdfFormName.replace('.pdf', '');
             editAndDownloadPDF(pdfName).then(() => {
+                conditionalPDFs.forEach(function(conditionalPDF) {
+                    const questionValue = document.getElementById(conditionalPDF.questionNameId).value;
+                    if (questionValue === conditionalPDF.conditionalAnswer) {
+                        editAndDownloadPDF(conditionalPDF.pdfName.replace('.pdf', ''));
+                    }
+                });
                 document.getElementById('customForm').style.display = 'none';
                 document.getElementById('thankYouMessage').style.display = 'block';
             });
 
-            return false; // Prevent form submission
+            return false;
         }
     </` + `script>
     </body>
@@ -424,3 +432,4 @@ function generateAndDownloadForm() {
 
     downloadHTML(formHTML, "custom_form.html");
 }
+

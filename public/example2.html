@@ -28,9 +28,13 @@
         <section>
         <div id="box">
             <form id="customForm" onsubmit="return showThankYouMessage();">
-    <div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1" ><label><h3>case</h3></label><input type="text" id="case_number" name="case_number" placeholder="case_number"><br><br></div>
-        <br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><h2>Section 2</h2><div id="question-container-2" ><label><h3>cas2</h3></label><input type="text" id="case_number69" name="case_number69" placeholder="case_number69"><br><br></div>
-        <br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(1)">Back</button><button type="submit">Submit</button></div></div>
+    <div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1" ><label><h3></h3></label>
+                    <select id="answer1" name="answer1">
+                        <option value="" disabled selected>Select an option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select><br></div><div id="question-container-2" ><label><h3></h3></label><input type="text" id="case_number" name="case_number" placeholder="case_number"><br><br></div><div id="question-container-3" ><label><h3></h3></label><input type="text" id="case_number69" name="case_number69" placeholder="case_number69"><br><br></div>
+        <br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div>
     <div id="hidden_pdf_fields">
     
     </div>
@@ -45,7 +49,6 @@
     </footer>
 
     <script>
-        // ----- Firebase Configuration -----
         const firebaseConfig = {
             apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
             authDomain: "formwiz-3f4fd.firebaseapp.com",
@@ -58,7 +61,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ----- Form Logic -----
         const urlParams = new URLSearchParams(window.location.search);
         const formId = urlParams.get('formId');
 
@@ -145,8 +147,7 @@
             autoSaveForm('section' + sectionNumber);
         }
 
-        // Set the pdfFormName variable in the generated HTML
-        var pdfFormName = 'form2.pdf';
+        var pdfFormName = 'sc100.pdf';
 
         function downloadPDF(url, filename) {
             const link = document.createElement("a");
@@ -157,7 +158,6 @@
             document.body.removeChild(link);
         }
 
-        // Edit and download specific PDF
         async function editAndDownloadPDF(pdfName) {
             const formData = new FormData();
 
@@ -169,7 +169,6 @@
                 }
             });
 
-            // Send to edit specified PDF
             return fetch('/edit_pdf?pdf=' + pdfName, { method: 'POST', body: formData })
                 .then(response => response.blob())
                 .then(blob => {
@@ -192,15 +191,22 @@
             setCurrentDate();
         };
 
+        var conditionalPDFs = [{"questionId":"1","questionNameId":"answer1","conditionalAnswer":"Yes","pdfName":"form2.pdf"}];
+
         function showThankYouMessage() {
-            // Remove '.pdf' extension for consistency with server expectations
             const pdfName = pdfFormName.replace('.pdf', '');
             editAndDownloadPDF(pdfName).then(() => {
+                conditionalPDFs.forEach(function(conditionalPDF) {
+                    const questionValue = document.getElementById(conditionalPDF.questionNameId).value;
+                    if (questionValue === conditionalPDF.conditionalAnswer) {
+                        editAndDownloadPDF(conditionalPDF.pdfName.replace('.pdf', ''));
+                    }
+                });
                 document.getElementById('customForm').style.display = 'none';
                 document.getElementById('thankYouMessage').style.display = 'block';
             });
 
-            return false; // Prevent form submission
+            return false;
         }
     </script>
     </body>
