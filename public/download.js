@@ -10,13 +10,16 @@ function downloadHTML(content, filename) {
     URL.revokeObjectURL(url);
 }
 
+// download.js
+
 function exportForm() {
     const formData = {
         sections: [],
-        hiddenFields: [], // Include hidden fields in the exported data
+        hiddenFields: [],
         sectionCounter: sectionCounter,
         questionCounter: questionCounter,
-        hiddenFieldCounter: hiddenFieldCounter // Include hiddenFieldCounter
+        hiddenFieldCounter: hiddenFieldCounter,
+        defaultPDFName: document.getElementById('formPDFName') ? document.getElementById('formPDFName').value.trim() : '' // Include default PDF name
     };
 
     // Export sections and questions
@@ -48,6 +51,14 @@ function exportForm() {
             const jumpOption = jumpOptionSelect ? jumpOptionSelect.value : "";
             const jumpTo = jumpToInput ? jumpToInput.value : "";
 
+            // Conditional PDF logic
+            const conditionalPDFCheckbox = questionBlock.querySelector(`#enableConditionalPDF${questionId}`);
+            const conditionalPDFEnabled = conditionalPDFCheckbox ? conditionalPDFCheckbox.checked : false;
+            const conditionalPDFNameInput = questionBlock.querySelector(`#conditionalPDFName${questionId}`);
+            const conditionalPDFAnswerSelect = questionBlock.querySelector(`#conditionalPDFAnswer${questionId}`);
+            const conditionalPDFName = conditionalPDFNameInput ? conditionalPDFNameInput.value : "";
+            const conditionalPDFAnswer = conditionalPDFAnswerSelect ? conditionalPDFAnswerSelect.value : "";
+
             const questionData = {
                 questionId: questionId,
                 text: questionText,
@@ -61,6 +72,11 @@ function exportForm() {
                     enabled: jumpEnabled,
                     option: jumpOption,
                     to: jumpTo
+                },
+                conditionalPDF: {
+                    enabled: conditionalPDFEnabled,
+                    pdfName: conditionalPDFName,
+                    answer: conditionalPDFAnswer
                 },
                 options: [],
                 labels: []
@@ -109,13 +125,13 @@ function exportForm() {
                 questionData.labels = labels;
             } else if (questionType === 'multipleTextboxes') {
                 const options = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
-                questionData.textboxes = []; // Array to store the textboxes data
+                questionData.textboxes = [];
                 options.forEach((optionDiv, index) => {
                     const labelInput = optionDiv.querySelector(`#multipleTextboxLabel${questionId}_${index + 1}`);
                     const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
                     const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
 
-                    const labelText = labelInput.value.trim(); // Do not assign default label
+                    const labelText = labelInput.value.trim();
                     const nameId = nameIdInput.value || `answer${questionId}_${index + 1}`;
                     const placeholder = placeholderInput.value || '';
 
@@ -220,6 +236,8 @@ function downloadJSON(content, filename) {
     URL.revokeObjectURL(url);
 }
 
+
+
 function importForm(event) {
     const file = event.target.files[0];
     if (file) {
@@ -238,6 +256,23 @@ function loadFormData(formData) {
     sectionCounter = formData.sectionCounter;
     questionCounter = formData.questionCounter;
     hiddenFieldCounter = formData.hiddenFieldCounter || 1;
+
+    // Set the default PDF form name if available
+    if (formData.defaultPDFName) {
+        const formPDFNameInput = document.getElementById('formPDFName');
+        if (formPDFNameInput) {
+            formPDFNameInput.value = formData.defaultPDFName;
+        } else {
+            // If the input doesn't exist, create it
+            const pdfNameDiv = document.createElement('div');
+            pdfNameDiv.innerHTML = `
+                <label>Choose Form PDF:</label>
+                <input type="text" id="formPDFName" placeholder="Enter PDF form name (e.g., sc100.pdf)" value="${formData.defaultPDFName}">
+                <br><br>
+            `;
+            document.getElementById('formBuilder').prepend(pdfNameDiv);
+        }
+    }
 
     // Initialize the Hidden PDF Fields module
     initializeHiddenPDFFieldsModule();
@@ -277,6 +312,9 @@ function loadFormData(formData) {
                     `;
                     checkboxOptionsDiv.appendChild(optionDiv);
                 });
+
+                // Update conditional PDF answers
+                updateConditionalPDFAnswersForCheckbox(question.questionId);
             } else if (question.type === 'dropdown') {
                 const dropdownOptionsDiv = document.getElementById(`dropdownOptions${question.questionId}`);
                 dropdownOptionsDiv.innerHTML = '';
@@ -342,7 +380,7 @@ function loadFormData(formData) {
                 }
             }
 
-            // Check for logic before accessing its properties
+            // Restore logic
             if (question.logic && question.logic.enabled) {
                 questionBlock.querySelector(`#logic${question.questionId}`).checked = true;
                 toggleLogic(question.questionId);
@@ -350,12 +388,22 @@ function loadFormData(formData) {
                 questionBlock.querySelector(`#prevAnswer${question.questionId}`).value = question.logic.prevAnswer;
             }
 
-            // Check for jump before accessing its properties
+            // Restore jump logic
             if (question.jump && question.jump.enabled) {
                 questionBlock.querySelector(`#enableJump${question.questionId}`).checked = true;
                 toggleJumpLogic(question.questionId);
                 questionBlock.querySelector(`#jumpOption${question.questionId}`).value = question.jump.option;
                 questionBlock.querySelector(`#jumpTo${question.questionId}`).value = question.jump.to;
+            }
+
+            // Restore Conditional PDF logic
+            if (question.conditionalPDF && question.conditionalPDF.enabled) {
+                questionBlock.querySelector(`#enableConditionalPDF${question.questionId}`).checked = true;
+                toggleConditionalPDFLogic(question.questionId);
+
+                // Set PDF name and answer
+                questionBlock.querySelector(`#conditionalPDFName${question.questionId}`).value = question.conditionalPDF.pdfName;
+                questionBlock.querySelector(`#conditionalPDFAnswer${question.questionId}`).value = question.conditionalPDF.answer;
             }
         });
     });
@@ -370,6 +418,7 @@ function loadFormData(formData) {
     // Update autofill options in hidden fields after loading all questions
     updateAutofillOptions();
 }
+
 
 // Function to add a hidden field with data, including autofill logic and conditions
 function addHiddenFieldWithData(hiddenField) {

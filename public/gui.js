@@ -205,7 +205,7 @@ function addQuestion(sectionId, questionId = null) {
             <button type="button" onclick="addDropdownOption(${currentQuestionId})">Add Option</button>
         </div><br>
 
-        <!-- Checkbox Options -->
+
 <!-- Checkbox Options -->
 <div id="checkboxBlock${currentQuestionId}" class="checkbox-options" style="display: none;">
     <label>Checkbox Options: </label>
@@ -216,6 +216,7 @@ function addQuestion(sectionId, questionId = null) {
         <label for="noneOfTheAbove${currentQuestionId}">Include "None of the above" option</label>
     </div>
 </div><br>
+
 
 
         <!-- Multiple Textboxes Options -->
@@ -401,6 +402,24 @@ function toggleOptions(questionId) {
     // Update autofill options in hidden fields
     updateAutofillOptions();
 }
+
+function updateConditionalPDFAnswersForRadio(questionId) {
+    const conditionalPDFAnswerSelect = document.getElementById(`conditionalPDFAnswer${questionId}`);
+    if (!conditionalPDFAnswerSelect) return;
+
+    // Clear existing options
+    conditionalPDFAnswerSelect.innerHTML = '';
+
+    // Radio questions have 'Yes' and 'No' options
+    const options = ['Yes', 'No'];
+    options.forEach(optionText => {
+        const opt = document.createElement('option');
+        opt.value = optionText;
+        opt.text = optionText;
+        conditionalPDFAnswerSelect.appendChild(opt);
+    });
+}
+
 
 
 function updateConditionalPDFAnswersForCheckbox(questionId) {

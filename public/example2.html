@@ -28,20 +28,26 @@
         <section>
         <div id="box">
             <form id="customForm" onsubmit="return showThankYouMessage();">
-    <div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1" ><label><h3></h3></label><div><center><div id="checkmark">
+    <div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1" ><label><h3>Case Number For Small Claims</h3></label><input type="text" id="case_number" name="case_number" placeholder=""><br><br></div><div id="question-container-2" ><label><h3>Case Number for Fee Waiver</h3></label><input type="text" id="case_number69" name="case_number69" placeholder=""><br><br></div><div id="question-container-3" ><label><h3>Would you like 2 pdfs</h3></label>
+                    <select id="answer3" name="answer3">
+                        <option value="" disabled selected>Select an option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select><br></div>
+        <br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><h2>Section 2</h2><div id="question-container-4" ><label><h3>Do you want 2 pdfs</h3></label><div><center><div id="checkmark">
                         <span class="checkbox-inline">
                             <label class="checkbox-label">
-                                <input type="checkbox" id="a" name="a" value="">
-                                a
+                                <input type="checkbox" id="yes" name="yes" value="">
+                                yes
                             </label>
                         </span>
                         <span class="checkbox-inline">
                             <label class="checkbox-label">
-                                <input type="checkbox" id="b" name="b" value="">
-                                b
+                                <input type="checkbox" id="no" name="no" value="">
+                                no
                             </label>
                         </span></div><br></div></div>
-        <br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div>
+        <br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(1)">Back</button><button type="submit">Submit</button></div></div>
     <div id="hidden_pdf_fields">
     
     </div>
@@ -198,7 +204,7 @@
             setCurrentDate();
         };
 
-        var conditionalPDFs = [{"questionId":"1","questionNameId":"a","conditionalAnswer":"","pdfName":"form2.pdf","questionType":"checkbox"}];
+        var conditionalPDFs = [{"questionId":"3","questionNameId":"answer3","conditionalAnswer":"Yes","pdfName":"form2.pdf","questionType":"radio"},{"questionId":"4","questionNameId":"yes","conditionalAnswer":"","pdfName":"form2.pdf","questionType":"checkbox"}];
 
         function showThankYouMessage() {
             const pdfName = pdfFormName.replace('.pdf', '');
