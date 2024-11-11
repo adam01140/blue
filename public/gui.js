@@ -206,15 +206,17 @@ function addQuestion(sectionId, questionId = null) {
         </div><br>
 
         <!-- Checkbox Options -->
-        <div id="checkboxBlock${currentQuestionId}" class="checkbox-options" style="display: none;">
-            <label>Checkbox Options: </label>
-            <div id="checkboxOptions${currentQuestionId}"></div>
-            <button type="button" onclick="addCheckboxOption(${currentQuestionId})">Add Option</button>
-            <div style="margin-top: 10px;">
-                <input type="checkbox" id="noneOfTheAbove${currentQuestionId}">
-                <label for="noneOfTheAbove${currentQuestionId}">Include "None of the above" option</label>
-            </div>
-        </div><br>
+<!-- Checkbox Options -->
+<div id="checkboxBlock${currentQuestionId}" class="checkbox-options" style="display: none;">
+    <label>Checkbox Options: </label>
+    <div id="checkboxOptions${currentQuestionId}"></div>
+    <button type="button" onclick="addCheckboxOption(${currentQuestionId})">Add Option</button>
+    <div style="margin-top: 10px;">
+        <input type="checkbox" id="noneOfTheAbove${currentQuestionId}" onchange="updateConditionalPDFAnswersForCheckbox(${currentQuestionId})">
+        <label for="noneOfTheAbove${currentQuestionId}">Include "None of the above" option</label>
+    </div>
+</div><br>
+
 
         <!-- Multiple Textboxes Options -->
         <div id="multipleTextboxesBlock${currentQuestionId}" class="multiple-textboxes-options" style="display: none;">
@@ -371,7 +373,10 @@ function toggleOptions(questionId) {
                 if (optionsBlock) optionsBlock.style.display = 'block';
             }
             if (questionType === 'radio') {
-                if (conditionalPDFLogicDiv) conditionalPDFLogicDiv.style.display = 'block';
+                if (conditionalPDFLogicDiv) {
+                    conditionalPDFLogicDiv.style.display = 'block';
+                    updateConditionalPDFAnswersForRadio(questionId); // New function
+                }
             }
             break;
         case 'multipleTextboxes':
@@ -379,6 +384,10 @@ function toggleOptions(questionId) {
             break;
         case 'checkbox':
             if (checkboxBlock) checkboxBlock.style.display = 'block';
+            if (conditionalPDFLogicDiv) {
+                conditionalPDFLogicDiv.style.display = 'block';
+                updateConditionalPDFAnswersForCheckbox(questionId); // New function
+            }
             break;
         case 'numberedDropdown':
             if (numberedDropdownBlock) numberedDropdownBlock.style.display = 'block';
@@ -392,6 +401,38 @@ function toggleOptions(questionId) {
     // Update autofill options in hidden fields
     updateAutofillOptions();
 }
+
+
+function updateConditionalPDFAnswersForCheckbox(questionId) {
+    const conditionalPDFAnswerSelect = document.getElementById(`conditionalPDFAnswer${questionId}`);
+    if (!conditionalPDFAnswerSelect) return;
+
+    conditionalPDFAnswerSelect.innerHTML = ''; // Clear existing options
+
+    const checkboxOptionsDiv = document.getElementById(`checkboxOptions${questionId}`);
+    if (!checkboxOptionsDiv) return;
+
+    const options = checkboxOptionsDiv.querySelectorAll(`input[id^="checkboxOptionText${questionId}_"]`);
+    options.forEach(optionInput => {
+        const optionText = optionInput.value.trim();
+        if (optionText) {
+            const opt = document.createElement('option');
+            opt.value = optionText;
+            opt.text = optionText;
+            conditionalPDFAnswerSelect.appendChild(opt);
+        }
+    });
+
+    // Include "None of the above" if selected
+    const noneOfTheAboveCheckbox = document.getElementById(`noneOfTheAbove${questionId}`);
+    if (noneOfTheAboveCheckbox && noneOfTheAboveCheckbox.checked) {
+        const opt = document.createElement('option');
+        opt.value = 'None of the above';
+        opt.text = 'None of the above';
+        conditionalPDFAnswerSelect.appendChild(opt);
+    }
+}
+
 
 
 function addMultipleTextboxOption(questionId) {
@@ -526,7 +567,11 @@ function addCheckboxOption(questionId) {
         <hr>
     `;
     checkboxOptionsDiv.appendChild(optionDiv);
+
+    // Update conditional PDF answers
+    updateConditionalPDFAnswersForCheckbox(questionId);
 }
+
 
 function removeCheckboxOption(questionId, optionNumber) {
     const optionDiv = document.querySelector(`#checkboxOptions${questionId} .option${optionNumber}`);
@@ -544,7 +589,11 @@ function removeCheckboxOption(questionId, optionNumber) {
             option.querySelector('button').setAttribute('onclick', `removeCheckboxOption(${questionId}, ${newOptionNumber})`);
         });
     }
+
+    // Update conditional PDF answers
+    updateConditionalPDFAnswersForCheckbox(questionId);
 }
+
 
 function addTextboxLabel(questionId) {
     const textboxLabelsDiv = document.getElementById(`textboxLabels${questionId}`);

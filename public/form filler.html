@@ -28,9 +28,7 @@
                 <input type="text" id="formPDFName" placeholder="Enter PDF form name (e.g., sc100.pdf)"><br><br>
 
                 <!-- Modified buttons with "Copy HTML" added -->
-                <button onclick="generateAndDownloadForm()">Download HTML</button>
-                <button onclick="generateAndCopyForm()">Copy HTML</button>
-
+                <button onclick="generateAndDownloadForm()">Export HTML</button>
                 <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importForm(event)">
                 <button onclick="document.getElementById('importFileInput').click();">Import JSON</button>
                 <button onclick="exportForm()">Export JSON</button>
