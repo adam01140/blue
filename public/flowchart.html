@@ -18,9 +18,9 @@
       width: 220px;
       background: #f9f9f9;
       border-right: 1px solid #ccc;
-      box-sizing: border-box;
       float: left;
       padding: 10px;
+      box-sizing: border-box;
     }
 
     #graphContainer {
@@ -74,10 +74,10 @@
 
     .context-menu {
       position: absolute;
-      background: white;
+      background: #fff;
       border: 1px solid #ccc;
       border-radius: 4px;
-      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+      box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
       display: none;
       z-index: 1000;
       padding: 5px;
@@ -86,7 +86,7 @@
     .context-menu button {
       border: none;
       background: none;
-      color: #333;
+      color: #000;
       padding: 5px 10px;
       text-align: left;
       width: 100%;
@@ -96,25 +96,56 @@
     .context-menu button:hover {
       background-color: #f0f0f0;
     }
+
+    .submenu {
+      position: absolute;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      padding: 5px;
+      display: none;
+      z-index: 2000;
+    }
+
+    .submenu button {
+      display: block;
+      margin-bottom: 4px;
+      border: none;
+      background: none;
+      color: #000;
+      padding: 5px 10px;
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .submenu button:hover {
+      background-color: #f0f0f0;
+    }
   </style>
 </head>
+
 <body>
   <div class="toolbar">
     <h3>Shapes</h3>
+    <!-- "Question Node" shape -->
     <div
       class="shape"
       data-type="question"
-      data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=question;"
+      data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;"
     >
       Question Node
     </div>
+    <!-- "Options Node" shape -->
     <div
       class="shape"
       data-type="options"
-      data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=options;"
+      data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;"
     >
       Options Node
     </div>
+
     <div class="button-bar">
       <button onclick="exportFlowchartJson()">Export Flowchart JSON</button>
       <button onclick="document.getElementById('importFlowchartFile').click()">Import Flowchart</button>
@@ -130,8 +161,18 @@
 
   <div id="graphContainer"></div>
 
+  <!-- Main context menu -->
   <div id="contextMenu" class="context-menu">
     <button id="deleteNode">Delete Node</button>
+    <button id="duplicateNode">Duplicate Node</button>
+    <button id="changeType">Change Type &raquo;</button>
+  </div>
+
+  <!-- Sub-menu for "Change Type" -->
+  <div id="typeSubmenu" class="submenu">
+    <button id="dropdownType">Drop Down</button>
+    <button id="checkboxType">Checkbox</button>
+    <button id="textType">Text</button>
   </div>
 
   <script>
@@ -144,17 +185,68 @@
       const container = document.getElementById("graphContainer");
       const contextMenu = document.getElementById("contextMenu");
       const deleteNodeButton = document.getElementById("deleteNode");
+      const duplicateNodeButton = document.getElementById("duplicateNode");
+      const changeTypeButton = document.getElementById("changeType");
+
+      const typeSubmenu = document.getElementById("typeSubmenu");
+      const dropdownTypeBtn = document.getElementById("dropdownType");
+      const checkboxTypeBtn = document.getElementById("checkboxType");
+      const textTypeBtn = document.getElementById("textType");
+
       let selectedCell = null;
 
+      // Setup mxGraph
       mxEvent.disableContextMenu(container);
-
       const graph = new mxGraph(container);
       graph.setCellsMovable(true);
       graph.setConnectable(true);
       graph.setCellsResizable(true);
+
+      // Rubberband selection
       new mxRubberband(graph);
 
-      // Context menu logic
+      /**
+       * Overlays: show questionType in bottom-right corner
+       */
+      function updateTypeOverlay(cell) {
+        if (!cell || !cell.vertex) return;
+
+        // Remove any existing overlays
+        graph.removeCellOverlays(cell);
+
+        // Extract questionType from style
+        const style = cell.style || "";
+        const match = style.match(/questionType=([^;]+)/);
+        let qType = "dropdown";
+        if (match) {
+          qType = match[1];
+        }
+
+        const overlay = new mxCellOverlay(
+          new mxImage("data:image/gif;base64,R0lGODlhAQABAAAAACw=", 1, 1),
+          qType,
+          mxConstants.ALIGN_RIGHT,
+          mxConstants.ALIGN_BOTTOM,
+          new mxPoint(-10, -10)
+        );
+        overlay.defaultOverlap = 0.5;
+        overlay.cursor = "default";
+        overlay.align = mxConstants.ALIGN_RIGHT;
+        overlay.verticalAlign = mxConstants.ALIGN_BOTTOM;
+        overlay.offset = new mxPoint(-6, -6);
+
+        overlay.text = qType;
+        overlay.tooltip = "Type: " + qType;
+        graph.addCellOverlay(cell, overlay);
+      }
+
+      function refreshAllOverlays() {
+        const parent = graph.getDefaultParent();
+        const vertices = graph.getChildVertices(parent);
+        vertices.forEach((v) => updateTypeOverlay(v));
+      }
+
+      // CONTEXT MENU
       graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
         if (cell) {
           selectedCell = cell;
@@ -167,110 +259,96 @@
 
       function showContextMenu(evt) {
         contextMenu.style.display = "block";
-        contextMenu.style.left = `${evt.clientX}px`;
-        contextMenu.style.top = `${evt.clientY}px`;
+        contextMenu.style.left = evt.clientX + "px";
+        contextMenu.style.top = evt.clientY + "px";
+        typeSubmenu.style.display = "none";
       }
 
       function hideContextMenu() {
         contextMenu.style.display = "none";
+        typeSubmenu.style.display = "none";
       }
 
+      document.addEventListener("click", function (e) {
+        if (!contextMenu.contains(e.target) && !typeSubmenu.contains(e.target)) {
+          hideContextMenu();
+        }
+      });
+
+      // "Delete Node"
       deleteNodeButton.addEventListener("click", function () {
         if (selectedCell) {
           graph.removeCells([selectedCell]);
+          refreshAllOverlays();
         }
         hideContextMenu();
       });
 
-      document.addEventListener("click", function () {
+      // "Duplicate Node"
+      duplicateNodeButton.addEventListener("click", function () {
+        if (selectedCell) {
+          // copy/paste just that one cell
+          mxClipboard.setCells(mxClipboard.copyCells([selectedCell], false));
+          const pasted = mxClipboard.paste(graph);
+          if (pasted && pasted.length > 0) {
+            // offset the duplication
+            graph.moveCells(pasted, 40, 40);
+          }
+          refreshAllOverlays();
+        }
         hideContextMenu();
       });
 
-      const keyHandler = new mxKeyHandler(graph);
+      // "Change Type"
+      changeTypeButton.addEventListener("click", function () {
+        const rect = contextMenu.getBoundingClientRect();
+        typeSubmenu.style.display = "block";
+        typeSubmenu.style.left = rect.right + "px";
+        typeSubmenu.style.top = rect.top + "px";
+      });
+      dropdownTypeBtn.addEventListener("click", function () {
+        if (selectedCell) setQuestionType(selectedCell, "dropdown");
+        hideContextMenu();
+      });
+      checkboxTypeBtn.addEventListener("click", function () {
+        if (selectedCell) setQuestionType(selectedCell, "checkbox");
+        hideContextMenu();
+      });
+      textTypeBtn.addEventListener("click", function () {
+        if (selectedCell) setQuestionType(selectedCell, "text");
+        hideContextMenu();
+      });
 
-      // Copy-paste functionality
+      function setQuestionType(cell, newType) {
+        let style = cell.style || "";
+        style = style.replace(/questionType=[^;]+/, "");
+        style += `;questionType=${newType};`;
+        graph.getModel().setStyle(cell, style);
+
+        if (newType === "checkbox") {
+          cell.value = "Checkbox question node";
+        } else if (newType === "text") {
+          cell.value = "Text question node";
+        } else {
+          cell.value = "Dropdown question node";
+        }
+        refreshAllOverlays();
+      }
+
+      // Key handler: Ctrl+C / Ctrl+V
+      const keyHandler = new mxKeyHandler(graph);
       keyHandler.bindControlKey(67, function () {
         mxClipboard.copy(graph);
       });
-
       keyHandler.bindControlKey(86, function () {
-        mxClipboard.paste(graph);
-      });
-
-      // SHIFT + Drag for node movement
-      let shiftDown = false;
-
-      document.addEventListener("keydown", (evt) => {
-        if (evt.key === "Shift") shiftDown = true;
-      });
-
-      document.addEventListener("keyup", (evt) => {
-        if (evt.key === "Shift") shiftDown = false;
-      });
-
-      graph.addMouseListener({
-  currentState: null,
-  mouseDown: function (sender, me) {
-    if (shiftDown) {
-      const state = me.getState();
-      if (state) {
-        graph.panningHandler.start(state, me.getX(), me.getY());
-        me.consume();
-      }
-    }
-  },
-  mouseMove: function (sender, me) {},
-  mouseUp: function (sender, me) {}
-});
-
-
-      // Automatic classification of nodes
-      graph.getModel().addListener(mxEvent.EVENT_CHANGE, function (sender, evt) {
-        const changes = evt.getProperty("changes");
-        if (!changes) return;
-
-        changes.forEach((change) => {
-          if (change.constructor.name === "mxValueChange") {
-            const { cell, value } = change;
-            if (value && typeof value === "string") {
-              if (value.trim().endsWith("?")) {
-                reclassifyCellAsQuestion(cell);
-              }
-            }
-          }
-        });
-      });
-
-      graph.connectionHandler.addListener(mxEvent.CONNECT, function (sender, evt) {
-        const edge = evt.getProperty("cell");
-        const source = edge.source;
-        const target = edge.target;
-        if (source && isQuestionNode(source)) {
-          reclassifyCellAsOptions(target);
+        const pasted = mxClipboard.paste(graph);
+        if (pasted && pasted.length > 0) {
+          graph.moveCells(pasted, 40, 40);
+          refreshAllOverlays();
         }
       });
 
-      function isQuestionNode(cell) {
-        return cell.style && cell.style.indexOf("nodeType=question") >= 0;
-      }
-
-      function reclassifyCellAsQuestion(cell) {
-        let style = cell.style || "";
-        if (!style.includes("nodeType=question")) {
-          style += ";nodeType=question;";
-        }
-        graph.getModel().setStyle(cell, style);
-      }
-
-      function reclassifyCellAsOptions(cell) {
-        let style = cell.style || "";
-        if (!style.includes("nodeType=options")) {
-          style += ";nodeType=options;";
-        }
-        graph.getModel().setStyle(cell, style);
-      }
-
-      // Drag-and-drop for shapes
+      // Drag-and-drop from toolbar
       const toolbarShapes = document.querySelectorAll(".shape");
       toolbarShapes.forEach((shapeEl) => {
         const baseStyle = shapeEl.dataset.style;
@@ -279,9 +357,8 @@
           graph,
           function (graph, evt, targetCell, x, y) {
             const parent = graph.getDefaultParent();
-            const model = graph.getModel();
+            graph.getModel().beginUpdate();
             let newVertex;
-            model.beginUpdate();
             try {
               newVertex = graph.insertVertex(
                 parent,
@@ -294,24 +371,68 @@
                 baseStyle
               );
             } finally {
-              model.endUpdate();
+              graph.getModel().endUpdate();
             }
+            refreshAllOverlays();
             return newVertex;
           }
         );
       });
 
+      // Reclassify if label ends with '?'
+      graph.getModel().addListener(mxEvent.EVENT_CHANGE, function (sender, evt) {
+        const changes = evt.getProperty("changes");
+        if (!changes) return;
+        changes.forEach((change) => {
+          if (change.constructor.name === "mxValueChange") {
+            const { cell, value } = change;
+            if (value && typeof value === "string") {
+              if (value.trim().endsWith("?")) {
+                reclassifyCellAsQuestion(cell);
+              }
+            }
+          }
+        });
+        refreshAllOverlays();
+      });
 
- /**
-       * ===============================
-       * Export Flowchart JSON (all data)
-       * ===============================
-       */
+      graph.connectionHandler.addListener(mxEvent.CONNECT, function (sender, evt) {
+        const edge = evt.getProperty("cell");
+        if (!edge) return;
+        const source = edge.source;
+        const target = edge.target;
+        if (source && isQuestionNode(source)) {
+          reclassifyCellAsOptions(target);
+        }
+        refreshAllOverlays();
+      });
+
+      function isQuestionNode(cell) {
+        return cell.style && cell.style.indexOf("nodeType=question") >= 0;
+      }
+      function reclassifyCellAsQuestion(cell) {
+        let style = cell.style || "";
+        if (!style.includes("nodeType=question")) {
+          style += ";nodeType=question;";
+        }
+        graph.getModel().setStyle(cell, style);
+      }
+      function reclassifyCellAsOptions(cell) {
+        let style = cell.style || "";
+        if (!style.includes("nodeType=options")) {
+          style += ";nodeType=options;";
+        }
+        graph.getModel().setStyle(cell, style);
+      }
+
+      // -----------------------------
+      //    EXPORT FLOWCHART JSON
+      // -----------------------------
       window.exportFlowchartJson = function () {
         const data = [];
         const cells = graph.getModel().cells;
         for (let id in cells) {
-          if (id === "0" || id === "1") continue; // skip root & layer
+          if (id === "0" || id === "1") continue;
           const cell = cells[id];
           data.push({
             id: cell.id,
@@ -334,11 +455,6 @@
         downloadJson(JSON.stringify(data, null, 2), "flowchart_data.json");
       };
 
-      /**
-       * ===============================
-       * Import Flowchart JSON
-       * ===============================
-       */
       window.importFlowchartJson = function (evt) {
         const file = evt.target.files[0];
         if (!file) return;
@@ -354,13 +470,11 @@
       function loadFlowchartData(data) {
         graph.getModel().beginUpdate();
         try {
-          // Remove existing nodes
           const parent = graph.getDefaultParent();
           graph.removeCells(graph.getChildVertices(parent));
 
           const createdCells = {};
-
-          // Pass 1: create vertices
+          // pass 1: create vertices
           data.forEach((item) => {
             if (item.vertex) {
               const geo = new mxGeometry(
@@ -376,14 +490,12 @@
               createdCells[item.id] = newCell;
             }
           });
-
-          // Pass 2: create edges
+          // pass 2: create edges
           data.forEach((item) => {
             if (item.edge) {
               const newEdge = new mxCell(item.value, new mxGeometry(), item.style);
               newEdge.edge = true;
               newEdge.id = item.id;
-
               const sourceCell = createdCells[item.source];
               const targetCell = createdCells[item.target];
               graph.addCell(newEdge, parent, undefined, sourceCell, targetCell);
@@ -392,13 +504,12 @@
         } finally {
           graph.getModel().endUpdate();
         }
+        refreshAllOverlays();
       }
 
-      /**
-       * ===============================
-       * Export GUI JSON
-       * ===============================
-       */
+      // ---------------------------------
+      // EXPORT GUI JSON (Supports both checkbox & dropdown)
+      // ---------------------------------
       window.exportGuiJson = function () {
         const model = graph.getModel();
         const allCells = model.cells;
@@ -406,11 +517,14 @@
         let questionIdCounter = 1;
         const questionMap = {};
 
-        // Helper to detect nodeType
         function getNodeType(cell) {
           if (cell.style && cell.style.includes("nodeType=question")) return "question";
           if (cell.style && cell.style.includes("nodeType=options")) return "options";
           return null;
+        }
+        function getQuestionType(cell) {
+          const match = (cell.style || "").match(/questionType=([^;]+)/);
+          return match ? match[1] : "dropdown";
         }
 
         // 1) Identify question nodes
@@ -418,15 +532,31 @@
           if (id === "0" || id === "1") continue;
           const cell = allCells[id];
           if (cell.vertex && getNodeType(cell) === "question") {
-            // Label minus default text
-            const label = cell.value.toString().replace(/question node/i, "").trim() || "Untitled";
+            const label = (cell.value || "").toString().trim() || "Untitled";
+            const qType = getQuestionType(cell);
+
+            // Build question data
             questionMap[id] = {
               questionId: questionIdCounter,
               text: label,
-              type: "dropdown",
+              type: qType,
+
               logic: { enabled: false, prevQuestion: "", prevAnswer: "" },
               jump: { enabled: false, option: "", to: "" },
-              conditionalPDF: { enabled: false, pdfName: "", answer: "" },
+              conditionalPDF: {
+                enabled: false,
+                pdfName: "",
+                answer: "undefined"
+              },
+              conditionalAlert: {
+                enabled: false,
+                prevQuestion: "",
+                prevAnswer: "",
+                text: ""
+              },
+              // For checkbox => array of objects
+              // For dropdown => array of strings
+              // We'll fill this in step 2
               options: [],
               labels: []
             };
@@ -434,26 +564,37 @@
           }
         }
 
-        // 2) For each question node, gather options from connected "options" nodes
+        // 2) For each question node, gather "options" from connected nodes
         Object.keys(questionMap).forEach((cellId) => {
           const cell = allCells[cellId];
           const qObj = questionMap[cellId];
           const outEdges = graph.getOutgoingEdges(cell) || [];
+          const questionType = qObj.type; // "checkbox" or "dropdown" or "text" etc.
 
           outEdges.forEach((edge) => {
             const target = edge.target;
             if (!target) return;
             if (getNodeType(target) === "options") {
-              // Add to the question's options
-              const optLabel = target.value.toString().replace(/options node/i, "").trim() || "Option";
-              qObj.options.push(optLabel);
+              // The user label for that option node
+              const optLabel = (target.value || "").toString().trim() || "Option";
 
-              // Check if that options node leads to another question
+              if (questionType === "checkbox") {
+                // For a checkbox, store objects
+                qObj.options.push({
+                  label: optLabel,
+                  nameId: "undefined",
+                  value: "undefined"
+                });
+              } else {
+                // For a dropdown or anything else, store strings
+                qObj.options.push(optLabel);
+              }
+
+              // If that option leads to another question => conditional logic
               const nextEdges = graph.getOutgoingEdges(target) || [];
               nextEdges.forEach((nEdge) => {
                 const q2 = nEdge.target;
                 if (q2 && getNodeType(q2) === "question") {
-                  // Enable logic on q2
                   const q2Obj = questionMap[q2.id];
                   if (q2Obj) {
                     q2Obj.logic.enabled = true;
@@ -485,7 +626,7 @@
         downloadJson(JSON.stringify(guiData, null, 2), "gui_data.json");
       };
 
-      /** Utility to trigger JSON download */
+      // Utility function for JSON download
       function downloadJson(jsonString, filename) {
         const blob = new Blob([jsonString], { type: "application/json" });
         const url = URL.createObjectURL(blob);
@@ -498,7 +639,6 @@
         URL.revokeObjectURL(url);
       }
     });
-
   </script>
 </body>
 </html>
