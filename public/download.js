@@ -1,5 +1,21 @@
 // download.js
 
+function generateAndDownloadForm() {
+    const formHTML = getFormHTML();
+    navigator.clipboard.writeText(formHTML).then(() => {
+        alert("HTML code has been copied to the clipboard.");
+    });
+    downloadHTML(formHTML, "custom_form.html");
+}
+
+function showPreview() {
+    const formHTML = getFormHTML();
+    const previewModal = document.getElementById('previewModal');
+    const previewFrame = document.getElementById('previewFrame');
+    previewFrame.srcdoc = formHTML;
+    previewModal.style.display = 'flex';
+}
+
 function downloadHTML(content, filename) {
     const blob = new Blob([content], { type: "text/html" });
     const url = URL.createObjectURL(blob);
@@ -19,7 +35,7 @@ function exportForm() {
         sectionCounter: sectionCounter,
         questionCounter: questionCounter,
         hiddenFieldCounter: hiddenFieldCounter,
-        defaultPDFName: document.getElementById('formPDFName') ? document.getElementById('formPDFName').value.trim() : '' // Include default PDF name
+        defaultPDFName: document.getElementById('formPDFName') ? document.getElementById('formPDFName').value.trim() : ''
     };
 
     // Export sections and questions
@@ -59,6 +75,18 @@ function exportForm() {
             const conditionalPDFName = conditionalPDFNameInput ? conditionalPDFNameInput.value : "";
             const conditionalPDFAnswer = conditionalPDFAnswerSelect ? conditionalPDFAnswerSelect.value : "";
 
+            // NEW CODE START: Conditional Alert logic
+            const conditionalAlertCheckbox = questionBlock.querySelector(`#enableConditionalAlert${questionId}`);
+            const conditionalAlertEnabled = conditionalAlertCheckbox ? conditionalAlertCheckbox.checked : false;
+            const alertPrevQuestionInput = questionBlock.querySelector(`#alertPrevQuestion${questionId}`);
+            const alertPrevAnswerInput = questionBlock.querySelector(`#alertPrevAnswer${questionId}`);
+            const alertTextInput = questionBlock.querySelector(`#alertText${questionId}`);
+
+            const alertPrevQuestion = alertPrevQuestionInput ? alertPrevQuestionInput.value : "";
+            const alertPrevAnswer = alertPrevAnswerInput ? alertPrevAnswerInput.value : "";
+            const alertText = alertTextInput ? alertTextInput.value : "";
+            // NEW CODE END
+
             const questionData = {
                 questionId: questionId,
                 text: questionText,
@@ -78,6 +106,14 @@ function exportForm() {
                     pdfName: conditionalPDFName,
                     answer: conditionalPDFAnswer
                 },
+                // NEW CODE START: Include conditionalAlert in exported data
+                conditionalAlert: {
+                    enabled: conditionalAlertEnabled,
+                    prevQuestion: alertPrevQuestion,
+                    prevAnswer: alertPrevAnswer,
+                    text: alertText
+                },
+                // NEW CODE END
                 options: [],
                 labels: []
             };
@@ -194,7 +230,7 @@ function exportForm() {
                     }
                 });
 
-                hiddenFieldData.conditions = conditions; // Add conditions to the exported data
+                hiddenFieldData.conditions = conditions; 
             } else if (fieldType === 'text') {
                 // Collect conditional logic for textboxes
                 const conditions = [];
@@ -215,7 +251,7 @@ function exportForm() {
                     }
                 });
 
-                hiddenFieldData.conditions = conditions; // Add conditions to the exported data for textboxes
+                hiddenFieldData.conditions = conditions;
             }
 
             formData.hiddenFields.push(hiddenFieldData);
@@ -235,8 +271,6 @@ function downloadJSON(content, filename) {
     a.click();
     URL.revokeObjectURL(url);
 }
-
-
 
 function importForm(event) {
     const file = event.target.files[0];
@@ -263,7 +297,6 @@ function loadFormData(formData) {
         if (formPDFNameInput) {
             formPDFNameInput.value = formData.defaultPDFName;
         } else {
-            // If the input doesn't exist, create it
             const pdfNameDiv = document.createElement('div');
             pdfNameDiv.innerHTML = `
                 <label>Choose Form PDF:</label>
@@ -280,7 +313,6 @@ function loadFormData(formData) {
     // Load sections and questions first
     formData.sections.forEach(section => {
         addSection(section.sectionId);
-        // Set the custom section name
         document.getElementById(`sectionName${section.sectionId}`).value = section.sectionName || `Section ${section.sectionId}`;
         updateSectionName(section.sectionId);
 
@@ -368,7 +400,6 @@ function loadFormData(formData) {
                 });
             }
 
-            // Restore Name/ID and Placeholder for Text and Big Paragraph
             if (question.type === 'text' || question.type === 'bigParagraph') {
                 const nameIdInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
                 const placeholderInput = questionBlock.querySelector(`#textboxPlaceholder${question.questionId}`);
@@ -400,11 +431,19 @@ function loadFormData(formData) {
             if (question.conditionalPDF && question.conditionalPDF.enabled) {
                 questionBlock.querySelector(`#enableConditionalPDF${question.questionId}`).checked = true;
                 toggleConditionalPDFLogic(question.questionId);
-
-                // Set PDF name and answer
                 questionBlock.querySelector(`#conditionalPDFName${question.questionId}`).value = question.conditionalPDF.pdfName;
                 questionBlock.querySelector(`#conditionalPDFAnswer${question.questionId}`).value = question.conditionalPDF.answer;
             }
+
+            // NEW CODE START: Restore Conditional Alert logic
+            if (question.conditionalAlert && question.conditionalAlert.enabled) {
+                questionBlock.querySelector(`#enableConditionalAlert${question.questionId}`).checked = true;
+                toggleConditionalAlertLogic(question.questionId);
+                questionBlock.querySelector(`#alertPrevQuestion${question.questionId}`).value = question.conditionalAlert.prevQuestion;
+                questionBlock.querySelector(`#alertPrevAnswer${question.questionId}`).value = question.conditionalAlert.prevAnswer;
+                questionBlock.querySelector(`#alertText${question.questionId}`).value = question.conditionalAlert.text;
+            }
+            // NEW CODE END
         });
     });
 
@@ -419,8 +458,6 @@ function loadFormData(formData) {
     updateAutofillOptions();
 }
 
-
-// Function to add a hidden field with data, including autofill logic and conditions
 function addHiddenFieldWithData(hiddenField) {
     const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
     const hiddenFieldBlock = document.createElement('div');
@@ -473,7 +510,7 @@ function addHiddenFieldWithData(hiddenField) {
                 addConditionalAutofill(currentHiddenFieldId);
                 const conditionId = index + 1;
                 document.getElementById(`conditionQuestion${currentHiddenFieldId}_${conditionId}`).value = condition.questionId;
-                updateConditionAnswers(currentHiddenFieldId, conditionId); // Populate the answer dropdown
+                updateConditionAnswers(currentHiddenFieldId, conditionId);
                 document.getElementById(`conditionAnswer${currentHiddenFieldId}_${conditionId}`).value = condition.answerValue;
                 document.getElementById(`conditionValue${currentHiddenFieldId}_${conditionId}`).value = condition.autofillValue;
             });
