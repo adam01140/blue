@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Flowchart Creator</title>
-  <!-- mxGraph library from jsDelivr -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mxgraph@4.2.2/javascript/mxClient.min.js"></script>
 
   <style>
@@ -43,12 +42,15 @@
       border-radius: 4px;
       cursor: move;
     }
+
     .shape:hover {
       background: #e0e0e0;
     }
+
     .button-bar {
       margin-top: 15px;
     }
+
     button {
       margin-bottom: 6px;
       padding: 6px 10px;
@@ -61,36 +63,58 @@
       width: 100%;
       box-sizing: border-box;
     }
+
     button:hover {
       background-color: #0056b3;
     }
+
     input[type="file"] {
-      display: none; /* hidden by default; we trigger it via button click */
+      display: none;
+    }
+
+    .context-menu {
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 1000;
+      padding: 5px;
+    }
+
+    .context-menu button {
+      border: none;
+      background: none;
+      color: #333;
+      padding: 5px 10px;
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .context-menu button:hover {
+      background-color: #f0f0f0;
     }
   </style>
 </head>
 <body>
-  <!-- Toolbar Area -->
   <div class="toolbar">
     <h3>Shapes</h3>
-    <!-- Question Node (rectangle) -->
     <div
       class="shape"
       data-type="question"
-      data-style="shape=rectangle;whiteSpace=wrap;html=1;"
+      data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=question;"
     >
       Question Node
     </div>
-    <!-- Options Node (ellipse) -->
     <div
       class="shape"
       data-type="options"
-      data-style="ellipse;whiteSpace=wrap;html=1;"
+      data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=options;"
     >
       Options Node
     </div>
-
-    <!-- Buttons to export and import the flowchart JSON -->
     <div class="button-bar">
       <button onclick="exportFlowchartJson()">Export Flowchart JSON</button>
       <button onclick="document.getElementById('importFlowchartFile').click()">Import Flowchart</button>
@@ -100,14 +124,15 @@
         accept=".json"
         onchange="importFlowchartJson(event)"
       />
-
-      <!-- Export to GUI JSON (for your Custom Form Builder) -->
       <button onclick="exportGuiJson()">Export GUI JSON</button>
     </div>
   </div>
 
-  <!-- Graph Container -->
   <div id="graphContainer"></div>
+
+  <div id="contextMenu" class="context-menu">
+    <button id="deleteNode">Delete Node</button>
+  </div>
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -117,57 +142,156 @@
       }
 
       const container = document.getElementById("graphContainer");
-      // Disable context menu
+      const contextMenu = document.getElementById("contextMenu");
+      const deleteNodeButton = document.getElementById("deleteNode");
+      let selectedCell = null;
+
       mxEvent.disableContextMenu(container);
 
-      // Create graph
       const graph = new mxGraph(container);
-      // Basic setup
       graph.setCellsMovable(true);
       graph.setConnectable(true);
       graph.setCellsResizable(true);
-
-      // Rubberband selection
       new mxRubberband(graph);
 
-      // Prevent deleting text while editing a label
-      document.addEventListener("keydown", function (evt) {
-        // Only allow Delete/Backspace if NOT editing label text
-        if (
-          (evt.key === "Delete" || evt.key === "Backspace") &&
-          !graph.cellEditor.isEditing()
-        ) {
-          const selectedCells = graph.getSelectionCells();
-          if (selectedCells && selectedCells.length) {
-            graph.removeCells(selectedCells);
-            evt.preventDefault();
+      // Context menu logic
+      graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
+        if (cell) {
+          selectedCell = cell;
+          showContextMenu(evt);
+        } else {
+          selectedCell = null;
+          hideContextMenu();
+        }
+      };
+
+      function showContextMenu(evt) {
+        contextMenu.style.display = "block";
+        contextMenu.style.left = `${evt.clientX}px`;
+        contextMenu.style.top = `${evt.clientY}px`;
+      }
+
+      function hideContextMenu() {
+        contextMenu.style.display = "none";
+      }
+
+      deleteNodeButton.addEventListener("click", function () {
+        if (selectedCell) {
+          graph.removeCells([selectedCell]);
+        }
+        hideContextMenu();
+      });
+
+      document.addEventListener("click", function () {
+        hideContextMenu();
+      });
+
+      const keyHandler = new mxKeyHandler(graph);
+
+      // Copy-paste functionality
+      keyHandler.bindControlKey(67, function () {
+        mxClipboard.copy(graph);
+      });
+
+      keyHandler.bindControlKey(86, function () {
+        mxClipboard.paste(graph);
+      });
+
+      // SHIFT + Drag for node movement
+      let shiftDown = false;
+
+      document.addEventListener("keydown", (evt) => {
+        if (evt.key === "Shift") shiftDown = true;
+      });
+
+      document.addEventListener("keyup", (evt) => {
+        if (evt.key === "Shift") shiftDown = false;
+      });
+
+      graph.addMouseListener({
+  currentState: null,
+  mouseDown: function (sender, me) {
+    if (shiftDown) {
+      const state = me.getState();
+      if (state) {
+        graph.panningHandler.start(state, me.getX(), me.getY());
+        me.consume();
+      }
+    }
+  },
+  mouseMove: function (sender, me) {},
+  mouseUp: function (sender, me) {}
+});
+
+
+      // Automatic classification of nodes
+      graph.getModel().addListener(mxEvent.EVENT_CHANGE, function (sender, evt) {
+        const changes = evt.getProperty("changes");
+        if (!changes) return;
+
+        changes.forEach((change) => {
+          if (change.constructor.name === "mxValueChange") {
+            const { cell, value } = change;
+            if (value && typeof value === "string") {
+              if (value.trim().endsWith("?")) {
+                reclassifyCellAsQuestion(cell);
+              }
+            }
           }
+        });
+      });
+
+      graph.connectionHandler.addListener(mxEvent.CONNECT, function (sender, evt) {
+        const edge = evt.getProperty("cell");
+        const source = edge.source;
+        const target = edge.target;
+        if (source && isQuestionNode(source)) {
+          reclassifyCellAsOptions(target);
         }
       });
 
-      // Draggable shapes from toolbar
+      function isQuestionNode(cell) {
+        return cell.style && cell.style.indexOf("nodeType=question") >= 0;
+      }
+
+      function reclassifyCellAsQuestion(cell) {
+        let style = cell.style || "";
+        if (!style.includes("nodeType=question")) {
+          style += ";nodeType=question;";
+        }
+        graph.getModel().setStyle(cell, style);
+      }
+
+      function reclassifyCellAsOptions(cell) {
+        let style = cell.style || "";
+        if (!style.includes("nodeType=options")) {
+          style += ";nodeType=options;";
+        }
+        graph.getModel().setStyle(cell, style);
+      }
+
+      // Drag-and-drop for shapes
       const toolbarShapes = document.querySelectorAll(".shape");
       toolbarShapes.forEach((shapeEl) => {
-        const nodeType = shapeEl.dataset.type;
-        const styleStr = shapeEl.dataset.style;
-
+        const baseStyle = shapeEl.dataset.style;
         mxUtils.makeDraggable(
           shapeEl,
           graph,
           function (graph, evt, targetCell, x, y) {
+            const parent = graph.getDefaultParent();
             const model = graph.getModel();
             let newVertex;
             model.beginUpdate();
             try {
               newVertex = graph.insertVertex(
-                graph.getDefaultParent(),
+                parent,
                 null,
-                nodeType + " node", // default label
+                shapeEl.dataset.type + " node",
                 x,
                 y,
                 100,
                 60,
-                styleStr + `;nodeType=${nodeType};`
+                baseStyle
               );
             } finally {
               model.endUpdate();
@@ -177,16 +301,19 @@
         );
       });
 
-      /**
-       * Export Flowchart JSON
+
+ /**
+       * ===============================
+       * Export Flowchart JSON (all data)
+       * ===============================
        */
       window.exportFlowchartJson = function () {
         const data = [];
         const cells = graph.getModel().cells;
         for (let id in cells) {
-          if (id === "0" || id === "1") continue; // skip root/layer
+          if (id === "0" || id === "1") continue; // skip root & layer
           const cell = cells[id];
-          const cellData = {
+          data.push({
             id: cell.id,
             value: cell.value,
             geometry: cell.geometry
@@ -202,15 +329,15 @@
             edge: !!cell.edge,
             source: cell.edge ? cell.source?.id : null,
             target: cell.edge ? cell.target?.id : null
-          };
-          data.push(cellData);
+          });
         }
         downloadJson(JSON.stringify(data, null, 2), "flowchart_data.json");
       };
 
       /**
+       * ===============================
        * Import Flowchart JSON
-       * Rebuilds the graph from a previously exported JSON
+       * ===============================
        */
       window.importFlowchartJson = function (evt) {
         const file = evt.target.files[0];
@@ -225,77 +352,75 @@
       };
 
       function loadFlowchartData(data) {
-        // Clear existing graph
         graph.getModel().beginUpdate();
         try {
-          graph.removeCells(graph.getChildVertices(graph.getDefaultParent()), true);
+          // Remove existing nodes
+          const parent = graph.getDefaultParent();
+          graph.removeCells(graph.getChildVertices(parent));
 
-          // We'll store references to newly created cells by their old IDs
           const createdCells = {};
 
-          // First pass: create vertices
+          // Pass 1: create vertices
           data.forEach((item) => {
             if (item.vertex) {
-              const parent = graph.getDefaultParent();
-              const geo = new mxGeometry(item.geometry.x, item.geometry.y, item.geometry.width, item.geometry.height);
+              const geo = new mxGeometry(
+                item.geometry.x,
+                item.geometry.y,
+                item.geometry.width,
+                item.geometry.height
+              );
               const newCell = new mxCell(item.value, geo, item.style);
               newCell.vertex = true;
-              // Insert cell
-              newCell.id = item.id; // reuse the old ID
+              newCell.id = item.id;
               graph.addCell(newCell, parent);
               createdCells[item.id] = newCell;
             }
           });
 
-          // Second pass: create edges
+          // Pass 2: create edges
           data.forEach((item) => {
             if (item.edge) {
-              const parent = graph.getDefaultParent();
               const newEdge = new mxCell(item.value, new mxGeometry(), item.style);
               newEdge.edge = true;
-              newEdge.id = item.id; // reuse old ID
+              newEdge.id = item.id;
+
               const sourceCell = createdCells[item.source];
               const targetCell = createdCells[item.target];
               graph.addCell(newEdge, parent, undefined, sourceCell, targetCell);
             }
           });
-
         } finally {
           graph.getModel().endUpdate();
         }
       }
 
       /**
+       * ===============================
        * Export GUI JSON
-       * Single section -> each "question node" is a dropdown question
-       * "options node" shapes connected to that question become the question's dropdown options
-       * Conditional logic: If an "options node" leads to another question, we enable logic.
+       * ===============================
        */
       window.exportGuiJson = function () {
         const model = graph.getModel();
         const allCells = model.cells;
 
-        // We'll track question nodes in an array
-        // questionData = { questionId, text, options: [], logic: {enabled, prevQuestion, prevAnswer} }
         let questionIdCounter = 1;
-        const questionMap = {}; // oldCellId -> question object
-        const questionCells = []; // store the actual question cell references
+        const questionMap = {};
 
-        // A function to get nodeType from cell.style
+        // Helper to detect nodeType
         function getNodeType(cell) {
-          if (cell.style && cell.style.indexOf("nodeType=question") >= 0) return "question";
-          if (cell.style && cell.style.indexOf("nodeType=options") >= 0) return "options";
+          if (cell.style && cell.style.includes("nodeType=question")) return "question";
+          if (cell.style && cell.style.includes("nodeType=options")) return "options";
           return null;
         }
 
-        // 1) Identify all question nodes & assign them incremental question IDs
+        // 1) Identify question nodes
         for (let id in allCells) {
           if (id === "0" || id === "1") continue;
           const cell = allCells[id];
           if (cell.vertex && getNodeType(cell) === "question") {
-            // Use label minus "question node" if user hasn't changed it
+            // Label minus default text
             const label = cell.value.toString().replace(/question node/i, "").trim() || "Untitled";
-            const qObj = {
+            questionMap[id] = {
               questionId: questionIdCounter,
               text: label,
               type: "dropdown",
@@ -305,55 +430,47 @@
               options: [],
               labels: []
             };
-            questionMap[id] = qObj;
-            questionCells.push(cell);
             questionIdCounter++;
           }
         }
 
-        // 2) For each question node, gather "options nodes" from outgoing edges
-        questionCells.forEach((qCell) => {
-          const qObj = questionMap[qCell.id];
-          // Outgoing edges to "options" nodes
-          const outEdges = graph.getOutgoingEdges(qCell);
-          if (!outEdges) return;
+        // 2) For each question node, gather options from connected "options" nodes
+        Object.keys(questionMap).forEach((cellId) => {
+          const cell = allCells[cellId];
+          const qObj = questionMap[cellId];
+          const outEdges = graph.getOutgoingEdges(cell) || [];
 
           outEdges.forEach((edge) => {
             const target = edge.target;
             if (!target) return;
-            const targetType = getNodeType(target);
-            if (targetType === "options") {
-              // If it's an options node, add the label to the question's options
+            if (getNodeType(target) === "options") {
+              // Add to the question's options
               const optLabel = target.value.toString().replace(/options node/i, "").trim() || "Option";
               qObj.options.push(optLabel);
 
-              // Also check if that options node leads to a *question node*
-              const nextEdges = graph.getOutgoingEdges(target);
-              if (nextEdges) {
-                // If there's a question node on the other side, that question node is conditional
-                nextEdges.forEach((nEdge) => {
-                  const q2 = nEdge.target;
-                  if (q2 && getNodeType(q2) === "question") {
-                    // We want to enable logic on q2:
-                    // Show q2 if the user picks 'optLabel' on qObj's questionId
-                    const q2Obj = questionMap[q2.id];
-                    if (q2Obj) {
-                      q2Obj.logic.enabled = true;
-                      q2Obj.logic.prevQuestion = qObj.questionId.toString();
-                      q2Obj.logic.prevAnswer = optLabel;
-                    }
+              // Check if that options node leads to another question
+              const nextEdges = graph.getOutgoingEdges(target) || [];
+              nextEdges.forEach((nEdge) => {
+                const q2 = nEdge.target;
+                if (q2 && getNodeType(q2) === "question") {
+                  // Enable logic on q2
+                  const q2Obj = questionMap[q2.id];
+                  if (q2Obj) {
+                    q2Obj.logic.enabled = true;
+                    q2Obj.logic.prevQuestion = qObj.questionId.toString();
+                    q2Obj.logic.prevAnswer = optLabel;
                   }
-                });
-              }
+                }
+              });
             }
           });
         });
 
-        // 3) Build the final single-section structure
+        // Single section
         const section = {
           sectionId: 1,
           sectionName: "Flowchart Section",
-          questions: Object.values(questionMap) // all question objects
+          questions: Object.values(questionMap)
         };
 
         const guiData = {
@@ -365,13 +482,10 @@
           defaultPDFName: ""
         };
 
-        const jsonStr = JSON.stringify(guiData, null, 2);
-        downloadJson(jsonStr, "gui_data.json");
+        downloadJson(JSON.stringify(guiData, null, 2), "gui_data.json");
       };
 
-      /**
-       * Utility to download JSON as a file
-       */
+      /** Utility to trigger JSON download */
       function downloadJson(jsonString, filename) {
         const blob = new Blob([jsonString], { type: "application/json" });
         const url = URL.createObjectURL(blob);
@@ -384,6 +498,7 @@
         URL.revokeObjectURL(url);
       }
     });
+
   </script>
 </body>
 </html>
