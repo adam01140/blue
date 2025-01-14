@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Flowchart Creator</title>
-  <!-- mxGraph library -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mxgraph@4.2.2/javascript/mxClient.min.js"></script>
-
   <style>
     html, body {
       margin: 0;
@@ -13,9 +11,7 @@
       height: 100%;
       font-family: Arial, sans-serif;
       user-select: none;
-      /* If you want to see scrollbars, you can do overflow: auto; but we rely on panning. */
     }
-
     .toolbar {
       width: 220px;
       background: #f9f9f9;
@@ -24,17 +20,14 @@
       padding: 10px;
       box-sizing: border-box;
     }
-
     #graphContainer {
       position: absolute;
       left: 220px;
       right: 0;
       top: 0;
       bottom: 0;
-      /* Panning will let us drag on whitespace */
-      cursor: default;
+      cursor: default; /* for panning on whitespace */
     }
-
     .shape {
       background: #fff;
       border: 1px solid #999;
@@ -47,7 +40,6 @@
     .shape:hover {
       background: #e0e0e0;
     }
-
     .button-bar {
       margin-top: 15px;
     }
@@ -66,11 +58,9 @@
     button:hover {
       background-color: #0056b3;
     }
-
     input[type="file"] {
       display: none;
     }
-
     .context-menu {
       position: absolute;
       background: #fff;
@@ -93,7 +83,6 @@
     .context-menu button:hover {
       background-color: #f0f0f0;
     }
-
     .submenu {
       position: absolute;
       background: #fff;
@@ -119,7 +108,7 @@
       background-color: #f0f0f0;
     }
 
-    /* A small properties dialog */
+    /* Properties menu */
     #propertiesMenu {
       position: absolute;
       background: #fff;
@@ -127,30 +116,40 @@
       padding: 10px;
       border-radius: 4px;
       display: none;
-      z-index: 3000; /* above context menus */
+      z-index: 3000;
+      width: 220px;
     }
     #propertiesMenu p {
       margin: 4px 0;
     }
+    .editable-field {
+      border: 1px dashed transparent;
+      padding: 2px;
+      display: inline-block;
+      min-width: 50px;
+      cursor: text;
+    }
+    .editable-field:focus {
+      outline: 1px dashed #888;
+    }
   </style>
 </head>
-
 <body>
   <div class="toolbar">
     <h3>Shapes</h3>
-    <!-- "Question Node" shape (default: dropdown, section=1) -->
+    <!-- Default question node -->
     <div
       class="shape"
       data-type="question"
-      data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;sectionId=1;"
+      data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;sectionId=1;nodeId=Question_node;"
     >
       Question Node
     </div>
-    <!-- "Options Node" shape (default: dropdown, section=1) -->
+    <!-- Default options node -->
     <div
       class="shape"
       data-type="options"
-      data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;sectionId=1;"
+      data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;sectionId=1;nodeId=Option_node;"
     >
       Options Node
     </div>
@@ -188,6 +187,12 @@
 
   <!-- Properties menu -->
   <div id="propertiesMenu">
+    <p><strong>Node Text:</strong>
+      <span id="propNodeText" class="editable-field" tabindex="0"></span>
+    </p>
+    <p><strong>Node ID:</strong>
+      <span id="propNodeId" class="editable-field" tabindex="0"></span>
+    </p>
     <p><strong>Node Type:</strong> <span id="propNodeType"></span></p>
     <p><strong>Section Name:</strong> <span id="propSectionName"></span></p>
   </div>
@@ -200,53 +205,75 @@
       }
 
       const container = document.getElementById("graphContainer");
+
       const contextMenu = document.getElementById("contextMenu");
       const deleteNodeButton = document.getElementById("deleteNode");
       const duplicateNodeButton = document.getElementById("duplicateNode");
       const changeTypeButton = document.getElementById("changeType");
       const newSectionButton = document.getElementById("newSectionButton");
       const propertiesButton = document.getElementById("propertiesButton");
-
       const typeSubmenu = document.getElementById("typeSubmenu");
       const dropdownTypeBtn = document.getElementById("dropdownType");
       const checkboxTypeBtn = document.getElementById("checkboxType");
       const textTypeBtn = document.getElementById("textType");
 
       const propertiesMenu = document.getElementById("propertiesMenu");
+      const propNodeText = document.getElementById("propNodeText");
+      const propNodeId = document.getElementById("propNodeId");
       const propNodeType = document.getElementById("propNodeType");
       const propSectionName = document.getElementById("propSectionName");
 
       let selectedCell = null;
+      let currentMouseEvent = null;
+      let lastSelectedCell = null; // === NEW: track the previously selected cell
 
-      // Setup mxGraph with panning
       mxEvent.disableContextMenu(container);
-      const graph = new mxGraph(container);
-      graph.setPanning(true);  // allow panning
-      // This means left-click-drag on empty space moves the canvas
-      graph.panningHandler.useLeftButtonForPanning = true;
 
+      const graph = new mxGraph(container);
+      graph.setPanning(true);
+      graph.panningHandler.useLeftButtonForPanning = true; // Pan by dragging whitespace
       graph.setCellsMovable(true);
       graph.setConnectable(true);
       graph.setCellsResizable(true);
-
-      // Rubberband for multi-select
       new mxRubberband(graph);
 
+      // =========== NEW: auto-update node ID on selection change ===========
+      graph.getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) => {
+        // The old cell we are "leaving"
+        if (lastSelectedCell) {
+          autoUpdateNodeIdBasedOnLabel(lastSelectedCell);
+        }
+        // The new cell we are "selecting"
+        lastSelectedCell = graph.getSelectionCell();
+      });
+      function autoUpdateNodeIdBasedOnLabel(cell) {
+        // If it's a question or options, set node ID from label
+        if (!cell.vertex) return;
+        const label = (cell.value || "").trim();
+        if (!label) return;
+        if (isQuestion(cell)) {
+          refreshNodeIdFromLabel(cell); // e.g. "are you hungry?" => "are_you_hungry?"
+        } else if (isOptions(cell)) {
+          refreshOptionNodeId(cell);
+        }
+      }
+
+      // ---------- Helper: reading/writing style ----------
       function getSectionId(cell) {
         const style = cell.style || "";
-        const match = style.match(/sectionId=([^;]+)/);
-        return match ? parseInt(match[1]) : 1;
+        const m = style.match(/sectionId=([^;]+)/);
+        return m ? parseInt(m[1]) : 1;
       }
-      function setSectionId(cell, newSid) {
+      function setSectionId(cell, sid) {
         let style = cell.style || "";
         style = style.replace(/sectionId=[^;]+/, "");
-        style += `;sectionId=${newSid};`;
+        style += `;sectionId=${sid};`;
         graph.getModel().setStyle(cell, style);
       }
       function getQuestionType(cell) {
         const style = cell.style || "";
-        const match = style.match(/questionType=([^;]+)/);
-        return match ? match[1] : "dropdown";
+        const m = style.match(/questionType=([^;]+)/);
+        return m ? m[1] : "dropdown";
       }
       function setQuestionType(cell, newType) {
         let style = cell.style || "";
@@ -254,122 +281,99 @@
         style += `;questionType=${newType};`;
         graph.getModel().setStyle(cell, style);
       }
+      function getNodeId(cell) {
+        const style = cell.style || "";
+        const m = style.match(/nodeId=([^;]+)/);
+        return m ? decodeURIComponent(m[1]) : "";
+      }
+      function setNodeId(cell, nodeId) {
+        let style = cell.style || "";
+        style = style.replace(/nodeId=[^;]+/, "");
+        style += `;nodeId=${encodeURIComponent(nodeId)};`;
+        graph.getModel().setStyle(cell, style);
+      }
       function isQuestion(cell) {
-        return cell && cell.style && cell.style.includes("nodeType=question");
+        return (cell && cell.style && cell.style.includes("nodeType=question"));
       }
       function isOptions(cell) {
-        return cell && cell.style && cell.style.includes("nodeType=options");
+        return (cell && cell.style && cell.style.includes("nodeType=options"));
       }
 
-      /**
-       * Color-coding
-       *  - dropdown => #ADD8E6
-       *  - checkbox => #FFA07A
-       *  - text => #90EE90
-       *  - if it's the "first question" in that section and section>1 => pink (#FFC0CB)
-       *  - options nodes adopt parent's color
-       */
+      // ---------- Node coloring logic ----------
       function colorCell(cell) {
-        if (!cell || !cell.vertex) return;
-
-        const style = cell.style || "";
+        if (!cell.vertex) return;
         const qType = getQuestionType(cell);
+        let fillColor = "#ADD8E6"; // default for dropdown
+        if (qType === "checkbox") fillColor = "#FFA07A";
+        else if (qType === "text") fillColor = "#90EE90";
+
         const sId = getSectionId(cell);
-
-        let fillColor = "#ADD8E6"; // default (dropdown)
-        if (qType === "checkbox") {
-          fillColor = "#FFA07A";
-        } else if (qType === "text") {
-          fillColor = "#90EE90";
-        }
-
-        // figure out if it's the "first question" in that section. We'll do:
-        // "first question" = the question in that section with the lowest cell id
-        // that might not be perfect, but it's a simple approach
         if (isQuestion(cell)) {
           if (sId > 1 && isFirstQuestionInSection(cell, sId)) {
-            fillColor = "#FFC0CB"; // pink
+            fillColor = "#FFC0CB"; // pink if first question in that section
           }
-        }
-
-        // If node is "options", adopt parent's color
-        if (isOptions(cell)) {
+        } else if (isOptions(cell)) {
+          // match parent's color
           const edges = graph.getIncomingEdges(cell) || [];
           for (let e of edges) {
-            if (isQuestion(e.source)) {
-              fillColor = getQuestionColor(e.source);
+            const parent = e.source;
+            if (parent && isQuestion(parent)) {
+              fillColor = getComputedQuestionColor(parent);
               break;
             }
           }
         }
 
-        // remove old fillColor=, add fillColor=...
-        let newStyle = style.replace(/fillColor=[^;]+/, "");
-        newStyle += `;fillColor=${fillColor};`;
-        graph.getModel().setStyle(cell, newStyle);
+        let style = cell.style || "";
+        style = style.replace(/fillColor=[^;]+/, "");
+        style += `;fillColor=${fillColor};`;
+        graph.getModel().setStyle(cell, style);
       }
-
-      function getQuestionColor(qCell) {
-        // replicate the logic above, but for a question cell
+      function getComputedQuestionColor(qCell) {
         const qType = getQuestionType(qCell);
         let base = "#ADD8E6";
         if (qType === "checkbox") base = "#FFA07A";
-        if (qType === "text") base = "#90EE90";
-
+        else if (qType === "text") base = "#90EE90";
         const sId = getSectionId(qCell);
-        if (sId>1 && isFirstQuestionInSection(qCell, sId)) {
+        if (sId > 1 && isFirstQuestionInSection(qCell, sId)) {
           base = "#FFC0CB";
         }
         return base;
       }
-
       function isFirstQuestionInSection(cell, sId) {
-        // find all question cells in the graph that have style: sectionId=sId
-        // see if 'cell' has the smallest numeric cell.id
-        let smallestId = parseInt(cell.id);
-        const parent = graph.getDefaultParent();
-        const allCells = graph.getChildVertices(parent);
+        let minId = parseInt(cell.id);
+        const allCells = graph.getChildVertices(graph.getDefaultParent());
         for (let c of allCells) {
-          if (!c.style) continue;
-          if (isQuestion(c) && getSectionId(c)===sId) {
-            const cid = parseInt(c.id);
-            if (cid < smallestId) {
-              smallestId = cid;
-            }
+          if (isQuestion(c) && getSectionId(c) === sId) {
+            let cid = parseInt(c.id);
+            if (cid < minId) minId = cid;
           }
         }
-        return (parseInt(cell.id)===smallestId);
+        return parseInt(cell.id) === minId;
       }
-
       function refreshAllCells() {
         const parent = graph.getDefaultParent();
-        const cells = graph.getChildVertices(parent);
-        cells.forEach((c) => {
-          colorCell(c);
-          updateOverlay(c);
+        const vertices = graph.getChildVertices(parent);
+        vertices.forEach((v) => {
+          colorCell(v);
+          updateOverlay(v);
         });
       }
-
       function updateOverlay(cell) {
-        // remove old overlays
         graph.removeCellOverlays(cell);
         if (!cell.vertex) return;
-
-        const qType = getQuestionType(cell);
-        // if it's question or options => we show the type
-        let text = qType;
-        if (isOptions(cell)) text = "options";
-
+        let text = "node";
+        if (isQuestion(cell)) text = getQuestionType(cell);
+        else if (isOptions(cell)) text = "options";
         const overlay = new mxCellOverlay(
-          new mxImage("data:image/gif;base64,R0lGODlhAQABAAAAACw=",1,1),
+          new mxImage("data:image/gif;base64,R0lGODlhAQABAAAAACw=", 1, 1),
           text
         );
         graph.addCellOverlay(cell, overlay);
       }
 
-      // CONTEXT MENU
-      let currentMouseEvent = null;
-      graph.popupMenuHandler.factoryMethod = function(menu, cell, evt){
+      // ---------- Context Menu & handlers ----------
+      graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
         selectedCell = cell;
         currentMouseEvent = evt;
         if (cell) {
@@ -378,146 +382,219 @@
           hideContextMenu();
         }
       };
-      function showContextMenu(evt){
-        contextMenu.style.display="block";
-        contextMenu.style.left=evt.clientX+"px";
-        contextMenu.style.top=evt.clientY+"px";
-        typeSubmenu.style.display="none";
+      function showContextMenu(evt) {
+        contextMenu.style.display = "block";
+        contextMenu.style.left = evt.clientX + "px";
+        contextMenu.style.top = evt.clientY + "px";
+        typeSubmenu.style.display = "none";
       }
-      function hideContextMenu(){
-        contextMenu.style.display="none";
-        typeSubmenu.style.display="none";
+      function hideContextMenu() {
+        contextMenu.style.display = "none";
+        typeSubmenu.style.display = "none";
       }
-      document.addEventListener("click",(e)=>{
-        if (!contextMenu.contains(e.target) && !typeSubmenu.contains(e.target) && !propertiesMenu.contains(e.target)) {
+      document.addEventListener("click", (e) => {
+        if (
+          !contextMenu.contains(e.target) &&
+          !typeSubmenu.contains(e.target) &&
+          !propertiesMenu.contains(e.target)
+        ) {
           hideContextMenu();
-          propertiesMenu.style.display="none";
+          propertiesMenu.style.display = "none";
         }
       });
 
-      // Context menu items
-      deleteNodeButton.addEventListener("click",()=>{
+      deleteNodeButton.addEventListener("click", () => {
         if (selectedCell) {
           graph.removeCells([selectedCell]);
           refreshAllCells();
         }
         hideContextMenu();
       });
-      duplicateNodeButton.addEventListener("click",()=>{
+      duplicateNodeButton.addEventListener("click", () => {
         if (selectedCell) {
           mxClipboard.setCells(mxClipboard.copyCells([selectedCell], false));
           let pasted = mxClipboard.paste(graph);
-          if(pasted && pasted.length>0) {
-            graph.moveCells(pasted,40,40);
+          if (pasted && pasted.length > 0) {
+            graph.moveCells(pasted, 40, 40);
           }
           refreshAllCells();
         }
         hideContextMenu();
       });
-      changeTypeButton.addEventListener("click",()=>{
-        const rect=contextMenu.getBoundingClientRect();
-        typeSubmenu.style.display="block";
-        typeSubmenu.style.left=rect.right+"px";
-        typeSubmenu.style.top=rect.top+"px";
+      changeTypeButton.addEventListener("click", () => {
+        const rect = contextMenu.getBoundingClientRect();
+        typeSubmenu.style.display = "block";
+        typeSubmenu.style.left = rect.right + "px";
+        typeSubmenu.style.top = rect.top + "px";
       });
-      dropdownTypeBtn.addEventListener("click",()=>{
-        if(selectedCell && isQuestion(selectedCell)){
-          setQuestionType(selectedCell,"dropdown");
-          // optionally rename label
-          selectedCell.value="Dropdown question node";
+      dropdownTypeBtn.addEventListener("click", () => {
+        if (selectedCell && isQuestion(selectedCell)) {
+          setQuestionType(selectedCell, "dropdown");
+          selectedCell.value = "Dropdown question node";
           refreshAllCells();
         }
         hideContextMenu();
       });
-      checkboxTypeBtn.addEventListener("click",()=>{
-        if(selectedCell && isQuestion(selectedCell)){
-          setQuestionType(selectedCell,"checkbox");
-          selectedCell.value="Checkbox question node";
+      checkboxTypeBtn.addEventListener("click", () => {
+        if (selectedCell && isQuestion(selectedCell)) {
+          setQuestionType(selectedCell, "checkbox");
+          selectedCell.value = "Checkbox question node";
           refreshAllCells();
         }
         hideContextMenu();
       });
-      textTypeBtn.addEventListener("click",()=>{
-        if(selectedCell && isQuestion(selectedCell)){
-          setQuestionType(selectedCell,"text");
-          selectedCell.value="Text question node";
+      textTypeBtn.addEventListener("click", () => {
+        if (selectedCell && isQuestion(selectedCell)) {
+          setQuestionType(selectedCell, "text");
+          selectedCell.value = "Text question node";
           refreshAllCells();
         }
         hideContextMenu();
       });
-      newSectionButton.addEventListener("click",()=>{
-        if(selectedCell && isQuestion(selectedCell)){
-          // increment section
-          let oldSid = getSectionId(selectedCell);
-          let newSid = oldSid+1;
-          setSectionId(selectedCell, newSid);
+      newSectionButton.addEventListener("click", () => {
+        if (selectedCell && isQuestion(selectedCell)) {
+          let sid = getSectionId(selectedCell);
+          sid++;
+          setSectionId(selectedCell, sid);
           refreshAllCells();
         }
         hideContextMenu();
       });
-      propertiesButton.addEventListener("click",()=>{
+      propertiesButton.addEventListener("click", () => {
         if (selectedCell) {
           showPropertiesMenu(selectedCell, currentMouseEvent);
         }
         hideContextMenu();
       });
 
-      // Show a small "Properties" panel with Node Type & Section Name
-      function showPropertiesMenu(cell, evt){
-        if(!cell) return;
-        // compute node type
-        let nodeType = "unknown";
-        if(isQuestion(cell)) {
-          nodeType = getQuestionType(cell);
-        } else if(isOptions(cell)) {
-          nodeType = "options";
-        }
-        propNodeType.textContent = nodeType;
-
-        let sId = getSectionId(cell);
-        let sName = "Section "+ sId;
-        propSectionName.textContent = sName;
-
+      // ---------- Properties Menu ----------
+      function showPropertiesMenu(cell, evt) {
+        if (!cell) return;
         propertiesMenu.style.display = "block";
-        propertiesMenu.style.left = (evt.clientX+10)+"px";
-        propertiesMenu.style.top = (evt.clientY+10)+"px";
+        propertiesMenu.style.left = evt.clientX + 10 + "px";
+        propertiesMenu.style.top = evt.clientY + 10 + "px";
+
+        propNodeText.textContent = cell.value || "";
+        propNodeId.textContent = getNodeId(cell) || "";
+        if (isQuestion(cell)) {
+          propNodeType.textContent = getQuestionType(cell);
+        } else if (isOptions(cell)) {
+          propNodeType.textContent = "options";
+        } else {
+          propNodeType.textContent = "other";
+        }
+        let sid = getSectionId(cell);
+        propSectionName.textContent = "Section " + sid;
+      }
+      makeEditableField(propNodeText, onNodeTextFieldChange);
+      makeEditableField(propNodeId, onNodeIdFieldChange);
+
+      function makeEditableField(spanEl, onChangeCb) {
+        spanEl.addEventListener("dblclick", (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          spanEl.contentEditable = "true";
+          spanEl.focus();
+        });
+        spanEl.addEventListener("blur", () => {
+          spanEl.contentEditable = "false";
+          onChangeCb(spanEl.textContent);
+        });
+        spanEl.addEventListener("keydown", (evt) => {
+          if (evt.key === "Enter") {
+            evt.preventDefault();
+            spanEl.blur();
+          }
+        });
       }
 
-      // SHIFT+ drag is omitted. We rely on panning in empty space.
+      function onNodeTextFieldChange(newText) {
+        if (!selectedCell) return;
+        graph.getModel().beginUpdate();
+        try {
+          // Just set the label. We'll do the ID update upon deselect.
+          selectedCell.value = newText.trim();
+        } finally {
+          graph.getModel().endUpdate();
+        }
+        refreshAllCells();
+      }
+      function onNodeIdFieldChange(newId) {
+        if (!selectedCell) return;
+        graph.getModel().beginUpdate();
+        try {
+          setNodeId(selectedCell, newId);
+        } finally {
+          graph.getModel().endUpdate();
+        }
+        refreshAllCells();
+      }
 
-      // Key handler: ctrl+c / ctrl+v
+      // If question => nodeId = label with underscores
+      function refreshNodeIdFromLabel(cell) {
+        const label = (cell.value || "").toString().trim();
+        const nodeId = label.replace(/\s+/g, "_");
+        setNodeId(cell, nodeId);
+      }
+      // If options => nodeId = parent's nodeId + underscore + option label
+      function refreshOptionNodeId(cell) {
+        const edges = graph.getIncomingEdges(cell) || [];
+        let parentNodeId = "ParentQuestion";
+        for (let e of edges) {
+          const p = e.source;
+          if (isQuestion(p)) {
+            parentNodeId = getNodeId(p) || "ParentQuestion";
+            break;
+          }
+        }
+        let label = (cell.value || "Option").toString().trim().replace(/\s+/g, "_");
+        setNodeId(cell, parentNodeId + label);
+      }
+
+      // SHIFT+drag omitted for brevity
+
+      // Ctrl+C / Ctrl+V
       const keyHandler = new mxKeyHandler(graph);
-      keyHandler.bindControlKey(67,()=>{ mxClipboard.copy(graph); });
-      keyHandler.bindControlKey(86,()=>{
-        let pasted = mxClipboard.paste(graph);
-        if(pasted && pasted.length>0) {
-          graph.moveCells(pasted,40,40);
+      keyHandler.bindControlKey(67, () => {
+        mxClipboard.copy(graph);
+      });
+      keyHandler.bindControlKey(86, () => {
+        const pasted = mxClipboard.paste(graph);
+        if (pasted && pasted.length > 0) {
+          graph.moveCells(pasted, 40, 40);
           refreshAllCells();
         }
       });
 
-      // Drag & drop from the toolbar
+      // Drag from shapes
       const toolbarShapes = document.querySelectorAll(".shape");
-      toolbarShapes.forEach(shapeEl=>{
+      toolbarShapes.forEach((shapeEl) => {
         const baseStyle = shapeEl.dataset.style;
         mxUtils.makeDraggable(
           shapeEl,
           graph,
-          function(graph,evt,targetCell,x,y){
+          function (graph, evt, targetCell, x, y) {
             const parent = graph.getDefaultParent();
             graph.getModel().beginUpdate();
             let newVertex;
-            try{
+            try {
               newVertex = graph.insertVertex(
                 parent,
                 null,
                 shapeEl.dataset.type + " node",
-                x,y,
-                100,60,
+                x,
+                y,
+                100,
+                60,
                 baseStyle
               );
             } finally {
               graph.getModel().endUpdate();
+            }
+            if (isQuestion(newVertex)) {
+              refreshNodeIdFromLabel(newVertex);
+            } else if (isOptions(newVertex)) {
+              refreshOptionNodeId(newVertex);
             }
             refreshAllCells();
             return newVertex;
@@ -525,19 +602,20 @@
         );
       });
 
-      // Label ends with '?', classify as question
-      graph.getModel().addListener(mxEvent.EVENT_CHANGE, function(sender,evt){
+      // If label ends with '?', auto nodeType=question
+      graph.getModel().addListener(mxEvent.EVENT_CHANGE, function (sender, evt) {
         const changes = evt.getProperty("changes");
-        if(!changes) return;
-        changes.forEach(change=>{
-          if(change.constructor.name==="mxValueChange"){
-            const {cell,value} = change;
-            if(value && typeof value==="string"){
-              if(value.trim().endsWith("?")){
-                if(!isQuestion(cell)){
-                  let style=cell.style||"";
+        if (!changes) return;
+        changes.forEach((change) => {
+          if (change.constructor.name === "mxValueChange") {
+            const { cell, value } = change;
+            if (value && typeof value === "string") {
+              if (value.trim().endsWith("?")) {
+                if (!isQuestion(cell)) {
+                  let style = cell.style || "";
                   style += ";nodeType=question;";
-                  graph.getModel().setStyle(cell,style);
+                  graph.getModel().setStyle(cell, style);
+                  refreshNodeIdFromLabel(cell);
                 }
               }
             }
@@ -545,207 +623,193 @@
         });
         refreshAllCells();
       });
-
-      // If question => target is options
-      graph.connectionHandler.addListener(mxEvent.CONNECT, function(sender,evt){
-        const edge=evt.getProperty("cell");
-        if(!edge) return;
-        const source=edge.source;
-        const target=edge.target;
-        if(source && isQuestion(source)){
-          // mark target as options
-          if(!isOptions(target)){
-            let style=target.style||"";
+      // If question => target => options
+      graph.connectionHandler.addListener(mxEvent.CONNECT, function (sender, evt) {
+        const edge = evt.getProperty("cell");
+        if (!edge) return;
+        const source = edge.source;
+        const target = edge.target;
+        if (source && isQuestion(source)) {
+          if (!isOptions(target)) {
+            let style = target.style || "";
             style += ";nodeType=options;";
             graph.getModel().setStyle(target, style);
           }
+          refreshOptionNodeId(target);
         }
         refreshAllCells();
       });
 
-      // For debugging
-      window.exportFlowchartJson = function(){
-        const data=[];
+      // ---------- Export Flowchart JSON ----------
+      window.exportFlowchartJson = function () {
+        const data = [];
         const cells = graph.getModel().cells;
-        for(let id in cells){
-          if(id==="0"||id==="1") continue;
-          const cell=cells[id];
+        for (let id in cells) {
+          if (id === "0" || id === "1") continue;
+          const cell = cells[id];
           data.push({
-            id:cell.id,
-            value:cell.value,
-            geometry:cell.geometry?{
-              x: cell.geometry.x,
-              y: cell.geometry.y,
-              width: cell.geometry.width,
-              height: cell.geometry.height
-            }:null,
-            style: cell.style||"",
+            id: cell.id,
+            value: cell.value,
+            geometry: cell.geometry
+              ? {
+                  x: cell.geometry.x,
+                  y: cell.geometry.y,
+                  width: cell.geometry.width,
+                  height: cell.geometry.height
+                }
+              : null,
+            style: cell.style || "",
             vertex: !!cell.vertex,
             edge: !!cell.edge,
             source: cell.edge ? cell.source?.id : null,
             target: cell.edge ? cell.target?.id : null
           });
         }
-        downloadJson(JSON.stringify(data,null,2),"flowchart_data.json");
+        downloadJson(JSON.stringify(data, null, 2), "flowchart_data.json");
       };
-
-      function downloadJson(jsonString,filename){
-        const blob=new Blob([jsonString],{type:"application/json"});
-        const url=URL.createObjectURL(blob);
-        const link=document.createElement("a");
-        link.href=url;
-        link.download=filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+      function downloadJson(str, filename) {
+        const blob = new Blob([str], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
       }
-      window.importFlowchartJson=function(evt){
-        const file=evt.target.files[0];
-        if(!file)return;
-        const reader=new FileReader();
-        reader.onload=function(e){
-          const jsonData=JSON.parse(e.target.result);
+      window.importFlowchartJson = function (evt) {
+        const file = evt.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const jsonData = JSON.parse(e.target.result);
           loadFlowchartData(jsonData);
         };
         reader.readAsText(file);
       };
-      function loadFlowchartData(data){
+      function loadFlowchartData(data) {
         graph.getModel().beginUpdate();
-        try{
+        try {
           const parent = graph.getDefaultParent();
           graph.removeCells(graph.getChildVertices(parent));
-          const createdCells={};
+          const createdCells = {};
           // pass1: vertices
-          data.forEach((item)=>{
-            if(item.vertex){
-              const geo=new mxGeometry(
+          data.forEach((item) => {
+            if (item.vertex) {
+              const geo = new mxGeometry(
                 item.geometry.x,
                 item.geometry.y,
                 item.geometry.width,
                 item.geometry.height
               );
-              const newCell=new mxCell(item.value,geo,item.style);
-              newCell.vertex=true;
-              newCell.id=item.id;
-              graph.addCell(newCell,parent);
-              createdCells[item.id]=newCell;
+              const newCell = new mxCell(item.value, geo, item.style);
+              newCell.vertex = true;
+              newCell.id = item.id;
+              graph.addCell(newCell, parent);
+              createdCells[item.id] = newCell;
             }
           });
           // pass2: edges
-          data.forEach((item)=>{
-            if(item.edge){
-              const newEdge=new mxCell(item.value,new mxGeometry(),item.style);
-              newEdge.edge=true;
-              newEdge.id=item.id;
-              const src=createdCells[item.source];
-              const trg=createdCells[item.target];
-              graph.addCell(newEdge,parent,undefined,src,trg);
+          data.forEach((item) => {
+            if (item.edge) {
+              const newEdge = new mxCell(item.value, new mxGeometry(), item.style);
+              newEdge.edge = true;
+              newEdge.id = item.id;
+              const src = createdCells[item.source];
+              const trg = createdCells[item.target];
+              graph.addCell(newEdge, parent, undefined, src, trg);
             }
           });
-        }finally{
+        } finally {
           graph.getModel().endUpdate();
         }
         refreshAllCells();
       }
 
-      // Export GUI JSON with multiple sections
-      window.exportGuiJson = function(){
-        const model=graph.getModel();
-        const allCells=model.cells;
-
-        // We'll store question nodes grouped by section
+      // ---------- Export GUI JSON ----------
+      window.exportGuiJson = function () {
+        const model = graph.getModel();
+        const allCells = model.cells;
         const sectionsMap = {};
-        let questionIdCounter=1;
-        let maxSectionId=1;
+        let questionIdCounter = 1;
+        let maxSectionId = 1;
 
-        function getNodeType(cell){
-          return (cell.style||"").includes("nodeType=question")?"question":
-                 (cell.style||"").includes("nodeType=options")?"options":"other";
+        function getNodeType(cell) {
+          if (cell.style && cell.style.includes("nodeType=question")) return "question";
+          if (cell.style && cell.style.includes("nodeType=options")) return "options";
+          return "other";
         }
 
-        // 1) gather question nodes, grouping by section
-        for(let id in allCells){
-          if(id==="0"||id==="1") continue;
-          const cell=allCells[id];
-          if(cell.vertex && getNodeType(cell)==="question"){
+        // 1) gather question nodes
+        for (let id in allCells) {
+          if (id === "0" || id === "1") continue;
+          const cell = allCells[id];
+          if (cell.vertex && getNodeType(cell) === "question") {
             const sId = getSectionId(cell);
-            if(sId>maxSectionId) maxSectionId=sId;
-            const label=(cell.value||"").toString().trim()||"Untitled";
-            const qType=getQuestionType(cell);
+            if (sId > maxSectionId) maxSectionId = sId;
+            const label = (cell.value || "").trim() || "Untitled";
+            const qType = getQuestionType(cell);
 
-            // We'll build partial question obj
-            // We'll fill in the 'options' in step2
-            const questionObj={
+            const questionObj = {
               questionId: questionIdCounter,
               text: label,
               type: qType,
-              logic: { enabled:false, prevQuestion:"", prevAnswer:"" },
-              jump: { enabled:false, option:"", to:"" },
-              conditionalPDF: {
-                enabled:false,
-                pdfName:"",
-                answer:"Yes"
-              },
-              conditionalAlert: {
-                enabled:false,
-                prevQuestion:"",
-                prevAnswer:"",
-                text:""
-              },
+              logic: { enabled: false, prevQuestion: "", prevAnswer: "" },
+              jump: { enabled: false, option: "", to: "" },
+              conditionalPDF: { enabled: false, pdfName: "", answer: "Yes" },
+              conditionalAlert: { enabled: false, prevQuestion: "", prevAnswer: "", text: "" },
               options: [],
               labels: []
             };
-            if(!sectionsMap[sId]) sectionsMap[sId]=[];
+            if (!sectionsMap[sId]) sectionsMap[sId] = [];
             sectionsMap[sId].push(questionObj);
-
             questionIdCounter++;
           }
         }
 
-        // 2) For each question node, gather options from connected "options" nodes
-        for(let id in allCells){
-          if(id==="0"||id==="1") continue;
-          const cell=allCells[id];
-          if(cell.vertex && getNodeType(cell)==="question"){
-            const sId=getSectionId(cell);
-            const label=(cell.value||"").toString().trim()||"Untitled";
-            // find that question object
-            let questionList = sectionsMap[sId]||[];
-            let qObj = questionList.find(q=>q.text===label);
-            if(!qObj) continue;
+        // 2) gather "options" from each question
+        for (let id in allCells) {
+          if (id === "0" || id === "1") continue;
+          const cell = allCells[id];
+          if (cell.vertex && getNodeType(cell) === "question") {
+            const sId = getSectionId(cell);
+            const label = (cell.value || "").trim() || "Untitled";
+            let questionList = sectionsMap[sId] || [];
+            let qObj = questionList.find((q) => q.text === label);
+            if (!qObj) continue;
 
-            const outEdges=graph.getOutgoingEdges(cell)||[];
-            outEdges.forEach(edge=>{
-              const target=edge.target;
-              if(!target) return;
-              if(getNodeType(target)==="options"){
-                const optLabel=(target.value||"").toString().trim()||"Option";
-                if(qObj.type==="checkbox"){
+            const outEdges = graph.getOutgoingEdges(cell) || [];
+            outEdges.forEach((edge) => {
+              const target = edge.target;
+              if (!target) return;
+              if (getNodeType(target) === "options") {
+                const optLabel = (target.value || "Option").trim();
+                const optNodeId = getNodeId(target); // e.g. "are_you_hungry?Yes"
+                if (qObj.type === "checkbox") {
                   qObj.options.push({
-                    label: optLabel,
-                    nameId:"",
-                    value:""
+                    label: capitalizeFirst(optLabel),
+                    nameId: optNodeId,
+                    value: ""
                   });
                 } else {
-                  // for dropdown, text, etc => array of strings
-                  qObj.options.push(optLabel);
+                  // For dropdown or text => store as strings
+                  qObj.options.push(capitalizeFirst(optLabel));
                 }
 
-                // see if that option leads to another question => logic
-                const nextEdges=graph.getOutgoingEdges(target)||[];
-                nextEdges.forEach(ne=>{
-                  const q2=ne.target;
-                  if(q2 && getNodeType(q2)==="question"){
-                    // find q2 in the appropriate section
-                    const q2Sid=getSectionId(q2);
-                    const q2Label=(q2.value||"").toString().trim()||"Untitled";
-                    let q2List=sectionsMap[q2Sid]||[];
-                    let q2Obj=q2List.find(o=>o.text===q2Label);
-                    if(q2Obj){
-                      q2Obj.logic.enabled=true;
-                      q2Obj.logic.prevQuestion=qObj.questionId.toString();
-                      q2Obj.logic.prevAnswer=optLabel;
+                // check for logic if that option leads to another question
+                const nextEdges = graph.getOutgoingEdges(target) || [];
+                nextEdges.forEach((ne) => {
+                  const q2 = ne.target;
+                  if (q2 && getNodeType(q2) === "question") {
+                    let q2Sid = getSectionId(q2);
+                    let q2Label = (q2.value || "").trim();
+                    let q2List = sectionsMap[q2Sid] || [];
+                    let q2Obj = q2List.find((o) => o.text === q2Label);
+                    if (q2Obj) {
+                      q2Obj.logic.enabled = true;
+                      q2Obj.logic.prevQuestion = qObj.questionId.toString();
+                      q2Obj.logic.prevAnswer = capitalizeFirst(optLabel);
                     }
                   }
                 });
@@ -754,28 +818,32 @@
           }
         }
 
-        // produce final array of sections
-        const sectionsArr=[];
-        for(let s=1; s<=maxSectionId; s++){
-          const qList=sectionsMap[s]||[];
+        // finalize sections
+        const sectionsArr = [];
+        for (let s = 1; s <= maxSectionId; s++) {
+          const qList = sectionsMap[s] || [];
           sectionsArr.push({
             sectionId: s,
-            sectionName: "Section "+s,
+            sectionName: "Section " + s,
             questions: qList
           });
         }
 
-        const guiData={
+        const guiData = {
           sections: sectionsArr,
           hiddenFields: [],
-          sectionCounter: maxSectionId+1,
+          sectionCounter: maxSectionId + 1,
           questionCounter: questionIdCounter,
-          hiddenFieldCounter:1,
-          defaultPDFName:""
+          hiddenFieldCounter: 1,
+          defaultPDFName: ""
         };
-
-        downloadJson(JSON.stringify(guiData,null,2),"gui_data.json");
+        downloadJson(JSON.stringify(guiData, null, 2), "gui_data.json");
       };
+
+      function capitalizeFirst(str) {
+        if (!str) return str;
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      }
     });
   </script>
 </body>
