@@ -237,15 +237,16 @@
       graph.setCellsResizable(true);
       new mxRubberband(graph);
 
-      // =========== auto-update node ID on selection change ===========
+      // =========== Auto-update node ID on selection change ===========
       graph.getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) => {
-        // The old cell we are "leaving"
+        // The old cell we are leaving
         if (lastSelectedCell) {
           autoUpdateNodeIdBasedOnLabel(lastSelectedCell);
         }
-        // The new cell we are "selecting"
+        // The new cell we are selecting
         lastSelectedCell = graph.getSelectionCell();
       });
+
       function autoUpdateNodeIdBasedOnLabel(cell) {
         // If it's a question or options, set node ID from label
         if (!cell.vertex) return;
@@ -286,80 +287,84 @@
         const m = style.match(/questionType=([^;]+)/);
         return m ? m[1] : "dropdown";
       }
+
       function setQuestionType(cell, newType) {
         let style = cell.style || "";
         style = style.replace(/questionType=[^;]+/, "");
         style += `;questionType=${newType};`;
         graph.getModel().setStyle(cell, style);
       }
+
       function getNodeId(cell) {
         const style = cell.style || "";
         const m = style.match(/nodeId=([^;]+)/);
         return m ? decodeURIComponent(m[1]) : "";
       }
+
       function setNodeId(cell, nodeId) {
         let style = cell.style || "";
         style = style.replace(/nodeId=[^;]+/, "");
         style += `;nodeId=${encodeURIComponent(nodeId)};`;
         graph.getModel().setStyle(cell, style);
       }
+
       function isQuestion(cell) {
-        return (cell && cell.style && cell.style.includes("nodeType=question"));
+        return cell && cell.style && cell.style.includes("nodeType=question");
       }
+
       function isOptions(cell) {
-        return (cell && cell.style && cell.style.includes("nodeType=options"));
+        return cell && cell.style && cell.style.includes("nodeType=options");
       }
 
       // ---------- refresh logic ----------
       function refreshAllCells() {
-    const parent = graph.getDefaultParent();
-    const vertices = graph.getChildVertices(parent);
+        const parent = graph.getDefaultParent();
+        const vertices = graph.getChildVertices(parent);
 
-    vertices.forEach((cell) => {
-      if (isOptions(cell)) {
-        // Option nodes inherit the section ID from their parent question
-        const incomingEdges = graph.getIncomingEdges(cell) || [];
-        if (incomingEdges.length > 0) {
-          const parentCell = incomingEdges[0].source;
-          if (parentCell && isQuestion(parentCell)) {
-            const parentSectionId = getSectionId(parentCell);
-            setSectionId(cell, parentSectionId);
-          }
-        }
-      }
-
-      if (isQuestion(cell)) {
-        const thisSection = getSectionId(cell);
-
-        // Only inherit parent's section if NOT flagged as newSection
-        // AND if this node is still at default (1 or 0).
-        if (
-          !cell.style.includes("newSection=true") &&
-          (thisSection === 1 || thisSection === 0)
-        ) {
-          const incomingEdges = graph.getIncomingEdges(cell) || [];
-          if (incomingEdges.length > 0) {
-            const parentCell = incomingEdges[0].source;
-            if (parentCell && isOptions(parentCell)) {
-              const parentSectionId = getSectionId(parentCell);
-              setSectionId(cell, parentSectionId);
+        vertices.forEach((cell) => {
+          if (isOptions(cell)) {
+            // Option nodes inherit the section ID from their parent question
+            const incomingEdges = graph.getIncomingEdges(cell) || [];
+            if (incomingEdges.length > 0) {
+              const parentCell = incomingEdges[0].source;
+              if (parentCell && isQuestion(parentCell)) {
+                const parentSectionId = getSectionId(parentCell);
+                setSectionId(cell, parentSectionId);
+              }
             }
           }
-        }
+
+          if (isQuestion(cell)) {
+            const thisSection = getSectionId(cell);
+
+            // Only inherit parent's section if NOT flagged as newSection
+            // AND if this node is still at default (1 or 0).
+            if (
+              !cell.style.includes("newSection=true") &&
+              (thisSection === 1 || thisSection === 0)
+            ) {
+              const incomingEdges = graph.getIncomingEdges(cell) || [];
+              if (incomingEdges.length > 0) {
+                const parentCell = incomingEdges[0].source;
+                if (parentCell && isOptions(parentCell)) {
+                  const parentSectionId = getSectionId(parentCell);
+                  setSectionId(cell, parentSectionId);
+                }
+              }
+            }
+          }
+
+          // Now color the cell, etc.
+          colorCell(cell);
+          updateOverlay(cell);
+        });
       }
-
-      // Now color the cell, etc.
-      colorCell(cell);
-      updateOverlay(cell);
-    });
-  }
-
 
       function colorCell(cell) {
         if (!cell.vertex) return;
 
         // Default light blue for question
-        let fillColor = "#ADD8E6"; 
+        let fillColor = "#ADD8E6";
 
         // Pink if newSection
         if (isQuestion(cell) && cell.style.includes("newSection=true")) {
@@ -376,7 +381,7 @@
         if (!cell) return;
 
         let style = cell.style || "";
-        style = style.replace(/newSection=[^;]+/, ""); 
+        style = style.replace(/newSection=[^;]+/, "");
         style += ";newSection=true;";
         graph.getModel().setStyle(cell, style);
 
@@ -408,6 +413,7 @@
           hideContextMenu();
         }
       };
+
       function showContextMenu(evt) {
         contextMenu.style.display = "block";
         contextMenu.style.left = evt.clientX + "px";
@@ -436,6 +442,7 @@
         }
         hideContextMenu();
       });
+
       duplicateNodeButton.addEventListener("click", () => {
         if (selectedCell) {
           mxClipboard.setCells(mxClipboard.copyCells([selectedCell], false));
@@ -447,12 +454,14 @@
         }
         hideContextMenu();
       });
+
       changeTypeButton.addEventListener("click", () => {
         const rect = contextMenu.getBoundingClientRect();
         typeSubmenu.style.display = "block";
         typeSubmenu.style.left = rect.right + "px";
         typeSubmenu.style.top = rect.top + "px";
       });
+
       dropdownTypeBtn.addEventListener("click", () => {
         if (selectedCell && isQuestion(selectedCell)) {
           setQuestionType(selectedCell, "dropdown");
@@ -461,6 +470,7 @@
         }
         hideContextMenu();
       });
+
       checkboxTypeBtn.addEventListener("click", () => {
         if (selectedCell && isQuestion(selectedCell)) {
           setQuestionType(selectedCell, "checkbox");
@@ -469,6 +479,7 @@
         }
         hideContextMenu();
       });
+
       textTypeBtn.addEventListener("click", () => {
         if (selectedCell && isQuestion(selectedCell)) {
           setQuestionType(selectedCell, "text");
@@ -482,13 +493,10 @@
         if (selectedCell && isQuestion(selectedCell)) {
           const currentSectionId = getSectionId(selectedCell);
           const newSectionId = currentSectionId + 1; // Increment section ID
-
           // Update the section ID
           setSectionId(selectedCell, newSectionId);
-
           // Mark this node as a "New Section" node
           markAsNewSection(selectedCell);
-
           // Refresh to ensure children pick up new logic
           refreshAllCells();
         }
@@ -521,6 +529,7 @@
         let sid = getSectionId(cell);
         propSectionName.textContent = "Section " + sid;
       }
+
       makeEditableField(propNodeText, onNodeTextFieldChange);
       makeEditableField(propNodeId, onNodeIdFieldChange);
 
@@ -543,17 +552,26 @@
         });
       }
 
+      // ---------- KEY FIX: Update NodeId when text changes ----------
       function onNodeTextFieldChange(newText) {
         if (!selectedCell) return;
         graph.getModel().beginUpdate();
         try {
-          // Just set the label. We'll do the ID update upon deselect.
+          // Update the label
           selectedCell.value = newText.trim();
+
+          // Also update the node ID immediately
+          if (isQuestion(selectedCell)) {
+            refreshNodeIdFromLabel(selectedCell);
+          } else if (isOptions(selectedCell)) {
+            refreshOptionNodeId(selectedCell);
+          }
         } finally {
           graph.getModel().endUpdate();
         }
         refreshAllCells();
       }
+
       function onNodeIdFieldChange(newId) {
         if (!selectedCell) return;
         graph.getModel().beginUpdate();
@@ -571,6 +589,7 @@
         const nodeId = label.replace(/\s+/g, "_");
         setNodeId(cell, nodeId);
       }
+
       // If options => nodeId = parent's nodeId + underscore + option label
       function refreshOptionNodeId(cell) {
         const edges = graph.getIncomingEdges(cell) || [];
@@ -624,6 +643,7 @@
             } finally {
               graph.getModel().endUpdate();
             }
+
             if (isQuestion(newVertex)) {
               refreshNodeIdFromLabel(newVertex);
             } else if (isOptions(newVertex)) {
@@ -635,7 +655,7 @@
         );
       });
 
-      // Auto-detect question if label ends with '?'
+      // ---------- KEY FIX: Always refresh ID if label ends with '?' ----------
       graph.getModel().addListener(mxEvent.EVENT_CHANGE, function (sender, evt) {
         const changes = evt.getProperty("changes");
         if (!changes) return;
@@ -643,13 +663,15 @@
           if (change.constructor.name === "mxValueChange") {
             const { cell, value } = change;
             if (value && typeof value === "string") {
+              // If the text ends with '?', ensure it's a question
               if (value.trim().endsWith("?")) {
                 if (!isQuestion(cell)) {
                   let style = cell.style || "";
                   style += ";nodeType=question;";
                   graph.getModel().setStyle(cell, style);
-                  refreshNodeIdFromLabel(cell);
                 }
+                // Refresh ID from label right away
+                refreshNodeIdFromLabel(cell);
               }
             }
           }
@@ -659,31 +681,31 @@
 
       // On connect => set section IDs
       graph.connectionHandler.addListener(mxEvent.CONNECT, function (sender, evt) {
-    const edge = evt.getProperty("cell");
-    if (!edge) return;
+        const edge = evt.getProperty("cell");
+        if (!edge) return;
 
-    const parent = edge.source;
-    const child = edge.target;
+        const parent = edge.source;
+        const child = edge.target;
 
-    if (parent && isQuestion(parent) && child && isOptions(child)) {
-      // Option inherits from question unconditionally
-      const parentSectionId = getSectionId(parent);
-      setSectionId(child, parentSectionId);
-    }
+        if (parent && isQuestion(parent) && child && isOptions(child)) {
+          // Option inherits from question unconditionally
+          const parentSectionId = getSectionId(parent);
+          setSectionId(child, parentSectionId);
+        }
 
-    if (parent && isOptions(parent) && child && isQuestion(child)) {
-      // Only change child's section if it's basically "unassigned" or still in 1
-      if (
-        !child.style.includes("newSection=true") &&
-        (getSectionId(child) === 1 || getSectionId(child) === 0)
-      ) {
-        const parentSectionId = getSectionId(parent);
-        setSectionId(child, parentSectionId);
-      }
-    }
+        if (parent && isOptions(parent) && child && isQuestion(child)) {
+          // Only change child's section if it's basically "unassigned" or still in 1
+          if (
+            !child.style.includes("newSection=true") &&
+            (getSectionId(child) === 1 || getSectionId(child) === 0)
+          ) {
+            const parentSectionId = getSectionId(parent);
+            setSectionId(child, parentSectionId);
+          }
+        }
 
-    refreshAllCells();
-  });
+        refreshAllCells();
+      });
 
       // ---------- Export Flowchart JSON ----------
       window.exportFlowchartJson = function () {
@@ -712,6 +734,7 @@
         }
         downloadJson(JSON.stringify(data, null, 2), "flowchart_data.json");
       };
+
       function downloadJson(str, filename) {
         const blob = new Blob([str], { type: "application/json" });
         const url = URL.createObjectURL(blob);
@@ -723,6 +746,7 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
       }
+
       window.importFlowchartJson = function (evt) {
         const file = evt.target.files[0];
         if (!file) return;
@@ -733,13 +757,15 @@
         };
         reader.readAsText(file);
       };
+
       function loadFlowchartData(data) {
         graph.getModel().beginUpdate();
         try {
           const parent = graph.getDefaultParent();
+          // Clear existing
           graph.removeCells(graph.getChildVertices(parent));
           const createdCells = {};
-          // pass1: vertices
+          // Pass 1: create vertices
           data.forEach((item) => {
             if (item.vertex) {
               const geo = new mxGeometry(
@@ -755,7 +781,7 @@
               createdCells[item.id] = newCell;
             }
           });
-          // pass2: edges
+          // Pass 2: create edges
           data.forEach((item) => {
             if (item.edge) {
               const newEdge = new mxCell(item.value, new mxGeometry(), item.style);
@@ -830,7 +856,7 @@
               if (!target) return;
               if (getNodeType(target) === "options") {
                 const optLabel = (target.value || "Option").trim();
-                const optNodeId = getNodeId(target); 
+                const optNodeId = getNodeId(target);
                 if (qObj.type === "checkbox") {
                   qObj.options.push({
                     label: capitalizeFirst(optLabel),
@@ -890,21 +916,6 @@
         return str.charAt(0).toUpperCase() + str.slice(1);
       }
     });
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
   </script>
 </body>
 </html>
