@@ -1,389 +1,228 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Flowchart Creator</title>
-  <!-- mxGraph library from jsDelivr -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mxgraph@4.2.2/javascript/mxClient.min.js"></script>
 
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: Arial, sans-serif;
-      user-select: none;
-    }
-
-    .toolbar {
-      width: 220px;
-      background: #f9f9f9;
-      border-right: 1px solid #ccc;
-      box-sizing: border-box;
-      float: left;
-      padding: 10px;
-    }
-
-    #graphContainer {
-      position: absolute;
-      left: 220px;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      overflow: hidden;
-      cursor: default;
-    }
-
-    .shape {
-      background: #fff;
-      border: 1px solid #999;
-      margin-bottom: 8px;
-      text-align: center;
-      padding: 6px;
-      border-radius: 4px;
-      cursor: move;
-    }
-    .shape:hover {
-      background: #e0e0e0;
-    }
-    .button-bar {
-      margin-top: 15px;
-    }
-    button {
-      margin-bottom: 6px;
-      padding: 6px 10px;
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      display: block;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    input[type="file"] {
-      display: none; /* hidden by default; we trigger it via button click */
-    }
-  </style>
-</head>
-<body>
-  <!-- Toolbar Area -->
-  <div class="toolbar">
-    <h3>Shapes</h3>
-    <!-- Question Node (rectangle) -->
-    <div
-      class="shape"
-      data-type="question"
-      data-style="shape=rectangle;whiteSpace=wrap;html=1;"
-    >
-      Question Node
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Custom Form</title>
+        <link rel="stylesheet" href="generate.css">
+    </head>
+    <body>
+    <header>
+        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="forms.html">Forms</a>
+            <a href="contact.html">Contact Us</a>
+        </nav>
+    </header>
+    <div id="pdfPreview" style="display:none;">
+        <iframe id="pdfFrame" style="display:none"></iframe>
     </div>
-    <!-- Options Node (ellipse) -->
-    <div
-      class="shape"
-      data-type="options"
-      data-style="ellipse;whiteSpace=wrap;html=1;"
-    >
-      Options Node
+    <input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <div id="questions">
+        <div id="result"></div>
+        <section>
+        <div id="box">
+            <form id="customForm" onsubmit="return showThankYouMessage();">
+    <div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1" ><label><h3>hungry?</h3></label><div><center><div id="checkmark">
+                        <span class="checkbox-inline">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="" name="" value="">
+                                yes
+                            </label>
+                        </span>
+                    
+                        <span class="checkbox-inline">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="" name="" value="">
+                                no
+                            </label>
+                        </span>
+                    </div><br></div></div><div id="question-container-2" class="hidden"><label><h3>why?</h3></label><input type="text" id="answer2" name="answer2" placeholder=""><br><br></div>
+                    <script>
+                        (function() {
+                            var thisQ = document.getElementById('question-container-2');
+                            var checkboxes = document.querySelectorAll('input[name^="answer1_"]');
+                            if (!checkboxes || checkboxes.length === 0) return;
+                            function updateVisibility() {
+                                // gather all checked values
+                                var checkedVals = [];
+                                checkboxes.forEach(cb => {
+                                    if (cb.checked) { 
+                                        checkedVals.push(cb.value.trim().toLowerCase());
+                                    }
+                                });
+                                if (checkedVals.includes('yes')) {
+                                    thisQ.classList.remove('hidden');
+                                } else {
+                                    thisQ.classList.add('hidden');
+                                }
+                            }
+                            // attach event to all checkboxes
+                            checkboxes.forEach(cb => {
+                                cb.addEventListener('change', updateVisibility);
+                            });
+                        })();
+                    </script>
+                    <br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div>
+    <div id="hidden_pdf_fields">
+    
     </div>
-
-    <!-- Buttons to export and import the flowchart JSON -->
-    <div class="button-bar">
-      <button onclick="exportFlowchartJson()">Export Flowchart JSON</button>
-      <button onclick="document.getElementById('importFlowchartFile').click()">Import Flowchart</button>
-      <input
-        type="file"
-        id="importFlowchartFile"
-        accept=".json"
-        onchange="importFlowchartJson(event)"
-      />
-
-      <!-- Export to GUI JSON (for your Custom Form Builder) -->
-      <button onclick="exportGuiJson()">Export GUI JSON</button>
+    
+            </form>
+            <div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
+        </div>
+        </section>
     </div>
-  </div>
+    <footer>
+        &copy; 2024 FormWiz. All rights reserved.
+    </footer>
 
-  <!-- Graph Container -->
-  <div id="graphContainer"></div>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      if (typeof mxGraph === "undefined") {
-        alert("mxGraph library not found!");
-        return;
-      }
-
-      const container = document.getElementById("graphContainer");
-      // Disable context menu
-      mxEvent.disableContextMenu(container);
-
-      // Create graph
-      const graph = new mxGraph(container);
-      // Basic setup
-      graph.setCellsMovable(true);
-      graph.setConnectable(true);
-      graph.setCellsResizable(true);
-
-      // Rubberband selection
-      new mxRubberband(graph);
-
-      // Prevent deleting text while editing a label
-      document.addEventListener("keydown", function (evt) {
-        // Only allow Delete/Backspace if NOT editing label text
-        if (
-          (evt.key === "Delete" || evt.key === "Backspace") &&
-          !graph.cellEditor.isEditing()
-        ) {
-          const selectedCells = graph.getSelectionCells();
-          if (selectedCells && selectedCells.length) {
-            graph.removeCells(selectedCells);
-            evt.preventDefault();
-          }
-        }
-      });
-
-      // Draggable shapes from toolbar
-      const toolbarShapes = document.querySelectorAll(".shape");
-      toolbarShapes.forEach((shapeEl) => {
-        const nodeType = shapeEl.dataset.type;
-        const styleStr = shapeEl.dataset.style;
-
-        mxUtils.makeDraggable(
-          shapeEl,
-          graph,
-          function (graph, evt, targetCell, x, y) {
-            const model = graph.getModel();
-            let newVertex;
-            model.beginUpdate();
-            try {
-              newVertex = graph.insertVertex(
-                graph.getDefaultParent(),
-                null,
-                nodeType + " node", // default label
-                x,
-                y,
-                100,
-                60,
-                styleStr + `;nodeType=${nodeType};`
-              );
-            } finally {
-              model.endUpdate();
-            }
-            return newVertex;
-          }
-        );
-      });
-
-      /**
-       * Export Flowchart JSON
-       */
-      window.exportFlowchartJson = function () {
-        const data = [];
-        const cells = graph.getModel().cells;
-        for (let id in cells) {
-          if (id === "0" || id === "1") continue; // skip root/layer
-          const cell = cells[id];
-          const cellData = {
-            id: cell.id,
-            value: cell.value,
-            geometry: cell.geometry
-              ? {
-                  x: cell.geometry.x,
-                  y: cell.geometry.y,
-                  width: cell.geometry.width,
-                  height: cell.geometry.height
-                }
-              : null,
-            style: cell.style || "",
-            vertex: !!cell.vertex,
-            edge: !!cell.edge,
-            source: cell.edge ? cell.source?.id : null,
-            target: cell.edge ? cell.target?.id : null
-          };
-          data.push(cellData);
-        }
-        downloadJson(JSON.stringify(data, null, 2), "flowchart_data.json");
-      };
-
-      /**
-       * Import Flowchart JSON
-       * Rebuilds the graph from a previously exported JSON
-       */
-      window.importFlowchartJson = function (evt) {
-        const file = evt.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const jsonData = JSON.parse(e.target.result);
-          loadFlowchartData(jsonData);
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+            authDomain: "formwiz-3f4fd.firebaseapp.com",
+            projectId: "formwiz-3f4fd",
+            storageBucket: "formwiz-3f4fd.appspot.com",
+            messagingSenderId: "404259212529",
+            appId: "1:404259212529:web:15a33bce82383b21cfed50",
+            measurementId: "G-P07YEN0HPD"
         };
-        reader.readAsText(file);
-      };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const urlParams = new URLSearchParams(window.location.search);
+        const formId = urlParams.get('formId');
+        let userId = null;
 
-      function loadFlowchartData(data) {
-        // Clear existing graph
-        graph.getModel().beginUpdate();
-        try {
-          graph.removeCells(graph.getChildVertices(graph.getDefaultParent()), true);
-
-          // We'll store references to newly created cells by their old IDs
-          const createdCells = {};
-
-          // First pass: create vertices
-          data.forEach((item) => {
-            if (item.vertex) {
-              const parent = graph.getDefaultParent();
-              const geo = new mxGeometry(item.geometry.x, item.geometry.y, item.geometry.width, item.geometry.height);
-              const newCell = new mxCell(item.value, geo, item.style);
-              newCell.vertex = true;
-              // Insert cell
-              newCell.id = item.id; // reuse the old ID
-              graph.addCell(newCell, parent);
-              createdCells[item.id] = newCell;
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                userId = user.uid;
+            } else {
+                console.log("User not logged in.");
+                window.location.href = 'account.html';
             }
-          });
-
-          // Second pass: create edges
-          data.forEach((item) => {
-            if (item.edge) {
-              const parent = graph.getDefaultParent();
-              const newEdge = new mxCell(item.value, new mxGeometry(), item.style);
-              newEdge.edge = true;
-              newEdge.id = item.id; // reuse old ID
-              const sourceCell = createdCells[item.source];
-              const targetCell = createdCells[item.target];
-              graph.addCell(newEdge, parent, undefined, sourceCell, targetCell);
-            }
-          });
-
-        } finally {
-          graph.getModel().endUpdate();
-        }
-      }
-
-      /**
-       * Export GUI JSON
-       * Single section -> each "question node" is a dropdown question
-       * "options node" shapes connected to that question become the question's dropdown options
-       * Conditional logic: If an "options node" leads to another question, we enable logic.
-       */
-      window.exportGuiJson = function () {
-        const model = graph.getModel();
-        const allCells = model.cells;
-
-        // We'll track question nodes in an array
-        // questionData = { questionId, text, options: [], logic: {enabled, prevQuestion, prevAnswer} }
-        let questionIdCounter = 1;
-        const questionMap = {}; // oldCellId -> question object
-        const questionCells = []; // store the actual question cell references
-
-        // A function to get nodeType from cell.style
-        function getNodeType(cell) {
-          if (cell.style && cell.style.indexOf("nodeType=question") >= 0) return "question";
-          if (cell.style && cell.style.indexOf("nodeType=options") >= 0) return "options";
-          return null;
-        }
-
-        // 1) Identify all question nodes & assign them incremental question IDs
-        for (let id in allCells) {
-          if (id === "0" || id === "1") continue;
-          const cell = allCells[id];
-          if (cell.vertex && getNodeType(cell) === "question") {
-            // Use label minus "question node" if user hasn't changed it
-            const label = cell.value.toString().replace(/question node/i, "").trim() || "Untitled";
-            const qObj = {
-              questionId: questionIdCounter,
-              text: label,
-              type: "dropdown",
-              logic: { enabled: false, prevQuestion: "", prevAnswer: "" },
-              jump: { enabled: false, option: "", to: "" },
-              conditionalPDF: { enabled: false, pdfName: "", answer: "" },
-              options: [],
-              labels: []
-            };
-            questionMap[id] = qObj;
-            questionCells.push(cell);
-            questionIdCounter++;
-          }
-        }
-
-        // 2) For each question node, gather "options nodes" from outgoing edges
-        questionCells.forEach((qCell) => {
-          const qObj = questionMap[qCell.id];
-          // Outgoing edges to "options" nodes
-          const outEdges = graph.getOutgoingEdges(qCell);
-          if (!outEdges) return;
-
-          outEdges.forEach((edge) => {
-            const target = edge.target;
-            if (!target) return;
-            const targetType = getNodeType(target);
-            if (targetType === "options") {
-              // If it's an options node, add the label to the question's options
-              const optLabel = target.value.toString().replace(/options node/i, "").trim() || "Option";
-              qObj.options.push(optLabel);
-
-              // Also check if that options node leads to a *question node*
-              const nextEdges = graph.getOutgoingEdges(target);
-              if (nextEdges) {
-                // If there's a question node on the other side, that question node is conditional
-                nextEdges.forEach((nEdge) => {
-                  const q2 = nEdge.target;
-                  if (q2 && getNodeType(q2) === "question") {
-                    // We want to enable logic on q2:
-                    // Show q2 if the user picks 'optLabel' on qObj's questionId
-                    const q2Obj = questionMap[q2.id];
-                    if (q2Obj) {
-                      q2Obj.logic.enabled = true;
-                      q2Obj.logic.prevQuestion = qObj.questionId.toString();
-                      q2Obj.logic.prevAnswer = optLabel;
-                    }
-                  }
-                });
-              }
-            }
-          });
         });
 
-        // 3) Build the final single-section structure
-        const section = {
-          sectionId: 1,
-          sectionName: "Flowchart Section",
-          questions: Object.values(questionMap) // all question objects
+        function saveFormData(sectionId) {
+            const formData = {};
+            const inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' select, #' + sectionId + ' textarea');
+            inputs.forEach(input => {
+                if (input.tagName === 'INPUT' && input.type === 'checkbox') {
+                    formData[input.name] = input.checked;
+                } else {
+                    formData[input.name] = input.value;
+                }
+            });
+        }
+        function loadFormData(sectionId) {
+            // omitted
+        }
+        function autoSaveForm(sectionId) {
+            const inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' select, #' + sectionId + ' textarea');
+            inputs.forEach(input => {
+                //input.addEventListener('change', () => saveFormData(sectionId));
+            });
+        }
+        function handleNext(currentSection) {
+            navigateSection(currentSection + 1);
+        }
+        function navigateSection(sectionNumber) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById('section' + sectionNumber).classList.add('active');
+        }
+        var pdfFormName = 'default.pdf';
+
+        function downloadPDF(url, filename) {
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        async function editAndDownloadPDF(pdfName) {
+            const formData = new FormData();
+            document.querySelectorAll('#questions input, #questions select, #questions textarea').forEach(input => {
+                if (input.type === 'checkbox') {
+                    formData.append(input.name, input.checked ? 'Yes' : 'No');
+                } else {
+                    formData.append(input.name, input.value);
+                }
+            });
+            return fetch('/edit_pdf?pdf=' + pdfName, { method: 'POST', body: formData })
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    downloadPDF(url, 'Edited_' + pdfName + '.pdf');
+                });
+        }
+        function setCurrentDate() {
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var yyyy = today.getFullYear();
+            today = yyyy + '-' + mm + '-' + dd;
+            document.getElementById('current_date').value = today;
+        }
+        window.onload = function() {
+            setCurrentDate();
         };
 
-        const guiData = {
-          sections: [section],
-          hiddenFields: [],
-          sectionCounter: 2,
-          questionCounter: questionIdCounter,
-          hiddenFieldCounter: 1,
-          defaultPDFName: ""
-        };
+        var conditionalPDFs = [];
 
-        const jsonStr = JSON.stringify(guiData, null, 2);
-        downloadJson(jsonStr, "gui_data.json");
-      };
+        // NEW CODE START: Conditional Alerts
+        var conditionalAlerts = [];
+        function handleConditionalAlerts() {
+            conditionalAlerts.forEach(function(alertObj) {
+                const prevQuestionNameId = 'answer' + alertObj.prevQuestionId;
+                const prevQuestionElement = document.getElementById(prevQuestionNameId);
+                if (prevQuestionElement) {
+                    const userAnswer = prevQuestionElement.value;
+                    if (userAnswer.trim().toLowerCase() === alertObj.prevAnswer.trim().toLowerCase()) {
+                        alert(alertObj.alertText);
+                    }
+                } else {
+                    // If it's a checkbox or something else, we check them differently
+                    const checkboxes = document.querySelectorAll('[name^="answer' + alertObj.prevQuestionId + '_"]');
+                    if (checkboxes.length > 0) {
+                        checkboxes.forEach(cb => {
+                            if (cb.checked && cb.value.trim().toLowerCase() === alertObj.prevAnswer.trim().toLowerCase()) {
+                                alert(alertObj.alertText);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+        // NEW CODE END
 
-      /**
-       * Utility to download JSON as a file
-       */
-      function downloadJson(jsonString, filename) {
-        const blob = new Blob([jsonString], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-      }
-    });
-  </script>
-</body>
-</html>
+        function showThankYouMessage() {
+            const pdfName = pdfFormName.replace('.pdf', '');
+            editAndDownloadPDF(pdfName).then(() => {
+                conditionalPDFs.forEach(function(conditionalPDF) {
+                    if (conditionalPDF.questionType === 'checkbox') {
+                        const checkboxInput = document.getElementById(conditionalPDF.questionNameId);
+                        if (checkboxInput && checkboxInput.checked && checkboxInput.value === conditionalPDF.conditionalAnswer) {
+                            editAndDownloadPDF(conditionalPDF.pdfName.replace('.pdf', ''));
+                        }
+                    } else {
+                        const questionValue = document.getElementById(conditionalPDF.questionNameId).value;
+                        if (questionValue === conditionalPDF.conditionalAnswer) {
+                            editAndDownloadPDF(conditionalPDF.pdfName.replace('.pdf', ''));
+                        }
+                    }
+                });
+                handleConditionalAlerts();
+                document.getElementById('customForm').style.display = 'none';
+                document.getElementById('thankYouMessage').style.display = 'block';
+            });
+            return false;
+        }
+    </script>
+    </body>
+    </html>
+    
