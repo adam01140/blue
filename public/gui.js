@@ -1,11 +1,14 @@
-/******************************************************
- * gui.js (FULL UPDATED CODE, NO ABBREVIATIONS)
- ******************************************************/
 
+// ============================================
+// ===========  GLOBAL VARIABLES  =============
+// ============================================
 let sectionCounter = 1;
 let questionCounter = 1;
 let hiddenFieldCounter = 1; // Counter for hidden fields
 
+// ============================================
+// ===========  SECTION FUNCTIONS  ============
+// ============================================
 function addSection(sectionId = null) {
     const formBuilder = document.getElementById('formBuilder');
     const sectionBlock = document.createElement('div');
@@ -18,7 +21,8 @@ function addSection(sectionId = null) {
     sectionBlock.innerHTML = `
         <h2 id="sectionLabel${currentSectionId}">Section ${currentSectionId}</h2>
         <label>Section Name: </label>
-        <input type="text" id="sectionName${currentSectionId}" placeholder="Enter section name" value="Section ${currentSectionId}" oninput="updateSectionName(${currentSectionId})"><br><br>
+        <input type="text" id="sectionName${currentSectionId}" placeholder="Enter section name"
+               value="Section ${currentSectionId}" oninput="updateSectionName(${currentSectionId})"><br><br>
         <div id="questionsSection${currentSectionId}"></div>
         <button type="button" onclick="addQuestion(${currentSectionId})">Add Question to Section</button>
         <button type="button" onclick="removeSection(${currentSectionId})">Remove Section</button>
@@ -64,7 +68,8 @@ function updateSectionName(sectionId) {
 }
 
 /**
- * Re-label sections (and questions inside) after moves.
+ * Re-label sections (and questions inside) after moves, so that
+ * the GUI remains consistent.
  */
 function updateSectionLabels() {
     const sections = document.querySelectorAll('.section-block');
@@ -111,7 +116,7 @@ function updateSectionLabels() {
 }
 
 /**
- * Re-label all questions across all sections.
+ * Re-label questions across all sections
  */
 function updateGlobalQuestionLabels() {
     const sections = document.querySelectorAll('.section-block');
@@ -151,21 +156,18 @@ function updateGlobalQuestionLabels() {
         });
     });
 
-    questionCounter = globalQuestionIndex;  // Reset questionCounter to the new highest index + 1
+    questionCounter = globalQuestionIndex;  // Reset questionCounter
 }
 
 function removeSection(sectionId) {
     const sectionBlock = document.getElementById(`sectionBlock${sectionId}`);
     sectionBlock.remove();
-
-    // Update IDs and headers of all subsequent sections
     updateSectionLabels();
 }
 
-/**
- * Add a question to a section. 
- * Key change: "Answer value" is replaced with a <select> for possible answers.
- */
+// ============================================
+// ===========  QUESTION FUNCTIONS  ===========
+// ============================================
 function addQuestion(sectionId, questionId = null) {
     const questionsSection = document.getElementById(`questionsSection${sectionId}`);
     const questionBlock = document.createElement('div');
@@ -174,7 +176,6 @@ function addQuestion(sectionId, questionId = null) {
 
     questionBlock.className = 'question-block';
     questionBlock.id = `questionBlock${currentQuestionId}`;
-
     questionBlock.innerHTML = `
         <label>Question ${currentQuestionId}: </label>
         <input type="text" placeholder="Enter your question" id="question${currentQuestionId}"><br><br>
@@ -193,7 +194,7 @@ function addQuestion(sectionId, questionId = null) {
             <option value="bigParagraph">Big Paragraph</option>
         </select><br><br>
 
-        <!-- Name/ID & placeholders for text, bigParagraph, radio, dropdown (hidden initially) -->
+        <!-- Name/ID and Placeholder for Text, Big Paragraph, Radio, and Dropdown -->
         <div id="textboxOptions${currentQuestionId}" class="textbox-options" style="display: none;">
             <label>Name/ID: </label>
             <input type="text" id="textboxName${currentQuestionId}" placeholder="Enter field name"><br><br>
@@ -240,14 +241,13 @@ function addQuestion(sectionId, questionId = null) {
         <!-- Conditional Logic -->
         <label>Enable Conditional Logic: </label>
         <input type="checkbox" id="logic${currentQuestionId}" onchange="toggleLogic(${currentQuestionId})">
-
         <div id="logicBlock${currentQuestionId}" style="display: none;">
             <label>Show this question if: </label><br>
             <input type="number" placeholder="Previous question number" 
                    id="prevQuestion${currentQuestionId}" 
                    onchange="updateLogicAnswers(${currentQuestionId})"><br>
 
-            <!-- CHANGED from text input to select for possible answers: -->
+            <!-- CHANGED to <select> for possible answers: -->
             <select id="prevAnswer${currentQuestionId}" style="display: block;">
                 <option value="">-- Select an answer --</option>
             </select><br>
@@ -299,16 +299,15 @@ function addQuestion(sectionId, questionId = null) {
         <button type="button" onclick="removeQuestion(${currentQuestionId})">Remove Question</button>
     `;
 
-    // Append
     questionsSection.appendChild(questionBlock);
 
-    // Display the correct sub-option blocks, etc.
+    // Ensure the correct options menu is displayed based on the selected type
     toggleOptions(currentQuestionId);
 
-    // Update hidden field autofill references
+    // Update hidden field references (if any)
     updateAutofillOptions();
 
-    // If this is a brand new question, increment questionCounter
+    // If brand new question, increment questionCounter
     if (!questionId) {
         questionCounter++;
     }
@@ -320,14 +319,13 @@ function toggleLogic(questionId) {
     logicBlock.style.display = logicEnabled ? 'block' : 'none';
 
     if (logicEnabled) {
-        // If we just turned it on, let's fill in the possible answers
+        // If just turned on, fill possible answers
         updateLogicAnswers(questionId);
     }
 }
 
-/**
- * NEW: Dynamically fill #prevAnswer{questionId} with possible answers
- * from the "previous question #"
+/** 
+ * Refill #prevAnswer{questionId} with possible answers from "previous question #"
  */
 function updateLogicAnswers(questionId) {
     const prevQuestionField = document.getElementById(`prevQuestion${questionId}`);
@@ -392,9 +390,6 @@ function updateLogicAnswers(questionId) {
     }
 }
 
-/** 
- * Jump logic enabling/disabling
- */
 function toggleJumpLogic(questionId) {
     const jumpEnabled = document.getElementById(`enableJump${questionId}`).checked;
     const jumpBlock = document.getElementById(`jumpBlock${questionId}`);
@@ -407,16 +402,12 @@ function toggleConditionalPDFLogic(questionId) {
     conditionalPDFBlock.style.display = conditionalPDFEnabled ? 'block' : 'none';
 }
 
-// Conditional Alert logic
 function toggleConditionalAlertLogic(questionId) {
     const conditionalAlertEnabled = document.getElementById(`enableConditionalAlert${questionId}`).checked;
     const conditionalAlertBlock = document.getElementById(`conditionalAlertBlock${questionId}`);
     conditionalAlertBlock.style.display = conditionalAlertEnabled ? 'block' : 'none';
 }
 
-/**
- * Move question up
- */
 function moveQuestionUp(questionId, sectionId) {
     const questionBlock = document.getElementById(`questionBlock${questionId}`);
     const previousSibling = questionBlock.previousElementSibling;
@@ -428,9 +419,6 @@ function moveQuestionUp(questionId, sectionId) {
     }
 }
 
-/**
- * Move question down
- */
 function moveQuestionDown(questionId, sectionId) {
     const questionBlock = document.getElementById(`questionBlock${questionId}`);
     const nextSibling = questionBlock.nextElementSibling;
@@ -496,14 +484,12 @@ function toggleOptions(questionId) {
                     }
                 }
             }
-            if (questionType === 'dropdown') {
-                if (optionsBlock) optionsBlock.style.display = 'block';
+            if (questionType === 'dropdown' && optionsBlock) {
+                optionsBlock.style.display = 'block';
             }
-            if (questionType === 'radio') {
-                if (conditionalPDFLogicDiv) {
-                    conditionalPDFLogicDiv.style.display = 'block';
-                    updateConditionalPDFAnswersForRadio(questionId);
-                }
+            if (questionType === 'radio' && conditionalPDFLogicDiv) {
+                conditionalPDFLogicDiv.style.display = 'block';
+                updateConditionalPDFAnswersForRadio(questionId);
             }
             break;
         case 'multipleTextboxes':
@@ -529,7 +515,8 @@ function toggleOptions(questionId) {
     if ((questionType === 'radio' || questionType === 'checkbox') && conditionalPDFLogicDiv) {
         conditionalPDFLogicDiv.style.display = 'block';
     }
-    // Also show conditional alert logic if radio/checkbox...
+
+    // Also show conditional alert logic if question is radio/checkbox
     const conditionalAlertLogicDiv = document.getElementById(`conditionalAlertLogic${questionId}`);
     if (questionType === 'radio' || questionType === 'checkbox') {
         if (conditionalAlertLogicDiv) {
@@ -537,7 +524,6 @@ function toggleOptions(questionId) {
         }
     }
 
-    // Refresh hidden field references
     updateAutofillOptions();
 }
 
@@ -584,7 +570,7 @@ function updateConditionalPDFAnswersForCheckbox(questionId) {
 }
 
 /**
- * Multiple textboxes logic
+ * Add multiple textboxes
  */
 function addMultipleTextboxOption(questionId) {
     const multipleTextboxesOptionsDiv = document.getElementById(`multipleTextboxesOptions${questionId}`);
@@ -688,7 +674,6 @@ function removeDropdownOption(questionId, optionNumber) {
             option.querySelector('button').setAttribute('onclick', `removeDropdownOption(${questionId}, ${index + 1})`);
         });
     }
-
     updateJumpOptions(questionId);
 }
 
@@ -712,13 +697,9 @@ function addCheckboxOption(questionId) {
         <hr>
     `;
     checkboxOptionsDiv.appendChild(optionDiv);
-
     updateConditionalPDFAnswersForCheckbox(questionId);
 }
 
-/**
- * Remove a checkbox option
- */
 function removeCheckboxOption(questionId, optionNumber) {
     const optionDiv = document.querySelector(`#checkboxOptions${questionId} .option${optionNumber}`);
     if (optionDiv) {
@@ -734,7 +715,6 @@ function removeCheckboxOption(questionId, optionNumber) {
             option.querySelector('button').setAttribute('onclick', `removeCheckboxOption(${questionId}, ${newOptionNumber})`);
         });
     }
-
     updateConditionalPDFAnswersForCheckbox(questionId);
 }
 
@@ -769,9 +749,6 @@ function removeTextboxLabel(questionId, labelNumber) {
     }
 }
 
-/**
- * Remove question entirely
- */
 function removeQuestion(questionId) {
     const questionBlock = document.getElementById(`questionBlock${questionId}`);
     const sectionId = questionBlock.closest('.section-block').id.replace('sectionBlock', '');
@@ -780,9 +757,9 @@ function removeQuestion(questionId) {
     updateAutofillOptions();
 }
 
-/**
- * Initialize hidden PDF fields module once on load
- */
+// ============================================
+// ===========  HIDDEN FIELDS MOD  ============
+// ============================================
 function initializeHiddenPDFFieldsModule() {
     const formBuilder = document.getElementById('formBuilder');
     const hiddenFieldsModule = document.createElement('div');
@@ -795,7 +772,7 @@ function initializeHiddenPDFFieldsModule() {
     `;
     formBuilder.appendChild(hiddenFieldsModule);
 }
-initializeHiddenPDFFieldsModule(); // call it once
+initializeHiddenPDFFieldsModule(); // call once on load
 
 function addHiddenField() {
     const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
@@ -817,7 +794,7 @@ function addHiddenField() {
         <hr>
     `;
     hiddenFieldsContainer.appendChild(hiddenFieldBlock);
-    toggleHiddenFieldOptions(currentHiddenFieldId); // Initialize
+    toggleHiddenFieldOptions(currentHiddenFieldId);
     hiddenFieldCounter++;
 }
 
@@ -864,7 +841,7 @@ function addConditionalAutofillForCheckbox(hiddenFieldId) {
 
     const conditionDiv = document.createElement('div');
     conditionDiv.className = `condition${conditionId}`;
-    conditionDiv.id = `condition${hiddenFieldId}_${conditionId}`; 
+    conditionDiv.id = `condition${hiddenFieldId}_${conditionId}`;
     conditionDiv.innerHTML = `
         <label>Condition ${conditionId}:</label><br>
         <label>Question:</label>
@@ -960,8 +937,6 @@ function removeConditionalAutofill(hiddenFieldId, conditionId) {
     const conditionDiv = document.getElementById(`condition${hiddenFieldId}_${conditionId}`);
     if (conditionDiv) {
         conditionDiv.remove();
-    } else {
-        console.error(`Condition div with ID condition${hiddenFieldId}_${conditionId} not found.`);
     }
 }
 
@@ -987,14 +962,14 @@ function updateConditionAnswers(hiddenFieldId, conditionId) {
                 answerSelect.innerHTML += `<option value="${option.value}">${option.value}</option>`;
             });
         } else if (questionType === 'checkbox') {
-            const options = questionBlock.querySelectorAll(`#checkboxOptions${selectedQuestionId} [id^="checkboxOptionText"]`);
-            options.forEach(option => {
+            const opts = questionBlock.querySelectorAll(`#checkboxOptions${selectedQuestionId} [id^="checkboxOptionText"]`);
+            opts.forEach(option => {
                 const val = option.value.trim();
                 if (val) {
                     answerSelect.innerHTML += `<option value="${val}">${val}</option>`;
                 }
             });
-            const noneOfTheAboveSelected = document.getElementById(`noneOfTheAbove${selectedQuestionId}`).checked;
+            const noneOfTheAboveSelected = questionBlock.querySelector(`#noneOfTheAbove${selectedQuestionId}`)?.checked;
             if (noneOfTheAboveSelected) {
                 answerSelect.innerHTML += `<option value="None of the above">None of the above</option>`;
             }
@@ -1003,7 +978,7 @@ function updateConditionAnswers(hiddenFieldId, conditionId) {
 }
 
 /**
- * After question changes, re-populate hidden field references
+ * Refresh hidden field references after question changes
  */
 function updateAutofillOptions() {
     const hiddenFieldBlocks = document.querySelectorAll('.hidden-field-block');
@@ -1044,3 +1019,259 @@ function updateAutofillOptions() {
         }
     });
 }
+
+// ============================================
+// ===========  IMPORT / EXPORT  =============
+// ============================================
+function loadFormData(formData) {
+    // 1) Clear the entire "formBuilder" container
+    document.getElementById('formBuilder').innerHTML = '';
+
+    // 2) Reset counters based on what's stored in the JSON
+    sectionCounter = formData.sectionCounter || 1;
+    questionCounter = formData.questionCounter || 1;
+    hiddenFieldCounter = formData.hiddenFieldCounter || 1;
+
+    // 3) Possibly set default PDF name
+    if (formData.defaultPDFName) {
+        const formPDFNameInput = document.getElementById('formPDFName');
+        if (formPDFNameInput) {
+            formPDFNameInput.value = formData.defaultPDFName;
+        }
+    }
+
+    // 4) Initialize hidden-fields module (if required by your UI)
+    initializeHiddenPDFFieldsModule();
+
+    // 5) Build out sections and questions
+    if (formData.sections) {
+        formData.sections.forEach(section => {
+            // A) Create the section in the UI
+            addSection(section.sectionId);
+
+            // B) Set the name of the section (if customized)
+            const sectionNameInput = document.getElementById(`sectionName${section.sectionId}`);
+            if (sectionNameInput) {
+                sectionNameInput.value = section.sectionName || `Section ${section.sectionId}`;
+                updateSectionName(section.sectionId);
+            }
+
+            // C) Add questions inside this section
+            (section.questions || []).forEach(question => {
+                // i) Create the question UI
+                addQuestion(section.sectionId, question.questionId);
+
+                // ii) Grab the question block from the DOM
+                const questionBlock = document.getElementById(`questionBlock${question.questionId}`);
+                if (!questionBlock) return; // In case something went wrong
+
+                // iii) Set question text and type
+                const questionInput = questionBlock.querySelector(`#question${question.questionId}`);
+                if (questionInput) {
+                    questionInput.value = question.text;
+                }
+
+                const questionTypeSelect = questionBlock.querySelector(`#questionType${question.questionId}`);
+                if (questionTypeSelect) {
+                    questionTypeSelect.value = question.type;
+                    toggleOptions(question.questionId);  // Display the correct sub-blocks for this type
+                }
+
+                // iv) If it's a "checkbox" question, rebuild its options
+                if (question.type === 'checkbox') {
+                    const checkboxOptionsDiv = questionBlock.querySelector(`#checkboxOptions${question.questionId}`);
+                    if (checkboxOptionsDiv) {
+                        checkboxOptionsDiv.innerHTML = '';
+                        (question.options || []).forEach((optData, idx) => {
+                            const optionDiv = document.createElement('div');
+                            optionDiv.className = `option${idx + 1}`;
+                            optionDiv.innerHTML = `
+                                <label>Option ${idx + 1} Text:</label>
+                                <input type="text" id="checkboxOptionText${question.questionId}_${idx + 1}"
+                                       value="${optData.label}" placeholder="Enter option text"><br><br>
+                                <label>Name/ID:</label>
+                                <input type="text" id="checkboxOptionName${question.questionId}_${idx + 1}"
+                                       value="${optData.nameId}" placeholder="Enter Name/ID"><br><br>
+                                <label>Value (optional):</label>
+                                <input type="text" id="checkboxOptionValue${question.questionId}_${idx + 1}"
+                                       value="${optData.value}" placeholder="Enter Value"><br><br>
+                                <button type="button"
+                                        onclick="removeCheckboxOption(${question.questionId}, ${idx + 1})">
+                                    Remove
+                                </button>
+                                <hr>
+                            `;
+                            checkboxOptionsDiv.appendChild(optionDiv);
+                        });
+                        updateConditionalPDFAnswersForCheckbox(question.questionId);
+                    }
+                }
+
+                // v) If it's a "dropdown" question, rebuild its options array
+                else if (question.type === 'dropdown') {
+                    const dropdownOptionsDiv = questionBlock.querySelector(`#dropdownOptions${question.questionId}`);
+                    if (dropdownOptionsDiv) {
+                        dropdownOptionsDiv.innerHTML = '';
+                        (question.options || []).forEach((optText, idx) => {
+                            const optionDiv = document.createElement('div');
+                            optionDiv.className = `option${idx + 1}`;
+                            const optionId = `option${question.questionId}_${idx + 1}`;
+                            optionDiv.innerHTML = `
+                                <input type="text" id="${optionId}" value="${optText}" placeholder="Option ${idx + 1}">
+                                <button type="button"
+                                        onclick="removeDropdownOption(${question.questionId}, ${idx + 1})">
+                                    Remove
+                                </button>
+                            `;
+                            dropdownOptionsDiv.appendChild(optionDiv);
+                        });
+                    }
+                }
+
+                // vi) Handle other question types (numberedDropdown, multipleTextboxes, etc.)
+                // Rebuild their options/labels similarly if needed
+
+                // vii) Apply conditional logic (logic)
+                if (question.logic && question.logic.enabled) {
+                    const logicCheckbox = questionBlock.querySelector(`#logic${question.questionId}`);
+                    if (logicCheckbox) {
+                        logicCheckbox.checked = true;
+                        toggleLogic(question.questionId);
+                    }
+                    const prevQuestionField = questionBlock.querySelector(`#prevQuestion${question.questionId}`);
+                    if (prevQuestionField) {
+                        prevQuestionField.value = question.logic.prevQuestion;
+                    }
+                    const prevAnswerSelect = questionBlock.querySelector(`#prevAnswer${question.questionId}`);
+                    if (prevAnswerSelect) {
+                        // Repopulate answers in the dropdown
+                        updateLogicAnswers(question.questionId);
+                        // Now set the selected answer
+                        prevAnswerSelect.value = question.logic.prevAnswer;
+                    }
+                }
+
+                // viii) Jump Logic
+                if (question.jump && question.jump.enabled) {
+                    const jumpCheckbox = questionBlock.querySelector(`#enableJump${question.questionId}`);
+                    if (jumpCheckbox) {
+                        jumpCheckbox.checked = true;
+                        toggleJumpLogic(question.questionId);
+                    }
+                    const jumpOptionSelect = questionBlock.querySelector(`#jumpOption${question.questionId}`);
+                    const jumpToInput = questionBlock.querySelector(`#jumpTo${question.questionId}`);
+                    if (jumpOptionSelect) {
+                        jumpOptionSelect.value = question.jump.option;
+                    }
+                    if (jumpToInput) {
+                        jumpToInput.value = question.jump.to;
+                    }
+                }
+
+                // ix) Conditional PDF
+                if (question.conditionalPDF && question.conditionalPDF.enabled) {
+                    const pdfCheckbox = questionBlock.querySelector(`#enableConditionalPDF${question.questionId}`);
+                    if (pdfCheckbox) {
+                        pdfCheckbox.checked = true;
+                        toggleConditionalPDFLogic(question.questionId);
+                    }
+                    const pdfNameInput = questionBlock.querySelector(`#conditionalPDFName${question.questionId}`);
+                    const pdfAnswerSelect = questionBlock.querySelector(`#conditionalPDFAnswer${question.questionId}`);
+                    if (pdfNameInput) {
+                        pdfNameInput.value = question.conditionalPDF.pdfName;
+                    }
+                    if (pdfAnswerSelect) {
+                        pdfAnswerSelect.value = question.conditionalPDF.answer;
+                    }
+                }
+
+                // x) Conditional Alert
+                if (question.conditionalAlert && question.conditionalAlert.enabled) {
+                    const alertCheckbox = questionBlock.querySelector(`#enableConditionalAlert${question.questionId}`);
+                    if (alertCheckbox) {
+                        alertCheckbox.checked = true;
+                        toggleConditionalAlertLogic(question.questionId);
+                    }
+                    const alertPrevQ = questionBlock.querySelector(`#alertPrevQuestion${question.questionId}`);
+                    const alertPrevA = questionBlock.querySelector(`#alertPrevAnswer${question.questionId}`);
+                    const alertTextEl = questionBlock.querySelector(`#alertText${question.questionId}`);
+                    if (alertPrevQ) alertPrevQ.value = question.conditionalAlert.prevQuestion;
+                    if (alertPrevA) alertPrevA.value = question.conditionalAlert.prevAnswer;
+                    if (alertTextEl) alertTextEl.value = question.conditionalAlert.text;
+                }
+            });
+        });
+    }
+
+    // 6) Build hidden fields from JSON
+    if (formData.hiddenFields && formData.hiddenFields.length > 0) {
+        formData.hiddenFields.forEach(hiddenField => {
+            addHiddenFieldWithData(hiddenField);
+        });
+    }
+
+    // 7) Final step: re-run references
+    updateAutofillOptions();
+}
+
+/** 
+ * Add a hidden field from data 
+ */
+function addHiddenFieldWithData(hiddenField) {
+    const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
+    const hiddenFieldBlock = document.createElement('div');
+    const currentHiddenFieldId = hiddenField.hiddenFieldId;
+
+    hiddenFieldBlock.className = 'hidden-field-block';
+    hiddenFieldBlock.id = `hiddenFieldBlock${currentHiddenFieldId}`;
+    hiddenFieldBlock.innerHTML = `
+        <label>Hidden Field ${currentHiddenFieldId}: </label>
+        <select id="hiddenFieldType${currentHiddenFieldId}" onchange="toggleHiddenFieldOptions(${currentHiddenFieldId})">
+            <option value="text" ${hiddenField.type === 'text' ? 'selected' : ''}>Textbox</option>
+            <option value="checkbox" ${hiddenField.type === 'checkbox' ? 'selected' : ''}>Checkbox</option>
+        </select><br><br>
+        <div id="hiddenFieldOptions${currentHiddenFieldId}">
+            <!-- Options will be populated based on the type -->
+        </div>
+        <button type="button" onclick="removeHiddenField(${currentHiddenFieldId})">Remove Hidden Field</button>
+        <hr>
+    `;
+    hiddenFieldsContainer.appendChild(hiddenFieldBlock);
+
+    toggleHiddenFieldOptions(currentHiddenFieldId);
+
+    document.getElementById(`hiddenFieldName${currentHiddenFieldId}`).value = hiddenField.name;
+
+    if (hiddenField.type === 'checkbox') {
+        document.getElementById(`hiddenFieldChecked${currentHiddenFieldId}`).checked = hiddenField.checked;
+
+        // Load conditions for checkboxes
+        if (hiddenField.conditions && hiddenField.conditions.length > 0) {
+            hiddenField.conditions.forEach((condition, index) => {
+                addConditionalAutofillForCheckbox(currentHiddenFieldId);
+                const conditionId = index + 1;
+                document.getElementById(`conditionQuestion${currentHiddenFieldId}_${conditionId}`).value = condition.questionId;
+                updateConditionAnswers(currentHiddenFieldId, conditionId);
+                document.getElementById(`conditionAnswer${currentHiddenFieldId}_${conditionId}`).value = condition.answerValue;
+                document.getElementById(`conditionValue${currentHiddenFieldId}_${conditionId}`).value = condition.autofillValue;
+            });
+        }
+    } else if (hiddenField.type === 'text') {
+        if (hiddenField.autofillQuestionId) {
+            const autofillSelect = document.getElementById(`hiddenFieldAutofill${currentHiddenFieldId}`);
+            autofillSelect.value = hiddenField.autofillQuestionId;
+        }
+
+        if (hiddenField.conditions && hiddenField.conditions.length > 0) {
+            hiddenField.conditions.forEach((condition, index) => {
+                addConditionalAutofill(currentHiddenFieldId);
+                const conditionId = index + 1;
+                document.getElementById(`conditionQuestion${currentHiddenFieldId}_${conditionId}`).value = condition.questionId;
+                updateConditionAnswers(currentHiddenFieldId, conditionId);
+                document.getElementById(`conditionAnswer${currentHiddenFieldId}_${conditionId}`).value = condition.answerValue;
+                document.getElementById(`conditionValue${currentHiddenFieldId}_${conditionId}`).value = condition.autofillValue;
+            });
+        }
+    }
+}
+

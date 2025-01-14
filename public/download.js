@@ -54,12 +54,16 @@ function exportForm() {
             const questionId = parseInt(questionBlock.id.replace('questionBlock', ''));
             const questionText = questionBlock.querySelector(`#question${questionId}`).value;
             const questionType = questionBlock.querySelector(`#questionType${questionId}`).value;
+
+            // Conditional Logic
             const logicCheckbox = questionBlock.querySelector(`#logic${questionId}`);
             const logicEnabled = logicCheckbox ? logicCheckbox.checked : false;
             const prevQuestionInput = questionBlock.querySelector(`#prevQuestion${questionId}`);
             const prevAnswerInput = questionBlock.querySelector(`#prevAnswer${questionId}`);
             const prevQuestion = prevQuestionInput ? prevQuestionInput.value : "";
-            const prevAnswer = prevAnswerInput ? prevAnswerInput.value : "";
+            const prevAnswer = prevAnswerInput ? prevAnswerInput.value : ""; // Ensure we save the selected answer value
+
+            // Jump Logic
             const jumpCheckbox = questionBlock.querySelector(`#enableJump${questionId}`);
             const jumpEnabled = jumpCheckbox ? jumpCheckbox.checked : false;
             const jumpOptionSelect = questionBlock.querySelector(`#jumpOption${questionId}`);
@@ -67,7 +71,7 @@ function exportForm() {
             const jumpOption = jumpOptionSelect ? jumpOptionSelect.value : "";
             const jumpTo = jumpToInput ? jumpToInput.value : "";
 
-            // Conditional PDF logic
+            // Conditional PDF Logic
             const conditionalPDFCheckbox = questionBlock.querySelector(`#enableConditionalPDF${questionId}`);
             const conditionalPDFEnabled = conditionalPDFCheckbox ? conditionalPDFCheckbox.checked : false;
             const conditionalPDFNameInput = questionBlock.querySelector(`#conditionalPDFName${questionId}`);
@@ -75,17 +79,15 @@ function exportForm() {
             const conditionalPDFName = conditionalPDFNameInput ? conditionalPDFNameInput.value : "";
             const conditionalPDFAnswer = conditionalPDFAnswerSelect ? conditionalPDFAnswerSelect.value : "";
 
-            // NEW CODE START: Conditional Alert logic
+            // Conditional Alert Logic
             const conditionalAlertCheckbox = questionBlock.querySelector(`#enableConditionalAlert${questionId}`);
             const conditionalAlertEnabled = conditionalAlertCheckbox ? conditionalAlertCheckbox.checked : false;
             const alertPrevQuestionInput = questionBlock.querySelector(`#alertPrevQuestion${questionId}`);
             const alertPrevAnswerInput = questionBlock.querySelector(`#alertPrevAnswer${questionId}`);
             const alertTextInput = questionBlock.querySelector(`#alertText${questionId}`);
-
             const alertPrevQuestion = alertPrevQuestionInput ? alertPrevQuestionInput.value : "";
             const alertPrevAnswer = alertPrevAnswerInput ? alertPrevAnswerInput.value : "";
             const alertText = alertTextInput ? alertTextInput.value : "";
-            // NEW CODE END
 
             const questionData = {
                 questionId: questionId,
@@ -94,7 +96,7 @@ function exportForm() {
                 logic: {
                     enabled: logicEnabled,
                     prevQuestion: prevQuestion,
-                    prevAnswer: prevAnswer
+                    prevAnswer: prevAnswer // Save the selected answer value here
                 },
                 jump: {
                     enabled: jumpEnabled,
@@ -106,14 +108,12 @@ function exportForm() {
                     pdfName: conditionalPDFName,
                     answer: conditionalPDFAnswer
                 },
-                // NEW CODE START: Include conditionalAlert in exported data
                 conditionalAlert: {
                     enabled: conditionalAlertEnabled,
                     prevQuestion: alertPrevQuestion,
                     prevAnswer: alertPrevAnswer,
                     text: alertText
                 },
-                // NEW CODE END
                 options: [],
                 labels: []
             };
@@ -192,6 +192,9 @@ function exportForm() {
 
         formData.sections.push(sectionData);
     }
+
+  
+
 
     // Export hidden fields with autofill logic and conditional logic
     const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
@@ -284,142 +287,6 @@ function importForm(event) {
     }
 }
 
-function loadFormData(formData) {
-    // 1. Clear the entire formBuilder area
-    document.getElementById('formBuilder').innerHTML = '';
-
-    // 2. Reset counters from the JSON
-    sectionCounter = formData.sectionCounter || 1;
-    questionCounter = formData.questionCounter || 1;
-    hiddenFieldCounter = formData.hiddenFieldCounter || 1;
-
-    // 3. Possibly set the default PDF name
-    if (formData.defaultPDFName) {
-        const formPDFNameInput = document.getElementById('formPDFName');
-        if (formPDFNameInput) {
-            formPDFNameInput.value = formData.defaultPDFName;
-        } else {
-            // create an input if it doesn't exist
-        }
-    }
-
-    // 4. Initialize the hidden-fields module, if you have one
-    initializeHiddenPDFFieldsModule();
-
-    // 5. For each section
-    formData.sections.forEach(section => {
-        // a) Add the section UI
-        addSection(section.sectionId);
-
-        // b) Set custom name
-        document.getElementById(`sectionName${section.sectionId}`).value = section.sectionName || `Section ${section.sectionId}`;
-        updateSectionName(section.sectionId);
-
-        // c) For each question
-        section.questions.forEach(question => {
-            addQuestion(section.sectionId, question.questionId);
-
-            //  i) Retrieve the questionBlock
-            const questionBlock = document.getElementById(`questionBlock${question.questionId}`);
-
-            //  ii) Populate question text, type, etc.
-            questionBlock.querySelector(`#question${question.questionId}`).value = question.text;
-            questionBlock.querySelector(`#questionType${question.questionId}`).value = question.type;
-
-            //  iii) Force the correct options UI
-            toggleOptions(question.questionId);
-
-            //  iv) If type=checkbox, restore checkboxes
-            if (question.type === 'checkbox') {
-                const checkboxOptionsDiv = document.getElementById(`checkboxOptions${question.questionId}`);
-                // Clear any existing or default
-                checkboxOptionsDiv.innerHTML = '';
-
-                question.options.forEach((optData, idx) => {
-                    // Recreate the HTML
-                    const optionDiv = document.createElement('div');
-                    optionDiv.className = `option${idx + 1}`;
-                    optionDiv.innerHTML = `
-                        <label>Option ${idx + 1} Text:</label>
-                        <input type="text" id="checkboxOptionText${question.questionId}_${idx + 1}" 
-                               value="${optData.label}" placeholder="Enter option text"><br><br>
-
-                        <label>Name/ID:</label>
-                        <input type="text" id="checkboxOptionName${question.questionId}_${idx + 1}" 
-                               value="${optData.nameId}" placeholder="Enter Name/ID"><br><br>
-
-                        <label>Value (optional):</label>
-                        <input type="text" id="checkboxOptionValue${question.questionId}_${idx + 1}" 
-                               value="${optData.value}" placeholder="Enter Value"><br><br>
-
-                        <button type="button" onclick="removeCheckboxOption(${question.questionId}, ${idx + 1})">
-                          Remove
-                        </button>
-                        <hr>
-                    `;
-                    checkboxOptionsDiv.appendChild(optionDiv);
-                });
-                // Also handle noneOfTheAbove if relevant, call updateConditionalPDFAnswersForCheckbox
-                updateConditionalPDFAnswersForCheckbox(question.questionId);
-
-            } else if (question.type === 'dropdown') {
-                // Similar approach for dropdown
-                // ...
-            }
-            // etc. for numberedDropdown, multipleTextboxes, etc.
-
-            //  v) If logic is enabled, we “re-check” the logic checkbox, set fields
-            if (question.logic && question.logic.enabled) {
-                // Check the "Enable Conditional Logic" box
-                questionBlock.querySelector(`#logic${question.questionId}`).checked = true;
-                // show the logic block
-                toggleLogic(question.questionId);
-
-                // set the prevQuestion & prevAnswer fields
-                questionBlock.querySelector(`#prevQuestion${question.questionId}`).value = question.logic.prevQuestion;
-                questionBlock.querySelector(`#prevAnswer${question.questionId}`).value = question.logic.prevAnswer;
-            }
-
-            //  vi) If jump logic is enabled, do similarly
-            if (question.jump && question.jump.enabled) {
-                questionBlock.querySelector(`#enableJump${question.questionId}`).checked = true;
-                toggleJumpLogic(question.questionId);
-
-                questionBlock.querySelector(`#jumpOption${question.questionId}`).value = question.jump.option;
-                questionBlock.querySelector(`#jumpTo${question.questionId}`).value = question.jump.to;
-            }
-
-            //  vii) If conditional PDF is enabled
-            if (question.conditionalPDF && question.conditionalPDF.enabled) {
-                questionBlock.querySelector(`#enableConditionalPDF${question.questionId}`).checked = true;
-                toggleConditionalPDFLogic(question.questionId);
-
-                questionBlock.querySelector(`#conditionalPDFName${question.questionId}`).value = question.conditionalPDF.pdfName;
-                questionBlock.querySelector(`#conditionalPDFAnswer${question.questionId}`).value = question.conditionalPDF.answer;
-            }
-
-            //  viii) If conditional Alert is enabled
-            if (question.conditionalAlert && question.conditionalAlert.enabled) {
-                questionBlock.querySelector(`#enableConditionalAlert${question.questionId}`).checked = true;
-                toggleConditionalAlertLogic(question.questionId);
-
-                questionBlock.querySelector(`#alertPrevQuestion${question.questionId}`).value = question.conditionalAlert.prevQuestion;
-                questionBlock.querySelector(`#alertPrevAnswer${question.questionId}`).value = question.conditionalAlert.prevAnswer;
-                questionBlock.querySelector(`#alertText${question.questionId}`).value = question.conditionalAlert.text;
-            }
-        });
-    });
-
-    // 6. If your JSON has hiddenFields, reload them too
-    if (formData.hiddenFields && formData.hiddenFields.length > 0) {
-        formData.hiddenFields.forEach(hiddenField => {
-            addHiddenFieldWithData(hiddenField);
-        });
-    }
-
-    // 7. Final: re-run updateAutofillOptions if you need to refresh references
-    updateAutofillOptions();
-}
 
 
 function addHiddenFieldWithData(hiddenField) {
