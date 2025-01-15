@@ -1,5 +1,7 @@
 /*********************************************
  * gui.js - MULTIPLE OR-CONDITIONS VERSION
+ * WITH FIX so that all typed dropdown options
+ * show up in the Jump Option select.
  *********************************************/
 
 // ============================================
@@ -297,7 +299,7 @@ function addQuestion(sectionId, questionId = null) {
 
     questionsSection.appendChild(questionBlock);
 
-    // Ensure the correct options menu is displayed based on question type
+    // Display the correct sub-block for the default question type
     toggleOptions(currentQuestionId);
 
     // If brand new question, increment questionCounter
@@ -360,13 +362,11 @@ function updateLogicAnswersForRow(questionId, conditionIndex) {
         answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
         return;
     }
-
     const targetQuestionBlock = document.getElementById(`questionBlock${prevQNum}`);
     if (!targetQuestionBlock) {
         answerSelect.innerHTML = '<option value="">-- (invalid question #) --</option>';
         return;
     }
-
     const questionType = targetQuestionBlock.querySelector(`#questionType${prevQNum}`)?.value;
     if (!questionType) return;
 
@@ -410,7 +410,6 @@ function updateLogicAnswersForRow(questionId, conditionIndex) {
     }
 }
 
-// Normal jump logic, PDF logic, alert logic...
 function toggleJumpLogic(questionId) {
     const jumpEnabled = document.getElementById(`enableJump${questionId}`).checked;
     const jumpBlock = document.getElementById(`jumpBlock${questionId}`);
@@ -563,6 +562,7 @@ function updateConditionalPDFAnswersForRadio(questionId) {
 function updateConditionalPDFAnswersForCheckbox(questionId) {
     const conditionalPDFAnswerSelect = document.getElementById(`conditionalPDFAnswer${questionId}`);
     if (!conditionalPDFAnswerSelect) return;
+
     conditionalPDFAnswerSelect.innerHTML = '';
 
     const checkboxOptionsDiv = document.getElementById(`checkboxOptions${questionId}`);
@@ -652,7 +652,9 @@ function updateJumpOptions(questionId) {
     const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
     jumpOptionSelect.innerHTML = '';
 
-    dropdownOptionsDiv.querySelectorAll('input[type="text"]').forEach(optionInput => {
+    // Grab all text inputs in the dropdown options
+    const optionInputs = dropdownOptionsDiv.querySelectorAll('input[type="text"]');
+    optionInputs.forEach(optionInput => {
         const fullValue = optionInput.value.trim();
         if (fullValue) {
             const opt = document.createElement('option');
@@ -665,6 +667,9 @@ function updateJumpOptions(questionId) {
 
 /**
  * Add a dropdown option
+ *  -- KEY FIX: attach 'input' listener so that
+ *  jump options update live when the user edits 
+ *  the text of the newly added option
  */
 function addDropdownOption(questionId) {
     const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
@@ -679,6 +684,12 @@ function addDropdownOption(questionId) {
     `;
     dropdownOptionsDiv.appendChild(optionDiv);
 
+    // Attach 'input' event so jump options refresh in real time
+    const optionInput = optionDiv.querySelector('input[type="text"]');
+    optionInput.addEventListener('input', () => {
+        updateJumpOptions(questionId);
+    });
+
     updateJumpOptions(questionId);
 }
 
@@ -689,8 +700,11 @@ function removeDropdownOption(questionId, optionNumber) {
         const options = document.querySelectorAll(`#dropdownOptions${questionId} > div`);
         options.forEach((option, index) => {
             option.className = `option${index + 1}`;
-            option.querySelector('input').id = `option${questionId}_${index + 1}`;
-            option.querySelector('button').setAttribute('onclick', `removeDropdownOption(${questionId}, ${index + 1})`);
+            const inputEl = option.querySelector('input[type="text"]');
+            inputEl.id = `option${questionId}_${index + 1}`;
+            // reattach remove button
+            const btn = option.querySelector('button');
+            btn.setAttribute('onclick', `removeDropdownOption(${questionId}, ${index + 1})`);
         });
     }
     updateJumpOptions(questionId);
@@ -892,10 +906,12 @@ function generateQuestionOptions() {
         const questionText = questionBlock.querySelector('input[type="text"]').value;
         const questionType = questionBlock.querySelector('select').value;
 
+        // if question is text, bigParagraph, money, date, radio, or dropdown => we can auto fill from it
         if (['text', 'bigParagraph', 'money', 'date', 'radio', 'dropdown'].includes(questionType)) {
             optionsHTML += `<option value="${questionId}">Question ${questionId}: ${questionText}</option>`;
         }
 
+        // if questionType is multipleTextboxes => we can also fill from its child textboxes
         if (questionType === 'multipleTextboxes') {
             const textboxes = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} .option`);
             textboxes.forEach((textbox, idx) => {
@@ -918,6 +934,7 @@ function generateAllQuestionOptions() {
         const questionText = questionBlock.querySelector('input[type="text"]').value;
         const questionType = questionBlock.querySelector('select').value;
 
+        // Only dropdown, radio, or checkbox have discrete answers
         if (['dropdown', 'radio', 'checkbox'].includes(questionType)) {
             optionsHTML += `<option value="${questionId}">Question ${questionId}: ${questionText}</option>`;
         }
@@ -1039,8 +1056,9 @@ function updateAutofillOptions() {
     });
 }
 
-
-
+/**
+ * If we load from JSON, we can re-insert hidden fields
+ */
 function addHiddenFieldWithData(hiddenField) {
     const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
     const hiddenFieldBlock = document.createElement('div');
@@ -1067,6 +1085,7 @@ function addHiddenFieldWithData(hiddenField) {
 
     if (hiddenField.type === 'checkbox') {
         document.getElementById(`hiddenFieldChecked${currentHiddenFieldId}`).checked = hiddenField.checked;
+        // If conditions exist
         if (hiddenField.conditions && hiddenField.conditions.length > 0) {
             hiddenField.conditions.forEach((condition, index) => {
                 addConditionalAutofillForCheckbox(currentHiddenFieldId);
