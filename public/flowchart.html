@@ -248,7 +248,6 @@
       });
 
       function autoUpdateNodeIdBasedOnLabel(cell) {
-        // If it's a question or options, set node ID from label
         if (!cell.vertex) return;
         const label = (cell.value || "").trim();
         if (!label) return;
@@ -262,9 +261,7 @@
       // ---------- Helper: reading/writing style ----------
       function setSectionId(cell, sid) {
         let style = cell.style || "";
-        // Remove any existing sectionId
         style = style.replace(/sectionId=[^;]+/, "");
-        // Add new sectionId
         style += `;sectionId=${sid};`;
         graph.getModel().setStyle(cell, style);
       }
@@ -323,7 +320,6 @@
 
         vertices.forEach((cell) => {
           if (isOptions(cell)) {
-            // Option nodes inherit the section ID from their parent question
             const incomingEdges = graph.getIncomingEdges(cell) || [];
             if (incomingEdges.length > 0) {
               const parentCell = incomingEdges[0].source;
@@ -336,9 +332,6 @@
 
           if (isQuestion(cell)) {
             const thisSection = getSectionId(cell);
-
-            // Only inherit parent's section if NOT flagged as newSection
-            // AND if this node is still at default (1 or 0).
             if (
               !cell.style.includes("newSection=true") &&
               (thisSection === 1 || thisSection === 0)
@@ -354,7 +347,6 @@
             }
           }
 
-          // Now color the cell, etc.
           colorCell(cell);
           updateOverlay(cell);
         });
@@ -362,15 +354,10 @@
 
       function colorCell(cell) {
         if (!cell.vertex) return;
-
-        // Default light blue for question
-        let fillColor = "#ADD8E6";
-
-        // Pink if newSection
+        let fillColor = "#ADD8E6"; // default question color
         if (isQuestion(cell) && cell.style.includes("newSection=true")) {
-          fillColor = "#FFC0CB";
+          fillColor = "#FFC0CB"; // pink for new section
         }
-
         let style = cell.style || "";
         style = style.replace(/fillColor=[^;]+/, "");
         style += `;fillColor=${fillColor};`;
@@ -379,13 +366,10 @@
 
       function markAsNewSection(cell) {
         if (!cell) return;
-
         let style = cell.style || "";
         style = style.replace(/newSection=[^;]+/, "");
         style += ";newSection=true;";
         graph.getModel().setStyle(cell, style);
-
-        // Also apply pink color
         setCellColor(cell, "#FFC0CB");
       }
 
@@ -396,7 +380,6 @@
         if (isQuestion(cell)) text = getQuestionType(cell);
         else if (isOptions(cell)) text = "options";
         const overlay = new mxCellOverlay(
-          // Invisible dot, but the text will show on hover
           new mxImage("data:image/gif;base64,R0lGODlhAQABAAAAACw=", 1, 1),
           text
         );
@@ -492,12 +475,9 @@
       newSectionButton.addEventListener("click", () => {
         if (selectedCell && isQuestion(selectedCell)) {
           const currentSectionId = getSectionId(selectedCell);
-          const newSectionId = currentSectionId + 1; // Increment section ID
-          // Update the section ID
+          const newSectionId = currentSectionId + 1;
           setSectionId(selectedCell, newSectionId);
-          // Mark this node as a "New Section" node
           markAsNewSection(selectedCell);
-          // Refresh to ensure children pick up new logic
           refreshAllCells();
         }
         hideContextMenu();
@@ -529,7 +509,6 @@
         let sid = getSectionId(cell);
         propSectionName.textContent = "Section " + sid;
       }
-
       makeEditableField(propNodeText, onNodeTextFieldChange);
       makeEditableField(propNodeId, onNodeIdFieldChange);
 
@@ -552,15 +531,11 @@
         });
       }
 
-      // ---------- KEY FIX: Update NodeId when text changes ----------
       function onNodeTextFieldChange(newText) {
         if (!selectedCell) return;
         graph.getModel().beginUpdate();
         try {
-          // Update the label
           selectedCell.value = newText.trim();
-
-          // Also update the node ID immediately
           if (isQuestion(selectedCell)) {
             refreshNodeIdFromLabel(selectedCell);
           } else if (isOptions(selectedCell)) {
@@ -583,14 +558,12 @@
         refreshAllCells();
       }
 
-      // If question => nodeId = label with underscores
       function refreshNodeIdFromLabel(cell) {
         const label = (cell.value || "").toString().trim();
         const nodeId = label.replace(/\s+/g, "_");
         setNodeId(cell, nodeId);
       }
 
-      // If options => nodeId = parent's nodeId + underscore + option label
       function refreshOptionNodeId(cell) {
         const edges = graph.getIncomingEdges(cell) || [];
         let parentNodeId = "ParentQuestion";
@@ -605,7 +578,7 @@
         setNodeId(cell, parentNodeId + label);
       }
 
-      // Ctrl+C / Ctrl+V
+      // Copy/Paste
       const keyHandler = new mxKeyHandler(graph);
       keyHandler.bindControlKey(67, () => {
         mxClipboard.copy(graph);
@@ -643,7 +616,6 @@
             } finally {
               graph.getModel().endUpdate();
             }
-
             if (isQuestion(newVertex)) {
               refreshNodeIdFromLabel(newVertex);
             } else if (isOptions(newVertex)) {
@@ -655,7 +627,7 @@
         );
       });
 
-      // ---------- KEY FIX: Always refresh ID if label ends with '?' ----------
+      // If label ends with '?', auto question
       graph.getModel().addListener(mxEvent.EVENT_CHANGE, function (sender, evt) {
         const changes = evt.getProperty("changes");
         if (!changes) return;
@@ -663,15 +635,13 @@
           if (change.constructor.name === "mxValueChange") {
             const { cell, value } = change;
             if (value && typeof value === "string") {
-              // If the text ends with '?', ensure it's a question
               if (value.trim().endsWith("?")) {
                 if (!isQuestion(cell)) {
                   let style = cell.style || "";
                   style += ";nodeType=question;";
                   graph.getModel().setStyle(cell, style);
+                  refreshNodeIdFromLabel(cell);
                 }
-                // Refresh ID from label right away
-                refreshNodeIdFromLabel(cell);
               }
             }
           }
@@ -683,18 +653,14 @@
       graph.connectionHandler.addListener(mxEvent.CONNECT, function (sender, evt) {
         const edge = evt.getProperty("cell");
         if (!edge) return;
-
         const parent = edge.source;
         const child = edge.target;
 
         if (parent && isQuestion(parent) && child && isOptions(child)) {
-          // Option inherits from question unconditionally
           const parentSectionId = getSectionId(parent);
           setSectionId(child, parentSectionId);
         }
-
         if (parent && isOptions(parent) && child && isQuestion(child)) {
-          // Only change child's section if it's basically "unassigned" or still in 1
           if (
             !child.style.includes("newSection=true") &&
             (getSectionId(child) === 1 || getSectionId(child) === 0)
@@ -703,7 +669,6 @@
             setSectionId(child, parentSectionId);
           }
         }
-
         refreshAllCells();
       });
 
@@ -762,10 +727,9 @@
         graph.getModel().beginUpdate();
         try {
           const parent = graph.getDefaultParent();
-          // Clear existing
           graph.removeCells(graph.getChildVertices(parent));
           const createdCells = {};
-          // Pass 1: create vertices
+          // pass1: vertices
           data.forEach((item) => {
             if (item.vertex) {
               const geo = new mxGeometry(
@@ -781,7 +745,7 @@
               createdCells[item.id] = newCell;
             }
           });
-          // Pass 2: create edges
+          // pass2: edges
           data.forEach((item) => {
             if (item.edge) {
               const newEdge = new mxCell(item.value, new mxGeometry(), item.style);
@@ -798,7 +762,7 @@
         refreshAllCells();
       }
 
-      // ---------- Export GUI JSON ----------
+      // ---------- Export GUI JSON with multi-conditions logic ----------
       window.exportGuiJson = function () {
         const model = graph.getModel();
         const allCells = model.cells;
@@ -822,14 +786,31 @@
             const label = (cell.value || "").trim() || "Untitled";
             const qType = getQuestionType(cell);
 
+            // Instead of storing prevQuestion/prevAnswer, we store conditions as an array:
             const questionObj = {
               questionId: questionIdCounter,
               text: label,
               type: qType,
-              logic: { enabled: false, prevQuestion: "", prevAnswer: "" },
-              jump: { enabled: false, option: "", to: "" },
-              conditionalPDF: { enabled: false, pdfName: "", answer: "Yes" },
-              conditionalAlert: { enabled: false, prevQuestion: "", prevAnswer: "", text: "" },
+              logic: {
+                enabled: false,
+                conditions: []
+              },
+              jump: {
+                enabled: false,
+                option: "",
+                to: ""
+              },
+              conditionalPDF: {
+                enabled: false,
+                pdfName: "",
+                answer: "Yes"
+              },
+              conditionalAlert: {
+                enabled: false,
+                prevQuestion: "",
+                prevAnswer: "",
+                text: ""
+              },
               options: [],
               labels: []
             };
@@ -839,7 +820,7 @@
           }
         }
 
-        // 2) gather "options" from each question
+        // 2) gather "options" from each question and set logic conditions if needed
         for (let id in allCells) {
           if (id === "0" || id === "1") continue;
           const cell = allCells[id];
@@ -847,7 +828,7 @@
             const sId = getSectionId(cell);
             const label = (cell.value || "").trim() || "Untitled";
             let questionList = sectionsMap[sId] || [];
-            let qObj = questionList.find((q) => q.text === label);
+            let qObj = questionList.find(q => q.text === label);
             if (!qObj) continue;
 
             const outEdges = graph.getOutgoingEdges(cell) || [];
@@ -857,6 +838,8 @@
               if (getNodeType(target) === "options") {
                 const optLabel = (target.value || "Option").trim();
                 const optNodeId = getNodeId(target);
+
+                // Store as array of strings if not checkbox
                 if (qObj.type === "checkbox") {
                   qObj.options.push({
                     label: capitalizeFirst(optLabel),
@@ -864,23 +847,26 @@
                     value: ""
                   });
                 } else {
-                  // For dropdown or text => store as strings
                   qObj.options.push(capitalizeFirst(optLabel));
                 }
 
-                // check for logic if that option leads to another question
+                // If that option leads to another question => add a condition
                 const nextEdges = graph.getOutgoingEdges(target) || [];
                 nextEdges.forEach((ne) => {
                   const q2 = ne.target;
                   if (q2 && getNodeType(q2) === "question") {
-                    let q2Sid = getSectionId(q2);
-                    let q2Label = (q2.value || "").trim();
-                    let q2List = sectionsMap[q2Sid] || [];
+                    const q2Sid = getSectionId(q2);
+                    const q2Label = (q2.value || "").trim();
+                    if (!sectionsMap[q2Sid]) return;
+                    let q2List = sectionsMap[q2Sid];
                     let q2Obj = q2List.find((o) => o.text === q2Label);
                     if (q2Obj) {
                       q2Obj.logic.enabled = true;
-                      q2Obj.logic.prevQuestion = qObj.questionId.toString();
-                      q2Obj.logic.prevAnswer = capitalizeFirst(optLabel);
+                      // We push an item to conditions[]: e.g. {prevQuestion: "1", prevAnswer: "Yes"}
+                      q2Obj.logic.conditions.push({
+                        prevQuestion: qObj.questionId.toString(),
+                        prevAnswer: capitalizeFirst(optLabel)
+                      });
                     }
                   }
                 });

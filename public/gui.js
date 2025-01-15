@@ -1,3 +1,6 @@
+/*********************************************
+ * gui.js - MULTIPLE OR-CONDITIONS VERSION
+ *********************************************/
 
 // ============================================
 // ===========  GLOBAL VARIABLES  =============
@@ -68,8 +71,8 @@ function updateSectionName(sectionId) {
 }
 
 /**
- * Re-label sections (and questions inside) after moves, so that
- * the GUI remains consistent.
+ * Re-label sections (and questions inside) after moves,
+ * so that the GUI remains consistent.
  */
 function updateSectionLabels() {
     const sections = document.querySelectorAll('.section-block');
@@ -194,11 +197,10 @@ function addQuestion(sectionId, questionId = null) {
             <option value="bigParagraph">Big Paragraph</option>
         </select><br><br>
 
-        <!-- Name/ID and Placeholder for Text, Big Paragraph, Radio, and Dropdown -->
+        <!-- Name/ID and Placeholder for Text, Big Paragraph, etc. -->
         <div id="textboxOptions${currentQuestionId}" class="textbox-options" style="display: none;">
             <label>Name/ID: </label>
             <input type="text" id="textboxName${currentQuestionId}" placeholder="Enter field name"><br><br>
-
             <label>Placeholder: </label>
             <input type="text" id="textboxPlaceholder${currentQuestionId}" placeholder="Enter placeholder">
         </div>
@@ -238,19 +240,13 @@ function addQuestion(sectionId, questionId = null) {
             <button type="button" onclick="addMultipleTextboxOption(${currentQuestionId})">Add Textbox</button>
         </div><br>
 
-        <!-- Conditional Logic -->
+        <!-- ===== MULTIPLE-OR LOGIC BLOCK ===== -->
         <label>Enable Conditional Logic: </label>
         <input type="checkbox" id="logic${currentQuestionId}" onchange="toggleLogic(${currentQuestionId})">
         <div id="logicBlock${currentQuestionId}" style="display: none;">
-            <label>Show this question if: </label><br>
-            <input type="number" placeholder="Previous question number" 
-                   id="prevQuestion${currentQuestionId}" 
-                   onchange="updateLogicAnswers(${currentQuestionId})"><br>
-
-            <!-- CHANGED to <select> for possible answers: -->
-            <select id="prevAnswer${currentQuestionId}" style="display: block;">
-                <option value="">-- Select an answer --</option>
-            </select><br>
+            <label>Show this question if ANY of these conditions match:</label><br>
+            <div id="logicConditions${currentQuestionId}"></div>
+            <button type="button" onclick="addLogicCondition(${currentQuestionId})">+ Add OR Condition</button>
         </div><br>
 
         <!-- Jump Logic -->
@@ -271,7 +267,7 @@ function addQuestion(sectionId, questionId = null) {
             <input type="checkbox" id="enableConditionalPDF${currentQuestionId}" onchange="toggleConditionalPDFLogic(${currentQuestionId})"><br><br>
             <div id="conditionalPDFBlock${currentQuestionId}" style="display: none;">
                 <label>PDF Name:</label>
-                <input type="text" id="conditionalPDFName${currentQuestionId}" placeholder="Enter PDF name (e.g., sc-100.pdf)"><br><br>
+                <input type="text" id="conditionalPDFName${currentQuestionId}" placeholder="Enter PDF name"><br><br>
                 <label>Attach PDF if the answer is:</label>
                 <select id="conditionalPDFAnswer${currentQuestionId}">
                     <option value="Yes">Yes</option>
@@ -301,16 +297,40 @@ function addQuestion(sectionId, questionId = null) {
 
     questionsSection.appendChild(questionBlock);
 
-    // Ensure the correct options menu is displayed based on the selected type
+    // Ensure the correct options menu is displayed based on question type
     toggleOptions(currentQuestionId);
-
-    // Update hidden field references (if any)
-    updateAutofillOptions();
 
     // If brand new question, increment questionCounter
     if (!questionId) {
         questionCounter++;
     }
+}
+
+/** Add an OR condition row to logicBlock */
+function addLogicCondition(questionId) {
+    const logicConditionsDiv = document.getElementById(`logicConditions${questionId}`);
+    const numConditions = logicConditionsDiv.children.length + 1;
+
+    const conditionRow = document.createElement('div');
+    conditionRow.className = 'logic-condition-row';
+    conditionRow.id = `logicConditionRow${questionId}_${numConditions}`;
+    conditionRow.innerHTML = `
+        <span>Condition ${numConditions}:</span><br>
+        <input type="number" placeholder="Previous question number"
+               id="prevQuestion${questionId}_${numConditions}"
+               onchange="updateLogicAnswersForRow(${questionId}, ${numConditions})"><br>
+        <select id="prevAnswer${questionId}_${numConditions}" style="display: block;">
+            <option value="">-- Select an answer --</option>
+        </select><br>
+        <button type="button" onclick="removeLogicCondition(${questionId}, ${numConditions})">Remove</button>
+        <hr>
+    `;
+    logicConditionsDiv.appendChild(conditionRow);
+}
+
+function removeLogicCondition(questionId, conditionIndex) {
+    const row = document.getElementById(`logicConditionRow${questionId}_${conditionIndex}`);
+    if (row) row.remove();
 }
 
 function toggleLogic(questionId) {
@@ -319,26 +339,28 @@ function toggleLogic(questionId) {
     logicBlock.style.display = logicEnabled ? 'block' : 'none';
 
     if (logicEnabled) {
-        // If just turned on, fill possible answers
-        updateLogicAnswers(questionId);
+        // If just turned on and no conditions exist, add one
+        const logicConditionsDiv = document.getElementById(`logicConditions${questionId}`);
+        if (logicConditionsDiv.children.length === 0) {
+            addLogicCondition(questionId);
+        }
     }
 }
 
 /** 
- * Refill #prevAnswer{questionId} with possible answers from "previous question #"
+ * Refill #prevAnswer{questionId}_{rowIndex} with possible answers
  */
-function updateLogicAnswers(questionId) {
-    const prevQuestionField = document.getElementById(`prevQuestion${questionId}`);
-    const answerSelect = document.getElementById(`prevAnswer${questionId}`);
-    if (!prevQuestionField || !answerSelect) return;
+function updateLogicAnswersForRow(questionId, conditionIndex) {
+    const questionNumberInput = document.getElementById(`prevQuestion${questionId}_${conditionIndex}`);
+    const answerSelect = document.getElementById(`prevAnswer${questionId}_${conditionIndex}`);
+    if (!questionNumberInput || !answerSelect) return;
 
-    const prevQNum = parseInt(prevQuestionField.value);
+    const prevQNum = parseInt(questionNumberInput.value);
     if (!prevQNum) {
         answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
         return;
     }
 
-    // find that question block
     const targetQuestionBlock = document.getElementById(`questionBlock${prevQNum}`);
     if (!targetQuestionBlock) {
         answerSelect.innerHTML = '<option value="">-- (invalid question #) --</option>';
@@ -351,7 +373,6 @@ function updateLogicAnswers(questionId) {
     // Clear old answers
     answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
 
-    // Now gather possible answers
     if (questionType === 'radio') {
         answerSelect.innerHTML += `
             <option value="Yes">Yes</option>
@@ -379,7 +400,6 @@ function updateLogicAnswers(questionId) {
                 answerSelect.appendChild(optionEl);
             }
         });
-        // If user included "None of the above"
         const noneOfAbove = targetQuestionBlock.querySelector(`#noneOfTheAbove${prevQNum}`);
         if (noneOfAbove && noneOfAbove.checked) {
             const optionEl = document.createElement('option');
@@ -390,6 +410,7 @@ function updateLogicAnswers(questionId) {
     }
 }
 
+// Normal jump logic, PDF logic, alert logic...
 function toggleJumpLogic(questionId) {
     const jumpEnabled = document.getElementById(`enableJump${questionId}`).checked;
     const jumpBlock = document.getElementById(`jumpBlock${questionId}`);
@@ -515,7 +536,6 @@ function toggleOptions(questionId) {
     if ((questionType === 'radio' || questionType === 'checkbox') && conditionalPDFLogicDiv) {
         conditionalPDFLogicDiv.style.display = 'block';
     }
-
     // Also show conditional alert logic if question is radio/checkbox
     const conditionalAlertLogicDiv = document.getElementById(`conditionalAlertLogic${questionId}`);
     if (questionType === 'radio' || questionType === 'checkbox') {
@@ -543,8 +563,7 @@ function updateConditionalPDFAnswersForRadio(questionId) {
 function updateConditionalPDFAnswersForCheckbox(questionId) {
     const conditionalPDFAnswerSelect = document.getElementById(`conditionalPDFAnswer${questionId}`);
     if (!conditionalPDFAnswerSelect) return;
-
-    conditionalPDFAnswerSelect.innerHTML = ''; // Clear existing options
+    conditionalPDFAnswerSelect.innerHTML = '';
 
     const checkboxOptionsDiv = document.getElementById(`checkboxOptions${questionId}`);
     if (!checkboxOptionsDiv) return;
@@ -1020,203 +1039,8 @@ function updateAutofillOptions() {
     });
 }
 
-// ============================================
-// ===========  IMPORT / EXPORT  =============
-// ============================================
-function loadFormData(formData) {
-    // 1) Clear the entire "formBuilder" container
-    document.getElementById('formBuilder').innerHTML = '';
 
-    // 2) Reset counters based on what's stored in the JSON
-    sectionCounter = formData.sectionCounter || 1;
-    questionCounter = formData.questionCounter || 1;
-    hiddenFieldCounter = formData.hiddenFieldCounter || 1;
 
-    // 3) Possibly set default PDF name
-    if (formData.defaultPDFName) {
-        const formPDFNameInput = document.getElementById('formPDFName');
-        if (formPDFNameInput) {
-            formPDFNameInput.value = formData.defaultPDFName;
-        }
-    }
-
-    // 4) Initialize hidden-fields module (if required by your UI)
-    initializeHiddenPDFFieldsModule();
-
-    // 5) Build out sections and questions
-    if (formData.sections) {
-        formData.sections.forEach(section => {
-            // A) Create the section in the UI
-            addSection(section.sectionId);
-
-            // B) Set the name of the section (if customized)
-            const sectionNameInput = document.getElementById(`sectionName${section.sectionId}`);
-            if (sectionNameInput) {
-                sectionNameInput.value = section.sectionName || `Section ${section.sectionId}`;
-                updateSectionName(section.sectionId);
-            }
-
-            // C) Add questions inside this section
-            (section.questions || []).forEach(question => {
-                // i) Create the question UI
-                addQuestion(section.sectionId, question.questionId);
-
-                // ii) Grab the question block from the DOM
-                const questionBlock = document.getElementById(`questionBlock${question.questionId}`);
-                if (!questionBlock) return; // In case something went wrong
-
-                // iii) Set question text and type
-                const questionInput = questionBlock.querySelector(`#question${question.questionId}`);
-                if (questionInput) {
-                    questionInput.value = question.text;
-                }
-
-                const questionTypeSelect = questionBlock.querySelector(`#questionType${question.questionId}`);
-                if (questionTypeSelect) {
-                    questionTypeSelect.value = question.type;
-                    toggleOptions(question.questionId);  // Display the correct sub-blocks for this type
-                }
-
-                // iv) If it's a "checkbox" question, rebuild its options
-                if (question.type === 'checkbox') {
-                    const checkboxOptionsDiv = questionBlock.querySelector(`#checkboxOptions${question.questionId}`);
-                    if (checkboxOptionsDiv) {
-                        checkboxOptionsDiv.innerHTML = '';
-                        (question.options || []).forEach((optData, idx) => {
-                            const optionDiv = document.createElement('div');
-                            optionDiv.className = `option${idx + 1}`;
-                            optionDiv.innerHTML = `
-                                <label>Option ${idx + 1} Text:</label>
-                                <input type="text" id="checkboxOptionText${question.questionId}_${idx + 1}"
-                                       value="${optData.label}" placeholder="Enter option text"><br><br>
-                                <label>Name/ID:</label>
-                                <input type="text" id="checkboxOptionName${question.questionId}_${idx + 1}"
-                                       value="${optData.nameId}" placeholder="Enter Name/ID"><br><br>
-                                <label>Value (optional):</label>
-                                <input type="text" id="checkboxOptionValue${question.questionId}_${idx + 1}"
-                                       value="${optData.value}" placeholder="Enter Value"><br><br>
-                                <button type="button"
-                                        onclick="removeCheckboxOption(${question.questionId}, ${idx + 1})">
-                                    Remove
-                                </button>
-                                <hr>
-                            `;
-                            checkboxOptionsDiv.appendChild(optionDiv);
-                        });
-                        updateConditionalPDFAnswersForCheckbox(question.questionId);
-                    }
-                }
-
-                // v) If it's a "dropdown" question, rebuild its options array
-                else if (question.type === 'dropdown') {
-                    const dropdownOptionsDiv = questionBlock.querySelector(`#dropdownOptions${question.questionId}`);
-                    if (dropdownOptionsDiv) {
-                        dropdownOptionsDiv.innerHTML = '';
-                        (question.options || []).forEach((optText, idx) => {
-                            const optionDiv = document.createElement('div');
-                            optionDiv.className = `option${idx + 1}`;
-                            const optionId = `option${question.questionId}_${idx + 1}`;
-                            optionDiv.innerHTML = `
-                                <input type="text" id="${optionId}" value="${optText}" placeholder="Option ${idx + 1}">
-                                <button type="button"
-                                        onclick="removeDropdownOption(${question.questionId}, ${idx + 1})">
-                                    Remove
-                                </button>
-                            `;
-                            dropdownOptionsDiv.appendChild(optionDiv);
-                        });
-                    }
-                }
-
-                // vi) Handle other question types (numberedDropdown, multipleTextboxes, etc.)
-                // Rebuild their options/labels similarly if needed
-
-                // vii) Apply conditional logic (logic)
-                if (question.logic && question.logic.enabled) {
-                    const logicCheckbox = questionBlock.querySelector(`#logic${question.questionId}`);
-                    if (logicCheckbox) {
-                        logicCheckbox.checked = true;
-                        toggleLogic(question.questionId);
-                    }
-                    const prevQuestionField = questionBlock.querySelector(`#prevQuestion${question.questionId}`);
-                    if (prevQuestionField) {
-                        prevQuestionField.value = question.logic.prevQuestion;
-                    }
-                    const prevAnswerSelect = questionBlock.querySelector(`#prevAnswer${question.questionId}`);
-                    if (prevAnswerSelect) {
-                        // Repopulate answers in the dropdown
-                        updateLogicAnswers(question.questionId);
-                        // Now set the selected answer
-                        prevAnswerSelect.value = question.logic.prevAnswer;
-                    }
-                }
-
-                // viii) Jump Logic
-                if (question.jump && question.jump.enabled) {
-                    const jumpCheckbox = questionBlock.querySelector(`#enableJump${question.questionId}`);
-                    if (jumpCheckbox) {
-                        jumpCheckbox.checked = true;
-                        toggleJumpLogic(question.questionId);
-                    }
-                    const jumpOptionSelect = questionBlock.querySelector(`#jumpOption${question.questionId}`);
-                    const jumpToInput = questionBlock.querySelector(`#jumpTo${question.questionId}`);
-                    if (jumpOptionSelect) {
-                        jumpOptionSelect.value = question.jump.option;
-                    }
-                    if (jumpToInput) {
-                        jumpToInput.value = question.jump.to;
-                    }
-                }
-
-                // ix) Conditional PDF
-                if (question.conditionalPDF && question.conditionalPDF.enabled) {
-                    const pdfCheckbox = questionBlock.querySelector(`#enableConditionalPDF${question.questionId}`);
-                    if (pdfCheckbox) {
-                        pdfCheckbox.checked = true;
-                        toggleConditionalPDFLogic(question.questionId);
-                    }
-                    const pdfNameInput = questionBlock.querySelector(`#conditionalPDFName${question.questionId}`);
-                    const pdfAnswerSelect = questionBlock.querySelector(`#conditionalPDFAnswer${question.questionId}`);
-                    if (pdfNameInput) {
-                        pdfNameInput.value = question.conditionalPDF.pdfName;
-                    }
-                    if (pdfAnswerSelect) {
-                        pdfAnswerSelect.value = question.conditionalPDF.answer;
-                    }
-                }
-
-                // x) Conditional Alert
-                if (question.conditionalAlert && question.conditionalAlert.enabled) {
-                    const alertCheckbox = questionBlock.querySelector(`#enableConditionalAlert${question.questionId}`);
-                    if (alertCheckbox) {
-                        alertCheckbox.checked = true;
-                        toggleConditionalAlertLogic(question.questionId);
-                    }
-                    const alertPrevQ = questionBlock.querySelector(`#alertPrevQuestion${question.questionId}`);
-                    const alertPrevA = questionBlock.querySelector(`#alertPrevAnswer${question.questionId}`);
-                    const alertTextEl = questionBlock.querySelector(`#alertText${question.questionId}`);
-                    if (alertPrevQ) alertPrevQ.value = question.conditionalAlert.prevQuestion;
-                    if (alertPrevA) alertPrevA.value = question.conditionalAlert.prevAnswer;
-                    if (alertTextEl) alertTextEl.value = question.conditionalAlert.text;
-                }
-            });
-        });
-    }
-
-    // 6) Build hidden fields from JSON
-    if (formData.hiddenFields && formData.hiddenFields.length > 0) {
-        formData.hiddenFields.forEach(hiddenField => {
-            addHiddenFieldWithData(hiddenField);
-        });
-    }
-
-    // 7) Final step: re-run references
-    updateAutofillOptions();
-}
-
-/** 
- * Add a hidden field from data 
- */
 function addHiddenFieldWithData(hiddenField) {
     const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
     const hiddenFieldBlock = document.createElement('div');
@@ -1239,13 +1063,10 @@ function addHiddenFieldWithData(hiddenField) {
     hiddenFieldsContainer.appendChild(hiddenFieldBlock);
 
     toggleHiddenFieldOptions(currentHiddenFieldId);
-
     document.getElementById(`hiddenFieldName${currentHiddenFieldId}`).value = hiddenField.name;
 
     if (hiddenField.type === 'checkbox') {
         document.getElementById(`hiddenFieldChecked${currentHiddenFieldId}`).checked = hiddenField.checked;
-
-        // Load conditions for checkboxes
         if (hiddenField.conditions && hiddenField.conditions.length > 0) {
             hiddenField.conditions.forEach((condition, index) => {
                 addConditionalAutofillForCheckbox(currentHiddenFieldId);
@@ -1261,7 +1082,6 @@ function addHiddenFieldWithData(hiddenField) {
             const autofillSelect = document.getElementById(`hiddenFieldAutofill${currentHiddenFieldId}`);
             autofillSelect.value = hiddenField.autofillQuestionId;
         }
-
         if (hiddenField.conditions && hiddenField.conditions.length > 0) {
             hiddenField.conditions.forEach((condition, index) => {
                 addConditionalAutofill(currentHiddenFieldId);
@@ -1274,4 +1094,3 @@ function addHiddenFieldWithData(hiddenField) {
         }
     }
 }
-
