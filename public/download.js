@@ -128,7 +128,18 @@ function loadFormData(formData) {
                                 </button>
                             `;
                             dropdownOptionsDiv.appendChild(optionDiv);
+
+                            // Attach 'input' event so jump options refresh if user edits it
+                            const optionInput = optionDiv.querySelector('input[type="text"]');
+                            optionInput.addEventListener('input', () => {
+                                updateJumpOptions(question.questionId);
+                            });
                         });
+
+                        // *** IMPORTANT FIX ***
+                        // Re-run updateJumpOptions *after* we've populated the dropdown so
+                        // the Jump Option select is filled with the newly imported options.
+                        updateJumpOptions(question.questionId);
                     }
                 }
                 // ...multipleTextboxes, numberedDropdown, etc. if needed

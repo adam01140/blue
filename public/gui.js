@@ -650,6 +650,8 @@ function updateJumpOptionsForRadio(questionId) {
 function updateJumpOptions(questionId) {
     const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
     const jumpOptionSelect = document.getElementById(`jumpOption${questionId}`);
+    if (!dropdownOptionsDiv || !jumpOptionSelect) return;
+
     jumpOptionSelect.innerHTML = '';
 
     // Grab all text inputs in the dropdown options

@@ -43,6 +43,11 @@ function getFormHTML() {
     let conditionalPDFs = [];
     let conditionalAlerts = [];
 
+    // For jump logic (the new approach)
+    // We'll store an array of objects, one for each question with jump logic
+    // { questionId, questionNameId, jumpOption, jumpTo, section, questionType }
+    let jumpLogics = [];
+
     // Possibly read a PDF name if user typed it, else default
     const pdfFormNameInput = document.getElementById('formPDFName')
         ? document.getElementById('formPDFName').value.trim()
@@ -61,6 +66,7 @@ function getFormHTML() {
         const sectionNameInput = sectionBlock.querySelector(`#sectionName${s}`);
         const sectionName = sectionNameInput ? sectionNameInput.value : `Section ${s}`;
 
+        // Start the section
         formHTML += `<div id="section${s}" class="section${s === 1 ? ' active' : ''}">`;
         formHTML += `<h2>${sectionName}</h2>`;
 
@@ -73,24 +79,33 @@ function getFormHTML() {
 
             questionTypesMap[questionId] = questionType;
 
-            // Logic & jump
+            // Check logic
             const logicEnabled = questionBlock.querySelector(`#logic${questionId}`).checked;
-            // We no longer have just prevQuestionId / prevAnswer
-            // We have an array of conditions in question.logic
-            // But here we must gather them from the DOM if needed
-            // However, in your code, you've already stored them in your JSON
-            // So we'll just handle them after we build the question's HTML.
 
+            // Jump logic
             const jumpEnabled = questionBlock.querySelector(`#enableJump${questionId}`).checked;
             const jumpTo = questionBlock.querySelector(`#jumpTo${questionId}`).value;
             const jumpOption = questionBlock.querySelector(`#jumpOption${questionId}`).value;
 
-            // conditionalPDF
+            // If jump is enabled, store it for later processing
+            if (jumpEnabled && jumpTo) {
+                // We'll fill in the questionNameId below if needed
+                jumpLogics.push({
+                    questionId,
+                    questionNameId: '', // We'll populate after we know the actual name
+                    jumpOption,
+                    jumpTo,
+                    section: s,
+                    questionType
+                });
+            }
+
+            // Conditional PDF
             const conditionalPDFEnabled = questionBlock.querySelector(`#enableConditionalPDF${questionId}`)?.checked;
             const conditionalPDFName = questionBlock.querySelector(`#conditionalPDFName${questionId}`)?.value;
             const conditionalPDFAnswer = questionBlock.querySelector(`#conditionalPDFAnswer${questionId}`)?.value;
 
-            // conditionalAlert
+            // Conditional Alert
             const conditionalAlertEnabled = questionBlock.querySelector(`#enableConditionalAlert${questionId}`)?.checked;
             const alertPrevQuestion = questionBlock.querySelector(`#alertPrevQuestion${questionId}`)?.value;
             const alertPrevAnswer = questionBlock.querySelector(`#alertPrevAnswer${questionId}`)?.value;
@@ -113,7 +128,7 @@ function getFormHTML() {
                 // single text input
                 const nameId = questionBlock.querySelector(`#textboxName${questionId}`).value || `answer${questionId}`;
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`).value || '';
-                questionNameIds[questionId] = nameId;
+                questionNameIds[questionId] = nameId; // store for later
                 formHTML += `<input type="text" id="${nameId}" name="${nameId}" placeholder="${placeholder}"><br><br>`;
 
             } else if (questionType === 'bigParagraph') {
@@ -248,6 +263,7 @@ function getFormHTML() {
                 const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`).value;
                 const labels = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
                 const labelValues = Array.from(labels).map(label => label.value);
+
                 formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value)">
                                 <option value="" disabled selected>Select an option</option>`;
                 for (let i = rangeStart; i <= rangeEnd; i++) {
@@ -298,9 +314,6 @@ function getFormHTML() {
             formHTML += `</div>`;
 
             // =============== MULTIPLE OR LOGIC ===============
-            // We gather the conditions from the questionBlock
-            // (Your actual code might read from JSON, but here's how to generate the final <script>.)
-
             if (logicEnabled) {
                 // We'll find all .logic-condition-row for this question
                 const logicRows = questionBlock.querySelectorAll(`.logic-condition-row`);
@@ -321,7 +334,6 @@ function getFormHTML() {
                         if (!prevQNum || !prevAnswer) return; // skip incomplete
 
                         // questionTypesMap[prevQNum] might be undefined if user did something
-                        // we'll fallback to 'text'
                         const pType = questionTypesMap[prevQNum] || 'text';
 
                         formHTML += `
@@ -395,50 +407,9 @@ function getFormHTML() {
                     `;
                 }
             }
+        }); // end forEach question
 
-            // =============== JUMP LOGIC ===============
-            if (jumpEnabled && jumpTo) {
-                // check question type
-                if (questionType === 'radio' || questionType === 'dropdown') {
-                    const thisNameId = questionNameIds[questionId] || `answer${questionId}`;
-                    formHTML += `
-                    <script>
-                        (function(){
-                            var el = document.getElementById('${thisNameId}');
-                            if (!el) return;
-                            el.addEventListener('change', function(){
-                                if (this.value === '${jumpOption}') {
-                                    navigateSection(${jumpTo});
-                                }
-                            });
-                        })();
-                    </script>
-                    `;
-                } else if (questionType === 'checkbox') {
-                    formHTML += `
-                    <script>
-                        (function() {
-                            var checkboxes = document.querySelectorAll('input[id^="answer${questionId}_"]');
-                            if (!checkboxes || checkboxes.length === 0) return;
-                            checkboxes.forEach(cb => {
-                                cb.addEventListener('change', function(){
-                                    var chosenVals = [];
-                                    checkboxes.forEach(box => {
-                                        if (box.checked) chosenVals.push(box.value.trim().toLowerCase());
-                                    });
-                                    if (chosenVals.includes('${jumpOption.trim().toLowerCase()}')) {
-                                        navigateSection(${jumpTo});
-                                    }
-                                });
-                            });
-                        })();
-                    </script>
-                    `;
-                }
-            }
-        });
-
-        // Close the section
+        // Now the section-level navigation
         formHTML += `<br><br><div class="navigation-buttons">`;
         if (s > 1) {
             formHTML += `<button type="button" onclick="navigateSection(${s - 1})">Back</button>`;
@@ -448,8 +419,10 @@ function getFormHTML() {
         } else {
             formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
         }
+        formHTML += `</div>`; // close navigation-buttons
+
+        // Close the section
         formHTML += `</div>`;
-        formHTML += `</div>`; // end this section
     }
 
     // Insert any hidden fields
@@ -493,6 +466,7 @@ function getFormHTML() {
         });
 
         function saveFormData(sectionId) {
+            // Example of saving data
             const formData = {};
             const inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' select, #' + sectionId + ' textarea');
             inputs.forEach(input => {
@@ -512,13 +486,68 @@ function getFormHTML() {
                 // input.addEventListener('change', () => saveFormData(sectionId));
             });
         }
+
+        // We'll re-inject our jumpLogics array below
+        var jumpLogics = ${JSON.stringify(jumpLogics)};
+
+        // We'll also store the questionNameIds map
+        var questionNameIds = ${JSON.stringify(questionNameIds)};
+
         function handleNext(currentSection) {
-            navigateSection(currentSection + 1);
+            // Check if we have any jump logic in this section
+            // If the user has selected the jumpOption, we jump to jumpTo
+            // otherwise we just go to the next section.
+
+            // 1) default next section = currentSection + 1
+            let nextSection = currentSection + 1;
+
+            // 2) find all jumpLogics for questions that live in the currentSection
+            const relevantJumps = jumpLogics.filter(j => j.section == currentSection);
+
+            // 3) for each jump logic, check if user choice matches jumpOption
+            for (let i = 0; i < relevantJumps.length; i++) {
+                const jlogic = relevantJumps[i];
+                const { questionId, questionType, jumpOption, jumpTo } = jlogic;
+                const nameId = questionNameIds[questionId] || ('answer' + questionId);
+
+                if (questionType === 'radio' || questionType === 'dropdown') {
+                    const el = document.getElementById(nameId);
+                    if (el && el.value.trim().toLowerCase() === jumpOption.trim().toLowerCase()) {
+                        nextSection = jumpTo;
+                        break; // use the first matching jump
+                    }
+                } else if (questionType === 'checkbox') {
+                    // gather all checkboxes for that question
+                    const cbs = document.querySelectorAll('input[id^="answer' + questionId + '_"]');
+                    if (cbs && cbs.length > 0) {
+                        const selectedValues = [];
+                        cbs.forEach(cb => {
+                            if (cb.checked) selectedValues.push(cb.value.trim().toLowerCase());
+                        });
+                        if (selectedValues.includes(jumpOption.trim().toLowerCase())) {
+                            nextSection = jumpTo;
+                            break; // use the first matching jump
+                        }
+                    }
+                }
+            }
+
+            navigateSection(nextSection);
         }
+
         function navigateSection(sectionNumber) {
             const sections = document.querySelectorAll('.section');
             sections.forEach(section => section.classList.remove('active'));
-            document.getElementById('section' + sectionNumber).classList.add('active');
+            const target = document.getElementById('section' + sectionNumber);
+            if (target) {
+                target.classList.add('active');
+            } else {
+                // If user typed 'end' or a non-existing section
+                // We'll just show the final section or do something else
+                console.log("Tried to jump to an invalid section: " + sectionNumber);
+                // fallback: show last
+                sections[sections.length - 1].classList.add('active');
+            }
         }
 
         var pdfFormName = '${escapedPdfFormName}';
