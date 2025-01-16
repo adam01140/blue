@@ -320,6 +320,7 @@
 
         vertices.forEach((cell) => {
           if (isOptions(cell)) {
+            // If an options node has a parent question, inherit parent's section
             const incomingEdges = graph.getIncomingEdges(cell) || [];
             if (incomingEdges.length > 0) {
               const parentCell = incomingEdges[0].source;
@@ -331,19 +332,23 @@
           }
 
           if (isQuestion(cell)) {
+            // If a question is not explicitly set newSection=true, and currently has section 1 or 0,
+            // only update if there's a normal forward Options -> this question scenario.
             const thisSection = getSectionId(cell);
+            const incomingEdges = graph.getIncomingEdges(cell) || [];
+            // Filter edges that come from an Options node
+            const incomingOptions = incomingEdges.filter(e => {
+              return e.source && isOptions(e.source);
+            });
             if (
               !cell.style.includes("newSection=true") &&
-              (thisSection === 1 || thisSection === 0)
+              (thisSection === 1 || thisSection === 0) &&
+              incomingOptions.length > 0
             ) {
-              const incomingEdges = graph.getIncomingEdges(cell) || [];
-              if (incomingEdges.length > 0) {
-                const parentCell = incomingEdges[0].source;
-                if (parentCell && isOptions(parentCell)) {
-                  const parentSectionId = getSectionId(parentCell);
-                  setSectionId(cell, parentSectionId);
-                }
-              }
+              // Inherit from that options node's parent question's section
+              const parentOptCell = incomingOptions[0].source;
+              const parentSectionId = getSectionId(parentOptCell);
+              setSectionId(cell, parentSectionId);
             }
           }
 
@@ -649,26 +654,41 @@
         refreshAllCells();
       });
 
-      // On connect => set section IDs
+      // ========== MAIN FIX: skip reassigning sections on backward links ==========
       graph.connectionHandler.addListener(mxEvent.CONNECT, function (sender, evt) {
         const edge = evt.getProperty("cell");
         if (!edge) return;
         const parent = edge.source;
         const child = edge.target;
 
+        // If parent's a question -> child's an options node => child inherits parent's section
         if (parent && isQuestion(parent) && child && isOptions(child)) {
           const parentSectionId = getSectionId(parent);
           setSectionId(child, parentSectionId);
         }
+
+        // If parent's an options node -> child's a question => possibly inherit parent's section
+        // BUT skip if this is a backward jump (the child's question ID < the parent's question ID).
         if (parent && isOptions(parent) && child && isQuestion(child)) {
-          if (
-            !child.style.includes("newSection=true") &&
-            (getSectionId(child) === 1 || getSectionId(child) === 0)
-          ) {
-            const parentSectionId = getSectionId(parent);
-            setSectionId(child, parentSectionId);
+          // The question behind 'parent' is parent.source (the question that leads to this options node).
+          const parentQuestion = parent.source; // question node
+          if (parentQuestion && isQuestion(parentQuestion) && child._questionId && parentQuestion._questionId) {
+            // If parent's question is "restart?" ID=3 and child's question is "hungry?" ID=1 => skip
+            if (parentQuestion._questionId > child._questionId) {
+              // It's a backward link, so do NOT override the child's section
+            } else {
+              // normal forward chain => child inherits parent's section if child isn't newSection
+              if (
+                !child.style.includes("newSection=true") &&
+                (getSectionId(child) === 0 || getSectionId(child) === 1)
+              ) {
+                const parentSectionId = getSectionId(parent);
+                setSectionId(child, parentSectionId);
+              }
+            }
           }
         }
+
         refreshAllCells();
       });
 
@@ -762,7 +782,7 @@
         refreshAllCells();
       }
 
-      // ---------- Export GUI JSON with multi-conditions logic ----------
+      // ---------- Export GUI JSON with multi-conditions logic + Jump logic ----------
       window.exportGuiJson = function () {
         const model = graph.getModel();
         const allCells = model.cells;
@@ -786,7 +806,6 @@
             const label = (cell.value || "").trim() || "Untitled";
             const qType = getQuestionType(cell);
 
-            // Instead of storing prevQuestion/prevAnswer, we store conditions as an array:
             const questionObj = {
               questionId: questionIdCounter,
               text: label,
@@ -816,15 +835,19 @@
             };
             if (!sectionsMap[sId]) sectionsMap[sId] = [];
             sectionsMap[sId].push(questionObj);
+
+            // store a reference on the cell so we can link them easily
+            cell._questionId = questionIdCounter;
             questionIdCounter++;
           }
         }
 
-        // 2) gather "options" from each question and set logic conditions if needed
+        // 2) gather "options" from each question and set logic or jump
         for (let id in allCells) {
           if (id === "0" || id === "1") continue;
           const cell = allCells[id];
           if (cell.vertex && getNodeType(cell) === "question") {
+            // Identify the question object
             const sId = getSectionId(cell);
             const label = (cell.value || "").trim() || "Untitled";
             let questionList = sectionsMap[sId] || [];
@@ -835,11 +858,13 @@
             outEdges.forEach((edge) => {
               const target = edge.target;
               if (!target) return;
+
+              // If the target is an "options" node, it's an answer choice
               if (getNodeType(target) === "options") {
                 const optLabel = (target.value || "Option").trim();
                 const optNodeId = getNodeId(target);
 
-                // Store as array of strings if not checkbox
+                // For checkboxes, store as objects; else store as strings
                 if (qObj.type === "checkbox") {
                   qObj.options.push({
                     label: capitalizeFirst(optLabel),
@@ -850,19 +875,25 @@
                   qObj.options.push(capitalizeFirst(optLabel));
                 }
 
-                // If that option leads to another question => add a condition
+                // Then see if that option leads to the next question(s)
                 const nextEdges = graph.getOutgoingEdges(target) || [];
                 nextEdges.forEach((ne) => {
                   const q2 = ne.target;
                   if (q2 && getNodeType(q2) === "question") {
                     const q2Sid = getSectionId(q2);
-                    const q2Label = (q2.value || "").trim();
-                    if (!sectionsMap[q2Sid]) return;
-                    let q2List = sectionsMap[q2Sid];
-                    let q2Obj = q2List.find((o) => o.text === q2Label);
-                    if (q2Obj) {
+                    // find the question object for q2
+                    const questionList2 = sectionsMap[q2Sid] || [];
+                    const q2Obj = questionList2.find(o => o.text === (q2.value || "").trim());
+                    if (!q2Obj) return;
+
+                    // If we are pointing backward (e.g. restart? → hungry?), treat as a jump
+                    if (q2._questionId < cell._questionId) {
+                      qObj.jump.enabled = true;
+                      qObj.jump.option = capitalizeFirst(optLabel);
+                      qObj.jump.to = q2._questionId.toString();
+                    } else {
+                      // forward link => logic on q2
                       q2Obj.logic.enabled = true;
-                      // We push an item to conditions[]: e.g. {prevQuestion: "1", prevAnswer: "Yes"}
                       q2Obj.logic.conditions.push({
                         prevQuestion: qObj.questionId.toString(),
                         prevAnswer: capitalizeFirst(optLabel)
