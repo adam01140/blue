@@ -26,7 +26,7 @@
       right: 0;
       top: 0;
       bottom: 0;
-      cursor: default; /* for panning on whitespace */
+      cursor: default;
     }
     .shape {
       background: #fff;
@@ -172,7 +172,8 @@
   <!-- Main context menu -->
   <div id="contextMenu" class="context-menu">
     <button id="deleteNode">Delete Node</button>
-    <button id="duplicateNode">Duplicate Node</button>
+    <!-- Replaced “Duplicate Node” with “Jump” -->
+    <button id="jumpNode">Jump</button>
     <button id="changeType">Change Type &raquo;</button>
     <button id="newSectionButton">New Section</button>
     <button id="propertiesButton">Properties</button>
@@ -208,7 +209,7 @@
 
       const contextMenu = document.getElementById("contextMenu");
       const deleteNodeButton = document.getElementById("deleteNode");
-      const duplicateNodeButton = document.getElementById("duplicateNode");
+      const jumpNodeButton = document.getElementById("jumpNode");
       const changeTypeButton = document.getElementById("changeType");
       const newSectionButton = document.getElementById("newSectionButton");
       const propertiesButton = document.getElementById("propertiesButton");
@@ -225,25 +226,27 @@
 
       let selectedCell = null;
       let currentMouseEvent = null;
-      let lastSelectedCell = null; // track the previously selected cell
+      let lastSelectedCell = null;
+
+      // Track which node is in Jump Mode
+      let jumpModeNode = null;
+      const jumpBorderStyle = ";strokeWidth=3;strokeColor=#ff0000;dashed=1;dashPattern=4 4;";
 
       mxEvent.disableContextMenu(container);
 
       const graph = new mxGraph(container);
       graph.setPanning(true);
-      graph.panningHandler.useLeftButtonForPanning = true; // Pan by dragging whitespace
+      graph.panningHandler.useLeftButtonForPanning = true;
       graph.setCellsMovable(true);
       graph.setConnectable(true);
       graph.setCellsResizable(true);
       new mxRubberband(graph);
 
-      // =========== Auto-update node ID on selection change ===========
-      graph.getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) => {
-        // The old cell we are leaving
+      // Sync node IDs to labels on selection change
+      graph.getSelectionModel().addListener(mxEvent.CHANGE, () => {
         if (lastSelectedCell) {
           autoUpdateNodeIdBasedOnLabel(lastSelectedCell);
         }
-        // The new cell we are selecting
         lastSelectedCell = graph.getSelectionCell();
       });
 
@@ -258,18 +261,29 @@
         }
       }
 
-      // ---------- Helper: reading/writing style ----------
+      // ---------- Style / ID Helpers ----------
       function setSectionId(cell, sid) {
         let style = cell.style || "";
         style = style.replace(/sectionId=[^;]+/, "");
         style += `;sectionId=${sid};`;
         graph.getModel().setStyle(cell, style);
       }
-
       function getSectionId(cell) {
         const style = cell.style || "";
-        const match = style.match(/sectionId=([^;]+)/);
-        return match ? parseInt(match[1], 10) : 1; // Default to 1 if not found
+        const m = style.match(/sectionId=([^;]+)/);
+        return m ? parseInt(m[1], 10) : 1;
+      }
+
+      // skipReassign => permanently skip auto–section logic
+      function addSkipReassign(cell) {
+        if (!cell) return;
+        let style = cell.style || "";
+        style = style.replace(/skipReassign=[^;]+/, "");
+        style += ";skipReassign=true;";
+        graph.getModel().setStyle(cell, style);
+      }
+      function hasSkipReassign(cell) {
+        return cell && cell.style && cell.style.includes("skipReassign=true");
       }
 
       function setCellColor(cell, color) {
@@ -284,7 +298,6 @@
         const m = style.match(/questionType=([^;]+)/);
         return m ? m[1] : "dropdown";
       }
-
       function setQuestionType(cell, newType) {
         let style = cell.style || "";
         style = style.replace(/questionType=[^;]+/, "");
@@ -297,7 +310,6 @@
         const m = style.match(/nodeId=([^;]+)/);
         return m ? decodeURIComponent(m[1]) : "";
       }
-
       function setNodeId(cell, nodeId) {
         let style = cell.style || "";
         style = style.replace(/nodeId=[^;]+/, "");
@@ -308,7 +320,6 @@
       function isQuestion(cell) {
         return cell && cell.style && cell.style.includes("nodeType=question");
       }
-
       function isOptions(cell) {
         return cell && cell.style && cell.style.includes("nodeType=options");
       }
@@ -319,36 +330,35 @@
         const vertices = graph.getChildVertices(parent);
 
         vertices.forEach((cell) => {
-          if (isOptions(cell)) {
-            // If an options node has a parent question, inherit parent's section
-            const incomingEdges = graph.getIncomingEdges(cell) || [];
-            if (incomingEdges.length > 0) {
-              const parentCell = incomingEdges[0].source;
-              if (parentCell && isQuestion(parentCell)) {
-                const parentSectionId = getSectionId(parentCell);
-                setSectionId(cell, parentSectionId);
+          // If skipReassign => skip all auto–section logic
+          if (!hasSkipReassign(cell)) {
+            // Normal reassign logic:
+            if (isOptions(cell)) {
+              const incomingEdges = graph.getIncomingEdges(cell) || [];
+              if (incomingEdges.length > 0) {
+                const parentCell = incomingEdges[0].source;
+                if (parentCell && isQuestion(parentCell)) {
+                  const pSec = getSectionId(parentCell);
+                  setSectionId(cell, pSec);
+                }
               }
             }
-          }
 
-          if (isQuestion(cell)) {
-            // If a question is not explicitly set newSection=true, and currently has section 1 or 0,
-            // only update if there's a normal forward Options -> this question scenario.
-            const thisSection = getSectionId(cell);
-            const incomingEdges = graph.getIncomingEdges(cell) || [];
-            // Filter edges that come from an Options node
-            const incomingOptions = incomingEdges.filter(e => {
-              return e.source && isOptions(e.source);
-            });
-            if (
-              !cell.style.includes("newSection=true") &&
-              (thisSection === 1 || thisSection === 0) &&
-              incomingOptions.length > 0
-            ) {
-              // Inherit from that options node's parent question's section
-              const parentOptCell = incomingOptions[0].source;
-              const parentSectionId = getSectionId(parentOptCell);
-              setSectionId(cell, parentSectionId);
+            if (isQuestion(cell)) {
+              const thisSection = getSectionId(cell);
+              const incomingEdges = graph.getIncomingEdges(cell) || [];
+              const incomingOptions = incomingEdges.filter(e => {
+                return e.source && isOptions(e.source);
+              });
+              if (
+                !cell.style.includes("newSection=true") &&
+                (thisSection === 1 || thisSection === 0) &&
+                incomingOptions.length > 0
+              ) {
+                const parentOpt = incomingOptions[0].source;
+                const parentSectionId = getSectionId(parentOpt);
+                setSectionId(cell, parentSectionId);
+              }
             }
           }
 
@@ -359,9 +369,9 @@
 
       function colorCell(cell) {
         if (!cell.vertex) return;
-        let fillColor = "#ADD8E6"; // default question color
+        let fillColor = "#ADD8E6";
         if (isQuestion(cell) && cell.style.includes("newSection=true")) {
-          fillColor = "#FFC0CB"; // pink for new section
+          fillColor = "#FFC0CB";
         }
         let style = cell.style || "";
         style = style.replace(/fillColor=[^;]+/, "");
@@ -431,17 +441,38 @@
         hideContextMenu();
       });
 
-      duplicateNodeButton.addEventListener("click", () => {
+      jumpNodeButton.addEventListener("click", () => {
+        // Toggle jump mode
         if (selectedCell) {
-          mxClipboard.setCells(mxClipboard.copyCells([selectedCell], false));
-          let pasted = mxClipboard.paste(graph);
-          if (pasted && pasted.length > 0) {
-            graph.moveCells(pasted, 40, 40);
+          if (jumpModeNode === selectedCell) {
+            removeJumpStyling(selectedCell);
+            jumpModeNode = null;
+          } else {
+            if (jumpModeNode) removeJumpStyling(jumpModeNode);
+            jumpModeNode = selectedCell;
+            addJumpStyling(jumpModeNode);
           }
-          refreshAllCells();
         }
         hideContextMenu();
       });
+      function addJumpStyling(cell) {
+        let style = cell.style || "";
+        style = style.replace(/strokeWidth=\d+;?/, "");
+        style = style.replace(/strokeColor=[^;]+;?/, "");
+        style = style.replace(/dashed=\d;?/, "");
+        style = style.replace(/dashPattern=[^;]+;?/, "");
+        style += jumpBorderStyle;
+        graph.getModel().setStyle(cell, style);
+      }
+      function removeJumpStyling(cell) {
+        if (!cell) return;
+        let style = cell.style || "";
+        style = style.replace(/strokeWidth=\d+;?/, "");
+        style = style.replace(/strokeColor=[^;]+;?/, "");
+        style = style.replace(/dashed=\d;?/, "");
+        style = style.replace(/dashPattern=[^;]+;?/, "");
+        graph.getModel().setStyle(cell, style);
+      }
 
       changeTypeButton.addEventListener("click", () => {
         const rect = contextMenu.getBoundingClientRect();
@@ -449,7 +480,6 @@
         typeSubmenu.style.left = rect.right + "px";
         typeSubmenu.style.top = rect.top + "px";
       });
-
       dropdownTypeBtn.addEventListener("click", () => {
         if (selectedCell && isQuestion(selectedCell)) {
           setQuestionType(selectedCell, "dropdown");
@@ -458,7 +488,6 @@
         }
         hideContextMenu();
       });
-
       checkboxTypeBtn.addEventListener("click", () => {
         if (selectedCell && isQuestion(selectedCell)) {
           setQuestionType(selectedCell, "checkbox");
@@ -467,7 +496,6 @@
         }
         hideContextMenu();
       });
-
       textTypeBtn.addEventListener("click", () => {
         if (selectedCell && isQuestion(selectedCell)) {
           setQuestionType(selectedCell, "text");
@@ -479,9 +507,9 @@
 
       newSectionButton.addEventListener("click", () => {
         if (selectedCell && isQuestion(selectedCell)) {
-          const currentSectionId = getSectionId(selectedCell);
-          const newSectionId = currentSectionId + 1;
-          setSectionId(selectedCell, newSectionId);
+          const oldSec = getSectionId(selectedCell);
+          const newSec = oldSec + 1;
+          setSectionId(selectedCell, newSec);
           markAsNewSection(selectedCell);
           refreshAllCells();
         }
@@ -511,7 +539,7 @@
         } else {
           propNodeType.textContent = "other";
         }
-        let sid = getSectionId(cell);
+        const sid = getSectionId(cell);
         propSectionName.textContent = "Section " + sid;
       }
       makeEditableField(propNodeText, onNodeTextFieldChange);
@@ -551,7 +579,6 @@
         }
         refreshAllCells();
       }
-
       function onNodeIdFieldChange(newId) {
         if (!selectedCell) return;
         graph.getModel().beginUpdate();
@@ -568,7 +595,6 @@
         const nodeId = label.replace(/\s+/g, "_");
         setNodeId(cell, nodeId);
       }
-
       function refreshOptionNodeId(cell) {
         const edges = graph.getIncomingEdges(cell) || [];
         let parentNodeId = "ParentQuestion";
@@ -654,39 +680,60 @@
         refreshAllCells();
       });
 
-      // ========== MAIN FIX: skip reassigning sections on backward links ==========
+      // ========== CONNECT: skip reassign if jump mode, checking parent or grandparent question ==========
+
       graph.connectionHandler.addListener(mxEvent.CONNECT, function (sender, evt) {
         const edge = evt.getProperty("cell");
         if (!edge) return;
         const parent = edge.source;
         const child = edge.target;
 
-        // If parent's a question -> child's an options node => child inherits parent's section
-        if (parent && isQuestion(parent) && child && isOptions(child)) {
-          const parentSectionId = getSectionId(parent);
-          setSectionId(child, parentSectionId);
+        // function isJumpNode(pq): checks if pq is exactly jumpModeNode
+        function isJumpNode(pq) {
+          return pq && (pq === jumpModeNode);
         }
 
-        // If parent's an options node -> child's a question => possibly inherit parent's section
-        // BUT skip if this is a backward jump (the child's question ID < the parent's question ID).
-        if (parent && isOptions(parent) && child && isQuestion(child)) {
-          // The question behind 'parent' is parent.source (the question that leads to this options node).
-          const parentQuestion = parent.source; // question node
-          if (parentQuestion && isQuestion(parentQuestion) && child._questionId && parentQuestion._questionId) {
-            // If parent's question is "restart?" ID=3 and child's question is "hungry?" ID=1 => skip
-            if (parentQuestion._questionId > child._questionId) {
-              // It's a backward link, so do NOT override the child's section
-            } else {
-              // normal forward chain => child inherits parent's section if child isn't newSection
+        // We'll retrieve the grandparent question if parent is an options node
+        let parentQuestion = null;
+        if (parent && isOptions(parent)) {
+          parentQuestion = parent.source; 
+        } else if (parent && isQuestion(parent)) {
+          parentQuestion = parent;
+        }
+
+        // If parent or grandparent is jump mode => skip reassign for the child
+        const parentIsJump = (parent && parent === jumpModeNode);
+        const gpIsJump = (parentQuestion && parentQuestion === jumpModeNode);
+
+        if (parentIsJump || gpIsJump) {
+          // Mark child skipReassign
+          addSkipReassign(child);
+        } else {
+          // Normal assignment path
+          if (parent && isQuestion(parent) && isOptions(child)) {
+            // question -> options => child inherits parent's section
+            const sec = getSectionId(parent);
+            setSectionId(child, sec);
+          }
+          else if (parent && isOptions(parent) && isQuestion(child)) {
+            // options -> question
+            const pq = parent.source;
+            if (pq && isQuestion(pq)) {
               if (
                 !child.style.includes("newSection=true") &&
                 (getSectionId(child) === 0 || getSectionId(child) === 1)
               ) {
-                const parentSectionId = getSectionId(parent);
-                setSectionId(child, parentSectionId);
+                const sec = getSectionId(parent);
+                setSectionId(child, sec);
               }
             }
           }
+        }
+
+        // If the parent or grandparent was jump node => remove bold styling
+        if (parentIsJump || gpIsJump) {
+          removeJumpStyling(jumpModeNode);
+          jumpModeNode = null;
         }
 
         refreshAllCells();
@@ -782,7 +829,7 @@
         refreshAllCells();
       }
 
-      // ---------- Export GUI JSON with multi-conditions logic + Jump logic ----------
+      // ---------- Export GUI JSON ----------
       window.exportGuiJson = function () {
         const model = graph.getModel();
         const allCells = model.cells;
@@ -796,7 +843,7 @@
           return "other";
         }
 
-        // 1) gather question nodes
+        // gather question nodes
         for (let id in allCells) {
           if (id === "0" || id === "1") continue;
           const cell = allCells[id];
@@ -836,35 +883,30 @@
             if (!sectionsMap[sId]) sectionsMap[sId] = [];
             sectionsMap[sId].push(questionObj);
 
-            // store a reference on the cell so we can link them easily
             cell._questionId = questionIdCounter;
             questionIdCounter++;
           }
         }
 
-        // 2) gather "options" from each question and set logic or jump
+        // gather "options" from each question, set logic or jump
         for (let id in allCells) {
           if (id === "0" || id === "1") continue;
           const cell = allCells[id];
           if (cell.vertex && getNodeType(cell) === "question") {
-            // Identify the question object
             const sId = getSectionId(cell);
             const label = (cell.value || "").trim() || "Untitled";
-            let questionList = sectionsMap[sId] || [];
-            let qObj = questionList.find(q => q.text === label);
+            const questionList = sectionsMap[sId] || [];
+            const qObj = questionList.find(q => q.text === label);
             if (!qObj) continue;
 
             const outEdges = graph.getOutgoingEdges(cell) || [];
-            outEdges.forEach((edge) => {
+            outEdges.forEach(edge => {
               const target = edge.target;
               if (!target) return;
-
-              // If the target is an "options" node, it's an answer choice
               if (getNodeType(target) === "options") {
                 const optLabel = (target.value || "Option").trim();
                 const optNodeId = getNodeId(target);
 
-                // For checkboxes, store as objects; else store as strings
                 if (qObj.type === "checkbox") {
                   qObj.options.push({
                     label: capitalizeFirst(optLabel),
@@ -875,24 +917,22 @@
                   qObj.options.push(capitalizeFirst(optLabel));
                 }
 
-                // Then see if that option leads to the next question(s)
                 const nextEdges = graph.getOutgoingEdges(target) || [];
-                nextEdges.forEach((ne) => {
+                nextEdges.forEach(ne => {
                   const q2 = ne.target;
                   if (q2 && getNodeType(q2) === "question") {
                     const q2Sid = getSectionId(q2);
-                    // find the question object for q2
                     const questionList2 = sectionsMap[q2Sid] || [];
                     const q2Obj = questionList2.find(o => o.text === (q2.value || "").trim());
                     if (!q2Obj) return;
 
-                    // If we are pointing backward (e.g. restart? → hungry?), treat as a jump
+                    // backward link => jump
                     if (q2._questionId < cell._questionId) {
                       qObj.jump.enabled = true;
                       qObj.jump.option = capitalizeFirst(optLabel);
                       qObj.jump.to = q2._questionId.toString();
                     } else {
-                      // forward link => logic on q2
+                      // forward => logic
                       q2Obj.logic.enabled = true;
                       q2Obj.logic.conditions.push({
                         prevQuestion: qObj.questionId.toString(),
@@ -906,7 +946,7 @@
           }
         }
 
-        // finalize sections
+        // finalize
         const sectionsArr = [];
         for (let s = 1; s <= maxSectionId; s++) {
           const qList = sectionsMap[s] || [];
