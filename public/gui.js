@@ -199,7 +199,7 @@ function addQuestion(sectionId, questionId = null) {
             <option value="bigParagraph">Big Paragraph</option>
         </select><br><br>
 
-        <!-- Name/ID and Placeholder for Text, Big Paragraph, etc. -->
+        <!-- Name/ID and Placeholder for Text, Big Paragraph, Money, etc. -->
         <div id="textboxOptions${currentQuestionId}" class="textbox-options" style="display: none;">
             <label>Name/ID: </label>
             <input type="text" id="textboxName${currentQuestionId}" placeholder="Enter field name"><br><br>
@@ -526,6 +526,9 @@ function toggleOptions(questionId) {
             if (numberedDropdownBlock) numberedDropdownBlock.style.display = 'block';
             break;
         case 'money':
+            // Show name/placeholder block
+            if (textboxOptionsBlock) textboxOptionsBlock.style.display = 'block';
+            break;
         case 'date':
             // no special sub-block
             break;

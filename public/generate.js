@@ -304,7 +304,11 @@ function getFormHTML() {
                 });
 
             } else if (questionType === 'money') {
-                formHTML += `<input type="number" id="answer${questionId}" name="answer${questionId}" min="0" step="0.01" placeholder="Enter amount"><br>`;
+                // use the Name/ID and placeholder from the textboxOptions
+                const nameId = questionBlock.querySelector(`#textboxName${questionId}`).value || `answer${questionId}`;
+                const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`).value || 'Enter amount';
+                questionNameIds[questionId] = nameId;
+                formHTML += `<input type="number" id="${nameId}" name="${nameId}" min="0" step="0.01" placeholder="${placeholder}"><br>`;
 
             } else if (questionType === 'date') {
                 formHTML += `<input type="date" id="answer${questionId}" name="answer${questionId}" placeholder="Enter a date"><br>`;
@@ -333,7 +337,6 @@ function getFormHTML() {
                         const prevAnswer = row.querySelector(`#prevAnswer${questionId}_${rowIndex}`)?.value.trim().toLowerCase() || "";
                         if (!prevQNum || !prevAnswer) return; // skip incomplete
 
-                        // questionTypesMap[prevQNum] might be undefined if user did something
                         const pType = questionTypesMap[prevQNum] || 'text';
 
                         formHTML += `
