@@ -184,6 +184,8 @@
     <button id="dropdownType">Drop Down</button>
     <button id="checkboxType">Checkbox</button>
     <button id="textType">Text</button>
+    <!-- NEW: money type -->
+    <button id="moneyType">Money</button>
   </div>
 
   <!-- Properties menu -->
@@ -217,6 +219,8 @@
       const dropdownTypeBtn = document.getElementById("dropdownType");
       const checkboxTypeBtn = document.getElementById("checkboxType");
       const textTypeBtn = document.getElementById("textType");
+      // NEW: money button
+      const moneyTypeBtn = document.getElementById("moneyType");
 
       const propertiesMenu = document.getElementById("propertiesMenu");
       const propNodeText = document.getElementById("propNodeText");
@@ -504,6 +508,15 @@
         }
         hideContextMenu();
       });
+      // NEW: money type
+      moneyTypeBtn.addEventListener("click", () => {
+        if (selectedCell && isQuestion(selectedCell)) {
+          setQuestionType(selectedCell, "money");
+          selectedCell.value = "Money question node";
+          refreshAllCells();
+        }
+        hideContextMenu();
+      });
 
       newSectionButton.addEventListener("click", () => {
         if (selectedCell && isQuestion(selectedCell)) {
@@ -681,7 +694,6 @@
       });
 
       // ========== CONNECT: skip reassign if jump mode, checking parent or grandparent question ==========
-
       graph.connectionHandler.addListener(mxEvent.CONNECT, function (sender, evt) {
         const edge = evt.getProperty("cell");
         if (!edge) return;
@@ -696,7 +708,7 @@
         // We'll retrieve the grandparent question if parent is an options node
         let parentQuestion = null;
         if (parent && isOptions(parent)) {
-          parentQuestion = parent.source; 
+          parentQuestion = parent.source;
         } else if (parent && isQuestion(parent)) {
           parentQuestion = parent;
         }
