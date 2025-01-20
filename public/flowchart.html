@@ -232,8 +232,9 @@
       let currentMouseEvent = null;
       let lastSelectedCell = null;
 
-      // Track which node is in Jump Mode
+      // Track which node is in Jump Mode (only one at a time for simplicity)
       let jumpModeNode = null;
+      // Permanent jump style
       const jumpBorderStyle = ";strokeWidth=3;strokeColor=#ff0000;dashed=1;dashPattern=4 4;";
 
       mxEvent.disableContextMenu(container);
@@ -267,6 +268,7 @@
 
       // ---------- Style / ID Helpers ----------
       function setSectionId(cell, sid) {
+        if (!cell) return;
         let style = cell.style || "";
         style = style.replace(/sectionId=[^;]+/, "");
         style += `;sectionId=${sid};`;
@@ -336,7 +338,7 @@
         vertices.forEach((cell) => {
           // If skipReassign => skip all auto–section logic
           if (!hasSkipReassign(cell)) {
-            // Normal reassign logic:
+            // If it's an options node, we often inherit parent's section
             if (isOptions(cell)) {
               const incomingEdges = graph.getIncomingEdges(cell) || [];
               if (incomingEdges.length > 0) {
@@ -348,12 +350,14 @@
               }
             }
 
+            // If it's a question node, we typically might adjust the section
             if (isQuestion(cell)) {
               const thisSection = getSectionId(cell);
               const incomingEdges = graph.getIncomingEdges(cell) || [];
               const incomingOptions = incomingEdges.filter(e => {
                 return e.source && isOptions(e.source);
               });
+              // If not marked as newSection, but we have an options parent, keep parent's section
               if (
                 !cell.style.includes("newSection=true") &&
                 (thisSection === 1 || thisSection === 0) &&
@@ -373,9 +377,9 @@
 
       function colorCell(cell) {
         if (!cell.vertex) return;
-        let fillColor = "#ADD8E6";
+        let fillColor = "#ADD8E6"; // default fill for question / options
         if (isQuestion(cell) && cell.style.includes("newSection=true")) {
-          fillColor = "#FFC0CB";
+          fillColor = "#FFC0CB"; // pink for new-section question
         }
         let style = cell.style || "";
         style = style.replace(/fillColor=[^;]+/, "");
@@ -399,6 +403,7 @@
         if (isQuestion(cell)) text = getQuestionType(cell);
         else if (isOptions(cell)) text = "options";
         const overlay = new mxCellOverlay(
+          // Using a 1×1 transparent GIF, label is placed in the tooltip text
           new mxImage("data:image/gif;base64,R0lGODlhAQABAAAAACw=", 1, 1),
           text
         );
@@ -446,20 +451,19 @@
       });
 
       jumpNodeButton.addEventListener("click", () => {
-        // Toggle jump mode
+        // Make the selected cell the "jump" node, with a permanent border
         if (selectedCell) {
-          if (jumpModeNode === selectedCell) {
-            removeJumpStyling(selectedCell);
-            jumpModeNode = null;
-          } else {
-            if (jumpModeNode) removeJumpStyling(jumpModeNode);
-            jumpModeNode = selectedCell;
-            addJumpStyling(jumpModeNode);
+          // If a different node was previously in jump mode, remove that styling
+          if (jumpModeNode && jumpModeNode !== selectedCell) {
+            removeJumpStyling(jumpModeNode);
           }
+          jumpModeNode = selectedCell;
+          addJumpStyling(jumpModeNode);
         }
         hideContextMenu();
       });
       function addJumpStyling(cell) {
+        if (!cell) return;
         let style = cell.style || "";
         style = style.replace(/strokeWidth=\d+;?/, "");
         style = style.replace(/strokeColor=[^;]+;?/, "");
@@ -484,6 +488,7 @@
         typeSubmenu.style.left = rect.right + "px";
         typeSubmenu.style.top = rect.top + "px";
       });
+
       dropdownTypeBtn.addEventListener("click", () => {
         if (selectedCell && isQuestion(selectedCell)) {
           setQuestionType(selectedCell, "dropdown");
@@ -508,7 +513,6 @@
         }
         hideContextMenu();
       });
-      // NEW: money type
       moneyTypeBtn.addEventListener("click", () => {
         if (selectedCell && isQuestion(selectedCell)) {
           setQuestionType(selectedCell, "money");
@@ -693,61 +697,35 @@
         refreshAllCells();
       });
 
-      // ========== CONNECT: skip reassign if jump mode, checking parent or grandparent question ==========
+      // ========== CONNECT: child inherits parent's section UNLESS parent is in jump mode ==========
       graph.connectionHandler.addListener(mxEvent.CONNECT, function (sender, evt) {
         const edge = evt.getProperty("cell");
         if (!edge) return;
         const parent = edge.source;
         const child = edge.target;
 
-        // function isJumpNode(pq): checks if pq is exactly jumpModeNode
-        function isJumpNode(pq) {
-          return pq && (pq === jumpModeNode);
-        }
+        // We'll see if the parent or parent's question is in jump mode
+        const parentIsJump = (parent && parent === jumpModeNode);
 
-        // We'll retrieve the grandparent question if parent is an options node
+        // If the parent is an options node, check its source (question)
         let parentQuestion = null;
         if (parent && isOptions(parent)) {
           parentQuestion = parent.source;
         } else if (parent && isQuestion(parent)) {
           parentQuestion = parent;
         }
-
-        // If parent or grandparent is jump mode => skip reassign for the child
-        const parentIsJump = (parent && parent === jumpModeNode);
         const gpIsJump = (parentQuestion && parentQuestion === jumpModeNode);
 
+        // If parent (or grandparent question) is jump => skip reassign
         if (parentIsJump || gpIsJump) {
-          // Mark child skipReassign
           addSkipReassign(child);
         } else {
-          // Normal assignment path
-          if (parent && isQuestion(parent) && isOptions(child)) {
-            // question -> options => child inherits parent's section
-            const sec = getSectionId(parent);
-            setSectionId(child, sec);
-          }
-          else if (parent && isOptions(parent) && isQuestion(child)) {
-            // options -> question
-            const pq = parent.source;
-            if (pq && isQuestion(pq)) {
-              if (
-                !child.style.includes("newSection=true") &&
-                (getSectionId(child) === 0 || getSectionId(child) === 1)
-              ) {
-                const sec = getSectionId(parent);
-                setSectionId(child, sec);
-              }
-            }
-          }
+          // Normal assignment: child gets parent's section
+          const parentSec = getSectionId(parent);
+          setSectionId(child, parentSec);
         }
 
-        // If the parent or grandparent was jump node => remove bold styling
-        if (parentIsJump || gpIsJump) {
-          removeJumpStyling(jumpModeNode);
-          jumpModeNode = null;
-        }
-
+        // We do NOT remove the jump styling anymore; jump node remains
         refreshAllCells();
       });
 
@@ -920,15 +898,18 @@
                 const optNodeId = getNodeId(target);
 
                 if (qObj.type === "checkbox") {
+                  // For checkbox question, store an array of objects
                   qObj.options.push({
                     label: capitalizeFirst(optLabel),
                     nameId: optNodeId,
                     value: ""
                   });
                 } else {
+                  // For other question types, store an array of label strings
                   qObj.options.push(capitalizeFirst(optLabel));
                 }
 
+                // Then see if the options node leads to another question
                 const nextEdges = graph.getOutgoingEdges(target) || [];
                 nextEdges.forEach(ne => {
                   const q2 = ne.target;
@@ -938,13 +919,13 @@
                     const q2Obj = questionList2.find(o => o.text === (q2.value || "").trim());
                     if (!q2Obj) return;
 
-                    // backward link => jump
+                    // If it references an earlier question, treat as jump
                     if (q2._questionId < cell._questionId) {
                       qObj.jump.enabled = true;
                       qObj.jump.option = capitalizeFirst(optLabel);
                       qObj.jump.to = q2._questionId.toString();
                     } else {
-                      // forward => logic
+                      // If it references a later question, treat as logic
                       q2Obj.logic.enabled = true;
                       q2Obj.logic.conditions.push({
                         prevQuestion: qObj.questionId.toString(),
