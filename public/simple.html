@@ -51,6 +51,17 @@
       font-size: 25px;
       cursor: pointer;
     }
+    /* Hide question containers by adding .hidden class */
+    .hidden {
+      display: none;
+    }
+    /* Simple styling for active section */
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -88,16 +99,15 @@
  **********************************************/
 let sectionCounter = 1;
 let questionCounter = 1;
-let hiddenFieldCounter = 1;  // if needed for hidden fields
+let hiddenFieldCounter = 1;
 
 /**********************************************
- * 2) BASIC "GUI" LOGIC (reduced from gui.js)
+ * 2) BASIC "GUI" LOGIC
  *    We only define enough so that importForm
  *    can reconstruct the form from JSON.
  **********************************************/
 
 function initializeHiddenPDFFieldsModule() {
-  // We'll create a hidden container so if JSON has hidden fields, they'll be built here.
   const formBuilder = document.getElementById('formBuilder');
   let hiddenFieldsModule = document.getElementById('hiddenFieldsModule');
   if (!hiddenFieldsModule) {
@@ -168,13 +178,14 @@ function addQuestion(sectionId, questionId = null) {
       <option value="bigParagraph">Big Paragraph</option>
     </select><br><br>
 
-    <!-- Various sub-blocks that we won't fully show in the UI now -->
+    <!-- Various sub-blocks (hidden from simple UI) -->
     <div id="dropdownOptions${currentQuestionId}" style="display:none;"></div>
     <div id="checkboxOptions${currentQuestionId}" style="display:none;"></div>
     <div id="multipleTextboxesOptions${currentQuestionId}" style="display:none;"></div>
     <div id="textboxOptions${currentQuestionId}" style="display:none;"></div>
     <div id="numberedDropdownBlock${currentQuestionId}" style="display:none;"></div>
 
+    <!-- Hidden place for logic, jump, PDF, alert, etc. -->
     <div id="logicBlock${currentQuestionId}" style="display:none;"></div>
     <div id="jumpBlock${currentQuestionId}" style="display:none;"></div>
     <div id="conditionalPDFBlock${currentQuestionId}" style="display:none;"></div>
@@ -211,13 +222,18 @@ function addHiddenField() {
  **********************************************/
 
 function getFormHTML() {
-    let formHTML = `
+  let formHTML = `
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <title>Custom Form</title>
         <link rel="stylesheet" href="generate.css">
+        <style>
+          .hidden { display: none; }
+          .section { display: none; }
+          .section.active { display: block; }
+        </style>
     </head>
     <body>
     <header>
@@ -240,415 +256,304 @@ function getFormHTML() {
         <section>
         <div id="box">
             <form id="customForm" onsubmit="return showThankYouMessage();">
-    `;
+  `;
 
-    // We track single-element question IDs to help us attach logic
-    let questionNameIds = {};
-    // We also track question types. e.g. questionTypesMap[questionId] = "checkbox"
-    let questionTypesMap = {};
+  // Maps for final logic
+  let questionNameIds = {};
+  let questionTypesMap = {};
+  let jumpLogics = [];
+  let conditionalPDFs = [];
+  let conditionalAlerts = [];
 
-    // For conditional PDFs & alerts
-    let conditionalPDFs = [];
-    let conditionalAlerts = [];
+  // Possibly read a PDF name from an input
+  const pdfFormNameInput = document.getElementById('formPDFName')
+    ? document.getElementById('formPDFName').value.trim()
+    : '';
+  const pdfFormName = pdfFormNameInput || 'default.pdf';
+  const escapedPdfFormName = pdfFormName
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, '\\\'')
+    .replace(/"/g, '\\"');
 
-    // For jump logic
-    let jumpLogics = [];
+  // Build each section
+  for (let s = 1; s < sectionCounter; s++) {
+    const sectionBlock = document.getElementById(`sectionBlock${s}`);
+    if (!sectionBlock) continue;
 
-    // Possibly read a PDF name if user typed it, else default
-    const pdfFormNameInput = document.getElementById('formPDFName')
-        ? document.getElementById('formPDFName').value.trim()
-        : '';
-    const pdfFormName = pdfFormNameInput || 'default.pdf';
-    const escapedPdfFormName = pdfFormName
-        .replace(/\\/g, '\\\\')
-        .replace(/'/g, '\\\'')
-        .replace(/"/g, '\\"');
+    const sectionNameInput = sectionBlock.querySelector(`#sectionName${s}`);
+    const sectionName = sectionNameInput ? sectionNameInput.value : `Section ${s}`;
 
-    // Build each section
-    for (let s = 1; s < sectionCounter; s++) {
-        const sectionBlock = document.getElementById(`sectionBlock${s}`);
-        if (!sectionBlock) continue;
+    // Start the section
+    formHTML += `<div id="section${s}" class="section${s === 1 ? ' active' : ''}">`;
+    formHTML += `<h2>${sectionName}</h2>`;
 
-        const sectionNameInput = sectionBlock.querySelector(`#sectionName${s}`);
-        const sectionName = sectionNameInput ? sectionNameInput.value : `Section ${s}`;
+    // For each question in that section
+    const questionsSection = sectionBlock.querySelectorAll('.question-block');
+    questionsSection.forEach((questionBlock) => {
+      const questionId = questionBlock.id.replace('questionBlock', '');
+      const questionTextEl = questionBlock.querySelector(`#question${questionId}`);
+      const questionTypeEl = questionBlock.querySelector(`#questionType${questionId}`);
 
-        // Start the section
-        formHTML += `<div id="section${s}" class="section${s === 1 ? ' active' : ''}">`;
-        formHTML += `<h2>${sectionName}</h2>`;
+      const questionText = questionTextEl ? questionTextEl.value : '';
+      const questionType = questionTypeEl ? questionTypeEl.value : 'text';
 
-        // For each question in that section
-        const questionsSection = sectionBlock.querySelectorAll('.question-block');
-        questionsSection.forEach((questionBlock) => {
-            const questionId = questionBlock.id.replace('questionBlock', '');
-            const questionText = questionBlock.querySelector(`#question${questionId}`).value;
-            const questionType = questionBlock.querySelector(`#questionType${questionId}`).value;
+      questionTypesMap[questionId] = questionType;
 
-            questionTypesMap[questionId] = questionType;
+      // --- Logic (if enabled) ---
+      const logicCheckbox = questionBlock.querySelector(`#logic${questionId}`);
+      const logicEnabled = logicCheckbox ? logicCheckbox.checked : false;
 
-            // Check logic
-            const logicCheckbox = questionBlock.querySelector(`#logic${questionId}`);
-            const logicEnabled = logicCheckbox ? logicCheckbox.checked : false;
+      // --- Jump logic (if enabled) ---
+      const jumpCheckbox = questionBlock.querySelector(`#enableJump${questionId}`);
+      const jumpEnabled = jumpCheckbox ? jumpCheckbox.checked : false;
 
-            // Jump logic
-            const jumpCheckbox = questionBlock.querySelector(`#enableJump${questionId}`);
-            const jumpEnabled = jumpCheckbox ? jumpCheckbox.checked : false;
-            const jumpToInput = questionBlock.querySelector(`#jumpTo${questionId}`);
-            const jumpOptionSelect = questionBlock.querySelector(`#jumpOption${questionId}`);
-            const jumpTo = jumpToInput ? jumpToInput.value : '';
-            const jumpOption = jumpOptionSelect ? jumpOptionSelect.value : '';
+      // --- Conditional PDF / Alert (not essential for jump demonstration) ---
+      const conditionalPDFCheckbox = questionBlock.querySelector(`#enableConditionalPDF${questionId}`);
+      const conditionalPDFEnabled = conditionalPDFCheckbox ? conditionalPDFCheckbox.checked : false;
 
-            // If jump is enabled, store it for later
-            if (jumpEnabled && jumpTo) {
-                jumpLogics.push({
-                    questionId,
-                    questionNameId: '',
-                    jumpOption,
-                    jumpTo,
-                    section: s,
-                    questionType
-                });
-            }
+      const conditionalPDFNameEl = questionBlock.querySelector(`#conditionalPDFName${questionId}`);
+      const conditionalPDFAnswerEl = questionBlock.querySelector(`#conditionalPDFAnswer${questionId}`);
+      const conditionalPDFName = conditionalPDFNameEl ? conditionalPDFNameEl.value : '';
+      const conditionalPDFAnswer = conditionalPDFAnswerEl ? conditionalPDFAnswerEl.value : '';
 
-            // Conditional PDF
-            const conditionalPDFCheckbox = questionBlock.querySelector(`#enableConditionalPDF${questionId}`);
-            const conditionalPDFEnabled = conditionalPDFCheckbox ? conditionalPDFCheckbox.checked : false;
-            const conditionalPDFNameEl = questionBlock.querySelector(`#conditionalPDFName${questionId}`);
-            const conditionalPDFAnswerEl = questionBlock.querySelector(`#conditionalPDFAnswer${questionId}`);
-            const conditionalPDFName = conditionalPDFNameEl ? conditionalPDFNameEl.value : '';
-            const conditionalPDFAnswer = conditionalPDFAnswerEl ? conditionalPDFAnswerEl.value : '';
+      const alertCheckbox = questionBlock.querySelector(`#enableConditionalAlert${questionId}`);
+      const conditionalAlertEnabled = alertCheckbox ? alertCheckbox.checked : false;
+      const alertPrevQ = questionBlock.querySelector(`#alertPrevQuestion${questionId}`);
+      const alertPrevA = questionBlock.querySelector(`#alertPrevAnswer${questionId}`);
+      const alertTextEl = questionBlock.querySelector(`#alertText${questionId}`);
+      const alertPrevQuestion = alertPrevQ ? alertPrevQ.value : '';
+      const alertPrevAnswer = alertPrevA ? alertPrevA.value : '';
+      const alertText = alertTextEl ? alertTextEl.value : '';
 
-            // Conditional Alert
-            const alertCheckbox = questionBlock.querySelector(`#enableConditionalAlert${questionId}`);
-            const conditionalAlertEnabled = alertCheckbox ? alertCheckbox.checked : false;
-            const alertPrevQ = questionBlock.querySelector(`#alertPrevQuestion${questionId}`);
-            const alertPrevA = questionBlock.querySelector(`#alertPrevAnswer${questionId}`);
-            const alertTextEl = questionBlock.querySelector(`#alertText${questionId}`);
-            const alertPrevQuestion = alertPrevQ ? alertPrevQ.value : '';
-            const alertPrevAnswer = alertPrevA ? alertPrevA.value : '';
-            const alertText = alertTextEl ? alertTextEl.value : '';
+      if (conditionalAlertEnabled && alertPrevQuestion && alertPrevAnswer && alertText) {
+        conditionalAlerts.push({
+          questionId,
+          prevQuestionId: alertPrevQuestion,
+          prevAnswer: alertPrevAnswer,
+          alertText
+        });
+      }
 
-            if (conditionalAlertEnabled && alertPrevQuestion && alertPrevAnswer && alertText) {
-                conditionalAlerts.push({
-                    questionId,
-                    prevQuestionId: alertPrevQuestion,
-                    prevAnswer: alertPrevAnswer,
-                    alertText
-                });
-            }
+      // Start question container
+      formHTML += `<div id="question-container-${questionId}" ${logicEnabled ? 'class="hidden"' : ''}>`;
+      formHTML += `<label><h3>${questionText}</h3></label>`;
 
-            // Build the question container
-            formHTML += `<div id="question-container-${questionId}" ${logicEnabled ? 'class="hidden"' : ''}>`;
-            formHTML += `<label><h3>${questionText}</h3></label>`;
+      // Render the input
+      if (questionType === 'text') {
+        const nameId = `answer${questionId}`;
+        questionNameIds[questionId] = nameId;
+        formHTML += `<input type="text" id="${nameId}" name="${nameId}" placeholder="">`;
 
-            // Now create the actual question input(s)
-            if (questionType === 'text') {
-                const textboxName = questionBlock.querySelector(`#textboxName${questionId}`);
-                const textboxPlaceholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`);
-                const nameId = textboxName ? (textboxName.value || `answer${questionId}`) : `answer${questionId}`;
-                const placeholder = textboxPlaceholder ? textboxPlaceholder.value : '';
-                questionNameIds[questionId] = nameId;
-                formHTML += `<input type="text" id="${nameId}" name="${nameId}" placeholder="${placeholder}"><br><br>`;
+      } else if (questionType === 'dropdown') {
+        const nameId = `answer${questionId}`;
+        questionNameIds[questionId] = nameId;
+        formHTML += `<select id="${nameId}" name="${nameId}">`;
+        formHTML += `<option value="" disabled selected>Select an option</option>`;
 
-            } else if (questionType === 'bigParagraph') {
-                const textboxName = questionBlock.querySelector(`#textboxName${questionId}`);
-                const textboxPlaceholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`);
-                const nameId = textboxName ? (textboxName.value || `answer${questionId}`) : `answer${questionId}`;
-                const placeholder = textboxPlaceholder ? textboxPlaceholder.value : '';
-                questionNameIds[questionId] = nameId;
-                formHTML += `<textarea id="${nameId}" name="${nameId}" rows="5" cols="50" placeholder="${placeholder}"></textarea><br>`;
+        // gather options
+        const optionInputs = questionBlock.querySelectorAll(`#dropdownOptions${questionId} input`);
+        optionInputs.forEach((inp) => {
+          const val = inp.value.trim();
+          formHTML += `<option value="${val}">${val}</option>`;
+        });
+        formHTML += `</select>`;
 
-            } else if (questionType === 'radio') {
-                const textboxName = questionBlock.querySelector(`#textboxName${questionId}`);
-                const nameId = textboxName ? (textboxName.value || `answer${questionId}`) : `answer${questionId}`;
-                questionNameIds[questionId] = nameId;
-                formHTML += `
-                    <select id="${nameId}" name="${nameId}">
-                        <option value="" disabled selected>Select an option</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                    </select><br>
-                `;
-                if (conditionalPDFEnabled) {
-                    conditionalPDFs.push({
-                        questionId,
-                        questionNameId: nameId,
-                        conditionalAnswer: conditionalPDFAnswer,
-                        pdfName: conditionalPDFName,
-                        questionType
-                    });
-                }
+      } else if (questionType === 'radio') {
+        const nameId = `answer${questionId}`;
+        questionNameIds[questionId] = nameId;
+        formHTML += `
+          <select id="${nameId}" name="${nameId}">
+            <option value="" disabled selected>Select an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        `;
+        if (conditionalPDFEnabled) {
+          conditionalPDFs.push({
+            questionId,
+            questionNameId: nameId,
+            conditionalAnswer: conditionalPDFAnswer,
+            pdfName: conditionalPDFName,
+            questionType
+          });
+        }
 
-            } else if (questionType === 'dropdown') {
-                const textboxName = questionBlock.querySelector(`#textboxName${questionId}`);
-                const nameId = textboxName ? (textboxName.value || `answer${questionId}`) : `answer${questionId}`;
-                questionNameIds[questionId] = nameId;
+      } else if (questionType === 'checkbox') {
+        const optionsDivs = questionBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
+        const checkboxOptions = [];
 
-                formHTML += `<select id="${nameId}" name="${nameId}">`;
-                formHTML += `<option value="" disabled selected>Select an option</option>`;
+        formHTML += `<div><center><div id="checkmark">`;
+        optionsDivs.forEach((optDiv, index) => {
+          const optTextEl = optDiv.querySelector(`#checkboxOptionText${questionId}_${index + 1}`);
+          const optText = optTextEl ? optTextEl.value.trim() : `Option ${index + 1}`;
+          const forcedPrefix = `answer${questionId}_`;
+          const sanitized = optText.replace(/\W+/g, "_").toLowerCase();
+          const optionNameId = forcedPrefix + sanitized;
+          const optionValue = optText;
+          checkboxOptions.push({ optionText: optText, optionNameId, optionValue });
 
-                // Gather the dropdown options from the DOM
-                const optionInputs = questionBlock.querySelectorAll('#dropdownOptions' + questionId + ' input');
-                optionInputs.forEach(input => {
-                    const val = input.value;
-                    formHTML += `<option value="${val}">${val}</option>`;
-                });
+          formHTML += `
+            <span class="checkbox-inline">
+              <label class="checkbox-label">
+                <input type="checkbox" id="${optionNameId}" name="${optionNameId}" value="${optionValue}">
+                ${optText}
+              </label>
+            </span>
+          `;
+        });
+        formHTML += `</div></center></div>`;
 
-                formHTML += `</select><br>`;
+        if (conditionalPDFEnabled) {
+          const match = checkboxOptions.find(o => o.optionText === conditionalPDFAnswer);
+          if (match) {
+            conditionalPDFs.push({
+              questionId,
+              questionNameId: match.optionNameId,
+              conditionalAnswer: match.optionValue,
+              pdfName: conditionalPDFName,
+              questionType
+            });
+          }
+        }
 
-            } else if (questionType === 'checkbox') {
-                // Gather the <div> elements that contain each checkbox option
-                const optionsDivs = questionBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
-                const checkboxOptions = [];
+      } else {
+        // e.g. bigParagraph, multipleTextboxes, date, money, etc.
+        // minimal placeholder
+        const nameId = `answer${questionId}`;
+        questionNameIds[questionId] = nameId;
+        formHTML += `<input type="text" id="${nameId}" name="${nameId}" placeholder="[${questionType} placeholder]">`;
+      }
 
-                formHTML += `<div><center><div id="checkmark">`;
+      formHTML += `</div>`; // close question-container
 
-                optionsDivs.forEach((optionDiv, index) => {
-                    const optTextEl = optionDiv.querySelector(`#checkboxOptionText${questionId}_${index + 1}`);
-                    const optNameEl = optionDiv.querySelector(`#checkboxOptionName${questionId}_${index + 1}`);
-                    const optValueEl = optionDiv.querySelector(`#checkboxOptionValue${questionId}_${index + 1}`);
+      // 1) Logic Script
+      if (logicEnabled) {
+        const logicRows = questionBlock.querySelectorAll(`.logic-condition-row`);
+        if (logicRows.length > 0) {
+          formHTML += `
+          <script>
+            (function(){
+              var thisQ = document.getElementById('question-container-${questionId}');
+              function updateVisibility() {
+                var anyMatch = false;
+          `;
+          logicRows.forEach((row, idx) => {
+            const rowIndex = idx + 1;
+            const prevQNumEl = row.querySelector(`#prevQuestion${questionId}_${rowIndex}`);
+            const prevAnswerEl = row.querySelector(`#prevAnswer${questionId}_${rowIndex}`);
+            const prevQNum = prevQNumEl ? prevQNumEl.value.trim() : "";
+            const prevAnswer = prevAnswerEl ? prevAnswerEl.value.trim().toLowerCase() : "";
+            if (!prevQNum || !prevAnswer) return;
 
-                    let optionText = optTextEl ? optTextEl.value.trim() : `Option ${index + 1}`;
-                    let optionNameId = optNameEl ? optNameEl.value.trim() : "";
-                    let optionValue = optValueEl ? optValueEl.value.trim() : "";
-
-                    // Force a consistent prefix
-                    const forcedPrefix = `answer${questionId}_`;
-                    if (!optionNameId) {
-                        const sanitized = optionText.replace(/\W+/g, "_").toLowerCase();
-                        optionNameId = forcedPrefix + sanitized;
+            const pType = questionTypesMap[prevQNum] || 'text';
+            formHTML += `
+                  (function checkCond${idx}(){
+                    var cPrevType = '${pType}';
+                    var cPrevA = '${prevAnswer}';
+                    var cPrevQNum = '${prevQNum}';
+                    if (cPrevType === 'checkbox') {
+                      var cbs = document.querySelectorAll('input[id^="answer' + cPrevQNum + '_"]');
+                      var checkedVals = [];
+                      cbs.forEach(cb => { if(cb.checked) checkedVals.push(cb.value.trim().toLowerCase()); });
+                      if (checkedVals.includes(cPrevA)) {
+                        anyMatch = true;
+                      }
                     } else {
-                        if (!optionNameId.startsWith(forcedPrefix)) {
-                            optionNameId = forcedPrefix + optionNameId;
+                      var el = document.getElementById('answer' + cPrevQNum);
+                      if (el) {
+                        var val = el.value.trim().toLowerCase();
+                        if (val === cPrevA) {
+                          anyMatch = true;
                         }
+                      }
                     }
-                    if (!optionValue) {
-                        optionValue = optionText;
-                    }
-
-                    checkboxOptions.push({ optionText, optionNameId, optionValue });
-
-                    // Render the checkbox
-                    formHTML += `
-                        <span class="checkbox-inline">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="${optionNameId}" name="${optionNameId}" value="${optionValue}">
-                                ${optionText}
-                            </label>
-                        </span>
-                    `;
-                });
-
-                // **FIX**: Safely check for the "noneOfTheAbove" element
-                const noneOfTheAboveEl = questionBlock.querySelector(`#noneOfTheAbove${questionId}`);
-                const noneOfTheAboveSelected = noneOfTheAboveEl ? noneOfTheAboveEl.checked : false;
-
-                if (noneOfTheAboveSelected) {
-                    const optionText = 'None of the above';
-                    const forcedPrefix = `answer${questionId}_`;
-                    const sanitized = optionText.replace(/\W+/g, "_").toLowerCase();
-                    const optionNameId = forcedPrefix + sanitized;
-                    const optionValue = optionText;
-
-                    checkboxOptions.push({ optionText, optionNameId, optionValue });
-
-                    formHTML += `
-                        <span class="checkbox-inline">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="${optionNameId}" name="${optionNameId}" value="${optionValue}">
-                                ${optionText}
-                            </label>
-                        </span>
-                    `;
+                  })();
+            `;
+          });
+          formHTML += `
+                if (anyMatch) {
+                  thisQ.classList.remove('hidden');
+                } else {
+                  thisQ.classList.add('hidden');
                 }
+              }
+          `;
+          logicRows.forEach((row, idx) => {
+            const rowIndex = idx + 1;
+            const prevQNumEl = row.querySelector(`#prevQuestion${questionId}_${rowIndex}`);
+            const prevQNum = prevQNumEl ? prevQNumEl.value.trim() : "";
+            const pType = questionTypesMap[prevQNum] || 'text';
+            if (!prevQNum) return;
 
-                formHTML += `</div><br></div>`;
-
-                // Conditional PDF if any
-                if (conditionalPDFEnabled) {
-                    const matchingOption = checkboxOptions.find(opt => opt.optionText === conditionalPDFAnswer);
-                    if (matchingOption) {
-                        conditionalPDFs.push({
-                            questionId,
-                            questionNameId: matchingOption.optionNameId,
-                            conditionalAnswer: matchingOption.optionValue,
-                            pdfName: conditionalPDFName,
-                            questionType
-                        });
-                    }
+            if (pType === 'checkbox') {
+              formHTML += `
+              (function attachEvent${idx}(){
+                var cbs = document.querySelectorAll('input[id^="answer${prevQNum}_"]');
+                cbs.forEach(cb => { cb.addEventListener('change', updateVisibility); });
+              })();
+              `;
+            } else {
+              formHTML += `
+              (function attachEvent${idx}(){
+                var singleEl = document.getElementById('answer${prevQNum}');
+                if (singleEl) {
+                  singleEl.addEventListener('change', updateVisibility);
                 }
-
-            } else if (questionType === 'numberedDropdown') {
-                const rangeStartEl = questionBlock.querySelector(`#numberRangeStart${questionId}`);
-                const rangeEndEl = questionBlock.querySelector(`#numberRangeEnd${questionId}`);
-                const start = rangeStartEl ? parseInt(rangeStartEl.value) : 1;
-                const end = rangeEndEl ? parseInt(rangeEndEl.value) : 1;
-                const labels = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
-                const labelValues = Array.from(labels).map(label => label.value);
-
-                formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value)">
-                                <option value="" disabled selected>Select an option</option>`;
-                for (let i = start; i <= end; i++) {
-                    formHTML += `<option value="${i}">${i}</option>`;
-                }
-                formHTML += `</select><br>
-                             <div id="labelContainer${questionId}"></div>
-                             <script>
-                                 var labels${questionId} = ${JSON.stringify(labelValues)};
-                                 function showTextboxLabels(questionId, count) {
-                                     const container = document.getElementById('labelContainer' + questionId);
-                                     container.innerHTML = '';
-                                     for (let j = 1; j <= count; j++) {
-                                         labels${questionId}.forEach(function(label) {
-                                             const inputId = label.replace(/\\s+/g, '') + j;
-                                             container.innerHTML += '<input type="text" id="' + inputId + '" name="' + inputId + '" placeholder="' + label + ' ' + j + '" style="text-align:center;"><br>';
-                                         });
-                                     }
-                                 }
-                             <\/script>`;
-
-            } else if (questionType === 'multipleTextboxes') {
-                const multiBlocks = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
-                multiBlocks.forEach((optionDiv, index) => {
-                    const labelInput = optionDiv.querySelector(`#multipleTextboxLabel${questionId}_${index + 1}`);
-                    const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
-                    const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
-
-                    const labelText = labelInput ? labelInput.value.trim() : '';
-                    const nameId = nameIdInput ? (nameIdInput.value.trim() || `answer${questionId}_${index + 1}`) : `answer${questionId}_${index + 1}`;
-                    const placeholder = placeholderInput ? placeholderInput.value.trim() : '';
-
-                    if (labelText) {
-                        formHTML += `<label><h3>${labelText}</h3></label><br>`;
-                    }
-                    formHTML += `<input type="text" id="${nameId}" name="${nameId}" placeholder="${placeholder}" style="text-align:center;"><br>`;
-                });
-
-            } else if (questionType === 'money') {
-                const textboxName = questionBlock.querySelector(`#textboxName${questionId}`);
-                const textboxPlaceholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`);
-                const nameId = textboxName ? (textboxName.value || `answer${questionId}`) : `answer${questionId}`;
-                const placeholder = textboxPlaceholder ? textboxPlaceholder.value : 'Enter amount';
-                questionNameIds[questionId] = nameId;
-                formHTML += `<input type="number" id="${nameId}" name="${nameId}" min="0" step="0.01" placeholder="${placeholder}"><br>`;
-
-            } else if (questionType === 'date') {
-                formHTML += `<input type="date" id="answer${questionId}" name="answer${questionId}" placeholder="Enter a date"><br>`;
+              })();
+              `;
             }
-
-            // Close question container
-            formHTML += `</div>`;
-
-            // =============== MULTIPLE OR LOGIC ===============
-            if (logicEnabled) {
-                // We'll find all .logic-condition-row for this question
-                const logicRows = questionBlock.querySelectorAll(`.logic-condition-row`);
-                if (logicRows.length > 0) {
-                    formHTML += `
-                    <script>
-                        (function(){
-                            var thisQ = document.getElementById('question-container-${questionId}');
-                            function updateVisibility() {
-                                var anyMatch = false;
-                    `;
-                    logicRows.forEach((row, idx) => {
-                        const rowIndex = idx + 1;
-                        const prevQNumEl = row.querySelector(`#prevQuestion${questionId}_${rowIndex}`);
-                        const prevAnswerEl = row.querySelector(`#prevAnswer${questionId}_${rowIndex}`);
-                        const prevQNum = prevQNumEl ? prevQNumEl.value.trim() : "";
-                        const prevAnswer = prevAnswerEl ? prevAnswerEl.value.trim().toLowerCase() : "";
-                        if (!prevQNum || !prevAnswer) return;
-
-                        const pType = questionTypesMap[prevQNum] || 'text';
-                        formHTML += `
-                                (function checkCond${idx}(){
-                                    var cPrevType = '${pType}';
-                                    var cPrevA = '${prevAnswer}';
-                                    var cPrevQNum = '${prevQNum}';
-                                    if (cPrevType === 'checkbox') {
-                                        var cbs = document.querySelectorAll('input[id^="answer' + cPrevQNum + '_"]');
-                                        var checkedVals = [];
-                                        cbs.forEach(cb => { if(cb.checked) checkedVals.push(cb.value.trim().toLowerCase()); });
-                                        if (checkedVals.includes(cPrevA)) {
-                                            anyMatch = true;
-                                        }
-                                    } else {
-                                        var el = document.getElementById('answer' + cPrevQNum);
-                                        if (el) {
-                                            var val = el.value.trim().toLowerCase();
-                                            if (val === cPrevA) {
-                                                anyMatch = true;
-                                            }
-                                        }
-                                    }
-                                })();
-                        `;
-                    });
-                    formHTML += `
-                                if (anyMatch) {
-                                    thisQ.classList.remove('hidden');
-                                } else {
-                                    thisQ.classList.add('hidden');
-                                }
-                            }
-                    `;
-                    logicRows.forEach((row, idx) => {
-                        const rowIndex = idx + 1;
-                        const prevQNumEl = row.querySelector(`#prevQuestion${questionId}_${rowIndex}`);
-                        const prevQNum = prevQNumEl ? prevQNumEl.value.trim() : "";
-                        const pType = questionTypesMap[prevQNum] || 'text';
-                        if (!prevQNum) return;
-
-                        if (pType === 'checkbox') {
-                            formHTML += `
-                            (function attachEvent${idx}(){
-                                var cbs = document.querySelectorAll('input[id^="answer${prevQNum}_"]');
-                                cbs.forEach(cb => { cb.addEventListener('change', updateVisibility); });
-                            })();
-                            `;
-                        } else {
-                            formHTML += `
-                            (function attachEvent${idx}(){
-                                var singleEl = document.getElementById('answer${prevQNum}');
-                                if (singleEl) {
-                                    singleEl.addEventListener('change', updateVisibility);
-                                }
-                            })();
-                            `;
-                        }
-                    });
-                    formHTML += `
-                            updateVisibility();
-                        })();
-                    <\/script>
-                    `;
-                }
-            }
-        }); // end forEach question
-
-        // Section-level navigation
-        formHTML += `<br><br><div class="navigation-buttons">`;
-        if (s > 1) {
-            formHTML += `<button type="button" onclick="navigateSection(${s - 1})">Back</button>`;
+          });
+          formHTML += `
+              updateVisibility();
+            })();
+          <\/script>
+          `;
         }
-        if (s === sectionCounter - 1) {
-            formHTML += `<button type="submit">Submit</button>`;
-        } else {
-            formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
-        }
-        formHTML += `</div>`; // close nav-buttons
+      }
 
-        // Close the section
-        formHTML += `</div>`;
+      // 2) Jump Logic
+      if (jumpEnabled) {
+        const jumpRows = questionBlock.querySelectorAll('.jump-condition-row');
+        jumpRows.forEach((row) => {
+          const optEl = row.querySelector('.jump-option-input');
+          const toEl = row.querySelector('.jump-to-input');
+          if (!optEl || !toEl) return;
+          const jumpOption = optEl.value.trim();
+          const jumpTo = parseInt(toEl.value.trim(), 10);
+          if (jumpOption && jumpTo) {
+            jumpLogics.push({
+              section: s,
+              questionId,
+              questionType,
+              option: jumpOption,
+              to: jumpTo
+            });
+          }
+        });
+      }
+    }); // end forEach question
+
+    // Section-level nav
+    formHTML += `<br><br><div class="navigation-buttons">`;
+    if (s > 1) {
+      formHTML += `<button type="button" onclick="navigateSection(${s - 1})">Back</button>`;
     }
+    if (s === sectionCounter - 1) {
+      formHTML += `<button type="submit">Submit</button>`;
+    } else {
+      formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
+    }
+    formHTML += `</div>`; // close nav
+    formHTML += `</div>`; // close section
+  }
 
-    // Insert hidden fields (stub)
-    const { hiddenFieldsHTML, autofillMappings, conditionalAutofillLogic } = generateHiddenPDFFields();
-    formHTML += hiddenFieldsHTML;
+  // Hidden fields (stub)
+  const { hiddenFieldsHTML } = generateHiddenPDFFields();
+  formHTML += hiddenFieldsHTML;
 
-    // Finish the form & page
-    formHTML += `
+  formHTML += `
             </form>
-            <div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
+            <div id="thankYouMessage" class="thank-you-message" style="display:none;">Thank you for completing the survey</div>
         </div>
         </section>
     </div>
@@ -657,199 +562,172 @@ function getFormHTML() {
     </footer>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
-            authDomain: "formwiz-3f4fd.firebaseapp.com",
-            projectId: "formwiz-3f4fd",
-            storageBucket: "formwiz-3f4fd.appspot.com",
-            messagingSenderId: "404259212529",
-            appId: "1:404259212529:web:15a33bce82383b21cfed50",
-            measurementId: "G-P07YEN0HPD"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const urlParams = new URLSearchParams(window.location.search);
-        const formId = urlParams.get('formId');
-        let userId = null;
+      const firebaseConfig = {
+        apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+        authDomain: "formwiz-3f4fd.firebaseapp.com",
+        projectId: "formwiz-3f4fd",
+        storageBucket: "formwiz-3f4fd.appspot.com",
+        messagingSenderId: "404259212529",
+        appId: "1:404259212529:web:15a33bce82383b21cfed50",
+        measurementId: "G-P07YEN0HPD"
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
 
-        firebase.auth().onAuthStateChanged(user => {
-            if (user) {
-                userId = user.uid;
-            } else {
-                console.log("User not logged in.");
-                window.location.href = 'account.html';
+      const urlParams = new URLSearchParams(window.location.search);
+      const formId = urlParams.get('formId');
+      let userId = null;
+
+      firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+          userId = user.uid;
+        } else {
+          console.log("User not logged in.");
+          window.location.href = 'account.html';
+        }
+      });
+
+      var jumpLogics = ${JSON.stringify([])};
+      var questionNameIds = ${JSON.stringify({})};
+
+      function navigateSection(sectionNumber) {
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(sec => sec.classList.remove('active'));
+        const target = document.getElementById('section' + sectionNumber);
+        if (target) {
+          target.classList.add('active');
+        } else {
+          sections[sections.length - 1].classList.add('active');
+        }
+      }
+
+      function handleNext(currentSection) {
+        let nextSection = currentSection + 1;
+        // filter jumpLogics for this section
+        const relevantJumps = jumpLogics.filter(j => j.section == currentSection);
+
+        for (let i = 0; i < relevantJumps.length; i++) {
+          const jlogic = relevantJumps[i];
+          const { questionId, questionType, option, to } = jlogic;
+          const nameId = questionNameIds[questionId] || ('answer' + questionId);
+
+          if (questionType === 'radio' || questionType === 'dropdown') {
+            const el = document.getElementById(nameId);
+            if (el && el.value.trim().toLowerCase() === option.trim().toLowerCase()) {
+              nextSection = to;
+              break;
             }
+          } else if (questionType === 'checkbox') {
+            const cbs = document.querySelectorAll('input[id^="answer' + questionId + '_"]');
+            if (cbs && cbs.length > 0) {
+              const selectedVals = [];
+              cbs.forEach(cb => {
+                if (cb.checked) selectedVals.push(cb.value.trim().toLowerCase());
+              });
+              if (selectedVals.includes(option.trim().toLowerCase())) {
+                nextSection = to;
+                break;
+              }
+            }
+          }
+        }
+        navigateSection(nextSection);
+      }
+
+      function downloadPDF(url, filename) {
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      async function editAndDownloadPDF(pdfName) {
+        const formData = new FormData();
+        document.querySelectorAll('#questions input, #questions select, #questions textarea').forEach(input => {
+          if (input.type === 'checkbox') {
+            formData.append(input.name, input.checked ? 'Yes' : 'No');
+          } else {
+            formData.append(input.name, input.value);
+          }
         });
+        return fetch('/edit_pdf?pdf=' + pdfName, { method: 'POST', body: formData })
+          .then(response => response.blob())
+          .then(blob => {
+            const url = URL.createObjectURL(blob);
+            downloadPDF(url, 'Edited_' + pdfName + '.pdf');
+          });
+      }
 
-        function saveFormData(sectionId) {
-            // Example of saving data
-            const formData = {};
-            const inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' select, #' + sectionId + ' textarea');
-            inputs.forEach(input => {
-                if (input.tagName === 'INPUT' && input.type === 'checkbox') {
-                    formData[input.name] = input.checked;
-                } else {
-                    formData[input.name] = input.value;
-                }
-            });
-        }
-        function loadFormData(sectionId) {
-            // omitted for brevity
-        }
-        function autoSaveForm(sectionId) {
-            const inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' select, #' + sectionId + ' textarea');
-            inputs.forEach(input => {
-                // input.addEventListener('change', () => saveFormData(sectionId));
-            });
-        }
+      function setCurrentDate() {
+        const today = new Date();
+        const dd = String(today.getDate()).padStart(2, '0');
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const yyyy = today.getFullYear();
+        const dateValue = yyyy + '-' + mm + '-' + dd;
+        document.getElementById('current_date').value = dateValue;
+      }
+      window.onload = function() {
+        setCurrentDate();
+      };
 
-        // We'll re-inject our jumpLogics array below
-        var jumpLogics = ${JSON.stringify(jumpLogics)};
+      var conditionalPDFs = ${JSON.stringify([])};
+      var conditionalAlerts = ${JSON.stringify([])};
 
-        // We'll also store the questionNameIds map
-        var questionNameIds = ${JSON.stringify(questionNameIds)};
-
-        function handleNext(currentSection) {
-            // default next section
-            let nextSection = currentSection + 1;
-            // filter jumpLogics
-            const relevantJumps = jumpLogics.filter(j => j.section == currentSection);
-            // check if user choice matches jumpOption
-            for (let i = 0; i < relevantJumps.length; i++) {
-                const jlogic = relevantJumps[i];
-                const { questionId, questionType, jumpOption, jumpTo } = jlogic;
-                const nameId = questionNameIds[questionId] || ('answer' + questionId);
-
-                if (questionType === 'radio' || questionType === 'dropdown') {
-                    const el = document.getElementById(nameId);
-                    if (el && el.value.trim().toLowerCase() === jumpOption.trim().toLowerCase()) {
-                        nextSection = jumpTo;
-                        break;
-                    }
-                } else if (questionType === 'checkbox') {
-                    const cbs = document.querySelectorAll('input[id^="answer' + questionId + '_"]');
-                    if (cbs && cbs.length > 0) {
-                        const selectedValues = [];
-                        cbs.forEach(cb => {
-                            if (cb.checked) selectedValues.push(cb.value.trim().toLowerCase());
-                        });
-                        if (selectedValues.includes(jumpOption.trim().toLowerCase())) {
-                            nextSection = jumpTo;
-                            break;
-                        }
-                    }
-                }
+      function handleConditionalAlerts() {
+        conditionalAlerts.forEach(function(alertObj) {
+          const prevQuestionNameId = 'answer' + alertObj.prevQuestionId;
+          const prevQuestionEl = document.getElementById(prevQuestionNameId);
+          if (prevQuestionEl) {
+            if (prevQuestionEl.value.trim().toLowerCase() === alertObj.prevAnswer.trim().toLowerCase()) {
+              alert(alertObj.alertText);
             }
-            navigateSection(nextSection);
-        }
+          } else {
+            // Possibly checkboxes
+            const cbs = document.querySelectorAll('[name^="answer' + alertObj.prevQuestionId + '_"]');
+            if (cbs.length > 0) {
+              cbs.forEach(cb => {
+                if (cb.checked && cb.value.trim().toLowerCase() === alertObj.prevAnswer.trim().toLowerCase()) {
+                  alert(alertObj.alertText);
+                }
+              });
+            }
+          }
+        });
+      }
 
-        function navigateSection(sectionNumber) {
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => section.classList.remove('active'));
-            const target = document.getElementById('section' + sectionNumber);
-            if (target) {
-                target.classList.add('active');
+      function showThankYouMessage() {
+        // Example: generate the main PDF
+        const pdfName = '${escapedPdfFormName}'.replace('.pdf', '');
+        editAndDownloadPDF(pdfName).then(() => {
+          // handle any conditional PDFs
+          conditionalPDFs.forEach(function(conditionalPDF) {
+            if (conditionalPDF.questionType === 'checkbox') {
+              const cbInput = document.getElementById(conditionalPDF.questionNameId);
+              if (cbInput && cbInput.checked && cbInput.value === conditionalPDF.conditionalAnswer) {
+                editAndDownloadPDF(conditionalPDF.pdfName.replace('.pdf', ''));
+              }
             } else {
-                console.log("Tried to jump to an invalid section: " + sectionNumber);
-                sections[sections.length - 1].classList.add('active');
+              const val = document.getElementById(conditionalPDF.questionNameId)?.value;
+              if (val === conditionalPDF.conditionalAnswer) {
+                editAndDownloadPDF(conditionalPDF.pdfName.replace('.pdf', ''));
+              }
             }
-        }
-
-        var pdfFormName = '${escapedPdfFormName}';
-        function downloadPDF(url, filename) {
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-        async function editAndDownloadPDF(pdfName) {
-            const formData = new FormData();
-            document.querySelectorAll('#questions input, #questions select, #questions textarea').forEach(input => {
-                if (input.type === 'checkbox') {
-                    formData.append(input.name, input.checked ? 'Yes' : 'No');
-                } else {
-                    formData.append(input.name, input.value);
-                }
-            });
-            return fetch('/edit_pdf?pdf=' + pdfName, { method: 'POST', body: formData })
-                .then(response => response.blob())
-                .then(blob => {
-                    const url = URL.createObjectURL(blob);
-                    downloadPDF(url, 'Edited_' + pdfName + '.pdf');
-                });
-        }
-        function setCurrentDate() {
-            var today = new Date();
-            var dd = String(today.getDate()).padStart(2, '0');
-            var mm = String(today.getMonth() + 1).padStart(2, '0');
-            var yyyy = today.getFullYear();
-            today = yyyy + '-' + mm + '-' + dd;
-            document.getElementById('current_date').value = today;
-        }
-        window.onload = function() {
-            setCurrentDate();
-        };
-
-        // conditional PDF array from question logic
-        var conditionalPDFs = ${JSON.stringify(conditionalPDFs)};
-
-        // conditional alerts array
-        var conditionalAlerts = ${JSON.stringify(conditionalAlerts)};
-        function handleConditionalAlerts() {
-            conditionalAlerts.forEach(function(alertObj) {
-                const prevQuestionNameId = 'answer' + alertObj.prevQuestionId;
-                const prevQuestionElement = document.getElementById(prevQuestionNameId);
-                if (prevQuestionElement) {
-                    const userAnswer = prevQuestionElement.value;
-                    if (userAnswer.trim().toLowerCase() === alertObj.prevAnswer.trim().toLowerCase()) {
-                        alert(alertObj.alertText);
-                    }
-                } else {
-                    const checkboxes = document.querySelectorAll('[name^="answer' + alertObj.prevQuestionId + '_"]');
-                    if (checkboxes.length > 0) {
-                        checkboxes.forEach(cb => {
-                            if (cb.checked && cb.value.trim().toLowerCase() === alertObj.prevAnswer.trim().toLowerCase()) {
-                                alert(alertObj.alertText);
-                            }
-                        });
-                    }
-                }
-            });
-        }
-
-        function showThankYouMessage() {
-            const pdfName = pdfFormName.replace('.pdf', '');
-            editAndDownloadPDF(pdfName).then(() => {
-                // handle conditional PDFs
-                conditionalPDFs.forEach(function(conditionalPDF) {
-                    if (conditionalPDF.questionType === 'checkbox') {
-                        const checkboxInput = document.getElementById(conditionalPDF.questionNameId);
-                        if (checkboxInput && checkboxInput.checked && checkboxInput.value === conditionalPDF.conditionalAnswer) {
-                            editAndDownloadPDF(conditionalPDF.pdfName.replace('.pdf', ''));
-                        }
-                    } else {
-                        const questionValue = document.getElementById(conditionalPDF.questionNameId)?.value;
-                        if (questionValue === conditionalPDF.conditionalAnswer) {
-                            editAndDownloadPDF(conditionalPDF.pdfName.replace('.pdf', ''));
-                        }
-                    }
-                });
-                // handle alerts
-                handleConditionalAlerts();
-                // show thank you
-                document.getElementById('customForm').style.display = 'none';
-                document.getElementById('thankYouMessage').style.display = 'block';
-            });
-            return false;
-        }
-    <\/` + `script>
+          });
+          // handle alerts
+          handleConditionalAlerts();
+          // Show "thank you"
+          document.getElementById('customForm').style.display = 'none';
+          document.getElementById('thankYouMessage').style.display = 'block';
+        });
+        return false;
+      }
+    <\/script>
     </body>
     </html>
-    `;
+  `;
 
-    return formHTML;
+  return formHTML;
 }
 
 /**********************************************
@@ -868,9 +746,6 @@ function importForm(event) {
   }
 }
 
-/**
- * Reconstruct sections/questions from JSON
- */
 function loadFormData(formData) {
   // Clear the formBuilder
   document.getElementById('formBuilder').innerHTML = '';
@@ -880,66 +755,107 @@ function loadFormData(formData) {
   questionCounter = formData.questionCounter || 1;
   hiddenFieldCounter = formData.hiddenFieldCounter || 1;
 
-  // Possibly init hidden fields container
   initializeHiddenPDFFieldsModule();
 
-  // Build sections
   if (formData.sections) {
     formData.sections.forEach(section => {
       addSection(section.sectionId);
-      // Set section name
       const sectionNameInput = document.getElementById(`sectionName${section.sectionId}`);
       if (sectionNameInput) {
         sectionNameInput.value = section.sectionName || `Section ${section.sectionId}`;
         updateSectionName(section.sectionId);
       }
-
-      // Build questions
       if (section.questions) {
         section.questions.forEach(q => {
           addQuestion(section.sectionId, q.questionId);
           const qBlock = document.getElementById(`questionBlock${q.questionId}`);
           if (!qBlock) return;
 
-          // question text
-          let qInput = qBlock.querySelector(`#question${q.questionId}`);
+          const qInput = qBlock.querySelector(`#question${q.questionId}`);
           if (qInput) {
             qInput.value = q.text || '';
           }
-
-          // question type
-          let qTypeSel = qBlock.querySelector(`#questionType${q.questionId}`);
+          const qTypeSel = qBlock.querySelector(`#questionType${q.questionId}`);
           if (qTypeSel) {
             qTypeSel.value = q.type || 'text';
           }
 
-          // If it's dropdown/checkbox => fill hidden options
-          if (q.type === 'dropdown') {
+          // If dropdown or checkbox => fill hidden options
+          if (q.type === 'dropdown' && q.options) {
             const dropdownOptionsDiv = qBlock.querySelector(`#dropdownOptions${q.questionId}`);
-            if (dropdownOptionsDiv && q.options) {
+            if (dropdownOptionsDiv) {
               dropdownOptionsDiv.innerHTML = '';
               q.options.forEach((val, index) => {
                 const optionDiv = document.createElement('div');
                 optionDiv.className = `option${index+1}`;
-                optionDiv.innerHTML = `
-                  <input type="text" value="${val}" placeholder="Option ${index+1}">
-                `;
+                optionDiv.innerHTML = `<input type="text" value="${val}" placeholder="Option ${index+1}">`;
                 dropdownOptionsDiv.appendChild(optionDiv);
               });
             }
-          }
-          else if (q.type === 'checkbox') {
+          } else if (q.type === 'checkbox' && q.options) {
             const checkboxOptionsDiv = qBlock.querySelector(`#checkboxOptions${q.questionId}`);
-            if (checkboxOptionsDiv && q.options) {
+            if (checkboxOptionsDiv) {
               checkboxOptionsDiv.innerHTML = '';
-              q.options.forEach((optData, index) => {
+              q.options.forEach((val, index) => {
+                const labelText = (typeof val === 'object' && val.label) ? val.label : val;
                 const optionDiv = document.createElement('div');
                 optionDiv.className = `option${index+1}`;
-                optionDiv.innerHTML = `
-                  <input type="text" id="checkboxOptionText${q.questionId}_${index+1}" value="${optData.label}">
-                `;
+                optionDiv.innerHTML = `<input type="text" id="checkboxOptionText${q.questionId}_${index+1}" value="${labelText}">`;
                 checkboxOptionsDiv.appendChild(optionDiv);
               });
+            }
+          }
+
+          // Logic
+          if (q.logic && q.logic.enabled && q.logic.conditions && q.logic.conditions.length > 0) {
+            const logicBlock = qBlock.querySelector(`#logicBlock${q.questionId}`);
+            if (logicBlock) {
+              const hiddenLogicCheckbox = document.createElement('input');
+              hiddenLogicCheckbox.type = 'checkbox';
+              hiddenLogicCheckbox.id = `logic${q.questionId}`;
+              hiddenLogicCheckbox.name = `logic${q.questionId}`;
+              hiddenLogicCheckbox.checked = true;
+              hiddenLogicCheckbox.style.display = 'none';
+              logicBlock.appendChild(hiddenLogicCheckbox);
+
+              q.logic.conditions.forEach((cond, idx) => {
+                const row = document.createElement('div');
+                row.className = 'logic-condition-row';
+                row.innerHTML = `
+                  <input type="text" id="prevQuestion${q.questionId}_${idx+1}" value="${cond.prevQuestion}" style="display:none;">
+                  <input type="text" id="prevAnswer${q.questionId}_${idx+1}" value="${cond.prevAnswer}" style="display:none;">
+                `;
+                logicBlock.appendChild(row);
+              });
+            }
+          }
+
+          // Jump (IMPORTANT part):
+          // Even though your JSON doesn't have an array, we can create ONE row if jump.enabled is true and jump.option != ""
+          if (q.jump && q.jump.enabled) {
+            const jumpBlock = qBlock.querySelector(`#jumpBlock${q.questionId}`);
+            if (jumpBlock) {
+              // hidden "enable jump" checkbox
+              const hiddenJumpCheckbox = document.createElement('input');
+              hiddenJumpCheckbox.type = 'checkbox';
+              hiddenJumpCheckbox.id = `enableJump${q.questionId}`;
+              hiddenJumpCheckbox.name = `enableJump${q.questionId}`;
+              hiddenJumpCheckbox.checked = true;
+              hiddenJumpCheckbox.style.display = 'none';
+              jumpBlock.appendChild(hiddenJumpCheckbox);
+
+              // If there's a single option & to, create a single row
+              const jOpt = (q.jump.option || '').trim();
+              const jTo = parseInt((q.jump.to || '').trim(), 10);
+              if (jOpt && jTo) {
+                const row = document.createElement('div');
+                row.className = 'jump-condition-row';
+                row.innerHTML = `
+                  <input type="text" class="jump-option-input" value="${jOpt}" style="display:none;">
+                  <input type="text" class="jump-to-input" value="${jTo}" style="display:none;">
+                `;
+                jumpBlock.appendChild(row);
+              }
             }
           }
         });
@@ -947,21 +863,17 @@ function loadFormData(formData) {
     });
   }
 
-  // Build hidden fields if any
+  // hidden fields if any
   if (formData.hiddenFields) {
     formData.hiddenFields.forEach(hf => {
       addHiddenField(); 
-      // Optionally fill details for hidden fields if needed
     });
   }
 }
 
 function generateHiddenPDFFields() {
-  // Stub function for hidden fields logic
   const hiddenFieldsHTML = '';
-  const autofillMappings = [];
-  const conditionalAutofillLogic = [];
-  return { hiddenFieldsHTML, autofillMappings, conditionalAutofillLogic };
+  return { hiddenFieldsHTML };
 }
 
 /**********************************************
