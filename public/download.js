@@ -1,5 +1,6 @@
 /********************************************
- * export.js - MULTIPLE OR CONDITIONS
+ * download.js - MULTIPLE OR CONDITIONS
+ *   with hidden-field calculations export/import
  ********************************************/
 
 function generateAndDownloadForm() {
@@ -31,6 +32,7 @@ function downloadHTML(content, filename) {
 // ============================================
 // ===========  IMPORT / EXPORT  =============
 // ============================================
+
 function loadFormData(formData) {
     // 1) Clear the entire "formBuilder" container
     document.getElementById('formBuilder').innerHTML = '';
@@ -66,6 +68,7 @@ function loadFormData(formData) {
 
             // C) Add questions inside this section
             (section.questions || []).forEach(question => {
+                // Create the question in the GUI
                 addQuestion(section.sectionId, question.questionId);
 
                 const questionBlock = document.getElementById(`questionBlock${question.questionId}`);
@@ -82,8 +85,12 @@ function loadFormData(formData) {
                     toggleOptions(question.questionId);
                 }
 
-                // -- If checkbox => rebuild its options
+                // -----------------------------
+                // Question-type-specific rebuild
+                // -----------------------------
+
                 if (question.type === 'checkbox') {
+                    // Rebuild checkbox options
                     const checkboxOptionsDiv = questionBlock.querySelector(`#checkboxOptions${question.questionId}`);
                     if (checkboxOptionsDiv) {
                         checkboxOptionsDiv.innerHTML = '';
@@ -108,11 +115,12 @@ function loadFormData(formData) {
                             `;
                             checkboxOptionsDiv.appendChild(optionDiv);
                         });
+                        // "None of the above" logic
                         updateConditionalPDFAnswersForCheckbox(question.questionId);
                     }
                 }
-                // -- If dropdown => rebuild its options
                 else if (question.type === 'dropdown') {
+                    // Rebuild dropdown options
                     const dropdownOptionsDiv = questionBlock.querySelector(`#dropdownOptions${question.questionId}`);
                     if (dropdownOptionsDiv) {
                         dropdownOptionsDiv.innerHTML = '';
@@ -129,27 +137,95 @@ function loadFormData(formData) {
                             `;
                             dropdownOptionsDiv.appendChild(optionDiv);
 
-                            // Attach 'input' event so jump options refresh if user edits it
+                            // Whenever user edits these, re-update jump logic
                             const optionInput = optionDiv.querySelector('input[type="text"]');
                             optionInput.addEventListener('input', () => {
                                 updateJumpOptions(question.questionId);
                             });
                         });
-
-                        // *** IMPORTANT FIX ***
-                        // Re-run updateJumpOptions *after* we've populated the dropdown so
-                        // the Jump Option select is filled with the newly imported options.
                         updateJumpOptions(question.questionId);
                     }
+                    // Also restore Name/ID and Placeholder for dropdown
+                    const nameInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
+                    const placeholderInput = questionBlock.querySelector(`#textboxPlaceholder${question.questionId}`);
+                    if (nameInput) {
+                        nameInput.value = question.nameId || '';
+                    }
+                    if (placeholderInput) {
+                        placeholderInput.value = question.placeholder || '';
+                    }
                 }
-                // ...multipleTextboxes, numberedDropdown, etc. if needed
+                else if (question.type === 'multipleTextboxes') {
+                    // Rebuild multiple textboxes
+                    const multipleTextboxesBlock = questionBlock.querySelector(`#multipleTextboxesOptions${question.questionId}`);
+                    if (multipleTextboxesBlock) {
+                        multipleTextboxesBlock.innerHTML = '';
+                        (question.textboxes || []).forEach((tb, idx) => {
+                            // Add a textbox slot
+                            addMultipleTextboxOption(question.questionId);
+
+                            // Fill in the values
+                            const labelInput = questionBlock.querySelector(
+                                `#multipleTextboxLabel${question.questionId}_${idx + 1}`
+                            );
+                            const nameIdInput = questionBlock.querySelector(
+                                `#multipleTextboxName${question.questionId}_${idx + 1}`
+                            );
+                            const placeholderInput = questionBlock.querySelector(
+                                `#multipleTextboxPlaceholder${question.questionId}_${idx + 1}`
+                            );
+
+                            if (labelInput)        labelInput.value = tb.label || '';
+                            if (nameIdInput)       nameIdInput.value = tb.nameId || '';
+                            if (placeholderInput)  placeholderInput.value = tb.placeholder || '';
+                        });
+                    }
+                }
+                else if (question.type === 'numberedDropdown') {
+                    // Numbered dropdown
+                    const rangeStartEl = questionBlock.querySelector(`#numberRangeStart${question.questionId}`);
+                    const rangeEndEl   = questionBlock.querySelector(`#numberRangeEnd${question.questionId}`);
+                    if (rangeStartEl) rangeStartEl.value = question.min || '';
+                    if (rangeEndEl)   rangeEndEl.value   = question.max || '';
+
+                    // Rebuild custom text labels
+                    const textboxLabelsDiv = questionBlock.querySelector(`#textboxLabels${question.questionId}`);
+                    if (textboxLabelsDiv) {
+                        textboxLabelsDiv.innerHTML = '';
+                        (question.labels || []).forEach((labelValue, ldx) => {
+                            addTextboxLabel(question.questionId);
+                            const labelInput = textboxLabelsDiv.querySelector(
+                                `#label${question.questionId}_${ldx + 1}`
+                            );
+                            if (labelInput) labelInput.value = labelValue;
+                        });
+                    }
+                }
+                else if (
+                    // Text-like question types
+                    question.type === 'text' ||
+                    question.type === 'bigParagraph' ||
+                    question.type === 'radio' ||
+                    question.type === 'money' ||
+                    question.type === 'date'
+                ) {
+                    const nameInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
+                    const placeholderInput = questionBlock.querySelector(`#textboxPlaceholder${question.questionId}`);
+                    if (nameInput) {
+                        nameInput.value = question.nameId || '';
+                    }
+                    if (placeholderInput) {
+                        placeholderInput.value = question.placeholder || '';
+                    }
+                }
 
                 // ============== MULTIPLE OR logic ==============
                 if (question.logic && question.logic.enabled) {
-                    questionBlock.querySelector(`#logic${question.questionId}`).checked = true;
-                    toggleLogic(question.questionId);
-
-                    // For each condition
+                    const logicCbox = questionBlock.querySelector(`#logic${question.questionId}`);
+                    if (logicCbox) {
+                        logicCbox.checked = true;
+                        toggleLogic(question.questionId);
+                    }
                     const logicConditionsDiv = questionBlock.querySelector(`#logicConditions${question.questionId}`);
                     (question.logic.conditions || []).forEach((cond, idx) => {
                         addLogicCondition(question.questionId);
@@ -164,9 +240,9 @@ function loadFormData(formData) {
 
                 // ============== Jump logic ==============
                 if (question.jump && question.jump.enabled) {
-                    const jumpCheckbox = questionBlock.querySelector(`#enableJump${question.questionId}`);
-                    if (jumpCheckbox) {
-                        jumpCheckbox.checked = true;
+                    const jumpCbox = questionBlock.querySelector(`#enableJump${question.questionId}`);
+                    if (jumpCbox) {
+                        jumpCbox.checked = true;
                         toggleJumpLogic(question.questionId);
                     }
                     const jumpOptionSelect = questionBlock.querySelector(`#jumpOption${question.questionId}`);
@@ -181,9 +257,9 @@ function loadFormData(formData) {
 
                 // ============== Conditional PDF ==============
                 if (question.conditionalPDF && question.conditionalPDF.enabled) {
-                    const pdfCheckbox = questionBlock.querySelector(`#enableConditionalPDF${question.questionId}`);
-                    if (pdfCheckbox) {
-                        pdfCheckbox.checked = true;
+                    const pdfCbox = questionBlock.querySelector(`#enableConditionalPDF${question.questionId}`);
+                    if (pdfCbox) {
+                        pdfCbox.checked = true;
                         toggleConditionalPDFLogic(question.questionId);
                     }
                     const pdfNameInput = questionBlock.querySelector(`#conditionalPDFName${question.questionId}`);
@@ -198,31 +274,30 @@ function loadFormData(formData) {
 
                 // ============== Conditional Alert ==============
                 if (question.conditionalAlert && question.conditionalAlert.enabled) {
-                    const alertCheckbox = questionBlock.querySelector(`#enableConditionalAlert${question.questionId}`);
-                    if (alertCheckbox) {
-                        alertCheckbox.checked = true;
+                    const alertCbox = questionBlock.querySelector(`#enableConditionalAlert${question.questionId}`);
+                    if (alertCbox) {
+                        alertCbox.checked = true;
                         toggleConditionalAlertLogic(question.questionId);
                     }
                     const alertPrevQ = questionBlock.querySelector(`#alertPrevQuestion${question.questionId}`);
                     const alertPrevA = questionBlock.querySelector(`#alertPrevAnswer${question.questionId}`);
-                    const alertTextEl = questionBlock.querySelector(`#alertText${question.questionId}`);
-
+                    const alertT     = questionBlock.querySelector(`#alertText${question.questionId}`);
                     if (alertPrevQ) alertPrevQ.value = question.conditionalAlert.prevQuestion;
                     if (alertPrevA) alertPrevA.value = question.conditionalAlert.prevAnswer;
-                    if (alertTextEl) alertTextEl.value = question.conditionalAlert.text;
+                    if (alertT)     alertT.value     = question.conditionalAlert.text;
                 }
             });
         });
     }
 
-    // 6) Build hidden fields from JSON
+    // 6) Build hidden fields from JSON (including calculations)
     if (formData.hiddenFields && formData.hiddenFields.length > 0) {
         formData.hiddenFields.forEach(hiddenField => {
             addHiddenFieldWithData(hiddenField);
         });
     }
 
-    // 7) Finally, re-run references
+    // 7) Finally, re-run references (e.g. auto-fill dropdowns in hidden fields)
     updateAutofillOptions();
 }
 
@@ -263,10 +338,10 @@ function exportForm() {
             if (logicEnabled) {
                 logicRows.forEach((row, idx) => {
                     const rowIndex = idx + 1;
-                    const pq = row.querySelector(`#prevQuestion${questionId}_${rowIndex}`)?.value.trim() || "";
-                    const pa = row.querySelector(`#prevAnswer${questionId}_${rowIndex}`)?.value.trim() || "";
-                    if (pq && pa) {
-                        conditionsArray.push({ prevQuestion: pq, prevAnswer: pa });
+                    const pqVal = row.querySelector(`#prevQuestion${questionId}_${rowIndex}`)?.value.trim() || "";
+                    const paVal = row.querySelector(`#prevAnswer${questionId}_${rowIndex}`)?.value.trim() || "";
+                    if (pqVal && paVal) {
+                        conditionsArray.push({ prevQuestion: pqVal, prevAnswer: paVal });
                     }
                 });
             }
@@ -277,9 +352,9 @@ function exportForm() {
             const jumpTo = questionBlock.querySelector(`#jumpTo${questionId}`)?.value || "";
 
             // ---------- Conditional PDF logic ----------
-            const conditionalPDFEnabled = questionBlock.querySelector(`#enableConditionalPDF${questionId}`)?.checked || false;
-            const conditionalPDFName = questionBlock.querySelector(`#conditionalPDFName${questionId}`)?.value || "";
-            const conditionalPDFAnswer = questionBlock.querySelector(`#conditionalPDFAnswer${questionId}`)?.value || "";
+            const condPDFEnabled = questionBlock.querySelector(`#enableConditionalPDF${questionId}`)?.checked || false;
+            const condPDFName = questionBlock.querySelector(`#conditionalPDFName${questionId}`)?.value || "";
+            const condPDFAnswer = questionBlock.querySelector(`#conditionalPDFAnswer${questionId}`)?.value || "";
 
             // ---------- Conditional Alert logic ----------
             const alertEnabled = questionBlock.querySelector(`#enableConditionalAlert${questionId}`)?.checked || false;
@@ -293,7 +368,6 @@ function exportForm() {
                 type: questionType,
                 logic: {
                     enabled: logicEnabled,
-                    // multiple conditions stored here
                     conditions: conditionsArray
                 },
                 jump: {
@@ -302,9 +376,9 @@ function exportForm() {
                     to: jumpTo
                 },
                 conditionalPDF: {
-                    enabled: conditionalPDFEnabled,
-                    pdfName: conditionalPDFName,
-                    answer: conditionalPDFAnswer
+                    enabled: condPDFEnabled,
+                    pdfName: condPDFName,
+                    answer: condPDFAnswer
                 },
                 conditionalAlert: {
                     enabled: alertEnabled,
@@ -317,7 +391,9 @@ function exportForm() {
             };
 
             // ========== Collect question-specific options ==========
+
             if (questionType === 'checkbox') {
+                // ----- Checkboxes -----
                 const optionsDivs = questionBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
                 optionsDivs.forEach((optionDiv, index) => {
                     const optTextEl = optionDiv.querySelector(`#checkboxOptionText${questionId}_${index + 1}`);
@@ -346,23 +422,34 @@ function exportForm() {
                 }
             }
             else if (questionType === 'dropdown') {
+                // ----- Dropdown -----
                 const dropdownOptionEls = questionBlock.querySelectorAll(`#dropdownOptions${questionId} input`);
                 dropdownOptionEls.forEach(optionEl => {
                     const val = optionEl.value.trim() || "Option";
                     questionData.options.push(val);
                 });
+
+                // Also include Name/ID and Placeholder
+                const nameId = questionBlock.querySelector(`#textboxName${questionId}`)?.value.trim() || `answer${questionId}`;
+                const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
+                questionData.nameId = nameId;
+                questionData.placeholder = placeholder;
             }
             else if (questionType === 'numberedDropdown') {
+                // ----- Numbered Dropdown -----
                 const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`)?.value || '';
                 const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`)?.value || '';
-                const labels = Array.from(
-                    questionBlock.querySelectorAll(`#textboxLabels${questionId} input`)
-                ).map(lbl => lbl.value.trim());
+                const labelInputs = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
+                const labels = [];
+                labelInputs.forEach(lbl => {
+                    labels.push(lbl.value.trim());
+                });
                 questionData.min = rangeStart;
                 questionData.max = rangeEnd;
                 questionData.labels = labels;
             }
             else if (questionType === 'multipleTextboxes') {
+                // ----- Multiple Textboxes -----
                 const multiBlocks = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
                 questionData.textboxes = [];
                 multiBlocks.forEach((optionDiv, index) => {
@@ -381,7 +468,14 @@ function exportForm() {
                     });
                 });
             }
-            else if (questionType === 'text' || questionType === 'bigParagraph') {
+            else if (
+                questionType === 'text' ||
+                questionType === 'bigParagraph' ||
+                questionType === 'radio' ||
+                questionType === 'money' ||
+                questionType === 'date'
+            ) {
+                // ----- Text-like questions -----
                 const nameId = questionBlock.querySelector(`#textboxName${questionId}`)?.value.trim() || `answer${questionId}`;
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
                 questionData.nameId = nameId;
@@ -394,11 +488,11 @@ function exportForm() {
         formData.sections.push(sectionData);
     }
 
-    // ========== Export hidden fields with autofill logic ==========
+    // ========== Export hidden fields with calculations ==========
     const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
     if (hiddenFieldsContainer) {
         const hiddenFieldBlocks = hiddenFieldsContainer.querySelectorAll('.hidden-field-block');
-        hiddenFieldBlocks.forEach((fieldBlock) => {
+        hiddenFieldBlocks.forEach(fieldBlock => {
             const hiddenFieldId = fieldBlock.id.replace('hiddenFieldBlock', '');
             const fieldType = document.getElementById(`hiddenFieldType${hiddenFieldId}`).value;
             const fieldName = document.getElementById(`hiddenFieldName${hiddenFieldId}`)?.value.trim() || '';
@@ -408,22 +502,24 @@ function exportForm() {
                 hiddenFieldId: hiddenFieldId,
                 type: fieldType,
                 name: fieldName,
-                checked: isChecked
+                checked: isChecked,
+                conditions: [],
+                calculations: []
             };
 
+            // If type = checkbox, gather any conditions and calculations
             if (fieldType === 'checkbox') {
-                // Collect any conditions
-                const conditions = [];
+                // conditions
                 const conditionalDiv = document.getElementById(`conditionalAutofillForCheckbox${hiddenFieldId}`);
                 if (conditionalDiv) {
                     const conditionDivs = conditionalDiv.querySelectorAll('div[class^="condition"]');
                     conditionDivs.forEach((condDiv, index) => {
                         const cid = index + 1;
-                        const qId = condDiv.querySelector(`#conditionQuestion${hiddenFieldId}_${cid}`)?.value;
-                        const aVal = condDiv.querySelector(`#conditionAnswer${hiddenFieldId}_${cid}`)?.value;
-                        const fillVal = condDiv.querySelector(`#conditionValue${hiddenFieldId}_${cid}`)?.value;
+                        const qId = condDiv.querySelector(`#conditionQuestion${hiddenFieldId}_${cid}`)?.value || '';
+                        const aVal = condDiv.querySelector(`#conditionAnswer${hiddenFieldId}_${cid}`)?.value || '';
+                        const fillVal = condDiv.querySelector(`#conditionValue${hiddenFieldId}_${cid}`)?.value || '';
                         if (qId && aVal && fillVal) {
-                            conditions.push({
+                            hiddenFieldData.conditions.push({
                                 questionId: qId,
                                 answerValue: aVal,
                                 autofillValue: fillVal
@@ -431,20 +527,43 @@ function exportForm() {
                         }
                     });
                 }
-                hiddenFieldData.conditions = conditions;
+
+                // calculations
+                const calculationBlock = fieldBlock.querySelector(`#calculationBlock${hiddenFieldId}`);
+                if (calculationBlock) {
+                    const calcRows = calculationBlock.querySelectorAll(`div[id^="calculationRow"]`);
+                    if (calcRows.length > 0) {
+                        calcRows.forEach(row => {
+                            const rid = row.id.split('_')[1];
+                            const questionNameId = document.getElementById(`calcQuestion${hiddenFieldId}_${rid}`)?.value || '';
+                            const operator = document.getElementById(`calcOperator${hiddenFieldId}_${rid}`)?.value || '';
+                            const threshold = document.getElementById(`calcThreshold${hiddenFieldId}_${rid}`)?.value || '';
+                            const result = document.getElementById(`calcResult${hiddenFieldId}_${rid}`)?.value || '';
+
+                            if (questionNameId && operator && threshold !== '') {
+                                hiddenFieldData.calculations.push({
+                                    questionNameId: questionNameId,
+                                    operator: operator,
+                                    threshold: threshold,
+                                    result: result
+                                });
+                            }
+                        });
+                    }
+                }
             }
             else if (fieldType === 'text') {
-                const conditions = [];
+                // gather conditions
                 const textConditionalDiv = document.getElementById(`conditionalAutofill${hiddenFieldId}`);
                 if (textConditionalDiv) {
                     const conditionDivs = textConditionalDiv.querySelectorAll('div[class^="condition"]');
                     conditionDivs.forEach((condDiv, index) => {
                         const cid = index + 1;
-                        const qId = condDiv.querySelector(`#conditionQuestion${hiddenFieldId}_${cid}`)?.value;
-                        const aVal = condDiv.querySelector(`#conditionAnswer${hiddenFieldId}_${cid}`)?.value;
-                        const fillVal = condDiv.querySelector(`#conditionValue${hiddenFieldId}_${cid}`)?.value;
+                        const qId = condDiv.querySelector(`#conditionQuestion${hiddenFieldId}_${cid}`)?.value || '';
+                        const aVal = condDiv.querySelector(`#conditionAnswer${hiddenFieldId}_${cid}`)?.value || '';
+                        const fillVal = condDiv.querySelector(`#conditionValue${hiddenFieldId}_${cid}`)?.value || '';
                         if (qId && aVal && fillVal) {
-                            conditions.push({
+                            hiddenFieldData.conditions.push({
                                 questionId: qId,
                                 answerValue: aVal,
                                 autofillValue: fillVal
@@ -452,7 +571,6 @@ function exportForm() {
                         }
                     });
                 }
-                hiddenFieldData.conditions = conditions;
             }
 
             formData.hiddenFields.push(hiddenFieldData);
@@ -514,10 +632,11 @@ function addHiddenFieldWithData(hiddenField) {
     toggleHiddenFieldOptions(currentHiddenFieldId);
 
     // Fill the name
-    document.getElementById(`hiddenFieldName${currentHiddenFieldId}`).value = hiddenField.name;
+    document.getElementById(`hiddenFieldName${currentHiddenFieldId}`).value = hiddenField.name || '';
 
     if (hiddenField.type === 'checkbox') {
-        document.getElementById(`hiddenFieldChecked${currentHiddenFieldId}`).checked = hiddenField.checked;
+        document.getElementById(`hiddenFieldChecked${currentHiddenFieldId}`).checked = !!hiddenField.checked;
+
         // Rebuild conditions
         if (hiddenField.conditions && hiddenField.conditions.length > 0) {
             hiddenField.conditions.forEach((condition, index) => {
@@ -527,6 +646,18 @@ function addHiddenFieldWithData(hiddenField) {
                 updateConditionAnswers(currentHiddenFieldId, condRow);
                 document.getElementById(`conditionAnswer${currentHiddenFieldId}_${condRow}`).value = condition.answerValue;
                 document.getElementById(`conditionValue${currentHiddenFieldId}_${condRow}`).value = condition.autofillValue;
+            });
+        }
+
+        // Rebuild calculations
+        if (hiddenField.calculations && hiddenField.calculations.length > 0) {
+            hiddenField.calculations.forEach((calcObj, index) => {
+                addCalculationForCheckbox(currentHiddenFieldId);
+                const calcId = index + 1;
+                document.getElementById(`calcQuestion${currentHiddenFieldId}_${calcId}`).value = calcObj.questionNameId;
+                document.getElementById(`calcOperator${currentHiddenFieldId}_${calcId}`).value = calcObj.operator;
+                document.getElementById(`calcThreshold${currentHiddenFieldId}_${calcId}`).value = calcObj.threshold;
+                document.getElementById(`calcResult${currentHiddenFieldId}_${calcId}`).value = calcObj.result;
             });
         }
     }

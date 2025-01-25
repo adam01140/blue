@@ -1,228 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Custom Form</title>
+    <link rel="stylesheet" href="generate.css">
+</head>
+<body>
+<header>
+    <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="forms.html">Forms</a>
+        <a href="contact.html">Contact Us</a>
+    </nav>
+</header>
 
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Custom Form</title>
-        <link rel="stylesheet" href="generate.css">
-    </head>
-    <body>
-    <header>
-        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="forms.html">Forms</a>
-            <a href="contact.html">Contact Us</a>
-        </nav>
-    </header>
-    <div id="pdfPreview" style="display:none;">
-        <iframe id="pdfFrame" style="display:none"></iframe>
-    </div>
-    <input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <div id="questions">
-        <div id="result"></div>
-        <section>
-        <div id="box">
-            <form id="customForm" onsubmit="return showThankYouMessage();">
-    <div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1" ><label><h3>hungry?</h3></label><div><center><div id="checkmark">
-                        <span class="checkbox-inline">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="" name="" value="">
-                                yes
-                            </label>
-                        </span>
-                    
-                        <span class="checkbox-inline">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="" name="" value="">
-                                no
-                            </label>
-                        </span>
-                    </div><br></div></div><div id="question-container-2" class="hidden"><label><h3>why?</h3></label><input type="text" id="answer2" name="answer2" placeholder=""><br><br></div>
-                    <script>
-                        (function() {
-                            var thisQ = document.getElementById('question-container-2');
-                            var checkboxes = document.querySelectorAll('input[name^="answer1_"]');
-                            if (!checkboxes || checkboxes.length === 0) return;
-                            function updateVisibility() {
-                                // gather all checked values
-                                var checkedVals = [];
-                                checkboxes.forEach(cb => {
-                                    if (cb.checked) { 
-                                        checkedVals.push(cb.value.trim().toLowerCase());
-                                    }
-                                });
-                                if (checkedVals.includes('yes')) {
-                                    thisQ.classList.remove('hidden');
-                                } else {
-                                    thisQ.classList.add('hidden');
-                                }
-                            }
-                            // attach event to all checkboxes
-                            checkboxes.forEach(cb => {
-                                cb.addEventListener('change', updateVisibility);
-                            });
-                        })();
-                    </script>
-                    <br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div>
-    <div id="hidden_pdf_fields">
-    
-    </div>
-    
-            </form>
-            <div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
-        </div>
-        </section>
-    </div>
-    <footer>
-        &copy; 2024 FormWiz. All rights reserved.
-    </footer>
+<div id="pdfPreview" style="display:none;">
+    <iframe id="pdfFrame" style="display:none"></iframe>
+</div>
+<input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
-            authDomain: "formwiz-3f4fd.firebaseapp.com",
-            projectId: "formwiz-3f4fd",
-            storageBucket: "formwiz-3f4fd.appspot.com",
-            messagingSenderId: "404259212529",
-            appId: "1:404259212529:web:15a33bce82383b21cfed50",
-            measurementId: "G-P07YEN0HPD"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const urlParams = new URLSearchParams(window.location.search);
-        const formId = urlParams.get('formId');
-        let userId = null;
+<!-- Firebase includes -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-        firebase.auth().onAuthStateChanged(user => {
-            if (user) {
-                userId = user.uid;
-            } else {
-                console.log("User not logged in.");
-                window.location.href = 'account.html';
+<div id="questions">
+    <div id="result"></div>
+    <section>
+    <div id="box">
+        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1"><label><h3>What is your age?</h3></label><input type="number" id="What_is_your_age?" name="What_is_your_age?" min="0" step="0.01" placeholder="Enter amount"><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><h2>Section 2</h2><div id="question-container-2"><label><h3>What is your favorite number?</h3></label><input type="number" id="What_is_your_favorite_number?" name="What_is_your_favorite_number?" min="0" step="0.01" placeholder="Enter amount"><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(1)">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields" style="display:none;">
+<div style="display:none;">   <label class="checkbox-label">       <input type="checkbox" id="over" name="over" >       over   </label></div>
+</div></form>
+<div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
+</div>
+</section>
+</div>
+<footer>
+    &copy; 2024 FormWiz. All rights reserved.
+</footer>
+
+<script>
+    // -----------------------------------------
+    // Firebase initialization (if used)
+    // -----------------------------------------
+    const firebaseConfig = {
+        apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+        authDomain: "formwiz-3f4fd.firebaseapp.com",
+        projectId: "formwiz-3f4fd",
+        storageBucket: "formwiz-3f4fd.appspot.com",
+        messagingSenderId: "404259212529",
+        appId: "1:404259212529:web:15a33bce82383b21cfed50",
+        measurementId: "G-P07YEN0HPD"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const urlParams = new URLSearchParams(window.location.search);
+    const formId = urlParams.get("formId");
+    let userId = null;
+
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            userId = user.uid;
+        } else {
+            console.log("User not logged in.");
+            window.location.href = "account.html";
+        }
+    });
+
+    // questionNameIds used for logic & jump
+    var questionNameIds = {"1":"What_is_your_age?","2":"What_is_your_favorite_number?"};
+    // jumpLogics
+    var jumpLogics = [];
+    // conditional PDFs
+    var conditionalPDFs = [];
+    // conditional alerts
+    var conditionalAlerts = [];
+
+    // For "Next" button w/ jump logic
+    function handleNext(currentSection) {
+        var nextSection = currentSection + 1;
+        var relevantJumps = [];
+        for(var i=0; i<jumpLogics.length; i++){
+            if(jumpLogics[i].section == currentSection){
+                relevantJumps.push(jumpLogics[i]);
             }
+        }
+
+        for(var j=0; j<relevantJumps.length; j++){
+            var jlogic = relevantJumps[j];
+            var questionId = jlogic.questionId;
+            var questionType = jlogic.questionType;
+            var jumpOption = jlogic.jumpOption;
+            var jumpTo = jlogic.jumpTo;
+            var nameId = questionNameIds[questionId] || ("answer" + questionId);
+
+            if(questionType === "radio" || questionType === "dropdown"){
+                var el = document.getElementById(nameId);
+                if(el && el.value && el.value.trim().toLowerCase() === jumpOption.trim().toLowerCase()){
+                    nextSection = jumpTo;
+                    break;
+                }
+            } else if(questionType === "checkbox"){
+                var cbs = document.querySelectorAll('input[id^="answer' + questionId + '_"]');
+                if(cbs && cbs.length){
+                    var chosen = [];
+                    for(var c=0; c<cbs.length; c++){
+                        if(cbs[c].checked){
+                            chosen.push(cbs[c].value.trim().toLowerCase());
+                        }
+                    }
+                    if(chosen.indexOf(jumpOption.trim().toLowerCase()) !== -1){
+                        nextSection = jumpTo;
+                        break;
+                    }
+                }
+            }
+        }
+        navigateSection(nextSection);
+
+        // Also run calculations so they update after user clicks Next
+        runAllHiddenCheckboxCalculations();
+    }
+
+    function navigateSection(sectionNumber) {
+        var sections = document.querySelectorAll(".section");
+        for(var i=0; i<sections.length; i++){
+            sections[i].classList.remove("active");
+        }
+        var target = document.getElementById("section" + sectionNumber);
+        if(target){
+            target.classList.add("active");
+        } else {
+            sections[sections.length - 1].classList.add("active");
+        }
+    }
+
+    // set date field
+    function setCurrentDate() {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, "0");
+        var mm = String(today.getMonth() + 1).padStart(2, "0");
+        var yyyy = today.getFullYear();
+        today = yyyy + "-" + mm + "-" + dd;
+        document.getElementById("current_date").value = today;
+    }
+    window.onload = function() {
+        setCurrentDate();
+        // attach calculation listeners so hidden checkboxes update in real-time
+        attachCalculationListeners();
+    };
+
+    // conditional alerts
+    function handleConditionalAlerts() {
+        for(var i=0; i<conditionalAlerts.length; i++){
+            var alertObj = conditionalAlerts[i];
+            var prevQuestionId = alertObj.prevQuestionId;
+            var prevAnswer = alertObj.prevAnswer;
+            var alertText = alertObj.alertText;
+            var prevQEl = document.getElementById("answer" + prevQuestionId);
+            if(prevQEl){
+                if(prevQEl.value.trim().toLowerCase() === prevAnswer.trim().toLowerCase()){
+                    alert(alertText);
+                }
+            } else {
+                // check a checkbox group
+                var cbs = document.querySelectorAll('[name^="answer' + prevQuestionId + '_"]');
+                for(var c=0; c<cbs.length; c++){
+                    if(cbs[c].checked && cbs[c].value.trim().toLowerCase() === prevAnswer.trim().toLowerCase()){
+                        alert(alertText);
+                    }
+                }
+            }
+        }
+    }
+
+    // On form submit
+    function showThankYouMessage() {
+        var pdfName = "test.pdf".replace(".pdf", "");
+        editAndDownloadPDF(pdfName).then(function() {
+            // handle conditional PDFs
+            for(var i=0; i<conditionalPDFs.length; i++){
+                var pdfObj = conditionalPDFs[i];
+                if(pdfObj.questionType === "checkbox"){
+                    var cbox = document.getElementById(pdfObj.questionNameId);
+                    if(cbox && cbox.checked && cbox.value === pdfObj.conditionalAnswer){
+                        editAndDownloadPDF(pdfObj.pdfName.replace(".pdf",""));
+                    }
+                } else {
+                    var val = "";
+                    var valEl = document.getElementById(pdfObj.questionNameId);
+                    if(valEl){ val = valEl.value; }
+                    if(val === pdfObj.conditionalAnswer){
+                        editAndDownloadPDF(pdfObj.pdfName.replace(".pdf",""));
+                    }
+                }
+            }
+            handleConditionalAlerts();
+            document.getElementById("customForm").style.display = "none";
+            document.getElementById("thankYouMessage").style.display = "block";
         });
+        return false;
+    }
 
-        function saveFormData(sectionId) {
-            const formData = {};
-            const inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' select, #' + sectionId + ' textarea');
-            inputs.forEach(input => {
-                if (input.tagName === 'INPUT' && input.type === 'checkbox') {
-                    formData[input.name] = input.checked;
-                } else {
-                    formData[input.name] = input.value;
+    // PDF generation logic
+    function downloadPDF(url, filename) {
+        var link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    async function editAndDownloadPDF(pdfName) {
+        var formData = new FormData();
+        var inputs = document.querySelectorAll("#questions input, #questions select, #questions textarea");
+        for(var i=0; i<inputs.length; i++){
+            var inp = inputs[i];
+            if(inp.type === "checkbox"){
+                formData.append(inp.name, inp.checked ? "Yes" : "No");
+            } else {
+                formData.append(inp.name, inp.value);
+            }
+        }
+        return fetch("/edit_pdf?pdf=" + pdfName, { method: "POST", body: formData })
+            .then(function(res){return res.blob();})
+            .then(function(blob){
+                var url = URL.createObjectURL(blob);
+                downloadPDF(url, "Edited_" + pdfName + ".pdf");
+            });
+    }
+
+    /***********************************************
+     * Hidden Checkbox Calculations
+     ***********************************************/
+    var hiddenCheckboxCalculations = [{"hiddenFieldName":"over","calculations":[{"questionNameId":"What_is_your_age?","operator":"=","threshold":"100","result":"checked"}]}];
+
+    // Evaluate all calculations at once
+    function runAllHiddenCheckboxCalculations() {
+        if(!hiddenCheckboxCalculations || hiddenCheckboxCalculations.length === 0) return;
+        for(var i=0; i<hiddenCheckboxCalculations.length; i++){
+            runSingleHiddenCheckboxCalculation(hiddenCheckboxCalculations[i]);
+        }
+    }
+
+    // Evaluate one hidden checkbox's calculations
+    function runSingleHiddenCheckboxCalculation(calcObj) {
+        var hiddenCheckbox = document.getElementById(calcObj.hiddenFieldName);
+        if(!hiddenCheckbox) return;
+
+        var finalState = hiddenCheckbox.checked;
+        for(var c=0; c<calcObj.calculations.length; c++){
+            var cond = calcObj.calculations[c];
+            var qEl = document.getElementById(cond.questionNameId);
+            if(!qEl) continue;
+            var valNum = parseFloat(qEl.value) || 0;
+
+            var isMatch = false;
+            if(cond.operator === "="){
+                isMatch = (valNum === parseFloat(cond.threshold));
+            } else if(cond.operator === "<"){
+                isMatch = (valNum < parseFloat(cond.threshold));
+            } else if(cond.operator === ">"){
+                isMatch = (valNum > parseFloat(cond.threshold));
+            }
+            if(isMatch){
+                finalState = (cond.result === "checked");
+            }
+        }
+        hiddenCheckbox.checked = finalState;
+    }
+
+    function attachCalculationListeners() {
+        for(var i=0; i<hiddenCheckboxCalculations.length; i++){
+            var calcObj = hiddenCheckboxCalculations[i];
+            for(var j=0; j<calcObj.calculations.length; j++){
+                var c = calcObj.calculations[j];
+                var qEl = document.getElementById(c.questionNameId);
+                if(qEl){
+                    qEl.addEventListener("change", function(){
+                        runAllHiddenCheckboxCalculations();
+                    });
                 }
-            });
+            }
         }
-        function loadFormData(sectionId) {
-            // omitted
-        }
-        function autoSaveForm(sectionId) {
-            const inputs = document.querySelectorAll('#' + sectionId + ' input, #' + sectionId + ' select, #' + sectionId + ' textarea');
-            inputs.forEach(input => {
-                //input.addEventListener('change', () => saveFormData(sectionId));
-            });
-        }
-        function handleNext(currentSection) {
-            navigateSection(currentSection + 1);
-        }
-        function navigateSection(sectionNumber) {
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => section.classList.remove('active'));
-            document.getElementById('section' + sectionNumber).classList.add('active');
-        }
-        var pdfFormName = 'default.pdf';
-
-        function downloadPDF(url, filename) {
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-        async function editAndDownloadPDF(pdfName) {
-            const formData = new FormData();
-            document.querySelectorAll('#questions input, #questions select, #questions textarea').forEach(input => {
-                if (input.type === 'checkbox') {
-                    formData.append(input.name, input.checked ? 'Yes' : 'No');
-                } else {
-                    formData.append(input.name, input.value);
-                }
-            });
-            return fetch('/edit_pdf?pdf=' + pdfName, { method: 'POST', body: formData })
-                .then(response => response.blob())
-                .then(blob => {
-                    const url = URL.createObjectURL(blob);
-                    downloadPDF(url, 'Edited_' + pdfName + '.pdf');
-                });
-        }
-        function setCurrentDate() {
-            var today = new Date();
-            var dd = String(today.getDate()).padStart(2, '0');
-            var mm = String(today.getMonth() + 1).padStart(2, '0');
-            var yyyy = today.getFullYear();
-            today = yyyy + '-' + mm + '-' + dd;
-            document.getElementById('current_date').value = today;
-        }
-        window.onload = function() {
-            setCurrentDate();
-        };
-
-        var conditionalPDFs = [];
-
-        // NEW CODE START: Conditional Alerts
-        var conditionalAlerts = [];
-        function handleConditionalAlerts() {
-            conditionalAlerts.forEach(function(alertObj) {
-                const prevQuestionNameId = 'answer' + alertObj.prevQuestionId;
-                const prevQuestionElement = document.getElementById(prevQuestionNameId);
-                if (prevQuestionElement) {
-                    const userAnswer = prevQuestionElement.value;
-                    if (userAnswer.trim().toLowerCase() === alertObj.prevAnswer.trim().toLowerCase()) {
-                        alert(alertObj.alertText);
-                    }
-                } else {
-                    // If it's a checkbox or something else, we check them differently
-                    const checkboxes = document.querySelectorAll('[name^="answer' + alertObj.prevQuestionId + '_"]');
-                    if (checkboxes.length > 0) {
-                        checkboxes.forEach(cb => {
-                            if (cb.checked && cb.value.trim().toLowerCase() === alertObj.prevAnswer.trim().toLowerCase()) {
-                                alert(alertObj.alertText);
-                            }
-                        });
-                    }
-                }
-            });
-        }
-        // NEW CODE END
-
-        function showThankYouMessage() {
-            const pdfName = pdfFormName.replace('.pdf', '');
-            editAndDownloadPDF(pdfName).then(() => {
-                conditionalPDFs.forEach(function(conditionalPDF) {
-                    if (conditionalPDF.questionType === 'checkbox') {
-                        const checkboxInput = document.getElementById(conditionalPDF.questionNameId);
-                        if (checkboxInput && checkboxInput.checked && checkboxInput.value === conditionalPDF.conditionalAnswer) {
-                            editAndDownloadPDF(conditionalPDF.pdfName.replace('.pdf', ''));
-                        }
-                    } else {
-                        const questionValue = document.getElementById(conditionalPDF.questionNameId).value;
-                        if (questionValue === conditionalPDF.conditionalAnswer) {
-                            editAndDownloadPDF(conditionalPDF.pdfName.replace('.pdf', ''));
-                        }
-                    }
-                });
-                handleConditionalAlerts();
-                document.getElementById('customForm').style.display = 'none';
-                document.getElementById('thankYouMessage').style.display = 'block';
-            });
-            return false;
-        }
-    </script>
-    </body>
-    </html>
-    
+    }
+</script>
+</body>
+</html>

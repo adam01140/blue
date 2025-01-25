@@ -410,6 +410,25 @@
         graph.addCellOverlay(cell, overlay);
       }
 
+      function refreshNodeIdFromLabel(cell) {
+        const label = (cell.value || "").toString().trim();
+        const nodeId = label.replace(/\s+/g, "_");
+        setNodeId(cell, nodeId);
+      }
+      function refreshOptionNodeId(cell) {
+        const edges = graph.getIncomingEdges(cell) || [];
+        let parentNodeId = "ParentQuestion";
+        for (let e of edges) {
+          const p = e.source;
+          if (isQuestion(p)) {
+            parentNodeId = getNodeId(p) || "ParentQuestion";
+            break;
+          }
+        }
+        let label = (cell.value || "Option").toString().trim().replace(/\s+/g, "_");
+        setNodeId(cell, parentNodeId + label);
+      }
+
       // ---------- Context Menu & handlers ----------
       graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
         selectedCell = cell;
@@ -605,25 +624,6 @@
           graph.getModel().endUpdate();
         }
         refreshAllCells();
-      }
-
-      function refreshNodeIdFromLabel(cell) {
-        const label = (cell.value || "").toString().trim();
-        const nodeId = label.replace(/\s+/g, "_");
-        setNodeId(cell, nodeId);
-      }
-      function refreshOptionNodeId(cell) {
-        const edges = graph.getIncomingEdges(cell) || [];
-        let parentNodeId = "ParentQuestion";
-        for (let e of edges) {
-          const p = e.source;
-          if (isQuestion(p)) {
-            parentNodeId = getNodeId(p) || "ParentQuestion";
-            break;
-          }
-        }
-        let label = (cell.value || "Option").toString().trim().replace(/\s+/g, "_");
-        setNodeId(cell, parentNodeId + label);
       }
 
       // Copy/Paste
@@ -843,8 +843,11 @@
             const label = (cell.value || "").trim() || "Untitled";
             const qType = getQuestionType(cell);
 
+            // ADDED: nameId and placeholder
             const questionObj = {
               questionId: questionIdCounter,
+              nameId: getNodeId(cell) || "", // from our node style
+              placeholder: "",
               text: label,
               type: qType,
               logic: {
