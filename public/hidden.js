@@ -167,13 +167,6 @@ function addHiddenFieldWithData(hiddenField) {
                 addCalculationForCheckbox(currentHiddenFieldId);
                 var calcIndex=c+1;
                 var cObj = hiddenField.calculations[c];
-                // cObj has shape:
-                // {
-                //   terms: [ {operator:'', questionNameId:'...'}, {operator:'+', questionNameId:'...'}, ... ],
-                //   compareOperator:'=',
-                //   threshold:'100',
-                //   result:'checked'
-                // }
 
                 // remove the default single term from eq container
                 var eqContainer = document.getElementById('equationContainer'+currentHiddenFieldId+'_'+calcIndex);
@@ -228,15 +221,8 @@ function addHiddenFieldWithData(hiddenField) {
             }
         }
 
-        // Multi-term calculations for text (calcRows)
+        // Multi-term calculations for text
         if(hiddenField.calculations && hiddenField.calculations.length>0){
-            // each calc object shape:
-            // {
-            //    terms: [...],
-            //    compareOperator:'=',
-            //    threshold:'###',
-            //    fillValue:'some text'
-            // }
             for(var z=0; z<hiddenField.calculations.length; z++){
                 addCalculationForText(currentHiddenFieldId);
                 var calcIdx = z+1;
@@ -540,7 +526,7 @@ function addCalculationForText(hiddenFieldId) {
         </select>
         <input type="number" id="textThreshold${hiddenFieldId}_${calcIndex}" placeholder="Enter number" style="width:80px;">
         <label> then fill with: </label>
-        <input type="text" id="textFillValue${hiddenFieldId}_${calcIndex}" placeholder="Some text" style="width:180px;">
+        <input type="text" id="textFillValue${hiddenFieldId}_${calcIndex}" placeholder="Some text (you can use $$ID$$ placeholders)" style="width:230px;">
 
         <button type="button" onclick="removeCalculationForText(${hiddenFieldId}, ${calcIndex})">Remove</button>
         <hr>
@@ -648,11 +634,6 @@ function removeCalculationForText(hiddenFieldId, calcIndex) {
  * Helper functions to generate question lists
  *****************************************************/
 
-/**
- * generateQuestionOptions():
- *   - Return <option> tags for questions that can be used for text autofill
- *     (text, bigParagraph, money, date, radio, dropdown, multipleTextboxes)
- */
 function generateQuestionOptions() {
     var optionsHTML = '';
     var questionBlocks = document.querySelectorAll('.question-block');
@@ -680,11 +661,6 @@ function generateQuestionOptions() {
     return optionsHTML;
 }
 
-/**
- * generateAllQuestionOptions():
- *   - Return <option> tags for all questions that have *discrete* answers
- *   - (radio, dropdown, checkbox)
- */
 function generateAllQuestionOptions() {
     var optionsHTML='';
     var qBlocks= document.querySelectorAll('.question-block');
@@ -702,11 +678,6 @@ function generateAllQuestionOptions() {
     return optionsHTML;
 }
 
-/**
- * generateMoneyQuestionOptions():
- *   - Return <option> tags for only "money"-type questions,
- *     used for multi-term equation building
- */
 function generateMoneyQuestionOptions() {
     var optionsHTML='';
     var qBlocks= document.querySelectorAll('.question-block');
@@ -725,29 +696,14 @@ function generateMoneyQuestionOptions() {
     return optionsHTML;
 }
 
-/**
- * If user re-orders or modifies questions, call updateAutofillOptions()
- *  to refresh references in the hidden fields
- */
 function updateAutofillOptions() {
     var hiddenBlocks = document.querySelectorAll('.hidden-field-block');
     hiddenBlocks.forEach(function(block){
         var hid= block.id.replace('hiddenFieldBlock','');
         var ft= document.getElementById('hiddenFieldType'+hid).value;
 
-        // if text => refresh "Autofill from question" + conditions
+        // if text => refresh conditions
         if(ft==='text'){
-            var autofillSelect= document.getElementById('hiddenFieldAutofill'+hid);
-            if(autofillSelect){
-                var prevVal= autofillSelect.value;
-                autofillSelect.innerHTML=`
-                  <option value="">-- Select a question --</option>
-                  ${generateQuestionOptions()}
-                `;
-                if([].slice.call(autofillSelect.options).some(function(opt){return opt.value===prevVal;})){
-                    autofillSelect.value= prevVal;
-                }
-            }
             var condDiv= document.getElementById('conditionalAutofill'+hid);
             if(condDiv){
                 var crows= condDiv.querySelectorAll('.condition');
