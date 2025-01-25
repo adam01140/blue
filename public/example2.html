@@ -30,7 +30,7 @@
     <section>
     <div id="box">
         <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1"><label><h3>What is your age?</h3></label><input type="number" id="What_is_your_age?" name="What_is_your_age?" min="0" step="0.01" placeholder="Enter amount"><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><h2>Section 2</h2><div id="question-container-2"><label><h3>What is your favorite number?</h3></label><input type="number" id="What_is_your_favorite_number?" name="What_is_your_favorite_number?" min="0" step="0.01" placeholder="Enter amount"><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(1)">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields" style="display:none;">
-<div style="display:none;">   <label class="checkbox-label">       <input type="checkbox" id="over" name="over" >       over   </label></div>
+<input type="text" id="total" name="total" placeholder="total">
 </div></form>
 <div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
 </div>
@@ -41,9 +41,7 @@
 </footer>
 
 <script>
-    // -----------------------------------------
-    // Firebase initialization (if used)
-    // -----------------------------------------
+    // Firebase init if needed
     const firebaseConfig = {
         apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
         authDomain: "formwiz-3f4fd.firebaseapp.com",
@@ -58,103 +56,83 @@
     const urlParams = new URLSearchParams(window.location.search);
     const formId = urlParams.get("formId");
     let userId = null;
-
-    firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-            userId = user.uid;
-        } else {
-            console.log("User not logged in.");
-            window.location.href = "account.html";
+    firebase.auth().onAuthStateChanged(function(user){
+        if(user){ userId=user.uid;} else {
+           console.log("User not logged in.");
+           window.location.href="account.html";
         }
     });
 
-    // questionNameIds used for logic & jump
     var questionNameIds = {"1":"What_is_your_age?","2":"What_is_your_favorite_number?"};
     var jumpLogics = [];
     var conditionalPDFs = [];
     var conditionalAlerts = [];
-
-    function handleNext(currentSection) {
-        var nextSection = currentSection + 1;
-        var relevantJumps = [];
-        for(var i=0; i<jumpLogics.length; i++){
-            if(jumpLogics[i].section == currentSection){
-                relevantJumps.push(jumpLogics[i]);
-            }
+    function handleNext(currentSection){
+        var nextSection=currentSection+1;
+        var relevantJumps=[];
+        for(var i=0;i<jumpLogics.length;i++){
+            if(jumpLogics[i].section==currentSection){ relevantJumps.push(jumpLogics[i]);}
         }
-        for(var j=0; j<relevantJumps.length; j++){
-            var jlogic = relevantJumps[j];
-            var questionId = jlogic.questionId;
-            var questionType = jlogic.questionType;
-            var jumpOption = jlogic.jumpOption;
-            var jumpTo = jlogic.jumpTo;
-            var nameId = questionNameIds[questionId] || ("answer" + questionId);
-
-            if(questionType === "radio" || questionType === "dropdown"){
-                var el = document.getElementById(nameId);
-                if(el && el.value && el.value.trim().toLowerCase() === jumpOption.trim().toLowerCase()){
-                    nextSection = jumpTo;
-                    break;
+        for(var j=0;j<relevantJumps.length;j++){
+            var jl=relevantJumps[j];
+            var qId= jl.questionId;
+            var qType= jl.questionType;
+            var jOpt= jl.jumpOption;
+            var jTo= jl.jumpTo;
+            var nmId= questionNameIds[qId]||("answer"+qId);
+            if(qType==="radio"||qType==="dropdown"){
+                var el=document.getElementById(nmId);
+                if(el && el.value.trim().toLowerCase()=== jOpt.trim().toLowerCase()){
+                    nextSection=jTo; break;
                 }
-            } else if(questionType === "checkbox"){
-                var cbs = document.querySelectorAll('input[id^="answer' + questionId + '_"]');
+            } else if(qType==="checkbox"){
+                var cbs=document.querySelectorAll('input[id^="answer'+qId+'_"]');
                 if(cbs && cbs.length){
-                    var chosen = [];
-                    for(var c=0; c<cbs.length; c++){
-                        if(cbs[c].checked){
-                            chosen.push(cbs[c].value.trim().toLowerCase());
-                        }
-                    }
-                    if(chosen.indexOf(jumpOption.trim().toLowerCase()) !== -1){
-                        nextSection = jumpTo;
-                        break;
-                    }
+                    var chosen=[];
+                    for(var c=0;c<cbs.length;c++){ if(cbs[c].checked){ chosen.push(cbs[c].value.trim().toLowerCase());}}
+                    if(chosen.indexOf(jOpt.trim().toLowerCase())!==-1){ nextSection=jTo; break;}
                 }
             }
         }
         navigateSection(nextSection);
         runAllHiddenCheckboxCalculations();
+        runAllHiddenTextCalculations();
     }
 
-    function navigateSection(sectionNumber) {
-        var sections = document.querySelectorAll(".section");
-        for(var i=0; i<sections.length; i++){
-            sections[i].classList.remove("active");
-        }
-        var target = document.getElementById("section" + sectionNumber);
-        if(target){
-            target.classList.add("active");
-        } else {
-            // if user typed end or invalid
-            sections[sections.length - 1].classList.add("active");
+    function navigateSection(sectionNumber){
+        var sections=document.querySelectorAll(".section");
+        for(var i=0;i<sections.length;i++){ sections[i].classList.remove("active");}
+        var target=document.getElementById("section"+sectionNumber);
+        if(target){ target.classList.add("active");} else{
+            sections[sections.length-1].classList.add("active");
         }
     }
 
-    function setCurrentDate() {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, "0");
-        var mm = String(today.getMonth() + 1).padStart(2, "0");
-        var yyyy = today.getFullYear();
-        today = yyyy + "-" + mm + "-" + dd;
-        document.getElementById("current_date").value = today;
+    function setCurrentDate(){
+        var today=new Date();
+        var dd=String(today.getDate()).padStart(2,"0");
+        var mm=String(today.getMonth()+1).padStart(2,"0");
+        var yyyy=today.getFullYear();
+        var val= yyyy+"-"+mm+"-"+dd;
+        document.getElementById("current_date").value= val;
     }
-    window.onload = function() {
+    window.onload=function(){
         setCurrentDate();
         attachCalculationListeners();
     };
 
-    function handleConditionalAlerts() {
-        for(var i=0; i<conditionalAlerts.length; i++){
-            var obj = conditionalAlerts[i];
-            var prevQ = document.getElementById("answer" + obj.prevQuestionId);
-            if(prevQ){
-                if(prevQ.value.trim().toLowerCase() === obj.prevAnswer.trim().toLowerCase()){
+    function handleConditionalAlerts(){
+        for(var i=0;i<conditionalAlerts.length;i++){
+            var obj= conditionalAlerts[i];
+            var prevQEl= document.getElementById("answer"+obj.prevQuestionId);
+            if(prevQEl){
+                if(prevQEl.value.trim().toLowerCase()=== obj.prevAnswer.trim().toLowerCase()){
                     alert(obj.alertText);
                 }
             } else {
-                var cbs = document.querySelectorAll('[name^="answer' + obj.prevQuestionId + '_"]');
-                for(var c=0; c<cbs.length; c++){
-                    if(cbs[c].checked && cbs[c].value.trim().toLowerCase() === obj.prevAnswer.trim().toLowerCase()){
+                var cbs= document.querySelectorAll('[name^="answer'+obj.prevQuestionId+'_"]');
+                for(var x=0;x<cbs.length;x++){
+                    if(cbs[x].checked && cbs[x].value.trim().toLowerCase()=== obj.prevAnswer.trim().toLowerCase()){
                         alert(obj.alertText);
                     }
                 }
@@ -162,165 +140,216 @@
         }
     }
 
-    function showThankYouMessage() {
-        var pdfName = "test.pdf".replace(".pdf", "");
+    function showThankYouMessage(){
+        var pdfName="test.pdf".replace(".pdf","");
         editAndDownloadPDF(pdfName).then(function(){
-            for(var i=0; i<conditionalPDFs.length; i++){
-                var pdfObj = conditionalPDFs[i];
-                if(pdfObj.questionType === "checkbox"){
-                    var cbox = document.getElementById(pdfObj.questionNameId);
-                    if(cbox && cbox.checked && cbox.value === pdfObj.conditionalAnswer){
+            // handle conditional PDFs
+            for(var i=0;i<conditionalPDFs.length;i++){
+                var pdfObj= conditionalPDFs[i];
+                if(pdfObj.questionType==="checkbox"){
+                    var cbox= document.getElementById(pdfObj.questionNameId);
+                    if(cbox && cbox.checked && cbox.value=== pdfObj.conditionalAnswer){
                         editAndDownloadPDF(pdfObj.pdfName.replace(".pdf",""));
                     }
                 } else {
-                    var val = "";
-                    var valEl = document.getElementById(pdfObj.questionNameId);
-                    if(valEl){ val = valEl.value; }
-                    if(val === pdfObj.conditionalAnswer){
+                    var valEl= document.getElementById(pdfObj.questionNameId);
+                    var val2= valEl? valEl.value : "";
+                    if(val2=== pdfObj.conditionalAnswer){
                         editAndDownloadPDF(pdfObj.pdfName.replace(".pdf",""));
                     }
                 }
             }
             handleConditionalAlerts();
-            document.getElementById("customForm").style.display = "none";
-            document.getElementById("thankYouMessage").style.display = "block";
+            document.getElementById("customForm").style.display="none";
+            document.getElementById("thankYouMessage").style.display="block";
         });
         return false;
     }
 
-    function downloadPDF(url, filename) {
-        var a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        a.click();
+    function downloadPDF(url, filename){
+        var link=document.createElement("a");
+        link.href=url;
+        link.download=filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
-    async function editAndDownloadPDF(pdfName) {
-        var formData = new FormData();
-        var inputs = document.querySelectorAll("#questions input, #questions select, #questions textarea");
-        for(var i=0; i<inputs.length; i++){
-            var inp = inputs[i];
-            if(inp.type === "checkbox"){
-                formData.append(inp.name, inp.checked ? "Yes" : "No");
+    async function editAndDownloadPDF(pdfName){
+        var formData=new FormData();
+        var inputs=document.querySelectorAll("#questions input, #questions select, #questions textarea");
+        for(var i=0;i<inputs.length;i++){
+            var inp= inputs[i];
+            if(inp.type==="checkbox"){
+                formData.append(inp.name, inp.checked?"Yes":"No");
             } else {
                 formData.append(inp.name, inp.value);
             }
         }
-        return fetch("/edit_pdf?pdf=" + pdfName, { method: "POST", body: formData })
-            .then(function(res){ return res.blob(); })
+        return fetch("/edit_pdf?pdf="+pdfName,{method:"POST", body:formData})
+            .then(function(res){return res.blob();})
             .then(function(blob){
-                var url = URL.createObjectURL(blob);
-                downloadPDF(url, "Edited_" + pdfName + ".pdf");
+                var url=URL.createObjectURL(blob);
+                downloadPDF(url,"Edited_"+pdfName+".pdf");
             });
     }
 
     /***********************************************
      * Hidden Checkbox Calculations
      ***********************************************/
-    var hiddenCheckboxCalculations = [{"hiddenFieldName":"over","calculations":[{"questionNameId1":"What_is_your_age?","mathOp":"+","questionNameId2":"What_is_your_favorite_number?","operator":">","threshold":"100","result":"checked"}]}];
+    var hiddenCheckboxCalculations = [];
+    var hiddenTextCalculations = [{"hiddenFieldName":"total","calculations":[{"terms":[{"operator":"","questionNameId":"What_is_your_age?"}],"compareOperator":"=","threshold":"21","fillValue":"bruh"}]}];
 
     // Evaluate all calculations at once
-    function runAllHiddenCheckboxCalculations() {
-        if(!hiddenCheckboxCalculations || hiddenCheckboxCalculations.length === 0) return;
-        for(var i=0; i<hiddenCheckboxCalculations.length; i++){
+    function runAllHiddenCheckboxCalculations(){
+        if(!hiddenCheckboxCalculations || hiddenCheckboxCalculations.length===0) return;
+        for(var i=0;i<hiddenCheckboxCalculations.length;i++){
             runSingleHiddenCheckboxCalculation(hiddenCheckboxCalculations[i]);
         }
     }
-
-    // Evaluate one hidden checkbox's calculations
-    function runSingleHiddenCheckboxCalculation(calcObj) {
+    function runSingleHiddenCheckboxCalculation(calcObj){
         // calcObj = {
         //   hiddenFieldName: "someCheckboxName",
         //   calculations: [
-        //       {
-        //         questionNameId1,
-        //         mathOp,
-        //         questionNameId2,
-        //         operator, // =, <, >
-        //         threshold,
-        //         result // "checked" or "unchecked"
-        //       }
+        //     {
+        //       terms: [...],
+        //       compareOperator:'=',
+        //       threshold:'100',
+        //       result:'checked'
+        //     }
         //   ]
         // }
-        var hiddenCheckbox = document.getElementById(calcObj.hiddenFieldName);
-        if(!hiddenCheckbox) return;
-
-        // last matching condition wins
-        var finalState = hiddenCheckbox.checked;
-        for(var c=0; c<calcObj.calculations.length; c++){
-            var cond = calcObj.calculations[c];
-
-            // read question1
-            var val1 = 0;
-            if(cond.questionNameId1) {
-                var qEl1 = document.getElementById(cond.questionNameId1);
-                if(qEl1) {
-                    val1 = parseFloat(qEl1.value) || 0;
-                }
-            }
-            // read question2 if mathOp
-            var val2 = 0;
-            if(cond.mathOp && cond.questionNameId2) {
-                var qEl2 = document.getElementById(cond.questionNameId2);
-                if(qEl2){
-                    val2 = parseFloat(qEl2.value) || 0;
-                }
-            }
-            // compute combinedVal
-            var combinedVal = val1;
-            if(cond.mathOp === '+') {
-                combinedVal = val1 + val2;
-            } else if(cond.mathOp === '-') {
-                combinedVal = val1 - val2;
-            } else if(cond.mathOp === 'x') {
-                combinedVal = val1 * val2;
-            } else if(cond.mathOp === '/') {
-                if(val2 !== 0) {
-                    combinedVal = val1 / val2;
-                } else {
-                    combinedVal = 0; // or Infinity? 
-                }
-            }
-
-            // compare combinedVal with threshold
-            var thresholdNum = parseFloat(cond.threshold) || 0;
-            var isMatch = false;
-            if(cond.operator === '=') {
-                isMatch = (combinedVal === thresholdNum);
-            } else if(cond.operator === '<') {
-                isMatch = (combinedVal < thresholdNum);
-            } else if(cond.operator === '>') {
-                isMatch = (combinedVal > thresholdNum);
-            }
-
-            if(isMatch){
-                finalState = (cond.result === "checked");
-            }
-        }
-        hiddenCheckbox.checked = finalState;
-    }
-
-    function attachCalculationListeners() {
-        if(!hiddenCheckboxCalculations) return;
-        for(var i=0; i<hiddenCheckboxCalculations.length; i++){
-            var calcObj = hiddenCheckboxCalculations[i];
-            for(var j=0; j<calcObj.calculations.length; j++){
-                var c = calcObj.calculations[j];
-                // questionNameId1
-                if(c.questionNameId1) {
-                    var qEl1 = document.getElementById(c.questionNameId1);
-                    if(qEl1){
-                        qEl1.addEventListener("change", function(){
-                            runAllHiddenCheckboxCalculations();
-                        });
+        var cbox= document.getElementById(calcObj.hiddenFieldName);
+        if(!cbox) return;
+        var finalState= cbox.checked;
+        for(var c=0;c<calcObj.calculations.length;c++){
+            var oneCalc= calcObj.calculations[c];
+            // compute eq left->right
+            var val=0;
+            if(oneCalc.terms && oneCalc.terms.length>0){
+                // first term
+                val= parseFloat( getMoneyValue(oneCalc.terms[0].questionNameId) )||0;
+                for(var t=1; t<oneCalc.terms.length; t++){
+                    var term = oneCalc.terms[t];
+                    var op= term.operator||'';
+                    var nextVal= parseFloat(getMoneyValue(term.questionNameId))||0;
+                    if(op==='+') val= val+ nextVal;
+                    else if(op==='-') val= val- nextVal;
+                    else if(op==='x') val= val* nextVal;
+                    else if(op==='/'){
+                        if(nextVal!==0) val=val/ nextVal;
+                        else val=0; // or Infinity
                     }
                 }
-                // questionNameId2
-                if(c.questionNameId2) {
-                    var qEl2 = document.getElementById(c.questionNameId2);
-                    if(qEl2){
-                        qEl2.addEventListener("change", function(){
-                            runAllHiddenCheckboxCalculations();
-                        });
+            }
+            var thr= parseFloat(oneCalc.threshold)||0;
+            var matched=false;
+            if(oneCalc.compareOperator==='=') matched=(val===thr);
+            else if(oneCalc.compareOperator==='<') matched=(val<thr);
+            else if(oneCalc.compareOperator==='>') matched=(val>thr);
+            if(matched){
+                finalState=(oneCalc.result==='checked');
+            }
+        }
+        cbox.checked= finalState;
+    }
+
+    /***********************************************
+     * Hidden Text Calculations
+     ***********************************************/
+    function runAllHiddenTextCalculations(){
+        if(!hiddenTextCalculations || hiddenTextCalculations.length===0) return;
+        for(var i=0;i<hiddenTextCalculations.length;i++){
+            runSingleHiddenTextCalculation(hiddenTextCalculations[i]);
+        }
+    }
+    function runSingleHiddenTextCalculation(calcObj){
+        // calcObj= {
+        //   hiddenFieldName: "someTextField",
+        //   calculations: [
+        //     {
+        //       terms:[{operator:'', questionNameId:'Q1'}, {...}],
+        //       compareOperator:'=',
+        //       threshold:'100',
+        //       fillValue:'some text'
+        //     }
+        //   ]
+        // }
+        var textField= document.getElementById(calcObj.hiddenFieldName);
+        if(!textField) return;
+        // If multiple calculations exist, last match wins
+        var finalValue= textField.value; // or '' 
+        for(var c=0;c<calcObj.calculations.length;c++){
+            var oneCalc= calcObj.calculations[c];
+            var val=0;
+            if(oneCalc.terms && oneCalc.terms.length>0){
+                val= parseFloat(getMoneyValue(oneCalc.terms[0].questionNameId))||0;
+                for(var t=1; t<oneCalc.terms.length; t++){
+                    var term= oneCalc.terms[t];
+                    var op= term.operator||'';
+                    var nextVal= parseFloat(getMoneyValue(term.questionNameId))||0;
+                    if(op==='+') val= val+ nextVal;
+                    else if(op==='-') val= val- nextVal;
+                    else if(op==='x') val= val* nextVal;
+                    else if(op==='/'){
+                        if(nextVal!==0) val= val/ nextVal;
+                        else val=0; // or Infinity
+                    }
+                }
+            }
+            var thr= parseFloat(oneCalc.threshold)||0;
+            var matched=false;
+            if(oneCalc.compareOperator==='=') matched=(val===thr);
+            else if(oneCalc.compareOperator==='<') matched=(val<thr);
+            else if(oneCalc.compareOperator==='>') matched=(val>thr);
+
+            if(matched){
+                finalValue= oneCalc.fillValue || '';
+            }
+        }
+        textField.value= finalValue;
+    }
+
+    function getMoneyValue(qId){
+        var el= document.getElementById(qId);
+        if(!el) return 0;
+        return el.value;
+    }
+
+    // attach listeners
+    function attachCalculationListeners(){
+        if(hiddenCheckboxCalculations){
+            for(var i=0;i<hiddenCheckboxCalculations.length;i++){
+                var cObj= hiddenCheckboxCalculations[i];
+                for(var c=0;c<cObj.calculations.length;c++){
+                    var oneCalc= cObj.calculations[c];
+                    var terms= oneCalc.terms||[];
+                    for(var t=0;t<terms.length;t++){
+                        var qNameId= terms[t].questionNameId;
+                        var el2= document.getElementById(qNameId);
+                        if(el2){
+                            el2.addEventListener('change', function(){
+                                runAllHiddenCheckboxCalculations();
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        if(hiddenTextCalculations){
+            for(var i2=0;i2<hiddenTextCalculations.length;i2++){
+                var txtObj= hiddenTextCalculations[i2];
+                for(var c2=0;c2<txtObj.calculations.length;c2++){
+                    var oneCalc2= txtObj.calculations[c2];
+                    var terms2= oneCalc2.terms||[];
+                    for(var t2=0;t2<terms2.length;t2++){
+                        var qNameId2= terms2[t2].questionNameId;
+                        var el3= document.getElementById(qNameId2);
+                        if(el3){
+                            el3.addEventListener('change', function(){
+                                runAllHiddenTextCalculations();
+                            });
+                        }
                     }
                 }
             }
