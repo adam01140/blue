@@ -1,14 +1,25 @@
 /************************************************
- * hidden.js - Full version with new Calculations
+ * hidden.js - Full version supporting multi-term 
+ * equations for hidden checkbox calculations:
+ *   If [Q1] + [Q2] - [Q3] x [Q4] / [Q5] ... = threshold
  ************************************************/
 
 /**
- * Initializes the hidden PDF fields module on page load.
- * (If you already call this from gui.js, remove or adapt.)
+ * Initializes the hidden PDF fields module on page load
+ * (Inserts 'Add Hidden Field' button so user can do so from scratch).
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    initializeHiddenPDFFieldsModule();
+});
+
+/** 
+ * Creates a container for hidden fields, plus 'Add Hidden Field' button.
  */
 function initializeHiddenPDFFieldsModule() {
-    const formBuilder = document.getElementById('formBuilder');
-    const hiddenFieldsModule = document.createElement('div');
+    var formBuilder = document.getElementById('formBuilder');
+    if (!formBuilder) return;
+
+    var hiddenFieldsModule = document.createElement('div');
     hiddenFieldsModule.id = 'hiddenFieldsModule';
     hiddenFieldsModule.innerHTML = `
         <h2>Form Editor</h2>
@@ -19,17 +30,22 @@ function initializeHiddenPDFFieldsModule() {
     formBuilder.appendChild(hiddenFieldsModule);
 }
 
-/**
- * Adds a new (empty) hidden field block for the user to fill in.
- */
-let hiddenFieldCounter = 1; // Make sure this is tracked globally or adapt to your code
-function addHiddenField() {
-    const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
-    const hiddenFieldBlock = document.createElement('div');
-    const currentHiddenFieldId = hiddenFieldCounter;
+var hiddenFieldCounter = 1; // Keep track globally
 
+/**
+ * Adds a new empty hidden field block to the #hiddenFieldsContainer
+ */
+function addHiddenField() {
+    var hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
+    if(!hiddenFieldsContainer) return;
+
+    var currentHiddenFieldId = hiddenFieldCounter;
+    hiddenFieldCounter++;
+
+    var hiddenFieldBlock = document.createElement('div');
     hiddenFieldBlock.className = 'hidden-field-block';
-    hiddenFieldBlock.id = `hiddenFieldBlock${currentHiddenFieldId}`;
+    hiddenFieldBlock.id = 'hiddenFieldBlock' + currentHiddenFieldId;
+
     hiddenFieldBlock.innerHTML = `
         <label>Hidden Field ${currentHiddenFieldId}: </label>
         <select id="hiddenFieldType${currentHiddenFieldId}" onchange="toggleHiddenFieldOptions(${currentHiddenFieldId})">
@@ -37,44 +53,39 @@ function addHiddenField() {
             <option value="checkbox">Checkbox</option>
         </select><br><br>
         <div id="hiddenFieldOptions${currentHiddenFieldId}">
-            <!-- Options will be populated based on the type -->
+            <!-- Options populated by toggleHiddenFieldOptions(...) -->
         </div>
         <button type="button" onclick="removeHiddenField(${currentHiddenFieldId})">Remove Hidden Field</button>
         <hr>
     `;
-    hiddenFieldsContainer.appendChild(hiddenFieldBlock);
 
-    // Initialize sub-options
+    hiddenFieldsContainer.appendChild(hiddenFieldBlock);
     toggleHiddenFieldOptions(currentHiddenFieldId);
-    hiddenFieldCounter++;
 }
 
 /**
- * Removes a hidden-field block by ID.
+ * Removes a hidden field block by ID
  */
 function removeHiddenField(hiddenFieldId) {
-    const hiddenFieldBlock = document.getElementById(`hiddenFieldBlock${hiddenFieldId}`);
-    if (hiddenFieldBlock) {
-        hiddenFieldBlock.remove();
-    }
+    var block = document.getElementById('hiddenFieldBlock' + hiddenFieldId);
+    if(block) block.remove();
 }
 
 /**
- * Toggles the sub-options (textbox vs. checkbox) for a hidden field.
- * Shows the appropriate UI and logic controls.
+ * Toggles sub-options for a hidden field based on text vs. checkbox
  */
 function toggleHiddenFieldOptions(hiddenFieldId) {
-    const fieldType = document.getElementById(`hiddenFieldType${hiddenFieldId}`).value;
-    const hiddenFieldOptions = document.getElementById(`hiddenFieldOptions${hiddenFieldId}`);
+    var fieldType = document.getElementById('hiddenFieldType' + hiddenFieldId).value;
+    var optsDiv = document.getElementById('hiddenFieldOptions' + hiddenFieldId);
 
-    hiddenFieldOptions.innerHTML = '';
+    optsDiv.innerHTML = '';
 
-    if (fieldType === 'text') {
-        hiddenFieldOptions.innerHTML = `
+    if(fieldType === 'text') {
+        optsDiv.innerHTML = `
             <label>Name/ID: </label>
             <input type="text" id="hiddenFieldName${hiddenFieldId}" placeholder="Enter field name"><br><br>
             <label>Autofill from question:</label><br>
-            <select id="hiddenFieldAutofill${hiddenFieldId}" style="width: 300px;">
+            <select id="hiddenFieldAutofill${hiddenFieldId}" style="width:300px;">
                 <option value="">-- Select a question --</option>
                 ${generateQuestionOptions()}
             </select><br><br>
@@ -82,16 +93,17 @@ function toggleHiddenFieldOptions(hiddenFieldId) {
             <div id="conditionalAutofill${hiddenFieldId}"></div>
             <button type="button" onclick="addConditionalAutofill(${hiddenFieldId})">Add Conditional Logic</button><br><br>
         `;
-    } else if (fieldType === 'checkbox') {
-        hiddenFieldOptions.innerHTML = `
+    }
+    else if(fieldType === 'checkbox') {
+        optsDiv.innerHTML = `
             <label>Name/ID: </label>
             <input type="text" id="hiddenFieldName${hiddenFieldId}" placeholder="Enter field name"><br><br>
 
-            <!-- Add Calculation button -->
+            <!-- Multi-term Calculation -->
             <button type="button" onclick="addCalculationForCheckbox(${hiddenFieldId})">Add Calculation</button>
             <div id="calculationBlock${hiddenFieldId}"></div><br>
 
-            <label>Checked by default: </label>
+            <label>Checked by default:</label>
             <input type="checkbox" id="hiddenFieldChecked${hiddenFieldId}"><br><br>
 
             <label>Conditional Autofill Logic:</label><br>
@@ -102,227 +114,267 @@ function toggleHiddenFieldOptions(hiddenFieldId) {
 }
 
 /**
- * When loading from JSON, reconstruct a hidden field from data.
- * (This is called instead of addHiddenField() so we can fill in the details.)
+ * If JSON is loaded, we call addHiddenFieldWithData(...) 
+ * to re-insert hidden fields with their existing logic
  */
 function addHiddenFieldWithData(hiddenField) {
-    const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
-    const hiddenFieldBlock = document.createElement('div');
-    const currentHiddenFieldId = hiddenField.hiddenFieldId;
+    var hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
+    var currentHiddenFieldId = hiddenField.hiddenFieldId;
 
-    hiddenFieldBlock.className = 'hidden-field-block';
-    hiddenFieldBlock.id = `hiddenFieldBlock${currentHiddenFieldId}`;
-    hiddenFieldBlock.innerHTML = `
+    var block = document.createElement('div');
+    block.className = 'hidden-field-block';
+    block.id = 'hiddenFieldBlock' + currentHiddenFieldId;
+
+    block.innerHTML = `
         <label>Hidden Field ${currentHiddenFieldId}: </label>
         <select id="hiddenFieldType${currentHiddenFieldId}" onchange="toggleHiddenFieldOptions(${currentHiddenFieldId})">
             <option value="text" ${hiddenField.type === 'text' ? 'selected' : ''}>Textbox</option>
             <option value="checkbox" ${hiddenField.type === 'checkbox' ? 'selected' : ''}>Checkbox</option>
         </select><br><br>
         <div id="hiddenFieldOptions${currentHiddenFieldId}">
-            <!-- Options will be populated based on the type -->
         </div>
         <button type="button" onclick="removeHiddenField(${currentHiddenFieldId})">Remove Hidden Field</button>
         <hr>
     `;
-    hiddenFieldsContainer.appendChild(hiddenFieldBlock);
+    hiddenFieldsContainer.appendChild(block);
 
-    // Initialize sub-options
+    // Force the sub-options to appear
     toggleHiddenFieldOptions(currentHiddenFieldId);
 
-    // Fill in name
-    document.getElementById(`hiddenFieldName${currentHiddenFieldId}`).value = hiddenField.name || '';
+    // Fill the name
+    var nmInput = document.getElementById('hiddenFieldName' + currentHiddenFieldId);
+    if(nmInput) nmInput.value = hiddenField.name || '';
 
-    if (hiddenField.type === 'checkbox') {
-        // checked by default
-        document.getElementById(`hiddenFieldChecked${currentHiddenFieldId}`).checked = !!hiddenField.checked;
+    if(hiddenField.type === 'checkbox') {
+        var checkEl = document.getElementById('hiddenFieldChecked' + currentHiddenFieldId);
+        if(checkEl) checkEl.checked = !!hiddenField.checked;
 
-        // If we have conditions
-        if (hiddenField.conditions && hiddenField.conditions.length > 0) {
-            hiddenField.conditions.forEach((condition, index) => {
+        // Conditions
+        if(hiddenField.conditions && hiddenField.conditions.length > 0) {
+            for(var cIdx=0; cIdx<hiddenField.conditions.length; cIdx++){
                 addConditionalAutofillForCheckbox(currentHiddenFieldId);
-                const conditionId = index + 1;
-                document.getElementById(`conditionQuestion${currentHiddenFieldId}_${conditionId}`).value = condition.questionId;
-                updateConditionAnswers(currentHiddenFieldId, conditionId);
-                document.getElementById(`conditionAnswer${currentHiddenFieldId}_${conditionId}`).value = condition.answerValue;
-                document.getElementById(`conditionValue${currentHiddenFieldId}_${conditionId}`).value = condition.autofillValue;
-            });
+                var cond = hiddenField.conditions[cIdx];
+                var condId = cIdx + 1;
+                var qSel = document.getElementById('conditionQuestion' + currentHiddenFieldId + '_' + condId);
+                var ansSel = document.getElementById('conditionAnswer' + currentHiddenFieldId + '_' + condId);
+                var valSel = document.getElementById('conditionValue' + currentHiddenFieldId + '_' + condId);
+
+                if(qSel) qSel.value = cond.questionId;
+                updateConditionAnswers(currentHiddenFieldId, condId); // refresh answer list
+                if(ansSel) ansSel.value = cond.answerValue;
+                if(valSel) valSel.value = cond.autofillValue;
+            }
         }
 
-        // If we have calculations
-        if (hiddenField.calculations && hiddenField.calculations.length > 0) {
-            hiddenField.calculations.forEach((calcObj, index) => {
+        // Multi-term Calculations
+        if(hiddenField.calculations && hiddenField.calculations.length > 0) {
+            for(var z=0; z<hiddenField.calculations.length; z++){
                 addCalculationForCheckbox(currentHiddenFieldId);
-                const calcId = index + 1;
-                document.getElementById(`calcQuestion${currentHiddenFieldId}_${calcId}`).value = calcObj.questionNameId || calcObj.questionId;
-                document.getElementById(`calcOperator${currentHiddenFieldId}_${calcId}`).value = calcObj.operator;
-                document.getElementById(`calcThreshold${currentHiddenFieldId}_${calcId}`).value = calcObj.threshold;
-                document.getElementById(`calcResult${currentHiddenFieldId}_${calcId}`).value = calcObj.result;
-            });
-        }
+                var calcId = z + 1; 
+                var cObj = hiddenField.calculations[z];
+                // cObj is { terms: [ { questionNameId, operator: '+', etc }, ... ],
+                //           compareOperator: '=', threshold: '100', result: 'checked' }
 
-    } else if (hiddenField.type === 'text') {
-        // If we have an autofill question
-        if (hiddenField.autofillQuestionId) {
-            const autofillSelect = document.getElementById(`hiddenFieldAutofill${currentHiddenFieldId}`);
-            autofillSelect.value = hiddenField.autofillQuestionId;
-        }
+                // We'll fill them in
+                var eqContainerId = 'equationContainer' + currentHiddenFieldId + '_' + calcId;
+                var eqContainer = document.getElementById(eqContainerId);
+                if(!eqContainer) continue;
 
-        // If conditions
-        if (hiddenField.conditions && hiddenField.conditions.length > 0) {
-            hiddenField.conditions.forEach((condition, index) => {
+                // remove the initial default term block(s)
+                eqContainer.innerHTML = '';
+                // We'll re-create each term with "addEquationTerm(...)"
+                // Then after we have them, fill them in with data
+
+                // For example: cObj.terms might be an array of objects:
+                // [ {questionNameId: 'Q1'}, {operator: '+', questionNameId: 'Q2'}, {operator: '-', questionNameId: 'Q3'}, ...]
+                // We'll reconstruct them:
+
+                for(var t=0; t<cObj.terms.length; t++){
+                    addEquationTerm(currentHiddenFieldId, calcId);
+
+                    var slotId = t + 1; 
+                    var termObj = cObj.terms[t];
+                    // question select
+                    var qSelId = 'calcTermQuestion' + currentHiddenFieldId + '_' + calcId + '_' + slotId;
+                    var qSelEl = document.getElementById(qSelId);
+                    if(qSelEl) qSelEl.value = termObj.questionNameId || '';
+
+                    // operator select 
+                    if(t>0) {
+                        var opSelId = 'calcTermOperator' + currentHiddenFieldId + '_' + calcId + '_' + slotId;
+                        var opSelEl = document.getElementById(opSelId);
+                        if(opSelEl) opSelEl.value = termObj.operator || '';
+                    }
+                }
+
+                // Now the "compare operator" select
+                var compareOpEl = document.getElementById('calcCompareOperator' + currentHiddenFieldId + '_' + calcId);
+                if(compareOpEl) compareOpEl.value = cObj.compareOperator || '=';
+
+                // threshold
+                var thrEl = document.getElementById('calcThreshold' + currentHiddenFieldId + '_' + calcId);
+                if(thrEl) thrEl.value = cObj.threshold || '';
+
+                // result
+                var resEl = document.getElementById('calcResult' + currentHiddenFieldId + '_' + calcId);
+                if(resEl) resEl.value = cObj.result || 'checked';
+            }
+        }
+    }
+    else if(hiddenField.type === 'text') {
+        if(hiddenField.autofillQuestionId) {
+            var autoSel = document.getElementById('hiddenFieldAutofill' + currentHiddenFieldId);
+            if(autoSel) autoSel.value = hiddenField.autofillQuestionId;
+        }
+        if(hiddenField.conditions && hiddenField.conditions.length > 0) {
+            for(var y=0; y<hiddenField.conditions.length; y++){
                 addConditionalAutofill(currentHiddenFieldId);
-                const conditionId = index + 1;
-                document.getElementById(`conditionQuestion${currentHiddenFieldId}_${conditionId}`).value = condition.questionId;
-                updateConditionAnswers(currentHiddenFieldId, conditionId);
-                document.getElementById(`conditionAnswer${currentHiddenFieldId}_${conditionId}`).value = condition.answerValue;
-                document.getElementById(`conditionValue${currentHiddenFieldId}_${conditionId}`).value = condition.autofillValue;
-            });
+                var con = hiddenField.conditions[y];
+                var cId = y + 1;
+                var qSel2 = document.getElementById('conditionQuestion' + currentHiddenFieldId + '_' + cId);
+                var ansSel2 = document.getElementById('conditionAnswer' + currentHiddenFieldId + '_' + cId);
+                var valSel2 = document.getElementById('conditionValue' + currentHiddenFieldId + '_' + cId);
+
+                if(qSel2) qSel2.value = con.questionId;
+                updateConditionAnswers(currentHiddenFieldId, cId);
+                if(ansSel2) ansSel2.value = con.answerValue;
+                if(valSel2) valSel2.value = con.autofillValue;
+            }
         }
     }
 }
 
 /***************************************************
- * Conditional Autofill for Text / Checkbox hidden fields
+ * Conditional Autofill for text/checkbox 
  ***************************************************/
-
-/**
- * Adds a single condition row for "hiddenField" (type = text).
- *   If question X has answer Y, then autofill hidden field with Z
- */
 function addConditionalAutofill(hiddenFieldId) {
-    const conditionalAutofillDiv = document.getElementById(`conditionalAutofill${hiddenFieldId}`);
-    const conditionId = conditionalAutofillDiv.children.length + 1;
+    var parentDiv = document.getElementById('conditionalAutofill' + hiddenFieldId);
+    var nextIndex = parentDiv.children.length + 1;
 
-    const conditionDiv = document.createElement('div');
-    conditionDiv.className = 'condition';
-    conditionDiv.id = `condition${hiddenFieldId}_${conditionId}`;
-    conditionDiv.innerHTML = `
-        <label>Condition ${conditionId}:</label><br>
+    var condDiv = document.createElement('div');
+    condDiv.className = 'condition';
+    condDiv.id = 'condition' + hiddenFieldId + '_' + nextIndex;
+    condDiv.innerHTML = `
+        <label>Condition ${nextIndex}:</label><br>
         <label>Question:</label>
-        <select id="conditionQuestion${hiddenFieldId}_${conditionId}" onchange="updateConditionAnswers(${hiddenFieldId}, ${conditionId})" style="width: 300px;">
+        <select id="conditionQuestion${hiddenFieldId}_${nextIndex}" onchange="updateConditionAnswers(${hiddenFieldId}, ${nextIndex})" style="width: 300px;">
             <option value="">-- Select a question --</option>
             ${generateAllQuestionOptions()}
         </select><br>
         <label>Answer:</label>
-        <select id="conditionAnswer${hiddenFieldId}_${conditionId}" style="width: 300px;">
+        <select id="conditionAnswer${hiddenFieldId}_${nextIndex}" style="width: 300px;">
             <option value="">-- Select an answer --</option>
         </select><br>
         <label>Value to Autofill:</label>
-        <input type="text" id="conditionValue${hiddenFieldId}_${conditionId}" placeholder="Enter value"><br>
-        <button type="button" onclick="removeConditionalAutofill(${hiddenFieldId}, ${conditionId})">Remove Condition</button>
+        <input type="text" id="conditionValue${hiddenFieldId}_${nextIndex}" placeholder="Enter value"><br>
+        <button type="button" onclick="removeConditionalAutofill(${hiddenFieldId}, ${nextIndex})">Remove Condition</button>
         <hr>
     `;
-    conditionalAutofillDiv.appendChild(conditionDiv);
+    parentDiv.appendChild(condDiv);
 }
 
-/**
- * Removes one condition row from a text hidden field
- */
 function removeConditionalAutofill(hiddenFieldId, conditionId) {
-    const conditionDiv = document.getElementById(`condition${hiddenFieldId}_${conditionId}`);
-    if (conditionDiv) {
-        conditionDiv.remove();
-    }
+    var cDiv = document.getElementById('condition' + hiddenFieldId + '_' + conditionId);
+    if(cDiv) cDiv.remove();
 }
 
-/**
- * Adds a single condition row for "hiddenField" (type = checkbox).
- *   If question X has answer Y, then check/uncheck hidden checkbox
- */
 function addConditionalAutofillForCheckbox(hiddenFieldId) {
-    const conditionalAutofillDiv = document.getElementById(`conditionalAutofillForCheckbox${hiddenFieldId}`);
-    const conditionId = conditionalAutofillDiv.children.length + 1;
+    var parentDiv = document.getElementById('conditionalAutofillForCheckbox' + hiddenFieldId);
+    var nextIndex = parentDiv.children.length + 1;
 
-    const conditionDiv = document.createElement('div');
-    conditionDiv.className = `condition${conditionId}`;
-    conditionDiv.id = `condition${hiddenFieldId}_${conditionId}`;
-    conditionDiv.innerHTML = `
-        <label>Condition ${conditionId}:</label><br>
+    var condDiv = document.createElement('div');
+    condDiv.className = 'condition' + nextIndex;
+    condDiv.id = 'condition' + hiddenFieldId + '_' + nextIndex;
+    condDiv.innerHTML = `
+        <label>Condition ${nextIndex}:</label><br>
         <label>Question:</label>
-        <select id="conditionQuestion${hiddenFieldId}_${conditionId}" onchange="updateConditionAnswers(${hiddenFieldId}, ${conditionId})" style="width: 300px;">
+        <select id="conditionQuestion${hiddenFieldId}_${nextIndex}" onchange="updateConditionAnswers(${hiddenFieldId}, ${nextIndex})" style="width: 300px;">
             <option value="">-- Select a question --</option>
             ${generateAllQuestionOptions()}
         </select><br>
         <label>Answer:</label>
-        <select id="conditionAnswer${hiddenFieldId}_${conditionId}" style="width: 300px;">
+        <select id="conditionAnswer${hiddenFieldId}_${nextIndex}" style="width: 300px;">
             <option value="">-- Select an answer --</option>
         </select><br>
         <label>Value:</label>
-        <select id="conditionValue${hiddenFieldId}_${conditionId}" style="width: 300px;">
+        <select id="conditionValue${hiddenFieldId}_${nextIndex}" style="width: 300px;">
             <option value="checked">Checked</option>
             <option value="unchecked">Unchecked</option>
         </select><br>
-        <button type="button" onclick="removeConditionalAutofill(${hiddenFieldId}, ${conditionId})">Remove Condition</button>
+        <button type="button" onclick="removeConditionalAutofill(${hiddenFieldId}, ${nextIndex})">Remove Condition</button>
         <hr>
     `;
-    conditionalAutofillDiv.appendChild(conditionDiv);
+    parentDiv.appendChild(condDiv);
 }
 
-/**
- * Updates the "Answer" dropdown for a condition row,
- * once the user picks which previous question to reference.
- */
 function updateConditionAnswers(hiddenFieldId, conditionId) {
-    const questionSelect = document.getElementById(`conditionQuestion${hiddenFieldId}_${conditionId}`);
-    const answerSelect = document.getElementById(`conditionAnswer${hiddenFieldId}_${conditionId}`);
-    const selectedQuestionId = questionSelect.value;
+    var qSel = document.getElementById('conditionQuestion' + hiddenFieldId + '_' + conditionId);
+    var ansSel = document.getElementById('conditionAnswer' + hiddenFieldId + '_' + conditionId);
+    if(!qSel || !ansSel) return;
 
-    answerSelect.innerHTML = '<option value="">-- Select an answer --</option>';
+    ansSel.innerHTML = '<option value="">-- Select an answer --</option>';
 
-    const questionBlock = document.getElementById(`questionBlock${selectedQuestionId}`);
-    if (questionBlock) {
-        const questionType = questionBlock.querySelector('select').value;
-
-        if (questionType === 'radio') {
-            answerSelect.innerHTML += `
+    var prevQId = qSel.value;
+    var block = document.getElementById('questionBlock' + prevQId);
+    if(block) {
+        var questionType = block.querySelector('select') ? block.querySelector('select').value : '';
+        if(questionType === 'radio') {
+            ansSel.innerHTML += `
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
             `;
-        } else if (questionType === 'dropdown') {
-            const options = questionBlock.querySelectorAll(`#dropdownOptions${selectedQuestionId} input`);
-            options.forEach(option => {
-                answerSelect.innerHTML += `<option value="${option.value}">${option.value}</option>`;
-            });
-        } else if (questionType === 'checkbox') {
-            const opts = questionBlock.querySelectorAll(`#checkboxOptions${selectedQuestionId} [id^="checkboxOptionText"]`);
-            opts.forEach(option => {
-                const val = option.value.trim();
-                if (val) {
-                    answerSelect.innerHTML += `<option value="${val}">${val}</option>`;
-                }
-            });
-            const noneOfTheAboveSelected = questionBlock.querySelector(`#noneOfTheAbove${selectedQuestionId}`)?.checked;
-            if (noneOfTheAboveSelected) {
-                answerSelect.innerHTML += `<option value="None of the above">None of the above</option>`;
+        }
+        else if(questionType === 'dropdown') {
+            var options = block.querySelectorAll('#dropdownOptions' + prevQId + ' input');
+            for(var i=0; i<options.length; i++){
+                var val = options[i].value.trim();
+                if(val) ansSel.innerHTML += '<option value="' + val + '">' + val + '</option>';
+            }
+        }
+        else if(questionType === 'checkbox') {
+            var cOpts = block.querySelectorAll('#checkboxOptions' + prevQId + ' [id^="checkboxOptionText"]');
+            for(var x=0; x<cOpts.length; x++){
+                var tval = cOpts[x].value.trim();
+                if(tval) ansSel.innerHTML += '<option value="' + tval + '">' + tval + '</option>';
+            }
+            var noneEl = block.querySelector('#noneOfTheAbove' + prevQId);
+            if(noneEl && noneEl.checked){
+                ansSel.innerHTML += '<option value="None of the above">None of the above</option>';
             }
         }
     }
 }
 
 /*******************************************************
- * Calculation logic for hidden checkbox fields
- * "If [money question] [= / < / >] [threshold], then [Checked/Unchecked]"
+ * Calculation for hidden checkbox
+ *   with multi-term equation building
  *******************************************************/
 
 /**
- * Adds a single "Calculation" row for a hidden checkbox.
- * e.g.  If [money question] [= / < / >] [value] then [Checked/Unchecked]
+ * When user clicks "Add Calculation" for a checkbox
+ * we create a row with:
+ *  - An "equation container" that starts with 1 money question
+ *  - A button "Add Another Term"
+ *  - Compare operator + threshold + final result
  */
 function addCalculationForCheckbox(hiddenFieldId) {
-    const calculationBlock = document.getElementById(`calculationBlock${hiddenFieldId}`);
-    const calcIndex = calculationBlock.children.length + 1;
+    var calcBlock = document.getElementById('calculationBlock' + hiddenFieldId);
+    var calcIndex = calcBlock.children.length + 1;
 
-    const row = document.createElement('div');
-    row.className = `calculation${calcIndex}`;
-    row.id = `calculationRow${hiddenFieldId}_${calcIndex}`;
+    var row = document.createElement('div');
+    row.className = 'calculation' + calcIndex;
+    row.id = 'calculationRow' + hiddenFieldId + '_' + calcIndex;
+
     row.innerHTML = `
         <label>Calculation ${calcIndex}:</label><br>
-        <label>If </label>
-        <select id="calcQuestion${hiddenFieldId}_${calcIndex}" style="width: 200px;">
-            <option value="">-- Select money question --</option>
-            ${generateMoneyQuestionOptions()}
-        </select>
-        <select id="calcOperator${hiddenFieldId}_${calcIndex}">
+
+        <!-- The equation container: we can have many terms -->
+        <div id="equationContainer${hiddenFieldId}_${calcIndex}"></div>
+        <button type="button" onclick="addEquationTerm(${hiddenFieldId}, ${calcIndex})">Add Another Term</button>
+        <br><br>
+
+        <!-- Compare operator ( = < > ), threshold, final result (checked/unchecked) -->
+        <select id="calcCompareOperator${hiddenFieldId}_${calcIndex}">
             <option value="=">=</option>
             <option value="<"><</option>
             <option value=">">></option>
@@ -333,205 +385,274 @@ function addCalculationForCheckbox(hiddenFieldId) {
             <option value="checked">Checked</option>
             <option value="unchecked">Unchecked</option>
         </select>
+
         <button type="button" onclick="removeCalculationForCheckbox(${hiddenFieldId}, ${calcIndex})">Remove</button>
         <hr>
     `;
-    calculationBlock.appendChild(row);
+
+    calcBlock.appendChild(row);
+
+    // Immediately add the first term (Term #1)
+    addEquationTerm(hiddenFieldId, calcIndex);
 }
 
 /**
- * Removes one calculation row from the hidden checkbox's calculationBlock
+ * Adds "one term" to the equation container:
+ *   For the first term => just a money question dropdown
+ *   For subsequent terms => an operator dropdown + a money question dropdown
+ */
+function addEquationTerm(hiddenFieldId, calcIndex) {
+    var eqContainer = document.getElementById('equationContainer' + hiddenFieldId + '_' + calcIndex);
+    if(!eqContainer) return;
+
+    var existingTermCount = eqContainer.querySelectorAll('.equation-term').length;
+    var termNumber = existingTermCount + 1; // 1-based
+
+    var termDiv = document.createElement('div');
+    termDiv.className = 'equation-term';
+    termDiv.id = 'equationTerm' + hiddenFieldId + '_' + calcIndex + '_' + termNumber;
+
+    // If this is the first term => no operator
+    // If it's second or later => show operator
+    var operatorHTML = '';
+    if(termNumber > 1) {
+        operatorHTML = `
+            <select id="calcTermOperator${hiddenFieldId}_${calcIndex}_${termNumber}">
+                <option value="+">+</option>
+                <option value="-">-</option>
+                <option value="x">x</option>
+                <option value="/">/</option>
+            </select>
+        `;
+    }
+
+    termDiv.innerHTML = `
+        ${operatorHTML}
+        <select id="calcTermQuestion${hiddenFieldId}_${calcIndex}_${termNumber}" style="width:200px;">
+            <option value="">-- Select money question --</option>
+            ${generateMoneyQuestionOptions()}
+        </select><br><br>
+    `;
+    eqContainer.appendChild(termDiv);
+}
+
+/**
+ * Removes an entire calculation row
  */
 function removeCalculationForCheckbox(hiddenFieldId, calcIndex) {
-    const row = document.getElementById(`calculationRow${hiddenFieldId}_${calcIndex}`);
-    if (row) row.remove();
+    var row = document.getElementById('calculationRow' + hiddenFieldId + '_' + calcIndex);
+    if(row) row.remove();
 
-    // Re-label the remaining rows
-    const calculationBlock = document.getElementById(`calculationBlock${hiddenFieldId}`);
-    const rows = calculationBlock.querySelectorAll(`div[id^="calculationRow"]`);
-    rows.forEach((r, idx) => {
-        const newIndex = idx + 1;
-        r.className = `calculation${newIndex}`;
-        r.id = `calculationRow${hiddenFieldId}_${newIndex}`;
+    // re-label the remaining rows
+    var calcBlock = document.getElementById('calculationBlock' + hiddenFieldId);
+    var rows = calcBlock.querySelectorAll('div[id^="calculationRow"]');
+    for(var i=0; i<rows.length; i++){
+        var r = rows[i];
+        var newIndex = i+1;
+        r.className = 'calculation' + newIndex;
+        var oldId = r.id; // e.g. "calculationRow5_2"
+        // rename:
+        r.id = 'calculationRow' + hiddenFieldId + '_' + newIndex;
 
-        const label = r.querySelector('label');
-        if (label) {
-            label.textContent = `Calculation ${newIndex}:`;
-        }
-        const questionSelect = r.querySelector(`[id^="calcQuestion"]`);
-        questionSelect.id = `calcQuestion${hiddenFieldId}_${newIndex}`;
+        var label = r.querySelector('label');
+        if(label) label.textContent = 'Calculation ' + newIndex + ':';
 
-        const opSelect = r.querySelector(`[id^="calcOperator"]`);
-        opSelect.id = `calcOperator${hiddenFieldId}_${newIndex}`;
+        // fix "Add Another Term" button
+        var addTermBtn = r.querySelector('button[onclick^="addEquationTerm"]');
+        addTermBtn.setAttribute('onclick', `addEquationTerm(${hiddenFieldId}, ${newIndex})`);
 
-        const thresholdInput = r.querySelector(`[id^="calcThreshold"]`);
-        thresholdInput.id = `calcThreshold${hiddenFieldId}_${newIndex}`;
-
-        const resultSelect = r.querySelector(`[id^="calcResult"]`);
-        resultSelect.id = `calcResult${hiddenFieldId}_${newIndex}`;
-
-        const removeBtn = r.querySelector('button');
+        // fix "Remove" button
+        var removeBtn = r.querySelector('button[onclick^="removeCalculationForCheckbox"]');
         removeBtn.setAttribute('onclick', `removeCalculationForCheckbox(${hiddenFieldId}, ${newIndex})`);
-    });
+
+        // fix eqContainer
+        var eqContainer = r.querySelector('[id^="equationContainer"]');
+        if(eqContainer){
+            eqContainer.id = 'equationContainer' + hiddenFieldId + '_' + newIndex;
+
+            // fix each .equation-term IDs
+            var terms = eqContainer.querySelectorAll('.equation-term');
+            for(var t=0; t<terms.length; t++){
+                var termDiv = terms[t];
+                var newTermIndex = t+1;
+                termDiv.id = 'equationTerm' + hiddenFieldId + '_' + newIndex + '_' + newTermIndex;
+
+                // fix operator ID
+                var opSel = termDiv.querySelector('[id^="calcTermOperator"]');
+                if(opSel){
+                    opSel.id = 'calcTermOperator' + hiddenFieldId + '_' + newIndex + '_' + newTermIndex;
+                }
+
+                // fix question ID
+                var qSel = termDiv.querySelector('[id^="calcTermQuestion"]');
+                if(qSel){
+                    qSel.id = 'calcTermQuestion' + hiddenFieldId + '_' + newIndex + '_' + newTermIndex;
+                }
+            }
+        }
+
+        // fix "calcCompareOperator"
+        var cmpOpSel = r.querySelector('[id^="calcCompareOperator"]');
+        if(cmpOpSel){
+            cmpOpSel.id = 'calcCompareOperator' + hiddenFieldId + '_' + newIndex;
+        }
+        var thr = r.querySelector('[id^="calcThreshold"]');
+        if(thr){
+            thr.id = 'calcThreshold' + hiddenFieldId + '_' + newIndex;
+        }
+        var resSel = r.querySelector('[id^="calcResult"]');
+        if(resSel){
+            resSel.id = 'calcResult' + hiddenFieldId + '_' + newIndex;
+        }
+    }
 }
 
 /*****************************************************
  * Helper functions to generate question lists
- * (Used in the dropdowns for "Autofill" or "CalcQuestion")
  *****************************************************/
 
 /**
  * generateQuestionOptions():
  *   - Return <option> tags for questions that can be used for text autofill
- *   - Typically text, bigParagraph, money, date, radio, dropdown, multipleTextboxes
  */
 function generateQuestionOptions() {
-    let optionsHTML = '';
-    const questionBlocks = document.querySelectorAll('.question-block');
+    var optionsHTML = '';
+    var questionBlocks = document.querySelectorAll('.question-block');
 
-    questionBlocks.forEach(questionBlock => {
-        const questionId = questionBlock.id.replace('questionBlock', '');
-        const questionText = questionBlock.querySelector('input[type="text"]')?.value || `Question ${questionId}`;
-        const questionType = questionBlock.querySelector('select')?.value;
+    questionBlocks.forEach(function(qBlock){
+        var qId = qBlock.id.replace('questionBlock','');
+        var qTxtEl = qBlock.querySelector('input[type="text"]');
+        var qTxt = qTxtEl ? qTxtEl.value : ('Question ' + qId);
+        var selEl = qBlock.querySelector('select');
+        var qType = selEl ? selEl.value : 'text';
 
-        if (['text', 'bigParagraph', 'money', 'date', 'radio', 'dropdown'].includes(questionType)) {
-            optionsHTML += `<option value="${questionId}">Question ${questionId}: ${questionText}</option>`;
+        // These types can be used for text autofill:
+        if(['text','bigParagraph','money','date','radio','dropdown'].indexOf(qType) !== -1) {
+            optionsHTML += '<option value="'+qId+'">Question '+qId+': '+qTxt+'</option>';
         }
-        if (questionType === 'multipleTextboxes') {
-            const textboxes = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} .option`);
-            textboxes.forEach((textbox, idx) => {
-                const label = textbox.querySelector(`input[id^="multipleTextboxLabel"]`)?.value || `Textbox ${idx + 1}`;
-                const nameId = textbox.querySelector(`input[id^="multipleTextboxName"]`)?.value || `answer${questionId}_${idx + 1}`;
-                optionsHTML += `<option value="${questionId}_${idx + 1}">Q${questionId} - ${label} (${nameId})</option>`;
+        // multipleTextboxes => each child box can also be used
+        if(qType==='multipleTextboxes'){
+            var children = qBlock.querySelectorAll('#multipleTextboxesOptions'+qId+' .option');
+            children.forEach(function(optDiv, idx){
+                var lblInput = optDiv.querySelector('input[id^="multipleTextboxLabel"]');
+                var lblVal = lblInput ? lblInput.value : ('Textbox '+(idx+1));
+                var nmInput = optDiv.querySelector('input[id^="multipleTextboxName"]');
+                var nmVal = nmInput ? nmInput.value : ('answer'+qId+'_'+(idx+1));
+                optionsHTML += '<option value="'+(qId+'_'+(idx+1))+'">Q'+qId+' - '+lblVal+' ('+nmVal+')</option>';
             });
         }
     });
-
     return optionsHTML;
 }
 
 /**
  * generateAllQuestionOptions():
- *   - Return <option> tags for all questions that have *discrete* answers
- *   - Typically used by the conditional logic to check for a match
- *   - i.e. radio, dropdown, checkbox
+ *  - Return <option> tags for questions that have discrete answers (radio, dropdown, checkbox).
  */
 function generateAllQuestionOptions() {
-    let optionsHTML = '';
-    const questionBlocks = document.querySelectorAll('.question-block');
+    var optionsHTML = '';
+    var questionBlocks = document.querySelectorAll('.question-block');
+    questionBlocks.forEach(function(qBlock){
+        var qId = qBlock.id.replace('questionBlock','');
+        var qTxtEl = qBlock.querySelector('input[type="text"]');
+        var qTxt = qTxtEl ? qTxtEl.value : ('Question '+qId);
+        var selEl = qBlock.querySelector('select');
+        var qType = selEl ? selEl.value : 'text';
 
-    questionBlocks.forEach(questionBlock => {
-        const questionId = questionBlock.id.replace('questionBlock', '');
-        const questionText = questionBlock.querySelector('input[type="text"]')?.value || `Question ${questionId}`;
-        const questionType = questionBlock.querySelector('select')?.value;
-
-        if (['dropdown', 'radio', 'checkbox'].includes(questionType)) {
-            optionsHTML += `<option value="${questionId}">Question ${questionId}: ${questionText}</option>`;
+        if(['dropdown','radio','checkbox'].indexOf(qType) !== -1){
+            optionsHTML += '<option value="'+qId+'">Question '+qId+': '+qTxt+'</option>';
         }
     });
-
     return optionsHTML;
 }
 
 /**
  * generateMoneyQuestionOptions():
- *   - Return <option> tags for only "money"-type questions,
- *     used for the calculation feature
+ *  - Return <option> tags for only "money"-type questions,
+ *    used for multi-term equation building
  */
 function generateMoneyQuestionOptions() {
-    let optionsHTML = '';
-    const questionBlocks = document.querySelectorAll('.question-block');
-    questionBlocks.forEach(questionBlock => {
-        const qId = questionBlock.id.replace('questionBlock', '');
-        const qType = questionBlock.querySelector('select')?.value;
-        if (qType === 'money') {
-            const nameIdInput = questionBlock.querySelector(`#textboxName${qId}`);
-            const nameId = nameIdInput?.value || `answer${qId}`;
-            const questionText = questionBlock.querySelector(`#question${qId}`)?.value || `Question ${qId}`;
-            optionsHTML += `<option value="${nameId}">${questionText} (${nameId})</option>`;
+    var optionsHTML = '';
+    var questionBlocks = document.querySelectorAll('.question-block');
+    questionBlocks.forEach(function(qBlock){
+        var qId = qBlock.id.replace('questionBlock','');
+        var selEl = qBlock.querySelector('select');
+        var qType = selEl ? selEl.value : 'text';
+        if(qType === 'money'){
+            var nmEl = qBlock.querySelector('#textboxName'+qId);
+            var nmVal = nmEl && nmEl.value ? nmEl.value : ('answer'+qId);
+            var qTxtEl = qBlock.querySelector('#question'+qId);
+            var qTxt = qTxtEl ? qTxtEl.value : ('Question '+qId);
+            optionsHTML += '<option value="'+nmVal+'">'+qTxt+' ('+nmVal+')</option>';
         }
     });
     return optionsHTML;
 }
 
 /**
- * (Optional) If you want to re-sync or refresh these dropdowns 
- * after the user re-orders or modifies questions, call something like:
- *   updateAutofillOptions();
- * 
- * It re-generates the <option> sets for autofill or condition question references
- * to reflect the current questions in the form.
+ * If user re-orders or modifies questions, call updateAutofillOptions()
+ *  to refresh references in the hidden fields.
  */
 function updateAutofillOptions() {
-    const hiddenFieldBlocks = document.querySelectorAll('.hidden-field-block');
-    hiddenFieldBlocks.forEach(hiddenFieldBlock => {
-        const hiddenFieldId = hiddenFieldBlock.id.replace('hiddenFieldBlock', '');
-        const fieldType = document.getElementById(`hiddenFieldType${hiddenFieldId}`).value;
-
-        // If it's a text field with an "Autofill from question" select
-        if (fieldType === 'text') {
-            const autofillSelect = document.getElementById(`hiddenFieldAutofill${hiddenFieldId}`);
-            if (autofillSelect) {
-                const previousValue = autofillSelect.value;
-                autofillSelect.innerHTML = `
-                    <option value="">-- Select a question --</option>
-                    ${generateQuestionOptions()}
+    var hiddenBlocks = document.querySelectorAll('.hidden-field-block');
+    hiddenBlocks.forEach(function(block){
+        var hid = block.id.replace('hiddenFieldBlock','');
+        var ft = document.getElementById('hiddenFieldType'+hid).value;
+        if(ft==='text'){
+            // refresh "hiddenFieldAutofill" 
+            var autofillSel = document.getElementById('hiddenFieldAutofill'+hid);
+            if(autofillSel){
+                var prevVal = autofillSel.value;
+                autofillSel.innerHTML = `
+                  <option value="">-- Select a question --</option>
+                  ${generateQuestionOptions()}
                 `;
-                // Restore previous selection if still valid
-                if (Array.from(autofillSelect.options).some(opt => opt.value === previousValue)) {
-                    autofillSelect.value = previousValue;
+                if([].slice.call(autofillSel.options).some(function(opt){return opt.value===prevVal;})){
+                    autofillSel.value = prevVal;
                 }
             }
-
-            // Also refresh the “Conditional Autofill” question/answer selects
-            const conditionalAutofillDiv = document.getElementById(`conditionalAutofill${hiddenFieldId}`);
-            if (conditionalAutofillDiv) {
-                const conditionDivs = conditionalAutofillDiv.querySelectorAll('div[class^="condition"]');
-                conditionDivs.forEach(condDiv => {
-                    const condId = condDiv.id.split('_')[1];
-                    const questionSelect = document.getElementById(`conditionQuestion${hiddenFieldId}_${condId}`);
-                    if (!questionSelect) return;
-                    const previousQuestionVal = questionSelect.value;
-
-                    // Rebuild question list
-                    questionSelect.innerHTML = `
-                        <option value="">-- Select a question --</option>
-                        ${generateAllQuestionOptions()}
-                    `;
-                    // Re-select if still valid
-                    if (Array.from(questionSelect.options).some(opt => opt.value === previousQuestionVal)) {
-                        questionSelect.value = previousQuestionVal;
-                        updateConditionAnswers(hiddenFieldId, condId);
+            // refresh any conditions 
+            var condDiv = document.getElementById('conditionalAutofill'+hid);
+            if(condDiv){
+                var crows = condDiv.querySelectorAll('.condition');
+                crows.forEach(function(cr){
+                    var condId = cr.id.split('_')[1];
+                    var qSel = document.getElementById('conditionQuestion'+hid+'_'+condId);
+                    if(qSel){
+                        var oldQ = qSel.value;
+                        qSel.innerHTML=`
+                          <option value="">-- Select a question --</option>
+                          ${generateAllQuestionOptions()}
+                        `;
+                        if([].slice.call(qSel.options).some(function(o){return o.value===oldQ;})){
+                            qSel.value=oldQ;
+                            updateConditionAnswers(hid,condId);
+                        }
                     }
                 });
             }
         }
-        // If it's a checkbox hidden field, we might also re-sync condition question/answer selects
-        else if (fieldType === 'checkbox') {
-            const conditionalDiv = document.getElementById(`conditionalAutofillForCheckbox${hiddenFieldId}`);
-            if (conditionalDiv) {
-                const conditionDivs = conditionalDiv.querySelectorAll('div[class^="condition"]');
-                conditionDivs.forEach((condDiv, index) => {
-                    const condId = condDiv.id.split('_')[1];
-                    const questionSelect = document.getElementById(`conditionQuestion${hiddenFieldId}_${condId}`);
-                    if (!questionSelect) return;
-                    const prevVal = questionSelect.value;
-
-                    questionSelect.innerHTML = `
-                        <option value="">-- Select a question --</option>
-                        ${generateAllQuestionOptions()}
-                    `;
-                    if (Array.from(questionSelect.options).some(opt => opt.value === prevVal)) {
-                        questionSelect.value = prevVal;
-                        updateConditionAnswers(hiddenFieldId, condId);
+        else if(ft==='checkbox'){
+            // refresh conditionalAutofillForCheckbox
+            var cDiv = document.getElementById('conditionalAutofillForCheckbox'+hid);
+            if(cDiv){
+                var cRows2 = cDiv.querySelectorAll('.condition');
+                cRows2.forEach(function(cr2){
+                    var cId2 = cr2.id.split('_')[1];
+                    var qSel2 = document.getElementById('conditionQuestion'+hid+'_'+cId2);
+                    if(qSel2){
+                        var oldVal2 = qSel2.value;
+                        qSel2.innerHTML=`
+                          <option value="">-- Select a question --</option>
+                          ${generateAllQuestionOptions()}
+                        `;
+                        if([].slice.call(qSel2.options).some(function(o){return o.value===oldVal2;})){
+                            qSel2.value=oldVal2;
+                            updateConditionAnswers(hid,cId2);
+                        }
                     }
                 });
             }
         }
     });
 }
-
-
-/**********************************************
- * End of hidden.js 
- **********************************************/

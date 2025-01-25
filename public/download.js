@@ -1,6 +1,7 @@
 /********************************************
  * download.js - MULTIPLE OR CONDITIONS
- *   with hidden-field calculations export/import
+ *   WITH multi-term hidden-field calculations
+ *   export/import logic
  ********************************************/
 
 function generateAndDownloadForm() {
@@ -88,7 +89,6 @@ function loadFormData(formData) {
                 // -----------------------------
                 // Question-type-specific rebuild
                 // -----------------------------
-
                 if (question.type === 'checkbox') {
                     // Rebuild checkbox options
                     const checkboxOptionsDiv = questionBlock.querySelector(`#checkboxOptions${question.questionId}`);
@@ -145,7 +145,7 @@ function loadFormData(formData) {
                         });
                         updateJumpOptions(question.questionId);
                     }
-                    // Also restore Name/ID and Placeholder for dropdown
+                    // Also restore Name/ID and Placeholder
                     const nameInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
                     const placeholderInput = questionBlock.querySelector(`#textboxPlaceholder${question.questionId}`);
                     if (nameInput) {
@@ -290,7 +290,7 @@ function loadFormData(formData) {
         });
     }
 
-    // 6) Build hidden fields from JSON (including calculations)
+    // 6) Build hidden fields from JSON (including multi-term calculations)
     if (formData.hiddenFields && formData.hiddenFields.length > 0) {
         formData.hiddenFields.forEach(hiddenField => {
             addHiddenFieldWithData(hiddenField);
@@ -488,7 +488,7 @@ function exportForm() {
         formData.sections.push(sectionData);
     }
 
-    // ========== Export hidden fields with calculations ==========
+    // ========== Export hidden fields with multi-term calculations ==========
     const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
     if (hiddenFieldsContainer) {
         const hiddenFieldBlocks = hiddenFieldsContainer.querySelectorAll('.hidden-field-block');
@@ -504,10 +504,16 @@ function exportForm() {
                 name: fieldName,
                 checked: isChecked,
                 conditions: [],
+                // Now we store "calculations" as an array of multi-term objects:
+                // e.g. {
+                //   terms: [ {operator:'', questionNameId:'Q1'}, {operator:'+', questionNameId:'Q2'} ],
+                //   compareOperator: '=',
+                //   threshold: '100',
+                //   result: 'checked'
+                // }
                 calculations: []
             };
 
-            // If type = checkbox, gather any conditions and calculations
             if (fieldType === 'checkbox') {
                 // conditions
                 const conditionalDiv = document.getElementById(`conditionalAutofillForCheckbox${hiddenFieldId}`);
@@ -528,28 +534,62 @@ function exportForm() {
                     });
                 }
 
-                // calculations
+                // MULTI-TERM calculations
                 const calculationBlock = fieldBlock.querySelector(`#calculationBlock${hiddenFieldId}`);
                 if (calculationBlock) {
-                    const calcRows = calculationBlock.querySelectorAll(`div[id^="calculationRow"]`);
-                    if (calcRows.length > 0) {
-                        calcRows.forEach(row => {
-                            const rid = row.id.split('_')[1];
-                            const questionNameId = document.getElementById(`calcQuestion${hiddenFieldId}_${rid}`)?.value || '';
-                            const operator = document.getElementById(`calcOperator${hiddenFieldId}_${rid}`)?.value || '';
-                            const threshold = document.getElementById(`calcThreshold${hiddenFieldId}_${rid}`)?.value || '';
-                            const result = document.getElementById(`calcResult${hiddenFieldId}_${rid}`)?.value || '';
+                    const calcRows = calculationBlock.querySelectorAll(`div[id^="calculationRow${hiddenFieldId}_"]`);
+                    calcRows.forEach(row => {
+                        // row ID e.g. "calculationRow5_2"
+                        const rowIdParts = row.id.split('_');
+                        const calcIndex = rowIdParts[1];
+                        // inside the row, we have "equationContainer{hiddenFieldId}_{calcIndex}"
+                        const eqContainer = row.querySelector(`#equationContainer${hiddenFieldId}_${calcIndex}`);
+                        const termsArr = [];
+                        if (eqContainer) {
+                            // each .equation-term
+                            const termDivs = eqContainer.querySelectorAll('.equation-term');
+                            termDivs.forEach((termDiv, idx) => {
+                                const termNumber = idx + 1;
+                                // operator select if termNumber>1
+                                let operatorVal = '';
+                                if (termNumber > 1) {
+                                    const opSel = termDiv.querySelector(`[id^="calcTermOperator${hiddenFieldId}_${calcIndex}_${termNumber}"]`);
+                                    if (opSel) operatorVal = opSel.value || '';
+                                }
+                                // question select
+                                const qSel = termDiv.querySelector(`[id^="calcTermQuestion${hiddenFieldId}_${calcIndex}_${termNumber}"]`);
+                                let questionNameIdVal = qSel ? qSel.value.trim() : '';
+                                if (questionNameIdVal) {
+                                    termsArr.push({
+                                        operator: (termNumber===1 ? '' : operatorVal),
+                                        questionNameId: questionNameIdVal
+                                    });
+                                }
+                            });
+                        }
 
-                            if (questionNameId && operator && threshold !== '') {
-                                hiddenFieldData.calculations.push({
-                                    questionNameId: questionNameId,
-                                    operator: operator,
-                                    threshold: threshold,
-                                    result: result
-                                });
-                            }
-                        });
-                    }
+                        // compare operator
+                        const cmpOpSel = row.querySelector(`#calcCompareOperator${hiddenFieldId}_${calcIndex}`);
+                        const compareOperatorVal = cmpOpSel ? cmpOpSel.value : '=';
+
+                        // threshold
+                        const thrEl = row.querySelector(`#calcThreshold${hiddenFieldId}_${calcIndex}`);
+                        const thresholdVal = thrEl ? thrEl.value.trim() : '0';
+
+                        // result
+                        const resEl = row.querySelector(`#calcResult${hiddenFieldId}_${calcIndex}`);
+                        const resultVal = resEl ? resEl.value.trim() : 'checked';
+
+                        // only push if we have at least one term
+                        if (termsArr.length > 0) {
+                            hiddenFieldData.calculations.push({
+                                terms: termsArr,
+                                compareOperator: compareOperatorVal,
+                                threshold: thresholdVal,
+                                result: resultVal
+                            });
+                        }
+                    });
                 }
             }
             else if (fieldType === 'text') {
@@ -649,15 +689,53 @@ function addHiddenFieldWithData(hiddenField) {
             });
         }
 
-        // Rebuild calculations
+        // Rebuild multi-term calculations
         if (hiddenField.calculations && hiddenField.calculations.length > 0) {
+            // Each calculation is an object with { terms: [...], compareOperator, threshold, result }
             hiddenField.calculations.forEach((calcObj, index) => {
+                // create a new calculation row
                 addCalculationForCheckbox(currentHiddenFieldId);
-                const calcId = index + 1;
-                document.getElementById(`calcQuestion${currentHiddenFieldId}_${calcId}`).value = calcObj.questionNameId;
-                document.getElementById(`calcOperator${currentHiddenFieldId}_${calcId}`).value = calcObj.operator;
-                document.getElementById(`calcThreshold${currentHiddenFieldId}_${calcId}`).value = calcObj.threshold;
-                document.getElementById(`calcResult${currentHiddenFieldId}_${calcId}`).value = calcObj.result;
+                const calcIndex = index + 1;
+                // We'll fill in the row
+
+                // 1) remove the default single term from "equationContainer"
+                const eqContainer = document.getElementById(`equationContainer${currentHiddenFieldId}_${calcIndex}`);
+                eqContainer.innerHTML = '';
+
+                // 2) For each term in calcObj.terms => addEquationTerm
+                //    Then fill operator + questionNameId
+                calcObj.terms.forEach((termObj, tindex) => {
+                    addEquationTerm(currentHiddenFieldId, calcIndex);
+                    const termNumber = tindex + 1;
+                    // if termNumber>1 => set operator
+                    if (termNumber > 1) {
+                        const opSel = document.getElementById(
+                          `calcTermOperator${currentHiddenFieldId}_${calcIndex}_${termNumber}`
+                        );
+                        if (opSel) {
+                            opSel.value = termObj.operator || '';
+                        }
+                    }
+                    // set question
+                    const qSel = document.getElementById(
+                      `calcTermQuestion${currentHiddenFieldId}_${calcIndex}_${termNumber}`
+                    );
+                    if (qSel) {
+                        qSel.value = termObj.questionNameId || '';
+                    }
+                });
+
+                // 3) compareOperator
+                const compareOpSel = document.getElementById(`calcCompareOperator${currentHiddenFieldId}_${calcIndex}`);
+                if (compareOpSel) compareOpSel.value = calcObj.compareOperator || '=';
+
+                // threshold
+                const thrEl = document.getElementById(`calcThreshold${currentHiddenFieldId}_${calcIndex}`);
+                if (thrEl) thrEl.value = calcObj.threshold || '';
+
+                // result
+                const resEl = document.getElementById(`calcResult${currentHiddenFieldId}_${calcIndex}`);
+                if (resEl) resEl.value = calcObj.result || 'checked';
             });
         }
     }
