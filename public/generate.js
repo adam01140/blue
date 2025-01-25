@@ -1,8 +1,8 @@
 /*********************************************
  * generate.js - with hidden checkbox & text 
- *   multi-term calculations
+ *   multi-term calculations,
  *   plus $$placeholders$$ supporting expressions
- *   AND re-check on final submit
+ *   and fixing "showTextboxLabels" for numberedDropdown
  *********************************************/
 
 function getFormHTML() {
@@ -48,7 +48,10 @@ function getFormHTML() {
     var conditionalAlerts = [];
     var jumpLogics = [];
 
-    // Possibly get PDF name from user
+    // We'll also store a global "labelMap" for numberedDropdown labels:
+    var labelMap = {};
+
+    // Possibly read user’s PDF name:
     var pdfFormNameInputEl = document.getElementById('formPDFName');
     var pdfFormName = pdfFormNameInputEl ? pdfFormNameInputEl.value.trim() : 'test.pdf';
     var escapedPdfFormName = pdfFormName
@@ -56,7 +59,7 @@ function getFormHTML() {
         .replace(/'/g, '\\\'')
         .replace(/"/g, '\\"');
 
-    // Build out each section
+    // Build each section
     for(var s=1; s<sectionCounter; s++){
         var sectionBlock = document.getElementById('sectionBlock'+s);
         if(!sectionBlock) continue;
@@ -129,7 +132,7 @@ function getFormHTML() {
             formHTML += '<div id="question-container-'+questionId+'"'+(logicEnabled?' class="hidden"':'')+'>';
             formHTML += '<label><h3>'+questionText+'</h3></label>';
 
-            // Render by questionType
+            // Render input by questionType
             if(questionType==='text'){
                 var nmEl= qBlock.querySelector('#textboxName'+questionId);
                 var phEl= qBlock.querySelector('#textboxPlaceholder'+questionId);
@@ -272,14 +275,39 @@ function getFormHTML() {
                 }
             }
             else if(questionType==='numberedDropdown'){
+                // Example: min=1, max=3, labels = ["value of your car:"]
+                // Grab them from the question block
                 var stEl= qBlock.querySelector('#numberRangeStart'+questionId);
                 var enEl= qBlock.querySelector('#numberRangeEnd'+questionId);
-                var st= stEl? parseInt(stEl.value,10) : 1;
-                var en= enEl? parseInt(enEl.value,10) : 1;
+                var st= stEl ? parseInt(stEl.value,10) : 1;
+                var en= enEl ? parseInt(enEl.value,10) : 1;
+
+                // There's often a #textboxLabels${questionId} container
+                // but from your JSON, the 'labels' array is inside "labels"
+                // So let's do that:
+                var lblInputs= qBlock.querySelectorAll('#textboxLabels'+questionId+' input'); 
+                // If you have them as .labels in JSON, we can also parse them, but let's rely on the code:
+                var labelVals=[];
+                for(var L=0; L<lblInputs.length; L++){
+                    labelVals.push(lblInputs[L].value);
+                }
+                // If your code doesn't actually generate #textboxLabels container, 
+                // we might read from question JSON directly. 
+                // For safety, we do it if we see them. Otherwise check a data attribute.
+
+                var minAttr= qBlock.querySelector('#numberRangeStart'+questionId);
+                var maxAttr= qBlock.querySelector('#numberRangeEnd'+questionId);
+                var ddMin= minAttr? parseInt(minAttr.value,10):1;
+                var ddMax= maxAttr? parseInt(maxAttr.value,10):1;
+
+                // We'll store labelMap[questionId] = arrayOfLabels
+                labelMap[questionId] = labelVals;
+
                 questionNameIds[questionId] = 'answer'+questionId;
                 formHTML+='<select id="answer'+questionId+'" onchange="showTextboxLabels('+questionId+', this.value)">'+
                           '<option value="" disabled selected>Select an option</option>';
-                for(var rnum=st; rnum<=en; rnum++){
+                // Build numeric range from ddMin..ddMax
+                for(var rnum=ddMin; rnum<=ddMax; rnum++){
                     formHTML+='<option value="'+rnum+'">'+rnum+'</option>';
                 }
                 formHTML+='</select><br><div id="labelContainer'+questionId+'"></div>';
@@ -287,7 +315,7 @@ function getFormHTML() {
 
             formHTML += '</div>'; // end question container
 
-            // If multiple-OR logic is enabled, keep the existing logic script if it exists
+            // If multiple-OR logic
             if(logicEnabled){
                 var logicRows= qBlock.querySelectorAll('.logic-condition-row');
                 if(logicRows.length>0){
@@ -323,7 +351,7 @@ function getFormHTML() {
                     }
                     formHTML+=' if(anyMatch){ thisQ.classList.remove("hidden");} else{ thisQ.classList.add("hidden");}\n';
                     formHTML+='}\n';
-                    // attach events for each logic row
+                    // attach events
                     for(var lr2=0; lr2<logicRows.length; lr2++){
                         var row2= logicRows[lr2];
                         var rowIndex2= lr2+1;
@@ -401,13 +429,16 @@ function getFormHTML() {
         ''
     ].join('\n');
 
-    // questionNameIds, jumpLogics, PDF, Alerts, etc.
+    // questionNameIds, jumpLogics, PDF, Alerts
     formHTML += '    var questionNameIds = '+JSON.stringify(questionNameIds)+';\n';
     formHTML += '    var jumpLogics = '+JSON.stringify(jumpLogics)+';\n';
     formHTML += '    var conditionalPDFs = '+JSON.stringify(conditionalPDFs)+';\n';
     formHTML += '    var conditionalAlerts = '+JSON.stringify(conditionalAlerts)+';\n\n';
 
-    // Collect calculations from generateHiddenPDFFields
+    // We'll embed the labelMap as well:
+    formHTML += '    var labelMap = '+JSON.stringify(labelMap)+';\n';
+
+    // calculations from generateHiddenPDFFields
     var hiddenCheckboxCalcs = genHidden.hiddenCheckboxCalculations || [];
     var hiddenTextCalcs = genHidden.hiddenTextCalculations || [];
 
@@ -415,7 +446,26 @@ function getFormHTML() {
     formHTML += '    var hiddenCheckboxCalculations = '+JSON.stringify(hiddenCheckboxCalcs)+';\n';
     formHTML += '    var hiddenTextCalculations = '+JSON.stringify(hiddenTextCalcs)+';\n\n';
 
+    // The rest of the main script
     formHTML += `
+    // Provide the showTextboxLabels() function so we don't get "not defined" errors:
+    function showTextboxLabels(questionId, count){
+        var container = document.getElementById("labelContainer" + questionId);
+        if(!container) return;
+        container.innerHTML = "";
+        // Retrieve the labels from labelMap:
+        var theseLabels = labelMap[questionId] || [];
+        for(var j=1; j<=count; j++){
+            for(var L=0; L<theseLabels.length; L++){
+                var labelTxt = theseLabels[L] || "Value";
+                // Create a unique ID for each generated input
+                var sanitized = labelTxt.replace(/\\s+/g,"_").toLowerCase();
+                var inputId = "label"+questionId+"_"+j+"_"+sanitized;
+                container.innerHTML += "<input type=\\"text\\" id=\\"" + inputId + "\\" name=\\"" + inputId + "\\" placeholder=\\"" + labelTxt + " " + j + "\\" style=\\"text-align:center;\\"><br>";
+            }
+        }
+    }
+
     function handleNext(currentSection){
         var nextSection = currentSection+1;
         var relevantJumps = [];
@@ -456,7 +506,7 @@ function getFormHTML() {
         }
         navigateSection(nextSection);
 
-        // run hidden calculations if user wants the step-by-step too
+        // run hidden calculations each Next if you want real-time
         runAllHiddenCheckboxCalculations();
         runAllHiddenTextCalculations();
     }
@@ -507,7 +557,7 @@ function getFormHTML() {
     }
 
     function showThankYouMessage(){
-        // NEW: Ensure final calculation is performed right before submission
+        // run final hidden calculations
         runAllHiddenCheckboxCalculations();
         runAllHiddenTextCalculations();
 
@@ -662,7 +712,6 @@ function getFormHTML() {
         var tokens = exprString.split(/(\\+|\\-|x|\\/)/); 
         if(!tokens.length) return '0';
         var currentVal = parseTokenValue(tokens[0]);
-
         var i=1;
         while(i<tokens.length){
             var operator = tokens[i].trim();
@@ -697,7 +746,7 @@ function getFormHTML() {
     }
 
     function attachCalculationListeners(){
-        // Keep all existing real-time listeners for checkbox & text calculations
+        // keep real-time listeners for hidden calc
         if(hiddenCheckboxCalculations){
             for(var i=0;i<hiddenCheckboxCalculations.length;i++){
                 var cObj= hiddenCheckboxCalculations[i];
@@ -745,7 +794,7 @@ function getFormHTML() {
 
 /********************************************************************
  * generateHiddenPDFFields() 
- *   - Reads #hiddenFieldsContainer to build hidden fields
+ *   - Reads from #hiddenFieldsContainer to build hidden fields 
  *     plus multi-term calc for checkboxes & text
  ********************************************************************/
 function generateHiddenPDFFields() {
@@ -767,8 +816,7 @@ function generateHiddenPDFFields() {
             if(!fName) continue;
 
             if(fType==='text'){
-                // hidden text input
-                hiddenFieldsHTML+='\n<input type="text" id="'+fName+'" name="'+fName+'" placeholder="'+fName+'">';
+                hiddenFieldsHTML += '\n<input type="text" id="'+fName+'" name="'+fName+'" placeholder="'+fName+'">';
 
                 // parse multi-term text calc
                 var textCalcBlock= block.querySelector('#textCalculationBlock'+hid);
@@ -788,7 +836,7 @@ function generateHiddenPDFFields() {
                                 for(var t=0; t<termDivs.length; t++){
                                     var termDiv= termDivs[t];
                                     var termNumber= t+1;
-                                    var opSel=null;
+                                    var opSel= null;
                                     if(termNumber>1){
                                         opSel= termDiv.querySelector('#textTermOperator'+hid+'_'+calcIndex+'_'+termNumber);
                                     }
@@ -798,7 +846,7 @@ function generateHiddenPDFFields() {
                                     var questionNameIdVal= qSel? qSel.value.trim():'';
                                     if(questionNameIdVal){
                                         termsArr.push({
-                                            operator: (termNumber===1?'': operatorVal),
+                                            operator: (termNumber===1?'':operatorVal),
                                             questionNameId: questionNameIdVal
                                         });
                                     }
@@ -807,6 +855,7 @@ function generateHiddenPDFFields() {
                             var cmpOp= row.querySelector('#textCompareOperator'+hid+'_'+calcIndex);
                             var thrEl= row.querySelector('#textThreshold'+hid+'_'+calcIndex);
                             var fillEl= row.querySelector('#textFillValue'+hid+'_'+calcIndex);
+
                             var cmpVal= cmpOp? cmpOp.value:'=';
                             var thrVal= thrEl? thrEl.value.trim():'0';
                             var fillVal= fillEl? fillEl.value.trim():'';
@@ -830,10 +879,9 @@ function generateHiddenPDFFields() {
                 }
             }
             else if(fType==='checkbox'){
-                // hidden checkbox
                 var chkEl= document.getElementById('hiddenFieldChecked'+hid);
                 var isCheckedDefault= chkEl && chkEl.checked;
-                hiddenFieldsHTML+='\n<div style="display:none;">'+
+                hiddenFieldsHTML += '\n<div style="display:none;">'+
                     '<label class="checkbox-label">'+
                     '<input type="checkbox" id="'+fName+'" name="'+fName+'" '+(isCheckedDefault?'checked':'')+'>'+
                     fName+
@@ -857,7 +905,7 @@ function generateHiddenPDFFields() {
                                 for(var t2=0; t2<termDivs2.length; t2++){
                                     var td2= termDivs2[t2];
                                     var termNumber2= t2+1;
-                                    var opSel2=null;
+                                    var opSel2= null;
                                     if(termNumber2>1){
                                         opSel2= td2.querySelector('#calcTermOperator'+hid+'_'+calcIndex2+'_'+termNumber2);
                                     }
@@ -867,7 +915,7 @@ function generateHiddenPDFFields() {
                                     var questionNameIdVal2= qSel2? qSel2.value.trim():'';
                                     if(questionNameIdVal2){
                                         termsArr2.push({
-                                            operator: (termNumber2===1?'': operatorVal2),
+                                            operator: (termNumber2===1?'':operatorVal2),
                                             questionNameId: questionNameIdVal2
                                         });
                                     }
@@ -876,6 +924,7 @@ function generateHiddenPDFFields() {
                             var cmpOp2= row2.querySelector('#calcCompareOperator'+hid+'_'+calcIndex2);
                             var thrEl2= row2.querySelector('#calcThreshold'+hid+'_'+calcIndex2);
                             var resEl2= row2.querySelector('#calcResult'+hid+'_'+calcIndex2);
+
                             var cmpVal2= cmpOp2? cmpOp2.value:'=';
                             var thrVal2= thrEl2? thrEl2.value.trim():'0';
                             var resVal2= resEl2? resEl2.value:'checked';
@@ -902,7 +951,6 @@ function generateHiddenPDFFields() {
     }
 
     hiddenFieldsHTML+='\n</div>';
-
     return {
         hiddenFieldsHTML: hiddenFieldsHTML,
         hiddenCheckboxCalculations: hiddenCheckboxCalculations,
