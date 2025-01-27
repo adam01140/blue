@@ -29,7 +29,11 @@
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1"><label><h3>how many cars do you own?</h3></label><select id="answer1" onchange="showTextboxLabels(1, this.value)"><option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields" style="display:none;">
+        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1"><label><h3>hungry?</h3></label><select id="hungry" name="hungry">
+                               <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><h2>Section 2</h2><div id="question-container-2" class="hidden"><label><h3>eggs?</h3></label><select id="eggs" name="eggs">
+                               <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div><div id="question-container-3" class="hidden"><label><h3>restart?</h3></label><select id="restart" name="restart">
+                               <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(1)">Back</button><button type="button" onclick="handleNext(2)">Next</button></div></div><div id="section3" class="section"><h2>Section 3</h2><div id="question-container-4" class="hidden"><label><h3>name?</h3></label><select id="name" name="name">
+                               <option value="" disabled selected>Select an option</option></select><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(2)">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields" style="display:none;">
 </div></form>
 <div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
 </div>
@@ -38,9 +42,8 @@
 <footer>
     &copy; 2024 FormWiz. All rights reserved.
 </footer>
-
 <script>
-    // Firebase init if needed
+
     const firebaseConfig = {
         apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
         authDomain: "formwiz-3f4fd.firebaseapp.com",
@@ -61,36 +64,171 @@
            window.location.href="account.html";
         }
     });
-    var questionNameIds = {"1":"answer1"};
-    var jumpLogics = [];
-    var conditionalPDFs = [];
-    var conditionalAlerts = [];
+    var questionNameIds = {"1":"hungry","2":"eggs","3":"restart","4":"name"};
+var jumpLogics = [{"questionId":"3","questionType":"dropdown","jumpOption":"Yes","jumpTo":"1","section":2}];
+var conditionalPDFs = [];
+var conditionalAlerts = [];
+var labelMap = {};
+var hiddenCheckboxCalculations = [];
+var hiddenTextCalculations = [];
 
-    // Hidden fields calculations arrays:
-    var hiddenCheckboxCalculations = [];
-    var hiddenTextCalculations = [];
 
+(function(){
+ var thisQ=document.getElementById("question-container-2");
+ function updateVisibility(){
+  var anyMatch=false;
+ (function(){
+   var cPrevType="dropdown";
+   var cPrevAns="yes";
+   var cPrevQNum="1";
+   if(cPrevType==="checkbox"){
+     var cbs=document.querySelectorAll('input[id^="answer'+cPrevQNum+'_"]');
+     var checkedVals=[];
+     for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+     if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+   } else {
+     var el2=document.getElementById("answer"+cPrevQNum) || document.getElementById(questionNameIds[cPrevQNum]);
+     if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+   }
+ })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var el3= document.getElementById("answer1") || document.getElementById(questionNameIds["1"]);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-3");
+ function updateVisibility(){
+  var anyMatch=false;
+ (function(){
+   var cPrevType="dropdown";
+   var cPrevAns="no";
+   var cPrevQNum="1";
+   if(cPrevType==="checkbox"){
+     var cbs=document.querySelectorAll('input[id^="answer'+cPrevQNum+'_"]');
+     var checkedVals=[];
+     for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+     if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+   } else {
+     var el2=document.getElementById("answer"+cPrevQNum) || document.getElementById(questionNameIds[cPrevQNum]);
+     if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+   }
+ })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var el3= document.getElementById("answer1") || document.getElementById(questionNameIds["1"]);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-4");
+ function updateVisibility(){
+  var anyMatch=false;
+ (function(){
+   var cPrevType="dropdown";
+   var cPrevAns="yes";
+   var cPrevQNum="2";
+   if(cPrevType==="checkbox"){
+     var cbs=document.querySelectorAll('input[id^="answer'+cPrevQNum+'_"]');
+     var checkedVals=[];
+     for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+     if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+   } else {
+     var el2=document.getElementById("answer"+cPrevQNum) || document.getElementById(questionNameIds[cPrevQNum]);
+     if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+   }
+ })();
+ (function(){
+   var cPrevType="dropdown";
+   var cPrevAns="no";
+   var cPrevQNum="2";
+   if(cPrevType==="checkbox"){
+     var cbs=document.querySelectorAll('input[id^="answer'+cPrevQNum+'_"]');
+     var checkedVals=[];
+     for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+     if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+   } else {
+     var el2=document.getElementById("answer"+cPrevQNum) || document.getElementById(questionNameIds[cPrevQNum]);
+     if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+   }
+ })();
+ (function(){
+   var cPrevType="dropdown";
+   var cPrevAns="no";
+   var cPrevQNum="3";
+   if(cPrevType==="checkbox"){
+     var cbs=document.querySelectorAll('input[id^="answer'+cPrevQNum+'_"]');
+     var checkedVals=[];
+     for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+     if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+   } else {
+     var el2=document.getElementById("answer"+cPrevQNum) || document.getElementById(questionNameIds[cPrevQNum]);
+     if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+   }
+ })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var el3= document.getElementById("answer2") || document.getElementById(questionNameIds["2"]);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var el3= document.getElementById("answer2") || document.getElementById(questionNameIds["2"]);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var el3= document.getElementById("answer3") || document.getElementById(questionNameIds["3"]);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+
+    // Provide the showTextboxLabels() function so we don't get "not defined" errors:
+    function showTextboxLabels(questionId, count){
+        var container = document.getElementById("labelContainer" + questionId);
+        if(!container) return;
+        container.innerHTML = "";
+        // Retrieve the labels from labelMap:
+        var theseLabels = labelMap[questionId] || [];
+        for(var j=1; j<=count; j++){
+            for(var L=0; L<theseLabels.length; L++){
+                var labelTxt = theseLabels[L] || "Value";
+                // Create a unique ID for each generated input
+                var sanitized = labelTxt.replace(/\s+/g,"_").toLowerCase();
+                var inputId = "label"+questionId+"_"+j+"_"+sanitized;
+                container.innerHTML += "<input type=\"text\" id=\"" + inputId + "\" name=\"" + inputId + "\" placeholder=\"" + labelTxt + " " + j + "\" style=\"text-align:center;"><br>";
+            }
+        }
+    }
 
     function handleNext(currentSection){
-        var nextSection = currentSection+1;
+        var nextSection = currentSection + 1;
         var relevantJumps = [];
         for(var i=0; i<jumpLogics.length; i++){
-            if(jumpLogics[i].section===currentSection){
+            if(jumpLogics[i].section === currentSection){
                 relevantJumps.push(jumpLogics[i]);
             }
         }
         for(var j=0; j<relevantJumps.length; j++){
             var jl = relevantJumps[j];
             var qId = jl.questionId;
-            var qType= jl.questionType;
-            var jOpt= jl.jumpOption;
-            var jTo = jl.jumpTo;
-            var nmId= questionNameIds[qId] || ("answer"+qId);
+            var qType = jl.questionType;
+            var jOpt = jl.jumpOption;
+            var jTo  = jl.jumpTo;
+            var nmId = questionNameIds[qId] || ("answer"+qId);
 
             if(qType==="radio" || qType==="dropdown"){
                 var el= document.getElementById(nmId);
-                if(el && el.value.trim().toLowerCase()=== jOpt.trim().toLowerCase()){
-                    nextSection=jTo; 
+                if(el && el.value.trim().toLowerCase() === jOpt.trim().toLowerCase()){
+                    nextSection = jTo; 
                     break;
                 }
             } else if(qType==="checkbox"){
@@ -103,7 +241,7 @@
                         }
                     }
                     if(chosen.indexOf(jOpt.trim().toLowerCase())!==-1){
-                        nextSection=jTo;
+                        nextSection = jTo;
                         break;
                     }
                 }
@@ -111,7 +249,7 @@
         }
         navigateSection(nextSection);
 
-        // run hidden calculations if user wants the step-by-step too
+        // run hidden calculations each Next if you want real-time
         runAllHiddenCheckboxCalculations();
         runAllHiddenTextCalculations();
     }
@@ -143,16 +281,16 @@
     };
 
     function handleConditionalAlerts(){
-        for(var i=0;i<conditionalAlerts.length;i++){
+        for(var i=0; i<conditionalAlerts.length; i++){
             var obj = conditionalAlerts[i];
             var prevQEl= document.getElementById("answer"+obj.prevQuestionId);
             if(prevQEl){
-                if(prevQEl.value.trim().toLowerCase()=== obj.prevAnswer.trim().toLowerCase()){
+                if(prevQEl.value.trim().toLowerCase() === obj.prevAnswer.trim().toLowerCase()){
                     alert(obj.alertText);
                 }
             } else {
                 var cbs= document.querySelectorAll('[name^="answer'+obj.prevQuestionId+'_"]');
-                for(var x=0;x<cbs.length;x++){
+                for(var x=0; x<cbs.length; x++){
                     if(cbs[x].checked && cbs[x].value.trim().toLowerCase()=== obj.prevAnswer.trim().toLowerCase()){
                         alert(obj.alertText);
                     }
@@ -162,14 +300,15 @@
     }
 
     function showThankYouMessage(){
-        // NEW: Ensure final calculation is performed right before submission
+        // run final hidden calculations
         runAllHiddenCheckboxCalculations();
         runAllHiddenTextCalculations();
 
+        // PDF name
         var pdfName = "".replace(".pdf","");
         editAndDownloadPDF(pdfName).then(function(){
             // handle conditional PDFs
-            for(var i=0;i<conditionalPDFs.length;i++){
+            for(var i=0; i<conditionalPDFs.length; i++){
                 var pdfObj= conditionalPDFs[i];
                 if(pdfObj.questionType==="checkbox"){
                     var cbox= document.getElementById(pdfObj.questionNameId);
@@ -178,8 +317,8 @@
                     }
                 } else {
                     var valEl= document.getElementById(pdfObj.questionNameId);
-                    var val2= valEl? valEl.value:"";
-                    if(val2=== pdfObj.conditionalAnswer){
+                    var val2= valEl ? valEl.value : "";
+                    if(val2 === pdfObj.conditionalAnswer){
                         editAndDownloadPDF(pdfObj.pdfName.replace(".pdf",""));
                     }
                 }
@@ -202,7 +341,7 @@
     async function editAndDownloadPDF(pdfName){
         var formData= new FormData();
         var inputs= document.querySelectorAll("#questions input, #questions select, #questions textarea");
-        for(var i=0;i<inputs.length;i++){
+        for(var i=0; i<inputs.length; i++){
             var inp= inputs[i];
             if(inp.type==="checkbox"){
                 formData.append(inp.name, inp.checked?"Yes":"No");
@@ -223,7 +362,7 @@
      ***********************************************/
     function runAllHiddenCheckboxCalculations(){
         if(!hiddenCheckboxCalculations || hiddenCheckboxCalculations.length===0) return;
-        for(var i=0;i<hiddenCheckboxCalculations.length;i++){
+        for(var i=0; i<hiddenCheckboxCalculations.length; i++){
             runSingleHiddenCheckboxCalculation(hiddenCheckboxCalculations[i]);
         }
     }
@@ -231,20 +370,20 @@
         var cbox= document.getElementById(calcObj.hiddenFieldName);
         if(!cbox) return;
         var finalState= cbox.checked;
-        for(var c=0;c<calcObj.calculations.length;c++){
+        for(var c=0; c<calcObj.calculations.length; c++){
             var oneCalc= calcObj.calculations[c];
             var val=0;
             if(oneCalc.terms && oneCalc.terms.length>0){
-                val= parseFloat( getMoneyValue(oneCalc.terms[0].questionNameId))||0;
+                val= parseFloat( getMoneyValue(oneCalc.terms[0].questionNameId) )||0;
                 for(var t=1; t<oneCalc.terms.length; t++){
                     var term= oneCalc.terms[t];
                     var op= term.operator||'';
                     var nextVal= parseFloat(getMoneyValue(term.questionNameId))||0;
-                    if(op==='+') val+= nextVal;
-                    else if(op==='-') val-= nextVal;
-                    else if(op==='x') val*= nextVal;
+                    if(op==='+') val += nextVal;
+                    else if(op==='-') val -= nextVal;
+                    else if(op==='x') val *= nextVal;
                     else if(op==='/'){
-                        if(nextVal!==0) val/= nextVal;
+                        if(nextVal!==0) val /= nextVal;
                         else val=0;
                     }
                 }
@@ -266,7 +405,7 @@
      ***********************************************/
     function runAllHiddenTextCalculations(){
         if(!hiddenTextCalculations || hiddenTextCalculations.length===0) return;
-        for(var i=0;i<hiddenTextCalculations.length;i++){
+        for(var i=0; i<hiddenTextCalculations.length; i++){
             runSingleHiddenTextCalculation(hiddenTextCalculations[i]);
         }
     }
@@ -274,7 +413,7 @@
         var textField= document.getElementById(calcObj.hiddenFieldName);
         if(!textField) return;
         var finalValue= textField.value; 
-        for(var c=0;c<calcObj.calculations.length;c++){
+        for(var c=0; c<calcObj.calculations.length; c++){
             var oneCalc= calcObj.calculations[c];
             var val=0;
             if(oneCalc.terms && oneCalc.terms.length>0){
@@ -283,11 +422,11 @@
                     var term= oneCalc.terms[t];
                     var op= term.operator||'';
                     var nextVal= parseFloat(getMoneyValue(term.questionNameId))||0;
-                    if(op==='+') val+= nextVal;
-                    else if(op==='-') val-= nextVal;
-                    else if(op==='x') val*= nextVal;
+                    if(op==='+') val += nextVal;
+                    else if(op==='-') val -= nextVal;
+                    else if(op==='x') val *= nextVal;
                     else if(op==='/'){
-                        if(nextVal!==0) val/= nextVal;
+                        if(nextVal!==0) val /= nextVal;
                         else val=0;
                     }
                 }
@@ -314,10 +453,9 @@
     }
 
     function evaluatePlaceholderExpression(exprString){
-        var tokens = exprString.split(/(\+|\-|x|\/)/); 
+        var tokens = exprString.split(/(\+|\-|x|\/)/);
         if(!tokens.length) return '0';
         var currentVal = parseTokenValue(tokens[0]);
-
         var i=1;
         while(i<tokens.length){
             var operator = tokens[i].trim();
@@ -352,14 +490,14 @@
     }
 
     function attachCalculationListeners(){
-        // Keep all existing real-time listeners for checkbox & text calculations
+        // For hidden checkbox calculations
         if(hiddenCheckboxCalculations){
-            for(var i=0;i<hiddenCheckboxCalculations.length;i++){
+            for(var i=0; i<hiddenCheckboxCalculations.length; i++){
                 var cObj= hiddenCheckboxCalculations[i];
-                for(var c=0;c<cObj.calculations.length;c++){
+                for(var c=0; c<cObj.calculations.length; c++){
                     var oneCalc= cObj.calculations[c];
                     var terms= oneCalc.terms||[];
-                    for(var t=0;t<terms.length;t++){
+                    for(var t=0; t<terms.length; t++){
                         var qNameId= terms[t].questionNameId;
                         var el2= document.getElementById(qNameId);
                         if(el2){
@@ -371,13 +509,14 @@
                 }
             }
         }
+        // For hidden text calculations
         if(hiddenTextCalculations){
-            for(var i2=0;i2<hiddenTextCalculations.length;i2++){
+            for(var i2=0; i2<hiddenTextCalculations.length; i2++){
                 var txtObj= hiddenTextCalculations[i2];
-                for(var c2=0;c2<txtObj.calculations.length;c2++){
+                for(var c2=0; c2<txtObj.calculations.length; c2++){
                     var oneCalc2= txtObj.calculations[c2];
                     var terms2= oneCalc2.terms||[];
-                    for(var t2=0;t2<terms2.length;t2++){
+                    for(var t2=0; t2<terms2.length; t2++){
                         var qNameId2= terms2[t2].questionNameId;
                         var el3= document.getElementById(qNameId2);
                         if(el3){
