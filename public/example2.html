@@ -204,7 +204,9 @@ var hiddenTextCalculations = [];
                 // Create a unique ID for each generated input
                 var sanitized = labelTxt.replace(/\s+/g,"_").toLowerCase();
                 var inputId = "label"+questionId+"_"+j+"_"+sanitized;
-                container.innerHTML += "<input type=\"text\" id=\"" + inputId + "\" name=\"" + inputId + "\" placeholder=\"" + labelTxt + " " + j + "\" style=\"text-align:center;"><br>";
+        
+				container.innerHTML += '<input type=\"text"\ id=\"' + inputId + '\" name=\"' + inputId + '\" placeholder=\"' + labelTxt + ' ' + j + '\" style=\"text-align:center;"><br>';
+
             }
         }
     }

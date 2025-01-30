@@ -3,7 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <title>Flowchart Creator</title>
+
+  <!-- Include Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+
+  <!-- Include MXGraph -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mxgraph@4.2.2/javascript/mxClient.min.js"></script>
+
   <style>
     html, body {
       margin: 0;
@@ -11,7 +19,59 @@
       height: 100%;
       font-family: Arial, sans-serif;
       user-select: none;
+      overflow: hidden;
     }
+
+    /* Simple login overlay styling */
+    #loginOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.3);
+      display: none; /* hidden by default */
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    #loginModal {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+    }
+    #loginModal h2 {
+      margin: 0 0 10px;
+    }
+    #loginModal input {
+      margin-bottom: 10px;
+      padding: 8px;
+      font-size: 14px;
+    }
+    #loginModal button {
+      padding: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    #logoutButton {
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      background-color: #dc3545;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none; /* hidden until logged in */
+    }
+    #logoutButton:hover {
+      background-color: #c82333;
+    }
+
+    /* Main layout */
     .toolbar {
       width: 220px;
       background: #f9f9f9;
@@ -19,6 +79,8 @@
       float: left;
       padding: 10px;
       box-sizing: border-box;
+      height: 100%;
+      overflow-y: auto;
     }
     #graphContainer {
       position: absolute;
@@ -61,6 +123,8 @@
     input[type="file"] {
       display: none;
     }
+
+    /* Right-click context menu */
     .context-menu {
       position: absolute;
       background: #fff;
@@ -132,9 +196,42 @@
     .editable-field:focus {
       outline: 1px dashed #888;
     }
+
+    /* Legend for question-type colors */
+    .legend {
+      margin-top: 10px;
+      padding: 5px;
+      background: #f0f0f0;
+      border-radius: 4px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+    .color-block {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      border: 1px solid #333;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+  <!-- LOGIN OVERLAY -->
+  <div id="loginOverlay">
+    <div id="loginModal">
+      <h2>Login</h2>
+      <input type="email" id="loginEmail" placeholder="Email" />
+      <input type="password" id="loginPassword" placeholder="Password" />
+      <button id="loginButton">Login</button>
+      <button id="signupButton">Sign Up</button>
+    </div>
+  </div>
+
+  <!-- Main toolbar -->
   <div class="toolbar">
     <h3>Shapes</h3>
     <!-- Default question node -->
@@ -164,6 +261,24 @@
         onchange="importFlowchartJson(event)"
       />
       <button onclick="exportGuiJson()">Export GUI JSON</button>
+      <button id="logoutButton">Logout</button>
+    </div>
+
+    <!-- Legend for question-type colors -->
+    <div class="legend">
+      <strong>Legend (Question Colors)</strong>
+      <div class="legend-item" data-type="text">
+        <div class="color-block" id="colorBlockText"></div> Text
+      </div>
+      <div class="legend-item" data-type="checkbox">
+        <div class="color-block" id="colorBlockCheckbox"></div> Checkbox
+      </div>
+      <div class="legend-item" data-type="dropdown">
+        <div class="color-block" id="colorBlockDropdown"></div> Dropdown
+      </div>
+      <div class="legend-item" data-type="money">
+        <div class="color-block" id="colorBlockMoney"></div> Money
+      </div>
     </div>
   </div>
 
@@ -176,6 +291,7 @@
     <button id="jumpNode">Jump</button>
     <button id="changeType">Change Type &raquo;</button>
     <button id="newSectionButton">New Section</button>
+    <button id="yesNoButton">Yes/No</button>
     <button id="propertiesButton">Properties</button>
   </div>
 
@@ -184,7 +300,6 @@
     <button id="dropdownType">Drop Down</button>
     <button id="checkboxType">Checkbox</button>
     <button id="textType">Text</button>
-    <!-- NEW: money type -->
     <button id="moneyType">Money</button>
   </div>
 
@@ -201,12 +316,157 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      if (typeof mxGraph === "undefined") {
-        alert("mxGraph library not found!");
-        return;
-      }
+    /************************************************************/
+    /*  1) FIREBASE SETUP                                       */
+    /************************************************************/
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlxFmFD-rz1V_Q9_oV0DkLsENbmyJ1k-U",
+      authDomain: "flowchart-1eb90.firebaseapp.com",
+      projectId: "flowchart-1eb90",
+      storageBucket: "flowchart-1eb90.firebasestorage.app",
+      messagingSenderId: "546103281533",
+      appId: "1:546103281533:web:ae719cdbde727dcd94ee14",
+      measurementId: "G-8VSXRFREY9"
+    };
 
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // We'll store color preferences in user document, e.g. "colorPreferences"
+    let currentUser = null;
+    let colorPreferences = {
+      text: "#4B82D5",      // Example default: darker light blue
+      checkbox: "#79AFFF", // Example default: a bit lighter
+      dropdown: "#ADD8E6", // Example default: light blue
+      money: "#E0FFFF"     // Example default: very light blue
+    };
+
+    // Try to read color prefs from localStorage/cookie as a fallback
+    // (But the main source of truth will be Firestore once logged in)
+    let storedPrefs = localStorage.getItem('colorPreferences');
+    if (storedPrefs) {
+      try {
+        colorPreferences = JSON.parse(storedPrefs);
+      } catch(e){}
+    }
+
+    // Simple function to set a cookie (for demonstration)
+    function setCookie(name, value, days=7) {
+      const d = new Date();
+      d.setTime(d.getTime() + (days*24*60*60*1000));
+      let expires = "expires="+ d.toUTCString();
+      document.cookie = name + "=" + value + ";" + expires + ";path=/";
+    }
+    // Simple function to get a cookie
+    function getCookie(name) {
+      let decodedCookie = decodeURIComponent(document.cookie);
+      let ca = decodedCookie.split(';');
+      let prefix = name + "=";
+      for(let i = 0; i < ca.length; i++) {
+        let c = ca[i].trim();
+        if (c.indexOf(prefix) == 0) {
+          return c.substring(prefix.length, c.length);
+        }
+      }
+      return "";
+    }
+
+    // Listen for Auth changes
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        // Save userId in cookie so we know user is logged in
+        setCookie("flowchartUserId", user.uid);
+
+        // Load color preferences from Firestore
+        await loadColorPreferences();
+        // Hide login overlay
+        document.getElementById("loginOverlay").style.display = "none";
+        document.getElementById("logoutButton").style.display = "block";
+
+        // Refresh the blocks in the legend
+        updateLegendBlocks();
+        // Recolor existing cells
+        if (window.graph) refreshAllCells();
+
+      } else {
+        // If not logged in, check if we have a cookie
+        let cookieUser = getCookie("flowchartUserId");
+        if (cookieUser) {
+          // Attempt silent login or do something
+          // For simplicity, let's just show the login page if we truly have no Firebase user
+          // Clear cookie
+          setCookie("flowchartUserId", "", -1);
+        }
+        document.getElementById("logoutButton").style.display = "none";
+        // Show login overlay
+        document.getElementById("loginOverlay").style.display = "flex";
+      }
+    });
+
+    async function loadColorPreferences() {
+      if (!currentUser) return;
+      const docRef = db.collection("users").doc(currentUser.uid);
+      const docSnap = await docRef.get();
+      if (docSnap.exists) {
+        const data = docSnap.data();
+        if (data.colorPreferences) {
+          colorPreferences = data.colorPreferences;
+          // store locally
+          localStorage.setItem('colorPreferences', JSON.stringify(colorPreferences));
+        }
+      }
+    }
+
+    async function saveColorPreferences() {
+      if (!currentUser) return;
+      // Store in Firestore
+      const docRef = db.collection("users").doc(currentUser.uid);
+      await docRef.set({ colorPreferences }, { merge: true });
+      // Also store in localStorage
+      localStorage.setItem('colorPreferences', JSON.stringify(colorPreferences));
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      /* ----- LOGIN / SIGNUP ----- */
+      const loginButton = document.getElementById("loginButton");
+      const signupButton = document.getElementById("signupButton");
+      const logoutButton = document.getElementById("logoutButton");
+
+      loginButton.addEventListener("click", async () => {
+        const email = (document.getElementById("loginEmail").value || "").trim();
+        const pass = (document.getElementById("loginPassword").value || "").trim();
+        if (!email || !pass) return alert("Please fill in email/password");
+        try {
+          await auth.signInWithEmailAndPassword(email, pass);
+        } catch (err) {
+          alert("Login failed: " + err.message);
+        }
+      });
+
+      signupButton.addEventListener("click", async () => {
+        const email = (document.getElementById("loginEmail").value || "").trim();
+        const pass = (document.getElementById("loginPassword").value || "").trim();
+        if (!email || !pass) return alert("Please fill in email/password");
+        try {
+          await auth.createUserWithEmailAndPassword(email, pass);
+        } catch (err) {
+          alert("Sign up failed: " + err.message);
+        }
+      });
+
+      logoutButton.addEventListener("click", async () => {
+        await auth.signOut();
+        setCookie("flowchartUserId", "", -1);
+        // Show login
+        document.getElementById("loginOverlay").style.display = "flex";
+      });
+
+      /************************************************************/
+      /*  2) INITIALIZE GRAPH & LOGIC                            */
+      /************************************************************/
       const container = document.getElementById("graphContainer");
 
       const contextMenu = document.getElementById("contextMenu");
@@ -214,12 +474,13 @@
       const jumpNodeButton = document.getElementById("jumpNode");
       const changeTypeButton = document.getElementById("changeType");
       const newSectionButton = document.getElementById("newSectionButton");
+      const yesNoButton = document.getElementById("yesNoButton");
       const propertiesButton = document.getElementById("propertiesButton");
+
       const typeSubmenu = document.getElementById("typeSubmenu");
       const dropdownTypeBtn = document.getElementById("dropdownType");
       const checkboxTypeBtn = document.getElementById("checkboxType");
       const textTypeBtn = document.getElementById("textType");
-      // NEW: money button
       const moneyTypeBtn = document.getElementById("moneyType");
 
       const propertiesMenu = document.getElementById("propertiesMenu");
@@ -232,14 +493,13 @@
       let currentMouseEvent = null;
       let lastSelectedCell = null;
 
-      // Track which node is in Jump Mode (only one at a time for simplicity)
       let jumpModeNode = null;
-      // Permanent jump style
       const jumpBorderStyle = ";strokeWidth=3;strokeColor=#ff0000;dashed=1;dashPattern=4 4;";
 
       mxEvent.disableContextMenu(container);
 
       const graph = new mxGraph(container);
+      window.graph = graph; // so we can call refreshAllCells from outside
       graph.setPanning(true);
       graph.panningHandler.useLeftButtonForPanning = true;
       graph.setCellsMovable(true);
@@ -247,7 +507,6 @@
       graph.setCellsResizable(true);
       new mxRubberband(graph);
 
-      // Sync node IDs to labels on selection change
       graph.getSelectionModel().addListener(mxEvent.CHANGE, () => {
         if (lastSelectedCell) {
           autoUpdateNodeIdBasedOnLabel(lastSelectedCell);
@@ -266,7 +525,7 @@
         }
       }
 
-      // ---------- Style / ID Helpers ----------
+      // ---------- ID & Style Helpers ----------
       function setSectionId(cell, sid) {
         if (!cell) return;
         let style = cell.style || "";
@@ -279,8 +538,6 @@
         const m = style.match(/sectionId=([^;]+)/);
         return m ? parseInt(m[1], 10) : 1;
       }
-
-      // skipReassign => permanently skip auto–section logic
       function addSkipReassign(cell) {
         if (!cell) return;
         let style = cell.style || "";
@@ -292,11 +549,15 @@
         return cell && cell.style && cell.style.includes("skipReassign=true");
       }
 
-      function setCellColor(cell, color) {
-        let style = cell.style || "";
-        style = style.replace(/fillColor=[^;]+/, "");
-        style += `;fillColor=${color};`;
-        graph.getModel().setStyle(cell, style);
+      // Color for each question type pulled from colorPreferences
+      function getColorForQuestionType(qType) {
+        switch(qType) {
+          case "text":     return colorPreferences.text;
+          case "checkbox": return colorPreferences.checkbox;
+          case "dropdown": return colorPreferences.dropdown;
+          case "money":    return colorPreferences.money;
+          default:         return "#ADD8E6"; // fallback
+        }
       }
 
       function getQuestionType(cell) {
@@ -331,60 +592,72 @@
       }
 
       // ---------- refresh logic ----------
-      function refreshAllCells() {
+      window.refreshAllCells = function() {
         const parent = graph.getDefaultParent();
         const vertices = graph.getChildVertices(parent);
 
-        vertices.forEach((cell) => {
-          // If skipReassign => skip all auto–section logic
-          if (!hasSkipReassign(cell)) {
-            // If it's an options node, we often inherit parent's section
-            if (isOptions(cell)) {
-              const incomingEdges = graph.getIncomingEdges(cell) || [];
-              if (incomingEdges.length > 0) {
-                const parentCell = incomingEdges[0].source;
-                if (parentCell && isQuestion(parentCell)) {
-                  const pSec = getSectionId(parentCell);
-                  setSectionId(cell, pSec);
+        graph.getModel().beginUpdate();
+        try {
+          vertices.forEach((cell) => {
+            if (!hasSkipReassign(cell)) {
+              if (isOptions(cell)) {
+                const incomingEdges = graph.getIncomingEdges(cell) || [];
+                if (incomingEdges.length > 0) {
+                  const parentCell = incomingEdges[0].source;
+                  if (parentCell && isQuestion(parentCell)) {
+                    const pSec = getSectionId(parentCell);
+                    setSectionId(cell, pSec);
+                  }
+                }
+              }
+              if (isQuestion(cell)) {
+                const thisSection = getSectionId(cell);
+                const incomingEdges = graph.getIncomingEdges(cell) || [];
+                const incomingOptions = incomingEdges.filter(e => {
+                  return e.source && isOptions(e.source);
+                });
+                if (
+                  !cell.style.includes("newSection=true") &&
+                  (thisSection === 1 || thisSection === 0) &&
+                  incomingOptions.length > 0
+                ) {
+                  const parentOpt = incomingOptions[0].source;
+                  const parentSectionId = getSectionId(parentOpt);
+                  setSectionId(cell, parentSectionId);
                 }
               }
             }
-
-            // If it's a question node, we typically might adjust the section
-            if (isQuestion(cell)) {
-              const thisSection = getSectionId(cell);
-              const incomingEdges = graph.getIncomingEdges(cell) || [];
-              const incomingOptions = incomingEdges.filter(e => {
-                return e.source && isOptions(e.source);
-              });
-              // If not marked as newSection, but we have an options parent, keep parent's section
-              if (
-                !cell.style.includes("newSection=true") &&
-                (thisSection === 1 || thisSection === 0) &&
-                incomingOptions.length > 0
-              ) {
-                const parentOpt = incomingOptions[0].source;
-                const parentSectionId = getSectionId(parentOpt);
-                setSectionId(cell, parentSectionId);
-              }
-            }
-          }
-
-          colorCell(cell);
-          updateOverlay(cell);
-        });
+            colorCell(cell);
+            updateOverlay(cell);
+          });
+        } finally {
+          graph.getModel().endUpdate();
+        }
       }
 
       function colorCell(cell) {
         if (!cell.vertex) return;
-        let fillColor = "#ADD8E6"; // default fill for question / options
-        if (isQuestion(cell) && cell.style.includes("newSection=true")) {
-          fillColor = "#FFC0CB"; // pink for new-section question
+        if (isQuestion(cell)) {
+          const qType = getQuestionType(cell);
+          let fillColor = getColorForQuestionType(qType);
+
+          // If also "newSection=true", you might want a border or something.
+          if (cell.style.includes("newSection=true")) {
+            // We won't override fillColor, but you can do something else if needed
+          }
+
+          let style = cell.style || "";
+          style = style.replace(/fillColor=[^;]+/, "");
+          style += `;fillColor=${fillColor};`;
+          graph.getModel().setStyle(cell, style);
+
+        } else if (isOptions(cell)) {
+          // For options, let's just keep it as is or a default color.
+          let style = cell.style || "";
+          style = style.replace(/fillColor=[^;]+/, "");
+          style += ";fillColor=#ffffff;";
+          graph.getModel().setStyle(cell, style);
         }
-        let style = cell.style || "";
-        style = style.replace(/fillColor=[^;]+/, "");
-        style += `;fillColor=${fillColor};`;
-        graph.getModel().setStyle(cell, style);
       }
 
       function markAsNewSection(cell) {
@@ -393,7 +666,6 @@
         style = style.replace(/newSection=[^;]+/, "");
         style += ";newSection=true;";
         graph.getModel().setStyle(cell, style);
-        setCellColor(cell, "#FFC0CB");
       }
 
       function updateOverlay(cell) {
@@ -403,7 +675,6 @@
         if (isQuestion(cell)) text = getQuestionType(cell);
         else if (isOptions(cell)) text = "options";
         const overlay = new mxCellOverlay(
-          // Using a 1×1 transparent GIF, label is placed in the tooltip text
           new mxImage("data:image/gif;base64,R0lGODlhAQABAAAAACw=", 1, 1),
           text
         );
@@ -470,9 +741,7 @@
       });
 
       jumpNodeButton.addEventListener("click", () => {
-        // Make the selected cell the "jump" node, with a permanent border
         if (selectedCell) {
-          // If a different node was previously in jump mode, remove that styling
           if (jumpModeNode && jumpModeNode !== selectedCell) {
             removeJumpStyling(jumpModeNode);
           }
@@ -551,6 +820,69 @@
         }
         hideContextMenu();
       });
+
+      // The NEW "Yes/No" context menu item
+      yesNoButton.addEventListener("click", () => {
+        if (selectedCell && isQuestion(selectedCell)) {
+          createYesNoOptions(selectedCell);
+        }
+        hideContextMenu();
+      });
+
+      function createYesNoOptions(parentCell) {
+        graph.getModel().beginUpdate();
+        try {
+          const parentGeo = parentCell.geometry;
+          const parentX = parentGeo.x;
+          const parentY = parentGeo.y;
+
+          // Create a "Yes" options node (below to the left)
+          let yesVertex = graph.insertVertex(
+            graph.getDefaultParent(),
+            null,
+            "Yes",
+            parentX - 80,
+            parentY + 80,
+            80,
+            40,
+            "rounded=1;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;"
+          );
+          refreshOptionNodeId(yesVertex);
+
+          // Create a "No" options node (below to the right)
+          let noVertex = graph.insertVertex(
+            graph.getDefaultParent(),
+            null,
+            "No",
+            parentX + 80,
+            parentY + 80,
+            80,
+            40,
+            "rounded=1;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;"
+          );
+          refreshOptionNodeId(noVertex);
+
+          // Create edges
+          let yesEdge = graph.insertEdge(
+            graph.getDefaultParent(),
+            null,
+            "",
+            parentCell,
+            yesVertex
+          );
+          let noEdge = graph.insertEdge(
+            graph.getDefaultParent(),
+            null,
+            "",
+            parentCell,
+            noVertex
+          );
+
+        } finally {
+          graph.getModel().endUpdate();
+        }
+        refreshAllCells();
+      }
 
       propertiesButton.addEventListener("click", () => {
         if (selectedCell) {
@@ -697,17 +1029,15 @@
         refreshAllCells();
       });
 
-      // ========== CONNECT: child inherits parent's section UNLESS parent is in jump mode ==========
+      // CONNECT child inherits parent's section UNLESS parent is jump
       graph.connectionHandler.addListener(mxEvent.CONNECT, function (sender, evt) {
         const edge = evt.getProperty("cell");
         if (!edge) return;
         const parent = edge.source;
         const child = edge.target;
 
-        // We'll see if the parent or parent's question is in jump mode
         const parentIsJump = (parent && parent === jumpModeNode);
 
-        // If the parent is an options node, check its source (question)
         let parentQuestion = null;
         if (parent && isOptions(parent)) {
           parentQuestion = parent.source;
@@ -716,20 +1046,16 @@
         }
         const gpIsJump = (parentQuestion && parentQuestion === jumpModeNode);
 
-        // If parent (or grandparent question) is jump => skip reassign
         if (parentIsJump || gpIsJump) {
           addSkipReassign(child);
         } else {
-          // Normal assignment: child gets parent's section
           const parentSec = getSectionId(parent);
           setSectionId(child, parentSec);
         }
-
-        // We do NOT remove the jump styling anymore; jump node remains
         refreshAllCells();
       });
 
-      // ---------- Export Flowchart JSON ----------
+      // ---------- Export / Import Flowchart JSON ----------
       window.exportFlowchartJson = function () {
         const data = [];
         const cells = graph.getModel().cells;
@@ -756,18 +1082,6 @@
         }
         downloadJson(JSON.stringify(data, null, 2), "flowchart_data.json");
       };
-
-      function downloadJson(str, filename) {
-        const blob = new Blob([str], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
 
       window.importFlowchartJson = function (evt) {
         const file = evt.target.files[0];
@@ -819,6 +1133,18 @@
         refreshAllCells();
       }
 
+      function downloadJson(str, filename) {
+        const blob = new Blob([str], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
       // ---------- Export GUI JSON ----------
       window.exportGuiJson = function () {
         const model = graph.getModel();
@@ -833,7 +1159,6 @@
           return "other";
         }
 
-        // gather question nodes
         for (let id in allCells) {
           if (id === "0" || id === "1") continue;
           const cell = allCells[id];
@@ -843,10 +1168,9 @@
             const label = (cell.value || "").trim() || "Untitled";
             const qType = getQuestionType(cell);
 
-            // ADDED: nameId and placeholder
             const questionObj = {
               questionId: questionIdCounter,
-              nameId: getNodeId(cell) || "", // from our node style
+              nameId: getNodeId(cell) || "",
               placeholder: "",
               text: label,
               type: qType,
@@ -881,7 +1205,6 @@
           }
         }
 
-        // gather "options" from each question, set logic or jump
         for (let id in allCells) {
           if (id === "0" || id === "1") continue;
           const cell = allCells[id];
@@ -901,18 +1224,15 @@
                 const optNodeId = getNodeId(target);
 
                 if (qObj.type === "checkbox") {
-                  // For checkbox question, store an array of objects
                   qObj.options.push({
                     label: capitalizeFirst(optLabel),
                     nameId: optNodeId,
                     value: ""
                   });
                 } else {
-                  // For other question types, store an array of label strings
                   qObj.options.push(capitalizeFirst(optLabel));
                 }
 
-                // Then see if the options node leads to another question
                 const nextEdges = graph.getOutgoingEdges(target) || [];
                 nextEdges.forEach(ne => {
                   const q2 = ne.target;
@@ -922,13 +1242,13 @@
                     const q2Obj = questionList2.find(o => o.text === (q2.value || "").trim());
                     if (!q2Obj) return;
 
-                    // If it references an earlier question, treat as jump
+                    // If it references an earlier question => jump
                     if (q2._questionId < cell._questionId) {
                       qObj.jump.enabled = true;
                       qObj.jump.option = capitalizeFirst(optLabel);
                       qObj.jump.to = q2._questionId.toString();
                     } else {
-                      // If it references a later question, treat as logic
+                      // Later question => logic
                       q2Obj.logic.enabled = true;
                       q2Obj.logic.conditions.push({
                         prevQuestion: qObj.questionId.toString(),
@@ -942,7 +1262,6 @@
           }
         }
 
-        // finalize
         const sectionsArr = [];
         for (let s = 1; s <= maxSectionId; s++) {
           const qList = sectionsMap[s] || [];
@@ -968,7 +1287,52 @@
         if (!str) return str;
         return str.charAt(0).toUpperCase() + str.slice(1);
       }
-    });
+
+      // Load the legend color blocks
+      initLegendColorPickers();
+
+      function initLegendColorPickers() {
+        const colorBlockText = document.getElementById("colorBlockText");
+        const colorBlockCheckbox = document.getElementById("colorBlockCheckbox");
+        const colorBlockDropdown = document.getElementById("colorBlockDropdown");
+        const colorBlockMoney = document.getElementById("colorBlockMoney");
+
+        updateLegendBlocks();
+
+        // For each color block, attach an event that opens an <input type="color">
+        colorBlockText.addEventListener("click", () => onColorBlockClick("text"));
+        colorBlockCheckbox.addEventListener("click", () => onColorBlockClick("checkbox"));
+        colorBlockDropdown.addEventListener("click", () => onColorBlockClick("dropdown"));
+        colorBlockMoney.addEventListener("click", () => onColorBlockClick("money"));
+      }
+
+      function onColorBlockClick(questionType) {
+        // Create a hidden <input type="color">, click it
+        const colorInput = document.createElement("input");
+        colorInput.type = "color";
+        colorInput.value = colorPreferences[questionType] || "#ADD8E6";
+        colorInput.style.display = "none";
+
+        colorInput.addEventListener("input", async (e) => {
+          colorPreferences[questionType] = e.target.value;
+          await saveColorPreferences();
+          updateLegendBlocks();
+          refreshAllCells();
+        });
+
+        document.body.appendChild(colorInput);
+        colorInput.click();
+        document.body.removeChild(colorInput);
+      }
+
+      function updateLegendBlocks() {
+        document.getElementById("colorBlockText").style.backgroundColor = colorPreferences.text;
+        document.getElementById("colorBlockCheckbox").style.backgroundColor = colorPreferences.checkbox;
+        document.getElementById("colorBlockDropdown").style.backgroundColor = colorPreferences.dropdown;
+        document.getElementById("colorBlockMoney").style.backgroundColor = colorPreferences.money;
+      }
+
+    }); // end DOMContentLoaded
   </script>
 </body>
 </html>
