@@ -52,10 +52,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const colorPickerDropdown = document.getElementById("colorPickerDropdown");
   const colorPickerMoney = document.getElementById("colorPickerMoney");
 
+  // Initialize the graph
   graph = new mxGraph(container);
-  graph.setAutoSizeCells(true);
+  // Turn OFF automatic repositioning so that we control it manually
+  graph.setAutoSizeCells(false);
   graph.setHtmlLabels(true);
 
+  // We still allow panning and such
   mxEvent.disableContextMenu(container);
   graph.setPanning(true);
   graph.panningHandler.useLeftButtonForPanning = true;
@@ -72,17 +75,19 @@ document.addEventListener("DOMContentLoaded", function () {
   defStyle["arcSize"] = "24";
   defStyle["whiteSpace"] = "wrap";
   defStyle["html"] = "1";
-  defStyle["autosize"] = "1";
+  // Remove any autosize style
+  // defStyle["autosize"] = "1"; // removed so it doesn't auto-position
 
   defStyle["spacingTop"] = 16;
   defStyle["spacingBottom"] = 16;
   defStyle["spacingLeft"] = 16;
   defStyle["spacingRight"] = 16;
 
+  // This function locks the top-left corner and expands the size
   function keepTopLeftOnResize(cell) {
     // store old x,y
     const oldGeo = cell.geometry.clone();
-    // let mxGraph do updateCellSize
+    // Let mxGraph do the update, but do not center
     graph.updateCellSize(cell, false);
     // restore the old x,y
     const newGeo = cell.geometry.clone();
@@ -108,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Real-time text update but keep node from shifting
+  // Real-time text update but keep top-left corner
   (function overrideCellEditorForRealTime() {
     const oldInstallListeners = mxCellEditor.prototype.installListeners;
     mxCellEditor.prototype.installListeners = function(elt) {
@@ -141,6 +146,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   })();
 
+  // Track selection changes
   graph.getSelectionModel().addListener(mxEvent.CHANGE, () => {
     if (lastSelectedCell) {
       autoUpdateNodeIdBasedOnLabel(lastSelectedCell);
@@ -148,7 +154,7 @@ document.addEventListener("DOMContentLoaded", function () {
     lastSelectedCell = graph.getSelectionCell();
   });
 
-  // Draggable shapes from toolbar
+  // Draggable shapes from the toolbar
   const toolbarShapes = document.querySelectorAll(".shape");
   toolbarShapes.forEach((shapeEl) => {
     const baseStyle = shapeEl.dataset.style;
@@ -161,6 +167,8 @@ document.addEventListener("DOMContentLoaded", function () {
         let newVertex;
         try {
           const label = shapeEl.dataset.type + " node";
+          // Remove autosize from style so it doesn't shift
+          const finalStyle = baseStyle.replace(/autosize=1;?/g, "");
           newVertex = graph.insertVertex(
             parent,
             null,
@@ -169,7 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
             y,
             160,
             80,
-            baseStyle + ";autosize=1;"
+            finalStyle
           );
         } finally {
           graph.getModel().endUpdate();

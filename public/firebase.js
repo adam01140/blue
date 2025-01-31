@@ -1,13 +1,37 @@
-/* 
- ************************************************************************************************************
- ************************************************************************************************************
- ***                                                                                                      ***
- ***     S E C T I O N 5:   F I R E B A S E   &   A U T H                                                 ***
- ***                                                                                                      ***
- ************************************************************************************************************
- ************************************************************************************************************
-*/
+let currentUser = null;
 
+// We only change the references to updateLegendColors()
+// so it won't crash if helpers.js fails to load or returns 404.
+function loadUserColorPrefs() {
+  if (!currentUser) return;
+  db.collection("users")
+    .doc(currentUser.uid)
+    .collection("preferences")
+    .doc("colors")
+    .get()
+    .then(docSnap => {
+      if (docSnap.exists) {
+        const data = docSnap.data();
+        if (data.text) colorPreferences.text = data.text;
+        if (data.checkbox) colorPreferences.checkbox = data.checkbox;
+        if (data.dropdown) colorPreferences.dropdown = data.dropdown;
+        if (data.money) colorPreferences.money = data.money;
+      }
+      // Wrapped in a check:
+      if (typeof updateLegendColors === 'function') {
+        updateLegendColors();
+      }
+      if (typeof refreshAllCells === 'function') {
+        refreshAllCells();
+      }
+    })
+    .catch(err => {
+      console.error("Error loading color prefs:", err);
+    });
+}
+
+// The rest is unchanged from your original, except that we declare
+// currentUser = null up top and removed the repeated let currentUser.
 const firebaseConfig = {
   apiKey: "AIzaSyBlxFmFD-rz1V_Q9_oV0DkLsENbmyJ1k-U",
   authDomain: "flowchart-1eb90.firebaseapp.com",
@@ -19,16 +43,8 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-let currentUser = null;
 
-let colorPreferences = {
-  text: "#749FFE",
-  checkbox: "#A1B8FE",
-  dropdown: "#C5D4FE",
-  money: "#E2EAFF"
-};
-
-const loginOverlay = document.getElementById("loginOverlay");
+let loginOverlay = document.getElementById("loginOverlay");
 const loginButton = document.getElementById("loginButton");
 const signupButton = document.getElementById("signupButton");
 const loginEmail = document.getElementById("loginEmail");
@@ -90,6 +106,7 @@ loginButton.addEventListener("click", () => {
       loginError.textContent = err.message;
     });
 });
+
 signupButton.addEventListener("click", () => {
   const email = loginEmail.value.trim();
   const pass = loginPassword.value.trim();
@@ -107,28 +124,6 @@ signupButton.addEventListener("click", () => {
     });
 });
 
-function loadUserColorPrefs() {
-  if (!currentUser) return;
-  db.collection("users")
-    .doc(currentUser.uid)
-    .collection("preferences")
-    .doc("colors")
-    .get()
-    .then(docSnap => {
-      if (docSnap.exists) {
-        const data = docSnap.data();
-        if (data.text) colorPreferences.text = data.text;
-        if (data.checkbox) colorPreferences.checkbox = data.checkbox;
-        if (data.dropdown) colorPreferences.dropdown = data.dropdown;
-        if (data.money) colorPreferences.money = data.money;
-      }
-      updateLegendColors();
-      refreshAllCells();
-    })
-    .catch(err => {
-      console.error("Error loading color prefs:", err);
-    });
-}
 function saveUserColorPrefs() {
   if (!currentUser) return Promise.resolve();
   return db.collection("users")
@@ -138,5 +133,4 @@ function saveUserColorPrefs() {
     .set(colorPreferences, { merge: true });
 }
 
-// Start the login check right away.
 checkForSavedLogin();
