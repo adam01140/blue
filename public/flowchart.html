@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Flowchart Creator (No Sections, No Jumping)</title>
+  <title>Flowchart Creator (Rounded, Larger Font, Sections JSON, Zoom Scroll, Saved Flowcharts)</title>
   <!-- mxGraph -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mxgraph@4.2.2/javascript/mxClient.min.js"></script>
   <!-- Firebase -->
@@ -17,6 +17,8 @@
       height: 100%;
       font-family: Arial, sans-serif;
       user-select: none;
+      /* Prevent default browser wheel scroll so we can do zoom */
+      overflow: hidden;
     }
     .toolbar {
       width: 220px;
@@ -25,6 +27,8 @@
       float: left;
       padding: 10px;
       box-sizing: border-box;
+      height: 100%;
+      overflow-y: auto;
     }
     #graphContainer {
       position: absolute;
@@ -33,6 +37,8 @@
       top: 0;
       bottom: 0;
       cursor: default;
+      /* This container is where we do the wheel zoom */
+      overflow: hidden;
     }
     .shape {
       background: #fff;
@@ -138,7 +144,6 @@
       outline: 1px dashed #888;
     }
 
-    /* Legend area for colors */
     .legend {
       margin-top: 10px;
       padding: 6px;
@@ -160,7 +165,6 @@
       border-radius: 3px;
     }
 
-    /* Basic login form overlay */
     #loginOverlay {
       position: fixed;
       top: 0;
@@ -191,36 +195,71 @@
       margin-bottom: 8px;
     }
 
-    /* Customization for the in-node text box padding + rounding */
     .mxGraph .mxCellEditor,
     .mxGraph .mxCellOverlay {
       background: transparent !important;
     }
     .mxCellEditor {
       background: #ffffff !important;
-      border-radius: 12px !important;  /* round corners of the editor */
+      border-radius: 12px !important;
       overflow: visible !important;
       box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
       box-sizing: border-box !important;
     }
     .mxCellEditor div {
-      padding: 16px !important;       /* extra padding inside the editable area */
+      padding: 16px !important;
       border: 1px solid #ccc !important;
-      border-radius: 12px !important; /* also round corners here */
+      border-radius: 12px !important;
       background: #ffffff !important;
       min-width: 20px !important;
-      min-height: 90px !important;
+      min-height: 60px !important;
       box-sizing: border-box !important;
     }
     .mxCellEditor textarea {
-      padding: 16px !important;       /* extra padding inside the text area */
+      padding: 16px !important;
       border: 1px solid #ccc !important;
-      border-radius: 12px !important; /* round corners */
+      border-radius: 12px !important;
       background: #ffffff !important;
       min-width: 20px !important;
       min-height: 50px !important;
       resize: none;
       box-sizing: border-box !important;
+    }
+
+    /* Flowchart List Overlay (View Saved Flowcharts) */
+    #flowchartListOverlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 9999;
+      display: none;  /* hidden by default */
+      justify-content: center;
+      align-items: center;
+    }
+    #flowchartListPanel {
+      background: #fff;
+      padding: 20px;
+      border-radius: 6px;
+      min-width: 300px;
+      text-align: center;
+    }
+    #flowchartListPanel h3 {
+      margin-top: 0;
+      text-align: center;
+    }
+    .flowchart-item {
+      margin-bottom: 16px; /* More space below each item */
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 6px;
+      text-align: center;
+    }
+    .flowchart-item strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+    .flowchart-item button {
+      margin-right: 6px;
     }
   </style>
 </head>
@@ -237,20 +276,28 @@
   </div>
 </div>
 
+<div id="flowchartListOverlay">
+  <div id="flowchartListPanel">
+    <h3>Saved Flowcharts</h3>
+    <div id="flowchartList"></div>
+    <br/>
+    <button id="closeFlowchartListBtn">Close</button>
+  </div>
+</div>
+
 <div class="toolbar">
   <h3>Shapes</h3>
-  <!-- No auto-size or section data in these shapes -->
   <div
     class="shape"
     data-type="question"
-    data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;nodeId=Question_node;"
+    data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;nodeId=Question_node;section=1;spacing=12;fontSize=16;"
   >
     Question Node
   </div>
   <div
     class="shape"
     data-type="options"
-    data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;nodeId=Option_node;"
+    data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;nodeId=Option_node;section=1;spacing=12;fontSize=16;"
   >
     Options Node
   </div>
@@ -268,10 +315,10 @@
   </div>
 
   <div class="legend">
-    <strong>Legend (Click color to change)</strong>
+    <strong>Legend</strong>
     <div class="legend-item">
       <div class="legend-color-box" id="colorText"></div>
-      <span>Text</span>
+      <span>Textbox</span>
     </div>
     <div class="legend-item">
       <div class="legend-color-box" id="colorCheckbox"></div>
@@ -293,10 +340,16 @@
       <div class="legend-color-box" id="colorBigParagraph"></div>
       <span>Big Paragraph</span>
     </div>
+    <div class="legend-item">
+      <div class="legend-color-box" id="colorTextColor"></div>
+      <span>Text Color</span>
+    </div>
   </div>
 
-  <!-- RESET button to restore default colors, then a LOGOUT button -->
-  <button id="resetColorsBtn">Reset Colors</button>
+  <!-- Below the legend -->
+  <button id="resetBtn">Reset Colors</button>
+  <button id="saveFlowchartBtn" onclick="saveFlowchart()">Save Flowchart</button>
+  <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">View Saved Flowcharts</button>
   <button id="logoutBtn">Logout</button>
 </div>
 
@@ -308,6 +361,7 @@
   <button id="changeType">Change Type &raquo;</button>
   <button id="propertiesButton">Properties</button>
   <button id="yesNoNode">Yes/No</button>
+  <button id="newSectionNode">New Section</button>
 </div>
 
 <div id="typeSubmenu" class="submenu">
@@ -326,23 +380,25 @@
   <p><strong>Node ID:</strong>
     <span id="propNodeId" class="editable-field" tabindex="0"></span>
   </p>
+  <p><strong>Section:</strong>
+    <span id="propNodeSection" class="editable-field" tabindex="0"></span>
+  </p>
   <p><strong>Node Type:</strong> <span id="propNodeType"></span></p>
 </div>
 
-<!-- Color pickers (hidden by default) -->
+<!-- Hidden color pickers -->
 <input type="color" id="colorPickerText" style="display:none;" />
 <input type="color" id="colorPickerCheckbox" style="display:none;" />
 <input type="color" id="colorPickerDropdown" style="display:none;" />
 <input type="color" id="colorPickerMoney" style="display:none;" />
 <input type="color" id="colorPickerDate" style="display:none;" />
 <input type="color" id="colorPickerBigParagraph" style="display:none;" />
+<input type="color" id="colorPickerTextColor" style="display:none;" />
 
 <script>
-  /*
-   *********************************************************************
-   **************       Firebase Config & Auth Setup       *************
-   *********************************************************************
-  */
+  /**************************************************
+   ************ Firebase Config & Basic Auth ********
+   **************************************************/
   const firebaseConfig = {
     apiKey: "AIzaSyBlxFmFD-rz1V_Q9_oV0DkLsENbmyJ1k-U",
     authDomain: "flowchart-1eb90.firebaseapp.com",
@@ -356,21 +412,20 @@
   const db = firebase.firestore();
   let currentUser = null;
 
-  /*
-    Default color preferences: from light to dark blue, as requested.
-    We'll store a separate "defaultColorPreferences" so we can reset easily.
-  */
-  const defaultColorPreferences = {
-    text: "#cce6ff",         // lightest
+  // For "Reset" button
+  const defaultColors = {
+    text: "#cce6ff",
     checkbox: "#b3daff",
     dropdown: "#99ccff",
     money: "#80bfff",
     date: "#4da6ff",
-    bigParagraph: "#1a8cff"  // darkest
+    bigParagraph: "#1a8cff",
+    textColor: "#000000"
   };
+  let colorPreferences = { ...defaultColors };
 
-  // We'll let colorPreferences start as a copy of defaults
-  let colorPreferences = { ...defaultColorPreferences };
+  // If user has opened a flowchart by name, store it here
+  let currentFlowchartName = null;
 
   const loginOverlay = document.getElementById("loginOverlay");
   const loginButton = document.getElementById("loginButton");
@@ -378,6 +433,10 @@
   const loginEmail = document.getElementById("loginEmail");
   const loginPassword = document.getElementById("loginPassword");
   const loginError = document.getElementById("loginError");
+
+  const flowchartListOverlay = document.getElementById("flowchartListOverlay");
+  const flowchartListDiv = document.getElementById("flowchartList");
+  const closeFlowchartListBtn = document.getElementById("closeFlowchartListBtn");
 
   function showLoginOverlay() {
     loginOverlay.style.display = "flex";
@@ -403,10 +462,39 @@
     return "";
   }
 
+  loginButton.addEventListener("click", () => {
+    const email = loginEmail.value.trim();
+    const pass = loginPassword.value.trim();
+    firebase.auth().signInWithEmailAndPassword(email, pass)
+      .then(cred => {
+        currentUser = cred.user;
+        setCookie("flowchart_uid", currentUser.uid, 7);
+        hideLoginOverlay();
+        loadUserColorPrefs();
+      })
+      .catch(err => {
+        loginError.textContent = err.message;
+      });
+  });
+  signupButton.addEventListener("click", () => {
+    const email = loginEmail.value.trim();
+    const pass = loginPassword.value.trim();
+    firebase.auth().createUserWithEmailAndPassword(email, pass)
+      .then(cred => {
+        currentUser = cred.user;
+        setCookie("flowchart_uid", currentUser.uid, 7);
+        hideLoginOverlay();
+        saveUserColorPrefs().then(() => loadUserColorPrefs());
+      })
+      .catch(err => {
+        loginError.textContent = err.message;
+      });
+  });
+
   function checkForSavedLogin() {
     const savedUid = getCookie("flowchart_uid");
     if (savedUid) {
-      firebase.auth().onAuthStateChanged((user) => {
+      firebase.auth().onAuthStateChanged(user => {
         if (user && user.uid === savedUid) {
           currentUser = user;
           hideLoginOverlay();
@@ -420,37 +508,6 @@
     }
   }
 
-  loginButton.addEventListener("click", () => {
-    const email = loginEmail.value.trim();
-    const pass = loginPassword.value.trim();
-    firebase.auth().signInWithEmailAndPassword(email, pass)
-      .then((cred) => {
-        currentUser = cred.user;
-        setCookie("flowchart_uid", currentUser.uid, 7);
-        hideLoginOverlay();
-        loadUserColorPrefs();
-      })
-      .catch((err) => {
-        loginError.textContent = err.message;
-      });
-  });
-  signupButton.addEventListener("click", () => {
-    const email = loginEmail.value.trim();
-    const pass = loginPassword.value.trim();
-    firebase.auth().createUserWithEmailAndPassword(email, pass)
-      .then((cred) => {
-        currentUser = cred.user;
-        setCookie("flowchart_uid", currentUser.uid, 7);
-        hideLoginOverlay();
-        saveUserColorPrefs().then(() => {
-          loadUserColorPrefs();
-        });
-      })
-      .catch((err) => {
-        loginError.textContent = err.message;
-      });
-  });
-
   function loadUserColorPrefs() {
     if (!currentUser) return;
     db.collection("users")
@@ -461,17 +518,13 @@
       .then(docSnap => {
         if (docSnap.exists) {
           const data = docSnap.data();
-          // Merge them carefully
-          for (let key in defaultColorPreferences) {
-            if (data[key]) {
+          for (let key in defaultColors) {
+            if (data[key] !== undefined) {
               colorPreferences[key] = data[key];
             } else {
-              colorPreferences[key] = defaultColorPreferences[key];
+              colorPreferences[key] = defaultColors[key];
             }
           }
-        } else {
-          // If doc doesn't exist, use the defaults
-          colorPreferences = { ...defaultColorPreferences };
         }
         updateLegendColors();
         refreshAllCells();
@@ -491,11 +544,6 @@
 </script>
 
 <script>
-  /*
-   *********************************************************************
-   **************       Initialize Graph & Context Menu     ************
-   *********************************************************************
-  */
   let graph = null;
   let selectedCell = null;
   let currentMouseEvent = null;
@@ -503,11 +551,47 @@
   let jumpModeNode = null;
   const jumpBorderStyle = ";strokeWidth=3;strokeColor=#ff0000;dashed=1;dashPattern=4 4;";
 
-  document.addEventListener("DOMContentLoaded", function () {
-    if (typeof mxGraph === "undefined") {
-      alert("mxGraph library not found!");
-      return;
+  // We define loadFlowchartData globally so "openSavedFlowchart" can call it
+  function loadFlowchartData(data) {
+    graph.getModel().beginUpdate();
+    try {
+      const parent = graph.getDefaultParent();
+      graph.removeCells(graph.getChildVertices(parent));
+      const createdCells = {};
+
+      data.forEach((item) => {
+        if (item.vertex) {
+          const geo = new mxGeometry(
+            item.geometry.x,
+            item.geometry.y,
+            item.geometry.width,
+            item.geometry.height
+          );
+          const newCell = new mxCell(item.value, geo, item.style);
+          newCell.vertex = true;
+          newCell.id = item.id;
+          graph.addCell(newCell, parent);
+          createdCells[item.id] = newCell;
+        }
+      });
+
+      data.forEach((item) => {
+        if (item.edge) {
+          const newEdge = new mxCell(item.value, new mxGeometry(), item.style);
+          newEdge.edge = true;
+          newEdge.id = item.id;
+          const src = createdCells[item.source];
+          const trg = createdCells[item.target];
+          graph.addCell(newEdge, parent, undefined, src, trg);
+        }
+      });
+    } finally {
+      graph.getModel().endUpdate();
     }
+    refreshAllCells();
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
     checkForSavedLogin();
 
     const container = document.getElementById("graphContainer");
@@ -517,6 +601,7 @@
     const changeTypeButton = document.getElementById("changeType");
     const propertiesButton = document.getElementById("propertiesButton");
     const yesNoNodeButton = document.getElementById("yesNoNode");
+    const newSectionButton = document.getElementById("newSectionNode");
 
     const typeSubmenu = document.getElementById("typeSubmenu");
     const dropdownTypeBtn = document.getElementById("dropdownType");
@@ -530,90 +615,45 @@
     const propNodeText = document.getElementById("propNodeText");
     const propNodeId = document.getElementById("propNodeId");
     const propNodeType = document.getElementById("propNodeType");
+    const propNodeSection = document.getElementById("propNodeSection");
 
-    const colorBoxText = document.getElementById("colorText");
-    const colorBoxCheckbox = document.getElementById("colorCheckbox");
-    const colorBoxDropdown = document.getElementById("colorDropdown");
-    const colorBoxMoney = document.getElementById("colorMoney");
-    const colorBoxDate = document.getElementById("colorDate");
-    const colorBoxBigParagraph = document.getElementById("colorBigParagraph");
-
-    const colorPickerText = document.getElementById("colorPickerText");
-    const colorPickerCheckbox = document.getElementById("colorPickerCheckbox");
-    const colorPickerDropdown = document.getElementById("colorPickerDropdown");
-    const colorPickerMoney = document.getElementById("colorPickerMoney");
-    const colorPickerDate = document.getElementById("colorPickerDate");
-    const colorPickerBigParagraph = document.getElementById("colorPickerBigParagraph");
-
-    const resetColorsBtn = document.getElementById("resetColorsBtn");
+    const resetBtn = document.getElementById("resetBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    /*
-      1) Create the graph.
-         We do NOT call setAutoSizeCells(true) so it won't resize live.
-    */
+    // Create graph
     graph = new mxGraph(container);
-
-    // 2) We do NOT do auto sizing. So remove "autosize=1" from the style as well.
-
-    // 3) Let it render raw HTML in cell values
+    // Enter => newline
+    graph.setEnterStopsCellEditing(false);
     graph.setHtmlLabels(true);
 
-    mxEvent.disableContextMenu(container);
+    // Enable left-button panning on whitespace:
     graph.setPanning(true);
     graph.panningHandler.useLeftButtonForPanning = true;
+
+    mxEvent.disableContextMenu(container);
     graph.setCellsMovable(true);
     graph.setConnectable(true);
     graph.setCellsResizable(true);
     new mxRubberband(graph);
 
-    // 4) Default vertex style
+    // Default style
     const defStyle = graph.getStylesheet().getDefaultVertexStyle();
-    defStyle["labelBackgroundColor"] = "#ffffff";
-    defStyle["labelBorderColor"] = "#cccccc";
+    defStyle["shape"] = mxConstants.SHAPE_ROUND_RECT;
     defStyle["rounded"] = "1";
-    defStyle["arcSize"] = "24";
-    defStyle["whiteSpace"] = "wrap";
-    defStyle["html"] = "1";
-    // Remove "autosize" from default style
-    // *** Center text in the node ***
-    defStyle["align"] = mxConstants.ALIGN_CENTER;
-    defStyle["verticalAlign"] = mxConstants.ALIGN_MIDDLE;
-    // Extra internal padding
-    defStyle["spacingTop"] = 20;
-    defStyle["spacingBottom"] = 20;
-    defStyle["spacingLeft"] = 20;
-    defStyle["spacingRight"] = 20;
+    defStyle["arcSize"] = "20";
+    defStyle["fontSize"] = "16";
+    defStyle["spacing"] = "12";
 
-    // Enforce a minimum size if user tries to manually resize
-    graph.getModel().addListener(mxEvent.CHANGE, (sender, evt) => {
-      const changes = evt.getProperty("changes") || [];
-      changes.forEach(change => {
-        if (change.constructor.name === "mxGeometryChange") {
-          const changedCell = change.cell;
-          if (changedCell && changedCell.vertex) {
-            const geo = changedCell.geometry;
-            if (geo) {
-              if (geo.width < 120) geo.width = 120;
-              if (geo.height < 60) geo.height = 60;
-            }
-          }
-        }
-      });
-    });
+    // Zoom with mouse wheel
+    mxEvent.addMouseWheelListener(function(evt, up) {
+      if (!mxEvent.isConsumed(evt)) {
+        if (up) graph.zoomIn();
+        else graph.zoomOut();
+        mxEvent.consume(evt);
+      }
+    }, container);
 
-    /*
-      Remove the real-time text update that calls updateCellSize while typing.
-      We'll let the node remain the same size while you type, so it won't jump.
-      If you wanted to auto-size AFTER editing is done, you could do it in stopEditing,
-      but let's remove it entirely to keep the node from moving at all.
-    */
-    (function overrideCellEditorForRealTime() {
-      // We'll just let the default run, no changes for input or stopEditing.
-      // So we do NOT call graph.updateCellSize() at all here.
-    })();
-
-    // Keep track of last selection for auto node ID if needed
+    // Track selection
     graph.getSelectionModel().addListener(mxEvent.CHANGE, () => {
       if (lastSelectedCell) {
         autoUpdateNodeIdBasedOnLabel(lastSelectedCell);
@@ -621,9 +661,9 @@
       lastSelectedCell = graph.getSelectionCell();
     });
 
-    // DRAG FROM TOOLBAR
+    // Draggable shapes
     const toolbarShapes = document.querySelectorAll(".shape");
-    toolbarShapes.forEach((shapeEl) => {
+    toolbarShapes.forEach(shapeEl => {
       const baseStyle = shapeEl.dataset.style;
       mxUtils.makeDraggable(
         shapeEl,
@@ -634,7 +674,6 @@
           let newVertex;
           try {
             const label = shapeEl.dataset.type + " node";
-            // We remove autosize=1 from here so it doesn't auto-resize
             newVertex = graph.insertVertex(
               parent,
               null,
@@ -659,17 +698,12 @@
       );
     });
 
-    /*
-      CONTEXT MENU + PROPERTIES
-    */
+    // Context menu
     graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
       selectedCell = cell;
       currentMouseEvent = evt;
-      if (cell) {
-        showContextMenu(evt);
-      } else {
-        hideContextMenu();
-      }
+      if (cell) showContextMenu(evt);
+      else hideContextMenu();
     };
     function showContextMenu(evt) {
       contextMenu.style.display = "block";
@@ -681,11 +715,10 @@
       contextMenu.style.display = "none";
       typeSubmenu.style.display = "none";
     }
-    document.addEventListener("click", (e) => {
-      if (
-        !contextMenu.contains(e.target) &&
-        !typeSubmenu.contains(e.target) &&
-        !propertiesMenu.contains(e.target)
+    document.addEventListener("click", e => {
+      if (!contextMenu.contains(e.target)
+          && !typeSubmenu.contains(e.target)
+          && !propertiesMenu.contains(e.target)
       ) {
         hideContextMenu();
         propertiesMenu.style.display = "none";
@@ -715,8 +748,6 @@
       typeSubmenu.style.left = rect.right + "px";
       typeSubmenu.style.top = rect.top + "px";
     });
-
-    // Type submenu
     dropdownTypeBtn.addEventListener("click", () => {
       if (selectedCell && isQuestion(selectedCell)) {
         setQuestionType(selectedCell, "dropdown");
@@ -772,32 +803,55 @@
       }
       hideContextMenu();
     });
+    // "New Section" => increments this node's section number by 1
+    newSectionButton.addEventListener("click", () => {
+      if (selectedCell) {
+        const currentSection = parseInt(getSection(selectedCell) || "1", 10);
+        setSection(selectedCell, currentSection + 1);
+        refreshAllCells();
+      }
+      hideContextMenu();
+    });
+
     function createYesNoOptions(parentCell) {
-      const parentGeo = parentCell.geometry;
-      if (!parentGeo) return;
+      // Place them further below the parent
+      const geo = parentCell.geometry;
+      if (!geo) return;
       const parent = graph.getDefaultParent();
       graph.getModel().beginUpdate();
       try {
-        const yesX = parentGeo.x - 80;
-        const yesY = parentGeo.y + parentGeo.height + 50;
-        const yesStyle = "rounded=1;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;";
-        const yesVertex = graph.insertVertex(parent, null, "Yes", yesX, yesY, 100, 60, yesStyle);
-        refreshOptionNodeId(yesVertex);
-        graph.insertEdge(parent, null, "", parentCell, yesVertex);
+        const parentSection = getSection(parentCell) || "1";
 
-        const noX = parentGeo.x + parentGeo.width + 20;
-        const noY = parentGeo.y + parentGeo.height + 50;
-        const noStyle = "rounded=1;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;";
-        const noVertex = graph.insertVertex(parent, null, "No", noX, noY, 100, 60, noStyle);
-        refreshOptionNodeId(noVertex);
-        graph.insertEdge(parent, null, "", parentCell, noVertex);
+        // "No" node
+        const noX = geo.x + geo.width - 50;
+        const noY = geo.y + geo.height + 50;  // further below
+        const noStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
+        const noNode = graph.insertVertex(parent, null, "No", noX, noY, 100, 60, noStyle);
+        refreshOptionNodeId(noNode);
+
+        // Inherit section if parent not in jump mode:
+        if (parentCell !== jumpModeNode) {
+          setSection(noNode, parentSection);
+        }
+        graph.insertEdge(parent, null, "", parentCell, noNode);
+
+        // "Yes" node
+        const yesX = geo.x - 40;
+        const yesY = geo.y + geo.height + 50;  // further below
+        const yesStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
+        const yesNode = graph.insertVertex(parent, null, "Yes", yesX, yesY, 100, 60, yesStyle);
+        refreshOptionNodeId(yesNode);
+
+        if (parentCell !== jumpModeNode) {
+          setSection(yesNode, parentSection);
+        }
+        graph.insertEdge(parent, null, "", parentCell, yesNode);
       } finally {
         graph.getModel().endUpdate();
       }
       refreshAllCells();
     }
 
-    // Properties
     function showPropertiesMenu(cell, evt) {
       if (!cell) return;
       propertiesMenu.style.display = "block";
@@ -806,6 +860,8 @@
 
       propNodeText.textContent = cell.value || "";
       propNodeId.textContent = getNodeId(cell) || "";
+      propNodeSection.textContent = getSection(cell) || "1";
+
       if (isQuestion(cell)) {
         propNodeType.textContent = getQuestionType(cell);
       } else if (isOptions(cell)) {
@@ -820,11 +876,12 @@
       }
     });
 
-    // Make property fields editable
     makeEditableField(propNodeText, onNodeTextFieldChange);
     makeEditableField(propNodeId, onNodeIdFieldChange);
+    makeEditableField(propNodeSection, onNodeSectionFieldChange);
+
     function makeEditableField(spanEl, onChangeCb) {
-      spanEl.addEventListener("dblclick", (e) => {
+      spanEl.addEventListener("dblclick", e => {
         e.stopPropagation();
         e.preventDefault();
         spanEl.contentEditable = "true";
@@ -834,7 +891,7 @@
         spanEl.contentEditable = "false";
         onChangeCb(spanEl.textContent);
       });
-      spanEl.addEventListener("keydown", (evt) => {
+      spanEl.addEventListener("keydown", evt => {
         if (evt.key === "Enter") {
           evt.preventDefault();
           spanEl.blur();
@@ -866,8 +923,20 @@
       }
       refreshAllCells();
     }
+    function onNodeSectionFieldChange(newSec) {
+      if (!selectedCell) return;
+      const num = parseInt(newSec.trim(), 10);
+      if (isNaN(num)) return;
+      graph.getModel().beginUpdate();
+      try {
+        setSection(selectedCell, num);
+      } finally {
+        graph.getModel().endUpdate();
+      }
+      refreshAllCells();
+    }
 
-    // Keyboard copy/paste
+    // Key combos
     const keyHandler = new mxKeyHandler(graph);
     keyHandler.bindControlKey(67, () => {
       mxClipboard.copy(graph);
@@ -880,11 +949,11 @@
       }
     });
 
-    // Auto question detection if ends with '?'
+    // If user types '?' => question
     graph.getModel().addListener(mxEvent.EVENT_CHANGE, function(sender, evt) {
       const changes = evt.getProperty("changes");
       if (!changes) return;
-      changes.forEach((change) => {
+      changes.forEach(change => {
         if (change.constructor.name === "mxValueChange") {
           const { cell, value } = change;
           if (value && typeof value === "string") {
@@ -902,15 +971,20 @@
       refreshAllCells();
     });
 
-    // On connect
+    // On connect => if source is not jumpModeNode => child inherits parent's section
     graph.connectionHandler.addListener(mxEvent.CONNECT, function(sender, evt) {
       const edge = evt.getProperty("cell");
       if (!edge) return;
       const parent = edge.source;
       const child = edge.target;
-
-      // Jump mode check
       const parentIsJump = (parent && parent === jumpModeNode);
+
+      // Inherit if not jump
+      if (!parentIsJump && parent && child) {
+        const parentSec = parseInt(getSection(parent) || "1", 10);
+        setSection(child, parentSec);
+      }
+
       let parentQuestion = null;
       if (parent && isOptions(parent)) {
         parentQuestion = parent.source;
@@ -925,110 +999,14 @@
       refreshAllCells();
     });
 
-    // Initialize legend colors
     updateLegendColors();
-
-    // When user clicks color box, set the color picker to that color, then open
-    colorBoxText.addEventListener("click", () => {
-      colorPickerText.value = colorPreferences.text;
-      colorPickerText.click();
-    });
-    colorBoxCheckbox.addEventListener("click", () => {
-      colorPickerCheckbox.value = colorPreferences.checkbox;
-      colorPickerCheckbox.click();
-    });
-    colorBoxDropdown.addEventListener("click", () => {
-      colorPickerDropdown.value = colorPreferences.dropdown;
-      colorPickerDropdown.click();
-    });
-    colorBoxMoney.addEventListener("click", () => {
-      colorPickerMoney.value = colorPreferences.money;
-      colorPickerMoney.click();
-    });
-    colorBoxDate.addEventListener("click", () => {
-      colorPickerDate.value = colorPreferences.date;
-      colorPickerDate.click();
-    });
-    colorBoxBigParagraph.addEventListener("click", () => {
-      colorPickerBigParagraph.value = colorPreferences.bigParagraph;
-      colorPickerBigParagraph.click();
-    });
-
-    // Listen for user picking a new color
-    colorPickerText.addEventListener("input", (e) => {
-      colorPreferences.text = e.target.value;
-      saveUserColorPrefs().then(()=>{
-        updateLegendColors();
-        refreshAllCells();
-      });
-    });
-    colorPickerCheckbox.addEventListener("input", (e) => {
-      colorPreferences.checkbox = e.target.value;
-      saveUserColorPrefs().then(()=>{
-        updateLegendColors();
-        refreshAllCells();
-      });
-    });
-    colorPickerDropdown.addEventListener("input", (e) => {
-      colorPreferences.dropdown = e.target.value;
-      saveUserColorPrefs().then(()=>{
-        updateLegendColors();
-        refreshAllCells();
-      });
-    });
-    colorPickerMoney.addEventListener("input", (e) => {
-      colorPreferences.money = e.target.value;
-      saveUserColorPrefs().then(()=>{
-        updateLegendColors();
-        refreshAllCells();
-      });
-    });
-    colorPickerDate.addEventListener("input", (e) => {
-      colorPreferences.date = e.target.value;
-      saveUserColorPrefs().then(()=>{
-        updateLegendColors();
-        refreshAllCells();
-      });
-    });
-    colorPickerBigParagraph.addEventListener("input", (e) => {
-      colorPreferences.bigParagraph = e.target.value;
-      saveUserColorPrefs().then(()=>{
-        updateLegendColors();
-        refreshAllCells();
-      });
-    });
-
-    // RESET button
-    resetColorsBtn.addEventListener("click", () => {
-      // restore defaults
-      colorPreferences = { ...defaultColorPreferences };
-      // then save, update UI
-      saveUserColorPrefs().then(() => {
-        updateLegendColors();
-        refreshAllCells();
-      });
-    });
-
-    // LOGOUT button
-    logoutBtn.addEventListener("click", () => {
-      firebase.auth().signOut()
-        .then(() => {
-          // Clear the cookie
-          setCookie("flowchart_uid", "", -1);
-          // Show login overlay
-          showLoginOverlay();
-        })
-        .catch(err => console.error("Logout error:", err));
-    });
   });
 </script>
 
 <script>
-  /*
-   *********************************************************************
-   **************       Helper Functions / Styling       ***************
-   *********************************************************************
-  */
+  /*******************************************************
+   ************  HELPER / STYLING / JSON Exports  ********
+   *******************************************************/
   function updateLegendColors() {
     document.getElementById("colorText").style.backgroundColor = colorPreferences.text;
     document.getElementById("colorCheckbox").style.backgroundColor = colorPreferences.checkbox;
@@ -1036,6 +1014,7 @@
     document.getElementById("colorMoney").style.backgroundColor = colorPreferences.money;
     document.getElementById("colorDate").style.backgroundColor = colorPreferences.date;
     document.getElementById("colorBigParagraph").style.backgroundColor = colorPreferences.bigParagraph;
+    document.getElementById("colorTextColor").style.backgroundColor = colorPreferences.textColor;
   }
 
   function autoUpdateNodeIdBasedOnLabel(cell) {
@@ -1047,6 +1026,12 @@
     } else if (isOptions(cell)) {
       refreshOptionNodeId(cell);
     }
+  }
+  function isQuestion(cell) {
+    return cell && cell.style && cell.style.includes("nodeType=question");
+  }
+  function isOptions(cell) {
+    return cell && cell.style && cell.style.includes("nodeType=options");
   }
 
   function setNodeId(cell, nodeId) {
@@ -1061,11 +1046,17 @@
     return m ? decodeURIComponent(m[1]) : "";
   }
 
-  function isQuestion(cell) {
-    return cell && cell.style && cell.style.includes("nodeType=question");
+  function setSection(cell, sectionNum) {
+    let style = cell.style || "";
+    // remove old section=... if present
+    style = style.replace(/section=[^;]+/, "");
+    style += `;section=${sectionNum};`;
+    graph.getModel().setStyle(cell, style);
   }
-  function isOptions(cell) {
-    return cell && cell.style && cell.style.includes("nodeType=options");
+  function getSection(cell) {
+    const style = cell.style || "";
+    const match = style.match(/section=([^;]+)/);
+    return match ? match[1] : null;
   }
 
   function refreshNodeIdFromLabel(cell) {
@@ -1094,10 +1085,15 @@
     style += ";skipReassign=true;";
     graph.getModel().setStyle(cell, style);
   }
-  function hasSkipReassign(cell) {
-    return cell && cell.style && cell.style.includes("skipReassign=true");
+  function removeJumpStyling(cell) {
+    if (!cell) return;
+    let style = cell.style || "";
+    style = style.replace(/strokeWidth=\d+;?/, "");
+    style = style.replace(/strokeColor=[^;]+;?/, "");
+    style = style.replace(/dashed=\d;?/, "");
+    style = style.replace(/dashPattern=[^;]+;?/, "");
+    graph.getModel().setStyle(cell, style);
   }
-
   function addJumpStyling(cell) {
     if (!cell) return;
     let style = cell.style || "";
@@ -1106,15 +1102,6 @@
     style = style.replace(/dashed=\d;?/, "");
     style = style.replace(/dashPattern=[^;]+;?/, "");
     style += jumpBorderStyle;
-    graph.getModel().setStyle(cell, style);
-  }
-  function removeJumpStyling(cell) {
-    if (!cell) return;
-    let style = cell.style || "";
-    style = style.replace(/strokeWidth=\d+;?/, "");
-    style = style.replace(/strokeColor=[^;]+;?/, "");
-    style = style.replace(/dashed=\d;?/, "");
-    style = style.replace(/dashPattern=[^;]+;?/, "");
     graph.getModel().setStyle(cell, style);
   }
 
@@ -1139,9 +1126,13 @@
     } else if (isOptions(cell)) {
       fillColor = "#ffffff";
     }
+    // Also apply fontColor from textColor
+    const fontColor = colorPreferences.textColor;
+
     let style = cell.style || "";
     style = style.replace(/fillColor=[^;]+/, "");
-    style += `;fillColor=${fillColor};`;
+    style = style.replace(/fontColor=[^;]+/, "");
+    style += `;fillColor=${fillColor};fontColor=${fontColor};`;
     graph.getModel().setStyle(cell, style);
   }
 
@@ -1153,7 +1144,7 @@
       case "money":        return colorPreferences.money;
       case "date":         return colorPreferences.date;
       case "bigParagraph": return colorPreferences.bigParagraph;
-      default:             return "#ADD8E6"; // fallback
+      default:             return "#ADD8E6";
     }
   }
 
@@ -1162,12 +1153,10 @@
     const vertices = graph.getChildVertices(parent);
     vertices.forEach(cell => {
       colorCell(cell);
-
-      // If it's a question node with the default label, put the mini dropdown
       if (isQuestion(cell) && (cell.value === "question node" || cell.value === "Question Node")) {
         const cellId = cell.id;
-        cell.value = `
-          <select oninput="window.pickTypeForCell('${cellId}', this.value)">
+        cell.value =
+          `<select oninput="window.pickTypeForCell('${cellId}', this.value)">
             <option value="">-- Choose Type --</option>
             <option value="text">Text</option>
             <option value="checkbox">Checkbox</option>
@@ -1175,8 +1164,7 @@
             <option value="money">Money</option>
             <option value="date">Date</option>
             <option value="bigParagraph">Big Paragraph</option>
-          </select>
-        `;
+          </select>`;
       }
     });
   }
@@ -1193,14 +1181,7 @@
     }
     refreshAllCells();
   };
-</script>
 
-<script>
-  /*
-   *********************************************************************
-   **************       Export / Import Functions         **************
-   *********************************************************************
-  */
   function downloadJson(str, filename) {
     const blob = new Blob([str], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -1244,178 +1225,339 @@
     const file = evt.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = function(e) {
       const jsonData = JSON.parse(e.target.result);
       loadFlowchartData(jsonData);
+      // no name => new flowchart
+      currentFlowchartName = null;
     };
     reader.readAsText(file);
   };
 
-  function loadFlowchartData(data) {
-    graph.getModel().beginUpdate();
-    try {
-      const parent = graph.getDefaultParent();
-      graph.removeCells(graph.getChildVertices(parent));
-      const createdCells = {};
-
-      data.forEach((item) => {
-        if (item.vertex) {
-          const geo = new mxGeometry(
-            item.geometry.x,
-            item.geometry.y,
-            item.geometry.width,
-            item.geometry.height
-          );
-          const newCell = new mxCell(item.value, geo, item.style);
-          newCell.vertex = true;
-          newCell.id = item.id;
-          graph.addCell(newCell, parent);
-          createdCells[item.id] = newCell;
-        }
-      });
-
-      data.forEach((item) => {
-        if (item.edge) {
-          const newEdge = new mxCell(item.value, new mxGeometry(), item.style);
-          newEdge.edge = true;
-          newEdge.id = item.id;
-          const src = createdCells[item.source];
-          const trg = createdCells[item.target];
-          graph.addCell(newEdge, parent, undefined, src, trg);
-        }
-      });
-    } finally {
-      graph.getModel().endUpdate();
-    }
-    refreshAllCells();
-  }
-
+  // ---- EXPORT GUI JSON (WITH SECTIONS) ----
   window.exportGuiJson = function () {
-    const model = graph.getModel();
-    const allCells = model.cells;
-
-    const questionsArr = [];
+    const allCells = graph.getModel().cells;
+    const sectionMap = {}; // { [sectionNumber]: { sectionId, sectionName, questions: [] } }
     let questionIdCounter = 1;
 
-    function getNodeType(cell) {
-      if (cell.style && cell.style.includes("nodeType=question")) return "question";
-      if (cell.style && cell.style.includes("nodeType=options")) return "options";
-      return "other";
-    }
-
-    // 1) Gather question nodes
-    for (let id in allCells) {
-      if (id === "0" || id === "1") continue;
-      const cell = allCells[id];
-      if (cell.vertex && getNodeType(cell) === "question") {
-        const label = (cell.value || "").replace(/<[^>]+>/g, "").trim() || "Untitled";
-        const qType = getQuestionType(cell);
-        const qObj = {
-          questionId: questionIdCounter,
-          text: label,
-          type: qType,
-          logic: {
-            enabled: false,
-            conditions: []
-          },
-          jump: {
-            enabled: false,
-            option: "",
-            to: ""
-          },
-          conditionalPDF: {
-            enabled: false,
-            pdfName: "",
-            answer: "Yes"
-          },
-          conditionalAlert: {
-            enabled: false,
-            prevQuestion: "",
-            prevAnswer: "",
-            text: ""
-          },
-          options: [],
-          labels: [],
-          nameId: getNodeId(cell) || "",
-          placeholder: ""
-        };
-        questionsArr.push(qObj);
-        cell._questionId = questionIdCounter;
-        questionIdCounter++;
-      }
-    }
-
-    // 2) Connect options + logic
+    // 1) Gather question nodes; store by section
     for (let id in allCells) {
       if (id === "0" || id === "1") continue;
       const cell = allCells[id];
       if (!cell.vertex) continue;
-      if (getNodeType(cell) !== "question") continue;
+      if (!isQuestion(cell)) continue;
+
+      // read label, type, section
+      const rawLabel = (cell.value || "").replace(/<[^>]+>/g, "").trim() || "Untitled";
+      const qType = getQuestionType(cell);
+      const sec = parseInt(getSection(cell) || "1", 10);
+
+      // ensure there's a section entry in the map
+      if (!sectionMap[sec]) {
+        sectionMap[sec] = {
+          sectionId: sec,
+          sectionName: "Section " + sec,
+          questions: []
+        };
+      }
+
+      const questionObj = {
+        questionId: questionIdCounter,
+        text: rawLabel,
+        type: qType,
+        logic: {
+          enabled: false,
+          conditions: []
+        },
+        jump: {
+          enabled: false,
+          option: "",
+          to: ""
+        },
+        conditionalPDF: {
+          enabled: false,
+          pdfName: "",
+          answer: "Yes"
+        },
+        conditionalAlert: {
+          enabled: false,
+          prevQuestion: "",
+          prevAnswer: "",
+          text: ""
+        },
+        options: [],
+        labels: [],
+        // nameId is just the raw label
+        nameId: rawLabel,
+        placeholder: ""
+      };
+
+      questionIdCounter++;
+      cell._questionId = questionObj.questionId;
+
+      // push into that section
+      sectionMap[sec].questions.push(questionObj);
+    }
+
+    // 2) For each question => check for option children => fill "options" + logic/jump
+    for (let id in allCells) {
+      if (id === "0" || id === "1") continue;
+      const cell = allCells[id];
+      if (!cell.vertex) continue;
+      if (!isQuestion(cell)) continue;
 
       const label = (cell.value || "").replace(/<[^>]+>/g, "").trim() || "Untitled";
-      const qObj = questionsArr.find(q => q.text === label);
-      if (!qObj) continue;
+
+      // find the question object we stored
+      // we can match by questionId in cell._questionId
+      // or match by label if needed:
+      const myQId = cell._questionId;
+      // find it in sectionMap
+      let qObjRef = null;
+      for (let sKey in sectionMap) {
+        const secObj = sectionMap[sKey];
+        const foundQ = secObj.questions.find(q => q.questionId === myQId);
+        if (foundQ) {
+          qObjRef = foundQ;
+          break;
+        }
+      }
+      if (!qObjRef) continue;
 
       const outEdges = graph.getOutgoingEdges(cell) || [];
       outEdges.forEach(edge => {
         const target = edge.target;
         if (!target) return;
-        if (getNodeType(target) === "options") {
-          const optLabel = (target.value || "Option").replace(/<[^>]+>/g, "").trim();
-          const optNodeId = getNodeId(target);
+        if (!isOptions(target)) return;
 
-          if (qObj.type === "checkbox") {
-            qObj.options.push({
-              label: capitalizeFirst(optLabel),
-              nameId: optNodeId,
-              value: ""
-            });
+        // Option node
+        const optLabel = (target.value || "Option").replace(/<[^>]+>/g, "").trim();
+        if (qObjRef.type === "checkbox") {
+          qObjRef.options.push({
+            label: optLabel,
+            nameId: "option_" + optLabel.replace(/\s+/g,"_"),
+            value: ""
+          });
+        } else {
+          qObjRef.options.push(optLabel);
+        }
+
+        // Possibly leads to another question => logic or jump
+        const nextEdges = graph.getOutgoingEdges(target) || [];
+        nextEdges.forEach(ne => {
+          const q2 = ne.target;
+          if (!q2 || !isQuestion(q2)) return;
+          const q2Label = (q2.value || "").replace(/<[^>]+>/g, "").trim();
+          const q2Id = q2._questionId;
+          if (!q2Id) return; // no question assigned
+
+          // existing logic: if q2Id < myQId => jump else => logic
+          // (You can change this if you want the opposite condition.)
+          if (q2Id < myQId) {
+            qObjRef.jump.enabled = true;
+            qObjRef.jump.option = optLabel;
+            qObjRef.jump.to = q2Id.toString();
           } else {
-            qObj.options.push(capitalizeFirst(optLabel));
-          }
-
-          const nextEdges = graph.getOutgoingEdges(target) || [];
-          nextEdges.forEach(ne => {
-            const q2 = ne.target;
-            if (q2 && getNodeType(q2) === "question") {
-              if (!q2._questionId) return;
-              if (q2._questionId < cell._questionId) {
-                // jump backward
-                qObj.jump.enabled = true;
-                qObj.jump.option = capitalizeFirst(optLabel);
-                qObj.jump.to = q2._questionId.toString();
-              } else {
-                // forward logic
-                const q2Label = (q2.value||"").replace(/<[^>]+>/g, "").trim();
-                const foundQ2 = questionsArr.find(o => o.text === q2Label);
-                if (!foundQ2) return;
-                foundQ2.logic.enabled = true;
-                foundQ2.logic.conditions.push({
-                  prevQuestion: qObj.questionId.toString(),
-                  prevAnswer: capitalizeFirst(optLabel)
-                });
+            // logic
+            // means q2 is shown if we pick this option
+            // so q2 has a condition referencing my question
+            // find q2 in the map
+            let q2Ref = null;
+            for (let sKey2 in sectionMap) {
+              const secObj2 = sectionMap[sKey2];
+              const foundQ2 = secObj2.questions.find(q => q.questionId === q2Id);
+              if (foundQ2) {
+                q2Ref = foundQ2;
+                break;
               }
             }
-          });
-        }
+            if (q2Ref) {
+              q2Ref.logic.enabled = true;
+              q2Ref.logic.conditions.push({
+                prevQuestion: myQId.toString(),
+                prevAnswer: optLabel
+              });
+            }
+          }
+        });
       });
     }
 
-    const guiData = {
-      questions: questionsArr,
+    // 3) Convert sectionMap to an array sorted by sectionId
+    const sortedSectionNumbers = Object.keys(sectionMap)
+      .map(x => parseInt(x, 10))
+      .sort((a, b) => a - b);
+
+    const sectionsArr = sortedSectionNumbers.map(secNum => sectionMap[secNum]);
+
+    // 4) The sectionCounter is largest section + 1
+    const sectionCounter = sortedSectionNumbers.length > 0
+      ? Math.max(...sortedSectionNumbers) + 1
+      : 2;
+
+    const finalJson = {
+      sections: sectionsArr,
       hiddenFields: [],
+      sectionCounter: sectionCounter,
       questionCounter: questionIdCounter,
       hiddenFieldCounter: 1,
       defaultPDFName: ""
     };
 
-    downloadJson(JSON.stringify(guiData, null, 2), "gui_data.json");
+    downloadJson(JSON.stringify(finalJson, null, 2), "gui_data.json");
+  };
+</script>
+
+<script>
+  /***********************************************
+   *           SAVE & VIEW FLOWCHARTS           *
+   ***********************************************/
+  function saveFlowchart() {
+    if (!currentUser) {
+      alert("Please log in first.");
+      return;
+    }
+
+    let flowchartName = currentFlowchartName;
+
+    if (!flowchartName) {
+      // If no existing name => ask
+      flowchartName = prompt("Enter a name for this flowchart:");
+      if (!flowchartName || !flowchartName.trim()) return;
+      currentFlowchartName = flowchartName;
+    }
+
+    // Gather raw flowchart data
+    const data = [];
+    const cells = graph.getModel().cells;
+    for (let id in cells) {
+      if (id === "0" || id === "1") continue;
+      const cell = cells[id];
+      data.push({
+        id: cell.id,
+        value: cell.value,
+        geometry: cell.geometry
+          ? {
+              x: cell.geometry.x,
+              y: cell.geometry.y,
+              width: cell.geometry.width,
+              height: cell.geometry.height
+            }
+          : null,
+        style: cell.style || "",
+        vertex: !!cell.vertex,
+        edge: !!cell.edge,
+        source: cell.edge ? cell.source?.id : null,
+        target: cell.edge ? cell.target?.id : null
+      });
+    }
+
+    db.collection("users")
+      .doc(currentUser.uid)
+      .collection("flowcharts")
+      .doc(flowchartName)
+      .set({ flowchart: data })
+      .then(() => {
+        alert("Flowchart saved as: " + flowchartName);
+      })
+      .catch(err => {
+        console.error("Error saving flowchart:", err);
+        alert("Error saving flowchart: " + err);
+      });
+  }
+
+  function viewSavedFlowcharts() {
+    if (!currentUser) {
+      alert("Please log in first.");
+      return;
+    }
+    db.collection("users")
+      .doc(currentUser.uid)
+      .collection("flowcharts")
+      .get()
+      .then(snapshot => {
+        let html = "";
+        if (snapshot.empty) {
+          html = "<p>You currently have no saved flowcharts.</p>";
+        } else {
+          snapshot.forEach(doc => {
+            const name = doc.id; // doc id is the flowchart name
+            html += `
+              <div class="flowchart-item">
+                <strong>${name}</strong>
+                <button onclick="openSavedFlowchart('${name}')">Open</button>
+                <button onclick="deleteSavedFlowchart('${name}')">Delete</button>
+              </div>
+            `;
+          });
+        }
+        flowchartListDiv.innerHTML = html;
+        showFlowchartListOverlay();
+      })
+      .catch(err => {
+        console.error("Error fetching flowcharts:", err);
+        alert("Error fetching flowcharts: " + err);
+      });
+  }
+  function showFlowchartListOverlay() {
+    document.getElementById("flowchartListOverlay").style.display = "flex";
+  }
+  function hideFlowchartListOverlay() {
+    document.getElementById("flowchartListOverlay").style.display = "none";
+  }
+  document.getElementById("closeFlowchartListBtn").addEventListener("click", hideFlowchartListOverlay);
+
+  // Open existing flowchart => set name => user can overwrite
+  window.openSavedFlowchart = function(name) {
+    if (!currentUser) return;
+    db.collection("users")
+      .doc(currentUser.uid)
+      .collection("flowcharts")
+      .doc(name)
+      .get()
+      .then(docSnap => {
+        if (!docSnap.exists) {
+          alert("No flowchart named " + name);
+          return;
+        }
+        const data = docSnap.data();
+        if (!data.flowchart) {
+          alert("No flowchart data found for " + name);
+          return;
+        }
+        loadFlowchartData(data.flowchart);
+        currentFlowchartName = name;
+        hideFlowchartListOverlay();
+      })
+      .catch(err => {
+        console.error("Error loading flowchart:", err);
+        alert("Error loading flowchart: " + err);
+      });
   };
 
-  function capitalizeFirst(str) {
-    if (!str) return str;
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
+  // Delete saved flowchart
+  window.deleteSavedFlowchart = function(name) {
+    if (!currentUser) return;
+    const confirmDel = confirm("Are you sure you want to delete '" + name + "'?");
+    if (!confirmDel) return;
+
+    db.collection("users")
+      .doc(currentUser.uid)
+      .collection("flowcharts")
+      .doc(name)
+      .delete()
+      .then(() => {
+        alert("Deleted flowchart: " + name);
+        if (currentFlowchartName === name) {
+          currentFlowchartName = null;
+        }
+        viewSavedFlowcharts();
+      })
+      .catch(err => {
+        console.error("Error deleting flowchart:", err);
+        alert("Error deleting flowchart: " + err);
+      });
+  };
 </script>
 
 </body>
