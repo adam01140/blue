@@ -20,8 +20,10 @@
       /* Prevent default browser wheel scroll so we can do zoom */
       overflow: hidden;
     }
+    /* The toolbar now is resizable and scrollable */
     .toolbar {
       width: 220px;
+      min-width: 150px;
       background: #f9f9f9;
       border-right: 1px solid #ccc;
       float: left;
@@ -29,6 +31,7 @@
       box-sizing: border-box;
       height: 100%;
       overflow-y: auto;
+      resize: horizontal;
     }
     #graphContainer {
       position: absolute;
@@ -165,6 +168,59 @@
       border-radius: 3px;
     }
 
+    /* Section Legend inside the toolbar (placed above Save Flowchart) */
+    #sectionLegend {
+      margin-top: 10px;
+      padding: 6px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #sectionLegend h4 {
+      margin-top: 0;
+      margin-bottom: 6px;
+    }
+    .section-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .section-color-box {
+      width: 20px;
+      height: 20px;
+      margin-right: 6px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    .section-name {
+      flex-grow: 1;
+      border: 1px dashed transparent;
+      padding: 2px;
+      min-width: 80px;
+      cursor: text;
+    }
+    .section-name:focus {
+      outline: 1px dashed #888;
+    }
+    /* Abbreviated label: now display just "1:" instead of "Section 1:" */
+    .section-number {
+      margin-right: 4px;
+    }
+    #resetSectionColorsBtn {
+      margin-top: 6px;
+      padding: 4px 8px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+    }
+    #resetSectionColorsBtn:hover {
+      background-color: #0056b3;
+    }
+
     #loginOverlay {
       position: fixed;
       top: 0;
@@ -257,6 +313,7 @@
     .flowchart-item strong {
       display: block;
       margin-bottom: 6px;
+      cursor: pointer;
     }
     .flowchart-item button {
       margin-right: 6px;
@@ -315,7 +372,7 @@
   </div>
 
   <div class="legend">
-    <strong>Legend</strong><br><p>
+    <strong>Question Type Legend</strong><br>
     <div class="legend-item">
       <div class="legend-color-box" id="colorText"></div>
       <span>Textbox</span>
@@ -344,11 +401,16 @@
       <div class="legend-color-box" id="colorTextColor"></div>
       <span>Text Color</span>
     </div>
-	<button id="resetBtn">Reset Colors</button>
+    <button id="resetBtn">Reset Colors</button>
   </div>
 
-  <!-- Below the legend -->
-  
+  <!-- Section Legend inserted into the toolbar above the Save Flowchart button -->
+  <div id="sectionLegend">
+    <h4>Section Legend</h4>
+    <!-- Section items will be populated dynamically -->
+  </div>
+
+  <!-- Below the legends -->
   <br>
   <button id="saveFlowchartBtn" onclick="saveFlowchart()">Save Flowchart</button>
   <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">View Saved</button>
@@ -358,13 +420,14 @@
 
 <div id="graphContainer"></div>
 
+<!-- Updated Context Menu (order: Delete, Jump, Yes/No, Change Type, New Section, Properties) -->
 <div id="contextMenu" class="context-menu">
   <button id="deleteNode">Delete Node</button>
   <button id="jumpNode">Jump</button>
-  <button id="changeType">Change Type &raquo;</button>
-  <button id="propertiesButton">Properties</button>
   <button id="yesNoNode">Yes/No</button>
+  <button id="changeType">Change Type &raquo;</button>
   <button id="newSectionNode">New Section</button>
+  <button id="propertiesButton">Properties</button>
 </div>
 
 <div id="typeSubmenu" class="submenu">
@@ -386,6 +449,9 @@
   <p><strong>Section:</strong>
     <span id="propNodeSection" class="editable-field" tabindex="0"></span>
   </p>
+  <p><strong>Section Name:</strong>
+    <span id="propSectionName" class="editable-field" tabindex="0"></span>
+  </p>
   <p><strong>Node Type:</strong> <span id="propNodeType"></span></p>
 </div>
 
@@ -397,6 +463,8 @@
 <input type="color" id="colorPickerDate" style="display:none;" />
 <input type="color" id="colorPickerBigParagraph" style="display:none;" />
 <input type="color" id="colorPickerTextColor" style="display:none;" />
+<!-- Hidden color picker for section border colors -->
+<input type="color" id="sectionColorPicker" style="display:none;" />
 
 <script>
   /**************************************************
@@ -415,7 +483,7 @@
   const db = firebase.firestore();
   let currentUser = null;
 
-  // For "Reset" button
+  // For "Reset" button (question colors)
   const defaultColors = {
     text: "#cce6ff",
     checkbox: "#b3daff",
@@ -426,6 +494,12 @@
     textColor: "#000000"
   };
   let colorPreferences = { ...defaultColors };
+
+  // Section preferences: mapping section numbers to { borderColor, name }
+  // Ensure Section "1" exists by default.
+  let sectionPrefs = {
+    "1": { borderColor: getDefaultSectionColor(1), name: "Enter name" }
+  };
 
   // If user has opened a flowchart by name, store it here
   let currentFlowchartName = null;
@@ -558,32 +632,32 @@
   }
   
   // Function to handle color change when clicking legend boxes
-function setupColorPicker(colorBoxId, colorPickerId, colorKey) {
-    const colorBox = document.getElementById(colorBoxId);
-    const colorPicker = document.getElementById(colorPickerId);
+  function setupColorPicker(colorBoxId, colorPickerId, colorKey) {
+      const colorBox = document.getElementById(colorBoxId);
+      const colorPicker = document.getElementById(colorPickerId);
 
-    colorBox.addEventListener("click", () => {
-        // Set color picker value to the current color before opening
-        colorPicker.value = colorPreferences[colorKey]; 
-        colorPicker.click();
-    });
+      colorBox.addEventListener("click", () => {
+          // Set color picker value to the current color before opening
+          colorPicker.value = colorPreferences[colorKey]; 
+          colorPicker.click();
+      });
 
-    colorPicker.addEventListener("input", (e) => {
-        colorPreferences[colorKey] = e.target.value;
-        updateLegendColors();
-        refreshAllCells();
-        saveUserColorPrefs();
-    });
-}
+      colorPicker.addEventListener("input", (e) => {
+          colorPreferences[colorKey] = e.target.value;
+          updateLegendColors();
+          refreshAllCells();
+          saveUserColorPrefs();
+      });
+  }
 
-// Attach event listeners for all color boxes
-setupColorPicker("colorText", "colorPickerText", "text");
-setupColorPicker("colorCheckbox", "colorPickerCheckbox", "checkbox");
-setupColorPicker("colorDropdown", "colorPickerDropdown", "dropdown");
-setupColorPicker("colorMoney", "colorPickerMoney", "money");
-setupColorPicker("colorDate", "colorPickerDate", "date");
-setupColorPicker("colorBigParagraph", "colorPickerBigParagraph", "bigParagraph");
-setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
+  // Attach event listeners for all color boxes (question type legend)
+  setupColorPicker("colorText", "colorPickerText", "text");
+  setupColorPicker("colorCheckbox", "colorPickerCheckbox", "checkbox");
+  setupColorPicker("colorDropdown", "colorPickerDropdown", "dropdown");
+  setupColorPicker("colorMoney", "colorPickerMoney", "money");
+  setupColorPicker("colorDate", "colorPickerDate", "date");
+  setupColorPicker("colorBigParagraph", "colorPickerBigParagraph", "bigParagraph");
+  setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
 
   function saveUserColorPrefs() {
     if (!currentUser) return Promise.resolve();
@@ -593,9 +667,119 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
       .doc("colors")
       .set(colorPreferences, { merge: true });
   }
-</script>
 
-<script>
+  /**************************************************
+   ************ Section Preferences & Legend ********
+   **************************************************/
+  // Compute a default section border color (redscale) based on section number.
+  function getDefaultSectionColor(sectionNum) {
+    // Using HSL with decreasing lightness.
+    let lightness = Math.max(30, 80 - (sectionNum - 1) * 10);
+    return `hsl(0, 100%, ${lightness}%)`;
+  }
+
+  // When setting a cell's section, update the sectionPrefs if needed.
+  function setSection(cell, sectionNum) {
+    let style = cell.style || "";
+    // remove old section=... if present
+    style = style.replace(/section=[^;]+/, "");
+    style += `;section=${sectionNum};`;
+    graph.getModel().setStyle(cell, style);
+    // If this section is not in our preferences, add it with default values.
+    if (!sectionPrefs[sectionNum]) {
+      sectionPrefs[sectionNum] = {
+        borderColor: getDefaultSectionColor(parseInt(sectionNum)),
+        name: "Enter section name"
+      };
+      updateSectionLegend();
+    }
+  }
+  function getSection(cell) {
+    const style = cell.style || "";
+    const match = style.match(/section=([^;]+)/);
+    return match ? match[1] : "1";
+  }
+
+  // Update the section legend UI.
+  function updateSectionLegend() {
+    const legend = document.getElementById("sectionLegend");
+    // Clear current content and add header.
+    let innerHTML = "<h4>Section Legend</h4>";
+    const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
+    sections.forEach(sec => {
+      // Abbreviated label: display just "1:" instead of "Section 1:"
+      innerHTML += `
+        <div class="section-item" data-section="${sec}">
+          <div class="section-color-box" style="background-color: ${sectionPrefs[sec].borderColor};" data-section="${sec}"></div>
+          <span class="section-number">${sec}:</span>
+          <span class="section-name" contenteditable="true" data-section="${sec}">${sectionPrefs[sec].name}</span>
+        </div>
+      `;
+    });
+    innerHTML += `<button id="resetSectionColorsBtn">Reset Section Colors</button>`;
+    legend.innerHTML = innerHTML;
+
+    // Add event listeners to the section color boxes.
+    const colorBoxes = legend.querySelectorAll(".section-color-box");
+    colorBoxes.forEach(box => {
+      box.addEventListener("click", (e) => {
+        const sec = e.target.getAttribute("data-section");
+        // Set a global variable to know which section is being edited.
+        selectedSectionForColor = sec;
+        const picker = document.getElementById("sectionColorPicker");
+        picker.value = rgbToHex(getComputedStyle(e.target).backgroundColor);
+        picker.click();
+      });
+    });
+    // Add event listener to editable section name fields.
+    const nameFields = legend.querySelectorAll(".section-name");
+    nameFields.forEach(field => {
+      field.addEventListener("blur", (e) => {
+        const sec = e.target.getAttribute("data-section");
+        sectionPrefs[sec].name = e.target.textContent.trim() || "Enter section name";
+        // Also update the properties menu if the selected node is in this section.
+        if (selectedCell && getSection(selectedCell) === sec) {
+          document.getElementById("propSectionName").textContent = sectionPrefs[sec].name;
+        }
+      });
+      field.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          e.target.blur();
+        }
+      });
+    });
+    // Reset button for section colors.
+    document.getElementById("resetSectionColorsBtn").addEventListener("click", () => {
+      Object.keys(sectionPrefs).forEach(sec => {
+        sectionPrefs[sec].borderColor = getDefaultSectionColor(parseInt(sec));
+      });
+      updateSectionLegend();
+      refreshAllCells();
+    });
+  }
+
+  // Utility: Convert rgb(...) to hex string.
+  function rgbToHex(rgb) {
+    const result = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/.exec(rgb);
+    return result ? "#" +
+      ("0" + parseInt(result[1],10).toString(16)).slice(-2) +
+      ("0" + parseInt(result[2],10).toString(16)).slice(-2) +
+      ("0" + parseInt(result[3],10).toString(16)).slice(-2) : rgb;
+  }
+  // Global variable to track which section’s color is being changed.
+  let selectedSectionForColor = null;
+  document.getElementById("sectionColorPicker").addEventListener("input", (e) => {
+    if (selectedSectionForColor) {
+      sectionPrefs[selectedSectionForColor].borderColor = e.target.value;
+      updateSectionLegend();
+      refreshAllCells();
+    }
+  });
+
+  /**************************************************
+   ************  GRAPH, NODES, CONTEXT MENU, etc. ********
+   **************************************************/
   let graph = null;
   let selectedCell = null;
   let currentMouseEvent = null;
@@ -611,7 +795,13 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
       graph.removeCells(graph.getChildVertices(parent));
       const createdCells = {};
 
-      data.forEach((item) => {
+      // If the imported data includes sectionPrefs, restore it.
+      if (data.sectionPrefs) {
+        sectionPrefs = data.sectionPrefs;
+        updateSectionLegend();
+      }
+
+      data.cells.forEach((item) => {
         if (item.vertex) {
           const geo = new mxGeometry(
             item.geometry.x,
@@ -627,7 +817,7 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
         }
       });
 
-      data.forEach((item) => {
+      data.cells.forEach((item) => {
         if (item.edge) {
           const newEdge = new mxCell(item.value, new mxGeometry(), item.style);
           newEdge.edge = true;
@@ -668,6 +858,7 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
     const propNodeId = document.getElementById("propNodeId");
     const propNodeType = document.getElementById("propNodeType");
     const propNodeSection = document.getElementById("propNodeSection");
+    const propSectionName = document.getElementById("propSectionName");
 
     const resetBtn = document.getElementById("resetBtn");
 
@@ -749,6 +940,32 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
       );
     });
 
+    // Instead of overriding moveCells (which was causing errors),
+    // attach a listener to the MOVE_CELLS event to adjust option nodes
+    graph.addListener(mxEvent.MOVE_CELLS, function(sender, evt) {
+      var movedCells = evt.getProperty('cells');
+      var dx = evt.getProperty('dx');
+      var dy = evt.getProperty('dy');
+      if (!movedCells || movedCells.length === 0) return;
+      movedCells.forEach(function(cell) {
+         if (isQuestion(cell)) {
+           let outgoing = graph.getOutgoingEdges(cell) || [];
+           outgoing.forEach(function(edge) {
+              let option = edge.target;
+              if (option && isOptions(option) && movedCells.indexOf(option) < 0) {
+                let geo = option.geometry;
+                if (geo) {
+                  var newGeo = geo.clone();
+                  newGeo.x += dx;
+                  newGeo.y += dy;
+                  graph.getModel().setGeometry(option, newGeo);
+                }
+              }
+           });
+         }
+      });
+    });
+
     // Context menu
     graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
       selectedCell = cell;
@@ -790,6 +1007,12 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
         }
         jumpModeNode = selectedCell;
         addJumpStyling(jumpModeNode);
+      }
+      hideContextMenu();
+    });
+    yesNoNodeButton.addEventListener("click", () => {
+      if (selectedCell && isQuestion(selectedCell)) {
+        createYesNoOptions(selectedCell);
       }
       hideContextMenu();
     });
@@ -848,13 +1071,6 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
       hideContextMenu();
     });
 
-    yesNoNodeButton.addEventListener("click", () => {
-      if (selectedCell && isQuestion(selectedCell)) {
-        createYesNoOptions(selectedCell);
-      }
-      hideContextMenu();
-    });
-    // "New Section" => increments this node's section number by 1
     newSectionButton.addEventListener("click", () => {
       if (selectedCell) {
         const currentSection = parseInt(getSection(selectedCell) || "1", 10);
@@ -912,6 +1128,9 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
       propNodeText.textContent = cell.value || "";
       propNodeId.textContent = getNodeId(cell) || "";
       propNodeSection.textContent = getSection(cell) || "1";
+      // Set the section name from sectionPrefs (if exists)
+      const sec = getSection(cell);
+      propSectionName.textContent = (sectionPrefs[sec] && sectionPrefs[sec].name) || "Enter section name";
 
       if (isQuestion(cell)) {
         propNodeType.textContent = getQuestionType(cell);
@@ -926,10 +1145,6 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
         showPropertiesMenu(selectedCell, currentMouseEvent);
       }
     });
-
-    makeEditableField(propNodeText, onNodeTextFieldChange);
-    makeEditableField(propNodeId, onNodeIdFieldChange);
-    makeEditableField(propNodeSection, onNodeSectionFieldChange);
 
     function makeEditableField(spanEl, onChangeCb) {
       spanEl.addEventListener("dblclick", e => {
@@ -986,6 +1201,16 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
       }
       refreshAllCells();
     }
+    function onSectionNameFieldChange(newName) {
+      if (!selectedCell) return;
+      const sec = getSection(selectedCell);
+      sectionPrefs[sec].name = newName.trim() || "Enter section name";
+      updateSectionLegend();
+    }
+    makeEditableField(propNodeText, onNodeTextFieldChange);
+    makeEditableField(propNodeId, onNodeIdFieldChange);
+    makeEditableField(propNodeSection, onNodeSectionFieldChange);
+    makeEditableField(propSectionName, onSectionNameFieldChange);
 
     // Key combos
     const keyHandler = new mxKeyHandler(graph);
@@ -1050,7 +1275,7 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
       refreshAllCells();
     });
 
-    // Reset colors
+    // Reset colors (question colors)
     resetBtn.addEventListener("click", () => {
       colorPreferences = { ...defaultColors };
       updateLegendColors();
@@ -1126,6 +1351,11 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
     });
 
     updateLegendColors();
+    updateSectionLegend();
+
+    // --- Add double-click renaming for saved flowcharts ---
+    // After the flowchart list is populated (see viewSavedFlowcharts), the <strong> element is clickable.
+    // (This is handled in viewSavedFlowcharts below.)
   });
 </script>
 
@@ -1170,19 +1400,6 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
     const style = cell.style || "";
     const m = style.match(/nodeId=([^;]+)/);
     return m ? decodeURIComponent(m[1]) : "";
-  }
-
-  function setSection(cell, sectionNum) {
-    let style = cell.style || "";
-    // remove old section=... if present
-    style = style.replace(/section=[^;]+/, "");
-    style += `;section=${sectionNum};`;
-    graph.getModel().setStyle(cell, style);
-  }
-  function getSection(cell) {
-    const style = cell.style || "";
-    const match = style.match(/section=([^;]+)/);
-    return match ? match[1] : null;
   }
 
   function refreshNodeIdFromLabel(cell) {
@@ -1243,6 +1460,7 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
     graph.getModel().setStyle(cell, style);
   }
 
+  // Updated colorCell: applies fill, font, and stroke (section border) colors.
   function colorCell(cell) {
     if (!cell.vertex) return;
     let fillColor = "#ADD8E6"; // fallback
@@ -1252,13 +1470,14 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
     } else if (isOptions(cell)) {
       fillColor = "#ffffff";
     }
-    // Also apply fontColor from textColor
     const fontColor = colorPreferences.textColor;
-
+    const sec = getSection(cell) || "1";
+    let borderColor = (sectionPrefs[sec] && sectionPrefs[sec].borderColor) || getDefaultSectionColor(parseInt(sec));
     let style = cell.style || "";
     style = style.replace(/fillColor=[^;]+/, "");
     style = style.replace(/fontColor=[^;]+/, "");
-    style += `;fillColor=${fillColor};fontColor=${fontColor};`;
+    style = style.replace(/strokeColor=[^;]+/, "");
+    style += `;fillColor=${fillColor};fontColor=${fontColor};strokeColor=${borderColor};`;
     graph.getModel().setStyle(cell, style);
   }
 
@@ -1320,13 +1539,15 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
     URL.revokeObjectURL(url);
   }
 
+  // When saving a flowchart, we now also save the sectionPrefs and pack cell data under a "cells" key.
   window.exportFlowchartJson = function () {
-    const data = [];
+    const data = {};
+    data.cells = [];
     const cells = graph.getModel().cells;
     for (let id in cells) {
       if (id === "0" || id === "1") continue;
       const cell = cells[id];
-      data.push({
+      data.cells.push({
         id: cell.id,
         value: cell.value,
         geometry: cell.geometry
@@ -1344,6 +1565,8 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
         target: cell.edge ? cell.target?.id : null
       });
     }
+    // Also save the current sectionPrefs
+    data.sectionPrefs = sectionPrefs;
     downloadJson(JSON.stringify(data, null, 2), "flowchart_data.json");
   };
 
@@ -1382,7 +1605,7 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
       if (!sectionMap[sec]) {
         sectionMap[sec] = {
           sectionId: sec,
-          sectionName: "Section " + sec,
+          sectionName: (sectionPrefs[sec] && sectionPrefs[sec].name) || "Section " + sec,
           questions: []
         };
       }
@@ -1548,12 +1771,13 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
     }
 
     // Gather raw flowchart data
-    const data = [];
+    const data = {};
+    data.cells = [];
     const cells = graph.getModel().cells;
     for (let id in cells) {
       if (id === "0" || id === "1") continue;
       const cell = cells[id];
-      data.push({
+      data.cells.push({
         id: cell.id,
         value: cell.value,
         geometry: cell.geometry
@@ -1571,6 +1795,8 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
         target: cell.edge ? cell.target?.id : null
       });
     }
+    // Also save the current sectionPrefs
+    data.sectionPrefs = sectionPrefs;
 
     db.collection("users")
       .doc(currentUser.uid)
@@ -1604,7 +1830,7 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
             const name = doc.id; // doc id is the flowchart name
             html += `
               <div class="flowchart-item">
-                <strong>${name}</strong>
+                <strong ondblclick="renameFlowchart('${name}', this)">${name}</strong>
                 <button onclick="openSavedFlowchart('${name}')">Open</button>
                 <button onclick="deleteSavedFlowchart('${name}')">Delete</button>
               </div>
@@ -1612,6 +1838,7 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
           });
         }
         flowchartListDiv.innerHTML = html;
+        // Add double-click event to allow renaming of flowchart titles.
         showFlowchartListOverlay();
       })
       .catch(err => {
@@ -1653,6 +1880,34 @@ setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
         console.error("Error loading flowchart:", err);
         alert("Error loading flowchart: " + err);
       });
+  };
+
+  // Rename saved flowchart by double-clicking its title.
+  window.renameFlowchart = function(oldName, element) {
+    let newName = prompt("Enter new name for this flowchart:", oldName);
+    if (!newName || newName.trim() === "" || newName === oldName) return;
+    newName = newName.trim();
+    // Copy document to new name then delete old document.
+    const docRef = db.collection("users").doc(currentUser.uid).collection("flowcharts").doc(oldName);
+    docRef.get().then(docSnap => {
+      if (docSnap.exists) {
+        const data = docSnap.data();
+        db.collection("users")
+          .doc(currentUser.uid)
+          .collection("flowcharts")
+          .doc(newName)
+          .set(data)
+          .then(() => {
+            docRef.delete();
+            element.textContent = newName;
+            alert("Flowchart renamed to: " + newName);
+          })
+          .catch(err => {
+            console.error("Error renaming flowchart:", err);
+            alert("Error renaming flowchart: " + err);
+          });
+      }
+    });
   };
 
   // Delete saved flowchart
