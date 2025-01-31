@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Flowchart Creator (Fixed)</title>
+  <title>Flowchart Creator (No Sections, No Jumping)</title>
   <!-- mxGraph -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mxgraph@4.2.2/javascript/mxClient.min.js"></script>
   <!-- Firebase -->
@@ -10,15 +10,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-  <!--
-  ************************************************************************************************************
-  ************************************************************************************************************
-  ***                                                                                                      ***
-  ***      S E C T I O N 1:   G E N E R A L   S T Y L E   &   L A Y O U T                                  ***
-  ***                                                                                                      ***
-  ************************************************************************************************************
-  ************************************************************************************************************
-  -->
   <style>
     html, body {
       margin: 0;
@@ -123,7 +114,6 @@
       background-color: #f0f0f0;
     }
 
-    /* Properties menu */
     #propertiesMenu {
       position: absolute;
       background: #fff;
@@ -201,43 +191,31 @@
       margin-bottom: 8px;
     }
 
-    /* Node label backgrounds */
+    /* Customization for the in-node text box padding + rounding */
     .mxGraph .mxCellEditor,
     .mxGraph .mxCellOverlay {
       background: transparent !important;
     }
-
-    /*
-    ************************************************************************************************************
-    ************************************************************************************************************
-    ***                                                                                                      ***
-    ***      S E C T I O N 2:   C U S T O M   C E L L   E D I T O R   S T Y L I N G                          ***
-    ***                                                                                                      ***
-    ************************************************************************************************************
-    ************************************************************************************************************
-    */
     .mxCellEditor {
       background: #ffffff !important;
-      border-radius: 12px !important;
+      border-radius: 12px !important;  /* round corners of the editor */
       overflow: visible !important;
       box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
-      min-width: 20px !important;
-      min-height: 10px !important;
       box-sizing: border-box !important;
     }
     .mxCellEditor div {
-      padding: 16px !important;
+      padding: 16px !important;       /* extra padding inside the editable area */
       border: 1px solid #ccc !important;
-      border-radius: 12px !important;
+      border-radius: 12px !important; /* also round corners here */
       background: #ffffff !important;
       min-width: 20px !important;
       min-height: 90px !important;
       box-sizing: border-box !important;
     }
     .mxCellEditor textarea {
-      padding: 16px !important;
+      padding: 16px !important;       /* extra padding inside the text area */
       border: 1px solid #ccc !important;
-      border-radius: 12px !important;
+      border-radius: 12px !important; /* round corners */
       background: #ffffff !important;
       min-width: 20px !important;
       min-height: 50px !important;
@@ -248,15 +226,6 @@
 </head>
 <body>
 
-<!--
-###########################################################################################################
-###########################################################################################################
-###                                                                                                     ###
-###     S E C T I O N 3:  L O G I N   O V E R L A Y   &   T O O L B A R                                  ###
-###                                                                                                     ###
-###########################################################################################################
-###########################################################################################################
--->
 <div id="loginOverlay">
   <div id="loginForm">
     <h3>Login</h3>
@@ -270,17 +239,18 @@
 
 <div class="toolbar">
   <h3>Shapes</h3>
+  <!-- No auto-size or section data in these shapes -->
   <div
     class="shape"
     data-type="question"
-    data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;sectionId=1;nodeId=Question_node;"
+    data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;nodeId=Question_node;"
   >
     Question Node
   </div>
   <div
     class="shape"
     data-type="options"
-    data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;sectionId=1;nodeId=Option_node;"
+    data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;nodeId=Option_node;"
   >
     Options Node
   </div>
@@ -315,7 +285,19 @@
       <div class="legend-color-box" id="colorMoney"></div>
       <span>Money</span>
     </div>
+    <div class="legend-item">
+      <div class="legend-color-box" id="colorDate"></div>
+      <span>Date</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color-box" id="colorBigParagraph"></div>
+      <span>Big Paragraph</span>
+    </div>
   </div>
+
+  <!-- RESET button to restore default colors, then a LOGOUT button -->
+  <button id="resetColorsBtn">Reset Colors</button>
+  <button id="logoutBtn">Logout</button>
 </div>
 
 <div id="graphContainer"></div>
@@ -324,7 +306,6 @@
   <button id="deleteNode">Delete Node</button>
   <button id="jumpNode">Jump</button>
   <button id="changeType">Change Type &raquo;</button>
-  <button id="newSectionButton">New Section</button>
   <button id="propertiesButton">Properties</button>
   <button id="yesNoNode">Yes/No</button>
 </div>
@@ -334,6 +315,8 @@
   <button id="checkboxType">Checkbox</button>
   <button id="textType">Text</button>
   <button id="moneyType">Money</button>
+  <button id="dateType">Date</button>
+  <button id="bigParagraphType">Big Paragraph</button>
 </div>
 
 <div id="propertiesMenu">
@@ -344,24 +327,22 @@
     <span id="propNodeId" class="editable-field" tabindex="0"></span>
   </p>
   <p><strong>Node Type:</strong> <span id="propNodeType"></span></p>
-  <p><strong>Section Name:</strong> <span id="propSectionName"></span></p>
 </div>
 
+<!-- Color pickers (hidden by default) -->
 <input type="color" id="colorPickerText" style="display:none;" />
 <input type="color" id="colorPickerCheckbox" style="display:none;" />
 <input type="color" id="colorPickerDropdown" style="display:none;" />
 <input type="color" id="colorPickerMoney" style="display:none;" />
+<input type="color" id="colorPickerDate" style="display:none;" />
+<input type="color" id="colorPickerBigParagraph" style="display:none;" />
 
-<!--
-###########################################################################################################
-###########################################################################################################
-###                                                                                                     ###
-###     S E C T I O N 5:   F I R E B A S E   &   A U T H                                                ###
-###                                                                                                     ###
-###########################################################################################################
-###########################################################################################################
--->
 <script>
+  /*
+   *********************************************************************
+   **************       Firebase Config & Auth Setup       *************
+   *********************************************************************
+  */
   const firebaseConfig = {
     apiKey: "AIzaSyBlxFmFD-rz1V_Q9_oV0DkLsENbmyJ1k-U",
     authDomain: "flowchart-1eb90.firebaseapp.com",
@@ -375,12 +356,21 @@
   const db = firebase.firestore();
   let currentUser = null;
 
-  let colorPreferences = {
-    text: "#749FFE",
-    checkbox: "#A1B8FE",
-    dropdown: "#C5D4FE",
-    money: "#E2EAFF"
+  /*
+    Default color preferences: from light to dark blue, as requested.
+    We'll store a separate "defaultColorPreferences" so we can reset easily.
+  */
+  const defaultColorPreferences = {
+    text: "#cce6ff",         // lightest
+    checkbox: "#b3daff",
+    dropdown: "#99ccff",
+    money: "#80bfff",
+    date: "#4da6ff",
+    bigParagraph: "#1a8cff"  // darkest
   };
+
+  // We'll let colorPreferences start as a copy of defaults
+  let colorPreferences = { ...defaultColorPreferences };
 
   const loginOverlay = document.getElementById("loginOverlay");
   const loginButton = document.getElementById("loginButton");
@@ -471,10 +461,17 @@
       .then(docSnap => {
         if (docSnap.exists) {
           const data = docSnap.data();
-          if (data.text) colorPreferences.text = data.text;
-          if (data.checkbox) colorPreferences.checkbox = data.checkbox;
-          if (data.dropdown) colorPreferences.dropdown = data.dropdown;
-          if (data.money) colorPreferences.money = data.money;
+          // Merge them carefully
+          for (let key in defaultColorPreferences) {
+            if (data[key]) {
+              colorPreferences[key] = data[key];
+            } else {
+              colorPreferences[key] = defaultColorPreferences[key];
+            }
+          }
+        } else {
+          // If doc doesn't exist, use the defaults
+          colorPreferences = { ...defaultColorPreferences };
         }
         updateLegendColors();
         refreshAllCells();
@@ -493,16 +490,12 @@
   }
 </script>
 
-<!--
-###########################################################################################################
-###########################################################################################################
-###                                                                                                     ###
-###     S E C T I O N 6:   G R A P H   I N I T   &   C O N T E X T   M E N U                            ###
-###                                                                                                     ###
-###########################################################################################################
-###########################################################################################################
--->
 <script>
+  /*
+   *********************************************************************
+   **************       Initialize Graph & Context Menu     ************
+   *********************************************************************
+  */
   let graph = null;
   let selectedCell = null;
   let currentMouseEvent = null;
@@ -522,7 +515,6 @@
     const deleteNodeButton = document.getElementById("deleteNode");
     const jumpNodeButton = document.getElementById("jumpNode");
     const changeTypeButton = document.getElementById("changeType");
-    const newSectionButton = document.getElementById("newSectionButton");
     const propertiesButton = document.getElementById("propertiesButton");
     const yesNoNodeButton = document.getElementById("yesNoNode");
 
@@ -531,29 +523,40 @@
     const checkboxTypeBtn = document.getElementById("checkboxType");
     const textTypeBtn = document.getElementById("textType");
     const moneyTypeBtn = document.getElementById("moneyType");
+    const dateTypeBtn = document.getElementById("dateType");
+    const bigParagraphTypeBtn = document.getElementById("bigParagraphType");
 
     const propertiesMenu = document.getElementById("propertiesMenu");
     const propNodeText = document.getElementById("propNodeText");
     const propNodeId = document.getElementById("propNodeId");
     const propNodeType = document.getElementById("propNodeType");
-    const propSectionName = document.getElementById("propSectionName");
 
     const colorBoxText = document.getElementById("colorText");
     const colorBoxCheckbox = document.getElementById("colorCheckbox");
     const colorBoxDropdown = document.getElementById("colorDropdown");
     const colorBoxMoney = document.getElementById("colorMoney");
+    const colorBoxDate = document.getElementById("colorDate");
+    const colorBoxBigParagraph = document.getElementById("colorBigParagraph");
+
     const colorPickerText = document.getElementById("colorPickerText");
     const colorPickerCheckbox = document.getElementById("colorPickerCheckbox");
     const colorPickerDropdown = document.getElementById("colorPickerDropdown");
     const colorPickerMoney = document.getElementById("colorPickerMoney");
+    const colorPickerDate = document.getElementById("colorPickerDate");
+    const colorPickerBigParagraph = document.getElementById("colorPickerBigParagraph");
 
-    // 1) Create the graph
+    const resetColorsBtn = document.getElementById("resetColorsBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    /*
+      1) Create the graph.
+         We do NOT call setAutoSizeCells(true) so it won't resize live.
+    */
     graph = new mxGraph(container);
 
-    // 2) Let it auto-size to text, as user types
-    graph.setAutoSizeCells(true);
+    // 2) We do NOT do auto sizing. So remove "autosize=1" from the style as well.
 
-    // 3) So raw HTML in cell values actually renders as HTML
+    // 3) Let it render raw HTML in cell values
     graph.setHtmlLabels(true);
 
     mxEvent.disableContextMenu(container);
@@ -568,23 +571,21 @@
     const defStyle = graph.getStylesheet().getDefaultVertexStyle();
     defStyle["labelBackgroundColor"] = "#ffffff";
     defStyle["labelBorderColor"] = "#cccccc";
-    defStyle["rounded"] = "1";      // round corners
-    defStyle["arcSize"] = "24";     // bigger corner radius
+    defStyle["rounded"] = "1";
+    defStyle["arcSize"] = "24";
     defStyle["whiteSpace"] = "wrap";
     defStyle["html"] = "1";
-    defStyle["autosize"] = "1";
+    // Remove "autosize" from default style
+    // *** Center text in the node ***
+    defStyle["align"] = mxConstants.ALIGN_CENTER;
+    defStyle["verticalAlign"] = mxConstants.ALIGN_MIDDLE;
+    // Extra internal padding
+    defStyle["spacingTop"] = 20;
+    defStyle["spacingBottom"] = 20;
+    defStyle["spacingLeft"] = 20;
+    defStyle["spacingRight"] = 20;
 
-    // *** KEY LINES TO STOP "JUMPING" (ALIGN TOP-LEFT) ***
-    defStyle["align"] = mxConstants.ALIGN_LEFT;        // text alignment horizontally
-    defStyle["verticalAlign"] = mxConstants.ALIGN_TOP; // text alignment vertically
-
-    // 5) Give each node more internal padding
-    defStyle["spacingTop"] = 16;
-    defStyle["spacingBottom"] = 16;
-    defStyle["spacingLeft"] = 16;
-    defStyle["spacingRight"] = 16;
-
-    // 6) If you need a min size so node doesn't collapse too small:
+    // Enforce a minimum size if user tries to manually resize
     graph.getModel().addListener(mxEvent.CHANGE, (sender, evt) => {
       const changes = evt.getProperty("changes") || [];
       changes.forEach(change => {
@@ -593,7 +594,6 @@
           if (changedCell && changedCell.vertex) {
             const geo = changedCell.geometry;
             if (geo) {
-              // Example: enforce min 120 wide, 60 tall
               if (geo.width < 120) geo.width = 120;
               if (geo.height < 60) geo.height = 60;
             }
@@ -603,36 +603,17 @@
     });
 
     /*
-      Real-time text update inside the node
-      so we can keep it sized properly as user types
+      Remove the real-time text update that calls updateCellSize while typing.
+      We'll let the node remain the same size while you type, so it won't jump.
+      If you wanted to auto-size AFTER editing is done, you could do it in stopEditing,
+      but let's remove it entirely to keep the node from moving at all.
     */
     (function overrideCellEditorForRealTime() {
-      const oldInstallListeners = mxCellEditor.prototype.installListeners;
-      mxCellEditor.prototype.installListeners = function(elt) {
-        oldInstallListeners.apply(this, arguments);
-        mxEvent.addListener(elt, 'input', (evt) => {
-          if (this.editingCell) {
-            graph.getModel().beginUpdate();
-            try {
-              let newVal = elt.innerText || "";
-              this.editingCell.value = newVal;
-              graph.updateCellSize(this.editingCell);
-            } finally {
-              graph.getModel().endUpdate();
-            }
-          }
-        });
-      };
-      const oldStopEditing = mxCellEditor.prototype.stopEditing;
-      mxCellEditor.prototype.stopEditing = function(cancel) {
-        if (!cancel && this.editingCell != null) {
-          graph.updateCellSize(this.editingCell);
-        }
-        oldStopEditing.apply(this, arguments);
-      };
+      // We'll just let the default run, no changes for input or stopEditing.
+      // So we do NOT call graph.updateCellSize() at all here.
     })();
 
-    // Keep track of last selected cell
+    // Keep track of last selection for auto node ID if needed
     graph.getSelectionModel().addListener(mxEvent.CHANGE, () => {
       if (lastSelectedCell) {
         autoUpdateNodeIdBasedOnLabel(lastSelectedCell);
@@ -653,7 +634,7 @@
           let newVertex;
           try {
             const label = shapeEl.dataset.type + " node";
-            // Start them at 160x80
+            // We remove autosize=1 from here so it doesn't auto-resize
             newVertex = graph.insertVertex(
               parent,
               null,
@@ -662,7 +643,7 @@
               y,
               160,
               80,
-              baseStyle + ";autosize=1;"
+              baseStyle
             );
           } finally {
             graph.getModel().endUpdate();
@@ -690,7 +671,6 @@
         hideContextMenu();
       }
     };
-
     function showContextMenu(evt) {
       contextMenu.style.display = "block";
       contextMenu.style.left = evt.clientX + "px";
@@ -735,6 +715,8 @@
       typeSubmenu.style.left = rect.right + "px";
       typeSubmenu.style.top = rect.top + "px";
     });
+
+    // Type submenu
     dropdownTypeBtn.addEventListener("click", () => {
       if (selectedCell && isQuestion(selectedCell)) {
         setQuestionType(selectedCell, "dropdown");
@@ -767,29 +749,29 @@
       }
       hideContextMenu();
     });
-    newSectionButton.addEventListener("click", () => {
+    dateTypeBtn.addEventListener("click", () => {
       if (selectedCell && isQuestion(selectedCell)) {
-        const oldSec = getSectionId(selectedCell);
-        const newSec = oldSec + 1;
-        setSectionId(selectedCell, newSec);
-        markAsNewSection(selectedCell);
+        setQuestionType(selectedCell, "date");
+        selectedCell.value = "Date question node";
         refreshAllCells();
       }
       hideContextMenu();
     });
-    propertiesButton.addEventListener("click", () => {
-      if (selectedCell) {
-        showPropertiesMenu(selectedCell, currentMouseEvent);
+    bigParagraphTypeBtn.addEventListener("click", () => {
+      if (selectedCell && isQuestion(selectedCell)) {
+        setQuestionType(selectedCell, "bigParagraph");
+        selectedCell.value = "Big Paragraph question node";
+        refreshAllCells();
       }
       hideContextMenu();
     });
+
     yesNoNodeButton.addEventListener("click", () => {
       if (selectedCell && isQuestion(selectedCell)) {
         createYesNoOptions(selectedCell);
       }
       hideContextMenu();
     });
-
     function createYesNoOptions(parentCell) {
       const parentGeo = parentCell.geometry;
       if (!parentGeo) return;
@@ -815,6 +797,7 @@
       refreshAllCells();
     }
 
+    // Properties
     function showPropertiesMenu(cell, evt) {
       if (!cell) return;
       propertiesMenu.style.display = "block";
@@ -830,11 +813,16 @@
       } else {
         propNodeType.textContent = "other";
       }
-      propSectionName.textContent = "Section " + getSectionId(cell);
     }
+    propertiesButton.addEventListener("click", () => {
+      if (selectedCell) {
+        showPropertiesMenu(selectedCell, currentMouseEvent);
+      }
+    });
+
+    // Make property fields editable
     makeEditableField(propNodeText, onNodeTextFieldChange);
     makeEditableField(propNodeId, onNodeIdFieldChange);
-
     function makeEditableField(spanEl, onChangeCb) {
       spanEl.addEventListener("dblclick", (e) => {
         e.stopPropagation();
@@ -921,6 +909,7 @@
       const parent = edge.source;
       const child = edge.target;
 
+      // Jump mode check
       const parentIsJump = (parent && parent === jumpModeNode);
       let parentQuestion = null;
       if (parent && isOptions(parent)) {
@@ -932,21 +921,40 @@
 
       if (parentIsJump || gpIsJump) {
         addSkipReassign(child);
-      } else {
-        const parentSec = getSectionId(parent);
-        setSectionId(child, parentSec);
       }
       refreshAllCells();
     });
 
-    // Initialize legend
+    // Initialize legend colors
     updateLegendColors();
 
-    colorBoxText.addEventListener("click", () => colorPickerText.click());
-    colorBoxCheckbox.addEventListener("click", () => colorPickerCheckbox.click());
-    colorBoxDropdown.addEventListener("click", () => colorPickerDropdown.click());
-    colorBoxMoney.addEventListener("click", () => colorPickerMoney.click());
+    // When user clicks color box, set the color picker to that color, then open
+    colorBoxText.addEventListener("click", () => {
+      colorPickerText.value = colorPreferences.text;
+      colorPickerText.click();
+    });
+    colorBoxCheckbox.addEventListener("click", () => {
+      colorPickerCheckbox.value = colorPreferences.checkbox;
+      colorPickerCheckbox.click();
+    });
+    colorBoxDropdown.addEventListener("click", () => {
+      colorPickerDropdown.value = colorPreferences.dropdown;
+      colorPickerDropdown.click();
+    });
+    colorBoxMoney.addEventListener("click", () => {
+      colorPickerMoney.value = colorPreferences.money;
+      colorPickerMoney.click();
+    });
+    colorBoxDate.addEventListener("click", () => {
+      colorPickerDate.value = colorPreferences.date;
+      colorPickerDate.click();
+    });
+    colorBoxBigParagraph.addEventListener("click", () => {
+      colorPickerBigParagraph.value = colorPreferences.bigParagraph;
+      colorPickerBigParagraph.click();
+    });
 
+    // Listen for user picking a new color
     colorPickerText.addEventListener("input", (e) => {
       colorPreferences.text = e.target.value;
       saveUserColorPrefs().then(()=>{
@@ -975,25 +983,61 @@
         refreshAllCells();
       });
     });
+    colorPickerDate.addEventListener("input", (e) => {
+      colorPreferences.date = e.target.value;
+      saveUserColorPrefs().then(()=>{
+        updateLegendColors();
+        refreshAllCells();
+      });
+    });
+    colorPickerBigParagraph.addEventListener("input", (e) => {
+      colorPreferences.bigParagraph = e.target.value;
+      saveUserColorPrefs().then(()=>{
+        updateLegendColors();
+        refreshAllCells();
+      });
+    });
+
+    // RESET button
+    resetColorsBtn.addEventListener("click", () => {
+      // restore defaults
+      colorPreferences = { ...defaultColorPreferences };
+      // then save, update UI
+      saveUserColorPrefs().then(() => {
+        updateLegendColors();
+        refreshAllCells();
+      });
+    });
+
+    // LOGOUT button
+    logoutBtn.addEventListener("click", () => {
+      firebase.auth().signOut()
+        .then(() => {
+          // Clear the cookie
+          setCookie("flowchart_uid", "", -1);
+          // Show login overlay
+          showLoginOverlay();
+        })
+        .catch(err => console.error("Logout error:", err));
+    });
   });
 </script>
 
-<!--
-###########################################################################################################
-###########################################################################################################
-###                                                                                                     ###
-###     S E C T I O N 7:   H E L P E R   F U N C T I O N S                                               ###
-###                                                                                                     ###
-###########################################################################################################
-###########################################################################################################
--->
 <script>
+  /*
+   *********************************************************************
+   **************       Helper Functions / Styling       ***************
+   *********************************************************************
+  */
   function updateLegendColors() {
     document.getElementById("colorText").style.backgroundColor = colorPreferences.text;
     document.getElementById("colorCheckbox").style.backgroundColor = colorPreferences.checkbox;
     document.getElementById("colorDropdown").style.backgroundColor = colorPreferences.dropdown;
     document.getElementById("colorMoney").style.backgroundColor = colorPreferences.money;
+    document.getElementById("colorDate").style.backgroundColor = colorPreferences.date;
+    document.getElementById("colorBigParagraph").style.backgroundColor = colorPreferences.bigParagraph;
   }
+
   function autoUpdateNodeIdBasedOnLabel(cell) {
     if (!cell.vertex) return;
     const label = (cell.value || "").trim();
@@ -1004,6 +1048,7 @@
       refreshOptionNodeId(cell);
     }
   }
+
   function setNodeId(cell, nodeId) {
     let style = cell.style || "";
     style = style.replace(/nodeId=[^;]+/, "");
@@ -1015,12 +1060,14 @@
     const m = style.match(/nodeId=([^;]+)/);
     return m ? decodeURIComponent(m[1]) : "";
   }
+
   function isQuestion(cell) {
     return cell && cell.style && cell.style.includes("nodeType=question");
   }
   function isOptions(cell) {
     return cell && cell.style && cell.style.includes("nodeType=options");
   }
+
   function refreshNodeIdFromLabel(cell) {
     const label = (cell.value || "").toString().trim();
     const nodeId = label.replace(/\s+/g, "_");
@@ -1039,21 +1086,7 @@
     let label = (cell.value || "Option").toString().trim().replace(/\s+/g, "_");
     setNodeId(cell, parentNodeId + label);
   }
-  function setSectionId(cell, sid) {
-    if (!cell) return;
-    let style = cell.style || "";
-    style = style.replace(/sectionId=[^;]+/, "");
-    style += `;sectionId=${sid};`;
-    graph.getModel().setStyle(cell, style);
-  }
-  function getSectionId(cell) {
-    const style = cell.style || "";
-    const m = style.match(/sectionId=([^;]+)/);
-    return m ? parseInt(m[1], 10) : 1;
-  }
-  function hasSkipReassign(cell) {
-    return cell && cell.style && cell.style.includes("skipReassign=true");
-  }
+
   function addSkipReassign(cell) {
     if (!cell) return;
     let style = cell.style || "";
@@ -1061,13 +1094,10 @@
     style += ";skipReassign=true;";
     graph.getModel().setStyle(cell, style);
   }
-  function markAsNewSection(cell) {
-    if (!cell) return;
-    let style = cell.style || "";
-    style = style.replace(/newSection=[^;]+/, "");
-    style += ";newSection=true;";
-    graph.getModel().setStyle(cell, style);
+  function hasSkipReassign(cell) {
+    return cell && cell.style && cell.style.includes("skipReassign=true");
   }
+
   function addJumpStyling(cell) {
     if (!cell) return;
     let style = cell.style || "";
@@ -1087,6 +1117,19 @@
     style = style.replace(/dashPattern=[^;]+;?/, "");
     graph.getModel().setStyle(cell, style);
   }
+
+  function getQuestionType(cell) {
+    const style = cell.style || "";
+    const m = style.match(/questionType=([^;]+)/);
+    return m ? m[1] : "dropdown";
+  }
+  function setQuestionType(cell, newType) {
+    let style = cell.style || "";
+    style = style.replace(/questionType=[^;]+/, "");
+    style += `;questionType=${newType};`;
+    graph.getModel().setStyle(cell, style);
+  }
+
   function colorCell(cell) {
     if (!cell.vertex) return;
     let fillColor = "#ADD8E6"; // fallback
@@ -1101,55 +1144,26 @@
     style += `;fillColor=${fillColor};`;
     graph.getModel().setStyle(cell, style);
   }
+
   function getColorForQuestionType(qType) {
     switch (qType) {
-      case "text":     return colorPreferences.text;
-      case "checkbox": return colorPreferences.checkbox;
-      case "dropdown": return colorPreferences.dropdown;
-      case "money":    return colorPreferences.money;
-      default:         return "#ADD8E6";
+      case "text":         return colorPreferences.text;
+      case "checkbox":     return colorPreferences.checkbox;
+      case "dropdown":     return colorPreferences.dropdown;
+      case "money":        return colorPreferences.money;
+      case "date":         return colorPreferences.date;
+      case "bigParagraph": return colorPreferences.bigParagraph;
+      default:             return "#ADD8E6"; // fallback
     }
   }
-  function getQuestionType(cell) {
-    const style = cell.style || "";
-    const m = style.match(/questionType=([^;]+)/);
-    return m ? m[1] : "dropdown";
-  }
-  function setQuestionType(cell, newType) {
-    let style = cell.style || "";
-    style = style.replace(/questionType=[^;]+/, "");
-    style += `;questionType=${newType};`;
-    graph.getModel().setStyle(cell, style);
-  }
+
   function refreshAllCells() {
     const parent = graph.getDefaultParent();
     const vertices = graph.getChildVertices(parent);
     vertices.forEach(cell => {
-      if (!hasSkipReassign(cell)) {
-        if (isOptions(cell)) {
-          const incomingEdges = graph.getIncomingEdges(cell) || [];
-          if (incomingEdges.length > 0) {
-            const parentCell = incomingEdges[0].source;
-            if (parentCell && isQuestion(parentCell)) {
-              setSectionId(cell, getSectionId(parentCell));
-            }
-          }
-        }
-        if (isQuestion(cell)) {
-          const thisSection = getSectionId(cell);
-          const incomingEdges = graph.getIncomingEdges(cell) || [];
-          const incomingOptions = (incomingEdges||[]).filter(e => e.source && isOptions(e.source));
-          if (
-            !cell.style.includes("newSection=true") &&
-            (thisSection <= 1) &&
-            incomingOptions.length > 0
-          ) {
-            const parentOpt = incomingOptions[0].source;
-            setSectionId(cell, getSectionId(parentOpt));
-          }
-        }
-      }
       colorCell(cell);
+
+      // If it's a question node with the default label, put the mini dropdown
       if (isQuestion(cell) && (cell.value === "question node" || cell.value === "Question Node")) {
         const cellId = cell.id;
         cell.value = `
@@ -1159,6 +1173,8 @@
             <option value="checkbox">Checkbox</option>
             <option value="dropdown">Dropdown</option>
             <option value="money">Money</option>
+            <option value="date">Date</option>
+            <option value="bigParagraph">Big Paragraph</option>
           </select>
         `;
       }
@@ -1179,16 +1195,12 @@
   };
 </script>
 
-<!--
-###########################################################################################################
-###########################################################################################################
-###                                                                                                     ###
-###     S E C T I O N 8:   E X P O R T / I M P O R T                                                    ###
-###                                                                                                     ###
-###########################################################################################################
-###########################################################################################################
--->
 <script>
+  /*
+   *********************************************************************
+   **************       Export / Import Functions         **************
+   *********************************************************************
+  */
   function downloadJson(str, filename) {
     const blob = new Blob([str], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -1281,9 +1293,9 @@
   window.exportGuiJson = function () {
     const model = graph.getModel();
     const allCells = model.cells;
-    const sectionsMap = {};
+
+    const questionsArr = [];
     let questionIdCounter = 1;
-    let maxSectionId = 1;
 
     function getNodeType(cell) {
       if (cell.style && cell.style.includes("nodeType=question")) return "question";
@@ -1291,19 +1303,15 @@
       return "other";
     }
 
+    // 1) Gather question nodes
     for (let id in allCells) {
       if (id === "0" || id === "1") continue;
       const cell = allCells[id];
       if (cell.vertex && getNodeType(cell) === "question") {
-        const sId = getSectionId(cell);
-        if (sId > maxSectionId) maxSectionId = sId;
         const label = (cell.value || "").replace(/<[^>]+>/g, "").trim() || "Untitled";
         const qType = getQuestionType(cell);
-
-        const questionObj = {
+        const qObj = {
           questionId: questionIdCounter,
-          nameId: getNodeId(cell) || "",
-          placeholder: "",
           text: label,
           type: qType,
           logic: {
@@ -1327,92 +1335,83 @@
             text: ""
           },
           options: [],
-          labels: []
+          labels: [],
+          nameId: getNodeId(cell) || "",
+          placeholder: ""
         };
-        if (!sectionsMap[sId]) sectionsMap[sId] = [];
-        sectionsMap[sId].push(questionObj);
+        questionsArr.push(qObj);
         cell._questionId = questionIdCounter;
         questionIdCounter++;
       }
     }
 
+    // 2) Connect options + logic
     for (let id in allCells) {
       if (id === "0" || id === "1") continue;
       const cell = allCells[id];
-      if (cell.vertex && getNodeType(cell) === "question") {
-        const sId = getSectionId(cell);
-        const label = (cell.value || "").replace(/<[^>]+>/g, "").trim() || "Untitled";
-        const questionList = sectionsMap[sId] || [];
-        const qObj = questionList.find(q => q.text === label);
-        if (!qObj) continue;
+      if (!cell.vertex) continue;
+      if (getNodeType(cell) !== "question") continue;
 
-        const outEdges = graph.getOutgoingEdges(cell) || [];
-        outEdges.forEach(edge => {
-          const target = edge.target;
-          if (!target) return;
-          if (getNodeType(target) === "options") {
-            const optLabel = (target.value || "Option").replace(/<[^>]+>/g, "").trim();
-            const optNodeId = getNodeId(target);
+      const label = (cell.value || "").replace(/<[^>]+>/g, "").trim() || "Untitled";
+      const qObj = questionsArr.find(q => q.text === label);
+      if (!qObj) continue;
 
-            if (qObj.type === "checkbox") {
-              qObj.options.push({
-                label: capitalizeFirst(optLabel),
-                nameId: optNodeId,
-                value: ""
-              });
-            } else {
-              qObj.options.push(capitalizeFirst(optLabel));
-            }
+      const outEdges = graph.getOutgoingEdges(cell) || [];
+      outEdges.forEach(edge => {
+        const target = edge.target;
+        if (!target) return;
+        if (getNodeType(target) === "options") {
+          const optLabel = (target.value || "Option").replace(/<[^>]+>/g, "").trim();
+          const optNodeId = getNodeId(target);
 
-            const nextEdges = graph.getOutgoingEdges(target) || [];
-            nextEdges.forEach(ne => {
-              const q2 = ne.target;
-              if (q2 && getNodeType(q2) === "question") {
-                const q2Sid = getSectionId(q2);
-                const questionList2 = sectionsMap[q2Sid] || [];
-                const q2Obj = questionList2.find(o => o.text === (q2.value||"").replace(/<[^>]+>/g, "").trim());
-                if (!q2Obj) return;
-
-                // If target question has smaller ID, interpret as a jump
-                if (q2._questionId < cell._questionId) {
-                  qObj.jump.enabled = true;
-                  qObj.jump.option = capitalizeFirst(optLabel);
-                  qObj.jump.to = q2._questionId.toString();
-                } else {
-                  // Otherwise, interpret as normal forward logic
-                  q2Obj.logic.enabled = true;
-                  q2Obj.logic.conditions.push({
-                    prevQuestion: qObj.questionId.toString(),
-                    prevAnswer: capitalizeFirst(optLabel)
-                  });
-                }
-              }
+          if (qObj.type === "checkbox") {
+            qObj.options.push({
+              label: capitalizeFirst(optLabel),
+              nameId: optNodeId,
+              value: ""
             });
+          } else {
+            qObj.options.push(capitalizeFirst(optLabel));
           }
-        });
-      }
-    }
 
-    const sectionsArr = [];
-    for (let s = 1; s <= maxSectionId; s++) {
-      const qList = sectionsMap[s] || [];
-      sectionsArr.push({
-        sectionId: s,
-        sectionName: "Section " + s,
-        questions: qList
+          const nextEdges = graph.getOutgoingEdges(target) || [];
+          nextEdges.forEach(ne => {
+            const q2 = ne.target;
+            if (q2 && getNodeType(q2) === "question") {
+              if (!q2._questionId) return;
+              if (q2._questionId < cell._questionId) {
+                // jump backward
+                qObj.jump.enabled = true;
+                qObj.jump.option = capitalizeFirst(optLabel);
+                qObj.jump.to = q2._questionId.toString();
+              } else {
+                // forward logic
+                const q2Label = (q2.value||"").replace(/<[^>]+>/g, "").trim();
+                const foundQ2 = questionsArr.find(o => o.text === q2Label);
+                if (!foundQ2) return;
+                foundQ2.logic.enabled = true;
+                foundQ2.logic.conditions.push({
+                  prevQuestion: qObj.questionId.toString(),
+                  prevAnswer: capitalizeFirst(optLabel)
+                });
+              }
+            }
+          });
+        }
       });
     }
 
     const guiData = {
-      sections: sectionsArr,
+      questions: questionsArr,
       hiddenFields: [],
-      sectionCounter: maxSectionId + 1,
       questionCounter: questionIdCounter,
       hiddenFieldCounter: 1,
       defaultPDFName: ""
     };
+
     downloadJson(JSON.stringify(guiData, null, 2), "gui_data.json");
   };
+
   function capitalizeFirst(str) {
     if (!str) return str;
     return str.charAt(0).toUpperCase() + str.slice(1);

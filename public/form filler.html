@@ -1,332 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Flowchart Creator (Fixed)</title>
-  <!-- mxGraph -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mxgraph@4.2.2/javascript/mxClient.min.js"></script>
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-  <!--
-  ************************************************************************************************************
-  ************************************************************************************************************
-  ***                                                                                                      ***
-  ***      S E C T I O N 1:   G E N E R A L   S T Y L E   &   L A Y O U T                                  ***
-  ***                                                                                                      ***
-  ************************************************************************************************************
-  ************************************************************************************************************
-  -->
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: Arial, sans-serif;
-      user-select: none;
-    }
-    .toolbar {
-      width: 220px;
-      background: #f9f9f9;
-      border-right: 1px solid #ccc;
-      float: left;
-      padding: 10px;
-      box-sizing: border-box;
-    }
-    #graphContainer {
-      position: absolute;
-      left: 220px;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      cursor: default;
-    }
-    .shape {
-      background: #fff;
-      border: 1px solid #999;
-      margin-bottom: 8px;
-      text-align: center;
-      padding: 6px;
-      border-radius: 4px;
-      cursor: move;
-    }
-    .shape:hover {
-      background: #e0e0e0;
-    }
-    .button-bar {
-      margin-top: 15px;
-    }
-    button {
-      margin-bottom: 6px;
-      padding: 6px 10px;
-      background-color: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      display: block;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    input[type="file"] {
-      display: none;
-    }
-    .context-menu {
-      position: absolute;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
-      display: none;
-      z-index: 1000;
-      padding: 5px;
-    }
-    .context-menu button {
-      border: none;
-      background: none;
-      color: #000;
-      padding: 5px 10px;
-      text-align: left;
-      width: 100%;
-      cursor: pointer;
-    }
-    .context-menu button:hover {
-      background-color: #f0f0f0;
-    }
-    .submenu {
-      position: absolute;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      padding: 5px;
-      display: none;
-      z-index: 2000;
-    }
-    .submenu button {
-      display: block;
-      margin-bottom: 4px;
-      border: none;
-      background: none;
-      color: #000;
-      padding: 5px 10px;
-      text-align: left;
-      width: 100%;
-      cursor: pointer;
-    }
-    .submenu button:hover {
-      background-color: #f0f0f0;
-    }
-
-    /* Properties menu */
-    #propertiesMenu {
-      position: absolute;
-      background: #fff;
-      border: 1px solid #ccc;
-      padding: 10px;
-      border-radius: 4px;
-      display: none;
-      z-index: 3000;
-      width: 220px;
-    }
-    #propertiesMenu p {
-      margin: 4px 0;
-    }
-    .editable-field {
-      border: 1px dashed transparent;
-      padding: 2px;
-      display: inline-block;
-      min-width: 50px;
-      cursor: text;
-    }
-    .editable-field:focus {
-      outline: 1px dashed #888;
-    }
-
-    /* Legend area for colors */
-    .legend {
-      margin-top: 10px;
-      padding: 6px;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .legend .legend-item {
-      display: flex;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-    .legend-color-box {
-      width: 20px;
-      height: 20px;
-      margin-right: 8px;
-      cursor: pointer;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-    }
-
-    /* Basic login form overlay */
-    #loginOverlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0,0,0,0.5);
-      display: none;
-      z-index: 9999;
-      align-items: center;
-      justify-content: center;
-    }
-    #loginForm {
-      background: #fff;
-      padding: 20px;
-      border-radius: 6px;
-      min-width: 300px;
-    }
-    #loginForm input[type="email"],
-    #loginForm input[type="password"] {
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 8px;
-      box-sizing: border-box;
-    }
-    #loginError {
-      color: red;
-      margin-bottom: 8px;
-    }
-
-    /* Node label backgrounds */
-    .mxGraph .mxCellEditor,
-    .mxGraph .mxCellOverlay {
-      background: transparent !important;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Custom Form Builder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="form.css">
 </head>
 <body>
-
-  <!--
-  ###########################################################################################################
-  ###########################################################################################################
-  ###                                                                                                     ###
-  ###     S E C T I O N 3:  L O G I N   O V E R L A Y   &   T O O L B A R                                 ###
-  ###                                                                                                     ###
-  ###########################################################################################################
-  ###########################################################################################################
-  -->
-  <div id="loginOverlay">
-    <div id="loginForm">
-      <h3>Login</h3>
-      <div id="loginError"></div>
-      <input type="email" id="loginEmail" placeholder="Email" /><br/>
-      <input type="password" id="loginPassword" placeholder="Password" /><br/>
-      <button id="loginButton">Login</button>
-      <button id="signupButton">Sign Up</button>
+    <header>
+        <img src="logo.png" alt="Logo" width="130" height="80" onclick="location.href='index.html';">
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="forms.html">Forms</a>
+            <a href="contact.html">Contact Us</a>
+        </nav>
+    </header>
+    <section>
+        <div class="container">
+            <center>
+                <h2>FormWiz Developer GUI</h2>
+                <label>Choose Form PDF:</label>
+                <input type="text" id="formPDFName" placeholder="Enter PDF form name (e.g., sc100.pdf)"><br><br>
+                <button onclick="generateAndDownloadForm()">Export HTML</button>
+                <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importForm(event)">
+                <button onclick="document.getElementById('importFileInput').click();">Import JSON</button>
+                <button onclick="exportForm()">Export JSON</button>
+                <button type="button" id="previewButton" onclick="showPreview()">Preview</button>
+                <div id="previewModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closePreview()">&times;</span>
+        <iframe id="previewFrame"></iframe>
     </div>
-  </div>
+</div>
 
-  <div class="toolbar">
-    <h3>Shapes</h3>
-    <div
-      class="shape"
-      data-type="question"
-      data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;sectionId=1;nodeId=Question_node;"
-    >
-      Question Node
-    </div>
-    <div
-      class="shape"
-      data-type="options"
-      data-style="rounded=1;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;sectionId=1;nodeId=Option_node;"
-    >
-      Options Node
-    </div>
+<style>
+    .modal {
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); 
+        z-index: 1000; 
+        display: flex;
+        justify-content: center; 
+        align-items: center;
+    }
+    .modal-content {
+        background-color: #fff; 
+        border-radius: 8px; 
+        padding: 20px;
+        width: 90%; /* Increase this to 95% or 100% if you'd like more width */
+        max-width: 1200px; /* Increase max-width as needed */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+    .modal-content iframe {
+        width: 100%; 
+        height: 800px; /* Increase this value */
+        border: none;
+    }
+</style>
 
-    <div class="button-bar">
-      <button onclick="exportFlowchartJson()">Export Flowchart JSON</button>
-      <button onclick="document.getElementById('importFlowchartFile').click()">Import Flowchart</button>
-      <input
-        type="file"
-        id="importFlowchartFile"
-        accept=".json"
-        onchange="importFlowchartJson(event)"
-      />
-      <button onclick="exportGuiJson()">Export GUI JSON</button>
-    </div>
 
-    <div class="legend">
-      <strong>Legend (Click color to change)</strong>
-      <div class="legend-item">
-        <div class="legend-color-box" id="colorText"></div>
-        <span>Text</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-color-box" id="colorCheckbox"></div>
-        <span>Checkbox</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-color-box" id="colorDropdown"></div>
-        <span>Dropdown</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-color-box" id="colorMoney"></div>
-        <span>Money</span>
-      </div>
-    </div>
-  </div>
-
-  <div id="graphContainer"></div>
-
-  <div id="contextMenu" class="context-menu">
-    <button id="deleteNode">Delete Node</button>
-    <button id="jumpNode">Jump</button>
-    <button id="changeType">Change Type &raquo;</button>
-    <button id="newSectionButton">New Section</button>
-    <button id="propertiesButton">Properties</button>
-    <button id="yesNoNode">Yes/No</button>
-  </div>
-
-  <div id="typeSubmenu" class="submenu">
-    <button id="dropdownType">Drop Down</button>
-    <button id="checkboxType">Checkbox</button>
-    <button id="textType">Text</button>
-    <button id="moneyType">Money</button>
-    <!-- New question types: date and big paragraph -->
-    <button id="dateType">Date</button>
-    <button id="bigParaType">Big Paragraph</button>
-  </div>
-
-  <div id="propertiesMenu">
-    <p><strong>Node Text:</strong>
-      <span id="propNodeText" class="editable-field" tabindex="0"></span>
-    </p>
-    <p><strong>Node ID:</strong>
-      <span id="propNodeId" class="editable-field" tabindex="0"></span>
-    </p>
-    <p><strong>Node Type:</strong> <span id="propNodeType"></span></p>
-    <p><strong>Section Name:</strong> <span id="propSectionName"></span></p>
-  </div>
-
-  <input type="color" id="colorPickerText" style="display:none;" />
-  <input type="color" id="colorPickerCheckbox" style="display:none;" />
-  <input type="color" id="colorPickerDropdown" style="display:none;" />
-  <input type="color" id="colorPickerMoney" style="display:none;" />
-
-  <!-- 
-    Load the split JS files in the correct order:
-    1) firebase.js (Section 5)
-    2) helperFunctions.js (Section 7)  -- so that all helper functions exist
-    3) graphInitContextMenu.js (Section 6) -- references those helpers
-    4) exportImport.js (Section 8)
-  -->
-  <script src="firebase.js"></script>
-  <script src="helperFunctions.js"></script>
-  <script src="graphInitContextMenu.js"></script>
-  <script src="exportImport.js"></script>
+            </center>
+        </div>
+    </section>
+    <section>
+        <div class="container">
+            <div id="formBuilder"></div>
+            <button onclick="addSection()">Add Section</button>
+            <br>
+        </div>
+    </section>
+    <br>
+    <footer>
+        &copy; 2024 Custom Form Builder. All rights reserved.
+    </footer>
+    <script src="gui.js"></script>
+    <script src="generate.js"></script>
+    <script src="download.js"></script>
+    <script src="hidden.js"></script>
+    <script>
+        function closePreview() {
+            document.getElementById('previewModal').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
