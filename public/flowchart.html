@@ -315,7 +315,7 @@
   </div>
 
   <div class="legend">
-    <strong>Legend</strong>
+    <strong>Legend</strong><br><p>
     <div class="legend-item">
       <div class="legend-color-box" id="colorText"></div>
       <span>Textbox</span>
@@ -344,12 +344,15 @@
       <div class="legend-color-box" id="colorTextColor"></div>
       <span>Text Color</span>
     </div>
+	<button id="resetBtn">Reset Colors</button>
   </div>
 
   <!-- Below the legend -->
-  <button id="resetBtn">Reset Colors</button>
+  
+  <br>
   <button id="saveFlowchartBtn" onclick="saveFlowchart()">Save Flowchart</button>
-  <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">View Saved Flowcharts</button>
+  <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">View Saved</button>
+
   <button id="logoutBtn">Logout</button>
 </div>
 
@@ -438,6 +441,8 @@
   const flowchartListDiv = document.getElementById("flowchartList");
   const closeFlowchartListBtn = document.getElementById("closeFlowchartListBtn");
 
+  const logoutBtn = document.getElementById("logoutBtn");
+
   function showLoginOverlay() {
     loginOverlay.style.display = "flex";
   }
@@ -491,6 +496,24 @@
       });
   });
 
+  // Logout
+  logoutBtn.addEventListener("click", () => {
+    if (!currentUser) {
+      alert("No user is logged in.");
+      return;
+    }
+    firebase.auth().signOut()
+      .then(() => {
+        setCookie("flowchart_uid", "", -1); // clear the cookie
+        currentUser = null;
+        showLoginOverlay();
+      })
+      .catch(err => {
+        console.error("Logout error:", err);
+        alert("Error logging out: " + err);
+      });
+  });
+
   function checkForSavedLogin() {
     const savedUid = getCookie("flowchart_uid");
     if (savedUid) {
@@ -533,6 +556,35 @@
         console.error("Error loading color prefs:", err);
       });
   }
+  
+  // Function to handle color change when clicking legend boxes
+function setupColorPicker(colorBoxId, colorPickerId, colorKey) {
+    const colorBox = document.getElementById(colorBoxId);
+    const colorPicker = document.getElementById(colorPickerId);
+
+    colorBox.addEventListener("click", () => {
+        // Set color picker value to the current color before opening
+        colorPicker.value = colorPreferences[colorKey]; 
+        colorPicker.click();
+    });
+
+    colorPicker.addEventListener("input", (e) => {
+        colorPreferences[colorKey] = e.target.value;
+        updateLegendColors();
+        refreshAllCells();
+        saveUserColorPrefs();
+    });
+}
+
+// Attach event listeners for all color boxes
+setupColorPicker("colorText", "colorPickerText", "text");
+setupColorPicker("colorCheckbox", "colorPickerCheckbox", "checkbox");
+setupColorPicker("colorDropdown", "colorPickerDropdown", "dropdown");
+setupColorPicker("colorMoney", "colorPickerMoney", "money");
+setupColorPicker("colorDate", "colorPickerDate", "date");
+setupColorPicker("colorBigParagraph", "colorPickerBigParagraph", "bigParagraph");
+setupColorPicker("colorTextColor", "colorPickerTextColor", "textColor");
+
   function saveUserColorPrefs() {
     if (!currentUser) return Promise.resolve();
     return db.collection("users")
@@ -618,7 +670,6 @@
     const propNodeSection = document.getElementById("propNodeSection");
 
     const resetBtn = document.getElementById("resetBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
 
     // Create graph
     graph = new mxGraph(container);
@@ -999,6 +1050,81 @@
       refreshAllCells();
     });
 
+    // Reset colors
+    resetBtn.addEventListener("click", () => {
+      colorPreferences = { ...defaultColors };
+      updateLegendColors();
+      refreshAllCells();
+      saveUserColorPrefs();
+    });
+
+    // Setup legend color click => open color pickers
+    document.getElementById("colorText").addEventListener("click", () => {
+      document.getElementById("colorPickerText").click();
+    });
+    document.getElementById("colorCheckbox").addEventListener("click", () => {
+      document.getElementById("colorPickerCheckbox").click();
+    });
+    document.getElementById("colorDropdown").addEventListener("click", () => {
+      document.getElementById("colorPickerDropdown").click();
+    });
+    document.getElementById("colorMoney").addEventListener("click", () => {
+      document.getElementById("colorPickerMoney").click();
+    });
+    document.getElementById("colorDate").addEventListener("click", () => {
+      document.getElementById("colorPickerDate").click();
+    });
+    document.getElementById("colorBigParagraph").addEventListener("click", () => {
+      document.getElementById("colorPickerBigParagraph").click();
+    });
+    document.getElementById("colorTextColor").addEventListener("click", () => {
+      document.getElementById("colorPickerTextColor").click();
+    });
+
+    // Hook color picker events
+    document.getElementById("colorPickerText").addEventListener("input", e => {
+      colorPreferences.text = e.target.value;
+      updateLegendColors();
+      refreshAllCells();
+      saveUserColorPrefs();
+    });
+    document.getElementById("colorPickerCheckbox").addEventListener("input", e => {
+      colorPreferences.checkbox = e.target.value;
+      updateLegendColors();
+      refreshAllCells();
+      saveUserColorPrefs();
+    });
+    document.getElementById("colorPickerDropdown").addEventListener("input", e => {
+      colorPreferences.dropdown = e.target.value;
+      updateLegendColors();
+      refreshAllCells();
+      saveUserColorPrefs();
+    });
+    document.getElementById("colorPickerMoney").addEventListener("input", e => {
+      colorPreferences.money = e.target.value;
+      updateLegendColors();
+      refreshAllCells();
+      saveUserColorPrefs();
+    });
+    document.getElementById("colorPickerDate").addEventListener("input", e => {
+      colorPreferences.date = e.target.value;
+      updateLegendColors();
+      refreshAllCells();
+      saveUserColorPrefs();
+    });
+    document.getElementById("colorPickerBigParagraph").addEventListener("input", e => {
+      colorPreferences.bigParagraph = e.target.value;
+      updateLegendColors();
+      refreshAllCells();
+      saveUserColorPrefs();
+    });
+    document.getElementById("colorPickerTextColor").addEventListener("input", e => {
+      colorPreferences.textColor = e.target.value;
+      updateLegendColors();
+      refreshAllCells();
+      saveUserColorPrefs();
+    });
+
     updateLegendColors();
   });
 </script>
@@ -1306,13 +1432,10 @@
       if (!cell.vertex) continue;
       if (!isQuestion(cell)) continue;
 
-      const label = (cell.value || "").replace(/<[^>]+>/g, "").trim() || "Untitled";
-
-      // find the question object we stored
-      // we can match by questionId in cell._questionId
-      // or match by label if needed:
       const myQId = cell._questionId;
-      // find it in sectionMap
+      if (!myQId) continue;
+
+      // find the question object in the map
       let qObjRef = null;
       for (let sKey in sectionMap) {
         const secObj = sectionMap[sKey];
@@ -1330,7 +1453,7 @@
         if (!target) return;
         if (!isOptions(target)) return;
 
-        // Option node
+        // Option node label
         const optLabel = (target.value || "Option").replace(/<[^>]+>/g, "").trim();
         if (qObjRef.type === "checkbox") {
           qObjRef.options.push({
@@ -1347,13 +1470,11 @@
         nextEdges.forEach(ne => {
           const q2 = ne.target;
           if (!q2 || !isQuestion(q2)) return;
-          const q2Label = (q2.value || "").replace(/<[^>]+>/g, "").trim();
           const q2Id = q2._questionId;
           if (!q2Id) return; // no question assigned
 
-          // existing logic: if q2Id < myQId => jump else => logic
-          // (You can change this if you want the opposite condition.)
           if (q2Id < myQId) {
+            // jump
             qObjRef.jump.enabled = true;
             qObjRef.jump.option = optLabel;
             qObjRef.jump.to = q2Id.toString();
@@ -1361,7 +1482,6 @@
             // logic
             // means q2 is shown if we pick this option
             // so q2 has a condition referencing my question
-            // find q2 in the map
             let q2Ref = null;
             for (let sKey2 in sectionMap) {
               const secObj2 = sectionMap[sKey2];
