@@ -9,6 +9,16 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <!--
+  ************************************************************************************************************
+  ************************************************************************************************************
+  ***                                                                                                      ***
+  ***      S E C T I O N 1:   G E N E R A L   S T Y L E   &   L A Y O U T                                  ***
+  ***                                                                                                      ***
+  ************************************************************************************************************
+  ************************************************************************************************************
+  -->
   <style>
     html, body {
       margin: 0;
@@ -191,15 +201,44 @@
       margin-bottom: 8px;
     }
 
-    /* Node label backgrounds and round corners */
-    .mxGraph .mxCellEditor, .mxGraph .mxCellOverlay {
+    /* Node label backgrounds */
+    .mxGraph .mxCellEditor,
+    .mxGraph .mxCellOverlay {
       background: transparent !important;
     }
+
+    /*
+    ************************************************************************************************************
+    ************************************************************************************************************
+    ***                                                                                                      ***
+    ***      S E C T I O N 2:   C U S T O M   C E L L   E D I T O R   S T Y L I N G                          ***
+    ***                                                                                                      ***
+    ************************************************************************************************************
+    ************************************************************************************************************
+    */
+    .mxCellEditor {
+      background: #ffffff !important;
+      border-radius: 12px !important;
+      overflow: visible !important;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+      min-width: 120px !important;
+      min-height: 10px !important;
+      box-sizing: border-box !important;
+    }
+ 
   </style>
 </head>
 <body>
 
-<!-- LOGIN OVERLAY -->
+<!--
+###########################################################################################################
+###########################################################################################################
+###                                                                                                     ###
+###     S E C T I O N 3:  L O G I N   O V E R L A Y   &   T O O L B A R                                  ###
+###                                                                                                     ###
+###########################################################################################################
+###########################################################################################################
+-->
 <div id="loginOverlay">
   <div id="loginForm">
     <h3>Login</h3>
@@ -211,7 +250,6 @@
   </div>
 </div>
 
-<!-- TOOLBAR -->
 <div class="toolbar">
   <h3>Shapes</h3>
   <div
@@ -241,7 +279,6 @@
     <button onclick="exportGuiJson()">Export GUI JSON</button>
   </div>
 
-  <!-- LEGEND -->
   <div class="legend">
     <strong>Legend (Click color to change)</strong>
     <div class="legend-item">
@@ -263,10 +300,8 @@
   </div>
 </div>
 
-<!-- MAIN GRAPH CONTAINER -->
 <div id="graphContainer"></div>
 
-<!-- MAIN CONTEXT MENU -->
 <div id="contextMenu" class="context-menu">
   <button id="deleteNode">Delete Node</button>
   <button id="jumpNode">Jump</button>
@@ -276,7 +311,6 @@
   <button id="yesNoNode">Yes/No</button>
 </div>
 
-<!-- SUB-MENU FOR "CHANGE TYPE" -->
 <div id="typeSubmenu" class="submenu">
   <button id="dropdownType">Drop Down</button>
   <button id="checkboxType">Checkbox</button>
@@ -284,7 +318,6 @@
   <button id="moneyType">Money</button>
 </div>
 
-<!-- PROPERTIES MENU -->
 <div id="propertiesMenu">
   <p><strong>Node Text:</strong>
     <span id="propNodeText" class="editable-field" tabindex="0"></span>
@@ -296,16 +329,21 @@
   <p><strong>Section Name:</strong> <span id="propSectionName"></span></p>
 </div>
 
-<!-- HIDDEN COLOR PICKERS -->
 <input type="color" id="colorPickerText" style="display:none;" />
 <input type="color" id="colorPickerCheckbox" style="display:none;" />
 <input type="color" id="colorPickerDropdown" style="display:none;" />
 <input type="color" id="colorPickerMoney" style="display:none;" />
 
+<!--
+###########################################################################################################
+###########################################################################################################
+###                                                                                                     ###
+###     S E C T I O N 5:   F I R E B A S E   &   A U T H                                                ###
+###                                                                                                     ###
+###########################################################################################################
+###########################################################################################################
+-->
 <script>
-  /*************************************************
-   *                FIREBASE CONFIG
-   *************************************************/
   const firebaseConfig = {
     apiKey: "AIzaSyBlxFmFD-rz1V_Q9_oV0DkLsENbmyJ1k-U",
     authDomain: "flowchart-1eb90.firebaseapp.com",
@@ -319,17 +357,13 @@
   const db = firebase.firestore();
   let currentUser = null;
 
-  // Defaults for color preferences
   let colorPreferences = {
-    text: "#749FFE",      // example "dark but light" blue
-    checkbox: "#A1B8FE",  // lighter bluish
-    dropdown: "#C5D4FE",  // even lighter
-    money: "#E2EAFF"      // very light
+    text: "#749FFE",
+    checkbox: "#A1B8FE",
+    dropdown: "#C5D4FE",
+    money: "#E2EAFF"
   };
 
-  /*************************************************
-   *                 LOGIN HANDLING
-   *************************************************/
   const loginOverlay = document.getElementById("loginOverlay");
   const loginButton = document.getElementById("loginButton");
   const signupButton = document.getElementById("signupButton");
@@ -343,17 +377,16 @@
   function hideLoginOverlay() {
     loginOverlay.style.display = "none";
   }
-
   function setCookie(name, value, days) {
     const d = new Date();
-    d.setTime(d.getTime() + (days*24*60*60*1000));
+    d.setTime(d.getTime() + days*24*60*60*1000);
     const expires = "expires="+ d.toUTCString();
     document.cookie = name + "=" + value + ";" + expires + ";path=/";
   }
   function getCookie(name) {
     const ca = document.cookie.split(';');
     name = name + "=";
-    for(let i=0; i<ca.length; i++) {
+    for (let i=0; i < ca.length; i++) {
       let c = ca[i].trim();
       if (c.indexOf(name) === 0) {
         return c.substring(name.length, c.length);
@@ -401,7 +434,6 @@
         currentUser = cred.user;
         setCookie("flowchart_uid", currentUser.uid, 7);
         hideLoginOverlay();
-        // Initialize color prefs in Firestore
         saveUserColorPrefs().then(() => {
           loadUserColorPrefs();
         });
@@ -433,7 +465,6 @@
         console.error("Error loading color prefs:", err);
       });
   }
-
   function saveUserColorPrefs() {
     if (!currentUser) return Promise.resolve();
     return db.collection("users")
@@ -442,10 +473,18 @@
       .doc("colors")
       .set(colorPreferences, { merge: true });
   }
+</script>
 
-  /*************************************************
-   *          GLOBALS & GRAPH DECLARATIONS
-   *************************************************/
+<!--
+###########################################################################################################
+###########################################################################################################
+###                                                                                                     ###
+###     S E C T I O N 6:   G R A P H   I N I T   &   C O N T E X T   M E N U                            ###
+###                                                                                                     ###
+###########################################################################################################
+###########################################################################################################
+-->
+<script>
   let graph = null;
   let selectedCell = null;
   let currentMouseEvent = null;
@@ -453,13 +492,11 @@
   let jumpModeNode = null;
   const jumpBorderStyle = ";strokeWidth=3;strokeColor=#ff0000;dashed=1;dashPattern=4 4;";
 
-  // Called once DOM is ready
   document.addEventListener("DOMContentLoaded", function () {
     if (typeof mxGraph === "undefined") {
       alert("mxGraph library not found!");
       return;
     }
-
     checkForSavedLogin();
 
     const container = document.getElementById("graphContainer");
@@ -483,24 +520,22 @@
     const propNodeType = document.getElementById("propNodeType");
     const propSectionName = document.getElementById("propSectionName");
 
-    // Legend color boxes
     const colorBoxText = document.getElementById("colorText");
     const colorBoxCheckbox = document.getElementById("colorCheckbox");
     const colorBoxDropdown = document.getElementById("colorDropdown");
     const colorBoxMoney = document.getElementById("colorMoney");
-
-    // Color input elements
     const colorPickerText = document.getElementById("colorPickerText");
     const colorPickerCheckbox = document.getElementById("colorPickerCheckbox");
     const colorPickerDropdown = document.getElementById("colorPickerDropdown");
     const colorPickerMoney = document.getElementById("colorPickerMoney");
 
-    // Initialize the graph
+    // 1) Create the graph
     graph = new mxGraph(container);
-    // So raw HTML in cell values actually renders as HTML
+    // 2) Let it auto-size to text, as user types
+    graph.setAutoSizeCells(true);
+    // 3) So raw HTML in cell values actually renders as HTML
     graph.setHtmlLabels(true);
 
-    // Basic config
     mxEvent.disableContextMenu(container);
     graph.setPanning(true);
     graph.panningHandler.useLeftButtonForPanning = true;
@@ -509,16 +544,71 @@
     graph.setCellsResizable(true);
     new mxRubberband(graph);
 
-    // Style tweaks for label backgrounds
+    // 4) Default vertex style
     const defStyle = graph.getStylesheet().getDefaultVertexStyle();
     defStyle["labelBackgroundColor"] = "#ffffff";
     defStyle["labelBorderColor"] = "#cccccc";
-    defStyle["rounded"] = "1";
-    defStyle["arcSize"] = "8";
+    defStyle["rounded"] = "1";      // round corners
+    defStyle["arcSize"] = "24";     // bigger corner radius
     defStyle["whiteSpace"] = "wrap";
     defStyle["html"] = "1";
-//bruhs
-    // Track selection changes to auto-update ID from label
+    defStyle["autosize"] = "1";
+
+    // 5) Give each node more internal padding
+    defStyle["spacingTop"] = 16;
+    defStyle["spacingBottom"] = 16;
+    defStyle["spacingLeft"] = 16;
+    defStyle["spacingRight"] = 16;
+
+    // 6) If you need a min size so node doesn't collapse too small:
+    graph.getModel().addListener(mxEvent.CHANGE, (sender, evt) => {
+      const changes = evt.getProperty("changes") || [];
+      changes.forEach(change => {
+        if (change.constructor.name === "mxGeometryChange") {
+          const changedCell = change.cell;
+          if (changedCell && changedCell.vertex) {
+            const geo = changedCell.geometry;
+            if (geo) {
+              // Example: enforce min 120 wide, 60 tall
+              if (geo.width < 120) geo.width = 120;
+              if (geo.height < 60) geo.height = 60;
+            }
+          }
+        }
+      });
+    });
+
+    /*
+      Real-time text update inside the node
+      so we can keep it sized properly
+    */
+    (function overrideCellEditorForRealTime() {
+      const oldInstallListeners = mxCellEditor.prototype.installListeners;
+      mxCellEditor.prototype.installListeners = function(elt) {
+        oldInstallListeners.apply(this, arguments);
+        mxEvent.addListener(elt, 'input', (evt) => {
+          if (this.editingCell) {
+            graph.getModel().beginUpdate();
+            try {
+              let newVal = elt.innerText || "";
+              this.editingCell.value = newVal;
+              graph.updateCellSize(this.editingCell);
+            } finally {
+              graph.getModel().endUpdate();
+            }
+          }
+        });
+      };
+      const oldStopEditing = mxCellEditor.prototype.stopEditing;
+      mxCellEditor.prototype.stopEditing = function(cancel) {
+        if (!cancel && this.editingCell != null) {
+          graph.updateCellSize(this.editingCell);
+        }
+        oldStopEditing.apply(this, arguments);
+      };
+    })();
+
+    // Keep track
     graph.getSelectionModel().addListener(mxEvent.CHANGE, () => {
       if (lastSelectedCell) {
         autoUpdateNodeIdBasedOnLabel(lastSelectedCell);
@@ -526,7 +616,7 @@
       lastSelectedCell = graph.getSelectionCell();
     });
 
-    // ========== Drag shapes from toolbar ==========
+    // DRAG FROM TOOLBAR
     const toolbarShapes = document.querySelectorAll(".shape");
     toolbarShapes.forEach((shapeEl) => {
       const baseStyle = shapeEl.dataset.style;
@@ -539,15 +629,16 @@
           let newVertex;
           try {
             const label = shapeEl.dataset.type + " node";
+            // Start them at 160x80
             newVertex = graph.insertVertex(
               parent,
               null,
               label,
               x,
               y,
-              100,
-              60,
-              baseStyle
+              160,
+              80,
+              baseStyle + ";autosize=1;"
             );
           } finally {
             graph.getModel().endUpdate();
@@ -563,8 +654,10 @@
       );
     });
 
-    // ========== Context Menu ==========
-    graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
+    /*
+      CONTEXT MENU + PROPERTIES
+    */
+    graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
       selectedCell = cell;
       currentMouseEvent = evt;
       if (cell) {
@@ -573,6 +666,7 @@
         hideContextMenu();
       }
     };
+
     function showContextMenu(evt) {
       contextMenu.style.display = "block";
       contextMenu.style.left = evt.clientX + "px";
@@ -594,7 +688,6 @@
       }
     });
 
-    // Context menu handlers
     deleteNodeButton.addEventListener("click", () => {
       if (selectedCell) {
         graph.removeCells([selectedCell]);
@@ -673,37 +766,31 @@
       hideContextMenu();
     });
 
-    // Additional logic
     function createYesNoOptions(parentCell) {
       const parentGeo = parentCell.geometry;
       if (!parentGeo) return;
       const parent = graph.getDefaultParent();
-
       graph.getModel().beginUpdate();
       try {
-        // "Yes" option
-        const yesX = parentGeo.x - 60;
-        const yesY = parentGeo.y + parentGeo.height + 40;
+        const yesX = parentGeo.x - 80;
+        const yesY = parentGeo.y + parentGeo.height + 50;
         const yesStyle = "rounded=1;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;";
-        const yesVertex = graph.insertVertex(parent, null, "Yes", yesX, yesY, 80, 40, yesStyle);
+        const yesVertex = graph.insertVertex(parent, null, "Yes", yesX, yesY, 100, 60, yesStyle);
         refreshOptionNodeId(yesVertex);
         graph.insertEdge(parent, null, "", parentCell, yesVertex);
 
-        // "No" option
         const noX = parentGeo.x + parentGeo.width + 20;
-        const noY = parentGeo.y + parentGeo.height + 40;
+        const noY = parentGeo.y + parentGeo.height + 50;
         const noStyle = "rounded=1;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;";
-        const noVertex = graph.insertVertex(parent, null, "No", noX, noY, 80, 40, noStyle);
+        const noVertex = graph.insertVertex(parent, null, "No", noX, noY, 100, 60, noStyle);
         refreshOptionNodeId(noVertex);
         graph.insertEdge(parent, null, "", parentCell, noVertex);
-
       } finally {
         graph.getModel().endUpdate();
       }
       refreshAllCells();
     }
 
-    // ========== PROPERTIES MENU ==========
     function showPropertiesMenu(cell, evt) {
       if (!cell) return;
       propertiesMenu.style.display = "block";
@@ -719,11 +806,11 @@
       } else {
         propNodeType.textContent = "other";
       }
-      const sid = getSectionId(cell);
-      propSectionName.textContent = "Section " + sid;
+      propSectionName.textContent = "Section " + getSectionId(cell);
     }
     makeEditableField(propNodeText, onNodeTextFieldChange);
     makeEditableField(propNodeId, onNodeIdFieldChange);
+
     function makeEditableField(spanEl, onChangeCb) {
       spanEl.addEventListener("dblclick", (e) => {
         e.stopPropagation();
@@ -781,8 +868,8 @@
       }
     });
 
-    // Label changes (if user types something ending with '?', auto question)
-    graph.getModel().addListener(mxEvent.EVENT_CHANGE, function (sender, evt) {
+    // Auto question detection if ends with '?'
+    graph.getModel().addListener(mxEvent.EVENT_CHANGE, function(sender, evt) {
       const changes = evt.getProperty("changes");
       if (!changes) return;
       changes.forEach((change) => {
@@ -803,8 +890,8 @@
       refreshAllCells();
     });
 
-    // On connect (arrow from A->B)
-    graph.connectionHandler.addListener(mxEvent.CONNECT, function (sender, evt) {
+    // On connect
+    graph.connectionHandler.addListener(mxEvent.CONNECT, function(sender, evt) {
       const edge = evt.getProperty("cell");
       if (!edge) return;
       const parent = edge.source;
@@ -828,22 +915,14 @@
       refreshAllCells();
     });
 
-    // **Initialize legend** now that the DOM is loaded
+    // Initialize legend
     updateLegendColors();
 
-    // Legend handlers for picking new colors
-    colorBoxText.addEventListener("click", () => {
-      colorPickerText.click();
-    });
-    colorBoxCheckbox.addEventListener("click", () => {
-      colorPickerCheckbox.click();
-    });
-    colorBoxDropdown.addEventListener("click", () => {
-      colorPickerDropdown.click();
-    });
-    colorBoxMoney.addEventListener("click", () => {
-      colorPickerMoney.click();
-    });
+    colorBoxText.addEventListener("click", () => colorPickerText.click());
+    colorBoxCheckbox.addEventListener("click", () => colorPickerCheckbox.click());
+    colorBoxDropdown.addEventListener("click", () => colorPickerDropdown.click());
+    colorBoxMoney.addEventListener("click", () => colorPickerMoney.click());
+
     colorPickerText.addEventListener("input", (e) => {
       colorPreferences.text = e.target.value;
       saveUserColorPrefs().then(()=>{
@@ -873,18 +952,24 @@
       });
     });
   });
+</script>
 
-  /*************************************************
-   *                 HELPER FUNCTIONS
-   *************************************************/
+<!--
+###########################################################################################################
+###########################################################################################################
+###                                                                                                     ###
+###     S E C T I O N 7:   H E L P E R   F U N C T I O N S                                               ###
+###                                                                                                     ###
+###########################################################################################################
+###########################################################################################################
+-->
+<script>
   function updateLegendColors() {
-    // Update the little color squares in the legend
     document.getElementById("colorText").style.backgroundColor = colorPreferences.text;
     document.getElementById("colorCheckbox").style.backgroundColor = colorPreferences.checkbox;
     document.getElementById("colorDropdown").style.backgroundColor = colorPreferences.dropdown;
     document.getElementById("colorMoney").style.backgroundColor = colorPreferences.money;
   }
-
   function autoUpdateNodeIdBasedOnLabel(cell) {
     if (!cell.vertex) return;
     const label = (cell.value || "").trim();
@@ -978,31 +1063,27 @@
     style = style.replace(/dashPattern=[^;]+;?/, "");
     graph.getModel().setStyle(cell, style);
   }
-
-  // Color each cell based on question type (or keep white if options)
   function colorCell(cell) {
     if (!cell.vertex) return;
-    let fillColor = "#ADD8E6"; // default fallback
+    let fillColor = "#ADD8E6"; // fallback
     if (isQuestion(cell)) {
       const qType = getQuestionType(cell);
       fillColor = getColorForQuestionType(qType);
-    }
-    else if (isOptions(cell)) {
-      fillColor = "#ffffff"; // Options typically white
+    } else if (isOptions(cell)) {
+      fillColor = "#ffffff";
     }
     let style = cell.style || "";
     style = style.replace(/fillColor=[^;]+/, "");
     style += `;fillColor=${fillColor};`;
     graph.getModel().setStyle(cell, style);
   }
-
   function getColorForQuestionType(qType) {
     switch (qType) {
-      case "text":      return colorPreferences.text;
-      case "checkbox":  return colorPreferences.checkbox;
-      case "dropdown":  return colorPreferences.dropdown;
-      case "money":     return colorPreferences.money;
-      default:          return "#ADD8E6";
+      case "text":     return colorPreferences.text;
+      case "checkbox": return colorPreferences.checkbox;
+      case "dropdown": return colorPreferences.dropdown;
+      case "money":    return colorPreferences.money;
+      default:         return "#ADD8E6";
     }
   }
   function getQuestionType(cell) {
@@ -1016,11 +1097,9 @@
     style += `;questionType=${newType};`;
     graph.getModel().setStyle(cell, style);
   }
-
   function refreshAllCells() {
     const parent = graph.getDefaultParent();
     const vertices = graph.getChildVertices(parent);
-
     vertices.forEach(cell => {
       if (!hasSkipReassign(cell)) {
         if (isOptions(cell)) {
@@ -1038,7 +1117,7 @@
           const incomingOptions = (incomingEdges||[]).filter(e => e.source && isOptions(e.source));
           if (
             !cell.style.includes("newSection=true") &&
-            (thisSection === 1 || thisSection === 0) &&
+            (thisSection <= 1) &&
             incomingOptions.length > 0
           ) {
             const parentOpt = incomingOptions[0].source;
@@ -1047,9 +1126,7 @@
         }
       }
       colorCell(cell);
-      // If newly created question is still "question node", give them a select
       if (isQuestion(cell) && (cell.value === "question node" || cell.value === "Question Node")) {
-        // Insert a <select> so user can pick
         const cellId = cell.id;
         cell.value = `
           <select oninput="window.pickTypeForCell('${cellId}', this.value)">
@@ -1064,7 +1141,6 @@
     });
   }
 
-  // This is called by the <select> in newly dropped question nodes
   window.pickTypeForCell = function(cellId, val) {
     const c = graph.getModel().getCell(cellId);
     if (!c) return;
@@ -1077,10 +1153,18 @@
     }
     refreshAllCells();
   };
+</script>
 
-  /*************************************************
-   *             EXPORT/IMPORT
-   *************************************************/
+<!--
+###########################################################################################################
+###########################################################################################################
+###                                                                                                     ###
+###     S E C T I O N 8:   E X P O R T / I M P O R T                                                    ###
+###                                                                                                     ###
+###########################################################################################################
+###########################################################################################################
+-->
+<script>
   function downloadJson(str, filename) {
     const blob = new Blob([str], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -1137,7 +1221,7 @@
       const parent = graph.getDefaultParent();
       graph.removeCells(graph.getChildVertices(parent));
       const createdCells = {};
-      // pass1: vertices
+
       data.forEach((item) => {
         if (item.vertex) {
           const geo = new mxGeometry(
@@ -1153,7 +1237,7 @@
           createdCells[item.id] = newCell;
         }
       });
-      // pass2: edges
+
       data.forEach((item) => {
         if (item.edge) {
           const newEdge = new mxCell(item.value, new mxGeometry(), item.style);
@@ -1183,7 +1267,6 @@
       return "other";
     }
 
-    // gather question nodes
     for (let id in allCells) {
       if (id === "0" || id === "1") continue;
       const cell = allCells[id];
@@ -1224,13 +1307,11 @@
         };
         if (!sectionsMap[sId]) sectionsMap[sId] = [];
         sectionsMap[sId].push(questionObj);
-
         cell._questionId = questionIdCounter;
         questionIdCounter++;
       }
     }
 
-    // gather "options"
     for (let id in allCells) {
       if (id === "0" || id === "1") continue;
       const cell = allCells[id];
@@ -1258,7 +1339,7 @@
             } else {
               qObj.options.push(capitalizeFirst(optLabel));
             }
-            // Check if next edges lead to a question
+
             const nextEdges = graph.getOutgoingEdges(target) || [];
             nextEdges.forEach(ne => {
               const q2 = ne.target;
@@ -1269,12 +1350,10 @@
                 if (!q2Obj) return;
 
                 if (q2._questionId < cell._questionId) {
-                  // jump
                   qObj.jump.enabled = true;
                   qObj.jump.option = capitalizeFirst(optLabel);
                   qObj.jump.to = q2._questionId.toString();
                 } else {
-                  // logic
                   q2Obj.logic.enabled = true;
                   q2Obj.logic.conditions.push({
                     prevQuestion: qObj.questionId.toString(),
@@ -1308,7 +1387,6 @@
     };
     downloadJson(JSON.stringify(guiData, null, 2), "gui_data.json");
   };
-
   function capitalizeFirst(str) {
     if (!str) return str;
     return str.charAt(0).toUpperCase() + str.slice(1);
