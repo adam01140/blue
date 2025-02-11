@@ -183,13 +183,9 @@
     .section-item {
       display: flex;
       align-items: center;
-<<<<<<< HEAD
       margin-bottom: 8px;
       /* Increased padding for visual comfort */
       padding: 4px;
-=======
-      margin-bottom: 6px;
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
     }
     .section-color-box {
       width: 20px;
@@ -209,11 +205,7 @@
     .section-name:focus {
       outline: 1px dashed #888;
     }
-<<<<<<< HEAD
     /* Abbreviated label: display just "1:" instead of "Section 1:" */
-=======
-    /* Abbreviated label: now display just "1:" instead of "Section 1:" */
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
     .section-number {
       margin-right: 4px;
     }
@@ -317,11 +309,7 @@
       margin-bottom: 16px; /* More space below each item */
       border: 1px solid #ccc;
       border-radius: 8px;
-<<<<<<< HEAD
       padding: 10px; /* Increased padding for better appearance */
-=======
-      padding: 6px;
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
       text-align: center;
     }
     .flowchart-item strong {
@@ -386,11 +374,7 @@
   </div>
 
   <div class="legend">
-<<<<<<< HEAD
     <strong>Question Types</strong><br><p>
-=======
-    <strong>Question Type Legend</strong><br>
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
     <div class="legend-item">
       <div class="legend-color-box" id="colorText"></div>
       <span>Textbox</span>
@@ -405,11 +389,7 @@
     </div>
     <div class="legend-item">
       <div class="legend-color-box" id="colorMoney"></div>
-<<<<<<< HEAD
       <span>Number</span>
-=======
-      <span>Money</span>
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
     </div>
     <div class="legend-item">
       <div class="legend-color-box" id="colorDate"></div>
@@ -422,35 +402,21 @@
     <div class="legend-item">
       <div class="legend-color-box" id="colorTextColor"></div>
       <span>Text Color</span>
-<<<<<<< HEAD
     </div><p>
-=======
-    </div>
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
     <button id="resetBtn">Reset Colors</button>
   </div>
 
   <!-- Section Legend inserted into the toolbar above the Save Flowchart button -->
   <div id="sectionLegend">
-<<<<<<< HEAD
     <h4>Section Names</h4><p>
-=======
-    <h4>Section Legend</h4>
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
     <!-- Section items will be populated dynamically -->
   </div>
 
   <!-- Below the legends -->
   <br>
-<<<<<<< HEAD
   <button id="saveFlowchartBtn" onclick="saveFlowchart()">Save</button>
   <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">Library</button>
   <br>
-=======
-  <button id="saveFlowchartBtn" onclick="saveFlowchart()">Save Flowchart</button>
-  <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">View Saved</button>
-
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
   <button id="logoutBtn">Logout</button>
 </div>
 
@@ -470,11 +436,7 @@
   <button id="dropdownType">Drop Down</button>
   <button id="checkboxType">Checkbox</button>
   <button id="textType">Text</button>
-<<<<<<< HEAD
   <button id="moneyType">Number</button>
-=======
-  <button id="moneyType">Money</button>
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
   <button id="dateType">Date</button>
   <button id="bigParagraphType">Big Paragraph</button>
 </div>
@@ -538,11 +500,7 @@
   // Section preferences: mapping section numbers to { borderColor, name }
   // Ensure Section "1" exists by default.
   let sectionPrefs = {
-<<<<<<< HEAD
     "1": { borderColor: getDefaultSectionColor(1), name: "Enter Name" }
-=======
-    "1": { borderColor: getDefaultSectionColor(1), name: "Enter name" }
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
   };
 
   // If user has opened a flowchart by name, store it here
@@ -748,11 +706,7 @@
   function updateSectionLegend() {
     const legend = document.getElementById("sectionLegend");
     // Clear current content and add header.
-<<<<<<< HEAD
     let innerHTML = "<h4>Section Names</h4>";
-=======
-    let innerHTML = "<h4>Section Legend</h4>";
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
     const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
     sections.forEach(sec => {
       // Abbreviated label: display just "1:" instead of "Section 1:"
@@ -764,11 +718,7 @@
         </div>
       `;
     });
-<<<<<<< HEAD
     innerHTML += `<button id="resetSectionColorsBtn">Reset Colors</button>`;
-=======
-    innerHTML += `<button id="resetSectionColorsBtn">Reset Section Colors</button>`;
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
     legend.innerHTML = innerHTML;
 
     // Add event listeners to the section color boxes.
@@ -992,12 +942,7 @@
       );
     });
 
-<<<<<<< HEAD
     // Attach a listener for MOVE_CELLS events to adjust option nodes.
-=======
-    // Instead of overriding moveCells (which was causing errors),
-    // attach a listener to the MOVE_CELLS event to adjust option nodes
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
     graph.addListener(mxEvent.MOVE_CELLS, function(sender, evt) {
       var movedCells = evt.getProperty('cells');
       var dx = evt.getProperty('dx');
@@ -1022,16 +967,11 @@
       });
     });
 
-<<<<<<< HEAD
     // Context menu: when right-clicking, hide any open properties menu.
     graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
       // Hide any open menus
       propertiesMenu.style.display = "none";
       typeSubmenu.style.display = "none";
-=======
-    // Context menu
-    graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
       selectedCell = cell;
       currentMouseEvent = evt;
       if (cell) showContextMenu(evt);
@@ -1112,14 +1052,9 @@
     });
     moneyTypeBtn.addEventListener("click", () => {
       if (selectedCell && isQuestion(selectedCell)) {
-<<<<<<< HEAD
         // Replace "money" with "number"
         setQuestionType(selectedCell, "number");
         selectedCell.value = "Number question node";
-=======
-        setQuestionType(selectedCell, "money");
-        selectedCell.value = "Money question node";
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
         refreshAllCells();
       }
       hideContextMenu();
@@ -1424,12 +1359,7 @@
     updateSectionLegend();
 
     // --- Add double-click renaming for saved flowcharts ---
-<<<<<<< HEAD
     // (Handled in viewSavedFlowcharts below.)
-=======
-    // After the flowchart list is populated (see viewSavedFlowcharts), the <strong> element is clickable.
-    // (This is handled in viewSavedFlowcharts below.)
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
   });
 </script>
 
@@ -1560,12 +1490,8 @@
       case "text":         return colorPreferences.text;
       case "checkbox":     return colorPreferences.checkbox;
       case "dropdown":     return colorPreferences.dropdown;
-<<<<<<< HEAD
       // Replace "money" with "number" on the front end.
       case "number":       return colorPreferences.money;
-=======
-      case "money":        return colorPreferences.money;
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
       case "date":         return colorPreferences.date;
       case "bigParagraph": return colorPreferences.bigParagraph;
       default:             return "#ADD8E6";
@@ -1585,18 +1511,13 @@
             <option value="text">Text</option>
             <option value="checkbox">Checkbox</option>
             <option value="dropdown">Dropdown</option>
-<<<<<<< HEAD
             <option value="number">Number</option>
-=======
-            <option value="money">Money</option>
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
             <option value="date">Date</option>
             <option value="bigParagraph">Big Paragraph</option>
           </select>`;
       }
     });
   }
-<<<<<<< HEAD
 
   window.pickTypeForCell = function(cellId, val) {
     const c = graph.getModel().getCell(cellId);
@@ -1653,60 +1574,6 @@
         target: cell.edge ? (cell.target ? cell.target.id : null) : null
       });
     }
-=======
-
-  window.pickTypeForCell = function(cellId, val) {
-    const c = graph.getModel().getCell(cellId);
-    if (!c) return;
-    graph.getModel().beginUpdate();
-    try {
-      setQuestionType(c, val);
-      c.value = val.charAt(0).toUpperCase() + val.slice(1) + " question node";
-    } finally {
-      graph.getModel().endUpdate();
-    }
-    refreshAllCells();
-  };
-
-  function downloadJson(str, filename) {
-    const blob = new Blob([str], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-
-  // When saving a flowchart, we now also save the sectionPrefs and pack cell data under a "cells" key.
-  window.exportFlowchartJson = function () {
-    const data = {};
-    data.cells = [];
-    const cells = graph.getModel().cells;
-    for (let id in cells) {
-      if (id === "0" || id === "1") continue;
-      const cell = cells[id];
-      data.cells.push({
-        id: cell.id,
-        value: cell.value,
-        geometry: cell.geometry
-          ? {
-              x: cell.geometry.x,
-              y: cell.geometry.y,
-              width: cell.geometry.width,
-              height: cell.geometry.height
-            }
-          : null,
-        style: cell.style || "",
-        vertex: !!cell.vertex,
-        edge: !!cell.edge,
-        source: cell.edge ? cell.source?.id : null,
-        target: cell.edge ? cell.target?.id : null
-      });
-    }
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
     // Also save the current sectionPrefs
     data.sectionPrefs = sectionPrefs;
     downloadJson(JSON.stringify(data, null, 2), "flowchart_data.json");
@@ -1912,11 +1779,7 @@
       currentFlowchartName = flowchartName;
     }
 
-<<<<<<< HEAD
     // Gather raw flowchart data with safe fallbacks for undefined values.
-=======
-    // Gather raw flowchart data
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
     const data = {};
     data.cells = [];
     const cells = graph.getModel().cells;
@@ -1925,7 +1788,6 @@
       const cell = cells[id];
       data.cells.push({
         id: cell.id,
-<<<<<<< HEAD
         value: (cell.value === undefined ? "" : cell.value),
         geometry: cell.geometry ? {
               x: (typeof cell.geometry.x === 'undefined' ? 0 : cell.geometry.x),
@@ -1938,22 +1800,6 @@
         edge: !!cell.edge,
         source: cell.edge ? (cell.source ? cell.source.id : null) : null,
         target: cell.edge ? (cell.target ? cell.target.id : null) : null
-=======
-        value: cell.value,
-        geometry: cell.geometry
-          ? {
-              x: cell.geometry.x,
-              y: cell.geometry.y,
-              width: cell.geometry.width,
-              height: cell.geometry.height
-            }
-          : null,
-        style: cell.style || "",
-        vertex: !!cell.vertex,
-        edge: !!cell.edge,
-        source: cell.edge ? cell.source?.id : null,
-        target: cell.edge ? cell.target?.id : null
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
       });
     }
     // Also save the current sectionPrefs
@@ -2061,13 +1907,10 @@
           .then(() => {
             docRef.delete();
             element.textContent = newName;
-<<<<<<< HEAD
             // Update currentFlowchartName if it was the old name.
             if(currentFlowchartName === oldName) {
               currentFlowchartName = newName;
             }
-=======
->>>>>>> 238affc60a56e9843eaf00033f60ad17b1be7874
             alert("Flowchart renamed to: " + newName);
           })
           .catch(err => {
