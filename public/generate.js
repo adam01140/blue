@@ -194,30 +194,62 @@ function getFormHTML() {
                     });
                 }
             }
-            else if (questionType==='dropdown'){
-                const ddNameEl= qBlock.querySelector('#textboxName'+questionId);
-                const ddNm= ddNameEl && ddNameEl.value ? ddNameEl.value : ('answer'+questionId);
-                questionNameIds[questionId] = ddNm;
-                formHTML += `<select id="${ddNm}" name="${ddNm}">
-                               <option value="" disabled selected>Select an option</option>`;
-                const ddOps= qBlock.querySelectorAll(`#dropdownOptions${questionId} input`);
-                for (let i=0; i<ddOps.length; i++){
-                    const val= ddOps[i].value.trim();
-                    if(val){
-                        formHTML += `<option value="${val}">${val}</option>`;
-                    }
-                }
-                formHTML += `</select><br>`;
-                if (pdfEnabled){
-                    conditionalPDFs.push({
-                        questionId: questionId,
-                        questionNameId: ddNm,
-                        conditionalAnswer: pdfAnsVal,
-                        pdfName: pdfNameVal,
-                        questionType: questionType
-                    });
-                }
-            }
+            
+			
+			
+			
+			
+			
+			else if (questionType === 'dropdown') {
+    const ddNameEl = qBlock.querySelector('#textboxName' + questionId);
+    const ddNm = ddNameEl && ddNameEl.value ? ddNameEl.value : ('answer' + questionId);
+    questionNameIds[questionId] = ddNm;
+
+    // 1) Grab the user-entered image data:
+    const imgUrlEl = qBlock.querySelector('#dropdownImageURL' + questionId);
+    const imgWidthEl = qBlock.querySelector('#dropdownImageWidth' + questionId);
+    const imgHeightEl = qBlock.querySelector('#dropdownImageHeight' + questionId);
+
+    let imageUrl = imgUrlEl ? imgUrlEl.value.trim() : '';
+    let imageWidth = imgWidthEl ? parseInt(imgWidthEl.value, 10) : 0;
+    let imageHeight = imgHeightEl ? parseInt(imgHeightEl.value, 10) : 0;
+
+    // 2) Insert <img> if user filled in URL
+    if (imageUrl) {
+        if (!imageWidth || imageWidth < 1) imageWidth = 300;
+        if (!imageHeight || imageHeight < 1) imageHeight = 300;
+        formHTML += `<br><img src="${imageUrl}" alt="Dropdown Image" width="${imageWidth}" height="${imageHeight}"><br>`;
+    }
+
+    // 3) Now the <select> itself
+    formHTML += `<select id="${ddNm}" name="${ddNm}">
+                   <option value="" disabled selected>Select an option</option>`;
+
+    const ddOps = qBlock.querySelectorAll(`#dropdownOptions${questionId} input`);
+    for (let i = 0; i < ddOps.length; i++) {
+        const val = ddOps[i].value.trim();
+        if (val) {
+            formHTML += `<option value="${val}">${val}</option>`;
+        }
+    }
+    formHTML += `</select><br>`;
+
+    // Handle PDF logic as usual
+    if (pdfEnabled) {
+        conditionalPDFs.push({
+            questionId: questionId,
+            questionNameId: ddNm,
+            conditionalAnswer: pdfAnsVal,
+            pdfName: pdfNameVal,
+            questionType: questionType
+        });
+    }
+}
+
+
+			
+			
+			
             else if (questionType==='checkbox'){
                 const cOptsDivs= qBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
                 const cboxOptions=[];

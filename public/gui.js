@@ -224,6 +224,19 @@ function addQuestion(sectionId, questionId = null) {
             <div id="dropdownOptions${currentQuestionId}"></div>
             <button type="button" onclick="addDropdownOption(${currentQuestionId})">Add Option</button>
         </div><br>
+		
+		 <!-- ADD THIS IMAGE BLOCK -->
+    <div id="dropdownImageBlock${currentQuestionId}" class="dropdown-image-options" style="display:none;">
+        <button type="button" onclick="toggleDropdownImageFields(${currentQuestionId})">Add Image</button>
+        <div id="dropdownImageFields${currentQuestionId}" style="display:none; margin-top:8px;">
+            <label>Image URL:</label><br>
+            <input type="text" id="dropdownImageURL${currentQuestionId}" placeholder="Enter image URL"><br><br>
+            <label>Width:</label><br>
+            <input type="number" id="dropdownImageWidth${currentQuestionId}" placeholder="Width"><br><br>
+            <label>Height:</label><br>
+            <input type="number" id="dropdownImageHeight${currentQuestionId}" placeholder="Height"><br>
+        </div>
+    </div><br>
 
         <!-- Checkbox Options -->
         <div id="checkboxBlock${currentQuestionId}" class="checkbox-options" style="display: none;">
@@ -319,6 +332,15 @@ function removeQuestion(questionId) {
     questionBlock.remove();
     updateGlobalQuestionLabels();
 }
+function toggleDropdownImageFields(questionId) {
+    const fieldsDiv = document.getElementById(`dropdownImageFields${questionId}`);
+    if (!fieldsDiv) return;
+    if (fieldsDiv.style.display === 'none' || fieldsDiv.style.display === '') {
+        fieldsDiv.style.display = 'block';
+    } else {
+        fieldsDiv.style.display = 'none';
+    }
+}
 
 // ---------------------------------------
 // --- Move question up/down in a section
@@ -368,6 +390,9 @@ function toggleOptions(questionId) {
     const conditionalPDFLogicDiv = document.getElementById(`conditionalPDFLogic${questionId}`);
     const conditionalAlertLogicDiv = document.getElementById(`conditionalAlertLogic${questionId}`);
 
+    // === Newly added image block for dropdown ===
+    const dropdownImageBlock = document.getElementById(`dropdownImageBlock${questionId}`);
+
     // Hide everything first
     if (textboxOptionsBlock) textboxOptionsBlock.style.display = 'none';
     if (optionsBlock) optionsBlock.style.display = 'none';
@@ -378,6 +403,8 @@ function toggleOptions(questionId) {
     if (jumpOptionSelect) jumpOptionSelect.style.display = 'none';
     if (conditionalPDFLogicDiv) conditionalPDFLogicDiv.style.display = 'none';
     if (conditionalAlertLogicDiv) conditionalAlertLogicDiv.style.display = 'none';
+    // hide the new dropdownImageBlock
+    if (dropdownImageBlock) dropdownImageBlock.style.display = 'none';
 
     switch (questionType) {
         case 'text':
@@ -398,6 +425,10 @@ function toggleOptions(questionId) {
             }
             if (questionType === 'dropdown' && optionsBlock) {
                 optionsBlock.style.display = 'block';
+                // show the new dropdown image block
+                if (dropdownImageBlock) {
+                    dropdownImageBlock.style.display = 'block';
+                }
             }
             if (questionType === 'radio' && conditionalPDFLogicDiv) {
                 conditionalPDFLogicDiv.style.display = 'block';
@@ -433,6 +464,7 @@ function toggleOptions(questionId) {
             break;
     }
 }
+
 
 // --------------------------------------------------
 // --- Additional logic blocks (jump, PDF, alerts)
