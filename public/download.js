@@ -154,6 +154,17 @@ function loadFormData(formData) {
                     if (placeholderInput) {
                         placeholderInput.value = question.placeholder || '';
                     }
+
+                    // ********** Restore Image Data ********** 
+                    if (question.image) {
+                        const urlEl = questionBlock.querySelector(`#dropdownImageURL${question.questionId}`);
+                        const wEl = questionBlock.querySelector(`#dropdownImageWidth${question.questionId}`);
+                        const hEl = questionBlock.querySelector(`#dropdownImageHeight${question.questionId}`);
+
+                        if (urlEl) urlEl.value = question.image.url || '';
+                        if (wEl) wEl.value = question.image.width || 0;
+                        if (hEl) hEl.value = question.image.height || 0;
+                    }
                 }
                 else if (question.type === 'multipleTextboxes') {
                     // Rebuild multiple textboxes
@@ -391,7 +402,6 @@ function exportForm() {
             };
 
             // ========== Collect question-specific options ==========
-
             if (questionType === 'checkbox') {
                 // ----- Checkboxes -----
                 const optionsDivs = questionBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
@@ -434,6 +444,20 @@ function exportForm() {
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
                 questionData.nameId = nameId;
                 questionData.placeholder = placeholder;
+
+                // ********** Collect Image Data **********
+                const imgUrlEl = questionBlock.querySelector(`#dropdownImageURL${questionId}`);
+                const imgWidthEl = questionBlock.querySelector(`#dropdownImageWidth${questionId}`);
+                const imgHeightEl = questionBlock.querySelector(`#dropdownImageHeight${questionId}`);
+                const imageUrl = imgUrlEl ? imgUrlEl.value.trim() : '';
+                const imageWidth = imgWidthEl ? parseInt(imgWidthEl.value, 10) || 0 : 0;
+                const imageHeight = imgHeightEl ? parseInt(imgHeightEl.value, 10) || 0 : 0;
+
+                questionData.image = {
+                    url: imageUrl,
+                    width: imageWidth,
+                    height: imageHeight
+                };
             }
             else if (questionType === 'numberedDropdown') {
                 // ----- Numbered Dropdown -----
@@ -539,7 +563,7 @@ function exportForm() {
                         const eqContainer = row.querySelector(`#equationContainer${hiddenFieldId}_${calcIndex}`);
                         const termsArr = [];
                         if (eqContainer) {
-                            // each .equation-term-cb (or .equation-term, depending on naming)
+                            // each .equation-term-cb
                             const termDivs = eqContainer.querySelectorAll('.equation-term-cb');
                             termDivs.forEach((termDiv, idx) => {
                                 const termNumber = idx + 1;
