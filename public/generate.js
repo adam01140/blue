@@ -518,56 +518,75 @@ function getFormHTML() {
         }
     }
 
-    function handleNext(currentSection){
-        var nextSection = currentSection + 1;
-        var relevantJumps = [];
-        for(var i=0; i<jumpLogics.length; i++){
-            if(jumpLogics[i].section === currentSection){
-                relevantJumps.push(jumpLogics[i]);
-            }
+function handleNext(currentSection){
+    var nextSection = currentSection + 1;
+    var relevantJumps = [];
+    for(var i=0; i<jumpLogics.length; i++){
+        if(jumpLogics[i].section === currentSection){
+            relevantJumps.push(jumpLogics[i]);
         }
-        for(var j=0; j<relevantJumps.length; j++){
-            var jl = relevantJumps[j];
-            var qId = jl.questionId;
-            var qType = jl.questionType;
-            var jOpt = jl.jumpOption;
-            var jTo  = jl.jumpTo;
-            var nmId = questionNameIds[qId] || ("answer"+qId);
+    }
+    for(var j=0; j<relevantJumps.length; j++){
+        var jl = relevantJumps[j];
+        var qId = jl.questionId;
+        var qType = jl.questionType;
+        var jOpt = jl.jumpOption;
+        var jTo  = jl.jumpTo;
+        var nmId = questionNameIds[qId] || ("answer"+qId);
 
-            if(qType==="radio" || qType==="dropdown"){
-                var el= document.getElementById(nmId);
-                if(el && el.value.trim().toLowerCase() === jOpt.trim().toLowerCase()){
-                    nextSection = jTo; 
+        if(qType==="radio" || qType==="dropdown"){
+            var el= document.getElementById(nmId);
+            if(el && el.value.trim().toLowerCase() === jOpt.trim().toLowerCase()){
+                nextSection = jTo.toLowerCase();
+                break;
+            }
+        } else if(qType==="checkbox"){
+            var cbs= document.querySelectorAll('input[id^="answer'+qId+'_"]');
+            if(cbs && cbs.length){
+                var chosen=[];
+                for(var c=0;c<cbs.length;c++){
+                    if(cbs[c].checked){
+                        chosen.push(cbs[c].value.trim().toLowerCase());
+                    }
+                }
+                if(chosen.indexOf(jOpt.trim().toLowerCase())!==-1){
+                    nextSection = jTo.toLowerCase();
                     break;
                 }
-            } else if(qType==="checkbox"){
-                var cbs= document.querySelectorAll('input[id^="answer'+qId+'_"]');
-                if(cbs && cbs.length){
-                    var chosen=[];
-                    for(var c=0;c<cbs.length;c++){
-                        if(cbs[c].checked){
-                            chosen.push(cbs[c].value.trim().toLowerCase());
-                        }
-                    }
-                    if(chosen.indexOf(jOpt.trim().toLowerCase())!==-1){
-                        nextSection = jTo;
-                        break;
-                    }
-                }
             }
         }
-        navigateSection(nextSection);
-
-        // run hidden calculations each Next if you want real-time
-        runAllHiddenCheckboxCalculations();
-        runAllHiddenTextCalculations();
     }
+    
+    // Handle 'end' case before parsing numbers
+    if(nextSection === 'end') {
+        navigateSection('end');
+    } else {
+        nextSection = parseInt(nextSection, 10);
+        if(isNaN(nextSection)) nextSection = currentSection + 1;
+        navigateSection(nextSection);
+    }
+    
+    runAllHiddenCheckboxCalculations();
+    runAllHiddenTextCalculations();
+}
 
-    function navigateSection(sectionNumber){
-        var sections= document.querySelectorAll(".section");
-        for(var i=0; i<sections.length; i++){
-            sections[i].classList.remove("active");
-        }
+
+   function navigateSection(sectionNumber){
+    var sections= document.querySelectorAll(".section");
+    var form = document.getElementById("customForm");
+    var thankYou = document.getElementById("thankYouMessage");
+
+    // Hide all sections and thank you message initially
+    sections.forEach(s => s.classList.remove("active"));
+    thankYou.style.display = "none";
+    form.style.display = "block";
+
+    if(sectionNumber === 'end') {
+        form.style.display = "none";
+        thankYou.style.display = "block";
+    } else if(sectionNumber >= sections.length){
+        sections[sections.length-1].classList.add("active");
+    } else {
         var target= document.getElementById("section"+sectionNumber);
         if(target){
             target.classList.add("active");
@@ -575,6 +594,7 @@ function getFormHTML() {
             sections[sections.length-1].classList.add("active");
         }
     }
+}
 
     function setCurrentDate(){
         var today = new Date();
