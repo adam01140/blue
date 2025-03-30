@@ -889,12 +889,18 @@ function runAllHiddenTextCalculations(){
 /**
  * Evaluate each multi-term calculation and set the hidden text field.
  */
+/**
+ * Evaluate each multi-term calculation and set the hidden text field.
+ * If fillValue === "##total##", store the numeric sum of the terms
+ * (rather than a fixed string).
+ */
 function runSingleHiddenTextCalculation(calcObj) {
     var textField = document.getElementById(calcObj.hiddenFieldName);
     if (!textField) return;
 
-    // Start fresh each time
-    var finalValue = "";
+    // We'll assume that the last matched condition takes precedence,
+    // so we keep applying logic in order.
+    let finalValue = "";
 
     // For each multi-term condition:
     calcObj.calculations.forEach(function(oneCalc) {
@@ -926,18 +932,26 @@ function runSingleHiddenTextCalculation(calcObj) {
             case '=':  matched = (val === thr); break;
         }
 
-        // If condition matches, we fill in the text field
-        // If not matched, we clear it out
+        // If condition is matched, we either store "##total##" => the sum,
+        // or store whatever fillValue is, or clear it if not matched.
         if (matched) {
-            finalValue = oneCalc.fillValue;
+            if (oneCalc.fillValue === "##total##") {
+                // Put the numeric sum
+                finalValue = val.toString();
+            } else {
+                // Original behavior: store the text from fillValue
+                finalValue = oneCalc.fillValue;
+            }
         } else {
+            // Not matched => clear it out
             finalValue = "";
         }
     });
 
-    // Set the final value in the hidden field
+    // At the end, set the field
     textField.value = finalValue;
 }
+
 
 
 
@@ -1044,7 +1058,7 @@ function attachCalculationListeners(){
  *  - NEW: expands "numberedDropdown" amounts into multiple "amountX_Y_value" references
  */
 function generateHiddenPDFFields() {
-    let hiddenFieldsHTML = '<div id="hidden_pdf_fields" style="display:none;">';
+    let hiddenFieldsHTML = '<div id="hidden_pdf_fields">';
     const hiddenCheckboxCalculations = [];
     const hiddenTextCalculations = [];
 
