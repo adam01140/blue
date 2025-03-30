@@ -678,6 +678,9 @@ function generateAllQuestionOptions() {
     return optionsHTML;
 }
 
+/**
+ * UPDATED to also include hidden fields as numeric references
+ */
 function generateMoneyQuestionOptions() {
     let optionsHTML = '';
     const qBlocks = document.querySelectorAll('.question-block');
@@ -687,7 +690,7 @@ function generateMoneyQuestionOptions() {
         const selEl = qBlock.querySelector('select#questionType' + qId);
         if (!selEl) return;
 
-        // e.g. 'numberedDropdown'
+        // e.g. 'numberedDropdown', 'money', etc.
         const qType = selEl.value;  
         if (qType === 'numberedDropdown') {
             // 1) Get the question text (just for display in the dropdown)
@@ -701,7 +704,6 @@ function generateMoneyQuestionOptions() {
             const ddMax = enEl ? parseInt(enEl.value, 10) : ddMin;
 
             // 3) Gather the “amount labels” from #textboxAmounts. 
-            //    If user typed just "value", we’ll produce 4 lines: amount1_1_value, amount1_2_value, etc.
             const amtInputs = qBlock.querySelectorAll(`#textboxAmounts${qId} input[type="text"]`);
             const amountLabels = [];
             amtInputs.forEach((inp) => {
@@ -712,8 +714,6 @@ function generateMoneyQuestionOptions() {
             if (amountLabels.length === 0) return;
 
             // 4) For each label, produce a line for i in [ddMin..ddMax].
-            //    E.g. if min=1, max=4, label="value", we generate:
-            //      amount1_1_value, amount1_2_value, amount1_3_value, amount1_4_value
             amountLabels.forEach((rawLabel) => {
                 const sanitized = rawLabel.replace(/\s+/g, "_").toLowerCase();
                 for (let i = ddMin; i <= ddMax; i++) {
@@ -722,11 +722,36 @@ function generateMoneyQuestionOptions() {
                 }
             });
         }
+        else if (qType === 'money') {
+            // If it's a money question, we can reference it directly
+            const nmEl = qBlock.querySelector('#textboxName' + qId);
+            const fieldName = nmEl ? nmEl.value.trim() : ('answer' + qId);
+            const txtEl = qBlock.querySelector('#question' + qId);
+            const qTxt = txtEl ? txtEl.value : `Question ${qId}`;
+            optionsHTML += `<option value="${fieldName}">${qTxt} (money)</option>`;
+        }
+    });
+
+    // ---- NEW PART: also include hidden fields as references ----
+    const hiddenBlocks = document.querySelectorAll('.hidden-field-block');
+    hiddenBlocks.forEach((block) => {
+        const hid = block.id.replace('hiddenFieldBlock','');
+        const fTypeEl = document.getElementById('hiddenFieldType' + hid);
+        if (!fTypeEl) return;
+        const fType = fTypeEl.value;
+        const fNameEl = document.getElementById('hiddenFieldName' + hid);
+        if (!fNameEl) return;
+        const fName = fNameEl.value.trim();
+        if (!fName) return;
+
+        // We'll treat hidden checkbox or text fields as numeric references:
+        // text => parseFloat
+        // checkbox => 1/0
+        optionsHTML += `<option value="${fName}">(Hidden ${fType}) ${fName}</option>`;
     });
 
     return optionsHTML;
 }
-
 
 
 function updateAutofillOptions() {

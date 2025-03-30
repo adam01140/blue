@@ -449,7 +449,6 @@ function getFormHTML() {
       if (logicEnabled) {
         const logicRows = qBlock.querySelectorAll(".logic-condition-row");
         if (logicRows.length > 0) {
-          // We'll store the code in our logicScriptBuffer (no <script> tag here)
           logicScriptBuffer += `\n(function(){\n`;
           logicScriptBuffer += ` var thisQ=document.getElementById("question-container-${questionId}");\n`;
           logicScriptBuffer += ` function updateVisibility(){\n  var anyMatch=false;\n`;
@@ -595,10 +594,10 @@ function getFormHTML() {
     genHidden.hiddenTextCalculations || []
   )};\n\n`;
 
-  // 3) Append the logicScriptBuffer (the code that runs updateVisibility, etc.)
+  // 3) Append the logicScriptBuffer
   formHTML += logicScriptBuffer + "\n";
 
-  // 4) The rest of the main JS code: handleNext, navigateSection, etc.
+  // 4) The rest of the main JS code
   formHTML += `
 function toggleAmountField(amountFieldId, show) {
     const amountField = document.getElementById(amountFieldId);
@@ -620,7 +619,7 @@ function showTextboxLabels(questionId, count){
         // Labels
         for (var L=0; L < theseLabels.length; L++) {
             var labelTxt = theseLabels[L] || "Label";
-            var sanitizedLabel = labelTxt.replace(/\s+/g,"_").toLowerCase();
+            var sanitizedLabel = labelTxt.replace(/\\s+/g,"_").toLowerCase();
             // Add j to ID
             var labelId = "label" + questionId + "_" + j + "_" + sanitizedLabel;
             container.innerHTML += '<input type="text" id="' + labelId + '" ' +
@@ -632,7 +631,7 @@ function showTextboxLabels(questionId, count){
         // Amounts 
         for (var A=0; A < theseAmounts.length; A++) {
             var amtTxt = theseAmounts[A] || "Amount";
-            var sanitizedAmt = amtTxt.replace(/\s+/g,"_").toLowerCase();
+            var sanitizedAmt = amtTxt.replace(/\\s+/g,"_").toLowerCase();
             // Add j to ID
             var amtId = "amount" + questionId + "_" + j + "_" + sanitizedAmt;
             container.innerHTML += '<input type="number" id="' + amtId + '" ' +
@@ -642,7 +641,7 @@ function showTextboxLabels(questionId, count){
         }
         container.innerHTML += "<br>";
     }
-    attachCalculationListeners(); // Add this line
+    attachCalculationListeners(); // in case those new fields also matter
 }
 
 function handleNext(currentSection){
@@ -888,10 +887,7 @@ function runAllHiddenTextCalculations(){
 
 /**
  * Evaluate each multi-term calculation and set the hidden text field.
- */
-/**
- * Evaluate each multi-term calculation and set the hidden text field.
- * If fillValue === "##total##", store the numeric sum of the terms
+ * If fillValue === "##total##", we store the numeric sum of the terms
  * (rather than a fixed string).
  */
 function runSingleHiddenTextCalculation(calcObj) {
@@ -902,13 +898,11 @@ function runSingleHiddenTextCalculation(calcObj) {
     // so we keep applying logic in order.
     let finalValue = "";
 
-    // For each multi-term condition:
     calcObj.calculations.forEach(function(oneCalc) {
         let val = 0;
         if (oneCalc.terms && oneCalc.terms.length > 0) {
             val = parseFloat(getMoneyValue(oneCalc.terms[0].questionNameId)) || 0;
 
-            // Process remaining terms with operators
             for (let t = 1; t < oneCalc.terms.length; t++) {
                 const term = oneCalc.terms[t];
                 const op = term.operator;
@@ -932,14 +926,10 @@ function runSingleHiddenTextCalculation(calcObj) {
             case '=':  matched = (val === thr); break;
         }
 
-        // If condition is matched, we either store "##total##" => the sum,
-        // or store whatever fillValue is, or clear it if not matched.
         if (matched) {
             if (oneCalc.fillValue === "##total##") {
-                // Put the numeric sum
                 finalValue = val.toString();
             } else {
-                // Original behavior: store the text from fillValue
                 finalValue = oneCalc.fillValue;
             }
         } else {
@@ -948,12 +938,8 @@ function runSingleHiddenTextCalculation(calcObj) {
         }
     });
 
-    // At the end, set the field
     textField.value = finalValue;
 }
-
-
-
 
 function replacePlaceholderTokens(str){
     return str.replace(/\\$\\$(.*?)\\$\\$/g, function(match, expressionInside){
@@ -992,12 +978,21 @@ function parseTokenValue(token){
     return isNaN(val) ? 0 : val;
 }
 
+/**
+ * UPDATED so that if 'el' is a checkbox, return 1 if checked, else 0.
+ * Otherwise parse float. 
+ */
 function getMoneyValue(qId) {
-    // Remove the # handling since we're now generating proper IDs
     const el = document.getElementById(qId);
-    return el ? el.value : 0;
-}
+    if (!el) return 0;
 
+    if (el.type === 'checkbox') {
+        // Return 1 if checked, else 0
+        return el.checked ? 1 : 0;
+    }
+    // Otherwise parse float
+    return parseFloat(el.value) || 0;
+}
 
 function attachCalculationListeners(){
     // For hidden checkbox calculations
@@ -1030,7 +1025,7 @@ function attachCalculationListeners(){
                     var qNameId2= terms2[t2].questionNameId;
                     var el3= document.getElementById(qNameId2);
                     if(el3){
-                        // Change from 'change' to 'input' for real-time updates
+                        // 'input' event for real-time updates
                         el3.addEventListener('input', function(){
                             runAllHiddenTextCalculations();
                         });
@@ -1055,7 +1050,7 @@ function attachCalculationListeners(){
  *  - Reads from #hiddenFieldsContainer
  *  - Builds hidden <input> fields
  *  - Also handles multi-term calculations for both checkboxes & text
- *  - NEW: expands "numberedDropdown" amounts into multiple "amountX_Y_value" references
+ *  - Expands "numberedDropdown" amounts into multiple "amountX_Y_value" references
  */
 function generateHiddenPDFFields() {
     let hiddenFieldsHTML = '<div id="hidden_pdf_fields">';
