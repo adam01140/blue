@@ -679,22 +679,33 @@ function generateAllQuestionOptions() {
 }
 
 function generateMoneyQuestionOptions() {
-    var optionsHTML='';
-    var qBlocks= document.querySelectorAll('.question-block');
-    qBlocks.forEach(function(qBlock){
-        var qId=qBlock.id.replace('questionBlock','');
-        var selEl= qBlock.querySelector('select');
-        var qType= selEl? selEl.value:'text';
-        if(qType==='money'){
-            var nmEl= qBlock.querySelector('#textboxName'+qId);
-            var nmVal= nmEl&&nmEl.value? nmEl.value:('answer'+qId);
-            var txtEl= qBlock.querySelector('#question'+qId);
-            var qTxt= txtEl? txtEl.value:('Question '+qId);
-            optionsHTML+='<option value="'+nmVal+'">'+qTxt+' ('+nmVal+')</option>';
+    let optionsHTML = '';
+    const qBlocks = document.querySelectorAll('.question-block');
+
+    qBlocks.forEach(qBlock => {
+        const qId = qBlock.id.replace('questionBlock','');
+        const selEl = qBlock.querySelector('select');
+        const qType = selEl ? selEl.value : 'text';
+
+        if (qType === 'numberedDropdown') {
+            const txtEl = qBlock.querySelector(`#question${qId}`);
+            const qTxt = txtEl ? txtEl.value : (`Question ${qId}`);
+            const amountInputs = qBlock.querySelectorAll(`#textboxAmounts${qId} input`);
+            
+            amountInputs.forEach((input, idx) => {
+                const amtLabel = input.value.trim();
+                if (amtLabel) {
+                    // Generate pattern with actual index instead of #
+                    const sanitized = amtLabel.replace(/\s+/g, "_").toLowerCase();
+                    optionsHTML += `<option value="amount${qId}_${idx+1}_${sanitized}">${qTxt} - ${amtLabel}</option>`;
+                }
+            });
         }
     });
+
     return optionsHTML;
 }
+
 
 function updateAutofillOptions() {
     var hiddenBlocks = document.querySelectorAll('.hidden-field-block');
