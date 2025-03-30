@@ -399,28 +399,22 @@ function exportForm() {
 
             // ---------- Jump logic ----------
             const jumpEnabled = questionBlock.querySelector(`#enableJump${questionId}`)?.checked || false;
-        const jumpConditions = [];
-        
-        if (jumpEnabled) {
-            const jumpConditionDivs = questionBlock.querySelectorAll('.jump-condition');
-            jumpConditionDivs.forEach(condDiv => {
-                const conditionId = condDiv.id.split('_')[1];
-                const jumpOption = condDiv.querySelector(`#jumpOption${questionId}_${conditionId}`)?.value || '';
-                const jumpTo = condDiv.querySelector(`#jumpTo${questionId}_${conditionId}`)?.value || '';
-                
-                if (jumpOption && jumpTo) {
-                    jumpConditions.push({
-                        option: jumpOption,
-                        to: jumpTo
-                    });
-                }
-            });
-        }
-          
-          
-          
-            const jumpOption = questionBlock.querySelector(`#jumpOption${questionId}`)?.value || "";
-            const jumpTo = questionBlock.querySelector(`#jumpTo${questionId}`)?.value || "";
+            const jumpConditions = [];
+            if (jumpEnabled) {
+                const jumpConditionDivs = questionBlock.querySelectorAll('.jump-condition');
+                jumpConditionDivs.forEach(condDiv => {
+                    const conditionId = condDiv.id.split('_')[1];
+                    const jumpOption = condDiv.querySelector(`#jumpOption${questionId}_${conditionId}`)?.value || '';
+                    const jumpTo = condDiv.querySelector(`#jumpTo${questionId}_${conditionId}`)?.value || '';
+
+                    if (jumpOption && jumpTo) {
+                        jumpConditions.push({
+                            option: jumpOption,
+                            to: jumpTo
+                        });
+                    }
+                });
+            }
 
             // ---------- Conditional PDF logic ----------
             const condPDFEnabled = questionBlock.querySelector(`#enableConditionalPDF${questionId}`)?.checked || false;
@@ -433,6 +427,7 @@ function exportForm() {
             const alertPrevA = questionBlock.querySelector(`#alertPrevAnswer${questionId}`)?.value || "";
             const alertText = questionBlock.querySelector(`#alertText${questionId}`)?.value || "";
 
+            // Build the bare question object first
             const questionData = {
                 questionId: questionId,
                 text: questionText,
@@ -442,9 +437,9 @@ function exportForm() {
                     conditions: conditionsArray
                 },
                 jump: {
-                enabled: jumpEnabled,
-                conditions: jumpConditions
-            },
+                    enabled: jumpEnabled,
+                    conditions: jumpConditions
+                },
                 conditionalPDF: {
                     enabled: condPDFEnabled,
                     pdfName: condPDFName,
@@ -459,57 +454,52 @@ function exportForm() {
                 options: [],
                 labels: []
             };
-sectionData.questions.push(questionData);
-          
-          
+
             // ========== Collect question-specific options ==========
-         // In the checkbox section of exportForm()
-if (questionType === 'checkbox') {
-    const optionsDivs = questionBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
-    optionsDivs.forEach((optionDiv, index) => {
-        const optTextEl = optionDiv.querySelector(`#checkboxOptionText${questionId}_${index + 1}`);
-        const optNameEl = optionDiv.querySelector(`#checkboxOptionName${questionId}_${index + 1}`);
-        const optValueEl = optionDiv.querySelector(`#checkboxOptionValue${questionId}_${index + 1}`);
-        const hasAmountEl = optionDiv.querySelector(`#checkboxOptionHasAmount${questionId}_${index + 1}`);
-        const amountNameEl = optionDiv.querySelector(`#checkboxOptionAmountName${questionId}_${index + 1}`);
-        const amountPhEl = optionDiv.querySelector(`#checkboxOptionAmountPlaceholder${questionId}_${index + 1}`);
+            if (questionType === 'checkbox') {
+                const optionsDivs = questionBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
+                optionsDivs.forEach((optionDiv, index) => {
+                    const optTextEl = optionDiv.querySelector(`#checkboxOptionText${questionId}_${index + 1}`);
+                    const optNameEl = optionDiv.querySelector(`#checkboxOptionName${questionId}_${index + 1}`);
+                    const optValueEl = optionDiv.querySelector(`#checkboxOptionValue${questionId}_${index + 1}`);
+                    const hasAmountEl = optionDiv.querySelector(`#checkboxOptionHasAmount${questionId}_${index + 1}`);
+                    const amountNameEl = optionDiv.querySelector(`#checkboxOptionAmountName${questionId}_${index + 1}`);
+                    const amountPhEl = optionDiv.querySelector(`#checkboxOptionAmountPlaceholder${questionId}_${index + 1}`);
 
-        const optText = optTextEl ? optTextEl.value.trim() : `Option ${index + 1}`;
-        const optNameId = optNameEl ? optNameEl.value.trim() : `answer${questionId}_${index + 1}`;
-        const optValue = optValueEl ? optValueEl.value.trim() : optText;
-        const hasAmount = hasAmountEl ? hasAmountEl.checked : false;
-        const amountName = amountNameEl ? amountNameEl.value.trim() : '';
-        const amountPlaceholder = amountPhEl ? amountPhEl.value.trim() : '';
+                    const optText = optTextEl ? optTextEl.value.trim() : `Option ${index + 1}`;
+                    const optNameId = optNameEl ? optNameEl.value.trim() : `answer${questionId}_${index + 1}`;
+                    const optValue = optValueEl ? optValueEl.value.trim() : optText;
+                    const hasAmount = hasAmountEl ? hasAmountEl.checked : false;
+                    const amountName = amountNameEl ? amountNameEl.value.trim() : '';
+                    const amountPlaceholder = amountPhEl ? amountPhEl.value.trim() : '';
 
-        questionData.options.push({
-            label: optText,
-            nameId: optNameId,
-            value: optValue,
-            hasAmount: hasAmount,
-            amountName: amountName,
-            amountPlaceholder: amountPlaceholder
-        });
-    });
+                    questionData.options.push({
+                        label: optText,
+                        nameId: optNameId,
+                        value: optValue,
+                        hasAmount: hasAmount,
+                        amountName: amountName,
+                        amountPlaceholder: amountPlaceholder
+                    });
+                });
 
-    // Check if user included "None of the above"
-    const noneOfTheAboveCheckbox = questionBlock.querySelector(`#noneOfTheAbove${questionId}`);
-    if (noneOfTheAboveCheckbox && noneOfTheAboveCheckbox.checked) {
-        questionData.options.push({
-            label: "None of the above",
-            nameId: `answer${questionId}_none`,
-            value: "None of the above",
-            hasAmount: false
-        });
-    }
-}
+                // Check if user included "None of the above"
+                const noneOfTheAboveCheckbox = questionBlock.querySelector(`#noneOfTheAbove${questionId}`);
+                if (noneOfTheAboveCheckbox && noneOfTheAboveCheckbox.checked) {
+                    questionData.options.push({
+                        label: "None of the above",
+                        nameId: `answer${questionId}_none`,
+                        value: "None of the above",
+                        hasAmount: false
+                    });
+                }
+            }
             else if (questionType === 'dropdown') {
-                // ----- Dropdown -----
                 const dropdownOptionEls = questionBlock.querySelectorAll(`#dropdownOptions${questionId} input`);
                 dropdownOptionEls.forEach(optionEl => {
                     const val = optionEl.value.trim() || "Option";
                     questionData.options.push(val);
                 });
-
                 // Also include Name/ID and Placeholder
                 const nameId = questionBlock.querySelector(`#textboxName${questionId}`)?.value.trim() || `answer${questionId}`;
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
@@ -530,36 +520,30 @@ if (questionType === 'checkbox') {
                     height: imageHeight
                 };
             }
-          
-          
-        
-            // In the numbered dropdown section of exportForm()
-else if (questionType === 'numberedDropdown') {
-    // ----- Numbered Dropdown -----
-    const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`)?.value || '';
-    const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`)?.value || '';
-    
-    // Collect text labels
-    const labelInputs = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
-    const labels = [];
-    labelInputs.forEach(lbl => {
-        labels.push(lbl.value.trim());
-    });
-    
-    // Collect amount labels
-    const amountInputs = questionBlock.querySelectorAll(`#textboxAmounts${questionId} input`);
-    const amounts = [];
-    amountInputs.forEach(amt => {
-        amounts.push(amt.value.trim());
-    });
+            else if (questionType === 'numberedDropdown') {
+                const rangeStart = questionBlock.querySelector(`#numberRangeStart${questionId}`)?.value || '';
+                const rangeEnd = questionBlock.querySelector(`#numberRangeEnd${questionId}`)?.value || '';
+                
+                // Collect text labels
+                const labelInputs = questionBlock.querySelectorAll(`#textboxLabels${questionId} input`);
+                const labels = [];
+                labelInputs.forEach(lbl => {
+                    labels.push(lbl.value.trim());
+                });
 
-    questionData.min = rangeStart;
-    questionData.max = rangeEnd;
-    questionData.labels = labels;
-    questionData.amounts = amounts; // Add this line
-}
+                // Collect amount labels
+                const amountInputs = questionBlock.querySelectorAll(`#textboxAmounts${questionId} input`);
+                const amounts = [];
+                amountInputs.forEach(amt => {
+                    amounts.push(amt.value.trim());
+                });
+
+                questionData.min = rangeStart;
+                questionData.max = rangeEnd;
+                questionData.labels = labels;
+                questionData.amounts = amounts;
+            }
             else if (questionType === 'multipleTextboxes') {
-                // ----- Multiple Textboxes -----
                 const multiBlocks = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
                 questionData.textboxes = [];
                 multiBlocks.forEach((optionDiv, index) => {
@@ -585,13 +569,13 @@ else if (questionType === 'numberedDropdown') {
                 questionType === 'money' ||
                 questionType === 'date'
             ) {
-                // ----- Text-like questions -----
                 const nameId = questionBlock.querySelector(`#textboxName${questionId}`)?.value.trim() || `answer${questionId}`;
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
                 questionData.nameId = nameId;
                 questionData.placeholder = placeholder;
             }
 
+            // -- Push questionData once (after we finish building it!) --
             sectionData.questions.push(questionData);
         });
 
@@ -707,7 +691,6 @@ else if (questionType === 'numberedDropdown') {
                 }
 
                 // MULTI-TERM calculations for text
-                // we have textCalculationBlock + textEquationContainer
                 const textCalcBlock = fieldBlock.querySelector(`#textCalculationBlock${hiddenFieldId}`);
                 if (textCalcBlock) {
                     const calcRows = textCalcBlock.querySelectorAll(`div[id^="textCalculationRow${hiddenFieldId}_"]`);
@@ -761,6 +744,7 @@ else if (questionType === 'numberedDropdown') {
     const jsonString = JSON.stringify(formData, null, 2);
     downloadJSON(jsonString, "form_data.json");
 }
+
 
 function downloadJSON(content, filename) {
     const blob = new Blob([content], { type: "application/json" });
