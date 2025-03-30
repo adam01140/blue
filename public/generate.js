@@ -665,6 +665,25 @@ function handleNext(currentSection){
         var jTo  = jl.jumpTo;
         var nmId = questionNameIds[qId] || ("answer"+qId);
 
+<<<<<<< HEAD
+=======
+function handleNext(currentSection){
+    var nextSection = currentSection + 1;
+    var relevantJumps = [];
+    for(var i=0; i<jumpLogics.length; i++){
+        if(jumpLogics[i].section === currentSection){
+            relevantJumps.push(jumpLogics[i]);
+        }
+    }
+    for(var j=0; j<relevantJumps.length; j++){
+        var jl = relevantJumps[j];
+        var qId = jl.questionId;
+        var qType = jl.questionType;
+        var jOpt = jl.jumpOption;
+        var jTo  = jl.jumpTo;
+        var nmId = questionNameIds[qId] || ("answer"+qId);
+
+>>>>>>> ac2b2c18b2e74712750a30f81417f0425b85d050
         if(qType==="radio" || qType==="dropdown"){
             var el= document.getElementById(nmId);
             if(el && el.value.trim().toLowerCase() === jOpt.trim().toLowerCase()){
@@ -687,7 +706,21 @@ function handleNext(currentSection){
             }
         }
     }
+    
+    // Handle 'end' case before parsing numbers
+    if(nextSection === 'end') {
+        navigateSection('end');
+    } else {
+        nextSection = parseInt(nextSection, 10);
+        if(isNaN(nextSection)) nextSection = currentSection + 1;
+        navigateSection(nextSection);
+    }
+    
+    runAllHiddenCheckboxCalculations();
+    runAllHiddenTextCalculations();
+}
 
+<<<<<<< HEAD
     // Handle 'end' as a special string
     if(nextSection === 'end') {
         navigateSection('end');
@@ -703,6 +736,10 @@ function handleNext(currentSection){
 }
 
 function navigateSection(sectionNumber){
+=======
+
+   function navigateSection(sectionNumber){
+>>>>>>> ac2b2c18b2e74712750a30f81417f0425b85d050
     var sections= document.querySelectorAll(".section");
     var form = document.getElementById("customForm");
     var thankYou = document.getElementById("thankYouMessage");
@@ -713,11 +750,17 @@ function navigateSection(sectionNumber){
     form.style.display = "block";
 
     if(sectionNumber === 'end') {
+<<<<<<< HEAD
         // means skip directly to Thank You
         form.style.display = "none";
         thankYou.style.display = "block";
     } else if(sectionNumber >= sections.length){
         // if user typed something bigger than total sections
+=======
+        form.style.display = "none";
+        thankYou.style.display = "block";
+    } else if(sectionNumber >= sections.length){
+>>>>>>> ac2b2c18b2e74712750a30f81417f0425b85d050
         sections[sections.length-1].classList.add("active");
     } else {
         var target= document.getElementById("section"+sectionNumber);
