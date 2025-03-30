@@ -886,6 +886,9 @@ function runAllHiddenTextCalculations(){
     }
 }
 
+/**
+ * Evaluate each multi-term calculation and set the hidden text field.
+ */
 function runSingleHiddenTextCalculation(calcObj) {
     var textField = document.getElementById(calcObj.hiddenFieldName);
     if (!textField) return;
@@ -923,15 +926,19 @@ function runSingleHiddenTextCalculation(calcObj) {
             case '=':  matched = (val === thr); break;
         }
 
-        // If condition matches, update finalValue
+        // If condition matches, we fill in the text field
+        // If not matched, we clear it out
         if (matched) {
             finalValue = oneCalc.fillValue;
+        } else {
+            finalValue = "";
         }
     });
 
     // Set the final value in the hidden field
     textField.value = finalValue;
 }
+
 
 
 function replacePlaceholderTokens(str){
@@ -1028,11 +1035,14 @@ function attachCalculationListeners(){
   return formHTML;
 }
 
-/********************************************************************
+
+/**
  * generateHiddenPDFFields()
- *   - Reads from #hiddenFieldsContainer to build hidden fields
- *     plus multi-term calc for checkboxes & text
- ********************************************************************/
+ *  - Reads from #hiddenFieldsContainer
+ *  - Builds hidden <input> fields
+ *  - Also handles multi-term calculations for both checkboxes & text
+ *  - NEW: expands "numberedDropdown" amounts into multiple "amountX_Y_value" references
+ */
 function generateHiddenPDFFields() {
     let hiddenFieldsHTML = '<div id="hidden_pdf_fields" style="display:none;">';
     const hiddenCheckboxCalculations = [];
@@ -1052,6 +1062,9 @@ function generateHiddenPDFFields() {
             
             if (!fName) continue;
 
+            // ------------------------------
+            // HIDDEN TEXT FIELD
+            // ------------------------------
             if (fType === "text") {
                 // Add the hidden text field
                 hiddenFieldsHTML += `\n<input type="text" id="${fName}" name="${fName}" placeholder="${fName}">`;
@@ -1119,6 +1132,10 @@ function generateHiddenPDFFields() {
                     }
                 }
             } 
+            
+            // ------------------------------
+            // HIDDEN CHECKBOX FIELD
+            // ------------------------------
             else if (fType === "checkbox") {
                 // Hidden checkbox field
                 const chkEl = document.getElementById("hiddenFieldChecked" + hid);

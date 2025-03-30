@@ -684,20 +684,41 @@ function generateMoneyQuestionOptions() {
 
     qBlocks.forEach(qBlock => {
         const qId = qBlock.id.replace('questionBlock','');
-        const selEl = qBlock.querySelector('select');
-        const qType = selEl ? selEl.value : 'text';
+        const selEl = qBlock.querySelector('select#questionType' + qId);
+        if (!selEl) return;
 
+        // e.g. 'numberedDropdown'
+        const qType = selEl.value;  
         if (qType === 'numberedDropdown') {
+            // 1) Get the question text (just for display in the dropdown)
             const txtEl = qBlock.querySelector(`#question${qId}`);
             const qTxt = txtEl ? txtEl.value : (`Question ${qId}`);
-            const amountInputs = qBlock.querySelectorAll(`#textboxAmounts${qId} input`);
-            
-            amountInputs.forEach((input, idx) => {
-                const amtLabel = input.value.trim();
-                if (amtLabel) {
-                    // Generate pattern with actual index instead of #
-                    const sanitized = amtLabel.replace(/\s+/g, "_").toLowerCase();
-                    optionsHTML += `<option value="amount${qId}_${idx+1}_${sanitized}">${qTxt} - ${amtLabel}</option>`;
+
+            // 2) Grab min & max
+            const stEl = qBlock.querySelector('#numberRangeStart' + qId);
+            const enEl = qBlock.querySelector('#numberRangeEnd' + qId);
+            const ddMin = stEl ? parseInt(stEl.value, 10) : 1;
+            const ddMax = enEl ? parseInt(enEl.value, 10) : ddMin;
+
+            // 3) Gather the “amount labels” from #textboxAmounts. 
+            //    If user typed just "value", we’ll produce 4 lines: amount1_1_value, amount1_2_value, etc.
+            const amtInputs = qBlock.querySelectorAll(`#textboxAmounts${qId} input[type="text"]`);
+            const amountLabels = [];
+            amtInputs.forEach((inp) => {
+                const val = inp.value.trim();
+                if (val) amountLabels.push(val);
+            });
+            // If no labels were entered, skip
+            if (amountLabels.length === 0) return;
+
+            // 4) For each label, produce a line for i in [ddMin..ddMax].
+            //    E.g. if min=1, max=4, label="value", we generate:
+            //      amount1_1_value, amount1_2_value, amount1_3_value, amount1_4_value
+            amountLabels.forEach((rawLabel) => {
+                const sanitized = rawLabel.replace(/\s+/g, "_").toLowerCase();
+                for (let i = ddMin; i <= ddMax; i++) {
+                    const moneyId = `amount${qId}_${i}_${sanitized}`;
+                    optionsHTML += `<option value="${moneyId}">${qTxt} - ${rawLabel} #${i}</option>`;
                 }
             });
         }
@@ -705,6 +726,7 @@ function generateMoneyQuestionOptions() {
 
     return optionsHTML;
 }
+
 
 
 function updateAutofillOptions() {
