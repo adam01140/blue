@@ -26,6 +26,29 @@ const defaultColors = {
   textColor: "#000000"
 };
 
+// Global function for hiding context menus
+function hideContextMenu() {
+  document.getElementById('contextMenu').style.display = 'none';
+  document.getElementById('typeSubmenu').style.display = 'none';
+  document.getElementById('emptySpaceMenu').style.display = 'none';
+}
+
+// Determine the type of a node (question, options, etc.)
+function getNodeType(cell) {
+  if (!cell || !cell.style) return "unknown";
+  
+  if (cell.style.includes("nodeType=question")) {
+    return "question";
+  } else if (cell.style.includes("nodeType=options")) {
+    return "options";
+  } else if (cell.style.includes("nodeType=calculation")) {
+    return "calculation"; 
+  } else if (cell.style.includes("nodeType=end")) {
+    return "end";
+  }
+  return "unknown";
+}
+
 function isEndNode(cell) {
   return cell && cell.style && cell.style.includes("nodeType=end");
 }
@@ -657,8 +680,7 @@ document.addEventListener("DOMContentLoaded", function() {
     typeSubmenu.style.display = "none";
     selectedCell = cell;
     currentMouseEvent = evt;
-    if (cell) showContextMenu(evt);
-    else hideContextMenu();
+    showContextMenu(evt);
   };
   function showContextMenu(evt) {
     const cell = graph.getSelectionCell();
@@ -699,11 +721,6 @@ document.addEventListener("DOMContentLoaded", function() {
       emptyMenu.style.top = y + 'px';
     }
     evt.preventDefault();
-  }
-  function hideContextMenu() {
-    document.getElementById('contextMenu').style.display = 'none';
-    document.getElementById('typeSubmenu').style.display = 'none';
-    document.getElementById('emptySpaceMenu').style.display = 'none';
   }
   document.addEventListener("click", e => {
     if (
@@ -1015,6 +1032,24 @@ document.addEventListener("DOMContentLoaded", function() {
   // Copy/Paste
   keyHandler.bindControlKey(67, () => { copySelectedNodeAsJson(); });
   keyHandler.bindControlKey(86, () => { pasteNodeFromJson(); });
+  
+  // Add listener for copy button
+  document.getElementById('copyNodeButton').addEventListener('click', function() {
+    copySelectedNodeAsJson();
+    hideContextMenu();
+  });
+  
+  // Add listener for paste here button
+  document.getElementById('pasteHereButton').addEventListener('click', function() {
+    if (window.emptySpaceClickX !== undefined && window.emptySpaceClickY !== undefined) {
+      pasteNodeFromJson(window.emptySpaceClickX, window.emptySpaceClickY);
+      window.emptySpaceClickX = undefined;
+      window.emptySpaceClickY = undefined;
+    } else {
+      pasteNodeFromJson();
+    }
+    hideContextMenu();
+  });
 
   graph.getModel().addListener(mxEvent.EVENT_CHANGE, function(sender, evt) {
     const changes = evt.getProperty("changes");
@@ -1087,19 +1122,20 @@ document.addEventListener("DOMContentLoaded", function() {
     
     const parent = graph.getDefaultParent();
     graph.getModel().beginUpdate();
+    let cell;
     try {
       let style = "";
       let label = "";
       
       if (nodeType === 'question') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;spacing=12;fontSize=16;";
-        label = "Question Text";
+        label = "question node"; // Use lowercase to match the pattern in refreshAllCells
       } else if (nodeType === 'options') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
         label = "Option Text";
       }
       
-      const cell = graph.insertVertex(
+      cell = graph.insertVertex(
         parent, 
         null, 
         label, 
@@ -1110,6 +1146,7 @@ document.addEventListener("DOMContentLoaded", function() {
         style
       );
       
+      // Set IDs and section
       if (nodeType === 'question') {
         setNodeId(cell, 'Question_' + Date.now().toString().slice(-4));
       } else if (nodeType === 'options') {
@@ -1117,11 +1154,13 @@ document.addEventListener("DOMContentLoaded", function() {
       }
       
       setSection(cell, "1");
-      colorCell(cell);
       
     } finally {
       graph.getModel().endUpdate();
     }
+    
+    // Apply coloring and show dropdown for question nodes
+    refreshAllCells();
     
     // Clear the click location
     window.emptySpaceClickX = undefined;
@@ -1533,7 +1572,7 @@ function updateCalculationNodeCell(cell) {
   });
 
   const html = `
-    <div style="padding:6px;" class="multiple-textboxes-node">
+    <div style="padding:10px; width:100%;" class="multiple-textboxes-node">
       <label>Calculation Title:</label><br/>
       <div class="textbox-entry">
         <input type="text" value="${escapeAttr(cell._calcTitle)}" onblur="window.updateCalcNodeTitle('${cell.id}', this.value)" style="width:100%;" />
@@ -1541,7 +1580,7 @@ function updateCalculationNodeCell(cell) {
       <br/>
 
       <label>Calc 1:</label>
-      <select onchange="window.updateCalcNodeAmountLabel('${cell.id}', this.value)">
+      <select onchange="window.updateCalcNodeAmountLabel('${cell.id}', this.value)" style="width:100%; max-width:500px;">
         ${amountOptionsHtml}
       </select>
       <br/><br/>
@@ -1567,6 +1606,13 @@ function updateCalculationNodeCell(cell) {
   try {
     graph.getModel().setValue(cell, html);
     let st = cell.style || "";
+    // Ensure it's a rounded rectangle
+    if (st.includes("shape=hexagon")) {
+      st = st.replace("shape=hexagon", "shape=roundRect;rounded=1;arcSize=10");
+    }
+    if (!st.includes("rounded=1")) {
+      st += "rounded=1;arcSize=10;";
+    }
     if (!st.includes("pointerEvents=")) {
       st += "pointerEvents=1;overflow=fill;";
     }
@@ -1574,9 +1620,24 @@ function updateCalculationNodeCell(cell) {
       st += "html=1;";
     }
     graph.getModel().setStyle(cell, st);
+    
+    // Set minimum size for the calculation node
+    const geo = cell.geometry;
+    if (geo) {
+      // Set a generous minimum width for the calculation node to fit dropdowns
+      if (geo.width < 300) {
+        geo.width = 300;
+      }
+      // Ensure height is adequate
+      if (geo.height < 250) {
+        geo.height = 250;
+      }
+    }
   } finally {
     graph.getModel().endUpdate();
   }
+  
+  // Force update cell size to fit content
   graph.updateCellSize(cell);
 }
 
@@ -2624,33 +2685,75 @@ function copySelectedNodeAsJson() {
     id: cell.id,
     value: cell.value,
     style: cell.style,
+    geometry: cell.geometry ? {
+      width: cell.geometry.width,
+      height: cell.geometry.height
+    } : null,
     _textboxes: cell._textboxes || null,
-    _questionText: cell._questionText || null
-    // etc. Add more fields as needed
+    _questionText: cell._questionText || null,
+    _twoNumbers: cell._twoNumbers || null,
+    _calcTitle: cell._calcTitle,
+    _calcAmountLabel: cell._calcAmountLabel,
+    _calcOperator: cell._calcOperator,
+    _calcThreshold: cell._calcThreshold,
+    _calcFinalText: cell._calcFinalText,
+    _image: cell._image
   };
   navigator.clipboard.writeText(JSON.stringify(data)).then(() => {
-    alert("Node JSON copied to system clipboard!");
+    console.log("Node JSON copied to system clipboard!");
   });
 }
 
 // Example: Paste from JSON (same or different tab)
-function pasteNodeFromJson() {
+function pasteNodeFromJson(x, y) {
   navigator.clipboard.readText().then(text => {
     try {
       const data = JSON.parse(text);
+      
       graph.getModel().beginUpdate();
       try {
-        const geo = new mxGeometry(50, 50, 160, 80);
+        // Use provided position or default to a fixed position
+        const posX = x !== undefined ? x : 50;
+        const posY = y !== undefined ? y : 50;
+        
+        // Use the original dimensions if available
+        const width = data.geometry && data.geometry.width ? data.geometry.width : 160;
+        const height = data.geometry && data.geometry.height ? data.geometry.height : 80;
+        
+        const geo = new mxGeometry(posX, posY, width, height);
         const newCell = new mxCell(data.value, geo, data.style || "");
         newCell.vertex = true;
+        
+        // Copy all custom properties
         newCell._textboxes = data._textboxes || null;
         newCell._questionText = data._questionText || null;
+        newCell._twoNumbers = data._twoNumbers || null;
+        newCell._calcTitle = data._calcTitle;
+        newCell._calcAmountLabel = data._calcAmountLabel;
+        newCell._calcOperator = data._calcOperator;
+        newCell._calcThreshold = data._calcThreshold;
+        newCell._calcFinalText = data._calcFinalText;
+        newCell._image = data._image;
+        
         graph.addCell(newCell, graph.getDefaultParent());
         graph.setSelectionCell(newCell);
+        
+        // Update any special cell types
+        if (isCalculationNode(newCell)) {
+          updateCalculationNodeCell(newCell);
+        } else if (isQuestion(newCell) && getQuestionType(newCell) === "multipleTextboxes") {
+          updateMultipleTextboxesCell(newCell);
+        } else if (isQuestion(newCell) && getQuestionType(newCell) === "multipleDropdownType") {
+          updatemultipleDropdownTypeCell(newCell);
+        } else if (isOptions(newCell) && getQuestionType(newCell) === "imageOption") {
+          updateImageOptionCell(newCell);
+        }
       } finally {
         graph.getModel().endUpdate();
       }
+      refreshAllCells();
     } catch (err) {
+      console.error("Paste error:", err);
       alert("Clipboard data is not valid JSON for a node.");
     }
   });
