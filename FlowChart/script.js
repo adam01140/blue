@@ -2222,16 +2222,33 @@ window.exportGuiJson = function() {
       // Find the question that contains the amount field
       const amountLabel = cell._calcAmountLabel || "";
       
+      // Extract the amount name from the amount label
+      // Format: "how_many_cars_do_you_have_delete_amount_delete_amount_add_option_car_value"
+      let amountName = "";
+      if (amountLabel) {
+        // Find the last occurrence of "add_option_" or "delete_amount_" followed by text
+        const addOptionMatch = amountLabel.match(/add_option_([^_]+)$/);
+        const deleteAmountMatch = amountLabel.match(/delete_amount_([^_]+)$/);
+        
+        if (addOptionMatch) {
+          amountName = addOptionMatch[1];
+        } else if (deleteAmountMatch) {
+          amountName = deleteAmountMatch[1];
+        } else {
+          // Fallback: just use the last part after the last underscore
+          const parts = amountLabel.split('_');
+          amountName = parts[parts.length - 1];
+        }
+      }
+      
       // Find the question that contains this amount
       let questionId = null;
-      let amountName = "";
       
       // Search through all questions to find the one with this amount
       for (const section of sections) {
         for (const question of section.questions) {
-          if (question.amounts && question.amounts.includes(amountLabel)) {
+          if (question.amounts && question.amounts.includes(amountName)) {
             questionId = question.questionId;
-            amountName = amountLabel;
             break;
           }
         }
@@ -2249,7 +2266,7 @@ window.exportGuiJson = function() {
           for (let i = min; i <= max; i++) {
             const term = {
               operator: i > min ? "+" : "",
-              questionNameId: `amount${questionId}_${i}_${amountName.replace(/\s+/g, "_")}`
+              questionNameId: `amount${questionId}_${i}_${amountName}`
             };
             calculation.terms.push(term);
           }
