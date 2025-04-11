@@ -1117,6 +1117,26 @@ document.addEventListener("DOMContentLoaded", function() {
     hideContextMenu();
   });
   
+  document.getElementById('placeCalcNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('calculation');
+    hideContextMenu();
+  });
+  
+  document.getElementById('placeImageNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('imageOption');
+    hideContextMenu();
+  });
+  
+  document.getElementById('placeAmountNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('amountOption');
+    hideContextMenu();
+  });
+  
+  document.getElementById('placeEndNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('end');
+    hideContextMenu();
+  });
+  
   function placeNodeAtClickLocation(nodeType) {
     if (window.emptySpaceClickX === undefined || window.emptySpaceClickY === undefined) return;
     
@@ -1134,6 +1154,30 @@ document.addEventListener("DOMContentLoaded", function() {
       } else if (nodeType === 'options') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;align=center;";
         label = "Option Text";
+      } else if (nodeType === 'calculation') {
+        style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=calculation;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;";
+        label = "Calculation node";
+      } else if (nodeType === 'imageOption') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=imageOption;spacing=12;fontSize=16;";
+        label = "Image Option";
+      } else if (nodeType === 'amountOption') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=amountOption;spacing=12;fontSize=16;";
+        label = "Amount Option";
+      } else if (nodeType === 'end') {
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=end;fillColor=#CCCCCC;fontColor=#000000;spacing=12;fontSize=16;";
+        label = "END";
+      }
+      
+      // Create cell with appropriate width/height based on type
+      let width = 160;
+      let height = 80;
+      
+      if (nodeType === 'calculation') {
+        width = 300;
+        height = 250;
+      } else if (nodeType === 'end') {
+        width = 120;
+        height = 60;
       }
       
       cell = graph.insertVertex(
@@ -1142,8 +1186,8 @@ document.addEventListener("DOMContentLoaded", function() {
         label, 
         window.emptySpaceClickX, 
         window.emptySpaceClickY, 
-        160, 
-        80,  // Make slightly taller to better accommodate the dropdown
+        width,
+        height,
         style
       );
       
@@ -1156,6 +1200,25 @@ document.addEventListener("DOMContentLoaded", function() {
       
       setSection(cell, "1");
       
+      // Special handling for calculation nodes
+      if (nodeType === 'calculation') {
+        cell._calcTitle = "Calculation Title";
+        cell._calcAmountLabel = "";
+        cell._calcOperator = "=";
+        cell._calcThreshold = "0";
+        cell._calcFinalText = "";
+        updateCalculationNodeCell(cell);
+      } else if (nodeType === 'imageOption') {
+        cell._image = {
+          url: "",
+          width: "100",
+          height: "100"
+        };
+        updateImageOptionCell(cell);
+      } else if (nodeType === 'end') {
+        updateEndNodeCell(cell);
+      }
+      
     } finally {
       graph.getModel().endUpdate();
     }
@@ -1167,7 +1230,7 @@ document.addEventListener("DOMContentLoaded", function() {
     window.emptySpaceClickX = undefined;
     window.emptySpaceClickY = undefined;
   }
-
+  
   // Add keyboard event listener for delete key
   document.addEventListener('keydown', function(event) {
     // Check if the key pressed is Delete or Backspace
@@ -1568,7 +1631,25 @@ function updateCalculationNodeCell(cell) {
   let amountOptionsHtml = `<option value="">-- pick an amount label --</option>`;
   allAmountLabels.forEach(lbl => {
     const selected = (lbl === cell._calcAmountLabel) ? "selected" : "";
-    amountOptionsHtml += `<option value="${escapeAttr(lbl)}" ${selected}>${lbl}</option>`;
+    
+    // Clean up display name for the dropdown
+    let displayName = lbl;
+    
+    // Strip out common artifacts like delete_amount, add_option etc.
+    displayName = displayName.replace(/delete_amount_/g, "");
+    displayName = displayName.replace(/add_option_/g, "");
+    
+    // Find the last instance of the question name + underscore
+    const lastUnderscoreIndex = displayName.lastIndexOf("_");
+    if (lastUnderscoreIndex !== -1) {
+      const questionPart = displayName.substring(0, lastUnderscoreIndex);
+      const amountPart = displayName.substring(lastUnderscoreIndex + 1);
+      
+      // Format: "how_many_cars_do_you_have + car_value"
+      displayName = `${questionPart}_${amountPart}`;
+    }
+    
+    amountOptionsHtml += `<option value="${escapeAttr(lbl)}" ${selected}>${displayName}</option>`;
   });
 
   // Operator dropdown
