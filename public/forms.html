@@ -3,159 +3,451 @@
 <head>
     <meta charset="UTF-8">
     <title>Forms - FormWiz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #2980b9;
+            --hover-color: #1c598a;
+            --background-color: #f8f9fa;
+            --text-color: #2c3e50;
+            --header-color: #2c3e50;
+            --error-color: #e74c3c;
+        }
+
         html, body {
             height: 100%;
             margin: 0;
             display: flex;
             flex-direction: column;
-        }
-        body {
             font-family: 'Montserrat', sans-serif;
-            color: #333;
-            background-color: #f4f4f4;
+            color: var(--text-color);
+            background-color: var(--background-color);
         }
+
         header {
-            background-color: #2c3e50;
-            padding: 40px;
+            background-color: var(--header-color);
+            padding: 20px 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
         }
+
         header img {
             position: absolute;
             left: 20px;
             cursor: pointer;
+            width: 130px;
+            height: 80px;
         }
+
         nav {
             display: flex;
             justify-content: center;
+            gap: 20px;
         }
+
         nav a {
-            margin: 0 15px;
             color: #ffffff;
             text-decoration: none;
             font-weight: bold;
             transition: color 0.3s ease;
+            padding: 5px 10px;
         }
+
         nav a:hover {
-            color: #2980b9;
+            color: var(--primary-color);
         }
+
+        .user-info {
+            position: absolute;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .welcome-message {
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .settings-button {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: 600;
+        }
+
+        .settings-button:hover {
+            background-color: var(--hover-color);
+        }
+
         .logout-button {
-            width: 100px;
-            background-color: #e74c3c;
+            background-color: var(--error-color);
             color: #ffffff;
             border: none;
             padding: 10px 15px;
             cursor: pointer;
             border-radius: 5px;
-            margin-top: 20px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            width: 100px;
         }
+
         .logout-button:hover {
             background-color: #c0392b;
         }
+
         section {
-            padding: 50px;
+            padding: 30px;
             text-align: center;
             flex: 1;
         }
+
         section h1 {
-            color: #2980b9;
-            text-align: center;
+            color: var(--primary-color);
             margin-bottom: 30px;
         }
+
         .forms-section {
             border: 4px solid lightblue;
-        border-radius: 10px;
+            border-radius: 10px;
             padding: 20px;
-            margin: 20px;
+            margin: 20px auto;
+            max-width: 1200px;
         }
+
         .forms-list {
             list-style: none;
             padding: 0;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
+            gap: 20px;
         }
-        section ul li {
+
+        .forms-list li {
             margin: 10px;
-            width: 150px;
+            width: 180px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            border: 2px solid #2980b9;
+            border: 2px solid var(--primary-color);
             border-radius: 5px;
             background-color: #EBE7D9;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
             box-sizing: border-box;
-            padding: 10px;
+            padding: 15px;
             text-align: center;
             position: relative;
         }
-        section ul li a {
-            color: #2980b9;
+
+        .forms-list li:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .forms-list li a {
+            color: var(--primary-color);
             text-decoration: none;
             font-weight: bold;
             width: 100%;
             margin-bottom: 10px;
+            font-size: 0.95em;
         }
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 10px;
-        }
+
         .remove-button {
-            background-color: #e74c3c;
+            background-color: var(--error-color);
             color: #ffffff;
             border: none;
             padding: 5px 10px;
             cursor: pointer;
             border-radius: 3px;
             width: 100px;
-            margin-top: 5px;
+            margin-top: 10px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
         }
+
         .remove-button:hover {
             background-color: #c0392b;
         }
+
         .no-forms-message {
             color: #7f8c8d;
             font-size: 18px;
             margin-top: 20px;
         }
+
         footer {
             text-align: center;
             padding: 20px;
-            background-color: #2c3e50;
+            background-color: var(--header-color);
             color: #EBE7D9;
-            margin-top: 20px;
+            margin-top: auto;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--error-color);
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
+            color: #4a5568;
+            text-align: left;
+        }
+
+        .form-group input, 
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--hover-color);
+        }
+
+        .address-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .city-state-zip {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            margin-top: 10px;
+            text-align: center;
+            font-size: 0.9em;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
-
     <header>
-        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
+        <img src="logo.png" alt="FormWiz Logo" onclick="location.href='index.html';">
         <nav>
             <a href="index.html">Home</a>
             <a href="forms.html">Forms</a>
             <a href="contact.html">Contact Us</a>
         </nav>
+        <div class="user-info">
+            <span class="welcome-message" id="welcome-message"></span>
+            <button class="settings-button" id="settings-button">👤</button>
+        </div>
     </header>
 
-<!-- My Forms Section -->
-    <section class="forms-section">
-        <h1>My Form Portfolio</h1>
-        <ul id="my-forms-list" class="forms-list">
-            <!-- User's forms will be dynamically inserted here -->
-        </ul>
-        <div id="no-forms-message" class="no-forms-message" style="display: none;">
-            You currently have no forms in your portfolio.
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeSettings()">&times;</span>
+            <h2>User Information</h2>
+            <form id="user-settings-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="settings-first-name">First Name</label>
+                        <input type="text" id="settings-first-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="settings-last-name">Last Name</label>
+                        <input type="text" id="settings-last-name" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="settings-email">Email</label>
+                    <input type="email" id="settings-email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="settings-phone">Phone Number</label>
+                    <input type="tel" id="settings-phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="123-456-7890" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Address</label>
+                    <div class="address-row">
+                        <div class="form-group">
+                            <input type="text" id="settings-street" placeholder="Street Address" required>
+                        </div>
+                        <div class="city-state-zip">
+                            <div class="form-group">
+                                <input type="text" id="settings-city" placeholder="City" required>
+                            </div>
+                            <div class="form-group">
+                                <select id="settings-state" required>
+                                    <option value="">State</option>
+                                    <option value="AL">AL</option>
+                                    <option value="AK">AK</option>
+                                    <option value="AZ">AZ</option>
+                                    <option value="AR">AR</option>
+                                    <option value="CA">CA</option>
+                                    <option value="CO">CO</option>
+                                    <option value="CT">CT</option>
+                                    <option value="DE">DE</option>
+                                    <option value="FL">FL</option>
+                                    <option value="GA">GA</option>
+                                    <option value="HI">HI</option>
+                                    <option value="ID">ID</option>
+                                    <option value="IL">IL</option>
+                                    <option value="IN">IN</option>
+                                    <option value="IA">IA</option>
+                                    <option value="KS">KS</option>
+                                    <option value="KY">KY</option>
+                                    <option value="LA">LA</option>
+                                    <option value="ME">ME</option>
+                                    <option value="MD">MD</option>
+                                    <option value="MA">MA</option>
+                                    <option value="MI">MI</option>
+                                    <option value="MN">MN</option>
+                                    <option value="MS">MS</option>
+                                    <option value="MO">MO</option>
+                                    <option value="MT">MT</option>
+                                    <option value="NE">NE</option>
+                                    <option value="NV">NV</option>
+                                    <option value="NH">NH</option>
+                                    <option value="NJ">NJ</option>
+                                    <option value="NM">NM</option>
+                                    <option value="NY">NY</option>
+                                    <option value="NC">NC</option>
+                                    <option value="ND">ND</option>
+                                    <option value="OH">OH</option>
+                                    <option value="OK">OK</option>
+                                    <option value="OR">OR</option>
+                                    <option value="PA">PA</option>
+                                    <option value="RI">RI</option>
+                                    <option value="SC">SC</option>
+                                    <option value="SD">SD</option>
+                                    <option value="TN">TN</option>
+                                    <option value="TX">TX</option>
+                                    <option value="UT">UT</option>
+                                    <option value="VT">VT</option>
+                                    <option value="VA">VA</option>
+                                    <option value="WA">WA</option>
+                                    <option value="WV">WV</option>
+                                    <option value="WI">WI</option>
+                                    <option value="WY">WY</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="settings-zip" placeholder="ZIP" pattern="[0-9]{5}" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">Save Changes</button>
+                <div class="error-message" id="settings-error"></div>
+            </form>
         </div>
-    </section>
+    </div>
 	
+	<br>
+	<center>
+	<h2 id="portfolio-welcome-message" style="color: var(--text-color); margin-bottom: 10px;"></h2>
+	</center>
+	
+
+<section class="forms-section">
+
+ 
+ 
+ 
+    <h1>My Form Portfolio</h1>
+    <ul id="my-forms-list" class="forms-list">
+        <!-- User's forms will be dynamically inserted here -->
+    </ul>
+    <div id="no-forms-message" class="no-forms-message" style="display: none;">
+        You currently have no forms in your portfolio.
+    </div>
+</section>
+
+    
     <!-- Available Forms Section -->
     <section class="forms-section">
         <h1>Available Forms</h1>
@@ -163,162 +455,257 @@
             <li><a href="#" data-form-id="fee-waiver" data-form-url="fee-waiver.html?formId=fee-waiver">Court Fees Waiver</a></li>
             <li><a href="#" data-form-id="example" data-form-url="example.html?formId=example">Example</a></li>
             <li><a href="#" data-form-id="example2" data-form-url="example2.html?formId=example2">Example2</a></li>
-			<li><a href="#" data-form-id="example3" data-form-url="example3.html?formId=example3">Example3</a></li>
-            <!-- Add more forms as needed -->
+            <li><a href="#" data-form-id="example3" data-form-url="example3.html?formId=example3">Example3</a></li>
+			<li><a href="#" data-form-id="smallclaims" data-form-url="smallclaims.html?formId=example3">Small Claims</a></li>
         </ul>
     </section>
 
-    
-	<center>
-<button class="logout-button" id="logout-button">Logout</button>
+    <center>
+	<br>
+        <button class="logout-button" id="logout-button">Logout</button>
+    </center><br><br>
 
-<br>
     <footer>
         &copy; 2024 FormWiz. All rights reserved.
     </footer>
 
-    <!-- Include Firebase SDKs -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-    <script>
-        // Your web app's Firebase configuration
-        var firebaseConfig = {
-            apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
-            authDomain: "formwiz-3f4fd.firebaseapp.com",
-            projectId: "formwiz-3f4fd",
-            storageBucket: "formwiz-3f4fd.appspot.com",
-            messagingSenderId: "404259212529",
-            appId: "1:404259212529:web:15a33bce82383b21cfed50",
-            measurementId: "G-P07YEN0HPD"
-        };
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        var db = firebase.firestore();
+ <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+        authDomain: "formwiz-3f4fd.firebaseapp.com",
+        projectId: "formwiz-3f4fd",
+        storageBucket: "formwiz-3f4fd.appspot.com",
+        messagingSenderId: "404259212529",
+        appId: "1:404259212529:web:15a33bce82383b21cfed50",
+        measurementId: "G-P07YEN0HPD"
+    };
 
-        // Logout functionality
-        const logoutButton = document.getElementById('logout-button');
-        logoutButton.addEventListener('click', () => {
-            firebase.auth().signOut().then(() => {
-                // Sign-out successful.
-                console.log('User signed out.');
-                window.location.href = 'index.html';
-            }).catch((error) => {
-                // An error happened.
-                console.error('Sign Out Error', error);
-            });
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // DOM Elements
+    const welcomeMessage = document.getElementById('welcome-message');
+    const settingsButton = document.getElementById('settings-button');
+    const logoutButton = document.getElementById('logout-button');
+    const settingsModal = document.getElementById('settings-modal');
+    const userSettingsForm = document.getElementById('user-settings-form');
+    const settingsError = document.getElementById('settings-error');
+    const myFormsList = document.getElementById('my-forms-list');
+    const availableFormsList = document.getElementById('available-forms-list');
+    const noFormsMessage = document.getElementById('no-forms-message');
+
+    // Modal Functions
+    function openSettings() {
+        settingsModal.style.display = 'block';
+    }
+
+    function closeSettings() {
+        settingsModal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == settingsModal) {
+            closeSettings();
+        }
+    };
+
+    // Logout Function
+    logoutButton.addEventListener('click', () => {
+        auth.signOut().then(() => {
+            window.location.href = 'index.html';
+        }).catch((error) => {
+            console.error('Sign Out Error', error);
         });
+    });
 
-        // Check if user is authenticated
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                // User is signed in, proceed to fetch and display forms
-                const userId = user.uid;
-                const myFormsList = document.getElementById('my-forms-list');
-                const availableFormsList = document.getElementById('available-forms-list');
-                const noFormsMessage = document.getElementById('no-forms-message');
-
-                // Function to render My Forms
-                function renderMyForms(forms) {
-                    myFormsList.innerHTML = ''; // Clear existing forms
-                    if (forms.length === 0) {
-                        noFormsMessage.style.display = 'block';
-                    } else {
-                        noFormsMessage.style.display = 'none';
-                        forms.forEach((form) => {
-                            const li = document.createElement('li');
-
-                            const a = document.createElement('a');
-                            a.href = form.url;
-                            a.textContent = form.name;
-
-                            const removeButton = document.createElement('button');
-                            removeButton.textContent = 'Remove';
-                            removeButton.classList.add('remove-button');
-                            removeButton.addEventListener('click', () => {
-                                // Remove form from Firestore
-                                db.collection('users').doc(userId).collection('myForms').doc(form.id).delete()
-                                    .then(() => {
-                                        // Remove form from UI
-                                        li.remove();
-                                        // Update forms array and check if empty
-                                        forms = forms.filter(f => f.id !== form.id);
-                                        if (forms.length === 0) {
-                                            noFormsMessage.style.display = 'block';
-                                        }
-                                    })
-                                    .catch((error) => {
-                                        console.error('Error removing form:', error);
-                                    });
-                            });
-
-                            li.appendChild(a);
-                            li.appendChild(removeButton); // Place the remove button under the form link
-                            myFormsList.appendChild(li);
-                        });
-                    }
-                }
-
-                // Fetch user's forms from Firestore
-                function fetchMyForms() {
-                    db.collection('users').doc(userId).collection('myForms').get()
-                        .then((querySnapshot) => {
-                            let forms = [];
-                            querySnapshot.forEach((doc) => {
-                                const formData = doc.data();
-                                formData.id = doc.id; // Save the document ID
-                                forms.push(formData);
-                            });
-                            renderMyForms(forms);
+    // Form Management Functions
+    function renderMyForms(forms) {
+        myFormsList.innerHTML = '';
+        if (forms.length === 0) {
+            noFormsMessage.style.display = 'block';
+        } else {
+            noFormsMessage.style.display = 'none';
+            forms.forEach((form) => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = form.url;
+                a.textContent = form.name;
+                
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'Remove';
+                removeButton.classList.add('remove-button');
+                removeButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    db.collection('users').doc(auth.currentUser.uid).collection('forms').doc(form.id).delete()
+                        .then(() => {
+                            li.remove();
+                            if (myFormsList.children.length === 0) {
+                                noFormsMessage.style.display = 'block';
+                            }
                         })
                         .catch((error) => {
-                            console.error('Error fetching user forms:', error);
+                            console.error('Error removing form:', error);
                         });
-                }
-
-                fetchMyForms(); // Initial fetch
-
-                // Add click event listeners to available forms
-                availableFormsList.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (e.target && e.target.nodeName === 'A') {
-                        const formId = e.target.getAttribute('data-form-id');
-                        const formUrl = e.target.getAttribute('data-form-url');
-                        const formName = e.target.textContent;
-
-                        // Check if form already exists in My Forms
-                        db.collection('users').doc(userId).collection('myForms').doc(formId).get()
-                            .then((doc) => {
-                                if (doc.exists) {
-                                    alert('You have already added this form to your portfolio.');
-                                } else {
-                                    // Add form to user's My Forms in Firestore
-                                    db.collection('users').doc(userId).collection('myForms').doc(formId).set({
-                                        name: formName,
-                                        url: formUrl,
-                                        id: formId
-                                    })
-                                    .then(() => {
-                                        // Update My Forms section
-                                        fetchMyForms();
-                                    })
-                                    .catch((error) => {
-                                        console.error('Error adding form to My Forms:', error);
-                                    });
-                                }
-                            })
-                            .catch((error) => {
-                                console.error('Error checking if form exists:', error);
-                            });
-                    }
                 });
-            } else {
-                // No user is signed in, redirect to login page
-                window.location.href = 'account.html';
-            }
-        });
-    </script>
 
+                li.appendChild(a);
+                li.appendChild(removeButton);
+                myFormsList.appendChild(li);
+            });
+        }
+    }
+
+    function fetchMyForms(userId) {
+        db.collection('users').doc(userId).collection('forms').get()
+            .then((querySnapshot) => {
+                const forms = [];
+                querySnapshot.forEach((doc) => {
+                    forms.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                renderMyForms(forms);
+            })
+            .catch((error) => {
+                console.error('Error fetching user forms:', error);
+            });
+    }
+
+    // Available Forms Click Handler
+    availableFormsList.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (e.target.tagName === 'A') {
+            const formId = e.target.getAttribute('data-form-id');
+            const formUrl = e.target.getAttribute('data-form-url');
+            const formName = e.target.textContent;
+            const userId = auth.currentUser.uid;
+
+            try {
+                // Check if form exists in user's collection
+                const formDoc = await db.collection('users').doc(userId).collection('forms').doc(formId).get();
+                
+                if (formDoc.exists) {
+                    alert('You already have this form in your portfolio.');
+                } else {
+                    // Add new form to user's collection
+                    await db.collection('users').doc(userId).collection('forms').doc(formId).set({
+                        name: formName,
+                        url: formUrl,
+                        addedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    // Refresh the forms list
+                    fetchMyForms(userId);
+                }
+            } catch (error) {
+                console.error('Error handling form:', error);
+            }
+        }
+    });
+
+    // User Settings Form Handler
+    userSettingsForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        settingsError.textContent = '';
+        
+        const userId = auth.currentUser.uid;
+        const updatedData = {
+            firstName: document.getElementById('settings-first-name').value.trim(),
+            lastName: document.getElementById('settings-last-name').value.trim(),
+            email: document.getElementById('settings-email').value.trim(),
+            phone: document.getElementById('settings-phone').value.trim(),
+            address: {
+                street: document.getElementById('settings-street').value.trim(),
+                city: document.getElementById('settings-city').value.trim(),
+                state: document.getElementById('settings-state').value,
+                zip: document.getElementById('settings-zip').value.trim()
+            },
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        try {
+            // Update user document (create if doesn't exist)
+            await db.collection('users').doc(userId).set(updatedData, { merge: true });
+            
+            // Update welcome message
+            welcomeMessage.textContent = `Welcome ${updatedData.firstName} ${updatedData.lastName}`;
+            
+            // Update auth email if changed
+            if (auth.currentUser.email !== updatedData.email) {
+                await auth.currentUser.updateEmail(updatedData.email);
+            }
+            
+            closeSettings();
+        } catch (error) {
+            settingsError.textContent = error.message;
+            console.error('Error updating profile:', error);
+        }
+    });
+
+    // Update the auth state listener in forms.html
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        try {
+            // Get user document from Firestore
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                
+                // Update welcome message with actual name
+                welcomeMessage.textContent = `${userData.firstName} ${userData.lastName}`;
+document.getElementById('portfolio-welcome-message').textContent = `Welcome, ${userData.firstName} ${userData.lastName}`;
+
+                // Pre-populate settings form
+                document.getElementById('settings-first-name').value = userData.firstName || '';
+                document.getElementById('settings-last-name').value = userData.lastName || '';
+                document.getElementById('settings-email').value = userData.email || user.email || '';
+                document.getElementById('settings-phone').value = userData.phone || '';
+                document.getElementById('settings-street').value = userData.address?.street || '';
+                document.getElementById('settings-city').value = userData.address?.city || '';
+                document.getElementById('settings-state').value = userData.address?.state || '';
+                document.getElementById('settings-zip').value = userData.address?.zip || '';
+                
+                // Load user's forms
+                fetchMyForms(user.uid);
+            } else {
+                // Create user document if it doesn't exist
+                const newUserData = {
+                    firstName: '',
+                    lastName: '',
+                    email: user.email,
+                    phone: '',
+                    address: {
+                        street: '',
+                        city: '',
+                        state: '',
+                        zip: ''
+                    },
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                await db.collection('users').doc(user.uid).set(newUserData);
+                welcomeMessage.textContent = `Welcome User`;
+            }
+        } catch (error) {
+            console.error('Error loading user data:', error);
+            welcomeMessage.textContent = 'Welcome User';
+        }
+        
+        settingsButton.addEventListener('click', openSettings);
+    } else {
+        window.location.href = 'account.html';
+    }
+});
+</script>
 </body>
 </html>
