@@ -1128,10 +1128,11 @@ document.addEventListener("DOMContentLoaded", function() {
       let label = "";
       
       if (nodeType === 'question') {
-        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;spacing=12;fontSize=16;";
+        // Include more styling to ensure content is properly centered and aligned
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;spacing=12;fontSize=16;align=center;verticalAlign=middle;";
         label = "question node"; // Use lowercase to match the pattern in refreshAllCells
       } else if (nodeType === 'options') {
-        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;align=center;";
         label = "Option Text";
       }
       
@@ -1142,7 +1143,7 @@ document.addEventListener("DOMContentLoaded", function() {
         window.emptySpaceClickX, 
         window.emptySpaceClickY, 
         160, 
-        60, 
+        80,  // Make slightly taller to better accommodate the dropdown
         style
       );
       
@@ -1252,11 +1253,11 @@ function escapeAttr(str) {
 
 function updateMultipleTextboxesCell(cell) {
   const qText = cell._questionText || "Enter question text";
-  let html = `<div class="multiple-textboxes-node">
-    <div class="question-text" style="text-align: center; padding: 8px;" contenteditable="true"onclick="window.handleMultipleTextboxClick(event, '${cell.id}')"onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')"onblur="window.updateQuestionTextHandler('${cell.id}', this.innerText)">
+  let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
+    <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true"onclick="window.handleMultipleTextboxClick(event, '${cell.id}')"onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')"onblur="window.updateQuestionTextHandler('${cell.id}', this.innerText)">
       ${escapeHtml(qText)}
     </div>
-    <div class="multiple-textboxes-container" style="padding: 8px;">`;
+    <div class="multiple-textboxes-container" style="padding: 8px; width:100%;">`;
 
   if (!cell._textboxes) {
     cell._textboxes = [{ nameId: "", placeholder: "Enter value" }];
@@ -1266,13 +1267,13 @@ function updateMultipleTextboxesCell(cell) {
     const val = tb.nameId || "";
     const ph = tb.placeholder || "Enter value";
     html += 
-      `<div class="textbox-entry">
+      `<div class="textbox-entry" style="margin-bottom:8px; text-align:center;">
         <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}"onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)"/>
         <button onclick="window.deleteMultipleTextboxHandler('${cell.id}', ${index})">Delete</button>
       </div>`;
   });
 
-  html += `<br><br><button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button>
+  html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button></div>
     </div>
   </div>`;
 
@@ -1287,6 +1288,9 @@ function updateMultipleTextboxesCell(cell) {
     }
     if (!st.includes("html=1")) {
       st += "html=1;";
+    }
+    if (!st.includes("verticalAlign=middle")) {
+      st += "verticalAlign=middle;";
     }
     graph.getModel().setStyle(cell, st);
   } finally {
@@ -1362,22 +1366,22 @@ function updatemultipleDropdownTypeCell(cell) {
     cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
   }
 
-  let html = `<div class="multiple-textboxes-node">
-    <div class="question-text" contenteditable="true"onfocus="if(this.innerText==='Enter question text'){this.innerText='';}"ondblclick="event.stopPropagation(); this.focus();"onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.innerText)">
+  let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
+    <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true"onfocus="if(this.innerText==='Enter question text'){this.innerText='';}"ondblclick="event.stopPropagation(); this.focus();"onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.innerText)">
       ${escapeHtml(qText)}
     </div>
-    <div class="two-number-container" style="display: flex; gap: 10px; margin-top: 8px;">
+    <div class="two-number-container" style="display: flex; justify-content:center; gap: 10px; margin-top: 8px; width:100%;">
       <input type="number" value="${escapeAttr(twoNums.first)}"onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'first', this.value)"/>
       <input type="number" value="${escapeAttr(twoNums.second)}"onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)"/>
     </div>
-    <div class="multiple-textboxes-container" style="margin-top: 8px;">`;
+    <div class="multiple-textboxes-container" style="margin-top: 8px; width:100%;">`;
 
   cell._textboxes.forEach((tb, index) => {
     const val = tb.nameId || "";
     const ph = tb.placeholder || "Enter value";
     const checked = tb.isAmountOption ? "checked" : "";
     html += `
-      <div class="textbox-entry" style="margin-bottom:4px;">
+      <div class="textbox-entry" style="margin-bottom:4px; text-align:center;">
         <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}"onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)"/>
         <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
         <label>
@@ -1387,13 +1391,17 @@ function updatemultipleDropdownTypeCell(cell) {
       </div>`;
   });
 
-  html += `<button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
+  html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button></div>
     </div>
   </div>`;
 
   graph.getModel().beginUpdate();
   try {
     graph.getModel().setValue(cell, html);
+    let st = cell.style || "";
+    if (!st.includes("verticalAlign=middle")) {
+      st += "verticalAlign=middle;";
+    }
   } finally {
     graph.getModel().endUpdate();
   }
@@ -1832,8 +1840,8 @@ window.pickTypeForCell = function(cellId, val) {
       c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
       updatemultipleDropdownTypeCell(c);
     } else {
-      c.value = val.charAt(0).toUpperCase() + val.slice(1) + " question node";
-      graph.getModel().setStyle(c, c.style + ";spacingTop=10;");
+      c.value = `<div style="text-align:center;">${val.charAt(0).toUpperCase() + val.slice(1)} question node</div>`;
+      graph.getModel().setStyle(c, c.style + ";spacingTop=10;verticalAlign=middle;");
     }
   } finally {
     graph.getModel().endUpdate();
@@ -1948,17 +1956,19 @@ function refreshAllCells() {
     if (isQuestion(cell) &&
        (cell.value === "question node" || cell.value === "Question Node")) {
       cell.value = `
-        <select oninput="window.pickTypeForCell('${cell.id}', this.value)">
-          <option value="">-- Choose Type --</option>
-          <option value="text">Text</option>
-          <option value="checkbox">Checkbox</option>
-          <option value="dropdown">Dropdown</option>
-          <option value="number">Number</option>
-          <option value="date">Date</option>
-          <option value="bigParagraph">Big Paragraph</option>
-          <option value="multipleTextboxes">Multiple Textboxes</option>
-          <option value="multipleDropdownType">Multiple Dropdown Type</option>
-        </select>`;
+        <div style="display: flex; justify-content: center; align-items: center; height:100%;">
+          <select style="margin:auto;" oninput="window.pickTypeForCell('${cell.id}', this.value)">
+            <option value="">-- Choose Type --</option>
+            <option value="text">Text</option>
+            <option value="checkbox">Checkbox</option>
+            <option value="dropdown">Dropdown</option>
+            <option value="number">Number</option>
+            <option value="date">Date</option>
+            <option value="bigParagraph">Big Paragraph</option>
+            <option value="multipleTextboxes">Multiple Textboxes</option>
+            <option value="multipleDropdownType">Multiple Dropdown Type</option>
+          </select>
+        </div>`;
     }
   });
 
