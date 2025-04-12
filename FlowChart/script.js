@@ -2230,9 +2230,43 @@ window.importFlowchartJson = function (evt) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = function(e) {
-    const jsonData = JSON.parse(e.target.result);
-    loadFlowchartData(jsonData);
-    currentFlowchartName = null;
+    try {
+      let jsonString = e.target.result;
+      
+      // Add debugging
+      console.log("Original input:", jsonString.substring(0, 100) + "...");
+      
+      // Check if the string starts and ends with quotes (might be a quoted JSON string)
+      if (jsonString.startsWith('"') && jsonString.endsWith('"')) {
+        console.log("Detected quoted JSON string, unquoting...");
+        // Remove the outer quotes and unescape internal quotes
+        jsonString = jsonString.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+        console.log("After unquoting:", jsonString.substring(0, 100) + "...");
+      }
+      
+      // Alternative approach: Try to parse the JSON directly
+      let jsonData;
+      try {
+        jsonData = JSON.parse(jsonString);
+      } catch (parseError) {
+        console.log("Initial parsing failed, trying workaround...", parseError);
+        // Try an alternative approach - this can handle double-stringified JSON
+        jsonData = JSON.parse(JSON.stringify(eval("(" + jsonString + ")")));
+      }
+      
+      // Validate that it has cells property
+      if (!jsonData || !jsonData.cells || !Array.isArray(jsonData.cells)) {
+        console.error("Invalid JSON structure:", jsonData);
+        throw new Error("Invalid flowchart data: missing cells array");
+      }
+      
+      console.log("Successfully parsed JSON with", jsonData.cells.length, "cells");
+      loadFlowchartData(jsonData);
+      currentFlowchartName = null;
+    } catch (error) {
+      console.error("Error importing flowchart:", error);
+      alert("Error importing flowchart: " + error.message);
+    }
   };
   reader.readAsText(file);
 };
@@ -2767,11 +2801,25 @@ window.exportGuiJson = function() {
       const incomingEdges = graph.getIncomingEdges(cell) || [];
       for (const edge of incomingEdges) {
         const sourceCell = edge.source;
-        if (sourceCell && isQuestion(sourceCell)) {
-          // This is a question-to-question connection
+        if (sourceCell && isQuestion(sourceCell) && !isOptions(sourceCell)) {
+          // This is a direct question-to-question connection
           const parentQuestionId = questionIdMap.get(sourceCell.id);
           
           if (parentQuestionId) {
+            // Check if this is from a number/money question or another type
+            const parentQuestionType = getQuestionType(sourceCell);
+            
+            // If it's a number/money question, add "Any Amount" condition
+            if (parentQuestionType === "number") {
+              question.logic.enabled = true;
+              question.logic.conditions.push({
+                prevQuestion: parentQuestionId.toString(),
+                prevAnswer: "Any Amount"
+              });
+              // Continue to next connection since we've handled this one
+              continue;
+            }
+            
             // Find the parent question in the JSON
             let parentQuestion = null;
             for (const sec of sections) {
@@ -2780,8 +2828,16 @@ window.exportGuiJson = function() {
             }
             
             if (parentQuestion) {
-              // Check if the parent is a numberedDropdown question
-              if (parentQuestion.type === "numberedDropdown") {
+              // Special handling for money/number questions
+              if (parentQuestion.type === "money") {
+                question.logic.enabled = true;
+                question.logic.conditions.push({
+                  prevQuestion: parentQuestionId.toString(),
+                  prevAnswer: "Any Amount"
+                });
+              }
+              // Special handling for numberedDropdown questions
+              else if (parentQuestion.type === "numberedDropdown") {
                 // For numberedDropdown questions, add a condition for each possible value
                 const min = parseInt(parentQuestion.min || "1", 10);
                 const max = parseInt(parentQuestion.max || "1", 10);
@@ -2831,10 +2887,11 @@ window.exportGuiJson = function() {
                     });
                   }
                 } else {
-                  // For other types, just use an empty answer or "Any Text" for text questions
+                  // For other types, use appropriate default answers
                   question.logic.conditions.push({
                     prevQuestion: parentQuestionId.toString(),
-                    prevAnswer: parentQuestion.type === "text" ? "Any Text" : ""
+                    prevAnswer: parentQuestion.type === "text" ? "Any Text" : 
+                               (parentQuestion.type === "number" || parentQuestion.type === "money") ? "Any Amount" : ""
                   });
                 }
               }
@@ -2842,9 +2899,13 @@ window.exportGuiJson = function() {
           }
         }
       }
-      
-      // Remove duplicates from logic conditions
-      if (question.logic.conditions.length > 0) {
+    }
+  }
+
+  // Deduplicate logic conditions for all questions
+  for (const section of sections) {
+    for (const question of section.questions) {
+      if (question.logic && question.logic.conditions && question.logic.conditions.length > 0) {
         const uniqueConditions = [];
         const seen = new Set();
         
@@ -3002,17 +3063,23 @@ window.exportGuiJson = function() {
   }
 
   // Create the final JSON object
-  const jsonData = {
-    sections,
-    hiddenFields,
-    sectionCounter,
-    questionCounter,
-    hiddenFieldCounter,
-    defaultPDFName
+  const guiJson = {
+    sections: sections,
+    hiddenFields: hiddenFields,
+    sectionCounter: sectionCounter,
+    questionCounter: questionCounter,
+    hiddenFieldCounter: hiddenFieldCounter,
+    defaultPDFName: ""
   };
-
+  
+  // For debugging, display full information about connections
+  console.log("Final GUI JSON:", JSON.stringify(guiJson, null, 2));
+  
   // Download the JSON file
-  downloadJson(JSON.stringify(jsonData, null, 2), "gui.json");
+  downloadJson(JSON.stringify(guiJson, null, 2), "gui.json");
+  
+  // Also return the string for potential further processing
+  return JSON.stringify(guiJson, null, 2);
 };
 
 /***********************************************
@@ -3569,3 +3636,81 @@ window.updateDropdownQuestionText = function(cellId, text) {
     graph.updateCellSize(cell);
   }
 };
+
+// Add a function to directly import a JSON string
+window.importFlowchartJsonDirectly = function(jsonString) {
+  try {
+    if (!jsonString) {
+      throw new Error("No data provided");
+    }
+    
+    console.log("Original input:", jsonString.substring(0, 100) + "...");
+    
+    // Check if the string starts and ends with quotes
+    if (jsonString.startsWith('"') && jsonString.endsWith('"')) {
+      console.log("Detected quoted JSON string, unquoting...");
+      jsonString = jsonString.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+      console.log("After unquoting:", jsonString.substring(0, 100) + "...");
+    }
+    
+    // Try to parse the JSON
+    let jsonData;
+    try {
+      jsonData = JSON.parse(jsonString);
+    } catch (parseError) {
+      console.log("Initial parsing failed, trying workaround...", parseError);
+      // Fallback approach for handling complex cases
+      jsonData = JSON.parse(JSON.stringify(eval("(" + jsonString + ")")));
+    }
+    
+    // Check if this is a GUI JSON instead of a flowchart JSON
+    if (jsonData.sections && Array.isArray(jsonData.sections) && !jsonData.cells) {
+      throw new Error("You are trying to import a GUI JSON. Please import a flowchart JSON that has a 'cells' property.");
+    }
+    
+    // Validate the JSON data
+    if (!jsonData || !jsonData.cells || !Array.isArray(jsonData.cells)) {
+      console.error("Invalid JSON structure:", jsonData);
+      throw new Error("Invalid flowchart data: missing cells array. Make sure you're importing a flowchart JSON, not a GUI JSON.");
+    }
+    
+    console.log("Successfully parsed JSON with", jsonData.cells.length, "cells");
+    loadFlowchartData(jsonData);
+    currentFlowchartName = null;
+    return true;
+  } catch (error) {
+    console.error("Error importing flowchart:", error);
+    alert("Error importing flowchart: " + error.message);
+    return false;
+  }
+};
+
+// Add a UI element to import JSON directly
+document.addEventListener('DOMContentLoaded', function() {
+  // Add button to the toolbar
+  const toolbar = document.querySelector('.toolbar');
+  if (toolbar) {
+    // Import flowchart JSON button
+    const importDirectlyBtn = document.createElement('button');
+    importDirectlyBtn.textContent = 'Import Flowchart JSON';
+    importDirectlyBtn.className = 'toolbar-button';
+    importDirectlyBtn.title = 'Import a flowchart JSON (with cells property), not a GUI JSON';
+    importDirectlyBtn.onclick = function() {
+      const jsonString = prompt("Paste your flowchart JSON here (must have cells property):");
+      if (jsonString) {
+        window.importFlowchartJsonDirectly(jsonString);
+      }
+    };
+    toolbar.appendChild(importDirectlyBtn);
+    
+    // Export GUI JSON button
+    const exportGuiJsonBtn = document.createElement('button');
+    exportGuiJsonBtn.textContent = 'Export GUI JSON';
+    exportGuiJsonBtn.className = 'toolbar-button';
+    exportGuiJsonBtn.title = 'Export the current flowchart as GUI JSON (sections format)';
+    exportGuiJsonBtn.onclick = function() {
+      window.exportGuiJson();
+    };
+    toolbar.appendChild(exportGuiJsonBtn);
+  }
+});
