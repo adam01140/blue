@@ -247,6 +247,12 @@ else if (question.type === 'numberedDropdown') {
             if (amountInput) amountInput.value = amountValue;
         });
     }
+    
+    // After setting min/max values, update any jump logic dropdowns
+    // This ensures the number range options are populated correctly
+    if (question.jump && question.jump.enabled) {
+        updateJumpOptionsForNumberedDropdown(question.questionId);
+    }
 }
                 else if (
                     // Text-like question types
@@ -298,15 +304,15 @@ else if (question.type === 'numberedDropdown') {
             const jumpConditionsDiv = questionBlock.querySelector(`#jumpConditions${question.questionId}`);
             if (jumpConditionsDiv) jumpConditionsDiv.innerHTML = '';
 
+            // For numbered dropdown, populate options based on min/max first
+            if (question.type === 'numberedDropdown') {
+                updateJumpOptionsForNumberedDropdown(question.questionId);
+            }
+
             // Add all conditions from import
             (question.jump.conditions || []).forEach((cond, index) => {
                 addJumpCondition(question.questionId);
                 const conditionId = index + 1;
-                const jumpOptionSelect = questionBlock.querySelector(`#jumpOption${question.questionId}_${conditionId}`);
-                const jumpToInput = questionBlock.querySelector(`#jumpTo${question.questionId}_${conditionId}`);
-                
-                if (jumpOptionSelect) jumpOptionSelect.value = cond.option;
-                if (jumpToInput) jumpToInput.value = cond.to;
                 
                 // Update options for the dropdown based on question type
                 if (question.type === 'dropdown') {
@@ -318,6 +324,13 @@ else if (question.type === 'numberedDropdown') {
                 } else if (question.type === 'numberedDropdown') {
                     updateJumpOptionsForNumberedDropdown(question.questionId, conditionId);
                 }
+                
+                // After options are populated, set the selected value
+                const jumpOptionSelect = questionBlock.querySelector(`#jumpOption${question.questionId}_${conditionId}`);
+                const jumpToInput = questionBlock.querySelector(`#jumpTo${question.questionId}_${conditionId}`);
+                
+                if (jumpOptionSelect) jumpOptionSelect.value = cond.option;
+                if (jumpToInput) jumpToInput.value = cond.to;
             });
         }
               

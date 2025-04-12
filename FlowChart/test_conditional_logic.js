@@ -129,4 +129,85 @@ console.log(JSON.stringify(result, null, 2));
 
 // Save to a file for inspection
 fs.writeFileSync('test_export.json', JSON.stringify(result, null, 2));
-console.log('Test export saved to test_export.json'); 
+console.log('Test export saved to test_export.json');
+
+// This is a test file for updating the conditional logic in GUI JSON export
+
+// First, let's create a fixed version of the exportGuiJson function that properly handles:
+// 1. Dropdown questions with End connections (enabled=true, empty conditions)
+// 2. Numbereddropdown questions with proper logic conditions from parent options
+// 3. Numberedropdown questions with proper End connections
+
+function fixedExportGuiJson(cells, questionCellMap, questionIdMap) {
+  // Create sections structure
+  const sections = [];
+  const hiddenFields = [];
+  let sectionCounter = 1;
+  let questionCounter = 1;
+  let hiddenFieldCounter = 3;
+  let defaultPDFName = "";
+
+  // Process each question to determine logic conditions and jump conditions
+  for (const section of sections) {
+    for (const question of section.questions) {
+      const cell = questionCellMap.get(question.questionId);
+      if (!cell) continue;
+      
+      // We're focusing on the logic conditions
+      
+      // Reset logic conditions
+      question.logic.conditions = [];
+      question.logic.enabled = false;
+      
+      // Process incoming edges to determine logic conditions
+      const incomingEdges = graph.getIncomingEdges(cell) || [];
+      
+      for (const edge of incomingEdges) {
+        const sourceCell = edge.source;
+        
+        if (sourceCell && isOptions(sourceCell)) {
+          // Direct condition from an option
+          const optionText = sourceCell.value.replace(/<[^>]+>/g, "").trim();
+          
+          // Find the parent question of this option
+          const optionIncomingEdges = graph.getIncomingEdges(sourceCell) || [];
+          for (const optionEdge of optionIncomingEdges) {
+            const parentQuestionCell = optionEdge.source;
+            
+            if (parentQuestionCell && isQuestion(parentQuestionCell)) {
+              const parentQuestionId = questionIdMap.get(parentQuestionCell.id);
+              
+              if (parentQuestionId) {
+                // We found a direct conditional relationship
+                question.logic.enabled = true;
+                
+                // Check if this condition already exists
+                const existingCondition = question.logic.conditions.find(
+                  c => c.prevQuestion === parentQuestionId.toString() && 
+                       c.prevAnswer === optionText
+                );
+                
+                if (!existingCondition) {
+                  // Add the condition
+                  question.logic.conditions.push({
+                    prevQuestion: parentQuestionId.toString(),
+                    prevAnswer: optionText
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return {
+    sections,
+    hiddenFields,
+    sectionCounter,
+    questionCounter,
+    hiddenFieldCounter,
+    defaultPDFName
+  };
+} 

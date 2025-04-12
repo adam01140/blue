@@ -651,19 +651,29 @@ function toggleJumpLogic(questionId) {
     const enabled = document.getElementById(`enableJump${questionId}`).checked;
     
     jumpBlock.style.display = enabled ? 'block' : 'none';
-    if (enabled && jumpBlock.querySelector('#jumpConditions' + questionId).children.length === 0) {
-        addJumpCondition(questionId); // Add first condition automatically
-        
-        // Make sure options are populated based on question type
+    if (enabled) {
+        const jumpConditionsDiv = document.getElementById(`jumpConditions${questionId}`);
+        // Get the question type to determine how to populate options
         const questionType = document.getElementById(`questionType${questionId}`).value;
-        if (questionType === 'numberedDropdown') {
+        
+        // If there are no conditions yet, add the first one
+        if (jumpConditionsDiv && jumpConditionsDiv.children.length === 0) {
+            addJumpCondition(questionId); // Add first condition automatically
+            
+            // Make sure options are populated based on question type
+            if (questionType === 'numberedDropdown') {
+                updateJumpOptionsForNumberedDropdown(questionId);
+            } else if (questionType === 'dropdown') {
+                updateJumpOptions(questionId);
+            } else if (questionType === 'radio') {
+                updateJumpOptionsForRadio(questionId);
+            } else if (questionType === 'checkbox') {
+                updateJumpOptionsForCheckbox(questionId);
+            }
+        } else if (questionType === 'numberedDropdown') {
+            // If conditions already exist but we're re-enabling jump logic,
+            // make sure numbered dropdown options are populated
             updateJumpOptionsForNumberedDropdown(questionId);
-        } else if (questionType === 'dropdown') {
-            updateJumpOptions(questionId);
-        } else if (questionType === 'radio') {
-            updateJumpOptionsForRadio(questionId);
-        } else if (questionType === 'checkbox') {
-            updateJumpOptionsForCheckbox(questionId);
         }
     }
 }
@@ -985,9 +995,20 @@ function updateJumpOptionsForNumberedDropdown(questionId, conditionId = null) {
  * Updates jump options for numbered dropdown when range values change
  */
 function updateNumberedDropdownEvents(questionId) {
-    // Update any jump conditions that exist for this question
+    // Get the current question type to confirm it's still a numbered dropdown
     const questionType = document.getElementById(`questionType${questionId}`).value;
     if (questionType === 'numberedDropdown') {
-        updateJumpOptionsForNumberedDropdown(questionId);
+        // Update all existing jump conditions for this question
+        const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
+        if (jumpConditions.length > 0) {
+            updateJumpOptionsForNumberedDropdown(questionId);
+        } else {
+            // If there are no jump conditions but jump logic is enabled,
+            // we should still update the options in case they add one later
+            const jumpEnabled = document.getElementById(`enableJump${questionId}`)?.checked || false;
+            if (jumpEnabled) {
+                updateJumpOptionsForNumberedDropdown(questionId);
+            }
+        }
     }
 }

@@ -2523,6 +2523,24 @@ window.exportGuiJson = function() {
     }
   }
   
+  // Create a helper function to find all option nodes that lead to a question
+  function findOptionsThatLeadTo(questionCell) {
+    const result = [];
+    for (const cellId in cells) {
+      const cell = cells[cellId];
+      if (!cell.isVertex() || !isOptions(cell)) continue;
+      
+      const outEdges = graph.getOutgoingEdges(cell) || [];
+      for (const edge of outEdges) {
+        if (edge.target === questionCell) {
+          result.push(cell);
+          break;
+        }
+      }
+    }
+    return result;
+  }
+
   // Third pass: Determine conditional logic between questions
   for (const section of sections) {
     for (const question of section.questions) {
@@ -2540,70 +2558,90 @@ window.exportGuiJson = function() {
       
       // Check for options that connect to END nodes
       const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-      for (const edge of outgoingEdges) {
-        const targetOptionCell = edge.target;
-        if (targetOptionCell && isOptions(targetOptionCell)) {
-          const optionText = targetOptionCell.value.replace(/<[^>]+>/g, "").trim();
-          
-          // Check if this option leads to an END node
-          const optionOutgoingEdges = graph.getOutgoingEdges(targetOptionCell) || [];
-          for (const optionEdge of optionOutgoingEdges) {
-            const endNodeCell = optionEdge.target;
-            if (endNodeCell && isEndNode(endNodeCell)) {
-              // This option jumps to an END node
-              question.jump.enabled = true;
-              
-              // Capitalize first letter of option for consistency
-              const capitalizedOption = optionText.charAt(0).toUpperCase() + optionText.slice(1);
-              
+      
+      // Special handling for multipleDropdownType/numberedDropdown questions connected to END nodes
+      if (question.type === "numberedDropdown") {
+        for (const edge of outgoingEdges) {
+          const targetCell = edge.target;
+          if (targetCell && isEndNode(targetCell)) {
+            // This numberedDropdown question jumps directly to an END node
+            question.jump.enabled = true;
+            
+            // Generate jump conditions for each number in the range
+            const min = parseInt(question.min || "1", 10);
+            const max = parseInt(question.max || "1", 10);
+            
+            for (let i = min; i <= max; i++) {
               question.jump.conditions.push({
-                option: capitalizedOption,
+                option: i.toString(),
                 to: "end"
+              });
+            }
+            
+            // We've handled this cell, break the loop
+            break;
+          }
+        }
+      } 
+      // Handle standard dropdown questions
+      else if (question.type === "dropdown") {
+        // First check if any option connects to an END node
+        let hasEndConnection = false;
+        
+        for (const edge of outgoingEdges) {
+          const targetOptionCell = edge.target;
+          if (targetOptionCell && isOptions(targetOptionCell)) {
+            const optionOutgoingEdges = graph.getOutgoingEdges(targetOptionCell) || [];
+            for (const optionEdge of optionOutgoingEdges) {
+              const endNodeCell = optionEdge.target;
+              if (endNodeCell && isEndNode(endNodeCell)) {
+                hasEndConnection = true;
+                // If options lead to an END node, set jump enabled but with empty conditions
+                question.jump.enabled = true;
+                // Don't add specific conditions for dropdown
+                break;
+              }
+            }
+            if (hasEndConnection) break;
+          }
+        }
+      }
+      
+      // Find all option nodes that directly lead to this question
+      const optionsThatLeadToThis = findOptionsThatLeadTo(cell);
+      
+      // Process these options to determine logic conditions
+      for (const optionNode of optionsThatLeadToThis) {
+        const optionText = optionNode.value.replace(/<[^>]+>/g, "").trim();
+        
+        // Find the parent question of this option
+        const optionIncomingEdges = graph.getIncomingEdges(optionNode) || [];
+        for (const optionEdge of optionIncomingEdges) {
+          const parentQuestionCell = optionEdge.source;
+          
+          if (parentQuestionCell && isQuestion(parentQuestionCell)) {
+            const parentQuestionId = questionIdMap.get(parentQuestionCell.id);
+            
+            if (parentQuestionId) {
+              // We found a direct conditional relationship - add it to the logic
+              question.logic.enabled = true;
+              
+              // Add the condition (capitalize the option text for consistency)
+              const capitalizedOption = optionText.charAt(0).toUpperCase() + optionText.slice(1);
+              question.logic.conditions.push({
+                prevQuestion: parentQuestionId.toString(),
+                prevAnswer: capitalizedOption
               });
             }
           }
         }
       }
       
-      // Check for direct incoming edges from option cells
+      // Check for direct incoming edges from other questions
       const incomingEdges = graph.getIncomingEdges(cell) || [];
-      
-      // Process all incoming edges to determine direct conditions
       for (const edge of incomingEdges) {
         const sourceCell = edge.source;
-        
-        if (sourceCell && isOptions(sourceCell)) {
-          // This is a direct condition - question depends on this option being selected
-          const optionText = sourceCell.value.replace(/<[^>]+>/g, "").trim();
-          
-          // Find the parent question of this option
-          const optionIncomingEdges = graph.getIncomingEdges(sourceCell) || [];
-          for (const optionEdge of optionIncomingEdges) {
-            const parentQuestionCell = optionEdge.source;
-            
-            if (parentQuestionCell && isQuestion(parentQuestionCell)) {
-              const parentQuestionId = questionIdMap.get(parentQuestionCell.id);
-              
-              if (parentQuestionId) {
-                // We found a direct conditional relationship - add it to the logic
-                question.logic.enabled = true;
-                
-                // Only add if this specific condition doesn't already exist
-                const existingCondition = question.logic.conditions.find(
-                  c => c.prevQuestion === parentQuestionId.toString() && c.prevAnswer === optionText
-                );
-                
-                if (!existingCondition) {
-                  // Add ONLY the direct condition from the immediate parent option
-                  question.logic.conditions.push({
-                    prevQuestion: parentQuestionId.toString(),
-                    prevAnswer: optionText.charAt(0).toUpperCase() + optionText.slice(1)
-                  });
-                }
-              }
-            }
-          }
-        } else if (sourceCell && isQuestion(sourceCell)) {
+        if (sourceCell && isQuestion(sourceCell)) {
           // This is a question-to-question connection
           // The current question should inherit all conditions from the parent question
           const parentQuestionId = questionIdMap.get(sourceCell.id);
@@ -2622,38 +2660,30 @@ window.exportGuiJson = function() {
               
               // Inherit all conditions from the parent question
               parentQuestion.logic.conditions.forEach(condition => {
-                // Only add if this specific condition doesn't already exist
-                const existingCondition = question.logic.conditions.find(
-                  c => c.prevQuestion === condition.prevQuestion && c.prevAnswer === condition.prevAnswer
-                );
-                
-                if (!existingCondition) {
-                  question.logic.conditions.push({
-                    prevQuestion: condition.prevQuestion,
-                    prevAnswer: condition.prevAnswer.charAt(0).toUpperCase() + condition.prevAnswer.slice(1)
-                  });
-                }
+                // Add the parent's condition
+                question.logic.conditions.push({
+                  prevQuestion: condition.prevQuestion,
+                  prevAnswer: condition.prevAnswer
+                });
               });
             }
           }
         }
       }
       
-      // Check for duplicate conditions that could have been added by multiple paths
+      // Remove duplicates from logic conditions
       if (question.logic.conditions.length > 0) {
-        // Create a unique set of conditions based on prevQuestion and prevAnswer
         const uniqueConditions = [];
-        const conditionMap = new Map();
+        const seen = new Set();
         
         for (const condition of question.logic.conditions) {
           const key = `${condition.prevQuestion}_${condition.prevAnswer}`;
-          if (!conditionMap.has(key)) {
-            conditionMap.set(key, true);
+          if (!seen.has(key)) {
+            seen.add(key);
             uniqueConditions.push(condition);
           }
         }
         
-        // Replace with the unique set
         question.logic.conditions = uniqueConditions;
       }
     }
@@ -2783,7 +2813,7 @@ window.exportGuiJson = function() {
 
   // Download the JSON file
   downloadJson(JSON.stringify(jsonData, null, 2), "gui.json");
-}
+};
 
 /***********************************************
  *           SAVE & VIEW FLOWCHARTS           *
