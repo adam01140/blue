@@ -335,7 +335,9 @@ function updateConditionAnswers(hiddenFieldId, condId) {
     var prevQId= qSel.value;
     var qBlock = document.getElementById('questionBlock'+prevQId);
     if(!qBlock) return;
-    var sel= qBlock.querySelector('select');
+    
+    // FIX: Make sure we get the correct question type selector
+    var sel= qBlock.querySelector('select#questionType'+prevQId);
     var qType= sel? sel.value:'text';
 
     if(qType==='radio'){
@@ -384,6 +386,9 @@ function updateConditionAnswers(hiddenFieldId, condId) {
     else if(qType==='money'){
         // For money questions, add an "Any Amount" option
         ansSel.innerHTML += '<option value="Any Amount">Any Amount</option>';
+        
+        // Debug to console
+        console.log('Money question detected, adding "Any Amount" option');
     }
     else if(qType==='date'){
         // For date questions, add an "Any Date" option

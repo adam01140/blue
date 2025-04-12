@@ -665,6 +665,19 @@ function updateLogicAnswersForRow(questionId, conditionIndex) {
         optionEl.value = 'Any Text';
         optionEl.textContent = 'Any Text';
         answerSelect.appendChild(optionEl);
+    } else if (questionType === 'money') {
+        // For money questions, add an "Any Amount" option
+        const optionEl = document.createElement('option');
+        optionEl.value = 'Any Amount';
+        optionEl.textContent = 'Any Amount';
+        answerSelect.appendChild(optionEl);
+        console.log('Money question selected, added "Any Amount" option');
+    } else if (questionType === 'date') {
+        // For date questions, add an "Any Date" option
+        const optionEl = document.createElement('option');
+        optionEl.value = 'Any Date';
+        optionEl.textContent = 'Any Date';
+        answerSelect.appendChild(optionEl);
     }
 }
 
