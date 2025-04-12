@@ -2049,7 +2049,7 @@ function setQuestionType(cell, newType) {
     
     // Create a more visible dropdown question with a text field
     let html = `<div class="dropdown-question" style="display:flex; flex-direction:column; align-items:center;">
-      <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true"onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}"ondblclick="event.stopPropagation(); this.focus();"onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
+      <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}" ondblclick="event.stopPropagation(); this.focus();" onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
         ${cell._questionText || "Enter dropdown question"}
       </div>
     </div>`;
@@ -2138,7 +2138,7 @@ function refreshAllCells() {
     // If it's a dropdown with _questionText but not yet formatted
     if (isQuestion(cell) && getQuestionType(cell) === "dropdown" && cell._questionText) {
       let html = `<div class="dropdown-question" style="display:flex; flex-direction:column; align-items:center;">
-        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true"onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}"ondblclick="event.stopPropagation(); this.focus();"onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
+        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}" ondblclick="event.stopPropagation(); this.focus();" onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
           ${escapeHtml(cell._questionText)}
         </div>
       </div>`;
@@ -2775,7 +2775,6 @@ window.exportGuiJson = function() {
         const sourceCell = edge.source;
         if (sourceCell && isQuestion(sourceCell)) {
           // This is a question-to-question connection
-          // The current question should inherit all conditions from the parent question
           const parentQuestionId = questionIdMap.get(sourceCell.id);
           
           if (parentQuestionId) {
@@ -2786,20 +2785,64 @@ window.exportGuiJson = function() {
               if (parentQuestion) break;
             }
             
-            if (parentQuestion && parentQuestion.logic.enabled) {
-              // Only inherit if we don't already have conditions
-              if (question.logic.conditions.length === 0) {
-                // Mark this question's logic as enabled
-                question.logic.enabled = true;
+            if (parentQuestion) {
+              // Check if the parent is a numberedDropdown question
+              if (parentQuestion.type === "numberedDropdown") {
+                // For numberedDropdown questions, add a condition for each possible value
+                const min = parseInt(parentQuestion.min || "1", 10);
+                const max = parseInt(parentQuestion.max || "1", 10);
                 
-                // Inherit all conditions from the parent question
-                parentQuestion.logic.conditions.forEach(condition => {
-                  // Add the parent's condition
+                // Generate conditions for each number in the range
+                for (let i = min; i <= max; i++) {
+                  question.logic.enabled = true;
                   question.logic.conditions.push({
-                    prevQuestion: condition.prevQuestion,
-                    prevAnswer: condition.prevAnswer
+                    prevQuestion: parentQuestionId.toString(),
+                    prevAnswer: i.toString()
                   });
-                });
+                }
+              }
+              // For regular questions with logic enabled, inherit their conditions
+              else if (parentQuestion.logic.enabled) {
+                // Only inherit if we don't already have conditions
+                if (question.logic.conditions.length === 0) {
+                  // Mark this question's logic as enabled
+                  question.logic.enabled = true;
+                  
+                  // Inherit all conditions from the parent question
+                  parentQuestion.logic.conditions.forEach(condition => {
+                    // Add the parent's condition
+                    question.logic.conditions.push({
+                      prevQuestion: condition.prevQuestion,
+                      prevAnswer: condition.prevAnswer
+                    });
+                  });
+                }
+              }
+              // For questions with no logic, add a generic connection
+              else {
+                question.logic.enabled = true;
+                // For dropdown and checkbox questions, attempt to find default answers
+                if (parentQuestion.type === "dropdown" || parentQuestion.type === "checkbox") {
+                  if (parentQuestion.options && parentQuestion.options.length > 0) {
+                    // Use the first option as a default answer
+                    question.logic.conditions.push({
+                      prevQuestion: parentQuestionId.toString(),
+                      prevAnswer: parentQuestion.options[0]
+                    });
+                  } else {
+                    // Fallback with empty answer
+                    question.logic.conditions.push({
+                      prevQuestion: parentQuestionId.toString(),
+                      prevAnswer: ""
+                    });
+                  }
+                } else {
+                  // For other types, just use an empty answer
+                  question.logic.conditions.push({
+                    prevQuestion: parentQuestionId.toString(),
+                    prevAnswer: ""
+                  });
+                }
               }
             }
           }
@@ -3519,7 +3562,7 @@ window.updateDropdownQuestionText = function(cellId, text) {
       
       // Recreate the HTML with the updated text
       let html = `<div class="dropdown-question" style="display:flex; flex-direction:column; align-items:center;">
-        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true"onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}"ondblclick="event.stopPropagation(); this.focus();"onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
+        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}" ondblclick="event.stopPropagation(); this.focus();" onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
           ${escapeHtml(cell._questionText)}
         </div>
       </div>`;

@@ -642,6 +642,23 @@ function updateLogicAnswersForRow(questionId, conditionIndex) {
             optionEl.textContent = 'None of the above';
             answerSelect.appendChild(optionEl);
         }
+    } else if (questionType === 'numberedDropdown') {
+        // Get the min and max values from the range inputs
+        const rangeStartEl = targetQuestionBlock.querySelector(`#numberRangeStart${prevQNum}`);
+        const rangeEndEl = targetQuestionBlock.querySelector(`#numberRangeEnd${prevQNum}`);
+        
+        if (rangeStartEl && rangeEndEl) {
+            const min = parseInt(rangeStartEl.value) || 1;
+            const max = parseInt(rangeEndEl.value) || min;
+            
+            // Add each number in the range as an option
+            for (let i = min; i <= max; i++) {
+                const optionEl = document.createElement('option');
+                optionEl.value = i.toString();
+                optionEl.textContent = i.toString();
+                answerSelect.appendChild(optionEl);
+            }
+        }
     }
 }
 
@@ -992,13 +1009,13 @@ function updateJumpOptionsForNumberedDropdown(questionId, conditionId = null) {
 }
 
 /**
- * Updates jump options for numbered dropdown when range values change
+ * Updates jump options and conditional logic options for numbered dropdown when range values change
  */
 function updateNumberedDropdownEvents(questionId) {
     // Get the current question type to confirm it's still a numbered dropdown
     const questionType = document.getElementById(`questionType${questionId}`).value;
     if (questionType === 'numberedDropdown') {
-        // Update all existing jump conditions for this question
+        // 1. Update all existing jump conditions for this question
         const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
         if (jumpConditions.length > 0) {
             updateJumpOptionsForNumberedDropdown(questionId);
@@ -1010,5 +1027,76 @@ function updateNumberedDropdownEvents(questionId) {
                 updateJumpOptionsForNumberedDropdown(questionId);
             }
         }
+        
+        // 2. Update conditional logic in other questions that reference this question
+        const allLogicRows = document.querySelectorAll('.logic-condition-row');
+        allLogicRows.forEach(row => {
+            const rowParts = row.id.match(/logicConditionRow(\d+)_(\d+)/);
+            if (rowParts && rowParts.length === 3) {
+                const targetQuestionId = rowParts[1];
+                const conditionIndex = rowParts[2];
+                
+                // Check if this logic row references our question
+                const prevQuestionInput = row.querySelector(`#prevQuestion${targetQuestionId}_${conditionIndex}`);
+                if (prevQuestionInput && prevQuestionInput.value == questionId) {
+                    // Update the answer options for this row
+                    updateLogicAnswersForRow(targetQuestionId, conditionIndex);
+                }
+            }
+        });
+        
+        // 3. Update any hidden field conditional logic that might reference this question
+        updateHiddenFieldConditionsForNumberedDropdown(questionId);
     }
+}
+
+/**
+ * Updates hidden field conditions referencing a numbered dropdown question
+ */
+function updateHiddenFieldConditionsForNumberedDropdown(questionId) {
+    // Look through all hidden field condition rows for references to this question
+    const hiddenFieldBlocks = document.querySelectorAll('.hidden-field-block');
+    
+    hiddenFieldBlocks.forEach(block => {
+        const hiddenFieldId = block.id.replace('hiddenFieldBlock', '');
+        
+        // Check text hidden fields
+        const textConditions = block.querySelectorAll('#conditionalAutofill' + hiddenFieldId + ' [id^="condition' + hiddenFieldId + '_"]');
+        textConditions.forEach(condition => {
+            const conditionId = condition.id.split('_')[1];
+            const prevQuestionEl = condition.querySelector(`#conditionQuestion${hiddenFieldId}_${conditionId}`);
+            
+            if (prevQuestionEl && prevQuestionEl.value === questionId) {
+                updateConditionAnswers(hiddenFieldId, conditionId);
+            }
+        });
+        
+        // Check checkbox hidden fields
+        const checkboxConditions = block.querySelectorAll('#conditionalAutofillForCheckbox' + hiddenFieldId + ' [id^="condition' + hiddenFieldId + '_"]');
+        checkboxConditions.forEach(condition => {
+            const conditionId = condition.id.split('_')[1];
+            const prevQuestionEl = condition.querySelector(`#conditionQuestion${hiddenFieldId}_${conditionId}`);
+            
+            if (prevQuestionEl && prevQuestionEl.value === questionId) {
+                updateConditionAnswers(hiddenFieldId, conditionId);
+            }
+        });
+    });
+}
+
+function generateAllQuestionOptions() {
+    var optionsHTML='';
+    var qBlocks= document.querySelectorAll('.question-block');
+    qBlocks.forEach(function(qBlock){
+        var qId= qBlock.id.replace('questionBlock','');
+        var txtEl= qBlock.querySelector('input[type="text"]');
+        var questionText= txtEl? txtEl.value:('Question '+qId);
+        var selEl= qBlock.querySelector('select');
+        var qType= selEl? selEl.value:'text';
+
+        if(['dropdown','radio','checkbox','numberedDropdown'].indexOf(qType)!==-1){
+            optionsHTML+='<option value="'+qId+'">Question '+qId+': '+questionText+'</option>';
+        }
+    });
+    return optionsHTML;
 }

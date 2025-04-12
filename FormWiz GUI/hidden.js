@@ -362,6 +362,21 @@ function updateConditionAnswers(hiddenFieldId, condId) {
             ansSel.innerHTML+='<option value="None of the above">None of the above</option>';
         }
     }
+    else if(qType==='numberedDropdown'){
+        // Handle numbered dropdown by getting min/max range
+        var rangeStartEl = qBlock.querySelector('#numberRangeStart'+prevQId);
+        var rangeEndEl = qBlock.querySelector('#numberRangeEnd'+prevQId);
+        
+        if(rangeStartEl && rangeEndEl){
+            var min = parseInt(rangeStartEl.value, 10) || 1;
+            var max = parseInt(rangeEndEl.value, 10) || min;
+            
+            // Add each number in the range as an option
+            for(var j=min; j<=max; j++){
+                ansSel.innerHTML += '<option value="'+j+'">'+j+'</option>';
+            }
+        }
+    }
 }
 
 /*******************************************************
@@ -671,7 +686,7 @@ function generateAllQuestionOptions() {
         var selEl= qBlock.querySelector('select');
         var qType= selEl? selEl.value:'text';
 
-        if(['dropdown','radio','checkbox'].indexOf(qType)!==-1){
+        if(['dropdown','radio','checkbox','numberedDropdown'].indexOf(qType)!==-1){
             optionsHTML+='<option value="'+qId+'">Question '+qId+': '+questionText+'</option>';
         }
     });
