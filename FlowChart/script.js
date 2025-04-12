@@ -2387,10 +2387,35 @@ window.exportGuiJson = function() {
       const questionType = getQuestionType(cell);
       
       if (questionType === "dropdown" || questionType === "checkbox") {
-        // Find all outgoing edges to get options
+        // Add empty image object for dropdown questions by default
+        if (questionType === "dropdown") {
+          question.image = {
+            url: "",
+            width: 0,
+            height: 0
+          };
+        }
+        
+        // Find all outgoing edges to get options and possibly image nodes
         const outgoingEdges = graph.getOutgoingEdges(cell) || [];
         for (const edge of outgoingEdges) {
           const targetCell = edge.target;
+          if (!targetCell) continue;
+          
+          // Check if this is an image option node
+          if (isOptions(targetCell) && getQuestionType(targetCell) === "imageOption") {
+            // Found an image node, update the question's image property
+            if (questionType === "dropdown" && targetCell._image) {
+              question.image = {
+                url: targetCell._image.url || "",
+                width: parseInt(targetCell._image.width) || 0,
+                height: parseInt(targetCell._image.height) || 0
+              };
+            }
+            // Skip adding as an option
+            continue;
+          }
+          
           if (targetCell && isOptions(targetCell)) {
             const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
             if (optionText) {
@@ -2424,15 +2449,6 @@ window.exportGuiJson = function() {
               }
             }
           }
-        }
-        
-        // Add empty image object only for dropdown questions
-        if (questionType === "dropdown") {
-          question.image = {
-            url: "",
-            width: 0,
-            height: 0
-          };
         }
         
         // Remove unnecessary fields
