@@ -1,0 +1,84 @@
+{
+  "questions": [
+    {
+      "questionId": 1,
+      "text": "Do you have a lawyer?",
+      "number": "1",
+      "logic": {
+        "enabled": false,
+        "conditions": []
+      },
+      "options": [
+        "Yes",
+        "No"
+      ]
+    },
+    {
+      "questionId": 2,
+      "text": "Who is your lawyer?",
+      "number": "2",
+      "logic": {
+        "enabled": true,
+        "conditions": [
+          {
+            "prevQuestion": "1",
+            "prevAnswer": "Yes"
+          }
+        ]
+      },
+      "options": []
+    },
+    {
+      "questionId": 3,
+      "text": "Has your lawyer agreed to help?",
+      "number": "3",
+      "logic": {
+        "enabled": true,
+        "conditions": [
+          {
+            "prevQuestion": "1",
+            "prevAnswer": "Yes"
+          }
+        ]
+      },
+      "options": [
+        "Yes",
+        "No"
+      ]
+    },
+    {
+      "questionId": 4,
+      "text": "Where are you?",
+      "number": "4",
+      "logic": {
+        "enabled": true,
+        "conditions": [
+          {
+            "prevQuestion": "3",
+            "prevAnswer": "Yes"
+          }
+        ]
+      },
+      "options": []
+    },
+    {
+      "questionId": 5,
+      "text": "What is your name?",
+      "number": "5",
+      "logic": {
+        "enabled": true,
+        "conditions": [
+          {
+            "prevQuestion": "1",
+            "prevAnswer": "No"
+          },
+          {
+            "prevQuestion": "3",
+            "prevAnswer": "No"
+          }
+        ]
+      },
+      "options": []
+    }
+  ]
+}

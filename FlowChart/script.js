@@ -2508,17 +2508,42 @@ window.exportGuiJson = function() {
                     prevAnswer: optionText
                   });
                 }
-                
-                // IMPORTANT: We only want direct conditions that lead to this question
-                // DO NOT inherit parent conditions as this creates incorrect conditions
-                // such as parent's parent conditions appearing in this question
               }
             }
           }
         } else if (sourceCell && isQuestion(sourceCell)) {
-          // This is a direct connection from another question, which is less common
-          // We don't add any special condition for a direct question-to-question link
-          // as this is typically handled by the UI differently
+          // This is a question-to-question connection
+          // The current question should inherit all conditions from the parent question
+          const parentQuestionId = questionIdMap.get(sourceCell.id);
+          
+          if (parentQuestionId) {
+            // Find the parent question in the JSON
+            let parentQuestion = null;
+            for (const sec of sections) {
+              parentQuestion = sec.questions.find(q => q.questionId === parentQuestionId);
+              if (parentQuestion) break;
+            }
+            
+            if (parentQuestion && parentQuestion.logic.enabled) {
+              // Mark this question's logic as enabled
+              question.logic.enabled = true;
+              
+              // Inherit all conditions from the parent question
+              parentQuestion.logic.conditions.forEach(condition => {
+                // Only add if this specific condition doesn't already exist
+                const existingCondition = question.logic.conditions.find(
+                  c => c.prevQuestion === condition.prevQuestion && c.prevAnswer === condition.prevAnswer
+                );
+                
+                if (!existingCondition) {
+                  question.logic.conditions.push({
+                    prevQuestion: condition.prevQuestion,
+                    prevAnswer: condition.prevAnswer
+                  });
+                }
+              });
+            }
+          }
         }
       }
       
