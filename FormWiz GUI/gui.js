@@ -96,7 +96,7 @@ function updateSectionLabels() {
             h2Label.textContent = `Section ${index + 1}`;
         }
         
-        // Optionally also update the "Section Name" input’s .value
+        // Optionally also update the "Section Name" input's .value
         // but do NOT rename block.id or button onClick attributes
     });
 
@@ -139,32 +139,42 @@ function updateGlobalQuestionLabels() {
 
 
 function addJumpCondition(questionId) {
-    const container = document.getElementById(`jumpConditions${questionId}`);
-    const conditionId = container.children.length + 1;
+    const jumpConditionsDiv = document.getElementById(`jumpConditions${questionId}`);
+    if (!jumpConditionsDiv) return;
     
-    const conditionHTML = `
-        <div class="jump-condition" id="jumpCondition${questionId}_${conditionId}">
-            <label>If selected:</label>
-            <select id="jumpOption${questionId}_${conditionId}"></select>
-            <label>Jump to:</label>
-            <input type="text" placeholder="Section number or 'end'" 
-                   id="jumpTo${questionId}_${conditionId}">
-            <button type="button" 
-                    onclick="removeJumpCondition(${questionId}, ${conditionId})">
-                Remove
-            </button>
-        </div>
+    // Find the next available condition ID
+    const existingConditions = jumpConditionsDiv.querySelectorAll('.jump-condition');
+    const conditionId = existingConditions.length + 1;
+    
+    const conditionDiv = document.createElement('div');
+    conditionDiv.className = 'jump-condition';
+    conditionDiv.id = `jumpCondition${questionId}_${conditionId}`;
+    conditionDiv.innerHTML = `
+        <label>If selected:</label>
+        <select id="jumpOption${questionId}_${conditionId}">
+            <option value="" disabled selected>Select an option</option>
+        </select>
+        <label>Jump to:</label>
+        <input type="text" id="jumpTo${questionId}_${conditionId}" placeholder="Section number or 'end'">
+        <button type="button" onclick="removeJumpCondition(${questionId}, ${conditionId})">Remove</button>
+        <hr>
     `;
+    jumpConditionsDiv.appendChild(conditionDiv);
     
-    container.insertAdjacentHTML('beforeend', conditionHTML);
-    
-    const questionType = document.getElementById(`questionType${questionId}`).value;
-    if (questionType === 'checkbox') {
-        updateJumpOptionsForCheckbox(questionId, conditionId);
-    } else if (questionType === 'radio') {
-        updateJumpOptionsForRadio(questionId, conditionId);
-    } else if (questionType === 'dropdown') {
-        updateJumpOptions(questionId, conditionId); // Ensure this line is present
+    // Populate the jump options based on question type
+    const questionTypeSelect = document.getElementById(`questionType${questionId}`);
+    if (questionTypeSelect) {
+        const questionType = questionTypeSelect.value;
+        
+        if (questionType === 'dropdown') {
+            updateJumpOptions(questionId, conditionId);
+        } else if (questionType === 'radio') {
+            updateJumpOptionsForRadio(questionId, conditionId);
+        } else if (questionType === 'checkbox') {
+            updateJumpOptionsForCheckbox(questionId, conditionId);
+        } else if (questionType === 'numberedDropdown') {
+            updateJumpOptionsForNumberedDropdown(questionId, conditionId);
+        }
     }
 }
 
@@ -241,8 +251,8 @@ function addQuestion(sectionId, questionId = null) {
         <!-- Numbered Dropdown Options -->
        <div id="numberedDropdownBlock${currentQuestionId}" class="numbered-dropdown-options" style="display: none;">
     <label>Number Range: </label>
-    <input type="number" id="numberRangeStart${currentQuestionId}" placeholder="Start" min="1" style="width: 60px;">
-    <input type="number" id="numberRangeEnd${currentQuestionId}" placeholder="End" min="1" style="width: 60px;"><br><br>
+    <input type="number" id="numberRangeStart${currentQuestionId}" placeholder="Start" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})">
+    <input type="number" id="numberRangeEnd${currentQuestionId}" placeholder="End" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})"><br><br>
 
     <label>Textbox Labels:</label>
     <div id="textboxLabels${currentQuestionId}"></div>
@@ -505,6 +515,12 @@ function toggleOptions(questionId) {
 
         case 'numberedDropdown':
             numberedDropdownBlock.style.display = 'block';
+            // Update jump options for numbered dropdown
+            const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
+            jumpConditions.forEach(condition => {
+                const conditionId = condition.id.split('_')[1];
+                updateJumpOptionsForNumberedDropdown(questionId, conditionId);
+            });
             break;
 
         case 'money':
@@ -635,8 +651,20 @@ function toggleJumpLogic(questionId) {
     const enabled = document.getElementById(`enableJump${questionId}`).checked;
     
     jumpBlock.style.display = enabled ? 'block' : 'none';
-    if (enabled && jumpBlock.children.length === 0) {
+    if (enabled && jumpBlock.querySelector('#jumpConditions' + questionId).children.length === 0) {
         addJumpCondition(questionId); // Add first condition automatically
+        
+        // Make sure options are populated based on question type
+        const questionType = document.getElementById(`questionType${questionId}`).value;
+        if (questionType === 'numberedDropdown') {
+            updateJumpOptionsForNumberedDropdown(questionId);
+        } else if (questionType === 'dropdown') {
+            updateJumpOptions(questionId);
+        } else if (questionType === 'radio') {
+            updateJumpOptionsForRadio(questionId);
+        } else if (questionType === 'checkbox') {
+            updateJumpOptionsForCheckbox(questionId);
+        }
     }
 }
 
@@ -921,5 +949,45 @@ function removeMultipleTextboxOption(questionId, optionNumber) {
             option.querySelector(`input[id^="multipleTextboxPlaceholder"]`).id = `multipleTextboxPlaceholder${questionId}_${index + 1}`;
             option.querySelector('button').setAttribute('onclick', `removeMultipleTextboxOption(${questionId}, ${index + 1})`);
         });
+    }
+}
+
+// This function populates the jump options for numbered dropdown questions
+function updateJumpOptionsForNumberedDropdown(questionId, conditionId = null) {
+    const selectElements = conditionId 
+        ? [document.getElementById(`jumpOption${questionId}_${conditionId}`)]
+        : document.querySelectorAll(`[id^="jumpOption${questionId}_"]`);
+
+    selectElements.forEach(selectEl => {
+        if (!selectEl) return;
+        selectEl.innerHTML = '<option value="" disabled selected>Select an option</option>';
+        
+        // Get the min and max values from the range inputs
+        const rangeStartEl = document.getElementById(`numberRangeStart${questionId}`);
+        const rangeEndEl = document.getElementById(`numberRangeEnd${questionId}`);
+        
+        if (!rangeStartEl || !rangeEndEl) return;
+        
+        const min = parseInt(rangeStartEl.value) || 1;
+        const max = parseInt(rangeEndEl.value) || min;
+        
+        // Add each number in the range as an option
+        for (let i = min; i <= max; i++) {
+            const opt = document.createElement('option');
+            opt.value = i.toString();
+            opt.text = i.toString();
+            selectEl.appendChild(opt);
+        }
+    });
+}
+
+/**
+ * Updates jump options for numbered dropdown when range values change
+ */
+function updateNumberedDropdownEvents(questionId) {
+    // Update any jump conditions that exist for this question
+    const questionType = document.getElementById(`questionType${questionId}`).value;
+    if (questionType === 'numberedDropdown') {
+        updateJumpOptionsForNumberedDropdown(questionId);
     }
 }

@@ -307,6 +307,17 @@ else if (question.type === 'numberedDropdown') {
                 
                 if (jumpOptionSelect) jumpOptionSelect.value = cond.option;
                 if (jumpToInput) jumpToInput.value = cond.to;
+                
+                // Update options for the dropdown based on question type
+                if (question.type === 'dropdown') {
+                    updateJumpOptions(question.questionId, conditionId);
+                } else if (question.type === 'radio') {
+                    updateJumpOptionsForRadio(question.questionId, conditionId);
+                } else if (question.type === 'checkbox') {
+                    updateJumpOptionsForCheckbox(question.questionId, conditionId);
+                } else if (question.type === 'numberedDropdown') {
+                    updateJumpOptionsForNumberedDropdown(question.questionId, conditionId);
+                }
             });
         }
               

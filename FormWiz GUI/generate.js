@@ -664,7 +664,7 @@ function handleNext(currentSection){
         var jTo  = jl.jumpTo;
         var nmId = questionNameIds[qId] || ("answer"+qId);
 
-        if(qType==="radio" || qType==="dropdown"){
+        if(qType==="radio" || qType==="dropdown" || qType==="numberedDropdown"){
             var el= document.getElementById(nmId);
             if(el && el.value.trim().toLowerCase() === jOpt.trim().toLowerCase()){
                 nextSection = jTo.toLowerCase();
