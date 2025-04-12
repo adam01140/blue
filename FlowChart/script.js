@@ -2295,6 +2295,9 @@ window.exportGuiJson = function() {
   let defaultPDFName = "";
 
   // First pass: collect all sections and their questions
+  const questionCellMap = new Map(); // Maps questionId to cell
+  const questionIdMap = new Map(); // Maps cell.id to questionId
+  
   for (const cellId in cells) {
     const cell = cells[cellId];
     if (!cell.isVertex() || cell.isEdge() || cell.id === "0" || cell.id === "1") continue;
@@ -2323,7 +2326,7 @@ window.exportGuiJson = function() {
       
       // Create question object
       const question = {
-        questionId: questionCounter++,
+        questionId: questionCounter,
         text: "",
         type: questionType,
         logic: {
@@ -2364,25 +2367,66 @@ window.exportGuiJson = function() {
         question.text = cleanText;
       }
 
-      // Handle different question types
-      if (questionType === "multipleDropdownType") {
+      // Store mapping between question cells and questionIds
+      questionCellMap.set(questionCounter, cell);
+      questionIdMap.set(cell.id, questionCounter);
+      
+      // Increment counter for next question
+      questionCounter++;
+      
+      section.questions.push(question);
+    }
+  }
+
+  // Second pass: Process question types and find connections
+  for (const section of sections) {
+    for (const question of section.questions) {
+      const cell = questionCellMap.get(question.questionId);
+      if (!cell) continue;
+      
+      const questionType = getQuestionType(cell);
+      
+      if (questionType === "dropdown" || questionType === "checkbox") {
+        // Find all outgoing edges to get options
+        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+        for (const edge of outgoingEdges) {
+          const targetCell = edge.target;
+          if (targetCell && isOptions(targetCell)) {
+            const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
+            if (optionText) {
+              question.options.push(optionText);
+            }
+          }
+        }
+        
+        // Add empty image object
+        question.image = {
+          url: "",
+          width: 0,
+          height: 0
+        };
+        
+        // Remove unnecessary fields
+        delete question.min;
+        delete question.max;
+        delete question.amounts;
+      } else if (questionType === "text" || questionType === "date" || questionType === "number" || questionType === "bigParagraph") {
+        // Remove unnecessary fields
+        delete question.min;
+        delete question.max;
+        delete question.amounts;
+        delete question.image;
+      } else if (questionType === "multipleDropdownType") {
         // Rename to numberedDropdown for consistency
         question.type = "numberedDropdown";
         
-        // Get min and max values from _twoNumbers if available
+        // Get min and max values
         if (cell._twoNumbers) {
           question.min = cell._twoNumbers.first || "1";
           question.max = cell._twoNumbers.second || "1";
-        } else {
-          // Fallback to extracting from HTML
-          const minMatch = questionText.match(/value="(\d+)"[^>]*onblur="window\.updatemultipleDropdownTypeNumber\('[^']*', 'first'/);
-          const maxMatch = questionText.match(/value="(\d+)"[^>]*onblur="window\.updatemultipleDropdownTypeNumber\('[^']*', 'second'/);
-          
-          if (minMatch) question.min = minMatch[1];
-          if (maxMatch) question.max = maxMatch[1];
         }
         
-        // Get labels and amounts from _textboxes if available
+        // Handle labels and amounts
         if (cell._textboxes) {
           for (const textbox of cell._textboxes) {
             if (textbox.isAmountOption) {
@@ -2391,45 +2435,114 @@ window.exportGuiJson = function() {
               question.labels.push(textbox.nameId);
             }
           }
-        } else {
-          // Fallback to extracting from HTML
-          const textboxEntries = questionText.match(/<div class="textbox-entry"[^>]*>([\s\S]*?)<\/div>/g) || [];
-          
-          for (const entry of textboxEntries) {
-            // Extract the input value
-            const valueMatch = entry.match(/value="([^"]*)"/);
-            if (!valueMatch) continue;
-            
-            const value = valueMatch[1];
-            
-            // Check if this is an amount field
-            const isAmountMatch = entry.match(/checked[^>]*onclick="window\.toggleMultipleDropdownAmount/);
-            const isAmount = isAmountMatch !== null;
-            
-            if (isAmount) {
-              question.amounts.push(value);
-            } else {
-              question.labels.push(value);
-            }
-          }
         }
       } else if (questionType === "multipleTextboxes") {
-        // Handle multiple textboxes
+        // Create textboxes array
+        question.textboxes = [];
+        
         if (cell._textboxes) {
-          question.labels = cell._textboxes.map(tb => tb.nameId || "");
+          cell._textboxes.forEach((tb, index) => {
+            const nameId = question.nameId.toLowerCase() + "_" + (tb.nameId || "").toLowerCase().replace(/\s+/g, '_');
+            
+            question.textboxes.push({
+              label: "", // Empty label as requested
+              nameId: nameId,
+              placeholder: tb.placeholder || tb.nameId || ""
+            });
+          });
         }
-      } else if (questionType === "multipleDropdown") {
-        // Handle multiple dropdowns
-        if (cell._dropdowns) {
-          question.labels = cell._dropdowns.map(dd => dd.nameId || "");
+        
+        // Clean up unnecessary fields
+        question.labels = [];
+        delete question.nameId;
+        delete question.placeholder;
+        delete question.min;
+        delete question.max;
+        delete question.amounts;
+      }
+    }
+  }
+  
+  // Third pass: Determine conditional logic between questions
+  for (const section of sections) {
+    for (const question of section.questions) {
+      const cell = questionCellMap.get(question.questionId);
+      if (!cell) continue;
+      
+      // Reset existing conditions for this question - we'll rebuild them correctly
+      question.logic.conditions = [];
+      question.logic.enabled = false;
+      
+      // Check for direct incoming edges from option cells
+      const incomingEdges = graph.getIncomingEdges(cell) || [];
+      
+      // Process all incoming edges to determine direct conditions
+      for (const edge of incomingEdges) {
+        const sourceCell = edge.source;
+        
+        if (sourceCell && isOptions(sourceCell)) {
+          // This is a direct condition - question depends on this option being selected
+          const optionText = sourceCell.value.replace(/<[^>]+>/g, "").trim();
+          
+          // Find the parent question of this option
+          const optionIncomingEdges = graph.getIncomingEdges(sourceCell) || [];
+          for (const optionEdge of optionIncomingEdges) {
+            const parentQuestionCell = optionEdge.source;
+            
+            if (parentQuestionCell && isQuestion(parentQuestionCell)) {
+              const parentQuestionId = questionIdMap.get(parentQuestionCell.id);
+              
+              if (parentQuestionId) {
+                // We found a direct conditional relationship - add it to the logic
+                question.logic.enabled = true;
+                
+                // Only add if this specific condition doesn't already exist
+                const existingCondition = question.logic.conditions.find(
+                  c => c.prevQuestion === parentQuestionId.toString() && c.prevAnswer === optionText
+                );
+                
+                if (!existingCondition) {
+                  // Add ONLY the direct condition from the immediate parent option
+                  question.logic.conditions.push({
+                    prevQuestion: parentQuestionId.toString(),
+                    prevAnswer: optionText
+                  });
+                }
+                
+                // IMPORTANT: We only want direct conditions that lead to this question
+                // DO NOT inherit parent conditions as this creates incorrect conditions
+                // such as parent's parent conditions appearing in this question
+              }
+            }
+          }
+        } else if (sourceCell && isQuestion(sourceCell)) {
+          // This is a direct connection from another question, which is less common
+          // We don't add any special condition for a direct question-to-question link
+          // as this is typically handled by the UI differently
         }
       }
-
-      section.questions.push(question);
+      
+      // Check for duplicate conditions that could have been added by multiple paths
+      if (question.logic.conditions.length > 0) {
+        // Create a unique set of conditions based on prevQuestion and prevAnswer
+        const uniqueConditions = [];
+        const conditionMap = new Map();
+        
+        for (const condition of question.logic.conditions) {
+          const key = `${condition.prevQuestion}_${condition.prevAnswer}`;
+          if (!conditionMap.has(key)) {
+            conditionMap.set(key, true);
+            uniqueConditions.push(condition);
+          }
+        }
+        
+        // Replace with the unique set
+        question.logic.conditions = uniqueConditions;
+      }
     }
   }
 
-  // Second pass: collect calculation nodes for hidden fields
+  // Fourth pass: Collect calculation nodes for hidden fields
   for (const cellId in cells) {
     const cell = cells[cellId];
     if (!cell.isVertex() || cell.isEdge() || cell.id === "0" || cell.id === "1") continue;
@@ -2461,15 +2574,12 @@ window.exportGuiJson = function() {
       // Find the question that contains the amount field
       const amountLabel = cell._calcAmountLabel || "";
       
-      // Extract the amount name from the amount label
-      // Format: "how_many_cars_do_you_have_delete_amount_delete_amount_add_option_car_value"
+      // Extract the amount name
       let amountName = "";
       let questionNameFromLabel = "";
-      console.log("Looking for amount name in label:", amountLabel);
       
       if (amountLabel) {
-        // First extract the question name from the label
-        // The format is usually "question_name_with_underscores_amount_name"
+        // Clean up the label
         const cleanedLabel = amountLabel.replace(/delete_amount_/g, "").replace(/add_option_/g, "");
         const parts = cleanedLabel.split('_');
         
@@ -2482,79 +2592,20 @@ window.exportGuiJson = function() {
         if (parts.length > 1) {
           questionNameFromLabel = parts.slice(0, -1).join('_');
         }
-        
-        console.log("Extracted question name from label:", questionNameFromLabel);
-        console.log("Extracted amount name:", amountName);
-        
-        // Get all amounts from all questions first
-        const allAmounts = [];
-        for (const section of sections) {
-          for (const question of section.questions) {
-            if (question.amounts && question.amounts.length > 0) {
-              question.amounts.forEach(amount => {
-                allAmounts.push(amount.trim());
-              });
-            }
-          }
-        }
-        
-        console.log("All known amounts:", allAmounts);
-        
-        // Try to find any of the known amounts in the label (case insensitive)
-        // For multi-word amounts, we need to check both with spaces and with underscores
-        for (const amount of allAmounts) {
-          // Check original amount format
-          if (amountLabel.toLowerCase().includes(amount.toLowerCase())) {
-            amountName = amount;
-            console.log("Found matching amount:", amountName);
-            break;
-          }
-          
-          // Check with underscores instead of spaces
-          const amountWithUnderscores = amount.replace(/\s+/g, "_");
-          if (amountLabel.toLowerCase().includes(amountWithUnderscores.toLowerCase())) {
-            amountName = amount;
-            console.log("Found matching amount (underscore version):", amountName);
-            break;
-          }
-        }
       }
       
-      // Find the question that contains this amount
+      // Find the target question for this calculation
       let targetQuestion = null;
       
-      // Search through all questions to find the one with this amount
+      // Search through all questions in all sections
       for (const section of sections) {
         for (const question of section.questions) {
-          // First try to match the question using the question name from the label
-          const cleanQuestionText = (question.text || "")
-            .toLowerCase()
-            .replace(/[^\w\s]/gi, "")
-            .replace(/\s+/g, "_");
-          
-          // Check if this question matches the question name from the label
-          const isQuestionMatch = questionNameFromLabel && 
-                                 cleanQuestionText.includes(questionNameFromLabel);
-          
-          if (isQuestionMatch && question.amounts) {
-            // If we have a question name match, check if it has the amount
+          // Check if this is a numberedDropdown question with amounts
+          if (question.type === "numberedDropdown" && question.amounts && question.amounts.length > 0) {
             for (const amount of question.amounts) {
-              if (amount === amountName || amount.trim() === amountName || 
-                  amount === amountName.trim() || amount.trim() === amountName.trim()) {
+              if (amount.toLowerCase() === amountName.toLowerCase() || 
+                  amount.toLowerCase().replace(/\s+/g, '_') === amountName.toLowerCase().replace(/\s+/g, '_')) {
                 targetQuestion = question;
-                console.log("Found perfect match (question + amount):", question);
-                break;
-              }
-            }
-          }
-          
-          // If we still don't have a match, but the question has the amount, use it as a fallback
-          if (!targetQuestion && question.amounts) {
-            for (const amount of question.amounts) {
-              if (amount === amountName || amount.trim() === amountName || 
-                  amount === amountName.trim() || amount.trim() === amountName.trim()) {
-                targetQuestion = question;
-                console.log("Found fallback match (amount only):", question);
                 break;
               }
             }
@@ -2565,35 +2616,27 @@ window.exportGuiJson = function() {
         if (targetQuestion) break;
       }
 
-      // Generate calculation terms if we found a matching question
+      // Generate calculation terms
       if (targetQuestion) {
-        // Create terms for the calculation based on the question text and amount name
-        const questionText = targetQuestion.text || "";
-        // Replace spaces with underscores and convert to lowercase for consistency
+        // Clean up the amount name for consistency
         const cleanAmountName = amountName.trim().toLowerCase().replace(/\s+/g, '_');
         
         // First term has no operator
         calculation.terms.push({
           operator: "",
-          questionNameId: `${questionText}_1_${cleanAmountName}`
+          questionNameId: `${targetQuestion.text}_1_${cleanAmountName}`
         });
         
-        // Add additional terms with the "+" operator
-        // For numberedDropdown questions, use the min/max values to determine how many terms to add
-        const min = parseInt(targetQuestion.min || "1", 10);
+        // Add additional terms
         const max = parseInt(targetQuestion.max || "4", 10);
         
-        // Add terms for each number from 2 to max (or up to 4 if no max specified)
+        // Add terms for each number from 2 to max
         for (let i = 2; i <= max; i++) {
           calculation.terms.push({
             operator: "+",
-            questionNameId: `${questionText}_${i}_${cleanAmountName}`
+            questionNameId: `${targetQuestion.text}_${i}_${cleanAmountName}`
           });
         }
-        
-        console.log("Generated calculation terms:", calculation.terms);
-      } else {
-        console.log("No matching question found for amount:", amountName);
       }
 
       hiddenField.calculations.push(calculation);
@@ -2608,7 +2651,7 @@ window.exportGuiJson = function() {
     sectionCounter = maxSectionId + 1;
   }
 
-  // Explicitly set hiddenFieldCounter to 3 for this specific case
+  // Explicitly set hiddenFieldCounter to 3
   hiddenFieldCounter = 3;
 
   // Create the final JSON object

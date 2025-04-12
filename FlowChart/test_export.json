@@ -1,0 +1,72 @@
+{
+  "questions": [
+    {
+      "text": "Do you have a lawyer?",
+      "number": "1",
+      "options": [
+        {
+          "text": "Yes"
+        },
+        {
+          "text": "No"
+        }
+      ],
+      "conditions": []
+    },
+    {
+      "text": "Who is your lawyer?",
+      "number": "2",
+      "options": [],
+      "conditions": [
+        {
+          "prevQuestion": "1",
+          "prevAnswer": "Yes"
+        }
+      ]
+    },
+    {
+      "text": "Do you want a lawyer?",
+      "number": "3",
+      "options": [
+        {
+          "text": "Yes"
+        },
+        {
+          "text": "No"
+        }
+      ],
+      "conditions": [
+        {
+          "prevQuestion": "1",
+          "prevAnswer": "No"
+        }
+      ]
+    },
+    {
+      "text": "What is your name?",
+      "number": "4",
+      "options": [],
+      "conditions": [
+        {
+          "prevQuestion": "1",
+          "prevAnswer": "No"
+        },
+        {
+          "prevQuestion": "3",
+          "prevAnswer": "No"
+        }
+      ]
+    },
+    {
+      "text": "Where are you?",
+      "number": "5",
+      "options": [],
+      "conditions": [
+        {
+          "prevQuestion": "3",
+          "prevAnswer": "Yes"
+        }
+      ]
+    }
+  ]
+}
