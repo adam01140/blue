@@ -1401,48 +1401,42 @@ function escapeAttr(str) {
   return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
 }
 
-function updateMultipleTextboxesCell(cell) {
-  const qText = cell._questionText || "Enter question text";
-  let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
-    <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true"onclick="window.handleMultipleTextboxClick(event, '${cell.id}')"onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')"onblur="window.updateQuestionTextHandler('${cell.id}', this.innerText)">
-      ${escapeHtml(qText)}
-    </div>
-    <div class="multiple-textboxes-container" style="padding: 8px; width:100%;">`;
-
+// Helper function to render textboxes for multiple textboxes question
+function renderTextboxes(cell) {
   if (!cell._textboxes) {
     cell._textboxes = [{ nameId: "", placeholder: "Enter value" }];
   }
-
+  
+  let html = '';
+  
   cell._textboxes.forEach((tb, index) => {
     const val = tb.nameId || "";
     const ph = tb.placeholder || "Enter value";
     html += 
       `<div class="textbox-entry" style="margin-bottom:8px; text-align:center;">
-        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}"onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)"/>
+        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)"/>
         <button onclick="window.deleteMultipleTextboxHandler('${cell.id}', ${index})">Delete</button>
       </div>`;
   });
+  
+  html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button></div>`;
+  
+  return html;
+}
 
-  html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button></div>
-    </div>
-  </div>`;
-
+// Update the multiple textboxes node
+function updateMultipleTextboxesCell(cell) {
   graph.getModel().beginUpdate();
   try {
-    graph.getModel().setValue(cell, html);
-    refreshNodeIdFromLabel(cell);
+    // Create a container for the question text and textboxes
+    let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
+    <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onclick="window.handleMultipleTextboxClick(event, '${cell.id}')" onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')" onblur="window.updateQuestionTextHandler('${cell.id}', this.innerText)">
+      ${cell._questionText || "Enter question text"}
+    </div>
+    <div class="multiple-textboxes-container" style="padding: 8px; width:100%;">${renderTextboxes(cell)}</div>
+  </div>`;
     
-    let st = cell.style || "";
-    if (!st.includes("pointerEvents=")) {
-      st += "pointerEvents=1;overflow=fill;";
-    }
-    if (!st.includes("html=1")) {
-      st += "html=1;";
-    }
-    if (!st.includes("verticalAlign=middle")) {
-      st += "verticalAlign=middle;";
-    }
-    graph.getModel().setStyle(cell, st);
+    cell.value = html;
   } finally {
     graph.getModel().endUpdate();
   }
@@ -2837,10 +2831,10 @@ window.exportGuiJson = function() {
                     });
                   }
                 } else {
-                  // For other types, just use an empty answer
+                  // For other types, just use an empty answer or "Any Text" for text questions
                   question.logic.conditions.push({
                     prevQuestion: parentQuestionId.toString(),
-                    prevAnswer: ""
+                    prevAnswer: parentQuestion.type === "text" ? "Any Text" : ""
                   });
                 }
               }

@@ -481,7 +481,12 @@ function getFormHTML() {
             logicScriptBuffer += `     if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}\n`;
             logicScriptBuffer += `   } else {\n`;
             logicScriptBuffer += `     var el2=document.getElementById("answer"+cPrevQNum) || document.getElementById(questionNameIds[cPrevQNum]);\n`;
-            logicScriptBuffer += `     if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }\n`;
+            // Special case for special options that check for presence rather than exact value
+            if (paVal.toLowerCase() === "any text" || paVal.toLowerCase() === "any amount" || paVal.toLowerCase() === "any date") {
+              logicScriptBuffer += `     if(el2){ var val2= el2.value.trim(); if(val2 !== ""){ anyMatch=true;} }\n`;
+            } else {
+              logicScriptBuffer += `     if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }\n`;
+            }
             logicScriptBuffer += `   }\n`;
             logicScriptBuffer += ` })();\n`;
           }

@@ -659,6 +659,12 @@ function updateLogicAnswersForRow(questionId, conditionIndex) {
                 answerSelect.appendChild(optionEl);
             }
         }
+    } else if (questionType === 'text' || questionType === 'bigParagraph') {
+        // For textbox questions, add an "Any Text" option
+        const optionEl = document.createElement('option');
+        optionEl.value = 'Any Text';
+        optionEl.textContent = 'Any Text';
+        answerSelect.appendChild(optionEl);
     }
 }
 

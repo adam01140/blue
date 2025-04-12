@@ -377,6 +377,18 @@ function updateConditionAnswers(hiddenFieldId, condId) {
             }
         }
     }
+    else if(qType==='text' || qType==='bigParagraph'){
+        // For text questions, add an "Any Text" option
+        ansSel.innerHTML += '<option value="Any Text">Any Text</option>';
+    }
+    else if(qType==='money'){
+        // For money questions, add an "Any Amount" option
+        ansSel.innerHTML += '<option value="Any Amount">Any Amount</option>';
+    }
+    else if(qType==='date'){
+        // For date questions, add an "Any Date" option
+        ansSel.innerHTML += '<option value="Any Date">Any Date</option>';
+    }
 }
 
 /*******************************************************
