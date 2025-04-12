@@ -2394,22 +2394,56 @@ window.exportGuiJson = function() {
           if (targetCell && isOptions(targetCell)) {
             const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
             if (optionText) {
-              question.options.push(optionText);
+              // For checkbox questions, create structured options
+              if (questionType === "checkbox") {
+                // Reset options array if it contains strings
+                if (question.options.length > 0 && typeof question.options[0] === 'string') {
+                  question.options = [];
+                }
+                
+                // Create a nameId by combining the question nameId and the option text
+                const optionNameId = question.nameId.toLowerCase() + "_" + optionText.toLowerCase().replace(/\s+/g, '_');
+                
+                // Capitalize first letter of option label
+                const label = optionText.charAt(0).toUpperCase() + optionText.slice(1);
+                
+                // Create a structured option object
+                const optionObj = {
+                  label: label,
+                  nameId: optionNameId,
+                  value: "",
+                  hasAmount: false,
+                  amountName: "",
+                  amountPlaceholder: ""
+                };
+                
+                question.options.push(optionObj);
+              } else {
+                // For dropdown questions, keep using simple strings
+                question.options.push(optionText);
+              }
             }
           }
         }
         
-        // Add empty image object
-        question.image = {
-          url: "",
-          width: 0,
-          height: 0
-        };
+        // Add empty image object only for dropdown questions
+        if (questionType === "dropdown") {
+          question.image = {
+            url: "",
+            width: 0,
+            height: 0
+          };
+        }
         
         // Remove unnecessary fields
         delete question.min;
         delete question.max;
         delete question.amounts;
+        
+        // For checkbox questions, use 'undefined' for conditionalPDF answer
+        if (questionType === "checkbox") {
+          question.conditionalPDF.answer = "undefined";
+        }
       } else if (questionType === "text" || questionType === "date" || questionType === "number" || questionType === "bigParagraph") {
         // Remove unnecessary fields
         delete question.min;
