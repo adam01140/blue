@@ -2569,7 +2569,8 @@ window.exportGuiJson = function() {
       if (targetQuestion) {
         // Create terms for the calculation based on the question text and amount name
         const questionText = targetQuestion.text || "";
-        const cleanAmountName = amountName.trim().toLowerCase(); // Convert to lowercase for consistency
+        // Replace spaces with underscores and convert to lowercase for consistency
+        const cleanAmountName = amountName.trim().toLowerCase().replace(/\s+/g, '_');
         
         // First term has no operator
         calculation.terms.push({
