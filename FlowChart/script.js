@@ -543,7 +543,7 @@ document.addEventListener("DOMContentLoaded", function() {
   // Enter => newline
   graph.setEnterStopsCellEditing(false);
 
-  // Enable left-button panning on whitespace:
+  // Set up proper panning with left button
   graph.setPanning(true);
   graph.panningHandler.useLeftButtonForPanning = true;
 
@@ -551,7 +551,92 @@ document.addEventListener("DOMContentLoaded", function() {
   graph.setCellsMovable(true);
   graph.setConnectable(true);
   graph.setCellsResizable(true);
-  new mxRubberband(graph);
+
+  // We'll focus just on making right-click work properly
+  // Customize rubberband handling (we'll skip selection box for now)
+  const rubberband = new mxRubberband(graph);
+  
+  // Context menu handling
+  graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
+    propertiesMenu.style.display = "none";
+    typeSubmenu.style.display = "none";
+    selectedCell = cell;
+    currentMouseEvent = evt;
+    
+    // Right-click context menu
+    if (mxEvent.isRightMouseButton(evt)) {
+      const selectedCells = graph.getSelectionCells();
+      
+      if (selectedCells && selectedCells.length > 0) {
+        // Show context menu for cell(s)
+        const x = evt.clientX;
+        const y = evt.clientY;
+        
+        const menu = document.getElementById('contextMenu');
+        menu.style.display = 'block';
+        menu.style.left = x + 'px';
+        menu.style.top = y + 'px';
+        
+        // Update menu title to show number of selected items
+        if (selectedCells.length > 1) {
+          document.getElementById('deleteNode').textContent = `Delete ${selectedCells.length} Nodes`;
+          document.getElementById('copyNodeButton').textContent = `Copy ${selectedCells.length} Nodes`;
+          
+          // Hide options that don't apply to multiple nodes
+          document.getElementById('yesNoNode').style.display = 'none';
+          document.getElementById('changeType').style.display = 'none';
+          document.getElementById('jumpNode').style.display = 'none';
+          document.getElementById('propertiesButton').style.display = 'none';
+        } else {
+          // Single node selection - restore original text and show/hide options based on node type
+          document.getElementById('deleteNode').textContent = "Delete Node";
+          document.getElementById('copyNodeButton').textContent = "Copy";
+          document.getElementById('jumpNode').style.display = 'block';
+          document.getElementById('propertiesButton').style.display = 'block';
+          
+          const cell = selectedCells[0];
+          if (getNodeType(cell) === 'question') {
+            document.getElementById('yesNoNode').style.display = 'block';
+            document.getElementById('changeType').style.display = 'block';
+          } else {
+            document.getElementById('yesNoNode').style.display = 'none';
+            document.getElementById('changeType').style.display = 'none';
+          }
+        }
+      } else {
+        // No cells selected - show empty space context menu
+        const x = evt.clientX;
+        const y = evt.clientY;
+        
+        // Convert client coordinates to graph coordinates
+        const pt = graph.getPointForEvent(evt, false);
+        
+        // Store click position in global variables for later use
+        window.emptySpaceClickX = pt.x;
+        window.emptySpaceClickY = pt.y;
+        
+        // Show empty space context menu
+        const emptyMenu = document.getElementById('emptySpaceMenu');
+        emptyMenu.style.display = 'block';
+        emptyMenu.style.left = x + 'px';
+        emptyMenu.style.top = y + 'px';
+      }
+      evt.preventDefault();
+    }
+    
+    return null; // Always return null to prevent the default menu
+  };
+
+  document.addEventListener("click", e => {
+    if (
+      !contextMenu.contains(e.target) &&
+      !typeSubmenu.contains(e.target) &&
+      !propertiesMenu.contains(e.target)
+    ) {
+      hideContextMenu();
+      propertiesMenu.style.display = "none";
+    }
+  });
 
   // Slight style tweaks to move label text away from top
   const style = graph.getStylesheet().getDefaultVertexStyle();
@@ -672,65 +757,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
       }
     });
-  });
-
-  // Context menu
-  graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
-    propertiesMenu.style.display = "none";
-    typeSubmenu.style.display = "none";
-    selectedCell = cell;
-    currentMouseEvent = evt;
-    showContextMenu(evt);
-  };
-  function showContextMenu(evt) {
-    const cell = graph.getSelectionCell();
-    if (cell) {
-      // Existing code for cell context menu
-      const x = evt.clientX;
-      const y = evt.clientY;
-      
-      const menu = document.getElementById('contextMenu');
-      menu.style.display = 'block';
-      menu.style.left = x + 'px';
-      menu.style.top = y + 'px';
-      
-      // Show the relevant buttons based on cell type
-      if (getNodeType(cell) === 'question') {
-        document.getElementById('yesNoNode').style.display = 'block';
-        document.getElementById('changeType').style.display = 'block';
-      } else {
-        document.getElementById('yesNoNode').style.display = 'none';
-        document.getElementById('changeType').style.display = 'none';
-      }
-    } else {
-      // New code for empty space context menu
-      const x = evt.clientX;
-      const y = evt.clientY;
-      
-      // Convert client coordinates to graph coordinates
-      const pt = graph.getPointForEvent(evt, false);
-      
-      // Store click position in global variables for later use
-      window.emptySpaceClickX = pt.x;
-      window.emptySpaceClickY = pt.y;
-      
-      // Show empty space context menu
-      const emptyMenu = document.getElementById('emptySpaceMenu');
-      emptyMenu.style.display = 'block';
-      emptyMenu.style.left = x + 'px';
-      emptyMenu.style.top = y + 'px';
-    }
-    evt.preventDefault();
-  }
-  document.addEventListener("click", e => {
-    if (
-      !contextMenu.contains(e.target) &&
-      !typeSubmenu.contains(e.target) &&
-      !propertiesMenu.contains(e.target)
-    ) {
-      hideContextMenu();
-      propertiesMenu.style.display = "none";
-    }
   });
 
   // Delete node
@@ -1260,6 +1286,67 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     }
   });
+
+  // ... existing code ...
+
+  // Add keyboard event listener for delete key and copy/paste functionality
+  document.addEventListener('keydown', function(event) {
+    // Check if the key pressed is Delete or Backspace
+    if (event.key === 'Delete' || event.key === 'Backspace') {
+      // Check if we're currently typing in an input field
+      const activeElement = document.activeElement;
+      const isTyping = activeElement && (
+        activeElement.tagName === 'INPUT' || 
+        activeElement.tagName === 'TEXTAREA' || 
+        activeElement.tagName === 'SELECT' ||
+        activeElement.isContentEditable
+      );
+      
+      // Only proceed if we're not typing
+      if (!isTyping) {
+        // Get the selected cells
+        const selectedCells = graph.getSelectionCells();
+        
+        // If cells are selected and they're not root cells
+        if (selectedCells && selectedCells.length > 0) {
+          // Filter out any root cells (0 or 1)
+          const cellsToRemove = selectedCells.filter(cell => 
+            cell.id !== '0' && cell.id !== '1'
+          );
+          
+          if (cellsToRemove.length > 0) {
+            // Delete the cells
+            graph.removeCells(cellsToRemove);
+            
+            // Prevent default behavior (like going back in browser history)
+            event.preventDefault();
+          }
+        }
+      }
+    }
+    
+    // Keyboard shortcut for copy: Ctrl+C
+    if (event.key === 'c' && (event.ctrlKey || event.metaKey)) {
+      const selectedCells = graph.getSelectionCells();
+      if (selectedCells && selectedCells.length > 0) {
+        copySelectedNodeAsJson();
+        event.preventDefault();
+      }
+    }
+    
+    // Keyboard shortcut for paste: Ctrl+V
+    if (event.key === 'v' && (event.ctrlKey || event.metaKey)) {
+      // Get current mouse position for paste location
+      const mousePosition = graph.getPointForEvent(graph.lastEvent);
+      if (mousePosition) {
+        pasteNodeFromJson(mousePosition.x, mousePosition.y);
+      } else {
+        pasteNodeFromJson(); // Fall back to default position
+      }
+      event.preventDefault();
+    }
+  });
+  // ... existing code ...
 });
 
 /*******************************************************
@@ -2377,53 +2464,61 @@ window.exportGuiJson = function() {
       // Extract the amount name from the amount label
       // Format: "how_many_cars_do_you_have_delete_amount_delete_amount_add_option_car_value"
       let amountName = "";
+      let questionNameFromLabel = "";
       console.log("Looking for amount name in label:", amountLabel);
       
       if (amountLabel) {
-        // Special case for the specific known string
-        if (amountLabel === "how_many_cars_do_you_have_delete_amount_delete_amount_add_option_car_value") {
-          console.log("Found exact match for test string, using 'car value'");
-          amountName = "car value";
+        // First extract the question name from the label
+        // The format is usually "question_name_with_underscores_amount_name"
+        const cleanedLabel = amountLabel.replace(/delete_amount_/g, "").replace(/add_option_/g, "");
+        const parts = cleanedLabel.split('_');
+        
+        // Get the amount name (last part)
+        if (parts.length > 0) {
+          amountName = parts[parts.length - 1].replace(/_/g, " ").trim();
         }
-        // For this specific case, hardcode detection of "car_value" or "car value"
-        else if (amountLabel.includes("car_value")) {
-          amountName = "car value";
-        } else if (amountLabel.includes("car value")) {
-          amountName = "car value";
-        } else {
-          // General extraction approach - compare with known amounts
-          // Get all amounts from all questions
-          const allAmounts = [];
-          for (const section of sections) {
-            for (const question of section.questions) {
-              if (question.amounts && question.amounts.length > 0) {
-                question.amounts.forEach(amount => {
-                  allAmounts.push(amount);
-                });
-              }
+        
+        // Build the question name from everything except the last part
+        if (parts.length > 1) {
+          questionNameFromLabel = parts.slice(0, -1).join('_');
+        }
+        
+        console.log("Extracted question name from label:", questionNameFromLabel);
+        console.log("Extracted amount name:", amountName);
+        
+        // Get all amounts from all questions first
+        const allAmounts = [];
+        for (const section of sections) {
+          for (const question of section.questions) {
+            if (question.amounts && question.amounts.length > 0) {
+              question.amounts.forEach(amount => {
+                allAmounts.push(amount.trim());
+              });
             }
           }
-          
-          console.log("All known amounts:", allAmounts);
-          
-          // Try to find any of the known amounts in the label
-          for (const amount of allAmounts) {
-            if (amountLabel.includes(amount)) {
-              amountName = amount;
-              console.log("Found matching amount:", amountName);
-              break;
-            }
+        }
+        
+        console.log("All known amounts:", allAmounts);
+        
+        // Try to find any of the known amounts in the label (case insensitive)
+        // For multi-word amounts, we need to check both with spaces and with underscores
+        for (const amount of allAmounts) {
+          // Check original amount format
+          if (amountLabel.toLowerCase().includes(amount.toLowerCase())) {
+            amountName = amount;
+            console.log("Found matching amount:", amountName);
+            break;
           }
           
-          // If still no match, use simple approach - take last part after underscore
-          if (!amountName) {
-            const parts = amountLabel.split('_');
-            amountName = parts[parts.length - 1];
-            console.log("Fallback to last part:", amountName);
+          // Check with underscores instead of spaces
+          const amountWithUnderscores = amount.replace(/\s+/g, "_");
+          if (amountLabel.toLowerCase().includes(amountWithUnderscores.toLowerCase())) {
+            amountName = amount;
+            console.log("Found matching amount (underscore version):", amountName);
+            break;
           }
         }
       }
-      console.log("Extracted amount name:", amountName);
       
       // Find the question that contains this amount
       let targetQuestion = null;
@@ -2431,40 +2526,71 @@ window.exportGuiJson = function() {
       // Search through all questions to find the one with this amount
       for (const section of sections) {
         for (const question of section.questions) {
-          if (question.amounts && question.amounts.includes(amountName)) {
-            targetQuestion = question;
-            console.log("Found matching question:", question);
-            break;
+          // First try to match the question using the question name from the label
+          const cleanQuestionText = (question.text || "")
+            .toLowerCase()
+            .replace(/[^\w\s]/gi, "")
+            .replace(/\s+/g, "_");
+          
+          // Check if this question matches the question name from the label
+          const isQuestionMatch = questionNameFromLabel && 
+                                 cleanQuestionText.includes(questionNameFromLabel);
+          
+          if (isQuestionMatch && question.amounts) {
+            // If we have a question name match, check if it has the amount
+            for (const amount of question.amounts) {
+              if (amount === amountName || amount.trim() === amountName || 
+                  amount === amountName.trim() || amount.trim() === amountName.trim()) {
+                targetQuestion = question;
+                console.log("Found perfect match (question + amount):", question);
+                break;
+              }
+            }
           }
+          
+          // If we still don't have a match, but the question has the amount, use it as a fallback
+          if (!targetQuestion && question.amounts) {
+            for (const amount of question.amounts) {
+              if (amount === amountName || amount.trim() === amountName || 
+                  amount === amountName.trim() || amount.trim() === amountName.trim()) {
+                targetQuestion = question;
+                console.log("Found fallback match (amount only):", question);
+                break;
+              }
+            }
+          }
+          
+          if (targetQuestion) break;
         }
         if (targetQuestion) break;
       }
-      
-      // If we found a matching question, create the proper calculation
+
+      // Generate calculation terms if we found a matching question
       if (targetQuestion) {
-        console.log("Creating terms for question ID:", targetQuestion.questionId);
-        console.log("Question text:", targetQuestion.text);
-        console.log("Min:", targetQuestion.min, "Max:", targetQuestion.max);
+        // Create terms for the calculation based on the question text and amount name
+        const questionText = targetQuestion.text || "";
+        const cleanAmountName = amountName.trim().toLowerCase(); // Convert to lowercase for consistency
         
-        if (targetQuestion.type === "numberedDropdown") {
-          // Capitalize first letter of question text
-          const questionText = targetQuestion.text.charAt(0).toUpperCase() + targetQuestion.text.slice(1);
-          const min = parseInt(targetQuestion.min) || 1;
-          const max = parseInt(targetQuestion.max) || 1;
-          
-          console.log("Creating terms from", min, "to", max);
-          
-          for (let i = min; i <= max; i++) {
-            // Note: We need to replace spaces with underscores in the amount name for the questionNameId
-            const amountWithUnderscores = amountName.replace(/\s+/g, "_");
-            const term = {
-              operator: i > min ? "+" : "",
-              questionNameId: `${questionText}_${i}_${amountWithUnderscores}`
-            };
-            console.log("Adding term:", term);
-            calculation.terms.push(term);
-          }
+        // First term has no operator
+        calculation.terms.push({
+          operator: "",
+          questionNameId: `${questionText}_1_${cleanAmountName}`
+        });
+        
+        // Add additional terms with the "+" operator
+        // For numberedDropdown questions, use the min/max values to determine how many terms to add
+        const min = parseInt(targetQuestion.min || "1", 10);
+        const max = parseInt(targetQuestion.max || "4", 10);
+        
+        // Add terms for each number from 2 to max (or up to 4 if no max specified)
+        for (let i = 2; i <= max; i++) {
+          calculation.terms.push({
+            operator: "+",
+            questionNameId: `${questionText}_${i}_${cleanAmountName}`
+          });
         }
+        
+        console.log("Generated calculation terms:", calculation.terms);
       } else {
         console.log("No matching question found for amount:", amountName);
       }
@@ -2767,32 +2893,81 @@ window.updateImageOptionHeight = function(cellId, value) {
 
 // Example: Copy the currently selected node to clipboard
 function copySelectedNodeAsJson() {
-  const cell = graph.getSelectionCell();
-  if (!cell) {
+  const cells = graph.getSelectionCells();
+  if (!cells || cells.length === 0) {
     alert("Nothing selected.");
     return;
   }
-  const data = {
-    id: cell.id,
-    value: cell.value,
-    style: cell.style,
-    geometry: cell.geometry ? {
-      width: cell.geometry.width,
-      height: cell.geometry.height
-    } : null,
-    _textboxes: cell._textboxes || null,
-    _questionText: cell._questionText || null,
-    _twoNumbers: cell._twoNumbers || null,
-    _calcTitle: cell._calcTitle,
-    _calcAmountLabel: cell._calcAmountLabel,
-    _calcOperator: cell._calcOperator,
-    _calcThreshold: cell._calcThreshold,
-    _calcFinalText: cell._calcFinalText,
-    _image: cell._image
-  };
-  navigator.clipboard.writeText(JSON.stringify(data)).then(() => {
-    console.log("Node JSON copied to system clipboard!");
-  });
+  
+  // If multiple cells are selected, create an array of cell data
+  if (cells.length > 1) {
+    const cellsData = cells.map(cell => ({
+      id: cell.id,
+      value: cell.value,
+      style: cell.style,
+      geometry: cell.geometry ? {
+        x: cell.geometry.x,
+        y: cell.geometry.y,
+        width: cell.geometry.width,
+        height: cell.geometry.height
+      } : null,
+      _textboxes: cell._textboxes || null,
+      _questionText: cell._questionText || null,
+      _twoNumbers: cell._twoNumbers || null,
+      _calcTitle: cell._calcTitle,
+      _calcAmountLabel: cell._calcAmountLabel,
+      _calcOperator: cell._calcOperator,
+      _calcThreshold: cell._calcThreshold,
+      _calcFinalText: cell._calcFinalText || "",
+      _image: cell._image
+    }));
+    
+    // Also record the edges between selected cells
+    const edges = [];
+    cells.forEach(cell => {
+      if (!cell.isEdge()) {
+        const outgoingEdges = graph.getOutgoingEdges(cell);
+        outgoingEdges.forEach(edge => {
+          if (cells.includes(edge.target)) {
+            edges.push({
+              source: cells.indexOf(edge.source),
+              target: cells.indexOf(edge.target),
+              style: edge.style
+            });
+          }
+        });
+      }
+    });
+    
+    const data = { cells: cellsData, edges: edges, isMultiCopy: true };
+    navigator.clipboard.writeText(JSON.stringify(data)).then(() => {
+      console.log("Multiple nodes copied to system clipboard!");
+    });
+  } else {
+    // Single cell copy (original behavior)
+    const cell = cells[0];
+    const data = {
+      id: cell.id,
+      value: cell.value,
+      style: cell.style,
+      geometry: cell.geometry ? {
+        width: cell.geometry.width,
+        height: cell.geometry.height
+      } : null,
+      _textboxes: cell._textboxes || null,
+      _questionText: cell._questionText || null,
+      _twoNumbers: cell._twoNumbers || null,
+      _calcTitle: cell._calcTitle,
+      _calcAmountLabel: cell._calcAmountLabel,
+      _calcOperator: cell._calcOperator,
+      _calcThreshold: cell._calcThreshold,
+      _calcFinalText: cell._calcFinalText || "",
+      _image: cell._image
+    };
+    navigator.clipboard.writeText(JSON.stringify(data)).then(() => {
+      console.log("Node JSON copied to system clipboard!");
+    });
+  }
 }
 
 // Example: Paste from JSON (same or different tab)
@@ -2801,46 +2976,139 @@ function pasteNodeFromJson(x, y) {
     try {
       const data = JSON.parse(text);
       
-      graph.getModel().beginUpdate();
-      try {
-        // Use provided position or default to a fixed position
-        const posX = x !== undefined ? x : 50;
-        const posY = y !== undefined ? y : 50;
-        
-        // Use the original dimensions if available
-        const width = data.geometry && data.geometry.width ? data.geometry.width : 160;
-        const height = data.geometry && data.geometry.height ? data.geometry.height : 80;
-        
-        const geo = new mxGeometry(posX, posY, width, height);
-        const newCell = new mxCell(data.value, geo, data.style || "");
-        newCell.vertex = true;
-        
-        // Copy all custom properties
-        newCell._textboxes = data._textboxes || null;
-        newCell._questionText = data._questionText || null;
-        newCell._twoNumbers = data._twoNumbers || null;
-        newCell._calcTitle = data._calcTitle;
-        newCell._calcAmountLabel = data._calcAmountLabel;
-        newCell._calcOperator = data._calcOperator;
-        newCell._calcThreshold = data._calcThreshold;
-        newCell._calcFinalText = data._calcFinalText;
-        newCell._image = data._image;
-        
-        graph.addCell(newCell, graph.getDefaultParent());
-        graph.setSelectionCell(newCell);
-        
-        // Update any special cell types
-        if (isCalculationNode(newCell)) {
-          updateCalculationNodeCell(newCell);
-        } else if (isQuestion(newCell) && getQuestionType(newCell) === "multipleTextboxes") {
-          updateMultipleTextboxesCell(newCell);
-        } else if (isQuestion(newCell) && getQuestionType(newCell) === "multipleDropdownType") {
-          updatemultipleDropdownTypeCell(newCell);
-        } else if (isOptions(newCell) && getQuestionType(newCell) === "imageOption") {
-          updateImageOptionCell(newCell);
+      // Check if this is a multi-cell paste
+      if (data.isMultiCopy && data.cells && data.cells.length > 0) {
+        graph.getModel().beginUpdate();
+        try {
+          // Use provided position or default to a fixed position
+          const posX = x !== undefined ? x : 50;
+          const posY = y !== undefined ? y : 50;
+          
+          // Track the bounding box of all original cells
+          let minX = Infinity, minY = Infinity;
+          data.cells.forEach(cellData => {
+            if (cellData.geometry) {
+              minX = Math.min(minX, cellData.geometry.x);
+              minY = Math.min(minY, cellData.geometry.y);
+            }
+          });
+          
+          // Create all cells first
+          const newCells = [];
+          data.cells.forEach(cellData => {
+            // Calculate offset to maintain relative positions
+            const offsetX = (cellData.geometry.x - minX) + posX;
+            const offsetY = (cellData.geometry.y - minY) + posY;
+            
+            const geo = new mxGeometry(
+              offsetX,
+              offsetY,
+              cellData.geometry.width,
+              cellData.geometry.height
+            );
+            
+            const newCell = new mxCell(cellData.value, geo, cellData.style || "");
+            newCell.vertex = true;
+            
+            // Copy all custom properties
+            newCell._textboxes = cellData._textboxes || null;
+            newCell._questionText = cellData._questionText || null;
+            newCell._twoNumbers = cellData._twoNumbers || null;
+            newCell._calcTitle = cellData._calcTitle;
+            newCell._calcAmountLabel = cellData._calcAmountLabel;
+            newCell._calcOperator = cellData._calcOperator;
+            newCell._calcThreshold = cellData._calcThreshold;
+            newCell._calcFinalText = cellData._calcFinalText;
+            newCell._image = cellData._image;
+            
+            graph.addCell(newCell, graph.getDefaultParent());
+            newCells.push(newCell);
+          });
+          
+          // Create all edges afterwards
+          if (data.edges) {
+            data.edges.forEach(edgeData => {
+              if (edgeData.source >= 0 && edgeData.source < newCells.length &&
+                  edgeData.target >= 0 && edgeData.target < newCells.length) {
+                const sourceCell = newCells[edgeData.source];
+                const targetCell = newCells[edgeData.target];
+                const edge = graph.insertEdge(
+                  graph.getDefaultParent(), 
+                  null, 
+                  '', 
+                  sourceCell, 
+                  targetCell, 
+                  edgeData.style
+                );
+              }
+            });
+          }
+          
+          // Select all pasted cells
+          graph.setSelectionCells(newCells);
+          
+          // Update any special cell types
+          newCells.forEach(cell => {
+            if (isCalculationNode(cell)) {
+              updateCalculationNodeCell(cell);
+            } else if (isQuestion(cell) && getQuestionType(cell) === "multipleTextboxes") {
+              updateMultipleTextboxesCell(cell);
+            } else if (isQuestion(cell) && getQuestionType(cell) === "multipleDropdownType") {
+              updatemultipleDropdownTypeCell(cell);
+            } else if (isOptions(cell) && getQuestionType(cell) === "imageOption") {
+              updateImageOptionCell(cell);
+            } else if (isEndNode(cell)) {
+              updateEndNodeCell(cell);
+            }
+          });
+        } finally {
+          graph.getModel().endUpdate();
         }
-      } finally {
-        graph.getModel().endUpdate();
+      } else {
+        // Original single-cell paste
+        graph.getModel().beginUpdate();
+        try {
+          // Use provided position or default to a fixed position
+          const posX = x !== undefined ? x : 50;
+          const posY = y !== undefined ? y : 50;
+          
+          // Use the original dimensions if available
+          const width = data.geometry && data.geometry.width ? data.geometry.width : 160;
+          const height = data.geometry && data.geometry.height ? data.geometry.height : 80;
+          
+          const geo = new mxGeometry(posX, posY, width, height);
+          const newCell = new mxCell(data.value, geo, data.style || "");
+          newCell.vertex = true;
+          
+          // Copy all custom properties
+          newCell._textboxes = data._textboxes || null;
+          newCell._questionText = data._questionText || null;
+          newCell._twoNumbers = data._twoNumbers || null;
+          newCell._calcTitle = data._calcTitle;
+          newCell._calcAmountLabel = data._calcAmountLabel;
+          newCell._calcOperator = data._calcOperator;
+          newCell._calcThreshold = data._calcThreshold;
+          newCell._calcFinalText = data._calcFinalText;
+          newCell._image = data._image;
+          
+          graph.addCell(newCell, graph.getDefaultParent());
+          graph.setSelectionCell(newCell);
+          
+          // Update any special cell types
+          if (isCalculationNode(newCell)) {
+            updateCalculationNodeCell(newCell);
+          } else if (isQuestion(newCell) && getQuestionType(newCell) === "multipleTextboxes") {
+            updateMultipleTextboxesCell(newCell);
+          } else if (isQuestion(newCell) && getQuestionType(newCell) === "multipleDropdownType") {
+            updatemultipleDropdownTypeCell(newCell);
+          } else if (isOptions(newCell) && getQuestionType(newCell) === "imageOption") {
+            updateImageOptionCell(newCell);
+          } else if (isEndNode(newCell)) {
+            updateEndNodeCell(newCell);
+          }
+        } finally {
+          graph.getModel().endUpdate();
+        }
       }
       refreshAllCells();
     } catch (err) {
