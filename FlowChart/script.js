@@ -2626,11 +2626,10 @@ window.exportGuiJson = function() {
               // We found a direct conditional relationship - add it to the logic
               question.logic.enabled = true;
               
-              // Add the condition (capitalize the option text for consistency)
-              const capitalizedOption = optionText.charAt(0).toUpperCase() + optionText.slice(1);
+              // Add the condition (preserve original case instead of capitalizing)
               question.logic.conditions.push({
                 prevQuestion: parentQuestionId.toString(),
-                prevAnswer: capitalizedOption
+                prevAnswer: optionText
               });
             }
           }
@@ -2800,6 +2799,34 @@ window.exportGuiJson = function() {
 
   // Explicitly set hiddenFieldCounter to 3
   hiddenFieldCounter = 3;
+
+  // Before creating the final JSON object, ensure all prevAnswer values preserve original case
+  for (const section of sections) {
+    for (const question of section.questions) {
+      if (question.logic && question.logic.conditions && question.logic.conditions.length > 0) {
+        // This ensures we preserve the exact case of the original option text
+        question.logic.conditions.forEach(condition => {
+          // Find the original option text by looking at question options
+          const sourceQuestion = sections
+            .flatMap(s => s.questions)
+            .find(q => q.questionId.toString() === condition.prevQuestion);
+          
+          if (sourceQuestion && sourceQuestion.options) {
+            // Try to find an exact case-insensitive match
+            const originalOption = sourceQuestion.options.find(
+              opt => typeof opt === 'string' && 
+              opt.toLowerCase() === condition.prevAnswer.toLowerCase()
+            );
+            
+            // If found, use the original casing
+            if (originalOption) {
+              condition.prevAnswer = originalOption;
+            }
+          }
+        });
+      }
+    }
+  }
 
   // Create the final JSON object
   const jsonData = {
