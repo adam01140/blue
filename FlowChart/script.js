@@ -2440,9 +2440,19 @@ window.exportGuiJson = function() {
         delete question.max;
         delete question.amounts;
         
-        // For checkbox questions, use 'undefined' for conditionalPDF answer
+        // For checkbox questions, use first option for conditionalPDF answer
         if (questionType === "checkbox") {
-          question.conditionalPDF.answer = "undefined";
+          // Set conditionalPDF answer to the first option (capitalized)
+          if (question.options.length > 0) {
+            if (typeof question.options[0] === 'object') {
+              question.conditionalPDF.answer = question.options[0].label;
+            } else {
+              const firstOption = question.options[0];
+              question.conditionalPDF.answer = firstOption.charAt(0).toUpperCase() + firstOption.slice(1);
+            }
+          } else {
+            question.conditionalPDF.answer = "undefined";
+          }
         }
       } else if (questionType === "text" || questionType === "date" || questionType === "number" || questionType === "bigParagraph") {
         // Remove unnecessary fields
@@ -2507,6 +2517,38 @@ window.exportGuiJson = function() {
       question.logic.conditions = [];
       question.logic.enabled = false;
       
+      // Also initialize jump logic
+      question.jump = question.jump || {};
+      question.jump.enabled = false;
+      question.jump.conditions = [];
+      
+      // Check for options that connect to END nodes
+      const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+      for (const edge of outgoingEdges) {
+        const targetOptionCell = edge.target;
+        if (targetOptionCell && isOptions(targetOptionCell)) {
+          const optionText = targetOptionCell.value.replace(/<[^>]+>/g, "").trim();
+          
+          // Check if this option leads to an END node
+          const optionOutgoingEdges = graph.getOutgoingEdges(targetOptionCell) || [];
+          for (const optionEdge of optionOutgoingEdges) {
+            const endNodeCell = optionEdge.target;
+            if (endNodeCell && isEndNode(endNodeCell)) {
+              // This option jumps to an END node
+              question.jump.enabled = true;
+              
+              // Capitalize first letter of option for consistency
+              const capitalizedOption = optionText.charAt(0).toUpperCase() + optionText.slice(1);
+              
+              question.jump.conditions.push({
+                option: capitalizedOption,
+                to: "end"
+              });
+            }
+          }
+        }
+      }
+      
       // Check for direct incoming edges from option cells
       const incomingEdges = graph.getIncomingEdges(cell) || [];
       
@@ -2539,7 +2581,7 @@ window.exportGuiJson = function() {
                   // Add ONLY the direct condition from the immediate parent option
                   question.logic.conditions.push({
                     prevQuestion: parentQuestionId.toString(),
-                    prevAnswer: optionText
+                    prevAnswer: optionText.charAt(0).toUpperCase() + optionText.slice(1)
                   });
                 }
               }
@@ -2572,7 +2614,7 @@ window.exportGuiJson = function() {
                 if (!existingCondition) {
                   question.logic.conditions.push({
                     prevQuestion: condition.prevQuestion,
-                    prevAnswer: condition.prevAnswer
+                    prevAnswer: condition.prevAnswer.charAt(0).toUpperCase() + condition.prevAnswer.slice(1)
                   });
                 }
               });
