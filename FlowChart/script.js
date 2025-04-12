@@ -2386,6 +2386,9 @@ window.exportGuiJson = function() {
       
       const questionType = getQuestionType(cell);
       
+      // Set to track added options to prevent duplicates
+      let addedOptions = new Set();
+      
       if (questionType === "dropdown" || questionType === "checkbox") {
         // Add empty image object for dropdown questions by default
         if (questionType === "dropdown") {
@@ -2398,10 +2401,20 @@ window.exportGuiJson = function() {
         
         // Find all outgoing edges to get options and possibly image nodes
         const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+
+        // First, deduplicate the edges - we may have multiple connections from the same source to target
+        const uniqueTargetMap = new Map(); // Map<targetId, targetCell>
         for (const edge of outgoingEdges) {
           const targetCell = edge.target;
           if (!targetCell) continue;
-          
+          // Only keep the first instance of each target cell
+          if (!uniqueTargetMap.has(targetCell.id)) {
+            uniqueTargetMap.set(targetCell.id, targetCell);
+          }
+        }
+
+        // Process unique target cells
+        for (const targetCell of uniqueTargetMap.values()) {
           // Check if this is an image option node
           if (isOptions(targetCell) && getQuestionType(targetCell) === "imageOption") {
             // Found an image node, update the question's image property
@@ -2418,7 +2431,13 @@ window.exportGuiJson = function() {
           
           if (targetCell && isOptions(targetCell)) {
             const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
-            if (optionText) {
+            // Create addedOptions set if it doesn't exist
+            if (!addedOptions) {
+              addedOptions = new Set();
+            }
+            if (optionText && !addedOptions.has(optionText.toLowerCase())) {
+              addedOptions.add(optionText.toLowerCase());
+              
               // For checkbox questions, create structured options
               if (questionType === "checkbox") {
                 // Reset options array if it contains strings
@@ -2426,8 +2445,20 @@ window.exportGuiJson = function() {
                   question.options = [];
                 }
                 
-                // Create a nameId by combining the question nameId and the option text
-                const optionNameId = question.nameId.toLowerCase() + "_" + optionText.toLowerCase().replace(/\s+/g, '_');
+                // Extract the full question nameId for consistent option naming
+                let fullQuestionNameId = question.nameId;
+                if (cell.style && cell.style.includes("nodeId=")) {
+                  const match = cell.style.match(/nodeId=([^;]+)/);
+                  if (match && match[1]) {
+                    const decodedId = decodeURIComponent(match[1]);
+                    if (decodedId.length > fullQuestionNameId.length) {
+                      fullQuestionNameId = decodedId;
+                    }
+                  }
+                }
+                
+                // Create a nameId by combining the full question nameId and the option text
+                const optionNameId = fullQuestionNameId.toLowerCase() + "_" + optionText.toLowerCase().replace(/\s+/g, '_');
                 
                 // Capitalize first letter of option label
                 const label = optionText.charAt(0).toUpperCase() + optionText.slice(1);
@@ -2443,6 +2474,22 @@ window.exportGuiJson = function() {
                 };
                 
                 question.options.push(optionObj);
+
+                // Check if this option leads to an END node
+                const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+                for (const optionEdge of optionOutgoingEdges) {
+                  const endNodeCell = optionEdge.target;
+                  if (endNodeCell && isEndNode(endNodeCell)) {
+                    // This option jumps to an END node
+                    question.jump.enabled = true;
+                    
+                    // Add jump condition with the correct case
+                    question.jump.conditions.push({
+                      option: label,
+                      to: "end"
+                    });
+                  }
+                }
               } else {
                 // For dropdown questions, keep using simple strings
                 question.options.push(optionText);
@@ -2557,7 +2604,7 @@ window.exportGuiJson = function() {
       question.jump.conditions = [];
       
       // Check for options that connect to END nodes
-      const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
       
       // Special handling for multipleDropdownType/numberedDropdown questions connected to END nodes
       if (question.type === "numberedDropdown") {
@@ -2603,6 +2650,56 @@ window.exportGuiJson = function() {
               }
             }
             if (hasEndConnection) break;
+          }
+        }
+      }
+      // Handle checkbox questions
+      else if (question.type === "checkbox") {
+        // Find all option nodes connected to this checkbox question
+        for (const edge of outgoingEdges) {
+          const targetOptionCell = edge.target;
+          if (targetOptionCell && isOptions(targetOptionCell)) {
+            const optionText = targetOptionCell.value.replace(/<[^>]+>/g, "").trim();
+            const optionOutgoingEdges = graph.getOutgoingEdges(targetOptionCell) || [];
+            
+            // Check if this option leads to an END node
+            for (const optionEdge of optionOutgoingEdges) {
+              const endNodeCell = optionEdge.target;
+              if (endNodeCell && isEndNode(endNodeCell)) {
+                // This option jumps to an END node
+                question.jump.enabled = true;
+                
+                // Check both string options and structured options
+                let foundOption = false;
+                for (const option of question.options) {
+                  if (typeof option === 'string' && option.toLowerCase() === optionText.toLowerCase()) {
+                    // Add jump condition with the correct case for string options
+                    question.jump.conditions.push({
+                      option: option,
+                      to: "end"
+                    });
+                    foundOption = true;
+                    break;
+                  } else if (typeof option === 'object' && option.label && option.label.toLowerCase() === optionText.toLowerCase()) {
+                    // Add jump condition with the correct case from the structured option
+                    question.jump.conditions.push({
+                      option: option.label,
+                      to: "end"
+                    });
+                    foundOption = true;
+                    break;
+                  }
+                }
+                
+                // If we couldn't find a direct match, use the option text as-is
+                if (!foundOption) {
+                  question.jump.conditions.push({
+                    option: optionText,
+                    to: "end"
+                  });
+                }
+              }
+            }
           }
         }
       }
@@ -2654,17 +2751,20 @@ window.exportGuiJson = function() {
             }
             
             if (parentQuestion && parentQuestion.logic.enabled) {
-              // Mark this question's logic as enabled
-              question.logic.enabled = true;
-              
-              // Inherit all conditions from the parent question
-              parentQuestion.logic.conditions.forEach(condition => {
-                // Add the parent's condition
-                question.logic.conditions.push({
-                  prevQuestion: condition.prevQuestion,
-                  prevAnswer: condition.prevAnswer
+              // Only inherit if we don't already have conditions
+              if (question.logic.conditions.length === 0) {
+                // Mark this question's logic as enabled
+                question.logic.enabled = true;
+                
+                // Inherit all conditions from the parent question
+                parentQuestion.logic.conditions.forEach(condition => {
+                  // Add the parent's condition
+                  question.logic.conditions.push({
+                    prevQuestion: condition.prevQuestion,
+                    prevAnswer: condition.prevAnswer
+                  });
                 });
-              });
+              }
             }
           }
         }
