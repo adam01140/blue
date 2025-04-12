@@ -514,7 +514,7 @@ function getFormHTML() {
             } else {
               logicScriptBuffer += ` (function(){\n`;
               logicScriptBuffer += `   var el3= document.getElementById("answer${pqVal2}") || document.getElementById(questionNameIds["${pqVal2}"]);\n`;
-              logicScriptBuffer += `   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}\n`;
+              logicScriptBuffer += `   if(el3){ el3.addEventListener("input", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
             }
           }
