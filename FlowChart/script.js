@@ -2041,6 +2041,20 @@ function setQuestionType(cell, newType) {
     } else {
       updatemultipleDropdownTypeCell(cell);
     }
+  } else if (newType === "dropdown") {
+    style += `;questionType=${newType};pointerEvents=1;overflow=fill;`;
+    if (!cell._questionText) {
+      cell._questionText = "Enter question text";
+    }
+    
+    // Create a more visible dropdown question with a text field
+    let html = `<div class="dropdown-question" style="display:flex; flex-direction:column; align-items:center;">
+      <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true"onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}"ondblclick="event.stopPropagation(); this.focus();"onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
+        ${cell._questionText || "Enter dropdown question"}
+      </div>
+    </div>`;
+    
+    cell.value = html;
   } else {
     style += `;questionType=${newType};`;
     cell.value = newType.charAt(0).toUpperCase() + newType.slice(1) + " question node";
@@ -2120,6 +2134,18 @@ function refreshAllCells() {
     if (isOptions(cell) && getQuestionType(cell) === "imageOption") {
       updateImageOptionCell(cell);
     }
+    
+    // If it's a dropdown with _questionText but not yet formatted
+    if (isQuestion(cell) && getQuestionType(cell) === "dropdown" && cell._questionText) {
+      let html = `<div class="dropdown-question" style="display:flex; flex-direction:column; align-items:center;">
+        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true"onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}"ondblclick="event.stopPropagation(); this.focus();"onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
+          ${escapeHtml(cell._questionText)}
+        </div>
+      </div>`;
+      
+      cell.value = html;
+    }
+    
     // If newly dropped question node is just placeholder
     if (isQuestion(cell) &&
        (cell.value === "question node" || cell.value === "Question Node")) {
@@ -2385,6 +2411,16 @@ window.exportGuiJson = function() {
       if (!cell) continue;
       
       const questionType = getQuestionType(cell);
+      
+      // Map number type to money type for GUI JSON
+      if (questionType === "number") {
+        question.type = "money";
+      }
+      
+      // Use the _nameId property if available instead of nodeId
+      if (cell._nameId) {
+        question.nameId = cell._nameId;
+      }
       
       // Set to track added options to prevent duplicates
       let addedOptions = new Set();
@@ -3472,3 +3508,27 @@ function createYesNoOptions(parentCell) {
   }
   refreshAllCells();
 }
+
+// For dropdown questions
+window.updateDropdownQuestionText = function(cellId, text) {
+  const cell = graph.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "dropdown") {
+    graph.getModel().beginUpdate();
+    try {
+      cell._questionText = text.trim() || "Enter dropdown question";
+      
+      // Recreate the HTML with the updated text
+      let html = `<div class="dropdown-question" style="display:flex; flex-direction:column; align-items:center;">
+        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true"onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}"ondblclick="event.stopPropagation(); this.focus();"onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
+          ${escapeHtml(cell._questionText)}
+        </div>
+      </div>`;
+      
+      cell.value = html;
+      refreshNodeIdFromLabel(cell);
+    } finally {
+      graph.getModel().endUpdate();
+    }
+    graph.updateCellSize(cell);
+  }
+};
