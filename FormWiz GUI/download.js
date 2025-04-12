@@ -611,9 +611,31 @@ function exportForm() {
                     const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
                     const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
 
-                    const labelText = labelInput?.value.trim() || `Textbox ${index + 1}`;
-                    const nameId = nameIdInput?.value.trim() || `answer${questionId}_${index + 1}`;
-                    const placeholder = placeholderInput?.value.trim() || '';
+                    // Handle each case separately to preserve empty strings
+                    let labelText, nameId, placeholder;
+                    
+                    // For label: preserve empty string if input exists
+                    if (!labelInput) {
+                        labelText = `Textbox ${index + 1}`;
+                    } else {
+                        // Don't trim if the value is explicitly an empty string
+                        labelText = labelInput.value === '' ? '' : labelInput.value.trim();
+                    }
+                    
+                    // For nameId: default only if input doesn't exist or value is empty
+                    if (!nameIdInput || nameIdInput.value.trim() === '') {
+                        nameId = `answer${questionId}_${index + 1}`;
+                    } else {
+                        nameId = nameIdInput.value.trim();
+                    }
+                    
+                    // For placeholder: preserve empty string if input exists
+                    if (!placeholderInput) {
+                        placeholder = '';
+                    } else {
+                        // Don't trim if the value is explicitly an empty string
+                        placeholder = placeholderInput.value === '' ? '' : placeholderInput.value.trim();
+                    }
 
                     questionData.textboxes.push({
                         label: labelText,
