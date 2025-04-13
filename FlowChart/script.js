@@ -50,7 +50,9 @@ function getNodeType(cell) {
 }
 
 function isEndNode(cell) {
-  return (cell && cell.style && cell.style.includes("nodeType=end")) || (cell && cell.id === "1");
+  return (cell && cell.style && cell.style.includes("nodeType=end")) || 
+         (cell && cell.id === "1") || 
+         (cell && cell.id === "19");
 }
 
 function updateEndNodeCell(cell) {
@@ -2551,6 +2553,7 @@ window.exportGuiJson = function() {
                 
         // For numbered dropdown/dropdown/checkbox question types, check if the outgoing edges lead to END nodes
         if (questionType === "numberedDropdown" || questionType === "dropdown" || questionType === "checkbox") {
+          console.log(`Checking if question ${question.questionId} (${question.text}) has options leading to END`);
           const outgoingEdges = graph.getOutgoingEdges(cell) || [];
           
           for (const edge of outgoingEdges) {
@@ -2559,17 +2562,19 @@ window.exportGuiJson = function() {
             // If it's an option node, check where it leads
             if (targetCell && isOptions(targetCell)) {
               const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
+              console.log(`  Checking option "${optionText}" for question ${question.questionId}`);
               const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
               
               for (const optionEdge of optionOutgoingEdges) {
                 const optionTarget = optionEdge.target;
+                console.log(`    Option ${optionText} leads to cell ID ${optionTarget ? optionTarget.id : 'unknown'}, style: ${optionTarget ? optionTarget.style : 'unknown'}`);
                 
                 // Check if this option leads to an END node
                 if (optionTarget && isEndNode(optionTarget)) {
                   // Add to our list of options that jump to END
                   optionsWithJumpToEnd.push(optionText);
                   // Debug log for jump to END detection
-                  console.log(`Found option "${optionText}" that jumps to END for question ${question.questionId}`);
+                  console.log(`    FOUND: Option "${optionText}" jumps to END for question ${question.questionId}`);
                 }
               }
             }
@@ -2758,7 +2763,7 @@ window.exportGuiJson = function() {
                 
                 // Add the logic condition
                 question.logic.conditions.push({
-                  prevQuestion: prevQuestionId,
+                  prevQuestion: prevQuestionId.toString(),
                   prevAnswer: optionValue
                 });
               }
@@ -2929,6 +2934,17 @@ window.exportGuiJson = function() {
     }
   }
 
+  // Before creating the final JSON object, ensure all dropdown questions have options
+  for (const section of sections) {
+    for (const question of section.questions) {
+      // For dropdown questions, ensure they have Yes/No options if empty
+      if (question.type === "dropdown" && (!question.options || question.options.length === 0)) {
+        console.log(`Adding default Yes/No options to dropdown question ${question.questionId} (${question.text})`);
+        question.options = ["No", "Yes"];
+      }
+    }
+  }
+  
   // Create the final JSON object
   const guiJson = {
     sections: sections,
@@ -2938,6 +2954,51 @@ window.exportGuiJson = function() {
     hiddenFieldCounter: hiddenFieldCounter,
     defaultPDFName: ""
   };
+  
+  // Fifth pass: Propagate logic conditions to sequential questions
+  // For questions that are directly connected (sequential flow), they should inherit
+  // the same logic conditions from their previous questions if they have no conditions themselves
+  for (const section of sections) {
+    for (const question of section.questions) {
+      const cell = questionCellMap.get(question.questionId);
+      if (!cell) continue;
+      
+      // Skip questions that already have logic conditions
+      if (question.logic.enabled && question.logic.conditions.length > 0) continue;
+      
+      // Check incoming edges from questions (not option nodes)
+      const incomingEdges = graph.getIncomingEdges(cell) || [];
+      let prevQuestionWithLogic = null;
+      
+      for (const edge of incomingEdges) {
+        const sourceCell = edge.source;
+        if (sourceCell && isQuestion(sourceCell)) {
+          // Found a direct connection from another question
+          const sourceQuestionId = questionIdMap.get(sourceCell.id);
+          if (!sourceQuestionId) continue;
+          
+          // Find the source question object
+          let sourceQuestion = null;
+          for (const sec of sections) {
+            sourceQuestion = sec.questions.find(q => q.questionId === sourceQuestionId);
+            if (sourceQuestion) break;
+          }
+          
+          if (sourceQuestion && sourceQuestion.logic.enabled && sourceQuestion.logic.conditions.length > 0) {
+            prevQuestionWithLogic = sourceQuestion;
+            break;
+          }
+        }
+      }
+      
+      // If we found a previous question with logic, propagate its conditions
+      if (prevQuestionWithLogic) {
+        console.log(`Propagating logic from question ${prevQuestionWithLogic.questionId} to sequential question ${question.questionId}`);
+        question.logic.enabled = true;
+        question.logic.conditions = JSON.parse(JSON.stringify(prevQuestionWithLogic.logic.conditions));
+      }
+    }
+  }
   
   // For debugging, display full information about connections
   console.log("Final GUI JSON:", JSON.stringify(guiJson, null, 2));
