@@ -50,7 +50,7 @@ function getNodeType(cell) {
 }
 
 function isEndNode(cell) {
-  return cell && cell.style && cell.style.includes("nodeType=end");
+  return (cell && cell.style && cell.style.includes("nodeType=end")) || (cell && cell.id === "1");
 }
 
 function updateEndNodeCell(cell) {
@@ -2538,27 +2538,57 @@ window.exportGuiJson = function() {
                 };
                 
                 question.options.push(optionObj);
-
-                // Check if this option leads to an END node
-                const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
-                for (const optionEdge of optionOutgoingEdges) {
-                  const endNodeCell = optionEdge.target;
-                  if (endNodeCell && isEndNode(endNodeCell)) {
-                    // This option jumps to an END node
-                    question.jump.enabled = true;
-                    
-                    // Add jump condition with the correct case
-                    question.jump.conditions.push({
-                      option: label,
-                      to: "end"
-                    });
-                  }
-                }
               } else {
                 // For dropdown questions, keep using simple strings
                 question.options.push(optionText);
               }
             }
+          }
+        }
+        
+        // Check for options that connect to END nodes
+        let optionsWithJumpToEnd = [];
+                
+        // For numbered dropdown/dropdown/checkbox question types, check if the outgoing edges lead to END nodes
+        if (questionType === "numberedDropdown" || questionType === "dropdown" || questionType === "checkbox") {
+          const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+          
+          for (const edge of outgoingEdges) {
+            const targetCell = edge.target;
+            
+            // If it's an option node, check where it leads
+            if (targetCell && isOptions(targetCell)) {
+              const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
+              const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+              
+              for (const optionEdge of optionOutgoingEdges) {
+                const optionTarget = optionEdge.target;
+                
+                // Check if this option leads to an END node
+                if (optionTarget && isEndNode(optionTarget)) {
+                  // Add to our list of options that jump to END
+                  optionsWithJumpToEnd.push(optionText);
+                  // Debug log for jump to END detection
+                  console.log(`Found option "${optionText}" that jumps to END for question ${question.questionId}`);
+                }
+              }
+            }
+          }
+          
+          // If we found options that jump to END, add them to the jump conditions
+          if (optionsWithJumpToEnd.length > 0) {
+            question.jump.enabled = true;
+            
+            // Process each option that jumps to END
+            optionsWithJumpToEnd.forEach(option => {
+              // Make sure to preserve the original case of the option
+              question.jump.conditions.push({
+                option: option,
+                to: "end"
+              });
+            });
+            
+            console.log(`Added jump conditions for question ${question.questionId}:`, JSON.stringify(question.jump.conditions));
           }
         }
         
@@ -2659,241 +2689,78 @@ window.exportGuiJson = function() {
       if (!cell) continue;
       
       // Reset existing conditions for this question - we'll rebuild them correctly
-      question.logic.conditions = [];
-      question.logic.enabled = false;
+      question.logic = {
+        enabled: false,
+        conditions: []
+      };
       
-      // Also initialize jump logic
-      question.jump = question.jump || {};
-      question.jump.enabled = false;
-      question.jump.conditions = [];
+      // If the question has incoming edges from other questions
+      // Figure out which questions can lead to this one
+      const incomingEdges = graph.getIncomingEdges(cell) || [];
+      let shouldAddLogicConditions = false;
+      let comesFromOption = false;
       
-      // Check for options that connect to END nodes
-        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+      // First check if this question is accessed via option nodes 
+      // (indicating conditional flow)
+      for (const edge of incomingEdges) {
+        const sourceCell = edge.source;
+        if (sourceCell && isOptions(sourceCell)) {
+          comesFromOption = true;
+          break;
+        }
+      }
       
-      // Special handling for multipleDropdownType/numberedDropdown questions connected to END nodes
-      if (question.type === "numberedDropdown") {
-        for (const edge of outgoingEdges) {
-          const targetCell = edge.target;
-          if (targetCell && isEndNode(targetCell)) {
-            // This numberedDropdown question jumps directly to an END node
-            question.jump.enabled = true;
-            
-            // Generate jump conditions for each number in the range
-            const min = parseInt(question.min || "1", 10);
-            const max = parseInt(question.max || "1", 10);
-            
-            for (let i = min; i <= max; i++) {
-              question.jump.conditions.push({
-                option: i.toString(),
-                to: "end"
-              });
-            }
-            
-            // We've handled this cell, break the loop
+      // If question is directly connected to previous questions without options in between,
+      // it's a sequential flow - don't add logic conditions
+      if (!comesFromOption) {
+        let hasPrevQuestion = false;
+        
+        for (const edge of incomingEdges) {
+          const sourceCell = edge.source;
+          // Check if any incoming edge is from a question
+          if (sourceCell && isQuestion(sourceCell)) {
+            hasPrevQuestion = true;
             break;
           }
         }
-      } 
-      // Handle standard dropdown questions
-      else if (question.type === "dropdown") {
-        // First check if any option connects to an END node
-        let hasEndConnection = false;
         
-        for (const edge of outgoingEdges) {
-          const targetOptionCell = edge.target;
-          if (targetOptionCell && isOptions(targetOptionCell)) {
-            const optionOutgoingEdges = graph.getOutgoingEdges(targetOptionCell) || [];
-            for (const optionEdge of optionOutgoingEdges) {
-              const endNodeCell = optionEdge.target;
-              if (endNodeCell && isEndNode(endNodeCell)) {
-                hasEndConnection = true;
-                // If options lead to an END node, set jump enabled but with empty conditions
-                question.jump.enabled = true;
-                // Don't add specific conditions for dropdown
-                break;
-              }
-            }
-            if (hasEndConnection) break;
-          }
+        // If it only has direct connections from questions (sequential flow),
+        // don't add logic conditions
+        if (hasPrevQuestion) {
+          shouldAddLogicConditions = false;
+          console.log(`Question ${question.questionId} is in sequential flow, skipping logic conditions`);
+        } else {
+          // No incoming questions and no option nodes, it's likely a starting question
+          shouldAddLogicConditions = false;
         }
-      }
-      // Handle checkbox questions
-      else if (question.type === "checkbox") {
-        // Find all option nodes connected to this checkbox question
-        for (const edge of outgoingEdges) {
-          const targetOptionCell = edge.target;
-          if (targetOptionCell && isOptions(targetOptionCell)) {
-            const optionText = targetOptionCell.value.replace(/<[^>]+>/g, "").trim();
-            const optionOutgoingEdges = graph.getOutgoingEdges(targetOptionCell) || [];
-            
-            // Check if this option leads to an END node
-            for (const optionEdge of optionOutgoingEdges) {
-              const endNodeCell = optionEdge.target;
-              if (endNodeCell && isEndNode(endNodeCell)) {
-                // This option jumps to an END node
-                question.jump.enabled = true;
-                
-                // Check both string options and structured options
-                let foundOption = false;
-                for (const option of question.options) {
-                  if (typeof option === 'string' && option.toLowerCase() === optionText.toLowerCase()) {
-                    // Add jump condition with the correct case for string options
-                    question.jump.conditions.push({
-                      option: option,
-                      to: "end"
-                    });
-                    foundOption = true;
-                    break;
-                  } else if (typeof option === 'object' && option.label && option.label.toLowerCase() === optionText.toLowerCase()) {
-                    // Add jump condition with the correct case from the structured option
-                    question.jump.conditions.push({
-                      option: option.label,
-                      to: "end"
-                    });
-                    foundOption = true;
-                    break;
-                  }
-                }
-                
-                // If we couldn't find a direct match, use the option text as-is
-                if (!foundOption) {
-                  question.jump.conditions.push({
-                    option: optionText,
-                    to: "end"
-                  });
-                }
-              }
-            }
-          }
-        }
+      } else {
+        // It comes from option nodes, so it's conditional flow
+        shouldAddLogicConditions = true;
+        console.log(`Question ${question.questionId} has conditional flow, adding logic conditions`);
       }
       
-      // Find all option nodes that directly lead to this question
-      const optionsThatLeadToThis = findOptionsThatLeadTo(cell);
-      
-      // Process these options to determine logic conditions
-      for (const optionNode of optionsThatLeadToThis) {
-        const optionText = optionNode.value.replace(/<[^>]+>/g, "").trim();
-        
-        // Find the parent question of this option
-        const optionIncomingEdges = graph.getIncomingEdges(optionNode) || [];
-        for (const optionEdge of optionIncomingEdges) {
-          const parentQuestionCell = optionEdge.source;
+      // Only add logic conditions if we determined it needs them
+      if (shouldAddLogicConditions) {
+        question.logic.enabled = true;
+        // Identify previous questions through option nodes
+        for (const edge of incomingEdges) {
+          const sourceCell = edge.source;
           
-          if (parentQuestionCell && isQuestion(parentQuestionCell)) {
-            const parentQuestionId = questionIdMap.get(parentQuestionCell.id);
+          if (sourceCell && isOptions(sourceCell)) {
+            const optionValue = sourceCell.value;
+            const optionIncomingEdges = graph.getIncomingEdges(sourceCell) || [];
             
-            if (parentQuestionId) {
-              // We found a direct conditional relationship - add it to the logic
-              question.logic.enabled = true;
+            for (const optionEdge of optionIncomingEdges) {
+              const prevQuestionCell = optionEdge.source;
               
-              // Add the condition (preserve original case instead of capitalizing)
-              question.logic.conditions.push({
-                prevQuestion: parentQuestionId.toString(),
-                prevAnswer: optionText
-              });
-            }
-          }
-        }
-      }
-      
-      // Check for direct incoming edges from other questions
-      const incomingEdges = graph.getIncomingEdges(cell) || [];
-      for (const edge of incomingEdges) {
-        const sourceCell = edge.source;
-        if (sourceCell && isQuestion(sourceCell) && !isOptions(sourceCell)) {
-          // This is a direct question-to-question connection
-          const parentQuestionId = questionIdMap.get(sourceCell.id);
-          
-          if (parentQuestionId) {
-            // Check if this is from a number/money question or another type
-            const parentQuestionType = getQuestionType(sourceCell);
-            
-            // If it's a number/money question, add "Any Amount" condition
-            if (parentQuestionType === "number") {
-              question.logic.enabled = true;
-              question.logic.conditions.push({
-                prevQuestion: parentQuestionId.toString(),
-                prevAnswer: "Any Amount"
-              });
-              // Continue to next connection since we've handled this one
-              continue;
-            }
-            
-            // Find the parent question in the JSON
-            let parentQuestion = null;
-            for (const sec of sections) {
-              parentQuestion = sec.questions.find(q => q.questionId === parentQuestionId);
-              if (parentQuestion) break;
-            }
-            
-            if (parentQuestion) {
-              // Special handling for money/number questions
-              if (parentQuestion.type === "money") {
-                question.logic.enabled = true;
-                question.logic.conditions.push({
-                  prevQuestion: parentQuestionId.toString(),
-                  prevAnswer: "Any Amount"
-                });
-              }
-              // Special handling for numberedDropdown questions
-              else if (parentQuestion.type === "numberedDropdown") {
-                // For numberedDropdown questions, add a condition for each possible value
-                const min = parseInt(parentQuestion.min || "1", 10);
-                const max = parseInt(parentQuestion.max || "1", 10);
+              if (prevQuestionCell && isQuestion(prevQuestionCell)) {
+                const prevQuestionId = questionIdMap.get(prevQuestionCell.id);
                 
-                // Generate conditions for each number in the range
-                for (let i = min; i <= max; i++) {
-                  question.logic.enabled = true;
-                  question.logic.conditions.push({
-                    prevQuestion: parentQuestionId.toString(),
-                    prevAnswer: i.toString()
-                  });
-                }
-              }
-              // For regular questions with logic enabled, inherit their conditions
-              else if (parentQuestion.logic.enabled) {
-                // Only inherit if we don't already have conditions
-                if (question.logic.conditions.length === 0) {
-                  // Mark this question's logic as enabled
-                  question.logic.enabled = true;
-                  
-                  // Inherit all conditions from the parent question
-                  parentQuestion.logic.conditions.forEach(condition => {
-                    // Add the parent's condition
-                    question.logic.conditions.push({
-                      prevQuestion: condition.prevQuestion,
-                      prevAnswer: condition.prevAnswer
-                    });
-                  });
-                }
-              }
-              // For questions with no logic, add a generic connection
-              else {
-                question.logic.enabled = true;
-                // For dropdown and checkbox questions, attempt to find default answers
-                if (parentQuestion.type === "dropdown" || parentQuestion.type === "checkbox") {
-                  if (parentQuestion.options && parentQuestion.options.length > 0) {
-                    // Use the first option as a default answer
-                    question.logic.conditions.push({
-                      prevQuestion: parentQuestionId.toString(),
-                      prevAnswer: parentQuestion.options[0]
-                    });
-                  } else {
-                    // Fallback with empty answer
-                    question.logic.conditions.push({
-                      prevQuestion: parentQuestionId.toString(),
-                      prevAnswer: ""
-                    });
-                  }
-                } else {
-                  // For other types, use appropriate default answers
-                  question.logic.conditions.push({
-                    prevQuestion: parentQuestionId.toString(),
-                    prevAnswer: parentQuestion.type === "text" ? "Any Text" : 
-                               (parentQuestion.type === "number" || parentQuestion.type === "money") ? "Any Amount" : ""
-                  });
-                }
+                // Add the logic condition
+                question.logic.conditions.push({
+                  prevQuestion: prevQuestionId,
+                  prevAnswer: optionValue
+                });
               }
             }
           }
