@@ -1355,31 +1355,57 @@ document.addEventListener("DOMContentLoaded", function() {
  ********** RENUMBERING QUESTIONS BY POSITION **********
  *******************************************************/
 function renumberQuestionIds() {
+  // Commented out to preserve original question IDs
+  // const parent = graph.getDefaultParent();
+  // const vertices = graph.getChildVertices(parent);
+  // const questions = vertices.filter(cell => isQuestion(cell));
+  
+  // // Sort questions by vertical position (Y coordinate)
+  // questions.sort((a, b) => {
+  //   const aY = a.geometry.y;
+  //   const bY = b.geometry.y;
+  //   if (aY !== bY) return aY - bY;
+  //   return a.geometry.x - b.geometry.x;
+  // });
+
+  // let currentId = 1;
+  // questions.forEach((cell) => {
+  //   if (!cell._questionId) {
+  //     cell._questionId = currentId;
+  //     currentId++;
+  //   }
+  // });
+
+  // // Update existing IDs based on new order
+  // questions.forEach((cell, index) => {
+  //   cell._questionId = index + 1;
+  // });
+
+  // // If properties menu is open for a selected question, update displayed ID
+  // if (selectedCell && document.getElementById("propertiesMenu").style.display === "block") {
+  //   document.getElementById("propQuestionNumber").textContent = selectedCell._questionId;
+  // }
+  
+  // Just assign ID to new cells that don't have one
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
   const questions = vertices.filter(cell => isQuestion(cell));
   
-  // Sort questions by vertical position (Y coordinate)
-  questions.sort((a, b) => {
-    const aY = a.geometry.y;
-    const bY = b.geometry.y;
-    if (aY !== bY) return aY - bY;
-    return a.geometry.x - b.geometry.x;
-  });
-
-  let currentId = 1;
+  let maxId = 0;
   questions.forEach((cell) => {
-    if (!cell._questionId) {
-      cell._questionId = currentId;
-      currentId++;
+    if (cell._questionId && cell._questionId > maxId) {
+      maxId = cell._questionId;
     }
   });
-
-  // Update existing IDs based on new order
-  questions.forEach((cell, index) => {
-    cell._questionId = index + 1;
+  
+  // Only assign IDs to cells that don't have one
+  questions.forEach((cell) => {
+    if (!cell._questionId) {
+      maxId++;
+      cell._questionId = maxId;
+    }
   });
-
+  
   // If properties menu is open for a selected question, update displayed ID
   if (selectedCell && document.getElementById("propertiesMenu").style.display === "block") {
     document.getElementById("propQuestionNumber").textContent = selectedCell._questionId;
@@ -2162,7 +2188,8 @@ function refreshAllCells() {
     }
   });
 
-  renumberQuestionIds();
+  // Don't renumber question IDs automatically
+  // renumberQuestionIds();
 }
 
 /*******************************************************
@@ -2383,9 +2410,12 @@ window.exportGuiJson = function() {
       const questionText = cell.getValue() || "";
       const nodeId = getNodeId(cell);
       
+      // Use the original _questionId from the cell instead of questionCounter
+      const questionId = cell._questionId || questionCounter++;
+      
       // Create question object
       const question = {
-        questionId: questionCounter,
+        questionId: questionId,
         text: "",
         type: questionType,
         logic: {
@@ -2427,11 +2457,13 @@ window.exportGuiJson = function() {
       }
 
       // Store mapping between question cells and questionIds
-      questionCellMap.set(questionCounter, cell);
-      questionIdMap.set(cell.id, questionCounter);
+      questionCellMap.set(questionId, cell);
+      questionIdMap.set(cell.id, questionId);
       
-      // Increment counter for next question
-      questionCounter++;
+      // Only increment counter for questions without _questionId
+      if (!cell._questionId) {
+        questionCounter++;
+      }
       
       section.questions.push(question);
     }
@@ -3854,6 +3886,12 @@ window.exportGuiJson = function() {
   }
 
   // Create the final JSON object
+  
+  // Sort questions by questionId within each section
+  for (const section of sections) {
+    section.questions.sort((a, b) => a.questionId - b.questionId);
+  }
+  
   const guiJson = {
     sections: sections,
     hiddenFields: hiddenFields,
