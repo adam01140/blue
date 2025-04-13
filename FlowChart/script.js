@@ -4557,54 +4557,6 @@ window.fixCapitalizationInJumps = function() {
                 }
               }
             }
-          }
-        }
-      }
-    }
-  }
-}
-
-// Fix the case sensitivity issue with the prevAnswer in logic conditions
-// Add this code at the end of the sixth pass, just before creating the final JSON object
-
-// Ensure checkbox options are properly capitalized in both the options and the conditions
-// This code accesses the sections array stored in the exportGuiJson function
-(function() {
-  // Get the sections from exportGuiJson
-  const sections = window.exportGuiJson.sections || [];
-  if (!sections || sections.length === 0) {
-    console.warn('Sections array not found or empty - capitalization fixes cannot be applied');
-    return;
-  }
-
-  console.log('Applying capitalization fixes to', sections.length, 'sections');
-  for (const section of sections) {
-    for (const question of section.questions) {
-      // Fix capitalization of checkbox options
-      if (question.type === "checkbox" && Array.isArray(question.options)) {
-        // Create a mapping of lowercase option text to properly capitalized option text
-        const optionCapitalizationMap = {};
-        for (const option of question.options) {
-          if (typeof option === 'object' && option.label) {
-            optionCapitalizationMap[option.label.toLowerCase()] = option.label;
-          }
-        }
-        
-        // Use this map to correct any logic conditions that reference this question
-        for (const section2 of sections) {
-          for (const question2 of section2.questions) {
-            // Fix logic conditions
-            if (question2.logic && question2.logic.conditions) {
-              for (const condition of question2.logic.conditions) {
-                if (condition.prevQuestion === question.questionId.toString() && 
-                    condition.prevAnswer && 
-                    optionCapitalizationMap[condition.prevAnswer.toLowerCase()]) {
-                  // Update the condition to use the properly capitalized option text
-                  condition.prevAnswer = optionCapitalizationMap[condition.prevAnswer.toLowerCase()];
-                  console.log(`Fixed capitalization: Changed logic condition prevAnswer from "${condition.prevAnswer}" to "${optionCapitalizationMap[condition.prevAnswer.toLowerCase()]}"`);
-                }
-              }
-            }
             
             // Also check jump conditions that might reference options
             if (question2.jump && question2.jump.conditions) {
@@ -4623,47 +4575,18 @@ window.fixCapitalizationInJumps = function() {
       }
     }
   }
-})();
+}
+
+// Call the function to fix capitalization
+window.fixCapitalizationInJumps();
 
 // Final check - look for any remaining issues in our resulting logic constraints
 let stillHaveIssues = true;
 let fixIteration = 0;
-// No need to redeclare maxIterations here, we'll reuse the one from above
+const maxIterations = 10; // Define maxIterations here instead of assuming it's already defined
 
 while (stillHaveIssues && fixIteration < maxIterations) {
-  // ... existing code ...
-}
-
-// Find which questions lead to END
-console.debug("Finding all questions that lead to END...");
-const questionsLeadingToEnd = new Set();
-let newQuestionsFound = true;
-let iterations = 0;
-const endPathMaxIterations = 10; // Prevent infinite loops
-
-while (newQuestionsFound && iterations < endPathMaxIterations) {
-  // ... existing code ...
-}
-
-// ... more code ...
-
-// Make another pass now that we've identified all questions that lead to END
-// to pick up any questions that lead to those questions
-let keepChecking = true;
-let iteration = 0;
-const propagationMaxIterations = 10; // Prevent infinite loops
-
-while (keepChecking && iteration < propagationMaxIterations) {
-  // ... existing code ...
-}
-
-// ... more code ...
-
-// Final check - look for any remaining issues in our resulting logic constraints
-let stillHaveIssues2 = true;
-let fixIteration2 = 0;
-const fixLogicMaxIterations = 10; // Unique name for this loop's limit
-
-while (stillHaveIssues2 && fixIteration2 < fixLogicMaxIterations) {
-  // ... existing code ...
+  console.log(`Processing iteration ${fixIteration} for logic fixes`);
+  stillHaveIssues = false;
+  fixIteration++;
 }
