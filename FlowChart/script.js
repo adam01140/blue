@@ -2945,6 +2945,107 @@ window.exportGuiJson = function() {
     }
   }
   
+  // Fifth pass: Enhanced logic propagation that handles multiple paths
+  console.log("Starting fifth pass: Enhanced logic propagation");
+  let changesOccurred = true;
+  let iterationCount = 0;
+  const maxIterations = 10; // Prevent infinite loops
+  
+  // Repeatedly propagate conditions until no more changes occur
+  while (changesOccurred && iterationCount < maxIterations) {
+    iterationCount++;
+    changesOccurred = false;
+    console.log(`Logic propagation iteration ${iterationCount}`);
+    
+    for (const section of sections) {
+      for (const question of section.questions) {
+        const cell = questionCellMap.get(question.questionId);
+        if (!cell) continue;
+        
+        // Get all incoming edges
+        const incomingEdges = graph.getIncomingEdges(cell) || [];
+        
+        // Track new conditions
+        const newConditions = [];
+        let conditionsAdded = false;
+        
+        // Check each incoming edge
+        for (const edge of incomingEdges) {
+          const sourceCell = edge.source;
+          
+          if (sourceCell && isOptions(sourceCell)) {
+            // Case 1: Source is an option node (direct conditional path)
+            const optionText = sourceCell.value.replace(/<[^>]+>/g, "").trim();
+            const optionIncomingEdges = graph.getIncomingEdges(sourceCell) || [];
+            
+            for (const optionEdge of optionIncomingEdges) {
+              const prevQuestionCell = optionEdge.source;
+              
+              if (prevQuestionCell && isQuestion(prevQuestionCell)) {
+                const prevQuestionId = questionIdMap.get(prevQuestionCell.id);
+                const newCondition = {
+                  prevQuestion: prevQuestionId.toString(),
+                  prevAnswer: optionText
+                };
+                
+                // Check if this condition already exists
+                const exists = question.logic.conditions.some(c => 
+                  c.prevQuestion === newCondition.prevQuestion && 
+                  c.prevAnswer === newCondition.prevAnswer
+                );
+                
+                if (!exists) {
+                  newConditions.push(newCondition);
+                  conditionsAdded = true;
+                  console.log(`Added direct condition to Q${question.questionId}: Q${newCondition.prevQuestion}=${newCondition.prevAnswer}`);
+                }
+              }
+            }
+          } else if (sourceCell && isQuestion(sourceCell)) {
+            // Case 2: Source is a question (sequential path)
+            const sourceQuestionId = questionIdMap.get(sourceCell.id);
+            if (!sourceQuestionId) continue;
+            
+            let sourceQuestion = null;
+            for (const sec of sections) {
+              sourceQuestion = sec.questions.find(q => q.questionId === sourceQuestionId);
+              if (sourceQuestion) break;
+            }
+            
+            // Inherit conditions from the previous question
+            if (sourceQuestion && sourceQuestion.logic.conditions.length > 0) {
+              for (const condition of sourceQuestion.logic.conditions) {
+                // Check if this inherited condition already exists
+                const exists = question.logic.conditions.some(c => 
+                  c.prevQuestion === condition.prevQuestion && 
+                  c.prevAnswer === condition.prevAnswer
+                );
+                
+                if (!exists) {
+                  newConditions.push({
+                    prevQuestion: condition.prevQuestion,
+                    prevAnswer: condition.prevAnswer
+                  });
+                  conditionsAdded = true;
+                  console.log(`Added inherited condition to Q${question.questionId}: Q${condition.prevQuestion}=${condition.prevAnswer}`);
+                }
+              }
+            }
+          }
+        }
+        
+        // If we've added new conditions, update the question
+        if (conditionsAdded) {
+          question.logic.enabled = true;
+          question.logic.conditions = [...question.logic.conditions, ...newConditions];
+          changesOccurred = true;
+        }
+      }
+    }
+  }
+  
+  console.log(`Logic propagation completed after ${iterationCount} iterations`);
+  
   // Create the final JSON object
   const guiJson = {
     sections: sections,
@@ -2954,51 +3055,6 @@ window.exportGuiJson = function() {
     hiddenFieldCounter: hiddenFieldCounter,
     defaultPDFName: ""
   };
-  
-  // Fifth pass: Propagate logic conditions to sequential questions
-  // For questions that are directly connected (sequential flow), they should inherit
-  // the same logic conditions from their previous questions if they have no conditions themselves
-  for (const section of sections) {
-    for (const question of section.questions) {
-      const cell = questionCellMap.get(question.questionId);
-      if (!cell) continue;
-      
-      // Skip questions that already have logic conditions
-      if (question.logic.enabled && question.logic.conditions.length > 0) continue;
-      
-      // Check incoming edges from questions (not option nodes)
-      const incomingEdges = graph.getIncomingEdges(cell) || [];
-      let prevQuestionWithLogic = null;
-      
-      for (const edge of incomingEdges) {
-        const sourceCell = edge.source;
-        if (sourceCell && isQuestion(sourceCell)) {
-          // Found a direct connection from another question
-          const sourceQuestionId = questionIdMap.get(sourceCell.id);
-          if (!sourceQuestionId) continue;
-          
-          // Find the source question object
-          let sourceQuestion = null;
-          for (const sec of sections) {
-            sourceQuestion = sec.questions.find(q => q.questionId === sourceQuestionId);
-            if (sourceQuestion) break;
-          }
-          
-          if (sourceQuestion && sourceQuestion.logic.enabled && sourceQuestion.logic.conditions.length > 0) {
-            prevQuestionWithLogic = sourceQuestion;
-            break;
-          }
-        }
-      }
-      
-      // If we found a previous question with logic, propagate its conditions
-      if (prevQuestionWithLogic) {
-        console.log(`Propagating logic from question ${prevQuestionWithLogic.questionId} to sequential question ${question.questionId}`);
-        question.logic.enabled = true;
-        question.logic.conditions = JSON.parse(JSON.stringify(prevQuestionWithLogic.logic.conditions));
-      }
-    }
-  }
   
   // For debugging, display full information about connections
   console.log("Final GUI JSON:", JSON.stringify(guiJson, null, 2));
