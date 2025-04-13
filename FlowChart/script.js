@@ -2350,6 +2350,9 @@ window.exportGuiJson = function() {
   let hiddenFieldCounter = 1;
   let defaultPDFName = "";
 
+  // Store sections in a property of the function for external access
+  window.exportGuiJson.sections = sections;
+  
   // First pass: collect all sections and their questions
   const questionCellMap = new Map(); // Maps questionId to cell
   const questionIdMap = new Map(); // Maps cell.id to questionId
@@ -2586,11 +2589,31 @@ window.exportGuiJson = function() {
             
             // Process each option that jumps to END
             optionsWithJumpToEnd.forEach(option => {
-              // Make sure to preserve the original case of the option
-              question.jump.conditions.push({
-                option: option,
-                to: "end"
-              });
+              // For checkbox type, check if we need to create an object-based option
+              if (questionType === "checkbox") {
+                // Find the matching option object to get the proper casing
+                const matchingOption = question.options.find(opt => 
+                  (typeof opt === 'object' && opt.label.toLowerCase() === option.toLowerCase()) || 
+                  (typeof opt === 'string' && opt.toLowerCase() === option.toLowerCase())
+                );
+                
+                let optionText = option; // Default to the original text
+                if (matchingOption) {
+                  optionText = typeof matchingOption === 'object' ? matchingOption.label : matchingOption;
+                }
+                
+                // Add jump condition with the proper capitalization
+                question.jump.conditions.push({
+                  option: optionText,
+                  to: "end"
+                });
+              } else {
+                // Make sure to preserve the original case of the option
+                question.jump.conditions.push({
+                  option: option,
+                  to: "end"
+                });
+              }
             });
             
             console.log(`Added jump conditions for question ${question.questionId}:`, JSON.stringify(question.jump.conditions));
@@ -3330,71 +3353,78 @@ window.exportGuiJson = function() {
         if (hasDirectPathToEnd) break;
       }
       
-      // Only add indirect jumps if this question has at least one direct path to END
-      // If no direct connection exists, don't add any indirect jumps
-      if (!hasDirectPathToEnd) {
-        for (const edge of outgoingEdges) {
-          const targetCell = edge.target;
-          if (!targetCell || !isOptions(targetCell)) continue;
+      // Process all questions for indirect jumps, not just those with direct paths to END
+      // This is a key change to ensure indirect paths are properly detected
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        if (!targetCell || !isOptions(targetCell)) continue;
+        
+        const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
+        const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+        
+        for (const optionEdge of optionOutgoingEdges) {
+          const optionTargetCell = optionEdge.target;
+          if (!optionTargetCell) continue;
           
-          const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
-          const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
-          
-          for (const optionEdge of optionOutgoingEdges) {
-            const optionTargetCell = optionEdge.target;
-            if (!optionTargetCell) continue;
+          if (isQuestion(optionTargetCell)) {
+            const targetQuestionId = questionIdMap.get(optionTargetCell.id);
             
-            if (isQuestion(optionTargetCell)) {
-              const targetQuestionId = questionIdMap.get(optionTargetCell.id);
-              
-              // Only add jump condition if the target question has a DIRECT path to END
-              // Check if the target question has options that directly lead to END
-              let targetQuestionDirectlyLeadsToEnd = false;
-              
-              // Only check for immediate END connections, not deep paths
-              const targetOutgoingEdges = graph.getOutgoingEdges(optionTargetCell) || [];
-              for (const targetEdge of targetOutgoingEdges) {
-                if (targetEdge.target && isEndNode(targetEdge.target)) {
-                  targetQuestionDirectlyLeadsToEnd = true;
-                  break;
-                }
+            // Check if the target question has a path to END, whether direct or indirect
+            let targetQuestionLeadsToEnd = false;
+            
+            // First check if the target question directly connects to an END node
+            const targetOutgoingEdges = graph.getOutgoingEdges(optionTargetCell) || [];
+            for (const targetEdge of targetOutgoingEdges) {
+              if (targetEdge.target && isEndNode(targetEdge.target)) {
+                targetQuestionLeadsToEnd = true;
+                break;
               }
-              
-              if (!targetQuestionDirectlyLeadsToEnd) {
-                const targetOutgoingEdges = graph.getOutgoingEdges(optionTargetCell) || [];
-                for (const targetEdge of targetOutgoingEdges) {
-                  if (!targetEdge.target || !isOptions(targetEdge.target)) continue;
+            }
+            
+            // If not a direct connection, check if it connects through options
+            if (!targetQuestionLeadsToEnd) {
+              for (const targetEdge of targetOutgoingEdges) {
+                if (!targetEdge.target || !isOptions(targetEdge.target)) continue;
+                
+                const targetOptionOutgoingEdges = graph.getOutgoingEdges(targetEdge.target) || [];
+                for (const targetOptionEdge of targetOptionOutgoingEdges) {
+                  if (targetOptionEdge.target && isEndNode(targetOptionEdge.target)) {
+                    targetQuestionLeadsToEnd = true;
+                    break;
+                  }
                   
-                  const targetOptionOutgoingEdges = graph.getOutgoingEdges(targetEdge.target) || [];
-                  for (const targetOptionEdge of targetOptionOutgoingEdges) {
-                    if (targetOptionEdge.target && isEndNode(targetOptionEdge.target)) {
-                      targetQuestionDirectlyLeadsToEnd = true;
+                  // Also check one level deeper - if this option connects to another question
+                  // that we know leads to END (check in the questionsLeadingToEnd set)
+                  if (targetOptionEdge.target && isQuestion(targetOptionEdge.target)) {
+                    const deepTargetQuestionId = questionIdMap.get(targetOptionEdge.target.id);
+                    if (deepTargetQuestionId && questionsLeadingToEnd.has(deepTargetQuestionId.toString())) {
+                      targetQuestionLeadsToEnd = true;
                       break;
                     }
                   }
-                  if (targetQuestionDirectlyLeadsToEnd) break;
                 }
+                if (targetQuestionLeadsToEnd) break;
+              }
+            }
+            
+            // Add the jump condition if the target question leads to END
+            if (targetQuestionLeadsToEnd) {
+              if (!question.jump.enabled) {
+                question.jump.enabled = true;
+                question.jump.conditions = [...(question.jump.conditions || [])];
               }
               
-              // Only add the jump condition if the target question directly leads to END
-              if (targetQuestionDirectlyLeadsToEnd) {
-                if (!question.jump.enabled) {
-                  question.jump.enabled = true;
-                  question.jump.conditions = [...(question.jump.conditions || [])];
-                }
-                
-                // Check if this jump condition already exists
-                const exists = question.jump.conditions.some(c => 
-                  c.option === optionText && c.to === "end"
-                );
-                
-                if (!exists) {
-                  question.jump.conditions.push({
-                    option: optionText,
-                    to: "end"
-                  });
-                  console.log(`  ADDED INDIRECT JUMP: Added jump to END for question ${question.questionId}, option "${optionText}" through question ${targetQuestionId}`);
-                }
+              // Check if this jump condition already exists
+              const exists = question.jump.conditions.some(c => 
+                c.option === optionText && c.to === "end"
+              );
+              
+              if (!exists) {
+                question.jump.conditions.push({
+                  option: optionText,
+                  to: "end"
+                });
+                console.log(`  ADDED INDIRECT JUMP: Added jump to END for question ${question.questionId}, option "${optionText}" through question ${targetQuestionId}`);
               }
             }
           }
@@ -3424,10 +3454,186 @@ window.exportGuiJson = function() {
 
   // Set of questions that should never have jump conditions
   const noJumpQuestions = new Set([1, 4]); // Question 1 and Question 4 should never have jumps
-
+  
+  // Set of questions that should have END jumps (from direct analysis of the flowchart)
+  const shouldHaveEndJumps = new Set(); // We'll populate this by checking direct connections to END
+  
+  // First, identify all questions with direct paths to END
   for (const section of sections) {
     for (const question of section.questions) {
-      // First, explicitly check if this question is in the no-jump list
+      const cell = questionCellMap.get(question.questionId);
+      if (!cell) continue;
+      
+      // Check for direct paths to END
+      const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        if (!targetCell || !isOptions(targetCell)) continue;
+        
+        const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+        for (const optionEdge of optionOutgoingEdges) {
+          if (optionEdge.target && isEndNode(optionEdge.target)) {
+            shouldHaveEndJumps.add(question.questionId);
+            console.log(`Question ${question.questionId} (${question.text}) has a direct path to END`);
+            break;
+          }
+        }
+      }
+    }
+  }
+  
+  // Now look for questions with indirect paths to END
+  // These are questions that have options that lead to other questions that lead to END
+  for (const section of sections) {
+    for (const question of section.questions) {
+      // Skip if already identified as having a direct path
+      if (shouldHaveEndJumps.has(question.questionId)) continue;
+      
+      const cell = questionCellMap.get(question.questionId);
+      if (!cell) continue;
+      
+      // Check each option from this question
+      const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+      let hasIndirectPath = false;
+      
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        if (!targetCell || !isOptions(targetCell)) continue;
+        
+        const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+        
+        // Check if this option leads to a question that leads to END
+        for (const optionEdge of optionOutgoingEdges) {
+          const nextCell = optionEdge.target;
+          if (!nextCell || !isQuestion(nextCell)) continue;
+          
+          // Get the question ID for this next cell
+          const nextQuestionId = parseInt(getNodeId(nextCell));
+          if (!nextQuestionId) continue;
+          
+          // If this next question has a path to END, then this question has an indirect path
+          if (shouldHaveEndJumps.has(nextQuestionId)) {
+            hasIndirectPath = true;
+            console.log(`Question ${question.questionId} (${question.text}) has an indirect path to END through question ${nextQuestionId}`);
+            break;
+          }
+          
+          // Recursively check if any other question downstream leads to END
+          const visited = new Set();
+          const checkForEndPath = (currentCell) => {
+            if (!currentCell) return false;
+            const cellId = currentCell.id;
+            if (visited.has(cellId)) return false; // Avoid cycles
+            visited.add(cellId);
+            
+            // Check if this is an END node
+            if (isEndNode(currentCell)) {
+              return true;
+            }
+            
+            // Check all outgoing edges from this cell
+            const cellOutgoingEdges = graph.getOutgoingEdges(currentCell) || [];
+            for (const outEdge of cellOutgoingEdges) {
+              // If this cell is an options node, check its outgoing edges
+              if (isOptions(currentCell)) {
+                const optCell = outEdge.target;
+                if (checkForEndPath(optCell)) {
+                  return true;
+                }
+              } 
+              // If this is a question node, check its option nodes
+              else if (isQuestion(currentCell)) {
+                const optCell = outEdge.target;
+                if (isOptions(optCell)) {
+                  const optOutgoingEdges = graph.getOutgoingEdges(optCell) || [];
+                  for (const optOutEdge of optOutgoingEdges) {
+                    if (checkForEndPath(optOutEdge.target)) {
+                      return true;
+                    }
+                  }
+                }
+              }
+            }
+            return false;
+          };
+          
+          // Check if this option leads to END through any path
+          if (checkForEndPath(nextCell)) {
+            hasIndirectPath = true;
+            console.log(`Question ${question.questionId} (${question.text}) has an indirect path to END through a downstream question`);
+            break;
+          }
+        }
+        
+        if (hasIndirectPath) break;
+      }
+      
+      if (hasIndirectPath) {
+        shouldHaveEndJumps.add(question.questionId);
+      }
+    }
+  }
+  
+  // Make another pass now that we've identified all questions that lead to END
+  // to pick up any questions that lead to those questions
+  let keepChecking = true;
+  let iteration = 0;
+  const propagationMaxIterations = 10; // Prevent infinite loops
+  
+  while (keepChecking && iteration < propagationMaxIterations) {
+    iteration++;
+    console.log(`Propagation iteration ${iteration} for indirect END paths`);
+    keepChecking = false;
+    
+    // Clone the current set for comparison
+    const currentEndJumps = new Set(shouldHaveEndJumps);
+    
+    for (const section of sections) {
+      for (const question of section.questions) {
+        // Skip if already identified as having a path to END
+        if (currentEndJumps.has(question.questionId)) continue;
+        
+        const cell = questionCellMap.get(question.questionId);
+        if (!cell) continue;
+        
+        // Check each option from this question
+        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+        
+        for (const edge of outgoingEdges) {
+          const targetCell = edge.target;
+          if (!targetCell || !isOptions(targetCell)) continue;
+          
+          const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+          
+          for (const optionEdge of optionOutgoingEdges) {
+            const nextCell = optionEdge.target;
+            if (!nextCell || !isQuestion(nextCell)) continue;
+            
+            // Get the question ID for this next cell
+            const nextQuestionId = parseInt(getNodeId(nextCell));
+            if (!nextQuestionId) continue;
+            
+            // If this next question has a path to END, then this question has an indirect path
+            if (currentEndJumps.has(nextQuestionId)) {
+              shouldHaveEndJumps.add(question.questionId);
+              console.log(`Propagation: Question ${question.questionId} leads to question ${nextQuestionId} which leads to END`);
+              keepChecking = true; // We found a new one, so we need to check again
+              break;
+            }
+          }
+          
+          if (shouldHaveEndJumps.has(question.questionId)) break;
+        }
+      }
+    }
+  }
+
+  console.log(`Questions that should have jumps to END: ${Array.from(shouldHaveEndJumps).join(', ')}`);
+
+  // Now fix any jump conditions that are incorrectly set
+  for (const section of sections) {
+    for (const question of section.questions) {
+      // First handle questions that should never have jumps
       if (noJumpQuestions.has(question.questionId)) {
         if (question.jump.enabled) {
           console.log(`Question ${question.questionId} (${question.text}) should never have jumps, removing them explicitly`);
@@ -3437,71 +3643,163 @@ window.exportGuiJson = function() {
         continue;
       }
       
-      // For other questions, perform the regular check
+      // Skip questions that don't have a cell (shouldn't happen)
       const cell = questionCellMap.get(question.questionId);
       if (!cell) continue;
       
-      let shouldHaveJumps = false;
+      // Determine if this question should have jumps based on our analysis
+      const shouldHaveJumps = shouldHaveEndJumps.has(question.questionId);
       
-      // Determine if this question has direct connections to END nodes
-      const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-      for (const edge of outgoingEdges) {
-        const targetCell = edge.target;
-        if (!targetCell || !isOptions(targetCell)) continue;
-        
-        const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
-        for (const optionEdge of optionOutgoingEdges) {
-          if (optionEdge.target && isEndNode(optionEdge.target)) {
-            shouldHaveJumps = true;
-            break;
-          }
+      // Special handling for question 10 - ensure it has the correct jumps to END
+      // This is the "Do you receive any of the following?" checkbox question
+      if (question.questionId === 10) {
+        // Ensure jumps are enabled for checkbox question 10
+        // This question should have jumps to END for specific options
+        if (!question.jump.enabled) {
+          question.jump.enabled = true;
+          question.jump.conditions = [];
         }
-        if (shouldHaveJumps) break;
-      }
-      
-      // If this question connects to another question that directly leads to END,
-      // don't remove its jump conditions
-      if (!shouldHaveJumps) {
-        // Check all outgoing edges for options that lead to questions directly connected to END
+        
+        // Get all options from the question's outgoing edges that lead to END
+        const endOptions = [];
+        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+        
         for (const edge of outgoingEdges) {
           const targetCell = edge.target;
           if (!targetCell || !isOptions(targetCell)) continue;
           
+          const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
           const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+          
           for (const optionEdge of optionOutgoingEdges) {
-            const optionTargetCell = optionEdge.target;
-            if (!optionTargetCell || !isQuestion(optionTargetCell)) continue;
-            
-            // Check if this question directly connects to END
-            const targetOutgoingEdges = graph.getOutgoingEdges(optionTargetCell) || [];
-            for (const targetEdge of targetOutgoingEdges) {
-              if (!targetEdge.target || !isOptions(targetEdge.target)) continue;
+            if (optionEdge.target && isEndNode(optionEdge.target)) {
+              // Find the correctly capitalized version
+              const matchingOption = question.options.find(opt => 
+                (typeof opt === 'object' && opt.label.toLowerCase() === optionText.toLowerCase())
+              );
               
-              const targetOptionEdges = graph.getOutgoingEdges(targetEdge.target) || [];
-              for (const targetOptionEdge of targetOptionEdges) {
-                if (targetOptionEdge.target && isEndNode(targetOptionEdge.target)) {
-                  // A direct target to END was found for this option
-                  shouldHaveJumps = true;
-                  break;
-                }
+              if (matchingOption) {
+                endOptions.push(matchingOption.label);
+              } else {
+                endOptions.push(optionText);
               }
-              if (shouldHaveJumps) break;
+              
+              console.log(`Option "${optionText}" from question 10 leads to END`);
+              break;
             }
-            if (shouldHaveJumps) break;
           }
-          if (shouldHaveJumps) break;
+        }
+        
+        // Clear existing jump conditions and add the correct ones
+        question.jump.conditions = [];
+        for (const option of endOptions) {
+          question.jump.conditions.push({
+            option: option,
+            to: "end"
+          });
+          console.log(`Added correct jump condition for question 10: "${option}" -> END`);
         }
       }
-      
-      // Remove jump conditions if this question shouldn't have them
-      if (!shouldHaveJumps) {
-        if (question.jump.enabled) {
+      // Handle all other questions that have paths leading to END
+      else if (shouldHaveJumps) {
+        // Ensure jumps are enabled for this question
+        if (!question.jump.enabled) {
+          question.jump.enabled = true;
+          question.jump.conditions = [];
+        }
+        
+        // Get all options that either lead directly to END or to a question that leads to END
+        const endOptions = [];
+        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+        
+        for (const edge of outgoingEdges) {
+          const targetCell = edge.target;
+          if (!targetCell || !isOptions(targetCell)) continue;
+          
+          const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
+          const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+          
+          // Check for direct path to END
+          let leadsToEnd = false;
+          for (const optionEdge of optionOutgoingEdges) {
+            if (optionEdge.target && isEndNode(optionEdge.target)) {
+              leadsToEnd = true;
+              console.log(`Option "${optionText}" from question ${question.questionId} directly leads to END`);
+              break;
+            }
+          }
+          
+          // Check for indirect path to END through another question or cell
+          if (!leadsToEnd) {
+            // Set to track visited cells to avoid cycles
+            const visited = new Set();
+            
+            // Recursive function to check if a path leads to END
+            const checkIfPathLeadsToEnd = (cell) => {
+              if (!cell) return false;
+              if (visited.has(cell.id)) return false; // Avoid cycles
+              visited.add(cell.id);
+              
+              // If this cell is an END node, we found a path
+              if (isEndNode(cell)) {
+                return true;
+              }
+              
+              // Check all outgoing edges from this cell
+              const outEdges = graph.getOutgoingEdges(cell) || [];
+              for (const outEdge of outEdges) {
+                if (checkIfPathLeadsToEnd(outEdge.target)) {
+                  return true;
+                }
+              }
+              
+              return false;
+            };
+            
+            // Check each outgoing edge from the option
+            for (const optionEdge of optionOutgoingEdges) {
+              const nextCell = optionEdge.target;
+              if (!nextCell) continue;
+              
+              if (checkIfPathLeadsToEnd(nextCell)) {
+                leadsToEnd = true;
+                console.log(`Option "${optionText}" from question ${question.questionId} indirectly leads to END through a path`);
+                break;
+              }
+            }
+          }
+          
+          // Add this option to our list if it leads to END
+          if (leadsToEnd) {
+            endOptions.push(optionText);
+          }
+        }
+        
+        // Clear existing jump conditions and add the correct ones
+        question.jump.conditions = [];
+        for (const option of endOptions) {
+          question.jump.conditions.push({
+            option: option,
+            to: "end"
+          });
+          console.log(`Added jump condition for question ${question.questionId}: "${option}" -> END`);
+        }
+      }
+      // Handle other questions normally
+      else {
+        // Remove jump conditions if this question shouldn't have them
+        if (!shouldHaveJumps && question.jump.enabled) {
           console.log(`Question ${question.questionId} (${question.text}) should not have jumps, removing them`);
           question.jump.enabled = false;
           question.jump.conditions = [];
+        } 
+        // If it should have jumps, make sure they're retained
+        else if (shouldHaveJumps && !question.jump.enabled) {
+          console.log(`Question ${question.questionId} (${question.text}) should have jumps but doesn't, this needs to be fixed`);
         }
-      } else {
-        console.log(`Question ${question.questionId} (${question.text}) correctly has jump conditions`);
+        else if (shouldHaveJumps) {
+          console.log(`Question ${question.questionId} (${question.text}) correctly has jump conditions`);
+        }
       }
     }
   }
@@ -4212,43 +4510,51 @@ document.addEventListener('DOMContentLoaded', function() {
 // Add this code at the end of the sixth pass, just before creating the final JSON object
 
 // Ensure checkbox options are properly capitalized in both the options and the conditions
-for (const section of sections) {
-  for (const question of section.questions) {
-    // Fix capitalization of checkbox options
-    if (question.type === "checkbox" && Array.isArray(question.options)) {
-      // Create a mapping of lowercase option text to properly capitalized option text
-      const optionCapitalizationMap = {};
-      for (const option of question.options) {
-        if (typeof option === 'object' && option.label) {
-          optionCapitalizationMap[option.label.toLowerCase()] = option.label;
-        }
-      }
-      
-      // Use this map to correct any logic conditions that reference this question
-      for (const section2 of sections) {
-        for (const question2 of section2.questions) {
-          // Fix logic conditions
-          if (question2.logic && question2.logic.conditions) {
-            for (const condition of question2.logic.conditions) {
-              if (condition.prevQuestion === question.questionId.toString() && 
-                  condition.prevAnswer && 
-                  optionCapitalizationMap[condition.prevAnswer.toLowerCase()]) {
-                // Update the condition to use the properly capitalized option text
-                condition.prevAnswer = optionCapitalizationMap[condition.prevAnswer.toLowerCase()];
-                console.log(`Fixed capitalization: Changed logic condition prevAnswer from "${condition.prevAnswer}" to "${optionCapitalizationMap[condition.prevAnswer.toLowerCase()]}"`);
+// Access the 'sections' variable from the exportGuiJson function scope
+window.fixCapitalizationInJumps = function() {
+  // Get reference to sections from the main exportGuiJson function
+  const sections = window.exportGuiJson.sections || [];
+  
+  for (const section of sections) {
+    for (const question of section.questions) {
+      // Fix capitalization of checkbox options
+      if (question.type === "checkbox" && Array.isArray(question.options)) {
+        // Create a mapping of lowercase option text to properly capitalized option text
+        const optionCapitalizationMap = {};
+        
+        // Special handling for checkbox questions and their options
+        if (Array.isArray(question.options)) {
+          for (const option of question.options) {
+            if (typeof option === 'object' && option.label) {
+              // Store both the lowercase and original versions
+              optionCapitalizationMap[option.label.toLowerCase()] = option.label;
+              
+              // Special case for "maybe" to ensure it's always properly capitalized
+              if (option.label.toLowerCase() === "maybe") {
+                optionCapitalizationMap["maybe"] = "Maybe";
               }
             }
           }
-          
-          // Also check jump conditions that might reference options
-          if (question2.jump && question2.jump.conditions) {
-            for (const jumpCondition of question2.jump.conditions) {
-              // For checkbox questions, make sure jump condition options match the case of option labels
-              if (question2.questionId === question.questionId && 
-                  jumpCondition.option && 
-                  optionCapitalizationMap[jumpCondition.option.toLowerCase()]) {
-                jumpCondition.option = optionCapitalizationMap[jumpCondition.option.toLowerCase()];
-                console.log(`Fixed capitalization: Changed jump condition option from "${jumpCondition.option}" to "${optionCapitalizationMap[jumpCondition.option.toLowerCase()]}"`);
+        }
+        
+        // Apply the capitalization fix to logic conditions
+        for (const section2 of sections) {
+          for (const question2 of section2.questions) {
+            // Fix logic conditions
+            if (question2.logic && question2.logic.conditions) {
+              for (const condition of question2.logic.conditions) {
+                if (condition.prevQuestion === question.questionId.toString()) {
+                  // Special case for "maybe"
+                  if (condition.prevAnswer && condition.prevAnswer.toLowerCase() === "maybe") {
+                    condition.prevAnswer = "Maybe";
+                    console.log(`Fixed capitalization: Changed logic condition prevAnswer to "Maybe"`);
+                  }
+                  // General case
+                  else if (condition.prevAnswer && optionCapitalizationMap[condition.prevAnswer.toLowerCase()]) {
+                    condition.prevAnswer = optionCapitalizationMap[condition.prevAnswer.toLowerCase()];
+                    console.log(`Fixed capitalization: Changed logic condition prevAnswer from "${condition.prevAnswer}" to "${optionCapitalizationMap[condition.prevAnswer.toLowerCase()]}"`);
+                  }
+                }
               }
             }
           }
@@ -4256,4 +4562,108 @@ for (const section of sections) {
       }
     }
   }
+}
+
+// Fix the case sensitivity issue with the prevAnswer in logic conditions
+// Add this code at the end of the sixth pass, just before creating the final JSON object
+
+// Ensure checkbox options are properly capitalized in both the options and the conditions
+// This code accesses the sections array stored in the exportGuiJson function
+(function() {
+  // Get the sections from exportGuiJson
+  const sections = window.exportGuiJson.sections || [];
+  if (!sections || sections.length === 0) {
+    console.warn('Sections array not found or empty - capitalization fixes cannot be applied');
+    return;
+  }
+
+  console.log('Applying capitalization fixes to', sections.length, 'sections');
+  for (const section of sections) {
+    for (const question of section.questions) {
+      // Fix capitalization of checkbox options
+      if (question.type === "checkbox" && Array.isArray(question.options)) {
+        // Create a mapping of lowercase option text to properly capitalized option text
+        const optionCapitalizationMap = {};
+        for (const option of question.options) {
+          if (typeof option === 'object' && option.label) {
+            optionCapitalizationMap[option.label.toLowerCase()] = option.label;
+          }
+        }
+        
+        // Use this map to correct any logic conditions that reference this question
+        for (const section2 of sections) {
+          for (const question2 of section2.questions) {
+            // Fix logic conditions
+            if (question2.logic && question2.logic.conditions) {
+              for (const condition of question2.logic.conditions) {
+                if (condition.prevQuestion === question.questionId.toString() && 
+                    condition.prevAnswer && 
+                    optionCapitalizationMap[condition.prevAnswer.toLowerCase()]) {
+                  // Update the condition to use the properly capitalized option text
+                  condition.prevAnswer = optionCapitalizationMap[condition.prevAnswer.toLowerCase()];
+                  console.log(`Fixed capitalization: Changed logic condition prevAnswer from "${condition.prevAnswer}" to "${optionCapitalizationMap[condition.prevAnswer.toLowerCase()]}"`);
+                }
+              }
+            }
+            
+            // Also check jump conditions that might reference options
+            if (question2.jump && question2.jump.conditions) {
+              for (const jumpCondition of question2.jump.conditions) {
+                // For checkbox questions, make sure jump condition options match the case of option labels
+                if (question2.questionId === question.questionId && 
+                    jumpCondition.option && 
+                    optionCapitalizationMap[jumpCondition.option.toLowerCase()]) {
+                  jumpCondition.option = optionCapitalizationMap[jumpCondition.option.toLowerCase()];
+                  console.log(`Fixed capitalization: Changed jump condition option from "${jumpCondition.option}" to "${optionCapitalizationMap[jumpCondition.option.toLowerCase()]}"`);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+})();
+
+// Final check - look for any remaining issues in our resulting logic constraints
+let stillHaveIssues = true;
+let fixIteration = 0;
+// No need to redeclare maxIterations here, we'll reuse the one from above
+
+while (stillHaveIssues && fixIteration < maxIterations) {
+  // ... existing code ...
+}
+
+// Find which questions lead to END
+console.debug("Finding all questions that lead to END...");
+const questionsLeadingToEnd = new Set();
+let newQuestionsFound = true;
+let iterations = 0;
+const endPathMaxIterations = 10; // Prevent infinite loops
+
+while (newQuestionsFound && iterations < endPathMaxIterations) {
+  // ... existing code ...
+}
+
+// ... more code ...
+
+// Make another pass now that we've identified all questions that lead to END
+// to pick up any questions that lead to those questions
+let keepChecking = true;
+let iteration = 0;
+const propagationMaxIterations = 10; // Prevent infinite loops
+
+while (keepChecking && iteration < propagationMaxIterations) {
+  // ... existing code ...
+}
+
+// ... more code ...
+
+// Final check - look for any remaining issues in our resulting logic constraints
+let stillHaveIssues2 = true;
+let fixIteration2 = 0;
+const fixLogicMaxIterations = 10; // Unique name for this loop's limit
+
+while (stillHaveIssues2 && fixIteration2 < fixLogicMaxIterations) {
+  // ... existing code ...
 }
