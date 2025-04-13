@@ -1916,6 +1916,10 @@ function isOptions(cell) {
   );
 }
 
+function isAmountOption(cell) {
+  return cell && cell.style && cell.style.includes("questionType=amountOption");
+}
+
 function setNodeId(cell, nodeId) {
   let style = cell.style || "";
   style = style.replace(/nodeId=[^;]+/, "");
@@ -2569,7 +2573,7 @@ window.exportGuiJson = function() {
                   label: label,
                   nameId: optionNameId,
                   value: "",
-                  hasAmount: false,
+                  hasAmount: isAmountOption(targetCell),
                   amountName: "",
                   amountPlaceholder: ""
                 };
