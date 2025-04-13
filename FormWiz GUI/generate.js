@@ -475,12 +475,13 @@ function getFormHTML() {
             logicScriptBuffer += `   var cPrevAns="${paVal}";\n`;
             logicScriptBuffer += `   var cPrevQNum="${pqVal}";\n`;
             logicScriptBuffer += `   if(cPrevType==="checkbox"){\n`;
-            logicScriptBuffer += `     var cbs=document.querySelectorAll('input[id^="answer'+cPrevQNum+'_"]');\n`;
+            logicScriptBuffer += `     var cbPrefix = (questionNameIds[cPrevQNum] && questionNameIds[cPrevQNum].startsWith("answer")) ? questionNameIds[cPrevQNum]+"_" : "answer"+cPrevQNum+"_";\n`;
+            logicScriptBuffer += `     var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');\n`;
             logicScriptBuffer += `     var checkedVals=[];\n`;
             logicScriptBuffer += `     for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}\n`;
             logicScriptBuffer += `     if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}\n`;
             logicScriptBuffer += `   } else {\n`;
-            logicScriptBuffer += `     var el2=document.getElementById("answer"+cPrevQNum) || document.getElementById(questionNameIds[cPrevQNum]);\n`;
+            logicScriptBuffer += `     var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);\n`;
             // Special case for special options that check for presence rather than exact value
             if (paVal.toLowerCase() === "any text" || paVal.toLowerCase() === "any amount" || paVal.toLowerCase() === "any date") {
               logicScriptBuffer += `     if(el2){ var val2= el2.value.trim(); if(val2 !== ""){ anyMatch=true;} }\n`;
@@ -511,9 +512,18 @@ function getFormHTML() {
               logicScriptBuffer += `   var cbs=document.querySelectorAll('input[id^="answer${pqVal2}_"]');\n`;
               logicScriptBuffer += `   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
-            } else {
+            } else if (pType2 === "dropdown" || pType2 === "radio" || pType2 === "numberedDropdown") {
+              // Use "change" event for select elements (dropdown, radio) instead of "input"
               logicScriptBuffer += ` (function(){\n`;
-              logicScriptBuffer += `   var el3= document.getElementById("answer${pqVal2}") || document.getElementById(questionNameIds["${pqVal2}"]);\n`;
+              // IMPORTANT: Try questionNameIds first, then fallback to default naming
+              logicScriptBuffer += `   var el3= document.getElementById(questionNameIds["${pqVal2}"]) || document.getElementById("answer${pqVal2}");\n`;
+              logicScriptBuffer += `   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}\n`;
+              logicScriptBuffer += ` })();\n`;
+            } else {
+              // Use "input" event for text fields
+              logicScriptBuffer += ` (function(){\n`;
+              // IMPORTANT: Try questionNameIds first, then fallback to default naming
+              logicScriptBuffer += `   var el3= document.getElementById(questionNameIds["${pqVal2}"]) || document.getElementById("answer${pqVal2}");\n`;
               logicScriptBuffer += `   if(el3){ el3.addEventListener("input", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
             }
