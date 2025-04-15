@@ -2893,7 +2893,7 @@ window.exportGuiJson = function() {
       console.log(`Processing calculation node: ${cell.id}, title: ${cell._calcTitle}`);
       console.log(`  Amount label: "${amountLabel}"`);
       
-      // Extract the amount name
+      // Extract the amount name and question name from the label
       let amountName = "";
       let questionNameFromLabel = "";
       
@@ -2901,46 +2901,133 @@ window.exportGuiJson = function() {
         // Clean up the label
         const cleanedLabel = amountLabel.replace(/delete_amount_/g, "").replace(/add_option_/g, "");
         console.log(`  Cleaned label: "${cleanedLabel}"`);
-        const parts = cleanedLabel.split('_');
         
-        // Get the amount name (last part)
-        if (parts.length > 0) {
-          amountName = parts[parts.length - 1].replace(/_/g, " ").trim();
+        // First, try to extract the question text from the label
+        // The label format is typically: "question_name_question_amount_name"
+        const lastIndex = cleanedLabel.lastIndexOf('_');
+        if (lastIndex > 0) {
+          amountName = cleanedLabel.substring(lastIndex + 1).trim();
+          questionNameFromLabel = cleanedLabel.substring(0, lastIndex).trim();
+          
+          console.log(`  Extracted question name: "${questionNameFromLabel}"`);
           console.log(`  Extracted amount name: "${amountName}"`);
-        }
-        
-        // Build the question name from everything except the last part
-        if (parts.length > 1) {
-          questionNameFromLabel = parts.slice(0, -1).join('_');
-          console.log(`  Question name from label: "${questionNameFromLabel}"`);
+        } else {
+          // Fallback to old method if no underscore found
+          const parts = cleanedLabel.split('_');
+          
+          // Get the amount name (last part)
+          if (parts.length > 0) {
+            amountName = parts[parts.length - 1].replace(/_/g, " ").trim();
+            console.log(`  Extracted amount name (fallback): "${amountName}"`);
+          }
+          
+          // Build the question name from everything except the last part
+          if (parts.length > 1) {
+            questionNameFromLabel = parts.slice(0, -1).join('_');
+            console.log(`  Question name from label (fallback): "${questionNameFromLabel}"`);
+          }
         }
       }
       
       // Find the target question for this calculation
       let targetQuestion = null;
       
-      // Search through all questions in all sections
-      console.log(`  Searching for matching question with amount: "${amountName}"`);
+      // First try to match the exact question from the label (this fixes the duplicate amount name issue)
+      console.log(`  First attempting to match exact question name: "${questionNameFromLabel}"`);
       for (const section of sections) {
         for (const question of section.questions) {
-          console.log(`    Checking question ${question.questionId}: "${question.text}", type: ${question.type}, amounts: ${JSON.stringify(question.amounts)}`);
+          // Generate various formats of the question text for matching
+          const questionText = question.text || "";
+          const questionTextLower = questionText.toLowerCase();
+          const questionTextAsId = questionTextLower.replace(/[^\w\s]/gi, "").replace(/\s+/g, "_");
+          const questionLabelFromStyle = (question.nameId || "").toLowerCase();
           
-          // Check if this is a numberedDropdown question with amounts
-          if (question.type === "numberedDropdown" && question.amounts && question.amounts.length > 0) {
-            for (const amount of question.amounts) {
-              console.log(`      Comparing amount "${amount}" with "${amountName}"`);
-              if (amount.toLowerCase() === amountName.toLowerCase() || 
-                  amount.toLowerCase().replace(/\s+/g, '_') === amountName.toLowerCase().replace(/\s+/g, '_')) {
-                targetQuestion = question;
-                console.log(`      MATCH FOUND! Using question ${question.questionId}`);
-                break;
-              }
+          // Generate various formats of the label for matching
+          const questionNameFromLabelLower = questionNameFromLabel.toLowerCase();
+          
+          console.log(`    Checking question ${question.questionId}: "${questionText}"`);
+          console.log(`      Text as ID: "${questionTextAsId}", Label from amount: "${questionNameFromLabelLower}"`);
+          
+          // Try multiple matching strategies
+          const directMatch = questionNameFromLabelLower === questionTextAsId;
+          const containsMatch = questionNameFromLabelLower.includes(questionTextAsId) || 
+                              questionTextAsId.includes(questionNameFromLabelLower);
+          const simpleTextMatch = questionNameFromLabelLower.replace(/_/g, " ") === questionTextLower;
+          
+          if (directMatch || containsMatch || simpleTextMatch) {
+            console.log(`    MATCH FOUND! Question "${questionText}" matches label "${questionNameFromLabel}"`);
+            
+            // Check if it also has a matching amount
+            if (question.type === "numberedDropdown" && question.amounts && 
+                question.amounts.some(amt => amt.toLowerCase() === amountName.toLowerCase())) {
+              console.log(`    Confirmed: question has matching amount "${amountName}"`);
+              targetQuestion = question;
+              break;
+            } else if (question.type === "numberedDropdown") {
+              console.log(`    Warning: matched question doesn't have exact amount "${amountName}", but using it anyway as fallback`);
+              targetQuestion = question;
             }
           }
-          
-          if (targetQuestion) break;
         }
         if (targetQuestion) break;
+      }
+      
+      // If still no match, try even more relaxed matching
+      if (!targetQuestion) {
+        console.log(`  No exact match found, trying more relaxed matching strategies`);
+        for (const section of sections) {
+          for (const question of section.questions) {
+            if (question.type !== "numberedDropdown") continue;
+            
+            // Try word-by-word matching
+            const questionWords = question.text.toLowerCase().split(/\s+/);
+            const labelWords = questionNameFromLabel.toLowerCase().replace(/_/g, " ").split(/\s+/);
+            
+            let wordMatches = 0;
+            for (const word of questionWords) {
+              if (labelWords.includes(word)) {
+                wordMatches++;
+              }
+            }
+            
+            // If more than half the words match, it's probably the right question
+            if (wordMatches > Math.min(2, questionWords.length / 2)) {
+              console.log(`    PARTIAL MATCH! Question "${question.text}" matches ${wordMatches} words from label`);
+              targetQuestion = question;
+              break;
+            }
+          }
+          if (targetQuestion) break;
+        }
+      }
+      
+      // If we didn't find a question by direct matching, fall back to the older logic
+      if (!targetQuestion) {
+        console.log(`  No match found by question name, falling back to amount-only matching`);
+        
+        // Search through all questions in all sections
+        console.log(`  Searching for matching question with amount: "${amountName}"`);
+        for (const section of sections) {
+          for (const question of section.questions) {
+            console.log(`    Checking question ${question.questionId}: "${question.text}", type: ${question.type}, amounts: ${JSON.stringify(question.amounts)}`);
+            
+            // Check if this is a numberedDropdown question with amounts
+            if (question.type === "numberedDropdown" && question.amounts && question.amounts.length > 0) {
+              for (const amount of question.amounts) {
+                console.log(`      Comparing amount "${amount}" with "${amountName}"`);
+                if (amount.toLowerCase() === amountName.toLowerCase() || 
+                    amount.toLowerCase().replace(/\s+/g, '_') === amountName.toLowerCase().replace(/\s+/g, '_')) {
+                  targetQuestion = question;
+                  console.log(`      MATCH FOUND! Using question ${question.questionId}`);
+                  break;
+                }
+              }
+            }
+            
+            if (targetQuestion) break;
+          }
+          if (targetQuestion) break;
+        }
       }
 
       // Generate calculation terms
@@ -3012,91 +3099,141 @@ window.exportGuiJson = function() {
         // FALLBACK: Create dynamic fallback terms based on any found questions
         console.log(`  Creating dynamic fallback terms`);
         
-        // Find any numberedDropdown question to use as reference
-        let fallbackQuestion = null;
-        for (const section of sections) {
-          for (const question of section.questions) {
-            if (question.type === "numberedDropdown" && question.amounts && question.amounts.length > 0) {
-              fallbackQuestion = question;
-              console.log(`  Found fallback numberedDropdown question: ${question.text}`);
-              break;
-            }
-          }
-          if (fallbackQuestion) break;
-        }
-        
-        if (fallbackQuestion) {
-          // Use the actual amount name from the question
-          const actualAmountName = fallbackQuestion.amounts[0].toLowerCase().replace(/\s+/g, '_');
-          console.log(`  Using amount name from fallback question: "${actualAmountName}"`);
+        // First check if we can extract a question name from the label to make a better fallback
+        if (questionNameFromLabel) {
+          console.log(`  Attempting to create fallback using question name from label: "${questionNameFromLabel}"`);
           
-          const min = parseInt(fallbackQuestion.min || "1", 10);
-          const max = parseInt(fallbackQuestion.max || "3", 10);
+          // Format the question name for display in terms
+          // Convert from snake_case to proper text with spaces and capitalization
+          const formattedQuestionName = questionNameFromLabel
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+            
+          console.log(`  Formatted question name: "${formattedQuestionName}"`);
           
-          // Generate terms using the found question
+          // Clean up the amount name
+          const cleanAmountName = amountName.trim().toLowerCase().replace(/\s+/g, '_');
+          
+          // Create terms based on the question name from the label
           calculation.terms = [];
+          
+          // First term has no operator
           calculation.terms.push({
             operator: "",
-            questionNameId: `${fallbackQuestion.text}_${min}_${actualAmountName}`
+            questionNameId: `${formattedQuestionName}_1_${cleanAmountName}`
           });
           
-          for (let i = min + 1; i <= max; i++) {
-            calculation.terms.push({
-              operator: "+",
-              questionNameId: `${fallbackQuestion.text}_${i}_${actualAmountName}`
-            });
-          }
-          
-          console.log(`  Created fallback terms using question: ${JSON.stringify(calculation.terms, null, 2)}`);
-        } else {
-          // No appropriate questions found, extract amount name from the label
-          let extractedAmount = amountName.trim().toLowerCase();
-          
-          // If amount name is still empty, try to find from any questions
-          if (!extractedAmount && sections.length > 0 && sections[0].questions.length > 0) {
-            const firstQuestion = sections[0].questions[0];
-            if (firstQuestion.amounts && firstQuestion.amounts.length > 0) {
-              extractedAmount = firstQuestion.amounts[0].trim().toLowerCase();
-              console.log(`  Using amount from first question: "${extractedAmount}"`);
-            }
-          }
-          
-          // If we still don't have an amount name, use a generic one
-          if (!extractedAmount) {
-            extractedAmount = "amount";
-          }
-          
-          const cleanAmount = extractedAmount.replace(/\s+/g, '_');
-          console.log(`  Using extracted amount: "${cleanAmount}"`);
-          
-          // First find any question that is numbered dropdown
-          let questionText = "How many jobs do you have";
+          // Add terms for numbers 2 and 3 (or use min/max from nearby questions)
+          // Find a numberedDropdown question to get the max value
+          let maxNumber = 3;
           for (const section of sections) {
             for (const question of section.questions) {
-              if (question.type === "numberedDropdown") {
-                questionText = question.text;
+              if (question.type === "numberedDropdown" && question.max) {
+                maxNumber = parseInt(question.max, 10);
                 break;
               }
             }
           }
           
-          // Format from the expected output: "How many jobs do you have_1_stuff"
-          calculation.terms = [
-            {
-              operator: "",
-              questionNameId: `${questionText}_1_${cleanAmount}`
-            },
-            {
+          // Add additional terms
+          for (let i = 2; i <= maxNumber; i++) {
+            calculation.terms.push({
               operator: "+",
-              questionNameId: `${questionText}_2_${cleanAmount}`
-            },
-            {
-              operator: "+",
-              questionNameId: `${questionText}_3_${cleanAmount}`
-            }
-          ];
+              questionNameId: `${formattedQuestionName}_${i}_${cleanAmountName}`
+            });
+          }
           
-          console.log(`  Created generic fallback terms: ${JSON.stringify(calculation.terms, null, 2)}`);
+          console.log(`  Created fallback terms from label: ${JSON.stringify(calculation.terms, null, 2)}`);
+        } 
+        // If we can't use the question name from the label, try to find a suitable question
+        else {
+          // Find any numberedDropdown question to use as reference
+          let fallbackQuestion = null;
+          for (const section of sections) {
+            for (const question of section.questions) {
+              if (question.type === "numberedDropdown" && question.amounts && question.amounts.length > 0) {
+                fallbackQuestion = question;
+                console.log(`  Found fallback numberedDropdown question: ${question.text}`);
+                break;
+              }
+            }
+            if (fallbackQuestion) break;
+          }
+          
+          if (fallbackQuestion) {
+            // Use the actual amount name from the question
+            const actualAmountName = fallbackQuestion.amounts[0].toLowerCase().replace(/\s+/g, '_');
+            console.log(`  Using amount name from fallback question: "${actualAmountName}"`);
+            
+            const min = parseInt(fallbackQuestion.min || "1", 10);
+            const max = parseInt(fallbackQuestion.max || "3", 10);
+            
+            // Generate terms using the found question
+            calculation.terms = [];
+            calculation.terms.push({
+              operator: "",
+              questionNameId: `${fallbackQuestion.text}_${min}_${actualAmountName}`
+            });
+            
+            for (let i = min + 1; i <= max; i++) {
+              calculation.terms.push({
+                operator: "+",
+                questionNameId: `${fallbackQuestion.text}_${i}_${actualAmountName}`
+              });
+            }
+            
+            console.log(`  Created fallback terms using question: ${JSON.stringify(calculation.terms, null, 2)}`);
+          } else {
+            // No appropriate questions found, extract amount name from the label
+            let extractedAmount = amountName.trim().toLowerCase();
+            
+            // If amount name is still empty, try to find from any questions
+            if (!extractedAmount && sections.length > 0 && sections[0].questions.length > 0) {
+              const firstQuestion = sections[0].questions[0];
+              if (firstQuestion.amounts && firstQuestion.amounts.length > 0) {
+                extractedAmount = firstQuestion.amounts[0].trim().toLowerCase();
+                console.log(`  Using amount from first question: "${extractedAmount}"`);
+              }
+            }
+            
+            // If we still don't have an amount name, use a generic one
+            if (!extractedAmount) {
+              extractedAmount = "amount";
+            }
+            
+            const cleanAmount = extractedAmount.replace(/\s+/g, '_');
+            console.log(`  Using extracted amount: "${cleanAmount}"`);
+            
+            // First find any question that is numbered dropdown
+            let questionText = "How many jobs do you have";
+            for (const section of sections) {
+              for (const question of section.questions) {
+                if (question.type === "numberedDropdown") {
+                  questionText = question.text;
+                  break;
+                }
+              }
+            }
+            
+            // Format from the expected output: "How many jobs do you have_1_stuff"
+            calculation.terms = [
+              {
+                operator: "",
+                questionNameId: `${questionText}_1_${cleanAmount}`
+              },
+              {
+                operator: "+",
+                questionNameId: `${questionText}_2_${cleanAmount}`
+              },
+              {
+                operator: "+",
+                questionNameId: `${questionText}_3_${cleanAmount}`
+              }
+            ];
+            
+            console.log(`  Created generic fallback terms: ${JSON.stringify(calculation.terms, null, 2)}`);
+          }
         }
       }
 
