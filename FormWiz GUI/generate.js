@@ -942,8 +942,8 @@ function runAllHiddenTextCalculations(){
 
 /**
  * Evaluate each multi-term calculation and set the hidden text field.
- * If fillValue === "##total##", we store the numeric sum of the terms
- * (rather than a fixed string).
+ * If fillValue format is "##fieldName##", we store the numeric sum of the terms
+ * using the field's own name (or any other field name).
  */
 function runSingleHiddenTextCalculation(calcObj) {
     var textField = document.getElementById(calcObj.hiddenFieldName);
@@ -982,7 +982,8 @@ function runSingleHiddenTextCalculation(calcObj) {
         }
 
         if (matched) {
-            if (oneCalc.fillValue === "##total##") {
+            // Check if fillValue is in ##fieldname## format
+            if (oneCalc.fillValue && oneCalc.fillValue.match(/^##(.+)##$/)) {
                 finalValue = val.toString();
             } else {
                 finalValue = oneCalc.fillValue;
@@ -1106,6 +1107,7 @@ function attachCalculationListeners(){
  *  - Builds hidden <input> fields
  *  - Also handles multi-term calculations for both checkboxes & text
  *  - Expands "numberedDropdown" amounts into multiple "amountX_Y_value" references
+ *  - Supports ##fieldname## pattern in fillValue to display the calculation result
  */
 function generateHiddenPDFFields() {
     let hiddenFieldsHTML = '<div id="hidden_pdf_fields">';

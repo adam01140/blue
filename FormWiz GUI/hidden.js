@@ -558,7 +558,7 @@ function addCalculationForText(hiddenFieldId) {
         </select>
         <input type="number" id="textThreshold${hiddenFieldId}_${calcIndex}" placeholder="Enter number" style="width:80px;">
         <label> then fill with: </label>
-        <input type="text" id="textFillValue${hiddenFieldId}_${calcIndex}" placeholder="Some text (you can use $$ID$$ placeholders)" style="width:230px;">
+        <input type="text" id="textFillValue${hiddenFieldId}_${calcIndex}" placeholder="Enter value or use ##FIELDNAME## to reference a field" style="width:230px;">
 
         <button type="button" onclick="removeCalculationForText(${hiddenFieldId}, ${calcIndex})">Remove</button>
         <hr>
