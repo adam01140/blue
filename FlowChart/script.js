@@ -1682,34 +1682,44 @@ function isCalculationNode(cell) {
  * We'll gather them in the format:
  *    "<question_id_text>_<amount_label>"
  * E.g. "how_many_cars_do_you_have_car_value"
+ * Also include calculation node titles as potential sources
  */
 function gatherAllAmountLabels() {
   const labels = [];
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
-
+  
+  // First collect all calculation nodes
+  const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
+  
   vertices.forEach(cell => {
-    if (!isQuestion(cell)) return;
-    const qType = getQuestionType(cell);
-    if (qType === "multipleDropdownType") {
-      // We'll rename it "numberedDropdown" in final JSON
-      // If it has amounts, push them
-      if (cell._textboxes) {
-        const cleanQuestionName = (cell.value || cell._questionText || "unnamed_question")
-          .replace(/<[^>]+>/g, "")
-          .trim()
-          .replace(/[^\w\s]/gi, "")
-          .replace(/\s+/g, "_")
-          .toLowerCase();
+    if (isCalculationNode(cell)) {
+      // Add calculation node titles as potential sources
+      if (cell._calcTitle) {
+        labels.push(cell._calcTitle);
+      }
+    } else if (isQuestion(cell)) {
+      const qType = getQuestionType(cell);
+      if (qType === "multipleDropdownType") {
+        // We'll rename it "numberedDropdown" in final JSON
+        // If it has amounts, push them
+        if (cell._textboxes) {
+          const cleanQuestionName = (cell.value || cell._questionText || "unnamed_question")
+            .replace(/<[^>]+>/g, "")
+            .trim()
+            .replace(/[^\w\s]/gi, "")
+            .replace(/\s+/g, "_")
+            .toLowerCase();
 
-        // We also add "car_value" for each isAmountOption
-        cell._textboxes.forEach(tb => {
-          if (tb.isAmountOption) {
-            // e.g. "how_many_cars_do_you_have_car_value"
-            let label = cleanQuestionName + "_" + tb.nameId.replace(/\s+/g, "_").toLowerCase();
-            labels.push(label);
-          }
-        });
+          // We also add "car_value" for each isAmountOption
+          cell._textboxes.forEach(tb => {
+            if (tb.isAmountOption) {
+              // e.g. "how_many_cars_do_you_have_car_value"
+              let label = cleanQuestionName + "_" + tb.nameId.replace(/\s+/g, "_").toLowerCase();
+              labels.push(label);
+            }
+          });
+        }
       }
     }
   });
@@ -2375,7 +2385,7 @@ window.exportGuiJson = function() {
   // Get all cells
   const cells = graph.getModel().cells;
   const sections = [];
-  const hiddenFields = [];
+  let hiddenFields = [];
   let sectionCounter = 1;
   let questionCounter = 1;
   let hiddenFieldCounter = 1;
@@ -2893,6 +2903,46 @@ window.exportGuiJson = function() {
       console.log(`Processing calculation node: ${cell.id}, title: ${cell._calcTitle}`);
       console.log(`  Amount label: "${amountLabel}"`);
       
+      // First, check if this amountLabel matches another calculation node's title
+      let isCalcNodeReference = false;
+      let calcNodeTitle = "";
+      
+      // Collect all calculation nodes except the current one
+      const otherCalcNodes = [];
+      for (const otherId in cells) {
+        const otherCell = cells[otherId];
+        if (otherId !== cellId && otherCell.isVertex() && !otherCell.isEdge() && isCalculationNode(otherCell)) {
+          otherCalcNodes.push(otherCell);
+        }
+      }
+      
+      // Check if amountLabel matches any calculation node's title
+      for (const otherCalcNode of otherCalcNodes) {
+        if (otherCalcNode._calcTitle && otherCalcNode._calcTitle === amountLabel) {
+          isCalcNodeReference = true;
+          calcNodeTitle = otherCalcNode._calcTitle;
+          console.log(`  Found matching calculation node with title: "${calcNodeTitle}"`);
+          break;
+        }
+      }
+      
+      // If this is a reference to another calculation node, create a simple term
+      if (isCalcNodeReference) {
+        console.log(`  Creating calculation term referencing calc node: "${calcNodeTitle}"`);
+        calculation.terms = [{
+          operator: "",
+          questionNameId: calcNodeTitle
+        }];
+        
+        // Add the calculation to hidden field
+        hiddenField.calculations.push(calculation);
+        hiddenFields.push(hiddenField);
+        hiddenFieldCounter++;
+        
+        // Skip the rest of the processing for this node
+        continue;
+      }
+      
       // Extract the amount name and question name from the label
       let amountName = "";
       let questionNameFromLabel = "";
@@ -3249,8 +3299,8 @@ window.exportGuiJson = function() {
     sectionCounter = maxSectionId + 1;
   }
 
-  // Explicitly set hiddenFieldCounter to 3
-  hiddenFieldCounter = 3;
+  // Update hiddenFieldCounter based on the actual number of hidden fields
+  hiddenFieldCounter = hiddenFields.length + 1;
 
   // Before creating the final JSON object, ensure all prevAnswer values preserve original case
   for (const section of sections) {
@@ -3296,6 +3346,110 @@ window.exportGuiJson = function() {
   let changesOccurred = true;
   let iterationCount = 0;
   const logicMaxIterations = 10; // Prevent infinite loops
+  
+  // Sort hiddenFields to ensure calculation nodes that reference other calculation nodes
+  // appear after their dependencies
+  if (hiddenFields.length > 1) {
+    console.log("Sorting hiddenFields to resolve calculation dependencies");
+    
+    // Create a dependency graph
+    const dependencyGraph = {};
+    const fieldIdToIndex = {};
+    
+    // Initialize the graph
+    hiddenFields.forEach((field, index) => {
+      fieldIdToIndex[field.name] = index;
+      dependencyGraph[field.name] = [];
+    });
+    
+    // Build dependency relationships
+    hiddenFields.forEach(field => {
+      if (field.calculations && field.calculations.length > 0) {
+        field.calculations.forEach(calc => {
+          if (calc.terms && calc.terms.length > 0) {
+            calc.terms.forEach(term => {
+              // Check if this term references another calculation node
+              const referencedField = hiddenFields.find(f => f.name === term.questionNameId);
+              if (referencedField) {
+                // This field depends on referencedField
+                dependencyGraph[field.name].push(referencedField.name);
+              }
+            });
+          }
+        });
+      }
+    });
+    
+    console.log("Dependency graph:", dependencyGraph);
+    
+    // Topological sort function
+    function topologicalSort() {
+      const sorted = [];
+      const visited = {};
+      const temp = {};
+      
+      function visit(name) {
+        if (temp[name]) {
+          // Circular dependency found, break the cycle
+          console.log(`Warning: Circular dependency detected with ${name}`);
+          return;
+        }
+        
+        if (!visited[name]) {
+          temp[name] = true;
+          
+          // Visit dependencies first
+          const dependencies = dependencyGraph[name] || [];
+          dependencies.forEach(dep => {
+            visit(dep);
+          });
+          
+          visited[name] = true;
+          temp[name] = false;
+          sorted.unshift(name); // Add to front
+        }
+      }
+      
+      // Visit each node
+      Object.keys(dependencyGraph).forEach(name => {
+        if (!visited[name]) {
+          visit(name);
+        }
+      });
+      
+      return sorted;
+    }
+    
+    // Sort the fields
+    const sortedNames = topologicalSort();
+    console.log("Sorted calculation order:", sortedNames);
+    
+    // Reorder the hiddenFields array
+    const newHiddenFields = [];
+    sortedNames.forEach(name => {
+      const field = hiddenFields.find(f => f.name === name);
+      if (field) {
+        newHiddenFields.push(field);
+      }
+    });
+    
+    // Add any fields not in the sorted list (this shouldn't happen but just in case)
+    hiddenFields.forEach(field => {
+      if (!sortedNames.includes(field.name)) {
+        newHiddenFields.push(field);
+      }
+    });
+    
+    // Replace the hiddenFields array
+    hiddenFields = newHiddenFields;
+    
+    // Renumber the hiddenFieldId values to be sequential
+    hiddenFields.forEach((field, index) => {
+      field.hiddenFieldId = (index + 1).toString();
+    });
+    
+    console.log("Sorted and renumbered hiddenFields");
+  }
   
   // Repeatedly propagate conditions until no more changes occur
   while (changesOccurred && iterationCount < logicMaxIterations) {

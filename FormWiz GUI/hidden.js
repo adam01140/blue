@@ -59,6 +59,9 @@ function addHiddenField() {
     `;
     hiddenFieldsContainer.appendChild(block);
     toggleHiddenFieldOptions(currentHiddenFieldId);
+    
+    // After adding a new hidden field, update all calculation dropdowns
+    setTimeout(updateAllCalculationDropdowns, 100);
 }
 
 /**
@@ -108,6 +111,9 @@ function toggleHiddenFieldOptions(hiddenFieldId) {
             <button type="button" onclick="addConditionalAutofillForCheckbox(${hiddenFieldId})">Add Conditional Logic</button><br><br>
         `;
     }
+    
+    // Update all calculation dropdowns whenever we toggle options
+    setTimeout(updateAllCalculationDropdowns, 100);
 }
 
 /**
@@ -536,6 +542,26 @@ function removeCalculationForCheckbox(hiddenFieldId, calcIndex) {
  *   "If eq => fill with some text"
  *******************************************************/
 
+/**
+ * Update all calculation dropdowns to ensure they show all available money questions
+ * and all hidden field options
+ */
+function updateAllCalculationDropdowns() {
+    // Update all calculation dropdown options to ensure they include all hidden fields
+    const allDropdowns = document.querySelectorAll('select[id^="textTermQuestion"]');
+    allDropdowns.forEach(dropdown => {
+        const selectedValue = dropdown.value;
+        dropdown.innerHTML = `
+            <option value="">-- Select money question --</option>
+            ${generateMoneyQuestionOptions()}
+        `;
+        if (selectedValue) dropdown.value = selectedValue;
+    });
+}
+
+/**
+ * Adds a new calculation for a text field
+ */
 function addCalculationForText(hiddenFieldId) {
     var textCalcBlock = document.getElementById('textCalculationBlock'+hiddenFieldId);
     var calcIndex = textCalcBlock.children.length+1;
@@ -567,6 +593,9 @@ function addCalculationForText(hiddenFieldId) {
 
     // Add the first term
     addEquationTermText(hiddenFieldId, calcIndex);
+    
+    // Make sure all dropdowns show all options
+    updateAllCalculationDropdowns();
 }
 
 /**
@@ -603,6 +632,9 @@ function addEquationTermText(hiddenFieldId, calcIndex) {
         </select><br><br>
     `;
     eqContainer.appendChild(div);
+    
+    // Force update all dropdowns to ensure consistent options
+    updateAllCalculationDropdowns();
 }
 
 /**
@@ -711,7 +743,7 @@ function generateAllQuestionOptions() {
 }
 
 /**
- * UPDATED to also include hidden fields as numeric references
+ * UPDATED to include ALL hidden fields as numeric references
  * And use question text instead of just ID in the display
  */
 function generateMoneyQuestionOptions() {
@@ -764,7 +796,7 @@ function generateMoneyQuestionOptions() {
         }
     });
 
-    // ---- ALSO include hidden fields as references ----
+    // ---- INCLUDE ALL HIDDEN FIELDS AS REFERENCES ----
     const hiddenBlocks = document.querySelectorAll('.hidden-field-block');
     hiddenBlocks.forEach((block) => {
         const hid = block.id.replace('hiddenFieldBlock','');
@@ -776,9 +808,7 @@ function generateMoneyQuestionOptions() {
         const fName = fNameEl.value.trim();
         if (!fName) return;
 
-        // We'll treat hidden checkbox or text fields as numeric references:
-        // text => parseFloat
-        // checkbox => 1/0
+        // Include all hidden fields as options, not just the current one
         optionsHTML += `<option value="${fName}">(Hidden ${fType}) ${fName}</option>`;
     });
 

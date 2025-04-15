@@ -1149,8 +1149,9 @@ function generateHiddenPDFFields() {
             // ------------------------------
             if (fType === "text") {
                 // Add the hidden text field
-                hiddenFieldsHTML += `\n<input type="text" id="${fName}" name="${fName}" placeholder="${fName}" style="display: none;">`;
-
+                //hide calc fields here
+                hiddenFieldsHTML += `\n<input type="text" id="${fName}" name="${fName}" placeholder="${fName}" style="display:block;">`;
+    
                 // Process text calculations from UI
                 const textCalcBlock = block.querySelector("#textCalculationBlock" + hid);
                 if (textCalcBlock) {
