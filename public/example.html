@@ -68,7 +68,10 @@
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1"><label><h3>Do you have a lawyer</h3></label><input type="text" id="answer1" name="answer1" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
+        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h2>Enter Name</h2><div id="question-container-1"><label><h3>How many sources of income do you have</h3></label><select id="answer1" onchange="showTextboxLabels(1, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><div id="question-container-2"><label><h3>How many bank accounts do you have?</h3></label><select id="answer2" onchange="showTextboxLabels(2, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer2"></div></div><br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
+<input type="text" id="bruh" name="bruh" placeholder="bruh">
 </div></form>
 <div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
 </div>
@@ -99,14 +102,14 @@
            window.location.href="account.html";
         }
     });
-  var questionNameIds = {"1":"answer1"};
+  var questionNameIds = {"1":"answer1","2":"answer2"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var conditionalAlerts = [];
-var labelMap = {};
-var amountMap = {};
+var labelMap = {"1":[],"2":[]};
+var amountMap = {"1":["Amount"],"2":["Amount"]};
 var hiddenCheckboxCalculations = [];
-var hiddenTextCalculations = [];
+var hiddenTextCalculations = [{"hiddenFieldName":"bruh","calculations":[{"terms":[{"operator":"","questionNameId":"amount1_1_amount"},{"operator":"+","questionNameId":"amount1_2_amount"},{"operator":"+","questionNameId":"amount1_3_amount"}],"compareOperator":">","threshold":"0","fillValue":"hello"}]}];
 
 
 
@@ -398,8 +401,8 @@ function runAllHiddenTextCalculations(){
 
 /**
  * Evaluate each multi-term calculation and set the hidden text field.
- * If fillValue === "##total##", we store the numeric sum of the terms
- * (rather than a fixed string).
+ * If fillValue format is "##fieldName##", we store the numeric sum of the terms
+ * using the field's own name (or any other field name).
  */
 function runSingleHiddenTextCalculation(calcObj) {
     var textField = document.getElementById(calcObj.hiddenFieldName);
@@ -438,7 +441,8 @@ function runSingleHiddenTextCalculation(calcObj) {
         }
 
         if (matched) {
-            if (oneCalc.fillValue === "##total##") {
+            // Check if fillValue is in ##fieldname## format
+            if (oneCalc.fillValue && oneCalc.fillValue.match(/^##(.+)##$/)) {
                 finalValue = val.toString();
             } else {
                 finalValue = oneCalc.fillValue;
