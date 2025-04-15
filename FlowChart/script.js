@@ -400,6 +400,14 @@ function loadFlowchartData(data) {
         if (item._calcOperator !== undefined) newCell._calcOperator = item._calcOperator;
         if (item._calcThreshold !== undefined) newCell._calcThreshold = item._calcThreshold;
         if (item._calcFinalText !== undefined) newCell._calcFinalText = item._calcFinalText;
+        if (item._calcTerms !== undefined) newCell._calcTerms = item._calcTerms;
+        // If we have _calcAmountLabel but no _calcTerms, create the terms array
+        if (item._calcAmountLabel !== undefined && item._calcTerms === undefined) {
+          newCell._calcTerms = [{
+            amountLabel: item._calcAmountLabel,
+            mathOperator: ""
+          }];
+        }
 
         graph.addCell(newCell, parent);
         createdCells[item.id] = newCell;
@@ -702,7 +710,7 @@ document.addEventListener("DOMContentLoaded", function() {
         } else if (isCalculationNode(newVertex)) {
           // Init calculation node data
           newVertex._calcTitle = "Calculation Title";
-          newVertex._calcAmountLabel = "";
+          newVertex._calcTerms = [{amountLabel: "", mathOperator: ""}];
           newVertex._calcOperator = "=";
           newVertex._calcThreshold = "0";
           newVertex._calcFinalText = "";
@@ -1738,38 +1746,91 @@ function gatherAllAmountLabels() {
 function updateCalculationNodeCell(cell) {
   // Prepare default fields if missing
   if (cell._calcTitle === undefined) cell._calcTitle = "Calculation Title";
-  if (cell._calcAmountLabel === undefined) cell._calcAmountLabel = "";
+  if (cell._calcTerms === undefined) cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
   if (cell._calcOperator === undefined) cell._calcOperator = "=";
   if (cell._calcThreshold === undefined) cell._calcThreshold = "0";
   if (cell._calcFinalText === undefined) cell._calcFinalText = "";
 
+  // For backward compatibility
+  if (cell._calcAmountLabel !== undefined && cell._calcTerms.length === 1 && !cell._calcTerms[0].amountLabel) {
+    cell._calcTerms[0].amountLabel = cell._calcAmountLabel;
+  }
+
   // Gather possible "amount" labels
   const allAmountLabels = gatherAllAmountLabels();
 
-  // Build dropdown of amount labels
-  let amountOptionsHtml = `<option value="">-- pick an amount label --</option>`;
-  allAmountLabels.forEach(lbl => {
-    const selected = (lbl === cell._calcAmountLabel) ? "selected" : "";
-    
-    // Clean up display name for the dropdown
-    let displayName = lbl;
-    
-    // Strip out common artifacts like delete_amount, add_option etc.
-    displayName = displayName.replace(/delete_amount_/g, "");
-    displayName = displayName.replace(/add_option_/g, "");
-    
-    // Find the last instance of the question name + underscore
-    const lastUnderscoreIndex = displayName.lastIndexOf("_");
-    if (lastUnderscoreIndex !== -1) {
-      const questionPart = displayName.substring(0, lastUnderscoreIndex);
-      const amountPart = displayName.substring(lastUnderscoreIndex + 1);
+  // Build the HTML for all calculation terms
+  let calcTermsHtml = '';
+  
+  cell._calcTerms.forEach((term, index) => {
+    // Build dropdown of amount labels for this term
+    let amountOptionsHtml = `<option value="">-- pick an amount label --</option>`;
+    allAmountLabels.forEach(lbl => {
+      const selected = (lbl === term.amountLabel) ? "selected" : "";
       
-      // Format: "how_many_cars_do_you_have + car_value"
-      displayName = `${questionPart}_${amountPart}`;
+      // Clean up display name for the dropdown
+      let displayName = lbl;
+      
+      // Strip out common artifacts like delete_amount, add_option etc.
+      displayName = displayName.replace(/delete_amount_/g, "");
+      displayName = displayName.replace(/add_option_/g, "");
+      
+      // Find the last instance of the question name + underscore
+      const lastUnderscoreIndex = displayName.lastIndexOf("_");
+      if (lastUnderscoreIndex !== -1) {
+        const questionPart = displayName.substring(0, lastUnderscoreIndex);
+        const amountPart = displayName.substring(lastUnderscoreIndex + 1);
+        
+        // Format: "how_many_cars_do_you_have + car_value"
+        displayName = `${questionPart}_${amountPart}`;
+      }
+      
+      amountOptionsHtml += `<option value="${escapeAttr(lbl)}" ${selected}>${displayName}</option>`;
+    });
+
+    // For the first term, don't show a math operator
+    if (index === 0) {
+      calcTermsHtml += `
+        <div class="calc-term" data-index="${index}">
+          <label>Calc ${index + 1}:</label>
+          <select onchange="window.updateCalcNodeTerm('${cell.id}', ${index}, 'amountLabel', this.value)" style="width:100%; max-width:500px;">
+            ${amountOptionsHtml}
+          </select>
+          <br/><br/>
+        </div>
+      `;
+    } else {
+      // For subsequent terms, show a math operator dropdown first
+      let mathOperatorOptionsHtml = "";
+      const mathOperators = ["+", "-", "*", "/"];
+      mathOperators.forEach(op => {
+        const selected = (op === term.mathOperator) ? "selected" : "";
+        mathOperatorOptionsHtml += `<option value="${op}" ${selected}>${op}</option>`;
+      });
+
+      calcTermsHtml += `
+        <div class="calc-term" data-index="${index}">
+          <label>Math Operator:</label>
+          <select onchange="window.updateCalcNodeTerm('${cell.id}', ${index}, 'mathOperator', this.value)" style="width:100px;">
+            ${mathOperatorOptionsHtml}
+          </select>
+          <label style="margin-left:10px;">Calc ${index + 1}:</label>
+          <select onchange="window.updateCalcNodeTerm('${cell.id}', ${index}, 'amountLabel', this.value)" style="width:calc(100% - 120px); max-width:380px;">
+            ${amountOptionsHtml}
+          </select>
+          <button onclick="window.removeCalcNodeTerm('${cell.id}', ${index})" style="margin-left:5px;">Remove</button>
+          <br/><br/>
+        </div>
+      `;
     }
-    
-    amountOptionsHtml += `<option value="${escapeAttr(lbl)}" ${selected}>${displayName}</option>`;
   });
+
+  // Add button for adding more terms
+  calcTermsHtml += `
+    <div style="margin-bottom:15px;">
+      <button onclick="window.addCalcNodeTerm('${cell.id}')">Add More</button>
+    </div>
+  `;
 
   // Operator dropdown
   const operators = ["=", ">", "<"];
@@ -1787,13 +1848,9 @@ function updateCalculationNodeCell(cell) {
       </div>
       <br/>
 
-      <label>Calc 1:</label>
-      <select onchange="window.updateCalcNodeAmountLabel('${cell.id}', this.value)" style="width:100%; max-width:500px;">
-        ${amountOptionsHtml}
-      </select>
-      <br/><br/>
+      ${calcTermsHtml}
 
-      <label>Operator:</label>
+      <label>Comparison Operator:</label>
       <select onchange="window.updateCalcNodeOperator('${cell.id}', this.value)">
         ${operatorOptionsHtml}
       </select>
@@ -1833,12 +1890,13 @@ function updateCalculationNodeCell(cell) {
     const geo = cell.geometry;
     if (geo) {
       // Set a generous minimum width for the calculation node to fit dropdowns
-      if (geo.width < 300) {
-        geo.width = 300;
+      if (geo.width < 400) {
+        geo.width = 400;
       }
-      // Ensure height is adequate
-      if (geo.height < 250) {
-        geo.height = 250;
+      // Ensure height is adequate (add 50px per term after the first)
+      const minHeight = 250 + (Math.max(0, cell._calcTerms.length - 1) * 50);
+      if (geo.height < minHeight) {
+        geo.height = minHeight;
       }
     }
   } finally {
@@ -1864,6 +1922,16 @@ window.updateCalcNodeAmountLabel = function(cellId, value) {
   graph.getModel().beginUpdate();
   try {
     cell._calcAmountLabel = value.trim();
+    
+    // Also update _calcTerms for backward compatibility
+    if (!cell._calcTerms || cell._calcTerms.length === 0) {
+      cell._calcTerms = [{
+        amountLabel: value.trim(),
+        mathOperator: ""
+      }];
+    } else if (cell._calcTerms.length > 0) {
+      cell._calcTerms[0].amountLabel = value.trim();
+    }
   } finally {
     graph.getModel().endUpdate();
   }
@@ -1899,6 +1967,78 @@ window.updateCalcNodeFinalText = (cellId, text) => {
   if (!cell) return;
   
   cell._calcFinalText = text;
+  updateCalculationNodeCell(cell);
+};
+
+// New function to handle updating calculation terms
+window.updateCalcNodeTerm = (cellId, termIndex, property, value) => {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isCalculationNode(cell)) return;
+  
+  graph.getModel().beginUpdate();
+  try {
+    // Initialize terms array if it doesn't exist
+    if (!cell._calcTerms) {
+      cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
+    }
+    
+    // Ensure the term exists
+    if (termIndex >= 0 && termIndex < cell._calcTerms.length) {
+      // Update the specified property
+      cell._calcTerms[termIndex][property] = value;
+      
+      // For backward compatibility, also update _calcAmountLabel if this is the first term
+      if (termIndex === 0 && property === 'amountLabel') {
+        cell._calcAmountLabel = value;
+      }
+    }
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  
+  updateCalculationNodeCell(cell);
+};
+
+// Add a new calculation term
+window.addCalcNodeTerm = (cellId) => {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isCalculationNode(cell)) return;
+  
+  graph.getModel().beginUpdate();
+  try {
+    // Initialize terms array if it doesn't exist
+    if (!cell._calcTerms) {
+      cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
+    }
+    
+    // Add a new term with default values
+    cell._calcTerms.push({
+      amountLabel: "",
+      mathOperator: "+"  // Default to addition
+    });
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  
+  updateCalculationNodeCell(cell);
+};
+
+// Remove a calculation term
+window.removeCalcNodeTerm = (cellId, termIndex) => {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isCalculationNode(cell)) return;
+  
+  graph.getModel().beginUpdate();
+  try {
+    // Ensure we have terms and the index is valid
+    if (cell._calcTerms && termIndex > 0 && termIndex < cell._calcTerms.length) {
+      // Remove the term at the specified index
+      cell._calcTerms.splice(termIndex, 1);
+    }
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  
   updateCalculationNodeCell(cell);
 };
 
@@ -2259,6 +2399,7 @@ window.exportFlowchartJson = function () {
       cellData._calcOperator = cell._calcOperator || "=";
       cellData._calcThreshold = cell._calcThreshold || "0";
       cellData._calcFinalText = cell._calcFinalText || "";
+      cellData._calcTerms = cell._calcTerms || [{amountLabel: cell._calcAmountLabel || "", mathOperator: ""}];
     }
 
     data.cells.push(cellData);
@@ -2945,6 +3086,177 @@ window.exportGuiJson = function() {
         hiddenField.calculations.push(calculation);
         hiddenFields.push(hiddenField);
         hiddenFieldCounter++;
+        
+        // Skip the rest of the processing for this node
+        continue;
+      }
+      
+      // For backward compatibility, if we have a single _calcAmountLabel but no _calcTerms
+      if (cell._calcAmountLabel && (!cell._calcTerms || cell._calcTerms.length === 0)) {
+        console.log(`  Converting legacy node with _calcAmountLabel to use _calcTerms`);
+        cell._calcTerms = [{
+          amountLabel: cell._calcAmountLabel,
+          mathOperator: ""
+        }];
+      }
+      
+      // Check if this node has multiple calculation terms defined
+      if (cell._calcTerms && cell._calcTerms.length > 1) {
+        console.log(`  Processing calculation node with multiple terms: ${cell._calcTerms.length} terms`);
+        
+        // Process each term separately
+        calculation.terms = [];
+        
+        // Process each term in the _calcTerms array
+        for (let i = 0; i < cell._calcTerms.length; i++) {
+          const term = cell._calcTerms[i];
+          const termAmountLabel = term.amountLabel || "";
+          const operator = i === 0 ? "" : (term.mathOperator || "+");
+          
+          console.log(`  Processing term ${i+1}: amount label="${termAmountLabel}", operator="${operator}"`);
+          
+          // Check if this term references another calculation node
+          let isTermCalcNodeReference = false;
+          let termCalcNodeTitle = "";
+          
+          for (const otherCalcNode of otherCalcNodes) {
+            if (otherCalcNode._calcTitle && otherCalcNode._calcTitle === termAmountLabel) {
+              isTermCalcNodeReference = true;
+              termCalcNodeTitle = otherCalcNode._calcTitle;
+              console.log(`  Term ${i+1} references calculation node: "${termCalcNodeTitle}"`);
+              break;
+            }
+          }
+          
+          if (isTermCalcNodeReference) {
+            // This term references another calculation node
+            calculation.terms.push({
+              operator: operator,
+              questionNameId: termCalcNodeTitle
+            });
+            console.log(`  Added term referencing calculation: ${JSON.stringify(calculation.terms[calculation.terms.length-1])}`);
+            continue;
+          }
+          
+          // Extract amount name and question name from the label
+          let termAmountName = "";
+          let termQuestionName = "";
+          
+          if (termAmountLabel) {
+            // Clean up the label
+            const cleanedLabel = termAmountLabel.replace(/delete_amount_/g, "").replace(/add_option_/g, "");
+            
+            // Extract from the label
+            const lastIndex = cleanedLabel.lastIndexOf('_');
+            if (lastIndex > 0) {
+              termAmountName = cleanedLabel.substring(lastIndex + 1).trim();
+              termQuestionName = cleanedLabel.substring(0, lastIndex).trim();
+            } else {
+              // Fallback
+              const parts = cleanedLabel.split('_');
+              if (parts.length > 0) {
+                termAmountName = parts[parts.length - 1].replace(/_/g, " ").trim();
+              }
+              if (parts.length > 1) {
+                termQuestionName = parts.slice(0, -1).join('_');
+              }
+            }
+            
+            console.log(`  Term ${i+1} extracted: question="${termQuestionName}", amount="${termAmountName}"`);
+            
+            // Find the matching question
+            let termTargetQuestion = null;
+            
+            // Look for matching question
+            for (const section of sections) {
+              for (const question of section.questions) {
+                if (question.type !== "numberedDropdown") continue;
+                
+                const questionText = question.text || "";
+                const questionTextLower = questionText.toLowerCase();
+                const questionTextAsId = questionTextLower.replace(/[^\w\s]/gi, "").replace(/\s+/g, "_");
+                
+                const questionNameLower = termQuestionName.toLowerCase();
+                
+                // Try multiple matching strategies
+                const directMatch = questionNameLower === questionTextAsId;
+                const containsMatch = questionNameLower.includes(questionTextAsId) || 
+                                    questionTextAsId.includes(questionNameLower);
+                const simpleTextMatch = questionNameLower.replace(/_/g, " ") === questionTextLower;
+                
+                if (directMatch || containsMatch || simpleTextMatch) {
+                  termTargetQuestion = question;
+                  console.log(`  Term ${i+1} matched question: "${questionText}"`);
+                  break;
+                }
+              }
+              if (termTargetQuestion) break;
+            }
+            
+            // If we found a matching question
+            if (termTargetQuestion) {
+              console.log(`  Term ${i+1} found target question: ${termTargetQuestion.questionId} (${termTargetQuestion.text})`);
+              
+              // Get the correct amount name
+              let actualAmountName = termAmountName.trim().toLowerCase().replace(/\s+/g, '_');
+              if (termTargetQuestion.amounts && termTargetQuestion.amounts.length > 0) {
+                actualAmountName = termTargetQuestion.amounts[0].toLowerCase().replace(/\s+/g, '_');
+              }
+              
+              // Handle numberedDropdown type
+              if (termTargetQuestion.type === "numberedDropdown") {
+                const min = parseInt(termTargetQuestion.min || "1", 10);
+                const max = parseInt(termTargetQuestion.max || "1", 10);
+                
+                // Add first number with the appropriate operator
+                calculation.terms.push({
+                  operator: operator,
+                  questionNameId: `${termTargetQuestion.text}_${min}_${actualAmountName}`
+                });
+                
+                // Add additional numbers with + operator
+                for (let j = min + 1; j <= max; j++) {
+                  calculation.terms.push({
+                    operator: "+",
+                    questionNameId: `${termTargetQuestion.text}_${j}_${actualAmountName}`
+                  });
+                }
+                
+                console.log(`  Added terms for numberedDropdown: min=${min}, max=${max}`);
+              } else {
+                // For other question types
+                calculation.terms.push({
+                  operator: operator,
+                  questionNameId: `${termTargetQuestion.nameId}_${actualAmountName}`
+                });
+                console.log(`  Added term for regular question`);
+              }
+            } else {
+              // If no target question found, create a placeholder term
+              console.log(`  Term ${i+1} no target question found, using placeholder`);
+              calculation.terms.push({
+                operator: operator,
+                questionNameId: `unknown_question_${termAmountName || i+1}`
+              });
+            }
+          }
+        }
+        
+        // Add the calculation to the hidden field
+        if (calculation.terms.length > 0) {
+          // Make sure fillValue uses the calculation's title
+          if (calcFinalText.includes(`##${calcName}##`)) {
+            calculation.fillValue = calcFinalText;
+          } else {
+            calculation.fillValue = `##${calcName}##`;
+          }
+          
+          hiddenField.calculations.push(calculation);
+          hiddenFields.push(hiddenField);
+          hiddenFieldCounter++;
+          
+          console.log(`  Final calculation terms: ${JSON.stringify(calculation.terms)}`);
+        }
         
         // Skip the rest of the processing for this node
         continue;
@@ -4420,6 +4732,7 @@ function saveFlowchart() {
       cellData._calcOperator = cell._calcOperator || "=";
       cellData._calcThreshold = cell._calcThreshold || "0";
       cellData._calcFinalText = cell._calcFinalText || "";
+      cellData._calcTerms = cell._calcTerms || [{amountLabel: cell._calcAmountLabel || "", mathOperator: ""}];
     }
 
     data.cells.push(cellData);
@@ -4659,6 +4972,7 @@ function copySelectedNodeAsJson() {
       _calcOperator: cell._calcOperator,
       _calcThreshold: cell._calcThreshold,
       _calcFinalText: cell._calcFinalText || "",
+      _calcTerms: cell._calcTerms || (cell._calcAmountLabel ? [{amountLabel: cell._calcAmountLabel, mathOperator: ""}] : null),
       _image: cell._image
     }));
     
@@ -4702,6 +5016,7 @@ function copySelectedNodeAsJson() {
       _calcOperator: cell._calcOperator,
       _calcThreshold: cell._calcThreshold,
       _calcFinalText: cell._calcFinalText || "",
+      _calcTerms: cell._calcTerms || (cell._calcAmountLabel ? [{amountLabel: cell._calcAmountLabel, mathOperator: ""}] : null),
       _image: cell._image
     };
     navigator.clipboard.writeText(JSON.stringify(data)).then(() => {
@@ -4759,6 +5074,7 @@ function pasteNodeFromJson(x, y) {
             newCell._calcOperator = cellData._calcOperator;
             newCell._calcThreshold = cellData._calcThreshold;
             newCell._calcFinalText = cellData._calcFinalText;
+            newCell._calcTerms = cellData._calcTerms || (cellData._calcAmountLabel ? [{amountLabel: cellData._calcAmountLabel, mathOperator: ""}] : null);
             newCell._image = cellData._image;
             
             graph.addCell(newCell, graph.getDefaultParent());
@@ -4829,6 +5145,7 @@ function pasteNodeFromJson(x, y) {
           newCell._calcOperator = data._calcOperator;
           newCell._calcThreshold = data._calcThreshold;
           newCell._calcFinalText = data._calcFinalText;
+          newCell._calcTerms = data._calcTerms || (data._calcAmountLabel ? [{amountLabel: data._calcAmountLabel, mathOperator: ""}] : null);
           newCell._image = data._image;
           
           graph.addCell(newCell, graph.getDefaultParent());
