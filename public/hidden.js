@@ -335,7 +335,9 @@ function updateConditionAnswers(hiddenFieldId, condId) {
     var prevQId= qSel.value;
     var qBlock = document.getElementById('questionBlock'+prevQId);
     if(!qBlock) return;
-    var sel= qBlock.querySelector('select');
+    
+    // FIX: Make sure we get the correct question type selector
+    var sel= qBlock.querySelector('select#questionType'+prevQId);
     var qType= sel? sel.value:'text';
 
     if(qType==='radio'){
@@ -361,6 +363,36 @@ function updateConditionAnswers(hiddenFieldId, condId) {
         if(noneAbove && noneAbove.checked){
             ansSel.innerHTML+='<option value="None of the above">None of the above</option>';
         }
+    }
+    else if(qType==='numberedDropdown'){
+        // Handle numbered dropdown by getting min/max range
+        var rangeStartEl = qBlock.querySelector('#numberRangeStart'+prevQId);
+        var rangeEndEl = qBlock.querySelector('#numberRangeEnd'+prevQId);
+        
+        if(rangeStartEl && rangeEndEl){
+            var min = parseInt(rangeStartEl.value, 10) || 1;
+            var max = parseInt(rangeEndEl.value, 10) || min;
+            
+            // Add each number in the range as an option
+            for(var j=min; j<=max; j++){
+                ansSel.innerHTML += '<option value="'+j+'">'+j+'</option>';
+            }
+        }
+    }
+    else if(qType==='text' || qType==='bigParagraph'){
+        // For text questions, add an "Any Text" option
+        ansSel.innerHTML += '<option value="Any Text">Any Text</option>';
+    }
+    else if(qType==='money'){
+        // For money questions, add an "Any Amount" option
+        ansSel.innerHTML += '<option value="Any Amount">Any Amount</option>';
+        
+        // Debug to console
+        console.log('Money question detected, adding "Any Amount" option');
+    }
+    else if(qType==='date'){
+        // For date questions, add an "Any Date" option
+        ansSel.innerHTML += '<option value="Any Date">Any Date</option>';
     }
 }
 
@@ -671,7 +703,7 @@ function generateAllQuestionOptions() {
         var selEl= qBlock.querySelector('select');
         var qType= selEl? selEl.value:'text';
 
-        if(['dropdown','radio','checkbox'].indexOf(qType)!==-1){
+        if(['dropdown','radio','checkbox','numberedDropdown'].indexOf(qType)!==-1){
             optionsHTML+='<option value="'+qId+'">Question '+qId+': '+questionText+'</option>';
         }
     });
@@ -680,6 +712,7 @@ function generateAllQuestionOptions() {
 
 /**
  * UPDATED to also include hidden fields as numeric references
+ * And use question text instead of just ID in the display
  */
 function generateMoneyQuestionOptions() {
     let optionsHTML = '';
@@ -691,19 +724,20 @@ function generateMoneyQuestionOptions() {
         if (!selEl) return;
 
         // e.g. 'numberedDropdown', 'money', etc.
-        const qType = selEl.value;  
+        const qType = selEl.value;
+        
+        // Get the question text for display
+        const txtEl = qBlock.querySelector(`#question${qId}`);
+        const qTxt = txtEl ? txtEl.value : (`Question ${qId}`);
+        
         if (qType === 'numberedDropdown') {
-            // 1) Get the question text (just for display in the dropdown)
-            const txtEl = qBlock.querySelector(`#question${qId}`);
-            const qTxt = txtEl ? txtEl.value : (`Question ${qId}`);
-
             // 2) Grab min & max
             const stEl = qBlock.querySelector('#numberRangeStart' + qId);
             const enEl = qBlock.querySelector('#numberRangeEnd' + qId);
             const ddMin = stEl ? parseInt(stEl.value, 10) : 1;
             const ddMax = enEl ? parseInt(enEl.value, 10) : ddMin;
 
-            // 3) Gather the “amount labels” from #textboxAmounts. 
+            // 3) Gather the "amount labels" from #textboxAmounts. 
             const amtInputs = qBlock.querySelectorAll(`#textboxAmounts${qId} input[type="text"]`);
             const amountLabels = [];
             amtInputs.forEach((inp) => {
@@ -726,13 +760,11 @@ function generateMoneyQuestionOptions() {
             // If it's a money question, we can reference it directly
             const nmEl = qBlock.querySelector('#textboxName' + qId);
             const fieldName = nmEl ? nmEl.value.trim() : ('answer' + qId);
-            const txtEl = qBlock.querySelector('#question' + qId);
-            const qTxt = txtEl ? txtEl.value : `Question ${qId}`;
             optionsHTML += `<option value="${fieldName}">${qTxt} (money)</option>`;
         }
     });
 
-    // ---- NEW PART: also include hidden fields as references ----
+    // ---- ALSO include hidden fields as references ----
     const hiddenBlocks = document.querySelectorAll('.hidden-field-block');
     hiddenBlocks.forEach((block) => {
         const hid = block.id.replace('hiddenFieldBlock','');

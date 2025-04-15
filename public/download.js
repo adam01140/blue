@@ -54,6 +54,9 @@ function loadFormData(formData) {
     // 4) Initialize hidden-fields module (if your GUI uses it)
     initializeHiddenPDFFieldsModule();
 
+    // Create a mapping of question text to question ID for reference transformations
+    const questionTextToIdMap = {};
+
     // 5) Build out sections and questions
     if (formData.sections) {
         formData.sections.forEach(section => {
@@ -69,6 +72,9 @@ function loadFormData(formData) {
 
             // C) Add questions inside this section
             (section.questions || []).forEach(question => {
+                // Store mapping of question text to ID
+                questionTextToIdMap[question.text] = question.questionId;
+                
                 // Create the question in the GUI
                 addQuestion(section.sectionId, question.questionId);
 
@@ -241,6 +247,12 @@ else if (question.type === 'numberedDropdown') {
             if (amountInput) amountInput.value = amountValue;
         });
     }
+    
+    // After setting min/max values, update any jump logic dropdowns
+    // This ensures the number range options are populated correctly
+    if (question.jump && question.jump.enabled) {
+        updateJumpOptionsForNumberedDropdown(question.questionId);
+    }
 }
                 else if (
                     // Text-like question types
@@ -292,10 +304,28 @@ else if (question.type === 'numberedDropdown') {
             const jumpConditionsDiv = questionBlock.querySelector(`#jumpConditions${question.questionId}`);
             if (jumpConditionsDiv) jumpConditionsDiv.innerHTML = '';
 
+            // For numbered dropdown, populate options based on min/max first
+            if (question.type === 'numberedDropdown') {
+                updateJumpOptionsForNumberedDropdown(question.questionId);
+            }
+
             // Add all conditions from import
             (question.jump.conditions || []).forEach((cond, index) => {
                 addJumpCondition(question.questionId);
                 const conditionId = index + 1;
+                
+                // Update options for the dropdown based on question type
+                if (question.type === 'dropdown') {
+                    updateJumpOptions(question.questionId, conditionId);
+                } else if (question.type === 'radio') {
+                    updateJumpOptionsForRadio(question.questionId, conditionId);
+                } else if (question.type === 'checkbox') {
+                    updateJumpOptionsForCheckbox(question.questionId, conditionId);
+                } else if (question.type === 'numberedDropdown') {
+                    updateJumpOptionsForNumberedDropdown(question.questionId, conditionId);
+                }
+                
+                // After options are populated, set the selected value
                 const jumpOptionSelect = questionBlock.querySelector(`#jumpOption${question.questionId}_${conditionId}`);
                 const jumpToInput = questionBlock.querySelector(`#jumpTo${question.questionId}_${conditionId}`);
                 
@@ -344,6 +374,30 @@ else if (question.type === 'numberedDropdown') {
     // 6) Build hidden fields from JSON (including multi-term calculations)
     if (formData.hiddenFields && formData.hiddenFields.length > 0) {
         formData.hiddenFields.forEach(hiddenField => {
+            // Before adding the hidden field, convert any question text references back to IDs
+            if (hiddenField.calculations) {
+                hiddenField.calculations.forEach(calc => {
+                    if (calc.terms) {
+                        calc.terms.forEach(term => {
+                            if (term.questionNameId) {
+                                // Look for pattern like "How many cars do you have_1_car_value"
+                                const textMatch = term.questionNameId.match(/^(.+?)_(\d+)_(.+)$/);
+                                if (textMatch) {
+                                    const questionText = textMatch[1];
+                                    const numValue = textMatch[2];
+                                    const fieldValue = textMatch[3];
+                                    
+                                    // If we have this question text mapped to an ID, convert the reference
+                                    if (questionTextToIdMap[questionText]) {
+                                        term.questionNameId = `amount${questionTextToIdMap[questionText]}_${numValue}_${fieldValue}`;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+            
             addHiddenFieldWithData(hiddenField);
         });
     }
@@ -364,6 +418,9 @@ function exportForm() {
             : ''
     };
 
+    // Create a map of questionId to question text for easy lookup
+    const questionTextMap = {};
+
     // ========== Export sections and questions ==========
     for (let s = 1; s < sectionCounter; s++) {
         const sectionBlock = document.getElementById(`sectionBlock${s}`);
@@ -380,6 +437,9 @@ function exportForm() {
             const questionId = parseInt(questionBlock.id.replace('questionBlock', ''), 10);
             const questionText = questionBlock.querySelector(`#question${questionId}`).value;
             const questionType = questionBlock.querySelector(`#questionType${questionId}`).value;
+            
+            // Store the question text for each ID
+            questionTextMap[questionId] = questionText;
 
             // ---------- Gather multiple OR logic ----------
             const logicEnabled = questionBlock.querySelector(`#logic${questionId}`)?.checked || false;
@@ -551,9 +611,31 @@ function exportForm() {
                     const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
                     const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
 
-                    const labelText = labelInput?.value.trim() || `Textbox ${index + 1}`;
-                    const nameId = nameIdInput?.value.trim() || `answer${questionId}_${index + 1}`;
-                    const placeholder = placeholderInput?.value.trim() || '';
+                    // Handle each case separately to preserve empty strings
+                    let labelText, nameId, placeholder;
+                    
+                    // For label: preserve empty string if input exists
+                    if (!labelInput) {
+                        labelText = `Textbox ${index + 1}`;
+                    } else {
+                        // Don't trim if the value is explicitly an empty string
+                        labelText = labelInput.value === '' ? '' : labelInput.value.trim();
+                    }
+                    
+                    // For nameId: default only if input doesn't exist or value is empty
+                    if (!nameIdInput || nameIdInput.value.trim() === '') {
+                        nameId = `answer${questionId}_${index + 1}`;
+                    } else {
+                        nameId = nameIdInput.value.trim();
+                    }
+                    
+                    // For placeholder: preserve empty string if input exists
+                    if (!placeholderInput) {
+                        placeholder = '';
+                    } else {
+                        // Don't trim if the value is explicitly an empty string
+                        placeholder = placeholderInput.value === '' ? '' : placeholderInput.value.trim();
+                    }
 
                     questionData.textboxes.push({
                         label: labelText,
@@ -645,6 +727,17 @@ function exportForm() {
                                 const qSel = termDiv.querySelector(`#calcTermQuestion${hiddenFieldId}_${calcIndex}_${termNumber}`);
                                 let questionNameIdVal = qSel ? qSel.value.trim() : '';
                                 if (questionNameIdVal) {
+                                    // Transform amount IDs from 'amount{id}_{num}_{value}' to '{questionText}_{num}_{value}'
+                                    const amountMatch = questionNameIdVal.match(/^amount(\d+)_(\d+)_(.+)$/);
+                                    if (amountMatch) {
+                                        const qId = amountMatch[1];
+                                        const numValue = amountMatch[2];
+                                        const fieldValue = amountMatch[3];
+                                        if (questionTextMap[qId]) {
+                                            questionNameIdVal = `${questionTextMap[qId]}_${numValue}_${fieldValue}`;
+                                        }
+                                    }
+                                    
                                     termsArr.push({
                                         operator: (termNumber===1 ? '' : operatorVal),
                                         questionNameId: questionNameIdVal
@@ -711,6 +804,17 @@ function exportForm() {
                                 const qSel = termDiv.querySelector(`#textTermQuestion${hiddenFieldId}_${calcIndex}_${termNumber}`);
                                 let questionNameIdVal = qSel ? qSel.value.trim() : '';
                                 if (questionNameIdVal) {
+                                    // Transform amount IDs from 'amount{id}_{num}_{value}' to '{questionText}_{num}_{value}'
+                                    const amountMatch = questionNameIdVal.match(/^amount(\d+)_(\d+)_(.+)$/);
+                                    if (amountMatch) {
+                                        const qId = amountMatch[1];
+                                        const numValue = amountMatch[2];
+                                        const fieldValue = amountMatch[3];
+                                        if (questionTextMap[qId]) {
+                                            questionNameIdVal = `${questionTextMap[qId]}_${numValue}_${fieldValue}`;
+                                        }
+                                    }
+                                    
                                     termsArr.push({
                                         operator: (termNumber===1 ? '' : operatorVal),
                                         questionNameId: questionNameIdVal

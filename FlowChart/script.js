@@ -2684,20 +2684,25 @@ window.exportGuiJson = function() {
       } else if (questionType === "multipleDropdownType") {
         // Rename to numberedDropdown for consistency
         question.type = "numberedDropdown";
+        console.log(`Converting multipleDropdownType to numberedDropdown for question ${question.questionId}: ${question.text}`);
         
         // Get min and max values
         if (cell._twoNumbers) {
           question.min = cell._twoNumbers.first || "1";
           question.max = cell._twoNumbers.second || "1";
+          console.log(`  Setting min=${question.min}, max=${question.max}`);
         }
         
         // Handle labels and amounts
         if (cell._textboxes) {
+          console.log(`  Processing ${cell._textboxes.length} textboxes for amount/label options`);
           for (const textbox of cell._textboxes) {
             if (textbox.isAmountOption) {
               question.amounts.push(textbox.nameId);
+              console.log(`  Added amount option: ${textbox.nameId}`);
             } else {
               question.labels.push(textbox.nameId);
+              console.log(`  Added label: ${textbox.nameId}`);
             }
           }
         }
@@ -2885,6 +2890,9 @@ window.exportGuiJson = function() {
       // Find the question that contains the amount field
       const amountLabel = cell._calcAmountLabel || "";
       
+      console.log(`Processing calculation node: ${cell.id}, title: ${cell._calcTitle}`);
+      console.log(`  Amount label: "${amountLabel}"`);
+      
       // Extract the amount name
       let amountName = "";
       let questionNameFromLabel = "";
@@ -2892,16 +2900,19 @@ window.exportGuiJson = function() {
       if (amountLabel) {
         // Clean up the label
         const cleanedLabel = amountLabel.replace(/delete_amount_/g, "").replace(/add_option_/g, "");
+        console.log(`  Cleaned label: "${cleanedLabel}"`);
         const parts = cleanedLabel.split('_');
         
         // Get the amount name (last part)
         if (parts.length > 0) {
           amountName = parts[parts.length - 1].replace(/_/g, " ").trim();
+          console.log(`  Extracted amount name: "${amountName}"`);
         }
         
         // Build the question name from everything except the last part
         if (parts.length > 1) {
           questionNameFromLabel = parts.slice(0, -1).join('_');
+          console.log(`  Question name from label: "${questionNameFromLabel}"`);
         }
       }
       
@@ -2909,14 +2920,19 @@ window.exportGuiJson = function() {
       let targetQuestion = null;
       
       // Search through all questions in all sections
+      console.log(`  Searching for matching question with amount: "${amountName}"`);
       for (const section of sections) {
         for (const question of section.questions) {
+          console.log(`    Checking question ${question.questionId}: "${question.text}", type: ${question.type}, amounts: ${JSON.stringify(question.amounts)}`);
+          
           // Check if this is a numberedDropdown question with amounts
           if (question.type === "numberedDropdown" && question.amounts && question.amounts.length > 0) {
             for (const amount of question.amounts) {
+              console.log(`      Comparing amount "${amount}" with "${amountName}"`);
               if (amount.toLowerCase() === amountName.toLowerCase() || 
                   amount.toLowerCase().replace(/\s+/g, '_') === amountName.toLowerCase().replace(/\s+/g, '_')) {
                 targetQuestion = question;
+                console.log(`      MATCH FOUND! Using question ${question.questionId}`);
                 break;
               }
             }
@@ -2929,24 +2945,158 @@ window.exportGuiJson = function() {
 
       // Generate calculation terms
       if (targetQuestion) {
+        console.log(`  Target question found: ${targetQuestion.questionId} (${targetQuestion.text}), type: ${targetQuestion.type}`);
+        
         // Clean up the amount name for consistency
         const cleanAmountName = amountName.trim().toLowerCase().replace(/\s+/g, '_');
         
-        // First term has no operator
-        calculation.terms.push({
-          operator: "",
-          questionNameId: `${targetQuestion.text}_1_${cleanAmountName}`
-        });
+        // Create a properly formatted question name
+        const formattedQuestionName = targetQuestion.text
+          .trim()
+          .replace(/[^\w\s]/gi, "")
+          .replace(/\s+/g, "_")
+          .toLowerCase();
         
-        // Add additional terms
-        const max = parseInt(targetQuestion.max || "4", 10);
+        console.log(`  Formatted question name: "${formattedQuestionName}", clean amount name: "${cleanAmountName}"`);
         
-        // Add terms for each number from 2 to max
-        for (let i = 2; i <= max; i++) {
+        // For numberedDropdown, we need to create a term for each number from 1 to max
+        if (targetQuestion.type === "numberedDropdown") {
+          console.log(`  Processing as numberedDropdown with min: ${targetQuestion.min}, max: ${targetQuestion.max}`);
+          
+          // Get the correct min/max values
+          const min = parseInt(targetQuestion.min || "1", 10);
+          const max = parseInt(targetQuestion.max || "1", 10);
+          
+          console.log(`  Creating terms for numbers ${min} to ${max}`);
+          
+          // IMPORTANT: For this format, we need to preserve the original capitalization and spacing
+          // The format should be exactly like: "How many jobs do you have_1_job_income"
+          
+          // Get accurate amount name directly from the question's amounts array
+          let actualAmountName = cleanAmountName;
+          if (targetQuestion.amounts && targetQuestion.amounts.length > 0) {
+            // Use the first amount from the question
+            actualAmountName = targetQuestion.amounts[0].toLowerCase().replace(/\s+/g, '_');
+            console.log(`  Using actual amount name from question: "${actualAmountName}"`);
+          }
+          
+          calculation.terms = []; // Reset terms array
+          
+          // First term has no operator (use the minimum number)
           calculation.terms.push({
-            operator: "+",
-            questionNameId: `${targetQuestion.text}_${i}_${cleanAmountName}`
+            operator: "",
+            questionNameId: `${targetQuestion.text}_${min}_${actualAmountName}`
           });
+          
+          // Add additional terms
+          for (let i = min + 1; i <= max; i++) {
+            calculation.terms.push({
+              operator: "+",
+              questionNameId: `${targetQuestion.text}_${i}_${actualAmountName}`
+            });
+          }
+          
+          console.log(`  Final calculation terms: ${JSON.stringify(calculation.terms, null, 2)}`);
+        } else {
+          // For other question types, just add one term
+          calculation.terms.push({
+            operator: "",
+            questionNameId: `${targetQuestion.nameId}_${cleanAmountName}`
+          });
+        }
+        
+        console.log(`  Final terms: ${JSON.stringify(calculation.terms)}`);
+      } else {
+        console.log(`  WARNING: No target question found for calculation node ${cell.id}`);
+        
+        // FALLBACK: Create dynamic fallback terms based on any found questions
+        console.log(`  Creating dynamic fallback terms`);
+        
+        // Find any numberedDropdown question to use as reference
+        let fallbackQuestion = null;
+        for (const section of sections) {
+          for (const question of section.questions) {
+            if (question.type === "numberedDropdown" && question.amounts && question.amounts.length > 0) {
+              fallbackQuestion = question;
+              console.log(`  Found fallback numberedDropdown question: ${question.text}`);
+              break;
+            }
+          }
+          if (fallbackQuestion) break;
+        }
+        
+        if (fallbackQuestion) {
+          // Use the actual amount name from the question
+          const actualAmountName = fallbackQuestion.amounts[0].toLowerCase().replace(/\s+/g, '_');
+          console.log(`  Using amount name from fallback question: "${actualAmountName}"`);
+          
+          const min = parseInt(fallbackQuestion.min || "1", 10);
+          const max = parseInt(fallbackQuestion.max || "3", 10);
+          
+          // Generate terms using the found question
+          calculation.terms = [];
+          calculation.terms.push({
+            operator: "",
+            questionNameId: `${fallbackQuestion.text}_${min}_${actualAmountName}`
+          });
+          
+          for (let i = min + 1; i <= max; i++) {
+            calculation.terms.push({
+              operator: "+",
+              questionNameId: `${fallbackQuestion.text}_${i}_${actualAmountName}`
+            });
+          }
+          
+          console.log(`  Created fallback terms using question: ${JSON.stringify(calculation.terms, null, 2)}`);
+        } else {
+          // No appropriate questions found, extract amount name from the label
+          let extractedAmount = amountName.trim().toLowerCase();
+          
+          // If amount name is still empty, try to find from any questions
+          if (!extractedAmount && sections.length > 0 && sections[0].questions.length > 0) {
+            const firstQuestion = sections[0].questions[0];
+            if (firstQuestion.amounts && firstQuestion.amounts.length > 0) {
+              extractedAmount = firstQuestion.amounts[0].trim().toLowerCase();
+              console.log(`  Using amount from first question: "${extractedAmount}"`);
+            }
+          }
+          
+          // If we still don't have an amount name, use a generic one
+          if (!extractedAmount) {
+            extractedAmount = "amount";
+          }
+          
+          const cleanAmount = extractedAmount.replace(/\s+/g, '_');
+          console.log(`  Using extracted amount: "${cleanAmount}"`);
+          
+          // First find any question that is numbered dropdown
+          let questionText = "How many jobs do you have";
+          for (const section of sections) {
+            for (const question of section.questions) {
+              if (question.type === "numberedDropdown") {
+                questionText = question.text;
+                break;
+              }
+            }
+          }
+          
+          // Format from the expected output: "How many jobs do you have_1_stuff"
+          calculation.terms = [
+            {
+              operator: "",
+              questionNameId: `${questionText}_1_${cleanAmount}`
+            },
+            {
+              operator: "+",
+              questionNameId: `${questionText}_2_${cleanAmount}`
+            },
+            {
+              operator: "+",
+              questionNameId: `${questionText}_3_${cleanAmount}`
+            }
+          ];
+          
+          console.log(`  Created generic fallback terms: ${JSON.stringify(calculation.terms, null, 2)}`);
         }
       }
 

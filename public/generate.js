@@ -35,6 +35,46 @@ function getFormHTML() {
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
     "",
+
+    '<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: none;">',
+    '    <h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50;">Your Information</h3>',
+    '    <div style="display: flex; gap: 15px; margin-bottom: 15px;">',
+    '        <div style="flex: 1;">',
+    '            <label for="user_firstname" style="display: block; margin-bottom: 5px; font-weight: bold;">First Name</label>',
+    '            <input type="text" id="user_firstname" name="user_firstname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '        </div>',
+    '        <div style="flex: 1;">',
+    '            <label for="user_lastname" style="display: block; margin-bottom: 5px; font-weight: bold;">Last Name</label>',
+    '            <input type="text" id="user_lastname" name="user_lastname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '        </div>',
+    '    </div>',
+    '    <div style="margin-bottom: 15px;">',
+    '        <label for="user_email" style="display: block; margin-bottom: 5px; font-weight: bold;">Email Address</label>',
+    '        <input type="email" id="user_email" name="user_email" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '    </div>',
+    '    <div style="margin-bottom: 15px;">',
+    '        <label for="user_phone" style="display: block; margin-bottom: 5px; font-weight: bold;">Phone Number</label>',
+    '        <input type="tel" id="user_phone" name="user_phone" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '    </div>',
+    '    <div style="margin-bottom: 15px;">',
+    '        <label for="user_street" style="display: block; margin-bottom: 5px; font-weight: bold;">Street Address</label>',
+    '        <input type="text" id="user_street" name="user_street" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '    </div>',
+    '    <div style="display: flex; gap: 15px; margin-bottom: 15px;">',
+    '        <div style="flex: 2;">',
+    '            <label for="user_city" style="display: block; margin-bottom: 5px; font-weight: bold;">City</label>',
+    '            <input type="text" id="user_city" name="user_city" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '        </div>',
+    '        <div style="flex: 1;">',
+    '            <label for="user_state" style="display: block; margin-bottom: 5px; font-weight: bold;">State</label>',
+    '            <input type="text" id="user_state" name="user_state" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '        </div>',
+    '        <div style="flex: 1;">',
+    '            <label for="user_zip" style="display: block; margin-bottom: 5px; font-weight: bold;">ZIP</label>',
+    '            <input type="text" id="user_zip" name="user_zip" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '        </div>',
+    '    </div>',
+    '</div>',
     '<div id="questions">',
     '    <div id="result"></div>',
     "    <section>",
@@ -55,7 +95,7 @@ function getFormHTML() {
   // so we can insert it later in one <script> block.
   let logicScriptBuffer = "";
 
-  // Possibly read user’s PDF name from an element on the page:
+  // Possibly read user's PDF name from an element on the page:
   const pdfFormNameInputEl = document.getElementById("formPDFName");
   const pdfFormName = pdfFormNameInputEl
     ? pdfFormNameInputEl.value.trim()
@@ -334,7 +374,7 @@ function getFormHTML() {
               </label>
             </span>`;
 
-          // If this checkbox has an associated “amount” input
+          // If this checkbox has an associated "amount" input
           if (hasAmount) {
             formHTML += `
               <input type="number" id="${rawNameId}_amount" name="${
@@ -445,7 +485,7 @@ function getFormHTML() {
       // end question container
       formHTML += "</div>";
 
-      // If logic is enabled, gather “multiple-OR” conditions
+      // If logic is enabled, gather "multiple-OR" conditions
       if (logicEnabled) {
         const logicRows = qBlock.querySelectorAll(".logic-condition-row");
         if (logicRows.length > 0) {
@@ -475,13 +515,19 @@ function getFormHTML() {
             logicScriptBuffer += `   var cPrevAns="${paVal}";\n`;
             logicScriptBuffer += `   var cPrevQNum="${pqVal}";\n`;
             logicScriptBuffer += `   if(cPrevType==="checkbox"){\n`;
-            logicScriptBuffer += `     var cbs=document.querySelectorAll('input[id^="answer'+cPrevQNum+'_"]');\n`;
+            logicScriptBuffer += `     var cbPrefix = (questionNameIds[cPrevQNum] && questionNameIds[cPrevQNum].startsWith("answer")) ? questionNameIds[cPrevQNum]+"_" : "answer"+cPrevQNum+"_";\n`;
+            logicScriptBuffer += `     var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');\n`;
             logicScriptBuffer += `     var checkedVals=[];\n`;
             logicScriptBuffer += `     for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}\n`;
             logicScriptBuffer += `     if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}\n`;
             logicScriptBuffer += `   } else {\n`;
-            logicScriptBuffer += `     var el2=document.getElementById("answer"+cPrevQNum) || document.getElementById(questionNameIds[cPrevQNum]);\n`;
-            logicScriptBuffer += `     if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }\n`;
+            logicScriptBuffer += `     var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);\n`;
+            // Special case for special options that check for presence rather than exact value
+            if (paVal.toLowerCase() === "any text" || paVal.toLowerCase() === "any amount" || paVal.toLowerCase() === "any date") {
+              logicScriptBuffer += `     if(el2){ var val2= el2.value.trim(); if(val2 !== ""){ anyMatch=true;} }\n`;
+            } else {
+              logicScriptBuffer += `     if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }\n`;
+            }
             logicScriptBuffer += `   }\n`;
             logicScriptBuffer += ` })();\n`;
           }
@@ -506,10 +552,19 @@ function getFormHTML() {
               logicScriptBuffer += `   var cbs=document.querySelectorAll('input[id^="answer${pqVal2}_"]');\n`;
               logicScriptBuffer += `   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
-            } else {
+            } else if (pType2 === "dropdown" || pType2 === "radio" || pType2 === "numberedDropdown") {
+              // Use "change" event for select elements (dropdown, radio) instead of "input"
               logicScriptBuffer += ` (function(){\n`;
-              logicScriptBuffer += `   var el3= document.getElementById("answer${pqVal2}") || document.getElementById(questionNameIds["${pqVal2}"]);\n`;
+              // IMPORTANT: Try questionNameIds first, then fallback to default naming
+              logicScriptBuffer += `   var el3= document.getElementById(questionNameIds["${pqVal2}"]) || document.getElementById("answer${pqVal2}");\n`;
               logicScriptBuffer += `   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}\n`;
+              logicScriptBuffer += ` })();\n`;
+            } else {
+              // Use "input" event for text fields
+              logicScriptBuffer += ` (function(){\n`;
+              // IMPORTANT: Try questionNameIds first, then fallback to default naming
+              logicScriptBuffer += `   var el3= document.getElementById(questionNameIds["${pqVal2}"]) || document.getElementById("answer${pqVal2}");\n`;
+              logicScriptBuffer += `   if(el3){ el3.addEventListener("input", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
             }
           }
@@ -664,7 +719,7 @@ function handleNext(currentSection){
         var jTo  = jl.jumpTo;
         var nmId = questionNameIds[qId] || ("answer"+qId);
 
-        if(qType==="radio" || qType==="dropdown"){
+        if(qType==="radio" || qType==="dropdown" || qType==="numberedDropdown"){
             var el= document.getElementById(nmId);
             if(el && el.value.trim().toLowerCase() === jOpt.trim().toLowerCase()){
                 nextSection = jTo.toLowerCase();
@@ -1057,7 +1112,23 @@ function generateHiddenPDFFields() {
     const hiddenCheckboxCalculations = [];
     const hiddenTextCalculations = [];
 
-    const hiddenFieldsContainer = document.getElementById("hiddenFieldsContainer");
+    // Create a map of question text to ID for field name conversions
+    const questionTextToIdMap = {};
+    const questionNameIds = {}; // Also track ID to text mapping
+    
+    // Gather all question texts and IDs
+    const questionBlocks = document.querySelectorAll('.question-block');
+    questionBlocks.forEach(qBlock => {
+        const qId = qBlock.id.replace('questionBlock', '');
+        const txtEl = qBlock.querySelector(`#question${qId}`);
+        if (txtEl) {
+            const qText = txtEl.value.trim();
+            questionTextToIdMap[qText] = qId;
+            questionNameIds[qId] = qText;
+        }
+    });
+
+    const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
     if (hiddenFieldsContainer) {
         const fieldBlocks = hiddenFieldsContainer.querySelectorAll(".hidden-field-block");
         
@@ -1103,9 +1174,22 @@ function generateHiddenPDFFields() {
                                     const qSel = termDiv.querySelector('[id^="textTermQuestion"]');
 
                                     const operatorVal = opSel ? opSel.value : "";
-                                    const questionNameIdVal = qSel ? qSel.value.trim() : "";
+                                    let questionNameIdVal = qSel ? qSel.value.trim() : "";
                                     
                                     if (questionNameIdVal) {
+                                        // Convert from text-based references to ID-based references
+                                        const textMatch = questionNameIdVal.match(/^(.+?)_(\d+)_(.+)$/);
+                                        if (textMatch) {
+                                            const questionText = textMatch[1];
+                                            const numValue = textMatch[2];
+                                            const fieldValue = textMatch[3];
+                                            
+                                            // If we can map this question text to an ID, do so
+                                            if (questionTextToIdMap[questionText]) {
+                                                questionNameIdVal = `amount${questionTextToIdMap[questionText]}_${numValue}_${fieldValue}`;
+                                            }
+                                        }
+                                        
                                         termsArr.push({
                                             operator: termNumber === 1 ? "" : operatorVal,
                                             questionNameId: questionNameIdVal
@@ -1181,9 +1265,22 @@ function generateHiddenPDFFields() {
                                     const qSel = termDiv.querySelector('[id^="calcTermQuestion"]');
 
                                     const operatorVal = opSel ? opSel.value : "";
-                                    const questionNameIdVal = qSel ? qSel.value.trim() : "";
+                                    let questionNameIdVal = qSel ? qSel.value.trim() : "";
                                     
                                     if (questionNameIdVal) {
+                                        // Convert from text-based references to ID-based references
+                                        const textMatch = questionNameIdVal.match(/^(.+?)_(\d+)_(.+)$/);
+                                        if (textMatch) {
+                                            const questionText = textMatch[1];
+                                            const numValue = textMatch[2];
+                                            const fieldValue = textMatch[3];
+                                            
+                                            // If we can map this question text to an ID, do so
+                                            if (questionTextToIdMap[questionText]) {
+                                                questionNameIdVal = `amount${questionTextToIdMap[questionText]}_${numValue}_${fieldValue}`;
+                                            }
+                                        }
+                                        
                                         termsArr.push({
                                             operator: termNumber === 1 ? "" : operatorVal,
                                             questionNameId: questionNameIdVal
