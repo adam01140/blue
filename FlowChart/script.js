@@ -3068,7 +3068,8 @@ window.exportGuiJson = function() {
       }
       
       // If this is a reference to another calculation node, create a simple term
-      if (isCalcNodeReference) {
+      if (isCalcNodeReference && (!cell._calcTerms || cell._calcTerms.length <= 1)) {
+        // This is a legacy single calculation node reference
         console.log(`  Creating calculation term referencing calc node: "${calcNodeTitle}"`);
         calculation.terms = [{
           operator: "",
@@ -3101,8 +3102,8 @@ window.exportGuiJson = function() {
       }
       
       // Check if this node has multiple calculation terms defined
-      if (cell._calcTerms && cell._calcTerms.length > 1) {
-        console.log(`  Processing calculation node with multiple terms: ${cell._calcTerms.length} terms`);
+      if (cell._calcTerms && cell._calcTerms.length > 0) {
+        console.log(`  Processing calculation node with terms: ${cell._calcTerms.length} terms`);
         
         // Process each term separately
         calculation.terms = [];
