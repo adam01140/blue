@@ -2934,6 +2934,13 @@ window.exportGuiJson = function() {
           questionNameId: calcNodeTitle
         }];
         
+        // Make sure fillValue uses the calculation's title
+        if (calcFinalText.includes(`##${calcName}##`)) {
+          calculation.fillValue = calcFinalText;
+        } else {
+          calculation.fillValue = `##${calcName}##`;
+        }
+        
         // Add the calculation to hidden field
         hiddenField.calculations.push(calculation);
         hiddenFields.push(hiddenField);
@@ -3373,6 +3380,7 @@ window.exportGuiJson = function() {
               if (referencedField) {
                 // This field depends on referencedField
                 dependencyGraph[field.name].push(referencedField.name);
+                console.log(`Dependency detected: ${field.name} depends on ${referencedField.name}`);
               }
             });
           }
@@ -3382,7 +3390,7 @@ window.exportGuiJson = function() {
     
     console.log("Dependency graph:", dependencyGraph);
     
-    // Topological sort function
+    // Topological sort function - reversed to put dependencies first
     function topologicalSort() {
       const sorted = [];
       const visited = {};
@@ -3406,7 +3414,7 @@ window.exportGuiJson = function() {
           
           visited[name] = true;
           temp[name] = false;
-          sorted.unshift(name); // Add to front
+          sorted.push(name); // Add to end (dependencies will be first)
         }
       }
       
