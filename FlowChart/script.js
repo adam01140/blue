@@ -3103,6 +3103,7 @@ window.exportGuiJson = function() {
       // Check if this node has multiple calculation terms defined
       if (cell._calcTerms && cell._calcTerms.length > 1) {
         console.log(`  Processing calculation node with multiple terms: ${cell._calcTerms.length} terms`);
+        console.log(`  All terms: ${JSON.stringify(cell._calcTerms)}`);
         
         // Process each term separately
         calculation.terms = [];
