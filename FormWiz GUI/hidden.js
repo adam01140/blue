@@ -804,13 +804,24 @@ function generateMoneyQuestionOptions() {
                 const options = checkboxOptionsDiv.querySelectorAll('div');
                 
                 options.forEach((option, index) => {
-                    // Find the hasAmount checkbox within this option div
+                    // Get the option text for display
+                    const optionTextEl = option.querySelector(`input[id^="checkboxOptionText${qId}_"]`);
+                    const optionText = optionTextEl ? optionTextEl.value.trim() : `Option ${index + 1}`;
+                    
+                    // Get the nameId (this exists for all checkbox options)
+                    const nameIdEl = option.querySelector(`input[id^="checkboxOptionName${qId}_"]`);
+                    let nameId = '';
+                    if (nameIdEl && nameIdEl.value.trim()) {
+                        nameId = nameIdEl.value.trim();
+                    } else {
+                        // Generate default nameId if not provided
+                        const sanitizedText = optionText.replace(/\W+/g, "_").toLowerCase();
+                        nameId = `answer${qId}_${sanitizedText}`;
+                    }
+                    
+                    // Find if this checkbox has an amount field
                     const hasAmountCheckbox = option.querySelector(`input[id^="checkboxOptionHasAmount${qId}_"]`);
                     if (hasAmountCheckbox && hasAmountCheckbox.checked) {
-                        // Get the option text for display
-                        const optionTextEl = option.querySelector(`input[id^="checkboxOptionText${qId}_"]`);
-                        const optionText = optionTextEl ? optionTextEl.value.trim() : `Option ${index + 1}`;
-                        
                         // Get the amount name or generate a default one
                         const amountNameEl = option.querySelector(`input[id^="checkboxOptionAmountName${qId}_"]`);
                         let amountName = '';
@@ -823,9 +834,13 @@ function generateMoneyQuestionOptions() {
                             amountName = `amount_${sanitizedText}_${qId}_${index + 1}`;
                         }
                         
-                        // Add this option to the dropdown
+                        // Add the amount field to the dropdown
                         optionsHTML += `<option value="${amountName}">${qTxt} - ${optionText} (amount)</option>`;
                     }
+                    
+                    // For all checkboxes, also add the checkbox field itself as a direct reference option
+                    // This supports the new format for calculations
+                    optionsHTML += `<option value="${nameId}">${qTxt} - ${optionText} (checkbox)</option>`;
                 });
             }
         }
