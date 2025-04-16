@@ -548,7 +548,7 @@ function removeCalculationForCheckbox(hiddenFieldId, calcIndex) {
  */
 function updateAllCalculationDropdowns() {
     // Update all calculation dropdown options to ensure they include all hidden fields
-    const allDropdowns = document.querySelectorAll('select[id^="textTermQuestion"]');
+    const allDropdowns = document.querySelectorAll('select[id^="textTermQuestion"], select[id^="calcTermQuestion"]');
     allDropdowns.forEach(dropdown => {
         const selectedValue = dropdown.value;
         dropdown.innerHTML = `
@@ -745,6 +745,7 @@ function generateAllQuestionOptions() {
 /**
  * UPDATED to include ALL hidden fields as numeric references
  * And use question text instead of just ID in the display
+ * Now also includes checkbox amount fields for calculations
  */
 function generateMoneyQuestionOptions() {
     let optionsHTML = '';
@@ -793,6 +794,40 @@ function generateMoneyQuestionOptions() {
             const nmEl = qBlock.querySelector('#textboxName' + qId);
             const fieldName = nmEl ? nmEl.value.trim() : ('answer' + qId);
             optionsHTML += `<option value="${fieldName}">${qTxt} (money)</option>`;
+        }
+        else if (qType === 'checkbox') {
+            // For checkboxes, look for options with hasAmount enabled
+            const checkboxOptionsDiv = qBlock.querySelector(`#checkboxOptions${qId}`);
+            if (checkboxOptionsDiv) {
+                // Use a more robust selector that finds all divs inside checkboxOptionsDiv
+                // This works better with JSON-loaded forms where class names might not be exactly .option
+                const options = checkboxOptionsDiv.querySelectorAll('div');
+                
+                options.forEach((option, index) => {
+                    // Find the hasAmount checkbox within this option div
+                    const hasAmountCheckbox = option.querySelector(`input[id^="checkboxOptionHasAmount${qId}_"]`);
+                    if (hasAmountCheckbox && hasAmountCheckbox.checked) {
+                        // Get the option text for display
+                        const optionTextEl = option.querySelector(`input[id^="checkboxOptionText${qId}_"]`);
+                        const optionText = optionTextEl ? optionTextEl.value.trim() : `Option ${index + 1}`;
+                        
+                        // Get the amount name or generate a default one
+                        const amountNameEl = option.querySelector(`input[id^="checkboxOptionAmountName${qId}_"]`);
+                        let amountName = '';
+                        
+                        if (amountNameEl && amountNameEl.value.trim()) {
+                            amountName = amountNameEl.value.trim();
+                        } else {
+                            // Default format for the field
+                            const sanitizedText = optionText.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                            amountName = `amount_${sanitizedText}_${qId}_${index + 1}`;
+                        }
+                        
+                        // Add this option to the dropdown
+                        optionsHTML += `<option value="${amountName}">${qTxt} - ${optionText} (amount)</option>`;
+                    }
+                });
+            }
         }
     });
 

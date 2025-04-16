@@ -403,7 +403,7 @@ else if (question.type === 'numberedDropdown') {
     }
 
     // 7) Finally, re-run references (e.g. auto-fill dropdowns in hidden fields)
-    updateAutofillOptions();
+    updateFormAfterImport();
 }
 
 function exportForm() {
@@ -867,6 +867,9 @@ function importForm(event) {
         reader.onload = function(e) {
             const jsonData = JSON.parse(e.target.result);
             loadFormData(jsonData);
+            
+            // Additional call in case the first one happens too early
+            setTimeout(updateFormAfterImport, 300);
         };
         reader.readAsText(file);
     }
@@ -998,5 +1001,18 @@ function addHiddenFieldWithData(hiddenField) {
                 if (fillValEl) fillValEl.value = calcObj.fillValue || '';
             });
         }
+    }
+}
+
+function updateFormAfterImport() {
+    // Update autofill options in hidden fields
+    if (typeof updateAutofillOptions === 'function') {
+        updateAutofillOptions();
+    }
+    
+    // Update calculation dropdowns in hidden fields
+    if (typeof updateAllCalculationDropdowns === 'function') {
+        // Run this with a slight delay to ensure DOM is ready
+        setTimeout(updateAllCalculationDropdowns, 100);
     }
 }

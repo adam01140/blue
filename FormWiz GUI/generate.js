@@ -549,7 +549,7 @@ function getFormHTML() {
             const pType2 = questionTypesMap[pqVal2] || "text";
             if (pType2 === "checkbox") {
               logicScriptBuffer += ` (function(){\n`;
-              logicScriptBuffer += `   var cbs=document.querySelectorAll('input[id^="answer${pqVal2}_"]');\n`;
+              logicScriptBuffer += `   var cbs=document.querySelectorAll('input[id^="answer'+qId+'_"]');\n`;
               logicScriptBuffer += `   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
             } else if (pType2 === "dropdown" || pType2 === "radio" || pType2 === "numberedDropdown") {
@@ -1035,61 +1035,210 @@ function parseTokenValue(token){
 }
 
 /**
- * UPDATED so that if 'el' is a checkbox, return 1 if checked, else 0.
- * Otherwise parse float. 
+ * UPDATED to handle checkbox amount fields properly.
+ * Handles both direct references and references where the actual element has "answerX_" prefix.
  */
 function getMoneyValue(qId) {
+    // First try direct element match
     const el = document.getElementById(qId);
-    if (!el) return 0;
-
-    if (el.type === 'checkbox') {
-        // Return 1 if checked, else 0
-        return el.checked ? 1 : 0;
+    if (el) {
+        // If it's a checkbox with an amount field
+        if (el.type === 'checkbox') {
+            // Check if there's a corresponding amount field
+            const amountFieldId = el.id + "_amount";
+            const amountField = document.getElementById(amountFieldId);
+            
+            if (amountField && el.checked) {
+                return parseFloat(amountField.value) || 0;
+            }
+            // No amount field or not checked
+            return el.checked ? 1 : 0;
+        }
+        
+        // Regular input field
+        return parseFloat(el.value) || 0;
     }
-    // Otherwise parse float
-    return parseFloat(el.value) || 0;
+    
+    // No direct match - try alternatives:
+    
+    // 1. Check if this is directly an amount field (with "_amount" suffix removed)
+    if (qId.endsWith("_amount")) {
+        const baseId = qId.slice(0, -7); // Remove "_amount"
+        const amountField = document.getElementById(qId);
+        if (amountField) {
+            return parseFloat(amountField.value) || 0;
+        }
+    }
+    
+    // 2. Look for elements with the qId as their name
+    const namedElements = document.getElementsByName(qId);
+    if (namedElements && namedElements.length > 0) {
+        const namedEl = namedElements[0];
+        return parseFloat(namedEl.value) || 0;
+    }
+    
+    // 3. Find prefixed IDs like "answerX_qId"
+    const possiblePrefixedIds = Array.from(document.querySelectorAll('[id*="_' + qId + '"]'));
+    for (let i = 0; i < possiblePrefixedIds.length; i++) {
+        const prefixedEl = possiblePrefixedIds[i];
+        if (prefixedEl.id.endsWith('_' + qId)) {
+            if (prefixedEl.type === 'checkbox') {
+                // If found checkbox, look for its amount field
+                const amountFieldId = prefixedEl.id + "_amount";
+                const amountField = document.getElementById(amountFieldId);
+                
+                if (amountField && prefixedEl.checked) {
+                    return parseFloat(amountField.value) || 0;
+                }
+                return prefixedEl.checked ? 1 : 0;
+            }
+            return parseFloat(prefixedEl.value) || 0;
+        }
+    }
+    
+    // 4. Look for amount field directly by ID + "_amount"
+    const amountFieldId = qId + "_amount";
+    const amountField = document.getElementById(amountFieldId);
+    if (amountField) {
+        // Now we need to check if the associated checkbox is checked
+        // Find checkbox that controls this amount field
+        const checkboxSelector = 'input[type="checkbox"][onchange*="' + amountFieldId + '"]';
+        const checkboxEl = document.querySelector(checkboxSelector);
+        
+        if (checkboxEl && checkboxEl.checked) {
+            return parseFloat(amountField.value) || 0;
+        }
+        return 0; // Checkbox not checked, so amount is 0
+    }
+    
+    // 5. Finally, try to find elements by name pattern
+    const elementsWithAmountName = document.querySelectorAll('input[name="' + qId + '"]');
+    if (elementsWithAmountName.length > 0) {
+        const amountEl = elementsWithAmountName[0];
+        if (amountEl.type === 'number') {
+            // Find associated checkbox through naming convention
+            const checkboxId = amountEl.id.replace('_amount', '');
+            const checkboxEl = document.getElementById(checkboxId);
+            
+            if (checkboxEl && checkboxEl.checked) {
+                return parseFloat(amountEl.value) || 0;
+            }
+        }
+    }
+    
+    // Nothing found
+    return 0;
 }
 
-function attachCalculationListeners(){
+function attachCalculationListeners() {
+    // Universal function to attach listeners in a consistent way
+    function attachListenersToCalculationTerms(calculations, runCalculationFunction) {
+        for (let i = 0; i < calculations.length; i++) {
+            const calcObj = calculations[i];
+            for (let c = 0; c < calcObj.calculations.length; c++) {
+                const oneCalc = calcObj.calculations[c];
+                const terms = oneCalc.terms || [];
+                
+                for (let t = 0; t < terms.length; t++) {
+                    const qNameId = terms[t].questionNameId;
+                    
+                    // 1. Try direct element
+                    const el = document.getElementById(qNameId);
+                    if (el) {
+                        el.addEventListener('change', runCalculationFunction);
+                        el.addEventListener('input', runCalculationFunction);
+                        
+                        // If it's a checkbox, also listen to its amount field
+                        if (el.type === 'checkbox') {
+                            const amountField = document.getElementById(el.id + '_amount');
+                            if (amountField) {
+                                amountField.addEventListener('input', runCalculationFunction);
+                            }
+                        }
+                        continue; // Found and attached, go to next term
+                    }
+                    
+                    // 2. Try elements with this name
+                    const namedElements = document.getElementsByName(qNameId);
+                    if (namedElements.length > 0) {
+                        for (let n = 0; n < namedElements.length; n++) {
+                            namedElements[n].addEventListener('change', runCalculationFunction);
+                            namedElements[n].addEventListener('input', runCalculationFunction);
+                        }
+                        continue;
+                    }
+                    
+                    // 3. Look for prefixed IDs like "answerX_qId"
+                    const prefixPattern = new RegExp('.*_' + qNameId + '$');
+                    const allInputs = document.querySelectorAll('input, select, textarea');
+                    
+                    for (let inp = 0; inp < allInputs.length; inp++) {
+                        const input = allInputs[inp];
+                        if (prefixPattern.test(input.id)) {
+                            input.addEventListener('change', runCalculationFunction);
+                            input.addEventListener('input', runCalculationFunction);
+                            
+                            // If it's a checkbox with amount field
+                            if (input.type === 'checkbox') {
+                                const amountField = document.getElementById(input.id + '_amount');
+                                if (amountField) {
+                                    amountField.addEventListener('input', runCalculationFunction);
+                                }
+                            }
+                        }
+                    }
+                    
+                    // 4. Look specifically for amount fields with this name
+                    const amountElements = document.querySelectorAll('input[name="' + qNameId + '"]');
+                    for (let a = 0; a < amountElements.length; a++) {
+                        amountElements[a].addEventListener('input', runCalculationFunction);
+                        
+                        // Also find and attach to the controlling checkbox
+                        if (amountElements[a].id.includes('_amount')) {
+                            const checkboxId = amountElements[a].id.replace('_amount', '');
+                            const checkbox = document.getElementById(checkboxId);
+                            if (checkbox) {
+                                checkbox.addEventListener('change', runCalculationFunction);
+                            }
+                        }
+                    }
+                    
+                    // 5. Try direct amount field
+                    const directAmountField = document.getElementById(qNameId + '_amount');
+                    if (directAmountField) {
+                        directAmountField.addEventListener('input', runCalculationFunction);
+                        
+                        // Find the checkbox controlling this amount field
+                        const checkboxSelector = 'input[type="checkbox"][onchange*="' + directAmountField.id + '"]';
+                        const checkbox = document.querySelector(checkboxSelector);
+                        if (checkbox) {
+                            checkbox.addEventListener('change', runCalculationFunction);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     // For hidden checkbox calculations
-    if(hiddenCheckboxCalculations){
-        for(var i=0; i<hiddenCheckboxCalculations.length; i++){
-            var cObj= hiddenCheckboxCalculations[i];
-            for(var c=0; c<cObj.calculations.length; c++){
-                var oneCalc= cObj.calculations[c];
-                var terms= oneCalc.terms||[];
-                for(var t=0; t<terms.length; t++){
-                    var qNameId= terms[t].questionNameId;
-                    var el2= document.getElementById(qNameId);
-                    if(el2){
-                        el2.addEventListener('change', function(){
-                            runAllHiddenCheckboxCalculations();
-                        });
-                    }
-                }
-            }
-        }
+    if (hiddenCheckboxCalculations && hiddenCheckboxCalculations.length > 0) {
+        const runAllCheckboxCalcs = function() {
+            runAllHiddenCheckboxCalculations();
+        };
+        attachListenersToCalculationTerms(hiddenCheckboxCalculations, runAllCheckboxCalcs);
     }
+    
     // For hidden text calculations
-    if(hiddenTextCalculations){
-        for(var i2=0; i2<hiddenTextCalculations.length; i2++){
-            var txtObj= hiddenTextCalculations[i2];
-            for(var c2=0; c2<txtObj.calculations.length; c2++){
-                var oneCalc2= txtObj.calculations[c2];
-                var terms2= oneCalc2.terms||[];
-                for(var t2=0; t2<terms2.length; t2++){
-                    var qNameId2= terms2[t2].questionNameId;
-                    var el3= document.getElementById(qNameId2);
-                    if(el3){
-                        // 'input' event for real-time updates
-                        el3.addEventListener('input', function(){
-                            runAllHiddenTextCalculations();
-                        });
-                    }
-                }
-            }
-        }
+    if (hiddenTextCalculations && hiddenTextCalculations.length > 0) {
+        const runAllTextCalcs = function() {
+            runAllHiddenTextCalculations();
+        };
+        attachListenersToCalculationTerms(hiddenTextCalculations, runAllTextCalcs);
     }
+    
+    // Run calculations once on page load to set initial values
+    runAllHiddenCheckboxCalculations();
+    runAllHiddenTextCalculations();
 }
 </script>
 </body>
@@ -1122,7 +1271,7 @@ function generateHiddenPDFFields() {
     const questionBlocks = document.querySelectorAll('.question-block');
     questionBlocks.forEach(qBlock => {
         const qId = qBlock.id.replace('questionBlock', '');
-        const txtEl = qBlock.querySelector(`#question${qId}`);
+        const txtEl = qBlock.querySelector('#question' + qId);
         if (txtEl) {
             const qText = txtEl.value.trim();
             questionTextToIdMap[qText] = qId;
@@ -1150,7 +1299,7 @@ function generateHiddenPDFFields() {
             if (fType === "text") {
                 // Add the hidden text field
                 //hide calc fields here
-                hiddenFieldsHTML += `\n<input type="text" id="${fName}" name="${fName}" placeholder="${fName}" style="display:block;">`;
+                hiddenFieldsHTML += '\n<input type="text" id="' + fName + '" name="' + fName + '" placeholder="' + fName + '" style="display:block;">';
     
                 // Process text calculations from UI
                 const textCalcBlock = block.querySelector("#textCalculationBlock" + hid);
@@ -1189,7 +1338,7 @@ function generateHiddenPDFFields() {
                                             
                                             // If we can map this question text to an ID, do so
                                             if (questionTextToIdMap[questionText]) {
-                                                questionNameIdVal = `amount${questionTextToIdMap[questionText]}_${numValue}_${fieldValue}`;
+                                                questionNameIdVal = 'amount' + questionTextToIdMap[questionText] + '_' + numValue + '_' + fieldValue;
                                             }
                                         }
                                         
@@ -1236,12 +1385,9 @@ function generateHiddenPDFFields() {
                 // Hidden checkbox field
                 const chkEl = document.getElementById("hiddenFieldChecked" + hid);
                 const isCheckedDefault = chkEl && chkEl.checked;
-                hiddenFieldsHTML += `\n<div style="display:none;">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="${fName}" name="${fName}" ${isCheckedDefault ? "checked" : ""}>
-                        ${fName}
-                    </label>
-                </div>`;
+                hiddenFieldsHTML += '\n<div style="display:none;">' + 
+                    '\n<input type="checkbox" id="' + fName + '" name="' + fName + '" ' + (isCheckedDefault ? "checked" : "") + '>' +
+                    '\n</div>';
 
                 // Process checkbox calculations from UI
                 const calcBlock = block.querySelector("#calculationBlock" + hid);
@@ -1280,7 +1426,7 @@ function generateHiddenPDFFields() {
                                             
                                             // If we can map this question text to an ID, do so
                                             if (questionTextToIdMap[questionText]) {
-                                                questionNameIdVal = `amount${questionTextToIdMap[questionText]}_${numValue}_${fieldValue}`;
+                                                questionNameIdVal = 'amount' + questionTextToIdMap[questionText] + '_' + numValue + '_' + fieldValue;
                                             }
                                         }
                                         

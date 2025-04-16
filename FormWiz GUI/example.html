@@ -135,7 +135,29 @@ var conditionalAlerts = [];
 var labelMap = {};
 var amountMap = {};
 var hiddenCheckboxCalculations = [];
-var hiddenTextCalculations = [];
+var hiddenTextCalculations = [
+  {
+    "hiddenFieldName": "total",  // ID of the hidden field to fill
+    "calculations": [
+      {
+        "terms": [
+          {"operator": "", "questionNameId": "amount1"}  // First term (no operator)
+        ],
+        "compareOperator": ">",
+        "threshold": "100",
+        "fillValue": "Amount exceeds threshold"  // Text to fill when condition is met
+      },
+      {
+        "terms": [
+          {"operator": "", "questionNameId": "amount1"}
+        ],
+        "compareOperator": "<=",
+        "threshold": "100",
+        "fillValue": "Amount within threshold"
+      }
+    ]
+  }
+];
 
 
 
