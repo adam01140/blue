@@ -36,7 +36,7 @@ function getFormHTML() {
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
     "",
 
-    '<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: none;">',
+    '<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: block;">',
     '    <h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50;">Your Information</h3>',
     '    <div style="display: flex; gap: 15px; margin-bottom: 15px;">',
     '        <div style="flex: 1;">',
@@ -304,6 +304,8 @@ function getFormHTML() {
           `#checkboxOptions${questionId} > div`
         );
         const cboxOptions = [];
+        // Make sure to add this checkbox question to questionNameIds
+        questionNameIds[questionId] = "answer" + questionId;
         formHTML += `<div><center><div id="checkmark">`;
         for (let co = 0; co < cOptsDivs.length; co++) {
           const optDiv = cOptsDivs[co];
@@ -510,26 +512,26 @@ function getFormHTML() {
 
             const pType = questionTypesMap[pqVal] || "text";
 
-            logicScriptBuffer += ` (function(){\n`;
-            logicScriptBuffer += `   var cPrevType="${pType}";\n`;
-            logicScriptBuffer += `   var cPrevAns="${paVal}";\n`;
-            logicScriptBuffer += `   var cPrevQNum="${pqVal}";\n`;
-            logicScriptBuffer += `   if(cPrevType==="checkbox"){\n`;
-            logicScriptBuffer += `     var cbPrefix = (questionNameIds[cPrevQNum] && questionNameIds[cPrevQNum].startsWith("answer")) ? questionNameIds[cPrevQNum]+"_" : "answer"+cPrevQNum+"_";\n`;
-            logicScriptBuffer += `     var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');\n`;
-            logicScriptBuffer += `     var checkedVals=[];\n`;
-            logicScriptBuffer += `     for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}\n`;
-            logicScriptBuffer += `     if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}\n`;
-            logicScriptBuffer += `   } else {\n`;
-            logicScriptBuffer += `     var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);\n`;
+            logicScriptBuffer += `  (function(){\n`;
+            logicScriptBuffer += `    var cPrevType="${pType}";\n`;
+            logicScriptBuffer += `    var cPrevAns="${paVal}";\n`;
+            logicScriptBuffer += `    var cPrevQNum="${pqVal}";\n`;
+            logicScriptBuffer += `    if(cPrevType==="checkbox"){\n`;
+            logicScriptBuffer += `      var cbPrefix = (questionNameIds[cPrevQNum] && questionNameIds[cPrevQNum].startsWith("answer")) ? questionNameIds[cPrevQNum]+"_" : "answer"+cPrevQNum+"_";\n`;
+            logicScriptBuffer += `      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');\n`;
+            logicScriptBuffer += `      var checkedVals=[];\n`;
+            logicScriptBuffer += `      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}\n`;
+            logicScriptBuffer += `      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}\n`;
+            logicScriptBuffer += `    } else {\n`;
+            logicScriptBuffer += `      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);\n`;
             // Special case for special options that check for presence rather than exact value
             if (paVal.toLowerCase() === "any text" || paVal.toLowerCase() === "any amount" || paVal.toLowerCase() === "any date") {
-              logicScriptBuffer += `     if(el2){ var val2= el2.value.trim(); if(val2 !== ""){ anyMatch=true;} }\n`;
+              logicScriptBuffer += `      if(el2){ var val2= el2.value.trim(); if(val2 !== ""){ anyMatch=true;} }\n`;
             } else {
-              logicScriptBuffer += `     if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }\n`;
+              logicScriptBuffer += `      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }\n`;
             }
-            logicScriptBuffer += `   }\n`;
-            logicScriptBuffer += ` })();\n`;
+            logicScriptBuffer += `    }\n`;
+            logicScriptBuffer += `  })();\n`;
           }
 
           logicScriptBuffer += ` if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }\n`;
@@ -549,21 +551,27 @@ function getFormHTML() {
             const pType2 = questionTypesMap[pqVal2] || "text";
             if (pType2 === "checkbox") {
               logicScriptBuffer += ` (function(){\n`;
-              logicScriptBuffer += `   var cbs=document.querySelectorAll('input[id^="answer'+qId+'_"]');\n`;
+              // Use explicit question ID value rather than relying on variable scope
+              logicScriptBuffer += `   var checkQuestion = "${pqVal2}";\n`;
+              logicScriptBuffer += `   var cbs=document.querySelectorAll('input[id^="answer'+checkQuestion+'_"]');\n`;
               logicScriptBuffer += `   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
             } else if (pType2 === "dropdown" || pType2 === "radio" || pType2 === "numberedDropdown") {
               // Use "change" event for select elements (dropdown, radio) instead of "input"
               logicScriptBuffer += ` (function(){\n`;
+              // Use explicit question ID reference
+              logicScriptBuffer += `   var selectQuestion = "${pqVal2}";\n`;
               // IMPORTANT: Try questionNameIds first, then fallback to default naming
-              logicScriptBuffer += `   var el3= document.getElementById(questionNameIds["${pqVal2}"]) || document.getElementById("answer${pqVal2}");\n`;
+              logicScriptBuffer += `   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);\n`;
               logicScriptBuffer += `   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
             } else {
               // Use "input" event for text fields
               logicScriptBuffer += ` (function(){\n`;
+              // Use explicit question ID reference
+              logicScriptBuffer += `   var textQuestion = "${pqVal2}";\n`;
               // IMPORTANT: Try questionNameIds first, then fallback to default naming
-              logicScriptBuffer += `   var el3= document.getElementById(questionNameIds["${pqVal2}"]) || document.getElementById("answer${pqVal2}");\n`;
+              logicScriptBuffer += `   var el3= document.getElementById(questionNameIds[textQuestion]) || document.getElementById("answer"+textQuestion);\n`;
               logicScriptBuffer += `   if(el3){ el3.addEventListener("input", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
             }
