@@ -549,7 +549,7 @@ function getFormHTML() {
             const pType2 = questionTypesMap[pqVal2] || "text";
             if (pType2 === "checkbox") {
               logicScriptBuffer += ` (function(){\n`;
-              logicScriptBuffer += `   var cbs=document.querySelectorAll('input[id^="answer${pqVal2}_"]');\n`;
+              logicScriptBuffer += `   var cbs=document.querySelectorAll('input[id^="answer'+qId+'_"]');\n`;
               logicScriptBuffer += `   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
             } else if (pType2 === "dropdown" || pType2 === "radio" || pType2 === "numberedDropdown") {
@@ -627,8 +627,27 @@ function getFormHTML() {
     const urlParams = new URLSearchParams(window.location.search);
     const formId = urlParams.get("formId");
     let userId = null;
-    firebase.auth().onAuthStateChanged(function(user){
-        if(user){ userId=user.uid;} else {
+    firebase.auth().onAuthStateChanged(async function(user){
+        if(user){ 
+            userId=user.uid;
+            // Fetch user data and display welcome message
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if(userDoc.exists) {
+                    const userData = userDoc.data();
+                    document.getElementById('user_firstname').value = userData.firstName || '';
+                    document.getElementById('user_lastname').value = userData.lastName || '';
+                    document.getElementById('user_email').value = userData.email || '';
+                    document.getElementById('user_phone').value = userData.phone || '';
+                    document.getElementById('user_street').value = userData.address?.street || '';
+                    document.getElementById('user_city').value = userData.address?.city || '';
+                    document.getElementById('user_state').value = userData.address?.state || '';
+                    document.getElementById('user_zip').value = userData.address?.zip || '';
+                }
+            } catch(error) {
+                console.error("Error fetching user data:", error);
+            }
+        } else {
            console.log("User not logged in.");
            window.location.href="account.html";
         }
@@ -816,6 +835,16 @@ function handleConditionalAlerts(){
 }
 
 function showThankYouMessage(){
+    // Copy user's name to hidden field before submitting
+    document.getElementById('user_firstname_hidden').value = document.getElementById('user_firstname').value;
+    document.getElementById('user_lastname_hidden').value = document.getElementById('user_lastname').value;
+    document.getElementById('user_email_hidden').value = document.getElementById('user_email').value;
+    document.getElementById('user_phone_hidden').value = document.getElementById('user_phone').value;
+    document.getElementById('user_street_hidden').value = document.getElementById('user_street').value;
+    document.getElementById('user_city_hidden').value = document.getElementById('user_city').value;
+    document.getElementById('user_state_hidden').value = document.getElementById('user_state').value;
+    document.getElementById('user_zip_hidden').value = document.getElementById('user_zip').value;
+    
     // run final hidden calculations
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
@@ -982,8 +1011,8 @@ function runSingleHiddenTextCalculation(calcObj) {
         }
 
         if (matched) {
-            // Check if fillValue is in ##fieldname## format
-            if (oneCalc.fillValue && oneCalc.fillValue.match(/^##(.+)##$/)) {
+            // Check if fillValue is in ##fieldname## format - both "##total##" and general pattern
+            if (oneCalc.fillValue === "##total##" || (oneCalc.fillValue && oneCalc.fillValue.match(/^##(.+)##$/))) {
                 finalValue = val.toString();
             } else {
                 finalValue = oneCalc.fillValue;
@@ -1260,6 +1289,18 @@ function attachCalculationListeners() {
  */
 function generateHiddenPDFFields() {
     let hiddenFieldsHTML = '<div id="hidden_pdf_fields">';
+    
+    // Add hidden fields for user information
+    hiddenFieldsHTML += `
+<input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
+<input type="hidden" id="user_lastname_hidden" name="user_lastname_hidden">
+<input type="hidden" id="user_email_hidden" name="user_email_hidden">
+<input type="hidden" id="user_phone_hidden" name="user_phone_hidden">
+<input type="hidden" id="user_street_hidden" name="user_street_hidden">
+<input type="hidden" id="user_city_hidden" name="user_city_hidden">
+<input type="hidden" id="user_state_hidden" name="user_state_hidden">
+<input type="hidden" id="user_zip_hidden" name="user_zip_hidden">`;
+    
     const hiddenCheckboxCalculations = [];
     const hiddenTextCalculations = [];
 
@@ -1299,7 +1340,7 @@ function generateHiddenPDFFields() {
             if (fType === "text") {
                 // Add the hidden text field
                 //hide calc fields here
-                hiddenFieldsHTML += '\n<input type="text" id="' + fName + '" name="' + fName + '" placeholder="' + fName + '" style="display:block;">';
+                hiddenFieldsHTML += '\n<input type="text" id="' + fName + '" name="' + fName + '" placeholder="' + fName + '" style="display:none;">';
     
                 // Process text calculations from UI
                 const textCalcBlock = block.querySelector("#textCalculationBlock" + hid);
