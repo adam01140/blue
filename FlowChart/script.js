@@ -1719,11 +1719,13 @@ function gatherAllAmountLabels() {
             .replace(/\s+/g, "_")
             .toLowerCase();
 
-          // We also add "car_value" for each isAmountOption
+          // We also add amount for each isAmountOption
           cell._textboxes.forEach(tb => {
             if (tb.isAmountOption) {
-              // e.g. "how_many_cars_do_you_have_car_value"
-              let label = cleanQuestionName + "_" + tb.nameId.replace(/\s+/g, "_").toLowerCase();
+              // Preserve original spaces in the nameId by converting to underscores
+              // e.g. "how_many_cars_do_you_have_amount_plus" for "Amount Plus"
+              let amountName = tb.nameId.replace(/\s+/g, "_").toLowerCase();
+              let label = cleanQuestionName + "_" + amountName;
               labels.push(label);
             }
           });
@@ -3166,24 +3168,107 @@ window.exportGuiJson = function() {
           if (termAmountLabel) {
             // Clean up the label
             const cleanedLabel = termAmountLabel.replace(/delete_amount_/g, "").replace(/add_option_/g, "");
+            console.log(`  Cleaned term label: "${cleanedLabel}"`);
             
-            // Extract from the label
-            const lastIndex = cleanedLabel.lastIndexOf('_');
-            if (lastIndex > 0) {
-              termAmountName = cleanedLabel.substring(lastIndex + 1).trim();
-              termQuestionName = cleanedLabel.substring(0, lastIndex).trim();
-            } else {
-              // Fallback
+            // Handle special cases first - direct checkbox amount options
+            const isCheckboxOption = /^([a-z0-9_]+)_([a-z0-9_]+)$/.test(cleanedLabel);
+            const isMultipleDropdownAmount = cleanedLabel.includes("_amount");
+            
+            console.log(`  Label format check: isCheckboxOption=${isCheckboxOption}, isMultipleDropdownAmount=${isMultipleDropdownAmount}`);
+            
+            // First try to match checkbox amount options which typically have simple format: questionname_optionname
+            if (isCheckboxOption && !isMultipleDropdownAmount) {
+              // Simple format for checkbox options like "choose_all_that_apply_rent"
               const parts = cleanedLabel.split('_');
-              if (parts.length > 0) {
-                termAmountName = parts[parts.length - 1].replace(/_/g, " ").trim();
-              }
-              if (parts.length > 1) {
-                termQuestionName = parts.slice(0, -1).join('_');
+              // For simple checkbox amount options, the last part is the option name
+              // and all previous parts combined form the question name
+              termAmountName = parts[parts.length - 1];
+              termQuestionName = parts.slice(0, -1).join('_');
+              console.log(`  Detected checkbox option. Question: "${termQuestionName}", Option/Amount: "${termAmountName}"`);
+            }
+            // For multi-word amounts like "amount_plus", we need to handle the extraction differently
+            else if (cleanedLabel.indexOf("_amount_") > 0) {
+              // This is likely a multi-word amount (like "amount_plus")
+              const questionNameEndPos = cleanedLabel.indexOf("_amount_");
+              termQuestionName = cleanedLabel.substring(0, questionNameEndPos);
+              termAmountName = "amount_" + cleanedLabel.substring(questionNameEndPos + 8); // Skip "_amount_"
+              console.log(`  Detected multi-word amount. Question: "${termQuestionName}", Amount: "${termAmountName}"`);
+            }
+            // Handle the simple case with just "amount" at the end
+            else if (cleanedLabel.endsWith("_amount")) {
+              termQuestionName = cleanedLabel.substring(0, cleanedLabel.length - 7); // Remove "_amount"
+              termAmountName = "amount";
+              console.log(`  Detected simple amount suffix. Question: "${termQuestionName}", Amount: "${termAmountName}"`);
+            }
+            // Try standard extraction with last underscore
+            else {
+              const lastIndex = cleanedLabel.lastIndexOf('_');
+              if (lastIndex > 0) {
+                termAmountName = cleanedLabel.substring(lastIndex + 1).trim();
+                termQuestionName = cleanedLabel.substring(0, lastIndex).trim();
+                console.log(`  Standard extraction. Question: "${termQuestionName}", Amount: "${termAmountName}"`);
+              } else {
+                // Fallback
+                const parts = cleanedLabel.split('_');
+                if (parts.length > 0) {
+                  termAmountName = parts[parts.length - 1].replace(/_/g, " ").trim();
+                }
+                if (parts.length > 1) {
+                  termQuestionName = parts.slice(0, -1).join('_');
+                }
+                console.log(`  Fallback extraction. Question: "${termQuestionName}", Amount: "${termAmountName}"`);
               }
             }
             
             console.log(`  Term ${i+1} extracted: question="${termQuestionName}", amount="${termAmountName}"`);
+            
+            // Special handling for checkbox options
+            // If the term appears to be a checkbox option (not containing "amount" in the name)
+            // and follows the pattern questionname_optionname
+            if (isCheckboxOption && !isMultipleDropdownAmount) {
+              let directHit = false;
+              
+              // Try to directly match it with options from checkbox questions
+              for (const section of sections) {
+                for (const question of section.questions) {
+                  if (question.type === "checkbox") {
+                    // Check if this question has options
+                    if (question.options && Array.isArray(question.options)) {
+                      for (const option of question.options) {
+                        if (typeof option === 'object') {
+                          // Create the expected nameId format and check if it matches our term
+                          const questionTextId = question.text.toLowerCase().replace(/[^\w\s]/gi, "").replace(/\s+/g, "_");
+                          const optionNameId = option.label.toLowerCase().replace(/\s+/g, '_');
+                          const expectedNameId = `${questionTextId}_${optionNameId}`;
+                          
+                          if (cleanedLabel === expectedNameId || 
+                              expectedNameId.includes(cleanedLabel) || 
+                              cleanedLabel.includes(expectedNameId)) {
+                            console.log(`  Direct match with checkbox option: "${expectedNameId}"`);
+                            
+                            // For checkbox amount options, just use the exact format
+                            calculation.terms.push({
+                              operator: operator,
+                              questionNameId: cleanedLabel
+                            });
+                            directHit = true;
+                            break;
+                          }
+                        }
+                      }
+                      if (directHit) break;
+                    }
+                  }
+                  if (directHit) break;
+                }
+                if (directHit) break;
+              }
+              
+              if (directHit) {
+                console.log(`  Added direct checkbox option term: "${cleanedLabel}"`);
+                continue; // Skip to next term
+              }
+            }
             
             // Find the matching question
             let termTargetQuestion = null;
@@ -3232,16 +3317,38 @@ window.exportGuiJson = function() {
                   const questionTextLower = questionText.toLowerCase();
                   const questionTextAsId = questionTextLower.replace(/[^\w\s]/gi, "").replace(/\s+/g, "_");
                   
-                  // Check if the question name part matches this numbered dropdown question
-                  if (termQuestionName.toLowerCase() === questionTextAsId) {
-                    // Check if this question has an option matching the amount name
+                  // Try multiple matching strategies
+                  const directMatch = termQuestionName.toLowerCase() === questionTextAsId;
+                  const containsMatch = termQuestionName.toLowerCase().includes(questionTextAsId) || 
+                                     questionTextAsId.includes(termQuestionName.toLowerCase());
+                  const simpleTextMatch = termQuestionName.toLowerCase().replace(/_/g, " ") === questionTextLower;
+                  
+                  if (directMatch || containsMatch || simpleTextMatch) {
+                    console.log(`  Term ${i+1} found potential question match: "${questionText}"`);
+                    
+                    // Check if this question has matching amounts
                     if (question.amounts && Array.isArray(question.amounts)) {
-                      for (const amount of question.amounts) {
-                        if (amount.toLowerCase() === termAmountName.toLowerCase()) {
-                          termTargetQuestion = question;
-                          console.log(`  Term ${i+1} matched numberedDropdown question: "${questionText}" with amount option "${amount}"`);
-                          break;
-                        }
+                      // For multi-word amounts, try both direct comparison and with spaces replaced by underscores
+                      const foundMatchingAmount = question.amounts.some(amount => {
+                        const amountLower = amount.toLowerCase();
+                        const amountUnderscores = amountLower.replace(/\s+/g, '_');
+                        const termAmountLower = termAmountName.toLowerCase();
+                        const termAmountSpaces = termAmountLower.replace(/_/g, ' ');
+                        
+                        return amountLower === termAmountLower || 
+                               amountLower === termAmountSpaces || 
+                               amountUnderscores === termAmountLower;
+                      });
+                      
+                      if (foundMatchingAmount) {
+                        termTargetQuestion = question;
+                        console.log(`  Term ${i+1} matched numberedDropdown question: "${questionText}" with matching amount`);
+                        break;
+                      } else {
+                        // Even if we don't find exact amount match, use this question if it has any amounts
+                        termTargetQuestion = question;
+                        console.log(`  Term ${i+1} matched numberedDropdown question: "${questionText}" but using fallback amount`);
+                        break;
                       }
                     }
                   }
@@ -3255,16 +3362,38 @@ window.exportGuiJson = function() {
             if (termTargetQuestion) {
               console.log(`  Term ${i+1} found target question: ${termTargetQuestion.questionId} (${termTargetQuestion.text})`);
               
-              // Get the correct amount name
-              let actualAmountName = termAmountName.trim().toLowerCase().replace(/\s+/g, '_');
-              if (termTargetQuestion.amounts && termTargetQuestion.amounts.length > 0) {
-                actualAmountName = termTargetQuestion.amounts[0].toLowerCase().replace(/\s+/g, '_');
-              }
-              
-              // Handle numberedDropdown type
+              // For numberedDropdown questions, create terms for each number
               if (termTargetQuestion.type === "numberedDropdown") {
                 const min = parseInt(termTargetQuestion.min || "1", 10);
                 const max = parseInt(termTargetQuestion.max || "1", 10);
+                
+                // For multi-word amounts like "amount_plus", use proper format
+                let actualAmountName = termAmountName.trim().toLowerCase();
+                
+                // Find matching amount in the question's amounts array
+                if (termTargetQuestion.amounts && termTargetQuestion.amounts.length > 0) {
+                  // Try to find exact match first (ignoring case and handling spaces vs underscores)
+                  const matchingAmount = termTargetQuestion.amounts.find(amount => {
+                    const amountLower = amount.toLowerCase();
+                    const amountUnderscores = amountLower.replace(/\s+/g, '_');
+                    const termAmountLower = termAmountName.toLowerCase();
+                    const termAmountSpaces = termAmountLower.replace(/_/g, ' ');
+                    
+                    return amountLower === termAmountLower || 
+                           amountLower === termAmountSpaces || 
+                           amountUnderscores === termAmountLower;
+                  });
+                  
+                  if (matchingAmount) {
+                    // Use the proper format with spaces replaced by underscores
+                    actualAmountName = matchingAmount.toLowerCase().replace(/\s+/g, '_');
+                    console.log(`  Found exact matching amount: "${matchingAmount}" -> "${actualAmountName}"`);
+                  } else {
+                    // Use the first amount as fallback
+                    actualAmountName = termTargetQuestion.amounts[0].toLowerCase().replace(/\s+/g, '_');
+                    console.log(`  Using fallback amount: "${termTargetQuestion.amounts[0]}" -> "${actualAmountName}"`);
+                  }
+                }
                 
                 // Add first number with the appropriate operator
                 calculation.terms.push({
@@ -3280,7 +3409,8 @@ window.exportGuiJson = function() {
                   });
                 }
                 
-                console.log(`  Added terms for numberedDropdown: min=${min}, max=${max}`);
+                console.log(`  Added terms for numberedDropdown: min=${min}, max=${max}, using amount="${actualAmountName}"`);
+                continue; // Skip to next term
               } else if (termTargetQuestion.type === "checkbox" && isCheckboxAmount) {
                 // For checkbox amount options, use the direct format: questionName_optionName
                 // This preserves the original format from gatherAllAmountLabels
@@ -3289,22 +3419,67 @@ window.exportGuiJson = function() {
                   questionNameId: `${termQuestionName}_${termAmountName}`
                 });
                 console.log(`  Added term for checkbox amount option using original format: ${termQuestionName}_${termAmountName}`);
+                continue; // Skip to next term
               } else {
                 // For other question types
                 calculation.terms.push({
                   operator: operator,
-                  questionNameId: `${termTargetQuestion.nameId}_${actualAmountName}`
+                  questionNameId: `${termTargetQuestion.nameId}_${termAmountName}`
                 });
                 console.log(`  Added term for regular question`);
+                continue; // Skip to next term
               }
-            } else {
-              // If no target question found, create a placeholder term
-              console.log(`  Term ${i+1} no target question found, using placeholder`);
-              calculation.terms.push({
-                operator: operator,
-                questionNameId: `unknown_question_${termAmountName || i+1}`
-              });
             }
+            
+            // If no target question found, try one more fallback approach for common question types
+            if (!termTargetQuestion) {
+              // For numbered dropdown questions (most common with amount options),
+              // try to find any numbered dropdown question and use its text
+              let fallbackQuestion = null;
+              for (const section of sections) {
+                for (const question of section.questions) {
+                  if (question.type === "numberedDropdown") {
+                    fallbackQuestion = question;
+                    break;
+                  }
+                }
+                if (fallbackQuestion) break;
+              }
+              
+              if (fallbackQuestion) {
+                console.log(`  Using fallback numbered dropdown question: "${fallbackQuestion.text}"`);
+                const min = parseInt(fallbackQuestion.min || "1", 10);
+                const max = parseInt(fallbackQuestion.max || "1", 10);
+                
+                // Use the termAmountName directly for the format
+                // Convert spaces to underscores for consistent format
+                const cleanedAmountName = termAmountName.trim().toLowerCase().replace(/\s+/g, '_');
+                
+                // Add first term with operator
+                calculation.terms.push({
+                  operator: operator,
+                  questionNameId: `${fallbackQuestion.text}_${min}_${cleanedAmountName}`
+                });
+                
+                // Add additional terms
+                for (let j = min + 1; j <= max; j++) {
+                  calculation.terms.push({
+                    operator: "+",
+                    questionNameId: `${fallbackQuestion.text}_${j}_${cleanedAmountName}`
+                  });
+                }
+                
+                console.log(`  Added fallback terms using first numberedDropdown question`);
+                continue; // Skip to next term
+              }
+            }
+            
+            // If still no match, create a placeholder
+            console.log(`  Term ${i+1} no target question found, using placeholder`);
+            calculation.terms.push({
+              operator: operator,
+              questionNameId: `unknown_question_${termAmountName || i+1}`
+            });
           }
         }
         
@@ -3333,29 +3508,69 @@ window.exportGuiJson = function() {
         const cleanedLabel = amountLabel.replace(/delete_amount_/g, "").replace(/add_option_/g, "");
         console.log(`  Cleaned label: "${cleanedLabel}"`);
         
-        // First, try to extract the question text from the label
-        // The label format is typically: "question_name_question_amount_name"
-        const lastIndex = cleanedLabel.lastIndexOf('_');
-        if (lastIndex > 0) {
-          amountName = cleanedLabel.substring(lastIndex + 1).trim();
-          questionNameFromLabel = cleanedLabel.substring(0, lastIndex).trim();
+        // Handle special case for checkbox amount options
+        const isCheckboxOption = /^([a-z0-9_]+)_([a-z0-9_]+)$/.test(cleanedLabel);
+        const isMultipleDropdownAmount = cleanedLabel.includes("_amount");
+        
+        if (isCheckboxOption && !isMultipleDropdownAmount) {
+          // For checkbox option format: questionname_optionname
+          // We can use it directly
+          console.log(`  Detected direct checkbox option format: "${cleanedLabel}"`);
           
-          console.log(`  Extracted question name: "${questionNameFromLabel}"`);
-          console.log(`  Extracted amount name: "${amountName}"`);
-        } else {
-          // Fallback to old method if no underscore found
-          const parts = cleanedLabel.split('_');
+          // For checkbox amount options, just use the full label directly
+          calculation.terms = [{
+            operator: "",
+            questionNameId: cleanedLabel
+          }];
           
-          // Get the amount name (last part)
-          if (parts.length > 0) {
-            amountName = parts[parts.length - 1].replace(/_/g, " ").trim();
-            console.log(`  Extracted amount name (fallback): "${amountName}"`);
-          }
+          // Add the calculation to the hidden field
+          hiddenField.calculations.push(calculation);
+          hiddenFields.push(hiddenField);
+          hiddenFieldCounter++;
           
-          // Build the question name from everything except the last part
-          if (parts.length > 1) {
-            questionNameFromLabel = parts.slice(0, -1).join('_');
-            console.log(`  Question name from label (fallback): "${questionNameFromLabel}"`);
+          console.log(`  Created term using direct checkbox format: ${JSON.stringify(calculation.terms)}`);
+          continue; // Skip the rest of the processing
+        }
+        
+        // Check for multi-word amounts like "amount_plus"
+        const questionNameEndPos = cleanedLabel.indexOf("_amount_");
+        if (questionNameEndPos > 0) {
+          // This is likely a multi-word amount (like "amount_plus")
+          questionNameFromLabel = cleanedLabel.substring(0, questionNameEndPos);
+          amountName = "amount_" + cleanedLabel.substring(questionNameEndPos + 8); // Skip "_amount_"
+          console.log(`  Detected multi-word amount. Question: "${questionNameFromLabel}", Amount: "${amountName}"`);
+        }
+        // Handle the simple case with just "amount" at the end
+        else if (cleanedLabel.endsWith("_amount")) {
+          questionNameFromLabel = cleanedLabel.substring(0, cleanedLabel.length - 7); // Remove "_amount"
+          amountName = "amount";
+          console.log(`  Detected simple amount suffix. Question: "${questionNameFromLabel}", Amount: "${amountName}"`);
+        }
+        else {
+          // First, try to extract the question text from the label
+          // The label format is typically: "question_name_question_amount_name"
+          const lastIndex = cleanedLabel.lastIndexOf('_');
+          if (lastIndex > 0) {
+            amountName = cleanedLabel.substring(lastIndex + 1).trim();
+            questionNameFromLabel = cleanedLabel.substring(0, lastIndex).trim();
+            
+            console.log(`  Extracted question name: "${questionNameFromLabel}"`);
+            console.log(`  Extracted amount name: "${amountName}"`);
+          } else {
+            // Fallback to old method if no underscore found
+            const parts = cleanedLabel.split('_');
+            
+            // Get the amount name (last part)
+            if (parts.length > 0) {
+              amountName = parts[parts.length - 1].replace(/_/g, " ").trim();
+              console.log(`  Extracted amount name (fallback): "${amountName}"`);
+            }
+            
+            // Build the question name from everything except the last part
+            if (parts.length > 1) {
+              questionNameFromLabel = parts.slice(0, -1).join('_');
+              console.log(`  Question name from label (fallback): "${questionNameFromLabel}"`);
+            }
           }
         }
       }
@@ -3465,7 +3680,8 @@ window.exportGuiJson = function() {
       if (targetQuestion) {
         console.log(`  Target question found: ${targetQuestion.questionId} (${targetQuestion.text}), type: ${targetQuestion.type}`);
         
-        // Clean up the amount name for consistency
+        // Important: preserve spaces by replacing with underscores
+        // This ensures multi-word amounts like "Amount Plus" become "amount_plus"
         const cleanAmountName = amountName.trim().toLowerCase().replace(/\s+/g, '_');
         
         // Create a properly formatted question name
@@ -3493,9 +3709,20 @@ window.exportGuiJson = function() {
           // Get accurate amount name directly from the question's amounts array
           let actualAmountName = cleanAmountName;
           if (targetQuestion.amounts && targetQuestion.amounts.length > 0) {
-            // Use the first amount from the question
-            actualAmountName = targetQuestion.amounts[0].toLowerCase().replace(/\s+/g, '_');
-            console.log(`  Using actual amount name from question: "${actualAmountName}"`);
+            // Find the exact amount name that matches (case-insensitive)
+            const matchingAmount = targetQuestion.amounts.find(
+              amt => amt.toLowerCase().replace(/\s+/g, '_') === cleanAmountName
+            );
+            
+            if (matchingAmount) {
+              // Use the properly formatted amount with spaces converted to underscores
+              actualAmountName = matchingAmount.toLowerCase().replace(/\s+/g, '_');
+              console.log(`  Using matched amount name from question: "${actualAmountName}"`);
+            } else {
+              // Fallback to the first amount
+              actualAmountName = targetQuestion.amounts[0].toLowerCase().replace(/\s+/g, '_');
+              console.log(`  Using fallback amount name from question: "${actualAmountName}"`);
+            }
           }
           
           calculation.terms = []; // Reset terms array
