@@ -1728,6 +1728,26 @@ function gatherAllAmountLabels() {
             }
           });
         }
+      } else if (qType === "checkbox") {
+        // Find all amount options linked to this checkbox question
+        const cleanQuestionName = (cell.value || "unnamed_question")
+          .replace(/<[^>]+>/g, "")
+          .trim()
+          .replace(/[^\w\s]/gi, "")
+          .replace(/\s+/g, "_")
+          .toLowerCase();
+          
+        // Get all outgoing edges to find options
+        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+        for (const edge of outgoingEdges) {
+          const targetCell = edge.target;
+          if (targetCell && isOptions(targetCell) && isAmountOption(targetCell)) {
+            const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim().toLowerCase().replace(/\s+/g, "_");
+            // Create label in format: "mark_all_that_apply_rent"
+            const optionLabel = cleanQuestionName + "_" + optionText;
+            labels.push(optionLabel);
+          }
+        }
       }
     }
   });
@@ -3080,7 +3100,7 @@ window.exportGuiJson = function() {
         if (calcFinalText.includes(`##${calcName}##`)) {
           calculation.fillValue = calcFinalText;
         } else {
-          calculation.fillValue = `##${calcName}##`;
+          calculation.fillValue = calcFinalText;
         }
         
         // Add the calculation to hidden field
@@ -3167,31 +3187,68 @@ window.exportGuiJson = function() {
             
             // Find the matching question
             let termTargetQuestion = null;
+            let isCheckboxAmount = false;
             
-            // Look for matching question
+            // First, check if this is a checkbox amount option
             for (const section of sections) {
               for (const question of section.questions) {
-                if (question.type !== "numberedDropdown") continue;
-                
-                const questionText = question.text || "";
-                const questionTextLower = questionText.toLowerCase();
-                const questionTextAsId = questionTextLower.replace(/[^\w\s]/gi, "").replace(/\s+/g, "_");
-                
-                const questionNameLower = termQuestionName.toLowerCase();
-                
-                // Try multiple matching strategies
-                const directMatch = questionNameLower === questionTextAsId;
-                const containsMatch = questionNameLower.includes(questionTextAsId) || 
-                                    questionTextAsId.includes(questionNameLower);
-                const simpleTextMatch = questionNameLower.replace(/_/g, " ") === questionTextLower;
-                
-                if (directMatch || containsMatch || simpleTextMatch) {
-                  termTargetQuestion = question;
-                  console.log(`  Term ${i+1} matched question: "${questionText}"`);
-                  break;
+                if (question.type === "checkbox") {
+                  const questionText = question.text || "";
+                  const questionTextLower = questionText.toLowerCase();
+                  const questionTextAsId = questionTextLower.replace(/[^\w\s]/gi, "").replace(/\s+/g, "_");
+                  
+                  // Check if the question name part matches this checkbox question
+                  if (termQuestionName.toLowerCase() === questionTextAsId) {
+                    // Check if this question has an option matching the amount name
+                    if (question.options && Array.isArray(question.options)) {
+                      for (const option of question.options) {
+                        // For object options
+                        if (typeof option === 'object' && option.hasAmount) {
+                          const optionLabel = option.label.toLowerCase().replace(/\s+/g, '_');
+                          if (optionLabel === termAmountName) {
+                            termTargetQuestion = question;
+                            isCheckboxAmount = true;
+                            console.log(`  Term ${i+1} matched checkbox question: "${questionText}" with amount option "${option.label}"`);
+                            break;
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
+                if (termTargetQuestion) break;
               }
               if (termTargetQuestion) break;
+            }
+            
+            // If not a checkbox amount, look for a numbered dropdown question
+            if (!termTargetQuestion) {
+              // Look for matching question
+              for (const section of sections) {
+                for (const question of section.questions) {
+                  if (question.type !== "numberedDropdown") continue;
+                  
+                  const questionText = question.text || "";
+                  const questionTextLower = questionText.toLowerCase();
+                  const questionTextAsId = questionTextLower.replace(/[^\w\s]/gi, "").replace(/\s+/g, "_");
+                  
+                  // Check if the question name part matches this numbered dropdown question
+                  if (termQuestionName.toLowerCase() === questionTextAsId) {
+                    // Check if this question has an option matching the amount name
+                    if (question.amounts && Array.isArray(question.amounts)) {
+                      for (const amount of question.amounts) {
+                        if (amount.toLowerCase() === termAmountName.toLowerCase()) {
+                          termTargetQuestion = question;
+                          console.log(`  Term ${i+1} matched numberedDropdown question: "${questionText}" with amount option "${amount}"`);
+                          break;
+                        }
+                      }
+                    }
+                  }
+                  if (termTargetQuestion) break;
+                }
+                if (termTargetQuestion) break;
+              }
             }
             
             // If we found a matching question
@@ -3224,6 +3281,14 @@ window.exportGuiJson = function() {
                 }
                 
                 console.log(`  Added terms for numberedDropdown: min=${min}, max=${max}`);
+              } else if (termTargetQuestion.type === "checkbox" && isCheckboxAmount) {
+                // For checkbox amount options, use the direct format: questionName_optionName
+                // This preserves the original format from gatherAllAmountLabels
+                calculation.terms.push({
+                  operator: operator,
+                  questionNameId: `${termQuestionName}_${termAmountName}`
+                });
+                console.log(`  Added term for checkbox amount option using original format: ${termQuestionName}_${termAmountName}`);
               } else {
                 // For other question types
                 calculation.terms.push({
@@ -3245,12 +3310,8 @@ window.exportGuiJson = function() {
         
         // Add the calculation to the hidden field
         if (calculation.terms.length > 0) {
-          // Make sure fillValue uses the calculation's title
-          if (calcFinalText.includes(`##${calcName}##`)) {
-            calculation.fillValue = calcFinalText;
-          } else {
-            calculation.fillValue = `##${calcName}##`;
-          }
+          // Make sure fillValue uses the actual final text
+          calculation.fillValue = calcFinalText;
           
           hiddenField.calculations.push(calculation);
           hiddenFields.push(hiddenField);
