@@ -549,7 +549,7 @@ function getFormHTML() {
             const pType2 = questionTypesMap[pqVal2] || "text";
             if (pType2 === "checkbox") {
               logicScriptBuffer += ` (function(){\n`;
-              logicScriptBuffer += `   var cbs=document.querySelectorAll('input[id^="answer'+qId+'_"]');\n`;
+              logicScriptBuffer += `   var cbs=document.querySelectorAll('input[id^="answer${pqVal2}_"]');\n`;
               logicScriptBuffer += `   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
             } else if (pType2 === "dropdown" || pType2 === "radio" || pType2 === "numberedDropdown") {
