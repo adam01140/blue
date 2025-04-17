@@ -2785,47 +2785,46 @@ window.exportGuiJson = function() {
                 if (optionTarget && isEndNode(optionTarget)) {
                   // Add to our list of options that jump to END
                   optionsWithJumpToEnd.push(optionText);
-                  // Debug log for jump to END detection
-                  console.log(`    FOUND: Option "${optionText}" jumps to END for question ${question.questionId}`);
                 }
               }
             }
           }
           
-          // If we found options that jump to END, add them to the jump conditions
+          // If we found options that jump to END, add them to the question's jump conditions
           if (optionsWithJumpToEnd.length > 0) {
+            console.log(`Found ${optionsWithJumpToEnd.length} options that jump to END for question ${question.questionId}`);
+            
+            // Enable jump conditions for this question
+            question.jump = question.jump || {};
             question.jump.enabled = true;
+            question.jump.conditions = question.jump.conditions || [];
             
-            // Process each option that jumps to END
-            optionsWithJumpToEnd.forEach(option => {
-              // For checkbox type, check if we need to create an object-based option
+            // Add each option as a jump condition to "end"
+            for (const optionText of optionsWithJumpToEnd) {
+              // For checkbox questions, we need to find the properly capitalized label
+              let optionLabel = optionText;
               if (questionType === "checkbox") {
-                // Find the matching option object to get the proper casing
                 const matchingOption = question.options.find(opt => 
-                  (typeof opt === 'object' && opt.label.toLowerCase() === option.toLowerCase()) || 
-                  (typeof opt === 'string' && opt.toLowerCase() === option.toLowerCase())
+                  (typeof opt === 'object' && opt.label.toLowerCase() === optionText.toLowerCase())
                 );
-                
-                let optionText = option; // Default to the original text
                 if (matchingOption) {
-                  optionText = typeof matchingOption === 'object' ? matchingOption.label : matchingOption;
+                  optionLabel = matchingOption.label;
                 }
-                
-                // Add jump condition with the proper capitalization
-                question.jump.conditions.push({
-                  option: optionText,
-                  to: "end"
-                });
-              } else {
-                // Make sure to preserve the original case of the option
-                question.jump.conditions.push({
-                  option: option,
-                  to: "end"
-                });
               }
-            });
-            
-            console.log(`Added jump conditions for question ${question.questionId}:`, JSON.stringify(question.jump.conditions));
+              
+              // Check if this jump condition already exists
+              const exists = question.jump.conditions.some(c => 
+                c.option === optionLabel && c.to === "end"
+              );
+              
+              if (!exists) {
+                question.jump.conditions.push({
+                  option: optionLabel,
+                  to: "end"
+                });
+                console.log(`Added jump condition for question ${question.questionId}: "${optionLabel}" -> END`);
+              }
+            }
           }
         }
         
@@ -4539,11 +4538,11 @@ window.exportGuiJson = function() {
   console.log("Performing final pass: Cleaning up unnecessary jump conditions");
 
   // Set of questions that should never have jump conditions
-  const noJumpQuestions = new Set([1, 4]); // Question 1 and Question 4 should never have jumps
+  const noJumpQuestions = new Set([4]); // Question 4 should never have jumps
   
   // Set of questions that should have END jumps (from direct analysis of the flowchart)
   const shouldHaveEndJumps = new Set(); // We'll populate this by checking direct connections to END
-  
+
   // First, identify all questions with direct paths to END
   for (const section of sections) {
     for (const question of section.questions) {
@@ -4736,9 +4735,58 @@ window.exportGuiJson = function() {
       // Determine if this question should have jumps based on our analysis
       const shouldHaveJumps = shouldHaveEndJumps.has(question.questionId);
       
+      // Special handling for question 1 - ensure it has the correct jumps to END
+      // This is the "Check all that apply" checkbox question
+      if (question.questionId === 1) {
+        // Ensure jumps are enabled for checkbox question 1
+        if (!question.jump.enabled) {
+          question.jump.enabled = true;
+          question.jump.conditions = [];
+        }
+        
+        // Get all options from the question's outgoing edges that lead to END
+        const endOptions = [];
+        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+        
+        for (const edge of outgoingEdges) {
+          const targetCell = edge.target;
+          if (!targetCell || !isOptions(targetCell)) continue;
+          
+          const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
+          const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+          
+          for (const optionEdge of optionOutgoingEdges) {
+            if (optionEdge.target && isEndNode(optionEdge.target)) {
+              // Find the correctly capitalized version
+              const matchingOption = question.options.find(opt => 
+                (typeof opt === 'object' && opt.label.toLowerCase() === optionText.toLowerCase())
+              );
+              
+              if (matchingOption) {
+                endOptions.push(matchingOption.label);
+              } else {
+                endOptions.push(optionText);
+              }
+              
+              console.log(`Option "${optionText}" from question 1 leads to END`);
+              break;
+            }
+          }
+        }
+        
+        // Clear existing jump conditions and add the correct ones
+        question.jump.conditions = [];
+        for (const option of endOptions) {
+          question.jump.conditions.push({
+            option: option,
+            to: "end"
+          });
+          console.log(`Added correct jump condition for question 1: "${option}" -> END`);
+        }
+      }
       // Special handling for question 10 - ensure it has the correct jumps to END
       // This is the "Do you receive any of the following?" checkbox question
-      if (question.questionId === 10) {
+      else if (question.questionId === 10) {
         // Ensure jumps are enabled for checkbox question 10
         // This question should have jumps to END for specific options
         if (!question.jump.enabled) {
