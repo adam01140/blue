@@ -25,7 +25,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: none;">
+<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: block;">
     <h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50;">Your Information</h3>
     <div style="display: flex; gap: 15px; margin-bottom: 15px;">
         <div style="flex: 1;">
@@ -39,28 +39,28 @@
     </div>
     <div style="margin-bottom: 15px;">
         <label for="user_email" style="display: block; margin-bottom: 5px; font-weight: bold;">Email Address</label>
-        <input type="email" form="customForm" id="user_email" name="user_email" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        <input type="email" id="user_email" name="user_email" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
     </div>
     <div style="margin-bottom: 15px;">
         <label for="user_phone" style="display: block; margin-bottom: 5px; font-weight: bold;">Phone Number</label>
-        <input type="tel" form="customForm" id="user_phone" name="user_phone" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        <input type="tel" id="user_phone" name="user_phone" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
     </div>
     <div style="margin-bottom: 15px;">
         <label for="user_street" style="display: block; margin-bottom: 5px; font-weight: bold;">Street Address</label>
-        <input type="text" form="customForm" id="user_street" name="user_street" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        <input type="text" id="user_street" name="user_street" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
     </div>
     <div style="display: flex; gap: 15px; margin-bottom: 15px;">
         <div style="flex: 2;">
             <label for="user_city" style="display: block; margin-bottom: 5px; font-weight: bold;">City</label>
-            <input type="text" form="customForm" id="user_city" name="user_city" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            <input type="text" id="user_city" name="user_city" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
         </div>
         <div style="flex: 1;">
             <label for="user_state" style="display: block; margin-bottom: 5px; font-weight: bold;">State</label>
-            <input type="text" form="customForm" id="user_state" name="user_state" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            <input type="text" id="user_state" name="user_state" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
         </div>
         <div style="flex: 1;">
             <label for="user_zip" style="display: block; margin-bottom: 5px; font-weight: bold;">ZIP</label>
-            <input type="text" form="customForm" id="user_zip" name="user_zip" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            <input type="text" id="user_zip" name="user_zip" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
         </div>
     </div>
 </div>
@@ -74,14 +74,7 @@
             <option value="Yes">Yes</option>
             <option value="No">No</option>
           </select><br></div><br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
-<input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
-<input type="hidden" id="user_lastname_hidden" name="user_lastname_hidden">
-<input type="hidden" id="user_email_hidden" name="user_email_hidden">
-<input type="hidden" id="user_phone_hidden" name="user_phone_hidden">
-<input type="hidden" id="user_street_hidden" name="user_street_hidden">
-<input type="hidden" id="user_city_hidden" name="user_city_hidden">
-<input type="hidden" id="user_state_hidden" name="user_state_hidden">
-<input type="hidden" id="user_zip_hidden" name="user_zip_hidden">
+
 </div></form>
 <div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
 </div>
@@ -271,23 +264,7 @@ function navigateSection(sectionNumber){
     }
 }
 
-/*──────────────── helpers ───────────────*/
-function setCurrentDate () {
-    const t = new Date();
-    document.getElementById('current_date').value =
-        t.getFullYear() + '-' +
-        String(t.getMonth() + 1).padStart(2, '0') + '-' +
-        String(t.getDate()).padStart(2, '0');
-}
 
-
-
-
-
-window.onload=function(){
-    setCurrentDate();
-    attachCalculationListeners();
-};
 
 function handleConditionalAlerts(){
     for(var i=0; i<conditionalAlerts.length; i++){
@@ -308,40 +285,52 @@ function handleConditionalAlerts(){
     }
 }
 
+
+
+
+
+
+
+
+
+
+/*──────────────── helpers ───────────────*/
+function setCurrentDate(){
+    const t=new Date();
+    document.getElementById('current_date').value =
+        `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+}
+window.onload=setCurrentDate;
+
 /*──── main submit handler ────*/
-function showThankYouMessage () {
-    editAndDownloadPDF('form').then(() => {
-        document.getElementById('customForm').style.display = 'none';
-        document.getElementById('thankYouMessage').style.display = 'block';
+function showThankYouMessage(){
+    editAndDownloadPDF('form').then(()=>{
+        document.getElementById('customForm').style.display='none';
+        document.getElementById('thankYouMessage').style.display='block';
     });
-    return false;                       // prevent page reload
+    return false;                   // prevent normal submit / page reload
 }
+
 /*──── build FormData with **everything inside the form** ────*/
-async function editAndDownloadPDF (pdfName) {
-    /* this grabs every control that belongs to <form id="customForm">,
-       including those specified with form="customForm" attributes   */
-    const fd = new FormData(document.getElementById('customForm'));
+async function editAndDownloadPDF(pdfName){
+    const fd=new FormData(document.getElementById('customForm'));
 
-    const res  = await fetch('/edit_pdf?pdf=' + pdfName, { method: 'POST', body: fd });
-    const blob = await res.blob();
-    const url  = URL.createObjectURL(blob);
+    const res = await fetch('/edit_pdf?pdf='+pdfName,{ method:'POST', body:fd });
+    const blob= await res.blob();
+    const url = URL.createObjectURL(blob);
 
-    // trigger download
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Edited_' + pdfName + '.pdf';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // download
+    const a=document.createElement('a');
+    a.href=url; a.download='Edited_'+pdfName+'.pdf';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
 
-    // inline preview
-    const frame = document.getElementById('pdfFrame');
-    frame.src = url;
-    frame.style.display = 'block';
-	
-	//showing the pdf or not
-    document.getElementById('pdfPreview').style.display = 'none';
+    // on‑screen preview
+    const f=document.getElementById('pdfFrame');
+    f.src=url; f.style.display='block';
+    document.getElementById('pdfPreview').style.display='block';
 }
+
+
 
 
 /***********************************************
@@ -469,7 +458,7 @@ function runSingleHiddenTextCalculation(calcObj) {
 }
 
 function replacePlaceholderTokens(str){
-    return str.replace(/$$(.*?)$$/g, function(match, expressionInside){
+    return str.replace(/\$\$(.*?)\$\$/g, function(match, expressionInside){
         return evaluatePlaceholderExpression(expressionInside);
     });
 }

@@ -846,17 +846,53 @@ function addCheckboxOption(questionId) {
     optionDiv.className = `option${optionCount}`;
     optionDiv.innerHTML = `
         <label>Option ${optionCount} Text:</label>
-        <input type="text" id="checkboxOptionText${questionId}_${optionCount}" placeholder="Enter option text">
+        <input type="text" id="checkboxOptionText${questionId}_${optionCount}" placeholder="Enter option text"><br><br>
+        <label>Name/ID:</label>
+        <input type="text" id="checkboxOptionName${questionId}_${optionCount}" placeholder="Enter Name/ID"><br><br>
+        <label>Value (optional):</label>
+        <input type="text" id="checkboxOptionValue${questionId}_${optionCount}" placeholder="Enter Value"><br><br>
+        <label>
+            <input type="checkbox" id="checkboxOptionHasAmount${questionId}_${optionCount}" 
+                   onchange="toggleAmountPlaceholder(${questionId}, ${optionCount})">
+            Enable amount field
+        </label>
+        <div id="checkboxOptionAmountDetails${questionId}_${optionCount}" 
+             style="display: none; margin-top: 8px;">
+            <label>Amount Field Name:</label>
+            <input type="text" id="checkboxOptionAmountName${questionId}_${optionCount}"
+                   placeholder="Enter amount field name"><br><br>
+            <label>Amount Placeholder:</label>
+            <input type="text" id="checkboxOptionAmountPlaceholder${questionId}_${optionCount}"
+                   placeholder="Enter amount placeholder"><br>
+        </div>
         <button type="button" onclick="removeCheckboxOption(${questionId}, ${optionCount})">Remove</button>
         <hr>
     `;
     checkboxOptionsDiv.appendChild(optionDiv);
 
-    // Add input listener to update all jump conditions
-    const optionInput = optionDiv.querySelector('input[type="text"]');
-    optionInput.addEventListener('input', () => {
-        updateJumpOptionsForCheckbox(questionId);
-    });
+    // Add input listeners
+    // 1. For jump conditions
+    const optionTextInput = optionDiv.querySelector(`#checkboxOptionText${questionId}_${optionCount}`);
+    if (optionTextInput) {
+        optionTextInput.addEventListener('input', () => {
+            updateJumpOptionsForCheckbox(questionId);
+            // Also update calculation dropdowns if available
+            if (typeof updateAllCalculationDropdowns === 'function') {
+                setTimeout(updateAllCalculationDropdowns, 100);
+            }
+        });
+    }
+    
+    // 2. For amount name changes
+    const amountNameInput = optionDiv.querySelector(`#checkboxOptionAmountName${questionId}_${optionCount}`);
+    if (amountNameInput) {
+        amountNameInput.addEventListener('input', () => {
+            // Update calculation dropdowns if available
+            if (typeof updateAllCalculationDropdowns === 'function') {
+                setTimeout(updateAllCalculationDropdowns, 100);
+            }
+        });
+    }
 
     // Update all existing jump conditions
     updateJumpOptionsForCheckbox(questionId);
@@ -867,6 +903,11 @@ function toggleAmountPlaceholder(questionId, optionNumber) {
     const amountDetails = document.getElementById(`checkboxOptionAmountDetails${questionId}_${optionNumber}`);
     if (amountDetails) {
         amountDetails.style.display = hasAmount ? 'block' : 'none';
+    }
+    
+    // Update all calculation dropdowns to reflect the new amount field
+    if (typeof updateAllCalculationDropdowns === 'function') {
+        setTimeout(updateAllCalculationDropdowns, 100);
     }
 }
 

@@ -36,42 +36,42 @@ function getFormHTML() {
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
     "",
 
-    '<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: block;">',
+    '<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: none;">',
     '    <h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50;">Your Information</h3>',
     '    <div style="display: flex; gap: 15px; margin-bottom: 15px;">',
     '        <div style="flex: 1;">',
     '            <label for="user_firstname" style="display: block; margin-bottom: 5px; font-weight: bold;">First Name</label>',
-    '            <input type="text" id="user_firstname" name="user_firstname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '            <input type="text" form="customForm" id="user_firstname" name="user_firstname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
     '        </div>',
     '        <div style="flex: 1;">',
     '            <label for="user_lastname" style="display: block; margin-bottom: 5px; font-weight: bold;">Last Name</label>',
-    '            <input type="text" id="user_lastname" name="user_lastname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '            <input type="text" form="customForm" id="user_lastname" name="user_lastname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
     '        </div>',
     '    </div>',
     '    <div style="margin-bottom: 15px;">',
     '        <label for="user_email" style="display: block; margin-bottom: 5px; font-weight: bold;">Email Address</label>',
-    '        <input type="email" id="user_email" name="user_email" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '        <input type="email" form="customForm" id="user_email" name="user_email" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
     '    </div>',
     '    <div style="margin-bottom: 15px;">',
     '        <label for="user_phone" style="display: block; margin-bottom: 5px; font-weight: bold;">Phone Number</label>',
-    '        <input type="tel" id="user_phone" name="user_phone" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '        <input type="tel" form="customForm" id="user_phone" name="user_phone" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
     '    </div>',
     '    <div style="margin-bottom: 15px;">',
     '        <label for="user_street" style="display: block; margin-bottom: 5px; font-weight: bold;">Street Address</label>',
-    '        <input type="text" id="user_street" name="user_street" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '        <input type="text" form="customForm" id="user_street" name="user_street" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
     '    </div>',
     '    <div style="display: flex; gap: 15px; margin-bottom: 15px;">',
     '        <div style="flex: 2;">',
     '            <label for="user_city" style="display: block; margin-bottom: 5px; font-weight: bold;">City</label>',
-    '            <input type="text" id="user_city" name="user_city" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '            <input type="text" form="customForm" id="user_city" name="user_city" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
     '        </div>',
     '        <div style="flex: 1;">',
     '            <label for="user_state" style="display: block; margin-bottom: 5px; font-weight: bold;">State</label>',
-    '            <input type="text" id="user_state" name="user_state" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '            <input type="text" form="customForm" id="user_state" name="user_state" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
     '        </div>',
     '        <div style="flex: 1;">',
     '            <label for="user_zip" style="display: block; margin-bottom: 5px; font-weight: bold;">ZIP</label>',
-    '            <input type="text" id="user_zip" name="user_zip" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
+    '            <input type="text" form="customForm" id="user_zip" name="user_zip" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">',
     '        </div>',
     '    </div>',
     '</div>',
@@ -810,14 +810,19 @@ function navigateSection(sectionNumber){
     }
 }
 
-function setCurrentDate(){
-    var today = new Date();
-    var dd= String(today.getDate()).padStart(2,"0");
-    var mm= String(today.getMonth()+1).padStart(2,"0");
-    var yyyy= today.getFullYear();
-    var val= yyyy+"-"+mm+"-"+dd;
-    document.getElementById("current_date").value= val;
+/*──────────────── helpers ───────────────*/
+function setCurrentDate () {
+    const t = new Date();
+    document.getElementById('current_date').value =
+        t.getFullYear() + '-' +
+        String(t.getMonth() + 1).padStart(2, '0') + '-' +
+        String(t.getDate()).padStart(2, '0');
 }
+
+
+
+
+
 window.onload=function(){
     setCurrentDate();
     attachCalculationListeners();
@@ -842,73 +847,40 @@ function handleConditionalAlerts(){
     }
 }
 
-function showThankYouMessage(){
-    // Copy user's name to hidden field before submitting
-    document.getElementById('user_firstname_hidden').value = document.getElementById('user_firstname').value;
-    document.getElementById('user_lastname_hidden').value = document.getElementById('user_lastname').value;
-    document.getElementById('user_email_hidden').value = document.getElementById('user_email').value;
-    document.getElementById('user_phone_hidden').value = document.getElementById('user_phone').value;
-    document.getElementById('user_street_hidden').value = document.getElementById('user_street').value;
-    document.getElementById('user_city_hidden').value = document.getElementById('user_city').value;
-    document.getElementById('user_state_hidden').value = document.getElementById('user_state').value;
-    document.getElementById('user_zip_hidden').value = document.getElementById('user_zip').value;
-    
-    // run final hidden calculations
-    runAllHiddenCheckboxCalculations();
-    runAllHiddenTextCalculations();
-
-    // PDF name
-    var pdfName = "${escapedPdfFormName}".replace(".pdf","");
-    editAndDownloadPDF(pdfName).then(function(){
-        // handle conditional PDFs
-        for(var i=0; i<conditionalPDFs.length; i++){
-            var pdfObj= conditionalPDFs[i];
-            if(pdfObj.questionType==="checkbox"){
-                var cbox= document.getElementById(pdfObj.questionNameId);
-                if(cbox && cbox.checked && cbox.value=== pdfObj.conditionalAnswer){
-                    editAndDownloadPDF(pdfObj.pdfName.replace(".pdf",""));
-                }
-            } else {
-                var valEl= document.getElementById(pdfObj.questionNameId);
-                var val2= valEl ? valEl.value : "";
-                if(val2 === pdfObj.conditionalAnswer){
-                    editAndDownloadPDF(pdfObj.pdfName.replace(".pdf",""));
-                }
-            }
-        }
-        handleConditionalAlerts();
-        document.getElementById("customForm").style.display="none";
-        document.getElementById("thankYouMessage").style.display="block";
+/*──── main submit handler ────*/
+function showThankYouMessage () {
+    editAndDownloadPDF('form').then(() => {
+        document.getElementById('customForm').style.display = 'none';
+        document.getElementById('thankYouMessage').style.display = 'block';
     });
-    return false;
+    return false;                       // prevent page reload
+}
+/*──── build FormData with **everything inside the form** ────*/
+async function editAndDownloadPDF (pdfName) {
+    /* this grabs every control that belongs to <form id="customForm">,
+       including those specified with form="customForm" attributes   */
+    const fd = new FormData(document.getElementById('customForm'));
+
+    const res  = await fetch('/edit_pdf?pdf=' + pdfName, { method: 'POST', body: fd });
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+
+    // trigger download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Edited_' + pdfName + '.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    // inline preview
+    const frame = document.getElementById('pdfFrame');
+    frame.src = url;
+    frame.style.display = 'block';
+    //for showing the pdf preview
+    document.getElementById('pdfPreview').style.display = 'none';
 }
 
-function downloadPDF(url, filename){
-    var link= document.createElement("a");
-    link.href= url;
-    link.download= filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-async function editAndDownloadPDF(pdfName){
-    var formData= new FormData();
-    var inputs= document.querySelectorAll("#questions input, #questions select, #questions textarea");
-    for(var i=0; i<inputs.length; i++){
-        var inp= inputs[i];
-        if(inp.type==="checkbox"){
-            formData.append(inp.name, inp.checked?"Yes":"No");
-        } else {
-            formData.append(inp.name, inp.value);
-        }
-    }
-    return fetch("/edit_pdf?pdf="+pdfName, {method:"POST", body:formData})
-        .then(function(res){ return res.blob(); })
-        .then(function(blob){
-            var url= URL.createObjectURL(blob);
-            downloadPDF(url, "Edited_"+pdfName+".pdf");
-        });
-}
 
 /***********************************************
  * Hidden Checkbox Calculations
@@ -1035,7 +1007,7 @@ function runSingleHiddenTextCalculation(calcObj) {
 }
 
 function replacePlaceholderTokens(str){
-    return str.replace(/\\$\\$(.*?)\\$\\$/g, function(match, expressionInside){
+    return str.replace(/\$\$(.*?)\$\$/g, function(match, expressionInside){
         return evaluatePlaceholderExpression(expressionInside);
     });
 }
