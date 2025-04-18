@@ -351,8 +351,6 @@ function getFormHTML() {
           if (!rawNameId) {
             const sanitized = labelText.replace(/\W+/g, "_").toLowerCase();
             rawNameId = forcedPrefix + sanitized;
-          } else if (!rawNameId.startsWith(forcedPrefix)) {
-            rawNameId = forcedPrefix + rawNameId;
           }
           cboxOptions.push({
             labelText: labelText,
