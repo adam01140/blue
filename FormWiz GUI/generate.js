@@ -726,59 +726,49 @@ function showTextboxLabels(questionId, count){
     attachCalculationListeners(); // in case those new fields also matter
 }
 
-function handleNext(currentSection){
-    // run hidden calculations first, so if we jump, they remain up-to-date
+function handleNext(currentSection) {
+  
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
 
-    var nextSection = currentSection + 1;
-    var relevantJumps = [];
-    for(var i=0; i<jumpLogics.length; i++){
-        if(jumpLogics[i].section === currentSection){
-            relevantJumps.push(jumpLogics[i]);
-        }
-    }
-    for(var j=0; j<relevantJumps.length; j++){
-        var jl = relevantJumps[j];
-        var qId = jl.questionId;
-        var qType = jl.questionType;
-        var jOpt = jl.jumpOption;
-        var jTo  = jl.jumpTo;
-        var nmId = questionNameIds[qId] || ("answer"+qId);
+    let nextSection = currentSection + 1;
 
-        if(qType==="radio" || qType==="dropdown" || qType==="numberedDropdown"){
-            var el= document.getElementById(nmId);
-            if(el && el.value.trim().toLowerCase() === jOpt.trim().toLowerCase()){
-                nextSection = jTo.toLowerCase();
+    // ── evaluate jump rules ──
+    const relevantJumps = jumpLogics.filter(jl => jl.section === currentSection);
+    for (const jl of relevantJumps) {
+        const nmId = questionNameIds[jl.questionId] || ('answer' + jl.questionId);
+
+        if (jl.questionType === 'radio' || jl.questionType === 'dropdown' || jl.questionType === 'numberedDropdown') {
+            const el = document.getElementById(nmId);
+            if (el && el.value.trim().toLowerCase() === jl.jumpOption.trim().toLowerCase()) {
+                nextSection = jl.jumpTo.toLowerCase();
                 break;
             }
-        } else if(qType==="checkbox"){
-            var cbs= document.querySelectorAll('input[id^="answer'+qId+'_"]');
-            if(cbs && cbs.length){
-                var chosen=[];
-                for(var c=0;c<cbs.length;c++){
-                    if(cbs[c].checked){
-                        chosen.push(cbs[c].value.trim().toLowerCase());
-                    }
-                }
-                if(chosen.indexOf(jOpt.trim().toLowerCase())!==-1){
-                    nextSection = jTo.toLowerCase();
-                    break;
-                }
+        } else if (jl.questionType === 'checkbox') {
+            const cbs = document.querySelectorAll('input[id^="answer' + jl.questionId + '_"]');
+            const chosen = Array.from(cbs).filter(cb => cb.checked).map(cb => cb.value.trim().toLowerCase());
+            if (chosen.includes(jl.jumpOption.trim().toLowerCase())) {
+                nextSection = jl.jumpTo.toLowerCase();
+                break;
             }
         }
     }
 
-    // Handle 'end' as a special string
-    if(nextSection === 'end') {
-        navigateSection('end');
-    } else {
-        nextSection = parseInt(nextSection, 10);
-        if(isNaN(nextSection)) nextSection = currentSection + 1;
-        navigateSection(nextSection);
+    /* ---------- NEW PART ---------- */
+    if (nextSection === 'end') {
+        /* generate the PDF first, then show the Thank‑you screen */
+        editAndDownloadPDF('form').then(() => {
+            navigateSection('end');
+        });
+        return;                 // stop; we've already handled navigation
     }
-    
-    // re-run if needed
+    /* ---------- END NEW PART ------ */
+
+    nextSection = parseInt(nextSection, 10);
+    if (isNaN(nextSection)) nextSection = currentSection + 1;
+    navigateSection(nextSection);
+
+    // update any calculated fields again
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
 }
