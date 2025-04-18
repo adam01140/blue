@@ -14,7 +14,7 @@ dotenv.config();
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(fileUpload());          // parses multipart/form‑data
+app.use(fileUpload());          // parses multipart/form‑data (fields ➜ req.body, files ➜ req.files)
 app.use(cors());
 
 // ────────────────────────────────────────────────────────────
@@ -39,6 +39,15 @@ app.get('/', (_, res) => {
   res.send('Welcome to the PDF Editing Server');
 });
 
+/* ————— helper ————— */
+function shouldCheck(v) {
+  // treat ANY present, non‑false value as “checked”
+  if (v === undefined)               return false;
+  if (Array.isArray(v))              return v.length > 0;
+  const s = String(v).trim().toLowerCase();
+  return s !== '' && s !== 'false' && s !== 'off' && s !== 'no';
+}
+
 /**
  * POST /edit_pdf
  * Accepts ▸ a file upload named “pdf”, **or** ▸ a query string ?pdf=fileName
@@ -48,21 +57,19 @@ app.post('/edit_pdf', async (req, res) => {
   let pdfBytes;
   let outputName = 'Edited_document.pdf';
 
-  // 1️⃣  First choice: an uploaded file (what the browser is already sending)
+  // 1️⃣  First choice: an uploaded file
   if (req.files && req.files.pdf) {
     pdfBytes   = req.files.pdf.data;
     outputName = `Edited_${req.files.pdf.name}`;
     console.log(`Using uploaded PDF: ${req.files.pdf.name}`);
   } else {
-    // 2️⃣  Fallback: look for ?pdf=fileName and load it from /public
+    // 2️⃣  Fallback: ?pdf=fileName
     const pdfName = req.query.pdf;
     if (!pdfName) {
       return res.status(400).send('No PDF provided (upload a file or pass ?pdf=filename).');
     }
-
     const sanitized = path.basename(pdfName) + '.pdf';
     const pdfPath   = path.join(__dirname, 'public', sanitized);
-
     if (!fs.existsSync(pdfPath)) {
       return res.status(400).send('Requested PDF does not exist on the server.');
     }
@@ -80,16 +87,18 @@ app.post('/edit_pdf', async (req, res) => {
     const key   = field.getName();
     const value = req.body[key];
 
-    if (value === undefined) return;               // nothing sent for this field
+    if (value === undefined) return;            // nothing sent for this field
 
     switch (field.constructor.name) {
       case 'PDFCheckBox':
-        (value === 'Yes' || value === 'true' || value === true) ? field.check() : field.uncheck();
+        shouldCheck(value) ? field.check() : field.uncheck();
         break;
+
       case 'PDFRadioGroup':
       case 'PDFDropdown':
         field.select(String(value));
         break;
+
       case 'PDFTextField':
       default:
         field.setText(String(value));
