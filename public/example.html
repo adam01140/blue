@@ -720,40 +720,42 @@ function dropdownMirror(selectEl, baseName){
     const wrap = document.getElementById('dropdowntext_'+baseName);
     if(!wrap) return;
 
-    // Clear previous content
-    wrap.innerHTML = '';
-
     const val = selectEl.value.trim();
-    if(!val) return; // User re-selected the blank option
+    if(!val) {
+        // Only clear the checkbox if the user selects a blank option
+        wrap.innerHTML = '';
+        return;
+    }
 
-    // Create the text field (always has the same ID regardless of selection)
+    // Handle the hidden text field
     const textId = baseName + '_dropdown';
     const textField = document.getElementById(textId);
     
     if(textField) {
-        // If the text field already exists, just update its value and display
-        textField.style.display = 'block';
+        // If the field exists (which it should), update its value but keep it hidden
         textField.value = val;
-        wrap.appendChild(textField);
-    } else {
-        // Otherwise create a new text field
-        const textHtml = '<input type="text" id="' + textId + '" name="' + textId + 
-                         '" value="' + val + '" readonly style="margin-top:6px;width:200px;text-align:center;">';
-        wrap.innerHTML += textHtml;
+        textField.style.display = 'none'; // Keep it hidden
     }
 
+    // Now handle the checkbox part - first remove any existing checkbox
+    // This preserves the text field but removes any previous checkbox
+    const existingCheckboxes = wrap.querySelectorAll('div');
+    existingCheckboxes.forEach(div => div.remove());
+
     // Create the ID for the checkbox based on the selected value
-    const idSuffix = val.replace(/W+/g, '_').toLowerCase(); // Example: "Yes" → "yes"
+    const idSuffix = val.replace(/W+/g, '_').toLowerCase(); // Fixed regex: W+
     const checkboxId = baseName + '_' + idSuffix + '_checkbox';
     
-    // Create the checkbox HTML - checked by default
-    const checkboxHtml = '<div style="margin-top:5px;">' +
-                         '<input type="checkbox" id="' + checkboxId + '" name="' + checkboxId + '" checked>' +
-                         '<label for="' + checkboxId + '"> ' + baseName + '_' + idSuffix + '</label>' +
-                         '</div>';
+    // Create the checkbox HTML - checked by default and hidden
+    const checkboxDiv = document.createElement('div');
+    checkboxDiv.style.display = 'none'; // Hide the entire checkbox div
+    checkboxDiv.innerHTML = '<input type="checkbox" id="' + checkboxId + 
+                     '" name="' + checkboxId + '" checked>' +
+                     '<label for="' + checkboxId + '"> ' + 
+                     baseName + '_' + idSuffix + '</label>';
     
     // Add the checkbox to the wrapper
-    wrap.innerHTML += checkboxHtml;
+    wrap.appendChild(checkboxDiv);
 }
 
 

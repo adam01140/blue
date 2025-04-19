@@ -1272,9 +1272,9 @@ function dropdownMirror(selectEl, baseName){
     const textField = document.getElementById(textId);
     
     if(textField) {
-        // If the field exists (which it should), update its value and make it visible
+        // If the field exists (which it should), update its value but keep it hidden
         textField.value = val;
-        textField.style.display = 'block';
+        textField.style.display = 'none'; // Keep it hidden
     }
 
     // Now handle the checkbox part - first remove any existing checkbox
@@ -1286,9 +1286,9 @@ function dropdownMirror(selectEl, baseName){
     const idSuffix = val.replace(/\W+/g, '_').toLowerCase(); // Fixed regex: \W+
     const checkboxId = baseName + '_' + idSuffix + '_checkbox';
     
-    // Create the checkbox HTML - checked by default
+    // Create the checkbox HTML - checked by default and hidden
     const checkboxDiv = document.createElement('div');
-    checkboxDiv.style.marginTop = '5px';
+    checkboxDiv.style.display = 'none'; // Hide the entire checkbox div
     checkboxDiv.innerHTML = '<input type="checkbox" id="' + checkboxId + 
                      '" name="' + checkboxId + '" checked>' +
                      '<label for="' + checkboxId + '"> ' + 
