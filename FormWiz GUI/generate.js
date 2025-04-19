@@ -1255,26 +1255,47 @@ function attachCalculationListeners() {
 
 
 
-/*──────── mirror a dropdown → textbox ────────*/
+/*──────── mirror a dropdown → textbox and checkbox ────────*/
 function dropdownMirror(selectEl, baseName){
     const wrap = document.getElementById('dropdowntext_'+baseName);
     if(!wrap) return;
 
     const val = selectEl.value.trim();
-    if(!val){ wrap.innerHTML = ''; return; }
+    if(!val) {
+        // Only clear the checkbox if the user selects a blank option
+        wrap.innerHTML = '';
+        return;
+    }
 
+    // Handle the hidden text field
+    const textId = baseName + '_dropdown';
+    const textField = document.getElementById(textId);
+    
+    if(textField) {
+        // If the field exists (which it should), update its value and make it visible
+        textField.value = val;
+        textField.style.display = 'block';
+    }
 
-   /* new: always  "dropdownName_dropdown"  */
-   const fullId = baseName + '_dropdown';
-   
-   const txt = document.getElementById(fullId);
- txt.style.display = 'block';
- wrap.appendChild(txt);   // move it into the wrapper (optional)
- txt.value = val;
+    // Now handle the checkbox part - first remove any existing checkbox
+    // This preserves the text field but removes any previous checkbox
+    const existingCheckboxes = wrap.querySelectorAll('div');
+    existingCheckboxes.forEach(div => div.remove());
 
-
-
-
+    // Create the ID for the checkbox based on the selected value
+    const idSuffix = val.replace(/\W+/g, '_').toLowerCase(); // Fixed regex: \W+
+    const checkboxId = baseName + '_' + idSuffix + '_checkbox';
+    
+    // Create the checkbox HTML - checked by default
+    const checkboxDiv = document.createElement('div');
+    checkboxDiv.style.marginTop = '5px';
+    checkboxDiv.innerHTML = '<input type="checkbox" id="' + checkboxId + 
+                     '" name="' + checkboxId + '" checked>' +
+                     '<label for="' + checkboxId + '"> ' + 
+                     baseName + '_' + idSuffix + '</label>';
+    
+    // Add the checkbox to the wrapper
+    wrap.appendChild(checkboxDiv);
 }
 
 

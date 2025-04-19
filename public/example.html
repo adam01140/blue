@@ -715,26 +715,45 @@ function attachCalculationListeners() {
 
 
 
-/*──────── mirror a dropdown → textbox ────────*/
+/*──────── mirror a dropdown → textbox and checkbox ────────*/
 function dropdownMirror(selectEl, baseName){
     const wrap = document.getElementById('dropdowntext_'+baseName);
     if(!wrap) return;
 
+    // Clear previous content
+    wrap.innerHTML = '';
+
     const val = selectEl.value.trim();
-    if(!val){ wrap.innerHTML = ''; return; }
+    if(!val) return; // User re-selected the blank option
 
+    // Create the text field (always has the same ID regardless of selection)
+    const textId = baseName + '_dropdown';
+    const textField = document.getElementById(textId);
+    
+    if(textField) {
+        // If the text field already exists, just update its value and display
+        textField.style.display = 'block';
+        textField.value = val;
+        wrap.appendChild(textField);
+    } else {
+        // Otherwise create a new text field
+        const textHtml = '<input type="text" id="' + textId + '" name="' + textId + 
+                         '" value="' + val + '" readonly style="margin-top:6px;width:200px;text-align:center;">';
+        wrap.innerHTML += textHtml;
+    }
 
-   /* new: always  "dropdownName_dropdown"  */
-   const fullId = baseName + '_dropdown';
-   
-   const txt = document.getElementById(fullId);
- txt.style.display = 'block';
- wrap.appendChild(txt);   // move it into the wrapper (optional)
- txt.value = val;
-
-
-
-
+    // Create the ID for the checkbox based on the selected value
+    const idSuffix = val.replace(/W+/g, '_').toLowerCase(); // Example: "Yes" → "yes"
+    const checkboxId = baseName + '_' + idSuffix + '_checkbox';
+    
+    // Create the checkbox HTML - checked by default
+    const checkboxHtml = '<div style="margin-top:5px;">' +
+                         '<input type="checkbox" id="' + checkboxId + '" name="' + checkboxId + '" checked>' +
+                         '<label for="' + checkboxId + '"> ' + baseName + '_' + idSuffix + '</label>' +
+                         '</div>';
+    
+    // Add the checkbox to the wrapper
+    wrap.innerHTML += checkboxHtml;
 }
 
 
