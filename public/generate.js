@@ -276,7 +276,11 @@ function getFormHTML() {
         }
 
         // 2) The <select> itself
-        formHTML += `<select id="${ddNm}" name="${ddNm}">
+       
+formHTML += `<select id="${ddNm}" name="${ddNm}"
+                    onchange="dropdownMirror(this, '${ddNm}')">`;
+
+
                        <option value="" disabled selected>Select an option</option>`;
         const ddOps = qBlock.querySelectorAll(
           `#dropdownOptions${questionId} input`
@@ -287,7 +291,8 @@ function getFormHTML() {
             formHTML += `<option value="${val}">${val}</option>`;
           }
         }
-        formHTML += `</select><br>`;
+         formHTML += `</select><br>
+              <div id="dropdowntext_${ddNm}"></div>`;
 
         // handle PDF logic
         if (pdfEnabled) {
@@ -1277,6 +1282,41 @@ function attachCalculationListeners() {
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
 }
+
+
+
+
+
+
+
+
+/*──────────────── mirror a dropdown → textbox ───────────────*/
+function dropdownMirror(selectEl, baseName){
+    const wrap = document.getElementById('dropdowntext_'+baseName);
+    if(!wrap) return;
+
+    // erase previous box (if any)
+    wrap.innerHTML = '';
+
+    const val = selectEl.value.trim();
+    if(!val) return;                      // user re‑selected the blank option
+
+    const idSuffix = val.replace(/\W+/g,'_').toLowerCase(); // "Yes" → "yes"
+    const fullId   = baseName + '_' + idSuffix;
+
+    // readonly textbox that carries the chosen text
+    wrap.innerHTML =
+        `<input type="text"
+                id="${fullId}"
+                name="${fullId}"
+                value="${val}"
+                readonly
+                style="margin-top:6px;width:200px;text-align:center;">`;
+}
+
+
+
+
 </script>
 </body>
 </html>

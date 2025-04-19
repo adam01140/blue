@@ -68,21 +68,12 @@
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h2>Enter Name</h2><div id="question-container-1"><label><h3>Do you have any of these?</h3></label><div><center><div id="checkmark">
-            <span class="checkbox-inline">
-              <label class="checkbox-label">
-                <input type="checkbox" id="do_you_have_any_of_these_no" name="do_you_have_any_of_these_no" value="No"
-                       >
-                No
-              </label>
-            </span>
-            <span class="checkbox-inline">
-              <label class="checkbox-label">
-                <input type="checkbox" id="do_you_have_any_of_these_yes" name="do_you_have_any_of_these_yes" value="Yes"
-                       >
-                Yes
-              </label>
-            </span></div><br></div></div><br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
+        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h2>Enter Name</h2><div id="question-container-1"><label><h3>Do you have any of these?</h3></label><select id="do_you_have_any_of_these" name="do_you_have_any_of_these"
+                      onchange="dropdownMirror(this, 'do_you_have_any_of_these')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_any_of_these"></div>
+              <input type="text" id="do_you_have_any_of_these_dropdown" name="do_you_have_any_of_these_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden" name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden" name="user_email_hidden">
@@ -140,7 +131,7 @@
            window.location.href="account.html";
         }
     });
-  var questionNameIds = {"1":"answer1"};
+  var questionNameIds = {"1":"do_you_have_any_of_these"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var conditionalAlerts = [];
@@ -599,6 +590,9 @@ function getMoneyValue(qId) {
     return 0;
 }
 
+
+
+
 function attachCalculationListeners() {
     // Universal function to attach listeners in a consistent way
     function attachListenersToCalculationTerms(calculations, runCalculationFunction) {
@@ -709,6 +703,41 @@ function attachCalculationListeners() {
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+/*──────── mirror a dropdown → textbox ────────*/
+function dropdownMirror(selectEl, baseName){
+    const wrap = document.getElementById('dropdowntext_'+baseName);
+    if(!wrap) return;
+
+    const val = selectEl.value.trim();
+    if(!val){ wrap.innerHTML = ''; return; }
+
+
+   /* new: always  "dropdownName_dropdown"  */
+   const fullId = baseName + '_dropdown';
+   
+   const txt = document.getElementById(fullId);
+ txt.style.display = 'block';
+ wrap.appendChild(txt);   // move it into the wrapper (optional)
+ txt.value = val;
+
+
+
+
+}
+
+
 </script>
 </body>
 </html>

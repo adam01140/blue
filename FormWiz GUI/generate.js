@@ -276,7 +276,8 @@ function getFormHTML() {
         }
 
         // 2) The <select> itself
-        formHTML += `<select id="${ddNm}" name="${ddNm}">
+        formHTML += `<select id="${ddNm}" name="${ddNm}"
+                      onchange="dropdownMirror(this, '${ddNm}')">
                        <option value="" disabled selected>Select an option</option>`;
         const ddOps = qBlock.querySelectorAll(
           `#dropdownOptions${questionId} input`
@@ -287,8 +288,10 @@ function getFormHTML() {
             formHTML += `<option value="${val}">${val}</option>`;
           }
         }
-        formHTML += `</select><br>`;
-
+        formHTML += `</select><br>
+              <div id="dropdowntext_${ddNm}"></div>
+              <input type="text" id="${ddNm}_dropdown" name="${ddNm}_dropdown"
+                   readonly style="display:none;">`;
         // handle PDF logic
         if (pdfEnabled) {
           conditionalPDFs.push({
@@ -1127,6 +1130,9 @@ function getMoneyValue(qId) {
     return 0;
 }
 
+
+
+
 function attachCalculationListeners() {
     // Universal function to attach listeners in a consistent way
     function attachListenersToCalculationTerms(calculations, runCalculationFunction) {
@@ -1237,6 +1243,41 @@ function attachCalculationListeners() {
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+/*──────── mirror a dropdown → textbox ────────*/
+function dropdownMirror(selectEl, baseName){
+    const wrap = document.getElementById('dropdowntext_'+baseName);
+    if(!wrap) return;
+
+    const val = selectEl.value.trim();
+    if(!val){ wrap.innerHTML = ''; return; }
+
+
+   /* new: always  "dropdownName_dropdown"  */
+   const fullId = baseName + '_dropdown';
+   
+   const txt = document.getElementById(fullId);
+ txt.style.display = 'block';
+ wrap.appendChild(txt);   // move it into the wrapper (optional)
+ txt.value = val;
+
+
+
+
+}
+
+
 </script>
 </body>
 </html>
