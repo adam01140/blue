@@ -68,8 +68,33 @@
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1"><label><h3>How many cars do you have</h3></label><select id="answer1" onchange="showTextboxLabels(1, this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
+        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h2>Enter Name</h2><div id="question-container-1"><label><h3>Check all that apply</h3></label><div><center><div id="checkmark">
+            <span class="checkbox-inline">
+              <label class="checkbox-label">
+                <input type="checkbox" id="check_all_that_apply_no" name="check_all_that_apply_no" value="No"
+                       >
+                No
+              </label>
+            </span>
+            <span class="checkbox-inline">
+              <label class="checkbox-label">
+                <input type="checkbox" id="check_all_that_apply_yes" name="check_all_that_apply_yes" value="Yes"
+                       >
+                Yes
+              </label>
+            </span>
+            <span class="checkbox-inline">
+              <label class="checkbox-label">
+                <input type="checkbox" id="check_all_that_apply_bruh" name="check_all_that_apply_bruh" value="Bruh"
+                       >
+                Bruh
+              </label>
+            </span></div><br></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><h2>Enter section name</h2><div id="question-container-2" class="hidden"><label><h3>Hungry?</h3></label><select id="answer6" name="answer6"
+                      onchange="dropdownMirror(this, 'answer6')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_answer6"></div>
+              <input type="text" id="answer6_dropdown" name="answer6_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(1)">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden" name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden" name="user_email_hidden">
@@ -127,15 +152,44 @@
            window.location.href="account.html";
         }
     });
-  var questionNameIds = {"1":"answer1"};
-var jumpLogics = [];
+  var questionNameIds = {"1":"answer1","2":"answer6"};
+var jumpLogics = [{"questionId":"1","questionType":"checkbox","jumpOption":"No","jumpTo":"end","section":1},{"questionId":"1","questionType":"checkbox","jumpOption":"Yes","jumpTo":"end","section":1}];
 var conditionalPDFs = [];
 var conditionalAlerts = [];
-var labelMap = {"1":[]};
-var amountMap = {"1":["Car Value"]};
+var labelMap = {};
+var amountMap = {};
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
+
+(function(){
+ var thisQ=document.getElementById("question-container-2");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="bruh";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = (questionNameIds[cPrevQNum] && questionNameIds[cPrevQNum].startsWith("answer")) ? questionNameIds[cPrevQNum]+"_" : "answer"+cPrevQNum+"_";
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var checkQuestion = "1";
+   var cbs=document.querySelectorAll('input[id^="answer'+checkQuestion+'_"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
 
 
 function toggleAmountField(amountFieldId, show) {
@@ -172,7 +226,7 @@ function showTextboxLabels(questionId, count){
             var amtTxt = theseAmounts[A] || "Amount";
             var sanitizedAmt = amtTxt.replace(/\s+/g,"_").toLowerCase();
             // Add j to ID
-            var amtId = "do_you_have_any_of_these_" + j + "_" + sanitizedAmt;
+            var amtId = "amount" + questionId + "_" + j + "_" + sanitizedAmt;
             container.innerHTML += '<input type="number" id="' + amtId + '" ' +
                 'name="' + amtId + '" ' +
                 'placeholder="' + amtTxt + ' ' + j + '" ' +
@@ -202,8 +256,17 @@ function handleNext(currentSection) {
                 break;
             }
         } else if (jl.questionType === 'checkbox') {
-            const cbs = document.querySelectorAll('input[id^="answer' + jl.questionId + '_"]');
-            const chosen = Array.from(cbs).filter(cb => cb.checked).map(cb => cb.value.trim().toLowerCase());
+            
+        
+ const prefix = questionNameIds[jl.questionId]   // e.g. "answer1"
+              || ('answer' + jl.questionId);      // fallback
+ const cbs = document.querySelectorAll(
+     'input[id^="' + prefix + '_"], input[id^="check_all_that_apply_"]'
+ );
+ 
+        
+        
+        const chosen = Array.from(cbs).filter(cb => cb.checked).map(cb => cb.value.trim().toLowerCase());
             if (chosen.includes(jl.jumpOption.trim().toLowerCase())) {
                 nextSection = jl.jumpTo.toLowerCase();
                 break;

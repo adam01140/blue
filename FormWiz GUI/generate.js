@@ -716,7 +716,7 @@ function showTextboxLabels(questionId, count){
             var amtTxt = theseAmounts[A] || "Amount";
             var sanitizedAmt = amtTxt.replace(/\\s+/g,"_").toLowerCase();
             // Add j to ID
-            var amtId = "do_you_have_any_of_these_" + j + "_" + sanitizedAmt;
+            var amtId = "amount" + questionId + "_" + j + "_" + sanitizedAmt;
             container.innerHTML += '<input type="number" id="' + amtId + '" ' +
                 'name="' + amtId + '" ' +
                 'placeholder="' + amtTxt + ' ' + j + '" ' +
@@ -746,8 +746,17 @@ function handleNext(currentSection) {
                 break;
             }
         } else if (jl.questionType === 'checkbox') {
-            const cbs = document.querySelectorAll('input[id^="answer' + jl.questionId + '_"]');
-            const chosen = Array.from(cbs).filter(cb => cb.checked).map(cb => cb.value.trim().toLowerCase());
+            
+        
+ const prefix = questionNameIds[jl.questionId]   // e.g. "answer1"
+              || ('answer' + jl.questionId);      // fallback
+ const cbs = document.querySelectorAll(
+     'input[id^="' + prefix + '_"], input[id^="check_all_that_apply_"]'
+ );
+ 
+        
+        
+        const chosen = Array.from(cbs).filter(cb => cb.checked).map(cb => cb.value.trim().toLowerCase());
             if (chosen.includes(jl.jumpOption.trim().toLowerCase())) {
                 nextSection = jl.jumpTo.toLowerCase();
                 break;
