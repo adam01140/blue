@@ -727,6 +727,24 @@ function showTextboxLabels(questionId, count){
     attachCalculationListeners(); // in case those new fields also matter
 }
 
+
+
+function getQuestionInputs (questionId, type = null) {
+  /* 1️⃣ First look inside the question container, if it exists */
+  const container = document.getElementById('question-container-' + questionId);
+  if (container) {
+    return container.querySelectorAll(
+      type ? 'input[type="' + type + '"]' : 'input, select, textarea'
+    );
+  }
+
+  /* 2️⃣ Fallback to the old prefix‑style that your generator sometimes uses */
+  const prefix = 'input[id^="answer' + questionId + '_"]';
+  return document.querySelectorAll(
+    type ? prefix + '[type="' + type + '"]' : prefix + ', select[id^="answer' + questionId + '"]'
+  );
+}
+
 function handleNext(currentSection) {
   
     runAllHiddenCheckboxCalculations();
@@ -746,17 +764,8 @@ function handleNext(currentSection) {
                 break;
             }
         } else if (jl.questionType === 'checkbox') {
-            
-        
- const prefix = questionNameIds[jl.questionId]   // e.g. "answer1"
-              || ('answer' + jl.questionId);      // fallback
- const cbs = document.querySelectorAll(
-     'input[id^="' + prefix + '_"], input[id^="check_all_that_apply_"]'
- );
- 
-        
-        
-        const chosen = Array.from(cbs).filter(cb => cb.checked).map(cb => cb.value.trim().toLowerCase());
+            const cbs = getQuestionInputs(jl.questionId, 'checkbox');
+            const chosen = Array.from(cbs).filter(cb => cb.checked).map(cb => cb.value.trim().toLowerCase());
             if (chosen.includes(jl.jumpOption.trim().toLowerCase())) {
                 nextSection = jl.jumpTo.toLowerCase();
                 break;
