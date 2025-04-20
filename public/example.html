@@ -68,12 +68,8 @@
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h2>Enter Name</h2><div id="question-container-1"><label><h3>Do you have any of these?</h3></label><select id="do_you_have_any_of_these" name="do_you_have_any_of_these"
-                      onchange="dropdownMirror(this, 'do_you_have_any_of_these')">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_do_you_have_any_of_these"></div>
-              <input type="text" id="do_you_have_any_of_these_dropdown" name="do_you_have_any_of_these_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
+        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1"><label><h3>How many cars do you have</h3></label><select id="answer1" onchange="showTextboxLabels(1, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden" name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden" name="user_email_hidden">
@@ -131,12 +127,12 @@
            window.location.href="account.html";
         }
     });
-  var questionNameIds = {"1":"do_you_have_any_of_these"};
+  var questionNameIds = {"1":"answer1"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var conditionalAlerts = [];
-var labelMap = {};
-var amountMap = {};
+var labelMap = {"1":[]};
+var amountMap = {"1":["Car Value"]};
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
@@ -176,7 +172,7 @@ function showTextboxLabels(questionId, count){
             var amtTxt = theseAmounts[A] || "Amount";
             var sanitizedAmt = amtTxt.replace(/\s+/g,"_").toLowerCase();
             // Add j to ID
-            var amtId = "amount" + questionId + "_" + j + "_" + sanitizedAmt;
+            var amtId = "do_you_have_any_of_these_" + j + "_" + sanitizedAmt;
             container.innerHTML += '<input type="number" id="' + amtId + '" ' +
                 'name="' + amtId + '" ' +
                 'placeholder="' + amtTxt + ' ' + j + '" ' +

@@ -716,7 +716,7 @@ function showTextboxLabels(questionId, count){
             var amtTxt = theseAmounts[A] || "Amount";
             var sanitizedAmt = amtTxt.replace(/\\s+/g,"_").toLowerCase();
             // Add j to ID
-            var amtId = "amount" + questionId + "_" + j + "_" + sanitizedAmt;
+            var amtId = "do_you_have_any_of_these_" + j + "_" + sanitizedAmt;
             container.innerHTML += '<input type="number" id="' + amtId + '" ' +
                 'name="' + amtId + '" ' +
                 'placeholder="' + amtTxt + ' ' + j + '" ' +
