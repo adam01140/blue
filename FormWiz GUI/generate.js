@@ -71,48 +71,58 @@ function getFormHTML() {
     '    handleLinkedDropdowns(baseName, val);',
     '}',
     '',
+    // Add a flag to prevent recursive calls
+    'let isHandlingLink = false;',
+    '',
     '// Handle linked dropdown logic',
     'function handleLinkedDropdowns(sourceName, selectedValue) {',
-    '    if (!linkedDropdowns || linkedDropdowns.length === 0) return;',
+    '    if (!linkedDropdowns || linkedDropdowns.length === 0 || isHandlingLink) return;',
     '    ',
-    '    linkedDropdowns.forEach(linkPair => {',
-    '        if (linkPair.sourceNameId === sourceName) {',
-    '            const targetDropdown = document.getElementById(linkPair.targetNameId);',
-    '            if (targetDropdown) {',
-    '                let optionExists = false;',
-    '                for (let i = 0; i < targetDropdown.options.length; i++) {',
-    '                    if (targetDropdown.options[i].value === selectedValue) {',
-    '                        optionExists = true;',
-    '                        targetDropdown.value = selectedValue;',
-    '                        const event = new Event("change");',
-    '                        targetDropdown.dispatchEvent(event);',
-    '                        break;',
+    '    try {',
+    '        isHandlingLink = true;  // Set flag before handling links',
+    '        linkedDropdowns.forEach(linkPair => {',
+    '            if (linkPair.sourceNameId === sourceName) {',
+    '                const targetDropdown = document.getElementById(linkPair.targetNameId);',
+    '                if (targetDropdown && targetDropdown.value !== selectedValue) {  // Only if value is different',
+    '                    let optionExists = false;',
+    '                    for (let i = 0; i < targetDropdown.options.length; i++) {',
+    '                        if (targetDropdown.options[i].value === selectedValue) {',
+    '                            optionExists = true;',
+    '                            targetDropdown.value = selectedValue;',
+    '                            // Trigger change event only if value actually changed',
+    '                            const event = new Event("change");',
+    '                            targetDropdown.dispatchEvent(event);',
+    '                            break;',
+    '                        }',
+    '                    }',
+    '                    if (!optionExists && selectedValue) {',
+    '                        console.warn("Option \'" + selectedValue + "\' does not exist in linked dropdown " + linkPair.targetNameId);',
     '                    }',
     '                }',
-    '                if (!optionExists && selectedValue) {',
-    '                    console.warn("Option \'" + selectedValue + "\' does not exist in linked dropdown " + linkPair.targetNameId);',
-    '                }',
     '            }',
-    '        }',
-    '        else if (linkPair.targetNameId === sourceName) {',
-    '            const sourceDropdown = document.getElementById(linkPair.sourceNameId);',
-    '            if (sourceDropdown) {',
-    '                let optionExists = false;',
-    '                for (let i = 0; i < sourceDropdown.options.length; i++) {',
-    '                    if (sourceDropdown.options[i].value === selectedValue) {',
-    '                        optionExists = true;',
-    '                        sourceDropdown.value = selectedValue;',
-    '                        const event = new Event("change");',
-    '                        sourceDropdown.dispatchEvent(event);',
-    '                        break;',
+    '            else if (linkPair.targetNameId === sourceName) {',
+    '                const sourceDropdown = document.getElementById(linkPair.sourceNameId);',
+    '                if (sourceDropdown && sourceDropdown.value !== selectedValue) {  // Only if value is different',
+    '                    let optionExists = false;',
+    '                    for (let i = 0; i < sourceDropdown.options.length; i++) {',
+    '                        if (sourceDropdown.options[i].value === selectedValue) {',
+    '                            optionExists = true;',
+    '                            sourceDropdown.value = selectedValue;',
+    '                            // Trigger change event only if value actually changed',
+    '                            const event = new Event("change");',
+    '                            sourceDropdown.dispatchEvent(event);',
+    '                            break;',
+    '                        }',
+    '                    }',
+    '                    if (!optionExists && selectedValue) {',
+    '                        console.warn("Option \'" + selectedValue + "\' does not exist in linked dropdown " + linkPair.sourceNameId);',
     '                    }',
     '                }',
-    '                if (!optionExists && selectedValue) {',
-    '                    console.warn("Option \'" + selectedValue + "\' does not exist in linked dropdown " + linkPair.sourceNameId);',
-    '                }',
     '            }',
-    '        }',
-    '    });',
+    '        });',
+    '    } finally {',
+    '        isHandlingLink = false;  // Always reset flag when done',
+    '    }',
     '}',
     '</script>',
     "",
@@ -849,58 +859,56 @@ function showTextboxLabels(questionId, count){
 
 // Handle linked dropdown logic
 function handleLinkedDropdowns(sourceName, selectedValue) {
-    if (!linkedDropdowns || linkedDropdowns.length === 0) return;
+    if (!linkedDropdowns || linkedDropdowns.length === 0 || isHandlingLink) return;
     
-    // Find any dropdowns that need to be updated
-    linkedDropdowns.forEach(linkPair => {
-        // Check if this is the source dropdown
-        if (linkPair.sourceNameId === sourceName) {
-            // Update the target dropdown
-            const targetDropdown = document.getElementById(linkPair.targetNameId);
-            if (targetDropdown) {
-                // First check if this option exists in the target dropdown
-                let optionExists = false;
-                for (let i = 0; i < targetDropdown.options.length; i++) {
-                    if (targetDropdown.options[i].value === selectedValue) {
-                        optionExists = true;
-                        targetDropdown.value = selectedValue;
-                        // Trigger the change event
-                        const event = new Event('change');
-                        targetDropdown.dispatchEvent(event);
-                        break;
+    try {
+        isHandlingLink = true;  // Set flag before handling links
+        
+        linkedDropdowns.forEach(linkPair => {
+            if (linkPair.sourceNameId === sourceName) {
+                const targetDropdown = document.getElementById(linkPair.targetNameId);
+                if (targetDropdown && targetDropdown.value !== selectedValue) {  // Only if value is different
+                    let optionExists = false;
+                    for (let i = 0; i < targetDropdown.options.length; i++) {
+                        if (targetDropdown.options[i].value === selectedValue) {
+                            optionExists = true;
+                            targetDropdown.value = selectedValue;
+                            // Trigger change event only if value actually changed
+                            const event = new Event('change');
+                            targetDropdown.dispatchEvent(event);
+                            break;
+                        }
                     }
-                }
-                
-                if (!optionExists && selectedValue) {
                     
-                    console.warn("Option '" + selectedValue + "' does not exist in linked dropdown " + linkPair.targetNameId);
-                }
-            }
-        }
-        // Also check if this is the target dropdown (for bidirectional linking)
-        else if (linkPair.targetNameId === sourceName) {
-            // Update the source dropdown
-            const sourceDropdown = document.getElementById(linkPair.sourceNameId);
-            if (sourceDropdown) {
-                // First check if this option exists in the source dropdown
-                let optionExists = false;
-                for (let i = 0; i < sourceDropdown.options.length; i++) {
-                    if (sourceDropdown.options[i].value === selectedValue) {
-                        optionExists = true;
-                        sourceDropdown.value = selectedValue;
-                        // Trigger the change event
-                        const event = new Event('change');
-                        sourceDropdown.dispatchEvent(event);
-                        break;
+                    if (!optionExists && selectedValue) {
+                        console.warn("Option '" + selectedValue + "' does not exist in linked dropdown " + linkPair.targetNameId);
                     }
                 }
-                
-                if (!optionExists && selectedValue) {
-                    console.warn("Option '" + selectedValue + "' does not exist in linked dropdown " + linkPair.targetNameId);
+            }
+            else if (linkPair.targetNameId === sourceName) {
+                const sourceDropdown = document.getElementById(linkPair.sourceNameId);
+                if (sourceDropdown && sourceDropdown.value !== selectedValue) {  // Only if value is different
+                    let optionExists = false;
+                    for (let i = 0; i < sourceDropdown.options.length; i++) {
+                        if (sourceDropdown.options[i].value === selectedValue) {
+                            optionExists = true;
+                            sourceDropdown.value = selectedValue;
+                            // Trigger change event only if value actually changed
+                            const event = new Event('change');
+                            sourceDropdown.dispatchEvent(event);
+                            break;
+                        }
+                    }
+                    
+                    if (!optionExists && selectedValue) {
+                        console.warn("Option '" + selectedValue + "' does not exist in linked dropdown " + linkPair.sourceNameId);
+                    }
                 }
             }
-        }
-    });
+        });
+    } finally {
+        isHandlingLink = false;  // Always reset flag when done
+    }
 }
 
 /*──────── mirror a dropdown → textbox and checkbox ────────*/
