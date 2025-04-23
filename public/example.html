@@ -91,9 +91,9 @@
                    readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(2)">Back</button><button type="button" onclick="handleNext(3)">Next</button></div></div><div id="section4" class="section"><h2>Qualified Assistance</h2><div id="question-container-10" class="hidden"><label><h3>Do you receive any of the following?</h3></label><div><center><div id="checkmark">
             <span class="checkbox-inline">
               <label class="checkbox-label">
-                <input type="checkbox" id="do_you_receive_any_of_the_following_unemployment" name="do_you_receive_any_of_the_following_unemployment" value="Unemployment"
+                <input type="checkbox" id="do_you_receive_any_of_the_following_supp_sec_inc" name="do_you_receive_any_of_the_following_supp_sec_inc" value="Supp Sec Inc"
                        >
-                Unemployment
+                Supp Sec Inc
               </label>
             </span>
             <span class="checkbox-inline">
@@ -108,6 +108,62 @@
                 <input type="checkbox" id="do_you_receive_any_of_the_following_none" name="do_you_receive_any_of_the_following_none" value="None"
                        >
                 None
+              </label>
+            </span>
+            <span class="checkbox-inline">
+              <label class="checkbox-label">
+                <input type="checkbox" id="do_you_receive_any_of_the_following_ssp" name="do_you_receive_any_of_the_following_ssp" value="SSP"
+                       >
+                SSP
+              </label>
+            </span>
+            <span class="checkbox-inline">
+              <label class="checkbox-label">
+                <input type="checkbox" id="do_you_receive_any_of_the_following_medi-cal" name="do_you_receive_any_of_the_following_medi-cal" value="Medi-Cal"
+                       >
+                Medi-Cal
+              </label>
+            </span>
+            <span class="checkbox-inline">
+              <label class="checkbox-label">
+                <input type="checkbox" id="do_you_receive_any_of_the_following_county_relief/gen._assist" name="do_you_receive_any_of_the_following_county_relief/gen._assist" value="County Relief/Gen. Assist"
+                       >
+                County Relief/Gen. Assist
+              </label>
+            </span>
+            <span class="checkbox-inline">
+              <label class="checkbox-label">
+                <input type="checkbox" id="do_you_receive_any_of_the_following_ihhs" name="do_you_receive_any_of_the_following_ihhs" value="IHHS"
+                       >
+                IHHS
+              </label>
+            </span>
+            <span class="checkbox-inline">
+              <label class="checkbox-label">
+                <input type="checkbox" id="do_you_receive_any_of_the_following_calworks_or_tribal_tanf" name="do_you_receive_any_of_the_following_calworks_or_tribal_tanf" value="CalWorks or Tribal TANF"
+                       >
+                CalWorks or Tribal TANF
+              </label>
+            </span>
+            <span class="checkbox-inline">
+              <label class="checkbox-label">
+                <input type="checkbox" id="do_you_receive_any_of_the_following_capi" name="do_you_receive_any_of_the_following_capi" value="CAPI"
+                       >
+                CAPI
+              </label>
+            </span>
+            <span class="checkbox-inline">
+              <label class="checkbox-label">
+                <input type="checkbox" id="do_you_receive_any_of_the_following_winc" name="do_you_receive_any_of_the_following_winc" value="WINC"
+                       >
+                WINC
+              </label>
+            </span>
+            <span class="checkbox-inline">
+              <label class="checkbox-label">
+                <input type="checkbox" id="do_you_receive_any_of_the_following_unemployment" name="do_you_receive_any_of_the_following_unemployment" value="Unemployment"
+                       >
+                Unemployment
               </label>
             </span></div><br></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(3)">Back</button><button type="button" onclick="handleNext(4)">Next</button></div></div><div id="section5" class="section"><h2>Household Income Qualifications</h2><div id="question-container-11" class="hidden"><label><h3>Is your household monthly income less than the amount below?</h3></label><br><img src="income.png" alt="Dropdown Image" width="1000" height="100"><br><select id="is_your_household_monthly_income_less_than_the_amount_below" name="is_your_household_monthly_income_less_than_the_amount_below"
                       onchange="dropdownMirror(this, 'is_your_household_monthly_income_less_than_the_amount_below')">
@@ -296,13 +352,13 @@
         }
     });
   var questionNameIds = {"1":"what_is_your_name","3":"what_is_your_phone_number","4":"are_you_currently_employed","6":"do_you_have_a_lawyer","8":"has_your_lawyer_agreed_to_cover_a_portion_of_your_fees","9":"have_you_filed_a_claim_before","10":"answer10","11":"is_your_household_monthly_income_less_than_the_amount_below","12":"what_would_you_like_the_court_to_do","13":"does_your_income_change_a_lot","14":"answer14","15":"does_anybody_else_live_in_your_home","16":"answer16","17":"does_your_income_change_a_lot_from_month_to_month","18":"answer18","19":"do_you_have_anybody_else_living_in_your_home","20":"answer20","21":"do_you_have_any_cash_savings","22":"how_much_cash_saving_do_you_have","23":"do_you_have_a_bank_account","24":"answer24","25":"do_you_own_any_cars_boats_and_other_vehicles","26":"answer26","27":"do_you_own_any_real_estate","28":"answer28","29":"do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect","30":"answer30","31":"do_you_have_any_payroll_deductions","32":"answer32","33":"answer33","34":"do_you_have_any_installment_payments","35":"answer35","36":"do_you_have_any_wagesearnings_withheld_by_the_court","37":"how_much_is_being_withheld","38":"do_you_have_any_other_monthly_expenses","39":"answer39"};
-var jumpLogics = [{"questionId":"10","questionType":"checkbox","jumpOption":"Unemployment","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"Food stamps","jumpTo":"end","section":4},{"questionId":"15","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":7},{"questionId":"15","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":7},{"questionId":"38","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":16},{"questionId":"38","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":16}];
+var jumpLogics = [{"questionId":"10","questionType":"checkbox","jumpOption":"Supp Sec Inc","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"Food stamps","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"SSP","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"Medi-Cal","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"County Relief/Gen. Assist","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"IHHS","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"CalWorks or Tribal TANF","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"CAPI","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"WINC","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"Unemployment","jumpTo":"end","section":4},{"questionId":"15","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":7},{"questionId":"15","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":7},{"questionId":"38","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":16},{"questionId":"38","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":16}];
 var conditionalPDFs = [];
 var conditionalAlerts = [];
 var labelMap = {"14":["Description"],"16":["Name","Age","Relationship"],"18":["Income Source"],"20":["Name","Age","Relationship"],"24":["Bank Name"],"26":["Make/Year"],"28":["Address"],"30":["Description"],"32":["Description"],"35":["Description"],"39":["Description"]};
 var amountMap = {"14":["Amount"],"16":["Monthly Income"],"18":["Income Value"],"20":["Monthly Income"],"24":["Amount"],"26":["Fair Market Value","Amount Owed"],"28":["Fair Market Value","Amount Owed"],"30":["Fair Market Value","Amount Owed"],"32":["Fair Market Value"],"35":["Amount"],"39":["Amount"]};
 var hiddenCheckboxCalculations = [];
-var hiddenTextCalculations = [{"hiddenFieldName":"10b","calculations":[{"terms":[{"operator":"","questionNameId":"amount24_1_amount"},{"operator":"+","questionNameId":"amount24_2_amount"},{"operator":"+","questionNameId":"amount24_3_amount"},{"operator":"+","questionNameId":"amount24_4_amount"}],"compareOperator":">","threshold":"0","fillValue":"##10b##"}]},{"hiddenFieldName":"alt8b","calculations":[{"terms":[{"operator":"","questionNameId":"amount14_1_amount"},{"operator":"+","questionNameId":"amount14_2_amount"},{"operator":"+","questionNameId":"amount14_3_amount"},{"operator":"+","questionNameId":"amount14_4_amount"}],"compareOperator":">","threshold":"0","fillValue":"##alt8b##"}]},{"hiddenFieldName":"alt9b","calculations":[{"terms":[{"operator":"","questionNameId":"amount16_1_monthly_income"},{"operator":"+","questionNameId":"amount16_2_monthly_income"},{"operator":"+","questionNameId":"amount16_3_monthly_income"},{"operator":"+","questionNameId":"amount16_4_monthly_income"}],"compareOperator":">","threshold":"0","fillValue":"##alt9b##"}]},{"hiddenFieldName":"8b","calculations":[{"terms":[{"operator":"","questionNameId":"amount18_1_income_value"},{"operator":"+","questionNameId":"amount18_2_income_value"},{"operator":"+","questionNameId":"amount18_3_income_value"},{"operator":"+","questionNameId":"amount18_4_income_value"}],"compareOperator":">","threshold":"0","fillValue":"##8b##"}]},{"hiddenFieldName":"9b","calculations":[{"terms":[{"operator":"","questionNameId":"amount20_1_monthly_income"},{"operator":"+","questionNameId":"amount20_2_monthly_income"},{"operator":"+","questionNameId":"amount20_3_monthly_income"},{"operator":"+","questionNameId":"amount20_4_monthly_income"}],"compareOperator":">","threshold":"0","fillValue":"##9b##"}]},{"hiddenFieldName":"10cmarket","calculations":[{"terms":[{"operator":"","questionNameId":"amount26_1_fair_market_value"},{"operator":"+","questionNameId":"amount26_2_fair_market_value"},{"operator":"+","questionNameId":"amount26_3_fair_market_value"},{"operator":"+","questionNameId":"amount26_4_fair_market_value"}],"compareOperator":">","threshold":"0","fillValue":"##10cmarket##"}]},{"hiddenFieldName":"10cdebt","calculations":[{"terms":[{"operator":"","questionNameId":"amount26_1_amount_owed"},{"operator":"+","questionNameId":"amount26_2_amount_owed"},{"operator":"+","questionNameId":"amount26_3_amount_owed"},{"operator":"+","questionNameId":"amount26_4_amount_owed"}],"compareOperator":">","threshold":"0","fillValue":"##10cdebt##"}]},{"hiddenFieldName":"10dmarket","calculations":[{"terms":[{"operator":"","questionNameId":"amount28_1_fair_market_value"},{"operator":"+","questionNameId":"amount28_2_fair_market_value"}],"compareOperator":">","threshold":"0","fillValue":"##10dmarket##"}]},{"hiddenFieldName":"10emarket","calculations":[{"terms":[{"operator":"","questionNameId":"amount30_1_fair_market_value"},{"operator":"+","questionNameId":"amount30_2_fair_market_value"}],"compareOperator":">","threshold":"0","fillValue":"##10emarket##"}]},{"hiddenFieldName":"10ddebt","calculations":[{"terms":[{"operator":"","questionNameId":"amount28_1_amount_owed"},{"operator":"+","questionNameId":"amount28_2_amount_owed"}],"compareOperator":">","threshold":"0","fillValue":"##10ddebtt##"}]},{"hiddenFieldName":"10edebt","calculations":[{"terms":[{"operator":"","questionNameId":"amount30_1_amount_owed"},{"operator":"+","questionNameId":"amount30_2_amount_owed"}],"compareOperator":">","threshold":"0","fillValue":"##10emarket##"}]},{"hiddenFieldName":"11a","calculations":[{"terms":[{"operator":"","questionNameId":"amount32_1_fair_market_value"},{"operator":"+","questionNameId":"amount32_2_fair_market_value"},{"operator":"+","questionNameId":"amount32_3_fair_market_value"},{"operator":"+","questionNameId":"amount32_4_fair_market_value"}],"compareOperator":">","threshold":"0","fillValue":"##11a##"}]},{"hiddenFieldName":"11l","calculations":[{"terms":[{"operator":"","questionNameId":"amount35_1_amount"},{"operator":"+","questionNameId":"amount35_2_amount"},{"operator":"+","questionNameId":"amount35_3_amount"}],"compareOperator":">","threshold":"0","fillValue":"##11l##"}]},{"hiddenFieldName":"11n","calculations":[{"terms":[{"operator":"","questionNameId":"amount39_1_amount"},{"operator":"+","questionNameId":"amount39_2_amount"},{"operator":"+","questionNameId":"amount39_3_amount"}],"compareOperator":">","threshold":"0","fillValue":"##11n##"}]},{"hiddenFieldName":"alt89total","calculations":[{"terms":[{"operator":"","questionNameId":"alt8b"},{"operator":"+","questionNameId":"alt9b"}],"compareOperator":">","threshold":"0","fillValue":"##alt89total##"}]}];
+var hiddenTextCalculations = [{"hiddenFieldName":"10b","calculations":[{"terms":[{"operator":"","questionNameId":"amount24_1_amount"},{"operator":"+","questionNameId":"amount24_2_amount"},{"operator":"+","questionNameId":"amount24_3_amount"},{"operator":"+","questionNameId":"amount24_4_amount"}],"compareOperator":">","threshold":"0","fillValue":"##10b##"}]},{"hiddenFieldName":"alt8b","calculations":[{"terms":[{"operator":"","questionNameId":"amount14_1_amount"},{"operator":"+","questionNameId":"amount14_2_amount"},{"operator":"+","questionNameId":"amount14_3_amount"},{"operator":"+","questionNameId":"amount14_4_amount"}],"compareOperator":">","threshold":"0","fillValue":"##alt8b##"}]},{"hiddenFieldName":"alt9b","calculations":[{"terms":[{"operator":"","questionNameId":"amount16_1_monthly_income"},{"operator":"+","questionNameId":"amount16_2_monthly_income"},{"operator":"+","questionNameId":"amount16_3_monthly_income"},{"operator":"+","questionNameId":"amount16_4_monthly_income"}],"compareOperator":">","threshold":"0","fillValue":"##alt9b##"}]},{"hiddenFieldName":"8b","calculations":[{"terms":[{"operator":"","questionNameId":"amount18_1_income_value"},{"operator":"+","questionNameId":"amount18_2_income_value"},{"operator":"+","questionNameId":"amount18_3_income_value"},{"operator":"+","questionNameId":"amount18_4_income_value"}],"compareOperator":">","threshold":"0","fillValue":"##8b##"}]},{"hiddenFieldName":"9b","calculations":[{"terms":[{"operator":"","questionNameId":"amount20_1_monthly_income"},{"operator":"+","questionNameId":"amount20_2_monthly_income"},{"operator":"+","questionNameId":"amount20_3_monthly_income"},{"operator":"+","questionNameId":"amount20_4_monthly_income"}],"compareOperator":">","threshold":"0","fillValue":"##9b##"}]},{"hiddenFieldName":"10cmarket","calculations":[{"terms":[{"operator":"","questionNameId":"amount26_1_fair_market_value"},{"operator":"+","questionNameId":"amount26_2_fair_market_value"},{"operator":"+","questionNameId":"amount26_3_fair_market_value"},{"operator":"+","questionNameId":"amount26_4_fair_market_value"}],"compareOperator":">","threshold":"0","fillValue":"##10cmarket##"}]},{"hiddenFieldName":"10cdebt","calculations":[{"terms":[{"operator":"","questionNameId":"amount26_1_amount_owed"},{"operator":"+","questionNameId":"amount26_2_amount_owed"},{"operator":"+","questionNameId":"amount26_3_amount_owed"},{"operator":"+","questionNameId":"amount26_4_amount_owed"}],"compareOperator":">","threshold":"0","fillValue":"##10cdebt##"}]},{"hiddenFieldName":"10dmarket","calculations":[{"terms":[{"operator":"","questionNameId":"amount28_1_fair_market_value"},{"operator":"+","questionNameId":"amount28_2_fair_market_value"}],"compareOperator":">","threshold":"0","fillValue":"##10dmarket##"}]},{"hiddenFieldName":"10emarket","calculations":[{"terms":[{"operator":"","questionNameId":"amount30_1_fair_market_value"},{"operator":"+","questionNameId":"amount30_2_fair_market_value"}],"compareOperator":">","threshold":"0","fillValue":"##10emarket##"}]},{"hiddenFieldName":"10ddebt","calculations":[{"terms":[{"operator":"","questionNameId":"amount28_1_amount_owed"},{"operator":"+","questionNameId":"amount28_2_amount_owed"}],"compareOperator":">","threshold":"0","fillValue":"##10ddebtt##"}]},{"hiddenFieldName":"10edebt","calculations":[{"terms":[{"operator":"","questionNameId":"amount30_1_amount_owed"},{"operator":"+","questionNameId":"amount30_2_amount_owed"}],"compareOperator":">","threshold":"0","fillValue":"##10emarket##"}]},{"hiddenFieldName":"11a","calculations":[{"terms":[{"operator":"","questionNameId":"amount32_1_fair_market_value"},{"operator":"+","questionNameId":"amount32_2_fair_market_value"},{"operator":"+","questionNameId":"amount32_3_fair_market_value"},{"operator":"+","questionNameId":"amount32_4_fair_market_value"}],"compareOperator":">","threshold":"0","fillValue":"##11a##"}]},{"hiddenFieldName":"11l","calculations":[{"terms":[{"operator":"","questionNameId":"amount35_1_amount"},{"operator":"+","questionNameId":"amount35_2_amount"},{"operator":"+","questionNameId":"amount35_3_amount"}],"compareOperator":">","threshold":"0","fillValue":"##11l##"}]},{"hiddenFieldName":"11n","calculations":[{"terms":[{"operator":"","questionNameId":"amount39_1_amount"},{"operator":"+","questionNameId":"amount39_2_amount"},{"operator":"+","questionNameId":"amount39_3_amount"}],"compareOperator":">","threshold":"0","fillValue":"##11n##"}]},{"hiddenFieldName":"alt89total","calculations":[{"terms":[{"operator":"","questionNameId":"alt8b"}],"compareOperator":">","threshold":"0","fillValue":"##alt89total##"}]}];
 
 
 (function(){

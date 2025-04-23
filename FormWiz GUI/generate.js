@@ -351,10 +351,13 @@ function getFormHTML() {
               : "Amount";
 
           const forcedPrefix = "answer" + questionId + "_";
-          if (!rawNameId) {
-            const sanitized = labelText.replace(/\W+/g, "_").toLowerCase();
-            rawNameId = forcedPrefix + sanitized;
-          }
+if (!rawNameId) {
+    const sanitized = labelText.replace(/\W+/g, "_").toLowerCase();
+    rawNameId = forcedPrefix + sanitized;
+} else if (!rawNameId.startsWith(forcedPrefix)) {
+    rawNameId = forcedPrefix + rawNameId;   // ← always keep the prefix
+}
+
           cboxOptions.push({
             labelText: labelText,
             optionNameId: rawNameId,
@@ -518,7 +521,9 @@ function getFormHTML() {
             logicScriptBuffer += `    var cPrevAns="${paVal}";\n`;
             logicScriptBuffer += `    var cPrevQNum="${pqVal}";\n`;
             logicScriptBuffer += `    if(cPrevType==="checkbox"){\n`;
-            logicScriptBuffer += `      var cbPrefix = (questionNameIds[cPrevQNum] && questionNameIds[cPrevQNum].startsWith("answer")) ? questionNameIds[cPrevQNum]+"_" : "answer"+cPrevQNum+"_";\n`;
+            logicScriptBuffer += `      var cbPrefix = getCbPrefix(cPrevQNum);\n`;
+			
+
             logicScriptBuffer += `      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');\n`;
             logicScriptBuffer += `      var checkedVals=[];\n`;
             logicScriptBuffer += `      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}\n`;
@@ -554,7 +559,7 @@ function getFormHTML() {
               logicScriptBuffer += ` (function(){\n`;
               // Use explicit question ID value rather than relying on variable scope
               logicScriptBuffer += `   var checkQuestion = "${pqVal2}";\n`;
-              logicScriptBuffer += `   var cbs=document.querySelectorAll('input[id^="answer'+checkQuestion+'_"]');\n`;
+              logicScriptBuffer += `   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');\n`;
               logicScriptBuffer += `   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
             } else if (pType2 === "dropdown" || pType2 === "radio" || pType2 === "numberedDropdown") {
@@ -619,6 +624,16 @@ function getFormHTML() {
 
   // Now we place ONE <script> block for everything:
   formHTML += "\n<script>\n";
+  
+  formHTML += `
+/*───────────────────────────────*
+ * return the true checkbox prefix
+ *───────────────────────────────*/
+function getCbPrefix(qId){
+    return (questionNameIds[qId] ? questionNameIds[qId] : ('answer' + qId)) + '_';
+}
+`;
+
 
   // 1) Firebase config and check
   formHTML += `
@@ -739,7 +754,8 @@ function getQuestionInputs (questionId, type = null) {
   }
 
   /* 2️⃣ Fallback to the old prefix‑style that your generator sometimes uses */
-  const prefix = 'input[id^="answer' + questionId + '_"]';
+  const prefix = 'input[id^="' + getCbPrefix(questionId) + '"]';
+
   return document.querySelectorAll(
     type ? prefix + '[type="' + type + '"]' : prefix + ', select[id^="answer' + questionId + '"]'
   );
@@ -1301,7 +1317,9 @@ function dropdownMirror(selectEl, baseName){
     existingCheckboxes.forEach(div => div.remove());
 
     // Create the ID for the checkbox based on the selected value
-    const idSuffix = val.replace(/\W+/g, '_').toLowerCase(); // Fixed regex: \W+
+    const idSuffix = val.replace(/\\W+/g, '_').toLowerCase();
+
+
     const checkboxId = baseName + '_' + idSuffix + '_checkbox';
     
     // Create the checkbox HTML - checked by default and hidden
