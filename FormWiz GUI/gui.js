@@ -286,6 +286,18 @@ function addQuestion(sectionId, questionId = null) {
         </div>
     </div><br>
 
+        <!-- Linking Logic UI -->
+        <div id="linkingLogicBlock${currentQuestionId}" class="linking-logic-options" style="display:none;">
+            <label>Enable Linking Logic: </label>
+            <input type="checkbox" id="enableLinking${currentQuestionId}" onchange="toggleLinkingLogic(${currentQuestionId})">
+            <div id="linkingLogicFields${currentQuestionId}" style="display:none; margin-top:8px;">
+                <label>Choose question to link to:</label><br>
+                <select id="linkingTarget${currentQuestionId}" style="width: 100%;">
+                    <option value="" disabled selected>Select a dropdown question</option>
+                </select>
+            </div>
+        </div><br>
+
         <!-- Checkbox Options -->
         <div id="checkboxBlock${currentQuestionId}" class="checkbox-options" style="display: none;">
             <label>Checkbox Options: </label>
@@ -372,6 +384,21 @@ function addQuestion(sectionId, questionId = null) {
 }
 
 /**
+ * Updates linking targets for all dropdown questions in the form
+ */
+function updateAllLinkingTargets() {
+    const questionBlocks = document.querySelectorAll('.question-block');
+    questionBlocks.forEach(block => {
+        const questionId = block.id.replace('questionBlock', '');
+        const typeSelect = block.querySelector(`#questionType${questionId}`);
+        
+        if (typeSelect && typeSelect.value === 'dropdown') {
+            updateLinkingTargets(questionId);
+        }
+    });
+}
+
+/**
  * Removes a question block entirely
  */
 function removeQuestion(questionId) {
@@ -380,7 +407,11 @@ function removeQuestion(questionId) {
     const sectionId = questionBlock.closest('.section-block').id.replace('sectionBlock', '');
     questionBlock.remove();
     updateGlobalQuestionLabels();
+    
+    // Update linking targets in case this was a dropdown question
+    updateAllLinkingTargets();
 }
+
 function toggleDropdownImageFields(questionId) {
     const fieldsDiv = document.getElementById(`dropdownImageFields${questionId}`);
     if (!fieldsDiv) return;
@@ -466,6 +497,7 @@ function toggleOptions(questionId) {
     const multipleTextboxesBlock = document.getElementById(`multipleTextboxesBlock${questionId}`);
     const textboxOptionsBlock = document.getElementById(`textboxOptions${questionId}`);
     const dropdownImageBlock = document.getElementById(`dropdownImageBlock${questionId}`);
+    const linkingLogicBlock = document.getElementById(`linkingLogicBlock${questionId}`);
 
     // Reset all blocks
     textboxOptionsBlock.style.display = 'none';
@@ -474,6 +506,7 @@ function toggleOptions(questionId) {
     numberedDropdownBlock.style.display = 'none';
     multipleTextboxesBlock.style.display = 'none';
     dropdownImageBlock.style.display = 'none';
+    linkingLogicBlock.style.display = 'none';
 
     switch (questionType) {
         case 'text':
@@ -485,6 +518,8 @@ function toggleOptions(questionId) {
                 if (questionType === 'dropdown') {
                     optionsBlock.style.display = 'block';
                     dropdownImageBlock.style.display = 'block';
+                    linkingLogicBlock.style.display = 'block';
+                    updateLinkingTargets(questionId);
                     // Update ALL jump conditions for this dropdown question
                     const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
                     jumpConditions.forEach(condition => {
@@ -540,6 +575,9 @@ function toggleOptions(questionId) {
     } else {
         pdfBlock.style.display = 'none';
     }
+    
+    // Update linking targets in case dropdown questions were added/changed
+    updateAllLinkingTargets();
 }
 
 
@@ -1159,4 +1197,45 @@ function generateAllQuestionOptions() {
         }
     });
     return optionsHTML;
+}
+
+// ------------------------------------------------
+// --- Linking Logic functions
+// ------------------------------------------------
+function toggleLinkingLogic(questionId) {
+    const linkingEnabled = document.getElementById(`enableLinking${questionId}`).checked;
+    const linkingFields = document.getElementById(`linkingLogicFields${questionId}`);
+    linkingFields.style.display = linkingEnabled ? 'block' : 'none';
+    
+    if (linkingEnabled) {
+        updateLinkingTargets(questionId);
+    }
+}
+
+function updateLinkingTargets(questionId) {
+    const targetDropdown = document.getElementById(`linkingTarget${questionId}`);
+    if (!targetDropdown) return;
+    
+    // Clear existing options except the first placeholder
+    const defaultOption = targetDropdown.options[0];
+    targetDropdown.innerHTML = '';
+    targetDropdown.appendChild(defaultOption);
+    
+    // Find all dropdown questions except this one
+    const questionBlocks = document.querySelectorAll('.question-block');
+    questionBlocks.forEach(block => {
+        const blockId = block.id.replace('questionBlock', '');
+        if (blockId === questionId.toString()) return; // Skip current question
+        
+        const typeSelect = block.querySelector(`#questionType${blockId}`);
+        if (!typeSelect || typeSelect.value !== 'dropdown') return; // Only include dropdown questions
+        
+        const questionTextInput = block.querySelector(`input[id="question${blockId}"]`);
+        const questionText = questionTextInput ? questionTextInput.value.trim() : `Question ${blockId}`;
+        
+        const option = document.createElement('option');
+        option.value = blockId;
+        option.textContent = questionText;
+        targetDropdown.appendChild(option);
+    });
 }

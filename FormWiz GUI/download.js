@@ -244,6 +244,23 @@ if (question.type === 'checkbox') {
                         if (wEl) wEl.value = question.image.width || 0;
                         if (hEl) hEl.value = question.image.height || 0;
                     }
+                    
+                    // Restore linking logic
+                    if (question.linking && question.linking.enabled) {
+                        const linkingCheckbox = questionBlock.querySelector(`#enableLinking${question.questionId}`);
+                        if (linkingCheckbox) {
+                            linkingCheckbox.checked = true;
+                            toggleLinkingLogic(question.questionId);
+                            
+                            // Wait for targets to be populated before setting value
+                            setTimeout(() => {
+                                const linkingTargetSelect = questionBlock.querySelector(`#linkingTarget${question.questionId}`);
+                                if (linkingTargetSelect && question.linking.targetId) {
+                                    linkingTargetSelect.value = question.linking.targetId;
+                                }
+                            }, 100);
+                        }
+                    }
                 }
                 else if (question.type === 'multipleTextboxes') {
                     // Rebuild multiple textboxes
@@ -622,6 +639,23 @@ function exportForm() {
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
                 questionData.nameId = nameId;
                 questionData.placeholder = placeholder;
+
+                // Include linking logic data
+                const linkingEnabledEl = questionBlock.querySelector(`#enableLinking${questionId}`);
+                const linkingEnabled = linkingEnabledEl?.checked || false;
+                if (linkingEnabled) {
+                    const linkingTargetEl = questionBlock.querySelector(`#linkingTarget${questionId}`);
+                    const linkingTargetId = linkingTargetEl?.value || '';
+                    questionData.linking = {
+                        enabled: linkingEnabled,
+                        targetId: linkingTargetId
+                    };
+                } else {
+                    questionData.linking = {
+                        enabled: false,
+                        targetId: ''
+                    };
+                }
 
                 // ********** Collect Image Data **********
                 const imgUrlEl = questionBlock.querySelector(`#dropdownImageURL${questionId}`);

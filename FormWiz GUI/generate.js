@@ -35,7 +35,87 @@ function getFormHTML() {
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
     "",
-
+    '<script>',
+    
+    '/*──────── mirror a dropdown → textbox and checkbox ────────*/',
+    'function dropdownMirror(selectEl, baseName){',
+    '    const wrap = document.getElementById("dropdowntext_"+baseName);',
+    '    if(!wrap) return;',
+    '',
+    '    const val = selectEl.value.trim();',
+    '    if(!val) {',
+    '        wrap.innerHTML = "";',
+    '        return;',
+    '    }',
+    '',
+    '    const textId = baseName + "_dropdown";',
+    '    const textField = document.getElementById(textId);',
+    '    ',
+    '    if(textField) {',
+    '        textField.value = val;',
+    '        textField.style.display = "none";',
+    '    }',
+    '',
+    '    const existingCheckboxes = wrap.querySelectorAll("div");',
+    '    existingCheckboxes.forEach(div => div.remove());',
+    '',
+    '    const idSuffix = val.replace(/\\W+/g, "_").toLowerCase();',
+    '    const checkboxId = baseName + "_" + idSuffix;',
+    '    ',
+    '    const checkboxDiv = document.createElement("div");',
+    '    checkboxDiv.style.display = "none";',
+    '    checkboxDiv.innerHTML = "<input type=\'checkbox\' id=\'" + checkboxId + "\' name=\'" + checkboxId + "\' checked>" +',
+    '                     "<label for=\'" + checkboxId + "\'> " + baseName + "_" + idSuffix + "</label>";',
+    '    ',
+    '    wrap.appendChild(checkboxDiv);',
+    '    handleLinkedDropdowns(baseName, val);',
+    '}',
+    '',
+    '// Handle linked dropdown logic',
+    'function handleLinkedDropdowns(sourceName, selectedValue) {',
+    '    if (!linkedDropdowns || linkedDropdowns.length === 0) return;',
+    '    ',
+    '    linkedDropdowns.forEach(linkPair => {',
+    '        if (linkPair.sourceNameId === sourceName) {',
+    '            const targetDropdown = document.getElementById(linkPair.targetNameId);',
+    '            if (targetDropdown) {',
+    '                let optionExists = false;',
+    '                for (let i = 0; i < targetDropdown.options.length; i++) {',
+    '                    if (targetDropdown.options[i].value === selectedValue) {',
+    '                        optionExists = true;',
+    '                        targetDropdown.value = selectedValue;',
+    '                        const event = new Event("change");',
+    '                        targetDropdown.dispatchEvent(event);',
+    '                        break;',
+    '                    }',
+    '                }',
+    '                if (!optionExists && selectedValue) {',
+    '                    console.warn("Option \'" + selectedValue + "\' does not exist in linked dropdown " + linkPair.targetNameId);',
+    '                }',
+    '            }',
+    '        }',
+    '        else if (linkPair.targetNameId === sourceName) {',
+    '            const sourceDropdown = document.getElementById(linkPair.sourceNameId);',
+    '            if (sourceDropdown) {',
+    '                let optionExists = false;',
+    '                for (let i = 0; i < sourceDropdown.options.length; i++) {',
+    '                    if (sourceDropdown.options[i].value === selectedValue) {',
+    '                        optionExists = true;',
+    '                        sourceDropdown.value = selectedValue;',
+    '                        const event = new Event("change");',
+    '                        sourceDropdown.dispatchEvent(event);',
+    '                        break;',
+    '                    }',
+    '                }',
+    '                if (!optionExists && selectedValue) {',
+    '                    console.warn("Option \'" + selectedValue + "\' does not exist in linked dropdown " + linkPair.sourceNameId);',
+    '                }',
+    '            }',
+    '        }',
+    '    });',
+    '}',
+    '</script>',
+    "",
     '<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: none;">',
     '    <h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50;">Your Information</h3>',
     '    <div style="display: flex; gap: 15px; margin-bottom: 15px;">',
@@ -90,6 +170,7 @@ function getFormHTML() {
   const jumpLogics = [];
   const labelMap = {};
   const amountMap = {}; // used for numberedDropdown with amounts
+  const linkedDropdowns = []; // For storing linked dropdown pairs
 
   // We also create a buffer to store our conditional-logic code
   // so we can insert it later in one <script> block.
@@ -254,6 +335,29 @@ function getFormHTML() {
         const ddNm =
           ddNameEl && ddNameEl.value ? ddNameEl.value : "answer" + questionId;
         questionNameIds[questionId] = ddNm;
+
+        // Check if linking logic is enabled
+        const linkingEnabledEl = qBlock.querySelector("#enableLinking" + questionId);
+        const linkingEnabled = linkingEnabledEl && linkingEnabledEl.checked;
+        if (linkingEnabled) {
+          const linkingTargetEl = qBlock.querySelector("#linkingTarget" + questionId);
+          const linkingTargetId = linkingTargetEl ? linkingTargetEl.value : "";
+		  
+		  
+		  const targetQuestionBlock = document.getElementById("questionBlock" + linkingTargetId);
+const targetNameInput = targetQuestionBlock?.querySelector("#textboxName" + linkingTargetId);
+const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
+
+
+          if (linkingTargetId) {
+            linkedDropdowns.push({
+  sourceId: questionId,
+  sourceNameId: ddNm,
+  targetId: linkingTargetId,
+  targetNameId: actualTargetNameId
+});
+          }
+        }
 
         // 1) Possibly grab user-entered image data
         const imgUrlEl = qBlock.querySelector("#dropdownImageURL" + questionId);
@@ -685,6 +789,7 @@ function getCbPrefix(qId){
   formHTML += `var conditionalAlerts = ${JSON.stringify(conditionalAlerts)};\n`;
   formHTML += `var labelMap = ${JSON.stringify(labelMap)};\n`;
   formHTML += `var amountMap = ${JSON.stringify(amountMap)};\n`;
+  formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns)};\n`;
   formHTML += `var hiddenCheckboxCalculations = ${JSON.stringify(
     genHidden.hiddenCheckboxCalculations || []
   )};\n`;
@@ -742,7 +847,95 @@ function showTextboxLabels(questionId, count){
     attachCalculationListeners(); // in case those new fields also matter
 }
 
+// Handle linked dropdown logic
+function handleLinkedDropdowns(sourceName, selectedValue) {
+    if (!linkedDropdowns || linkedDropdowns.length === 0) return;
+    
+    // Find any dropdowns that need to be updated
+    linkedDropdowns.forEach(linkPair => {
+        // Check if this is the source dropdown
+        if (linkPair.sourceNameId === sourceName) {
+            // Update the target dropdown
+            const targetDropdown = document.getElementById(linkPair.targetNameId);
+            if (targetDropdown) {
+                // First check if this option exists in the target dropdown
+                let optionExists = false;
+                for (let i = 0; i < targetDropdown.options.length; i++) {
+                    if (targetDropdown.options[i].value === selectedValue) {
+                        optionExists = true;
+                        targetDropdown.value = selectedValue;
+                        // Trigger the change event
+                        const event = new Event('change');
+                        targetDropdown.dispatchEvent(event);
+                        break;
+                    }
+                }
+                
+                if (!optionExists && selectedValue) {
+                    
+                    console.warn("Option '" + selectedValue + "' does not exist in linked dropdown " + linkPair.targetNameId);
+                }
+            }
+        }
+        // Also check if this is the target dropdown (for bidirectional linking)
+        else if (linkPair.targetNameId === sourceName) {
+            // Update the source dropdown
+            const sourceDropdown = document.getElementById(linkPair.sourceNameId);
+            if (sourceDropdown) {
+                // First check if this option exists in the source dropdown
+                let optionExists = false;
+                for (let i = 0; i < sourceDropdown.options.length; i++) {
+                    if (sourceDropdown.options[i].value === selectedValue) {
+                        optionExists = true;
+                        sourceDropdown.value = selectedValue;
+                        // Trigger the change event
+                        const event = new Event('change');
+                        sourceDropdown.dispatchEvent(event);
+                        break;
+                    }
+                }
+                
+                if (!optionExists && selectedValue) {
+                    console.warn("Option '" + selectedValue + "' does not exist in linked dropdown " + linkPair.targetNameId);
+                }
+            }
+        }
+    });
+}
 
+/*──────── mirror a dropdown → textbox and checkbox ────────*/
+function dropdownMirror(selectEl, baseName){
+    const wrap = document.getElementById("dropdowntext_"+baseName);
+    if(!wrap) return;
+
+    const val = selectEl.value.trim();
+    if(!val) {
+        wrap.innerHTML = "";
+        return;
+    }
+
+    const textId = baseName + "_dropdown";
+    const textField = document.getElementById(textId);
+    
+    if(textField) {
+        textField.value = val;
+        textField.style.display = "none";
+    }
+
+    const existingCheckboxes = wrap.querySelectorAll("div");
+    existingCheckboxes.forEach(div => div.remove());
+
+    const idSuffix = val.replace(/\\W+/g, "_").toLowerCase();
+    const checkboxId = baseName + "_" + idSuffix;
+    
+    const checkboxDiv = document.createElement("div");
+    checkboxDiv.style.display = "none";
+    checkboxDiv.innerHTML = "<input type='checkbox' id='" + checkboxId + "' name='" + checkboxId + "' checked>" +
+                     "<label for='" + checkboxId + "'> " + baseName + "_" + idSuffix + "</label>";
+    
+    wrap.appendChild(checkboxDiv);
+    handleLinkedDropdowns(baseName, val);
+}
 
 function getQuestionInputs (questionId, type = null) {
   /* 1️⃣ First look inside the question container, if it exists */
@@ -1032,7 +1225,7 @@ function runSingleHiddenTextCalculation(calcObj) {
 }
 
 function replacePlaceholderTokens(str){
-    return str.replace(/\$\$(.*?)\$\$/g, function(match, expressionInside){
+    return str.replace(/\\$\\$(.*?)\\$\\$/g, function(match, expressionInside){
         return evaluatePlaceholderExpression(expressionInside);
     });
 }
@@ -1277,63 +1470,6 @@ function attachCalculationListeners() {
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-/*──────── mirror a dropdown → textbox and checkbox ────────*/
-function dropdownMirror(selectEl, baseName){
-    const wrap = document.getElementById('dropdowntext_'+baseName);
-    if(!wrap) return;
-
-    const val = selectEl.value.trim();
-    if(!val) {
-        // Only clear the checkbox if the user selects a blank option
-        wrap.innerHTML = '';
-        return;
-    }
-
-    // Handle the hidden text field
-    const textId = baseName + '_dropdown';
-    const textField = document.getElementById(textId);
-    
-    if(textField) {
-        // If the field exists (which it should), update its value but keep it hidden
-        textField.value = val;
-        textField.style.display = 'none'; // Keep it hidden
-    }
-
-    // Now handle the checkbox part - first remove any existing checkbox
-    // This preserves the text field but removes any previous checkbox
-    const existingCheckboxes = wrap.querySelectorAll('div');
-    existingCheckboxes.forEach(div => div.remove());
-
-    // Create the ID for the checkbox based on the selected value
-    const idSuffix = val.replace(/\\W+/g, '_').toLowerCase();
-
-
-    const checkboxId = baseName + '_' + idSuffix; 
-    
-    // Create the checkbox HTML - checked by default and hidden
-    const checkboxDiv = document.createElement('div');
-    checkboxDiv.style.display = 'none'; // Hide the entire checkbox div
-    checkboxDiv.innerHTML = '<input type="checkbox" id="' + checkboxId + 
-                     '" name="' + checkboxId + '" checked>' +
-                     '<label for="' + checkboxId + '"> ' + 
-                     baseName + '_' + idSuffix + '</label>';
-    
-    // Add the checkbox to the wrapper
-    wrap.appendChild(checkboxDiv);
-}
-
 
 </script>
 </body>
