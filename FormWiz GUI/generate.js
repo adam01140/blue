@@ -1320,7 +1320,7 @@ function dropdownMirror(selectEl, baseName){
     const idSuffix = val.replace(/\\W+/g, '_').toLowerCase();
 
 
-    const checkboxId = baseName + '_' + idSuffix + '_checkbox';
+    const checkboxId = baseName + '_' + idSuffix; 
     
     // Create the checkbox HTML - checked by default and hidden
     const checkboxDiv = document.createElement('div');
