@@ -2590,7 +2590,6 @@ window.exportGuiJson = function() {
   const cells = graph.getModel().cells;
   const sections = [];
   let hiddenFields = [];
-  let sectionCounter = 1;
   let questionCounter = 1;
   let hiddenFieldCounter = 1;
   let defaultPDFName = "";
@@ -2599,12 +2598,18 @@ window.exportGuiJson = function() {
   const questionCellMap = new Map(); // Maps questionId to cell
   const questionIdMap = new Map(); // Maps cell.id to questionId
   
+  // Track highest section number
+  let highestSectionNumber = 0;
+  
   for (const cellId in cells) {
     const cell = cells[cellId];
     if (!cell.isVertex() || cell.isEdge() || cell.id === "0" || cell.id === "1") continue;
 
     // Get section information
     const sectionNum = parseInt(getSection(cell) || 1, 10);
+    // Update highest section number
+    highestSectionNumber = Math.max(highestSectionNumber, sectionNum);
+    
     let section = sections.find(s => s.sectionId === sectionNum);
     
     if (!section) {
@@ -2661,7 +2666,6 @@ window.exportGuiJson = function() {
       
       // Process options and jumps
       if (questionType === "dropdown" || questionType === "checkbox") {
-        // Process options and jumps
         processJumpConditions(cell, question);
       }
       
@@ -2669,8 +2673,8 @@ window.exportGuiJson = function() {
     }
   }
 
-  // Rest of the function (logic conditions, etc.)
-  // ... existing code ...
+  // Set sectionCounter to highest section number + 1
+  const sectionCounter = highestSectionNumber + 1;
 
   const guiJson = {
     sections: sections,
