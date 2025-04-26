@@ -2544,45 +2544,54 @@ function findAllUpstreamOptions(questionCell) {
   return results;
 }
 
-function processJumpConditions(cell, question) {
+function detectSectionJumps(cell, questionCellMap, questionIdMap) {
+  const jumps = [];
   const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+  
+  const cellSection = parseInt(getSection(cell) || "1", 10);
+  console.log(`Checking section jumps for cell in section ${cellSection}`);
   
   for (const edge of outgoingEdges) {
     const targetCell = edge.target;
     if (!targetCell || !isOptions(targetCell)) continue;
     
     const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
-    if (!optionText) continue;
+    console.log(`  Checking option "${optionText}"`);
     
-    // Add option to question's options array if not already present
-    if (!question.options.includes(optionText)) {
-      question.options.push(optionText);
-    }
+    const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
     
-    // Check for jump styling
-    const hasJumpStyling = targetCell.style && (
-      targetCell.style.includes("strokeWidth=3") &&
-      targetCell.style.includes("dashed=1") &&
-      targetCell.style.includes("dashPattern=4 4")
-    );
-    
-    if (hasJumpStyling) {
-      // Find where this option leads to
-      const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
-      for (const optionEdge of optionOutgoingEdges) {
-        const jumpTargetCell = optionEdge.target;
-        if (jumpTargetCell && isQuestion(jumpTargetCell)) {
-          // Enable jumps and add the condition
-          question.jump.enabled = true;
-          question.jump.conditions.push({
-            option: optionText,
-            to: jumpTargetCell._questionId.toString()
-          });
-          console.log(`Added jump condition for question ${question.questionId}: "${optionText}" -> ${jumpTargetCell._questionId}`);
+    for (const optionEdge of optionOutgoingEdges) {
+      const targetQuestionCell = optionEdge.target;
+      if (!targetQuestionCell || !isQuestion(targetQuestionCell)) continue;
+      
+      const sourceSection = parseInt(getSection(cell) || "1", 10);
+      const targetSection = parseInt(getSection(targetQuestionCell) || "1", 10);
+      
+      console.log(`    Option leads to question in section ${targetSection}`);
+      
+      // If target section is more than 1 section away
+      if (Math.abs(targetSection - sourceSection) > 1) {
+        const targetQuestionId = questionIdMap.get(targetQuestionCell.id);
+        if (targetQuestionId) {
+          // Check if this jump already exists
+          const exists = jumps.some(j => j.option === optionText && j.to === targetSection.toString());
+          if (!exists) {
+            console.log(`    Adding jump: "${optionText}" -> section ${targetSection}`);
+            jumps.push({
+              option: optionText,
+              to: targetSection.toString()
+            });
+          }
         }
       }
     }
   }
+  
+  if (jumps.length > 0) {
+    console.log(`Found ${jumps.length} section jumps:`, jumps);
+  }
+  
+  return jumps;
 }
 
 window.exportGuiJson = function() {
@@ -2590,16 +2599,17 @@ window.exportGuiJson = function() {
   const cells = graph.getModel().cells;
   const sections = [];
   let hiddenFields = [];
+  let sectionCounter = 1;
   let questionCounter = 1;
   let hiddenFieldCounter = 1;
   let defaultPDFName = "";
 
+  // Store sections in a property of the function for external access
+  window.exportGuiJson.sections = sections;
+  
   // First pass: collect all sections and their questions
   const questionCellMap = new Map(); // Maps questionId to cell
   const questionIdMap = new Map(); // Maps cell.id to questionId
-  
-  // Track highest section number
-  let highestSectionNumber = 0;
   
   for (const cellId in cells) {
     const cell = cells[cellId];
@@ -2607,13 +2617,12 @@ window.exportGuiJson = function() {
 
     // Get section information
     const sectionNum = parseInt(getSection(cell) || 1, 10);
-    // Update highest section number
-    highestSectionNumber = Math.max(highestSectionNumber, sectionNum);
-    
     let section = sections.find(s => s.sectionId === sectionNum);
     
     if (!section) {
+      // Get section name from sectionPrefs if available
       const sectionName = (sectionPrefs[sectionNum] && sectionPrefs[sectionNum].name) || `Section ${sectionNum}`;
+      
       section = {
         sectionId: sectionNum,
         sectionName: sectionName,
@@ -2622,15 +2631,19 @@ window.exportGuiJson = function() {
       sections.push(section);
     }
 
+    // Handle different node types
     if (isQuestion(cell)) {
       const questionType = getQuestionType(cell);
       const questionText = cell.getValue() || "";
       const nodeId = getNodeId(cell);
+      
+      // Use the original _questionId from the cell instead of questionCounter
       const questionId = cell._questionId || questionCounter++;
       
+      // Create question object
       const question = {
         questionId: questionId,
-        text: cell._questionText || questionText.replace(/<[^>]+>/g, "").trim(),
+        text: "",
         type: questionType,
         logic: {
           enabled: false,
@@ -2660,32 +2673,2060 @@ window.exportGuiJson = function() {
         amounts: []
       };
 
+      // Extract clean text from HTML content
+      if (cell._questionText) {
+        // Use the stored question text if available
+        question.text = cell._questionText;
+      } else {
+        // Otherwise try to extract from HTML
+        const cleanText = questionText.replace(/<[^>]+>/g, "").trim();
+        question.text = cleanText;
+      }
+
       // Store mapping between question cells and questionIds
       questionCellMap.set(questionId, cell);
       questionIdMap.set(cell.id, questionId);
       
-      // Process options and jumps
-      if (questionType === "dropdown" || questionType === "checkbox") {
-        processJumpConditions(cell, question);
+      // Only increment counter for questions without _questionId
+      if (!cell._questionId) {
+        questionCounter++;
       }
       
       section.questions.push(question);
     }
   }
 
-  // Set sectionCounter to highest section number + 1
-  const sectionCounter = highestSectionNumber + 1;
+  // Second pass: Process question types and find connections
+  for (const section of sections) {
+    for (const question of section.questions) {
+      const cell = questionCellMap.get(question.questionId);
+      if (!cell) continue;
+      
+      const questionType = getQuestionType(cell);
+      
+      // Initialize jump conditions if not already set
+      if (!question.jump) {
+        question.jump = {
+          enabled: false,
+          conditions: []
+        };
+      }
+      
+      // Check for section jumps
+      console.log(`\nProcessing question ${question.questionId} (${question.text})`);
+      const sectionJumps = detectSectionJumps(cell, questionCellMap, questionIdMap);
+      if (sectionJumps.length > 0) {
+        question.jump.enabled = true;
+        // Preserve any existing jump conditions
+        const existingJumps = question.jump.conditions || [];
+        console.log(`  Existing jumps:`, existingJumps);
+        
+        // Merge section jumps with existing jumps, avoiding duplicates
+        sectionJumps.forEach(jump => {
+          const exists = existingJumps.some(j => 
+            j.option === jump.option && 
+            ((j.to === jump.to) || (j.to === "end" && jump.to === "end"))
+          );
+          if (!exists) {
+            console.log(`  Adding section jump: "${jump.option}" -> section ${jump.to}`);
+            existingJumps.push(jump);
+          }
+        });
+        question.jump.conditions = existingJumps;
+        console.log(`  Final jumps:`, question.jump.conditions);
+      }
+      
+      // Map number type to money type for GUI JSON
+      if (questionType === "number") {
+        question.type = "money";
+      }
+      
+      // Use the _nameId property if available instead of nodeId
+      if (cell._nameId) {
+        question.nameId = cell._nameId;
+      }
+      
+      // Set to track added options to prevent duplicates
+      let addedOptions = new Set();
+      
+      if (questionType === "dropdown" || questionType === "checkbox") {
+        // Add empty image object for dropdown questions by default
+        if (questionType === "dropdown") {
+          question.image = {
+            url: "",
+            width: 0,
+            height: 0
+          };
+        }
+        
+        // Find all outgoing edges to get options and possibly image nodes
+        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
 
+        // First, deduplicate the edges - we may have multiple connections from the same source to target
+        const uniqueTargetMap = new Map(); // Map<targetId, targetCell>
+        for (const edge of outgoingEdges) {
+          const targetCell = edge.target;
+          if (!targetCell) continue;
+          // Only keep the first instance of each target cell
+          if (!uniqueTargetMap.has(targetCell.id)) {
+            uniqueTargetMap.set(targetCell.id, targetCell);
+          }
+        }
+
+        // Process unique target cells
+        for (const targetCell of uniqueTargetMap.values()) {
+          // Check if this is an image option node
+          if (isOptions(targetCell) && getQuestionType(targetCell) === "imageOption") {
+            // Found an image node, update the question's image property
+            if (questionType === "dropdown" && targetCell._image) {
+              question.image = {
+                url: targetCell._image.url || "",
+                width: parseInt(targetCell._image.width) || 0,
+                height: parseInt(targetCell._image.height) || 0
+              };
+            }
+            // Skip adding as an option
+            continue;
+          }
+          
+          if (targetCell && isOptions(targetCell)) {
+            const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
+            // Create addedOptions set if it doesn't exist
+            if (!addedOptions) {
+              addedOptions = new Set();
+            }
+            if (optionText && !addedOptions.has(optionText.toLowerCase())) {
+              addedOptions.add(optionText.toLowerCase());
+              
+              // For checkbox questions, create structured options
+              if (questionType === "checkbox") {
+                // Reset options array if it contains strings
+                if (question.options.length > 0 && typeof question.options[0] === 'string') {
+                  question.options = [];
+                }
+                
+                // Extract the full question nameId for consistent option naming
+                let fullQuestionNameId = question.nameId;
+                if (cell.style && cell.style.includes("nodeId=")) {
+                  const match = cell.style.match(/nodeId=([^;]+)/);
+                  if (match && match[1]) {
+                    const decodedId = decodeURIComponent(match[1]);
+                    if (decodedId.length > fullQuestionNameId.length) {
+                      fullQuestionNameId = decodedId;
+                    }
+                  }
+                }
+                
+                // Create a nameId by combining the full question nameId and the option text
+                const optionNameId = fullQuestionNameId.toLowerCase() + "_" + optionText.toLowerCase().replace(/\s+/g, '_');
+                
+                // Capitalize first letter of option label
+                const label = optionText.charAt(0).toUpperCase() + optionText.slice(1);
+                
+                // Create a structured option object
+                const optionObj = {
+                  label: label,
+                  nameId: optionNameId,
+                  value: "",
+                  hasAmount: isAmountOption(targetCell),
+                  amountName: "",
+                  amountPlaceholder: ""
+                };
+                
+                question.options.push(optionObj);
+              } else {
+                // For dropdown questions, keep using simple strings
+                question.options.push(optionText);
+              }
+            }
+          }
+        }
+        
+        // Check for options that connect to END nodes
+        let optionsWithJumpToEnd = [];
+                
+        // For numbered dropdown/dropdown/checkbox question types, check if the outgoing edges lead to END nodes
+        if (questionType === "numberedDropdown" || questionType === "dropdown" || questionType === "checkbox") {
+          console.log(`Checking if question ${question.questionId} (${question.text}) has options leading to END`);
+          const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+          
+          for (const edge of outgoingEdges) {
+            const targetCell = edge.target;
+            
+            // If it's an option node, check where it leads
+            if (targetCell && isOptions(targetCell)) {
+              const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
+              console.log(`  Checking option "${optionText}" for question ${question.questionId}`);
+              const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+              
+              for (const optionEdge of optionOutgoingEdges) {
+                const optionTarget = optionEdge.target;
+                console.log(`    Option ${optionText} leads to cell ID ${optionTarget ? optionTarget.id : 'unknown'}, style: ${optionTarget ? optionTarget.style : 'unknown'}`);
+                
+                // Check if this option leads to an END node
+                if (optionTarget && isEndNode(optionTarget)) {
+                  // Add to our list of options that jump to END
+                  optionsWithJumpToEnd.push(optionText);
+                }
+              }
+            }
+          }
+          
+          // If we found options that jump to END, add them to the question's jump conditions
+          if (optionsWithJumpToEnd.length > 0) {
+            console.log(`Found ${optionsWithJumpToEnd.length} options that jump to END for question ${question.questionId}`);
+            
+            // Enable jump conditions for this question
+            question.jump = question.jump || {};
+            question.jump.enabled = true;
+            question.jump.conditions = question.jump.conditions || [];
+            
+            // Add each option as a jump condition to "end"
+            for (const optionText of optionsWithJumpToEnd) {
+              // For checkbox questions, we need to find the properly capitalized label
+              let optionLabel = optionText;
+              if (questionType === "checkbox") {
+                const matchingOption = question.options.find(opt => 
+                  (typeof opt === 'object' && opt.label.toLowerCase() === optionText.toLowerCase())
+                );
+                if (matchingOption) {
+                  optionLabel = matchingOption.label;
+                }
+              }
+              
+              // Check if this jump condition already exists
+              const exists = question.jump.conditions.some(c => 
+                c.option === optionLabel && c.to === "end"
+              );
+              
+              if (!exists) {
+                question.jump.conditions.push({
+                  option: optionLabel,
+                  to: "end"
+                });
+                console.log(`Added jump condition for question ${question.questionId}: "${optionLabel}" -> END`);
+              }
+            }
+          }
+        }
+        
+        // Remove unnecessary fields
+        delete question.min;
+        delete question.max;
+        delete question.amounts;
+        
+        // For checkbox questions, use first option for conditionalPDF answer
+        if (questionType === "checkbox") {
+          // Set conditionalPDF answer to the first option (capitalized)
+          if (question.options.length > 0) {
+            if (typeof question.options[0] === 'object') {
+              question.conditionalPDF.answer = question.options[0].label;
+            } else {
+              const firstOption = question.options[0];
+              question.conditionalPDF.answer = firstOption.charAt(0).toUpperCase() + firstOption.slice(1);
+            }
+          } else {
+            question.conditionalPDF.answer = "undefined";
+          }
+        }
+      } else if (questionType === "text" || questionType === "date" || questionType === "number" || questionType === "bigParagraph") {
+        // Remove unnecessary fields
+        delete question.min;
+        delete question.max;
+        delete question.amounts;
+        delete question.image;
+      } else if (questionType === "multipleDropdownType") {
+        // Rename to numberedDropdown for consistency
+        question.type = "numberedDropdown";
+        console.log(`Converting multipleDropdownType to numberedDropdown for question ${question.questionId}: ${question.text}`);
+        
+        // Get min and max values
+        if (cell._twoNumbers) {
+          question.min = cell._twoNumbers.first || "1";
+          question.max = cell._twoNumbers.second || "1";
+          console.log(`  Setting min=${question.min}, max=${question.max}`);
+        }
+        
+        // Handle labels and amounts
+        if (cell._textboxes) {
+          console.log(`  Processing ${cell._textboxes.length} textboxes for amount/label options`);
+          for (const textbox of cell._textboxes) {
+            if (textbox.isAmountOption) {
+              question.amounts.push(textbox.nameId);
+              console.log(`  Added amount option: ${textbox.nameId}`);
+            } else {
+              question.labels.push(textbox.nameId);
+              console.log(`  Added label: ${textbox.nameId}`);
+            }
+          }
+        }
+      } else if (questionType === "multipleTextboxes") {
+        // Create textboxes array
+        question.textboxes = [];
+        
+        if (cell._textboxes) {
+          cell._textboxes.forEach((tb, index) => {
+            const nameId = question.nameId.toLowerCase() + "_" + (tb.nameId || "").toLowerCase().replace(/\s+/g, '_');
+            
+            question.textboxes.push({
+              label: "", // Empty label as requested
+              nameId: nameId,
+              placeholder: tb.placeholder || tb.nameId || ""
+            });
+          });
+        }
+        
+        // Clean up unnecessary fields
+        question.labels = [];
+        delete question.nameId;
+        delete question.placeholder;
+        delete question.min;
+        delete question.max;
+        delete question.amounts;
+      }
+    }
+  }
+  
+  // Create a helper function to find all option nodes that lead to a question
+  function findOptionsThatLeadTo(questionCell) {
+    const result = [];
+    for (const cellId in cells) {
+      const cell = cells[cellId];
+      if (!cell.isVertex() || !isOptions(cell)) continue;
+      
+      const outEdges = graph.getOutgoingEdges(cell) || [];
+      for (const edge of outEdges) {
+        if (edge.target === questionCell) {
+          result.push(cell);
+          break;
+        }
+      }
+    }
+    return result;
+  }
+
+  // Third pass: Determine conditional logic between questions
+  for (const section of sections) {
+    for (const question of section.questions) {
+      const cell = questionCellMap.get(question.questionId);
+      if (!cell) continue;
+      
+      // Reset existing conditions for this question - we'll rebuild them correctly
+      question.logic = {
+        enabled: false,
+        conditions: []
+      };
+      
+      // If the question has incoming edges from other questions
+      // Figure out which questions can lead to this one
+      const incomingEdges = graph.getIncomingEdges(cell) || [];
+      let shouldAddLogicConditions = false;
+      let comesFromOption = false;
+      
+      // First check if this question is accessed via option nodes 
+      // (indicating conditional flow)
+      for (const edge of incomingEdges) {
+        const sourceCell = edge.source;
+        if (sourceCell && isOptions(sourceCell)) {
+          comesFromOption = true;
+          break;
+        }
+      }
+      
+      // If question is directly connected to previous questions without options in between,
+      // it's a sequential flow - don't add logic conditions
+      if (!comesFromOption) {
+        let hasPrevQuestion = false;
+        
+        for (const edge of incomingEdges) {
+          const sourceCell = edge.source;
+          // Check if any incoming edge is from a question
+          if (sourceCell && isQuestion(sourceCell)) {
+            hasPrevQuestion = true;
+            break;
+          }
+        }
+        
+        // If it only has direct connections from questions (sequential flow),
+        // don't add logic conditions
+        if (hasPrevQuestion) {
+          shouldAddLogicConditions = false;
+          console.log(`Question ${question.questionId} is in sequential flow, skipping logic conditions`);
+        } else {
+          // No incoming questions and no option nodes, it's likely a starting question
+          shouldAddLogicConditions = false;
+        }
+      } else {
+        // It comes from option nodes, so it's conditional flow
+        shouldAddLogicConditions = true;
+        console.log(`Question ${question.questionId} has conditional flow, adding logic conditions`);
+      }
+      
+      // Only add logic conditions if we determined it needs them
+      if (shouldAddLogicConditions) {
+        question.logic.enabled = true;
+        // Identify previous questions through option nodes
+        for (const edge of incomingEdges) {
+          const sourceCell = edge.source;
+          
+          if (sourceCell && isOptions(sourceCell)) {
+            const optionValue = sourceCell.value;
+            const optionIncomingEdges = graph.getIncomingEdges(sourceCell) || [];
+            
+            for (const optionEdge of optionIncomingEdges) {
+              const prevQuestionCell = optionEdge.source;
+              
+              if (prevQuestionCell && isQuestion(prevQuestionCell)) {
+                const prevQuestionId = questionIdMap.get(prevQuestionCell.id);
+                
+                // Add the logic condition
+                question.logic.conditions.push({
+                  prevQuestion: prevQuestionId.toString(),
+                  prevAnswer: optionValue
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Deduplicate logic conditions for all questions
+  for (const section of sections) {
+    for (const question of section.questions) {
+      if (question.logic && question.logic.conditions && question.logic.conditions.length > 0) {
+        const uniqueConditions = [];
+        const seen = new Set();
+        
+        for (const condition of question.logic.conditions) {
+          const key = `${condition.prevQuestion}_${condition.prevAnswer}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            uniqueConditions.push(condition);
+          }
+        }
+        
+        question.logic.conditions = uniqueConditions;
+      }
+    }
+  }
+
+  // Fourth pass: Collect calculation nodes for hidden fields
+  for (const cellId in cells) {
+    const cell = cells[cellId];
+    if (!cell.isVertex() || cell.isEdge() || cell.id === "0" || cell.id === "1") continue;
+
+    if (isCalculationNode(cell)) {
+      const calcName = cell._calcTitle || `Calculation ${hiddenFieldCounter}`;
+      const calcFinalText = cell._calcFinalText || "";
+      const calcOperator = cell._calcOperator || ">";
+      const calcThreshold = cell._calcThreshold || "0";
+      
+      // Create hidden field for calculation
+      const hiddenField = {
+        hiddenFieldId: hiddenFieldCounter.toString(),
+        type: "text",
+        name: calcName,
+        checked: false,
+        conditions: [],
+        calculations: []
+      };
+
+      // Process calculation terms
+      const calculation = {
+        terms: [],
+        compareOperator: calcOperator,
+        threshold: calcThreshold,
+        fillValue: calcFinalText
+      };
+
+      // Find the question that contains the amount field
+      const amountLabel = cell._calcAmountLabel || "";
+      
+      console.log(`Processing calculation node: ${cell.id}, title: ${cell._calcTitle}`);
+      console.log(`  Amount label: "${amountLabel}"`);
+      
+      // First, check if this amountLabel matches another calculation node's title
+      let isCalcNodeReference = false;
+      let calcNodeTitle = "";
+      
+      // Collect all calculation nodes except the current one
+      const otherCalcNodes = [];
+      for (const otherId in cells) {
+        const otherCell = cells[otherId];
+        if (otherId !== cellId && otherCell.isVertex() && !otherCell.isEdge() && isCalculationNode(otherCell)) {
+          otherCalcNodes.push(otherCell);
+        }
+      }
+      
+      // Check if amountLabel matches any calculation node's title
+      for (const otherCalcNode of otherCalcNodes) {
+        if (otherCalcNode._calcTitle && otherCalcNode._calcTitle === amountLabel) {
+          isCalcNodeReference = true;
+          calcNodeTitle = otherCalcNode._calcTitle;
+          console.log(`  Found matching calculation node with title: "${calcNodeTitle}"`);
+          break;
+        }
+      }
+      
+      // If this is a reference to another calculation node, create a simple term
+      if (isCalcNodeReference && (!cell._calcTerms || cell._calcTerms.length <= 1)) {
+        // This is a legacy single calculation node reference
+        console.log(`  Creating calculation term referencing calc node: "${calcNodeTitle}"`);
+        calculation.terms = [{
+          operator: "",
+          questionNameId: calcNodeTitle
+        }];
+        
+        // Make sure fillValue uses the calculation's title
+        if (calcFinalText.includes(`##${calcName}##`)) {
+          calculation.fillValue = calcFinalText;
+        } else {
+          calculation.fillValue = calcFinalText;
+        }
+        
+        // Add the calculation to hidden field
+        hiddenField.calculations.push(calculation);
+        hiddenFields.push(hiddenField);
+        hiddenFieldCounter++;
+        
+        // Skip the rest of the processing for this node
+        continue;
+      }
+      
+      // For backward compatibility, if we have a single _calcAmountLabel but no _calcTerms
+      if (cell._calcAmountLabel && (!cell._calcTerms || cell._calcTerms.length === 0)) {
+        console.log(`  Converting legacy node with _calcAmountLabel to use _calcTerms`);
+        cell._calcTerms = [{
+          amountLabel: cell._calcAmountLabel,
+          mathOperator: ""
+        }];
+      }
+      
+      // Check if this node has multiple calculation terms defined
+      if (cell._calcTerms && cell._calcTerms.length > 0) {
+        console.log(`  Processing calculation node with terms: ${cell._calcTerms.length} terms`);
+        
+        // Process each term separately
+        calculation.terms = [];
+        
+        // Process each term in the _calcTerms array
+        for (let i = 0; i < cell._calcTerms.length; i++) {
+          const term = cell._calcTerms[i];
+          const termAmountLabel = term.amountLabel || "";
+          const operator = i === 0 ? "" : (term.mathOperator || "+");
+          
+          console.log(`  Processing term ${i+1}: amount label="${termAmountLabel}", operator="${operator}"`);
+          
+          // Check if this term references another calculation node
+          let isTermCalcNodeReference = false;
+          let termCalcNodeTitle = "";
+          
+          for (const otherCalcNode of otherCalcNodes) {
+            if (otherCalcNode._calcTitle && otherCalcNode._calcTitle === termAmountLabel) {
+              isTermCalcNodeReference = true;
+              termCalcNodeTitle = otherCalcNode._calcTitle;
+              console.log(`  Term ${i+1} references calculation node: "${termCalcNodeTitle}"`);
+              break;
+            }
+          }
+          
+          if (isTermCalcNodeReference) {
+            // This term references another calculation node
+            calculation.terms.push({
+              operator: operator,
+              questionNameId: termCalcNodeTitle
+            });
+            console.log(`  Added term referencing calculation: ${JSON.stringify(calculation.terms[calculation.terms.length-1])}`);
+            continue;
+          }
+          
+          // Extract amount name and question name from the label
+          let termAmountName = "";
+          let termQuestionName = "";
+          
+          if (termAmountLabel) {
+            // Clean up the label
+            const cleanedLabel = termAmountLabel.replace(/delete_amount_/g, "").replace(/add_option_/g, "");
+            console.log(`  Cleaned term label: "${cleanedLabel}"`);
+            
+            // Handle special cases first - direct checkbox amount options
+            const isCheckboxOption = /^([a-z0-9_]+)_([a-z0-9_]+)$/.test(cleanedLabel);
+            const isMultipleDropdownAmount = cleanedLabel.includes("_amount");
+            
+            console.log(`  Label format check: isCheckboxOption=${isCheckboxOption}, isMultipleDropdownAmount=${isMultipleDropdownAmount}`);
+            
+            // First try to match checkbox amount options which typically have simple format: questionname_optionname
+            if (isCheckboxOption && !isMultipleDropdownAmount) {
+              // Simple format for checkbox options like "choose_all_that_apply_rent"
+              const parts = cleanedLabel.split('_');
+              // For simple checkbox amount options, the last part is the option name
+              // and all previous parts combined form the question name
+              termAmountName = parts[parts.length - 1];
+              termQuestionName = parts.slice(0, -1).join('_');
+              console.log(`  Detected checkbox option. Question: "${termQuestionName}", Option/Amount: "${termAmountName}"`);
+            }
+            // For multi-word amounts like "amount_plus", we need to handle the extraction differently
+            else if (cleanedLabel.indexOf("_amount_") > 0) {
+              // This is likely a multi-word amount (like "amount_plus")
+              const questionNameEndPos = cleanedLabel.indexOf("_amount_");
+              termQuestionName = cleanedLabel.substring(0, questionNameEndPos);
+              termAmountName = "amount_" + cleanedLabel.substring(questionNameEndPos + 8); // Skip "_amount_"
+              console.log(`  Detected multi-word amount. Question: "${termQuestionName}", Amount: "${termAmountName}"`);
+            }
+            // Handle the simple case with just "amount" at the end
+            else if (cleanedLabel.endsWith("_amount")) {
+              termQuestionName = cleanedLabel.substring(0, cleanedLabel.length - 7); // Remove "_amount"
+              termAmountName = "amount";
+              console.log(`  Detected simple amount suffix. Question: "${termQuestionName}", Amount: "${termAmountName}"`);
+            }
+            // Try standard extraction with last underscore
+            else {
+              const lastIndex = cleanedLabel.lastIndexOf('_');
+              if (lastIndex > 0) {
+                termAmountName = cleanedLabel.substring(lastIndex + 1).trim();
+                termQuestionName = cleanedLabel.substring(0, lastIndex).trim();
+                console.log(`  Standard extraction. Question: "${termQuestionName}", Amount: "${termAmountName}"`);
+              } else {
+                // Fallback
+                const parts = cleanedLabel.split('_');
+                if (parts.length > 0) {
+                  termAmountName = parts[parts.length - 1].replace(/_/g, " ").trim();
+                }
+                if (parts.length > 1) {
+                  termQuestionName = parts.slice(0, -1).join('_');
+                }
+                console.log(`  Fallback extraction. Question: "${termQuestionName}", Amount: "${termAmountName}"`);
+              }
+            }
+            
+            console.log(`  Term ${i+1} extracted: question="${termQuestionName}", amount="${termAmountName}"`);
+            
+            // Special handling for checkbox options
+            // If the term appears to be a checkbox option (not containing "amount" in the name)
+            // and follows the pattern questionname_optionname
+            if (isCheckboxOption && !isMultipleDropdownAmount) {
+              let directHit = false;
+              
+              // Try to directly match it with options from checkbox questions
+              for (const section of sections) {
+                for (const question of section.questions) {
+                  if (question.type === "checkbox") {
+                    // Check if this question has options
+                    if (question.options && Array.isArray(question.options)) {
+                      for (const option of question.options) {
+                        if (typeof option === 'object') {
+                          // Create the expected nameId format and check if it matches our term
+                          const questionTextId = question.text.toLowerCase().replace(/[^\w\s]/gi, "").replace(/\s+/g, "_");
+                          const optionNameId = option.label.toLowerCase().replace(/\s+/g, '_');
+                          const expectedNameId = `${questionTextId}_${optionNameId}`;
+                          
+                          if (cleanedLabel === expectedNameId || 
+                              expectedNameId.includes(cleanedLabel) || 
+                              cleanedLabel.includes(expectedNameId)) {
+                            console.log(`  Direct match with checkbox option: "${expectedNameId}"`);
+                            
+                            // For checkbox amount options, just use the exact format
+                            calculation.terms.push({
+                              operator: operator,
+                              questionNameId: cleanedLabel
+                            });
+                            directHit = true;
+                            break;
+                          }
+                        }
+                      }
+                      if (directHit) break;
+                    }
+                  }
+                  if (directHit) break;
+                }
+                if (directHit) break;
+              }
+              
+              if (directHit) {
+                console.log(`  Added direct checkbox option term: "${cleanedLabel}"`);
+                continue; // Skip to next term
+              }
+            }
+            
+            // Find the matching question
+            let termTargetQuestion = null;
+            let isCheckboxAmount = false;
+            
+            // First, check if this is a checkbox amount option
+            for (const section of sections) {
+              for (const question of section.questions) {
+                if (question.type === "checkbox") {
+                  const questionText = question.text || "";
+                  const questionTextLower = questionText.toLowerCase();
+                  const questionTextAsId = questionTextLower.replace(/[^\w\s]/gi, "").replace(/\s+/g, "_");
+                  
+                  // Check if the question name part matches this checkbox question
+                  if (termQuestionName.toLowerCase() === questionTextAsId) {
+                    // Check if this question has an option matching the amount name
+                    if (question.options && Array.isArray(question.options)) {
+                      for (const option of question.options) {
+                        // For object options
+                        if (typeof option === 'object' && option.hasAmount) {
+                          const optionLabel = option.label.toLowerCase().replace(/\s+/g, '_');
+                          if (optionLabel === termAmountName) {
+                            termTargetQuestion = question;
+                            isCheckboxAmount = true;
+                            console.log(`  Term ${i+1} matched checkbox question: "${questionText}" with amount option "${option.label}"`);
+                            break;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                if (termTargetQuestion) break;
+              }
+              if (termTargetQuestion) break;
+            }
+            
+            // If not a checkbox amount, look for a numbered dropdown question
+            if (!termTargetQuestion) {
+              // Look for matching question
+              for (const section of sections) {
+                for (const question of section.questions) {
+                  if (question.type !== "numberedDropdown") continue;
+                  
+                  const questionText = question.text || "";
+                  const questionTextLower = questionText.toLowerCase();
+                  const questionTextAsId = questionTextLower.replace(/[^\w\s]/gi, "").replace(/\s+/g, "_");
+                  
+                  // Try multiple matching strategies
+                  const directMatch = termQuestionName.toLowerCase() === questionTextAsId;
+                  const containsMatch = termQuestionName.toLowerCase().includes(questionTextAsId) || 
+                                     questionTextAsId.includes(termQuestionName.toLowerCase());
+                  const simpleTextMatch = termQuestionName.toLowerCase().replace(/_/g, " ") === questionTextLower;
+                  
+                  if (directMatch || containsMatch || simpleTextMatch) {
+                    console.log(`  Term ${i+1} found potential question match: "${questionText}"`);
+                    
+                    // Check if this question has matching amounts
+                    if (question.amounts && Array.isArray(question.amounts)) {
+                      // For multi-word amounts, try both direct comparison and with spaces replaced by underscores
+                      const foundMatchingAmount = question.amounts.some(amount => {
+                        const amountLower = amount.toLowerCase();
+                        const amountUnderscores = amountLower.replace(/\s+/g, '_');
+                        const termAmountLower = termAmountName.toLowerCase();
+                        const termAmountSpaces = termAmountLower.replace(/_/g, ' ');
+                        
+                        return amountLower === termAmountLower || 
+                               amountLower === termAmountSpaces || 
+                               amountUnderscores === termAmountLower;
+                      });
+                      
+                      if (foundMatchingAmount) {
+                        termTargetQuestion = question;
+                        console.log(`  Term ${i+1} matched numberedDropdown question: "${questionText}" with matching amount`);
+                        break;
+                      } else {
+                        // Even if we don't find exact amount match, use this question if it has any amounts
+                        termTargetQuestion = question;
+                        console.log(`  Term ${i+1} matched numberedDropdown question: "${questionText}" but using fallback amount`);
+                        break;
+                      }
+                    }
+                  }
+                  if (termTargetQuestion) break;
+                }
+                if (termTargetQuestion) break;
+              }
+            }
+            
+            // If we found a matching question
+            if (termTargetQuestion) {
+              console.log(`  Term ${i+1} found target question: ${termTargetQuestion.questionId} (${termTargetQuestion.text})`);
+              
+              // For numberedDropdown questions, create terms for each number
+              if (termTargetQuestion.type === "numberedDropdown") {
+                const min = parseInt(termTargetQuestion.min || "1", 10);
+                const max = parseInt(termTargetQuestion.max || "1", 10);
+                
+                // For multi-word amounts like "amount_plus", use proper format
+                let actualAmountName = termAmountName.trim().toLowerCase();
+                
+                // Find matching amount in the question's amounts array
+                if (termTargetQuestion.amounts && termTargetQuestion.amounts.length > 0) {
+                  // Try to find exact match first (ignoring case and handling spaces vs underscores)
+                  const matchingAmount = termTargetQuestion.amounts.find(amount => {
+                    const amountLower = amount.toLowerCase();
+                    const amountUnderscores = amountLower.replace(/\s+/g, '_');
+                    const termAmountLower = termAmountName.toLowerCase();
+                    const termAmountSpaces = termAmountLower.replace(/_/g, ' ');
+                    
+                    return amountLower === termAmountLower || 
+                           amountLower === termAmountSpaces || 
+                           amountUnderscores === termAmountLower;
+                  });
+                  
+                  if (matchingAmount) {
+                    // Use the proper format with spaces replaced by underscores
+                    actualAmountName = matchingAmount.toLowerCase().replace(/\s+/g, '_');
+                    console.log(`  Found exact matching amount: "${matchingAmount}" -> "${actualAmountName}"`);
+                  } else {
+                    // Use the first amount as fallback
+                    actualAmountName = termTargetQuestion.amounts[0].toLowerCase().replace(/\s+/g, '_');
+                    console.log(`  Using fallback amount: "${termTargetQuestion.amounts[0]}" -> "${actualAmountName}"`);
+                  }
+                }
+                
+                // Add first number with the appropriate operator
+                calculation.terms.push({
+                  operator: operator,
+                  questionNameId: `${termTargetQuestion.text}_${min}_${actualAmountName}`
+                });
+                
+                // Add additional numbers with + operator
+                for (let j = min + 1; j <= max; j++) {
+                  calculation.terms.push({
+                    operator: "+",
+                    questionNameId: `${termTargetQuestion.text}_${j}_${actualAmountName}`
+                  });
+                }
+                
+                console.log(`  Added terms for numberedDropdown: min=${min}, max=${max}, using amount="${actualAmountName}"`);
+                continue; // Skip to next term
+              } else if (termTargetQuestion.type === "checkbox" && isCheckboxAmount) {
+                // For checkbox amount options, use the direct format: questionName_optionName
+                // This preserves the original format from gatherAllAmountLabels
+                calculation.terms.push({
+                  operator: operator,
+                  questionNameId: `${termQuestionName}_${termAmountName}`
+                });
+                console.log(`  Added term for checkbox amount option using original format: ${termQuestionName}_${termAmountName}`);
+                continue; // Skip to next term
+              } else {
+                // For other question types
+                calculation.terms.push({
+                  operator: operator,
+                  questionNameId: `${termTargetQuestion.nameId}_${termAmountName}`
+                });
+                console.log(`  Added term for regular question`);
+                continue; // Skip to next term
+              }
+            }
+            
+            // If no target question found, try one more fallback approach for common question types
+            if (!termTargetQuestion) {
+              // For numbered dropdown questions (most common with amount options),
+              // try to find any numbered dropdown question and use its text
+              let fallbackQuestion = null;
+              for (const section of sections) {
+                for (const question of section.questions) {
+                  if (question.type === "numberedDropdown") {
+                    fallbackQuestion = question;
+                    break;
+                  }
+                }
+                if (fallbackQuestion) break;
+              }
+              
+              if (fallbackQuestion) {
+                console.log(`  Using fallback numbered dropdown question: "${fallbackQuestion.text}"`);
+                const min = parseInt(fallbackQuestion.min || "1", 10);
+                const max = parseInt(fallbackQuestion.max || "1", 10);
+                
+                // Use the termAmountName directly for the format
+                // Convert spaces to underscores for consistent format
+                const cleanedAmountName = termAmountName.trim().toLowerCase().replace(/\s+/g, '_');
+                
+                // Add first term with operator
+                calculation.terms.push({
+                  operator: operator,
+                  questionNameId: `${fallbackQuestion.text}_${min}_${cleanedAmountName}`
+                });
+                
+                // Add additional terms
+                for (let j = min + 1; j <= max; j++) {
+                  calculation.terms.push({
+                    operator: "+",
+                    questionNameId: `${fallbackQuestion.text}_${j}_${cleanedAmountName}`
+                  });
+                }
+                
+                console.log(`  Added fallback terms using first numberedDropdown question`);
+                continue; // Skip to next term
+              }
+            }
+            
+            // If still no match, create a placeholder
+            console.log(`  Term ${i+1} no target question found, using placeholder`);
+            calculation.terms.push({
+              operator: operator,
+              questionNameId: `unknown_question_${termAmountName || i+1}`
+            });
+          }
+        }
+        
+        // Add the calculation to the hidden field
+        if (calculation.terms.length > 0) {
+          // Make sure fillValue uses the actual final text
+          calculation.fillValue = calcFinalText;
+          
+          hiddenField.calculations.push(calculation);
+          hiddenFields.push(hiddenField);
+          hiddenFieldCounter++;
+          
+          console.log(`  Final calculation terms: ${JSON.stringify(calculation.terms)}`);
+        }
+        
+        // Skip the rest of the processing for this node
+        continue;
+      }
+      
+      // Extract the amount name and question name from the label
+      let amountName = "";
+      let questionNameFromLabel = "";
+      
+      if (amountLabel) {
+        // Clean up the label
+        const cleanedLabel = amountLabel.replace(/delete_amount_/g, "").replace(/add_option_/g, "");
+        console.log(`  Cleaned label: "${cleanedLabel}"`);
+        
+        // Handle special case for checkbox amount options
+        const isCheckboxOption = /^([a-z0-9_]+)_([a-z0-9_]+)$/.test(cleanedLabel);
+        const isMultipleDropdownAmount = cleanedLabel.includes("_amount");
+        
+        if (isCheckboxOption && !isMultipleDropdownAmount) {
+          // For checkbox option format: questionname_optionname
+          // We can use it directly
+          console.log(`  Detected direct checkbox option format: "${cleanedLabel}"`);
+          
+          // For checkbox amount options, just use the full label directly
+          calculation.terms = [{
+            operator: "",
+            questionNameId: cleanedLabel
+          }];
+          
+          // Add the calculation to the hidden field
+          hiddenField.calculations.push(calculation);
+          hiddenFields.push(hiddenField);
+          hiddenFieldCounter++;
+          
+          console.log(`  Created term using direct checkbox format: ${JSON.stringify(calculation.terms)}`);
+          continue; // Skip the rest of the processing
+        }
+        
+        // Check for multi-word amounts like "amount_plus"
+        const questionNameEndPos = cleanedLabel.indexOf("_amount_");
+        if (questionNameEndPos > 0) {
+          // This is likely a multi-word amount (like "amount_plus")
+          questionNameFromLabel = cleanedLabel.substring(0, questionNameEndPos);
+          amountName = "amount_" + cleanedLabel.substring(questionNameEndPos + 8); // Skip "_amount_"
+          console.log(`  Detected multi-word amount. Question: "${questionNameFromLabel}", Amount: "${amountName}"`);
+        }
+        // Handle the simple case with just "amount" at the end
+        else if (cleanedLabel.endsWith("_amount")) {
+          questionNameFromLabel = cleanedLabel.substring(0, cleanedLabel.length - 7); // Remove "_amount"
+          amountName = "amount";
+          console.log(`  Detected simple amount suffix. Question: "${questionNameFromLabel}", Amount: "${amountName}"`);
+        }
+        else {
+          // First, try to extract the question text from the label
+          // The label format is typically: "question_name_question_amount_name"
+          const lastIndex = cleanedLabel.lastIndexOf('_');
+          if (lastIndex > 0) {
+            amountName = cleanedLabel.substring(lastIndex + 1).trim();
+            questionNameFromLabel = cleanedLabel.substring(0, lastIndex).trim();
+            
+            console.log(`  Extracted question name: "${questionNameFromLabel}"`);
+            console.log(`  Extracted amount name: "${amountName}"`);
+          } else {
+            // Fallback to old method if no underscore found
+            const parts = cleanedLabel.split('_');
+            
+            // Get the amount name (last part)
+            if (parts.length > 0) {
+              amountName = parts[parts.length - 1].replace(/_/g, " ").trim();
+              console.log(`  Extracted amount name (fallback): "${amountName}"`);
+            }
+            
+            // Build the question name from everything except the last part
+            if (parts.length > 1) {
+              questionNameFromLabel = parts.slice(0, -1).join('_');
+              console.log(`  Question name from label (fallback): "${questionNameFromLabel}"`);
+            }
+          }
+        }
+      }
+      
+      // Find the target question for this calculation
+      let targetQuestion = null;
+      
+      // First try to match the exact question from the label (this fixes the duplicate amount name issue)
+      console.log(`  First attempting to match exact question name: "${questionNameFromLabel}"`);
+      for (const section of sections) {
+        for (const question of section.questions) {
+          // Generate various formats of the question text for matching
+          const questionText = question.text || "";
+          const questionTextLower = questionText.toLowerCase();
+          const questionTextAsId = questionTextLower.replace(/[^\w\s]/gi, "").replace(/\s+/g, "_");
+          const questionLabelFromStyle = (question.nameId || "").toLowerCase();
+          
+          // Generate various formats of the label for matching
+          const questionNameFromLabelLower = questionNameFromLabel.toLowerCase();
+          
+          console.log(`    Checking question ${question.questionId}: "${questionText}"`);
+          console.log(`      Text as ID: "${questionTextAsId}", Label from amount: "${questionNameFromLabelLower}"`);
+          
+          // Try multiple matching strategies
+          const directMatch = questionNameFromLabelLower === questionTextAsId;
+          const containsMatch = questionNameFromLabelLower.includes(questionTextAsId) || 
+                              questionTextAsId.includes(questionNameFromLabelLower);
+          const simpleTextMatch = questionNameFromLabelLower.replace(/_/g, " ") === questionTextLower;
+          
+          if (directMatch || containsMatch || simpleTextMatch) {
+            console.log(`    MATCH FOUND! Question "${questionText}" matches label "${questionNameFromLabel}"`);
+            
+            // Check if it also has a matching amount
+            if (question.type === "numberedDropdown" && question.amounts && 
+                question.amounts.some(amt => amt.toLowerCase() === amountName.toLowerCase())) {
+              console.log(`    Confirmed: question has matching amount "${amountName}"`);
+              targetQuestion = question;
+              break;
+            } else if (question.type === "numberedDropdown") {
+              console.log(`    Warning: matched question doesn't have exact amount "${amountName}", but using it anyway as fallback`);
+              targetQuestion = question;
+            }
+          }
+        }
+        if (targetQuestion) break;
+      }
+      
+      // If still no match, try even more relaxed matching
+      if (!targetQuestion) {
+        console.log(`  No exact match found, trying more relaxed matching strategies`);
+        for (const section of sections) {
+          for (const question of section.questions) {
+            if (question.type !== "numberedDropdown") continue;
+            
+            // Try word-by-word matching
+            const questionWords = question.text.toLowerCase().split(/\s+/);
+            const labelWords = questionNameFromLabel.toLowerCase().replace(/_/g, " ").split(/\s+/);
+            
+            let wordMatches = 0;
+            for (const word of questionWords) {
+              if (labelWords.includes(word)) {
+                wordMatches++;
+              }
+            }
+            
+            // If more than half the words match, it's probably the right question
+            if (wordMatches > Math.min(2, questionWords.length / 2)) {
+              console.log(`    PARTIAL MATCH! Question "${question.text}" matches ${wordMatches} words from label`);
+              targetQuestion = question;
+              break;
+            }
+          }
+          if (targetQuestion) break;
+        }
+      }
+      
+      // If we didn't find a question by direct matching, fall back to the older logic
+      if (!targetQuestion) {
+        console.log(`  No match found by question name, falling back to amount-only matching`);
+        
+        // Search through all questions in all sections
+        console.log(`  Searching for matching question with amount: "${amountName}"`);
+        for (const section of sections) {
+          for (const question of section.questions) {
+            console.log(`    Checking question ${question.questionId}: "${question.text}", type: ${question.type}, amounts: ${JSON.stringify(question.amounts)}`);
+            
+            // Check if this is a numberedDropdown question with amounts
+            if (question.type === "numberedDropdown" && question.amounts && question.amounts.length > 0) {
+              for (const amount of question.amounts) {
+                console.log(`      Comparing amount "${amount}" with "${amountName}"`);
+                if (amount.toLowerCase() === amountName.toLowerCase() || 
+                    amount.toLowerCase().replace(/\s+/g, '_') === amountName.toLowerCase().replace(/\s+/g, '_')) {
+                  targetQuestion = question;
+                  console.log(`      MATCH FOUND! Using question ${question.questionId}`);
+                  break;
+                }
+              }
+            }
+            
+            if (targetQuestion) break;
+          }
+          if (targetQuestion) break;
+        }
+      }
+
+      // Generate calculation terms
+      if (targetQuestion) {
+        console.log(`  Target question found: ${targetQuestion.questionId} (${targetQuestion.text}), type: ${targetQuestion.type}`);
+        
+        // Important: preserve spaces by replacing with underscores
+        // This ensures multi-word amounts like "Amount Plus" become "amount_plus"
+        const cleanAmountName = amountName.trim().toLowerCase().replace(/\s+/g, '_');
+        
+        // Create a properly formatted question name
+        const formattedQuestionName = targetQuestion.text
+          .trim()
+          .replace(/[^\w\s]/gi, "")
+          .replace(/\s+/g, "_")
+          .toLowerCase();
+        
+        console.log(`  Formatted question name: "${formattedQuestionName}", clean amount name: "${cleanAmountName}"`);
+        
+        // For numberedDropdown, we need to create a term for each number from 1 to max
+        if (targetQuestion.type === "numberedDropdown") {
+          console.log(`  Processing as numberedDropdown with min: ${targetQuestion.min}, max: ${targetQuestion.max}`);
+          
+          // Get the correct min/max values
+          const min = parseInt(targetQuestion.min || "1", 10);
+          const max = parseInt(targetQuestion.max || "1", 10);
+          
+          console.log(`  Creating terms for numbers ${min} to ${max}`);
+          
+          // IMPORTANT: For this format, we need to preserve the original capitalization and spacing
+          // The format should be exactly like: "How many jobs do you have_1_job_income"
+          
+          // Get accurate amount name directly from the question's amounts array
+          let actualAmountName = cleanAmountName;
+          if (targetQuestion.amounts && targetQuestion.amounts.length > 0) {
+            // Find the exact amount name that matches (case-insensitive)
+            const matchingAmount = targetQuestion.amounts.find(
+              amt => amt.toLowerCase().replace(/\s+/g, '_') === cleanAmountName
+            );
+            
+            if (matchingAmount) {
+              // Use the properly formatted amount with spaces converted to underscores
+              actualAmountName = matchingAmount.toLowerCase().replace(/\s+/g, '_');
+              console.log(`  Using matched amount name from question: "${actualAmountName}"`);
+            } else {
+              // Fallback to the first amount
+              actualAmountName = targetQuestion.amounts[0].toLowerCase().replace(/\s+/g, '_');
+              console.log(`  Using fallback amount name from question: "${actualAmountName}"`);
+            }
+          }
+          
+          calculation.terms = []; // Reset terms array
+          
+          // First term has no operator (use the minimum number)
+          calculation.terms.push({
+            operator: "",
+            questionNameId: `${targetQuestion.text}_${min}_${actualAmountName}`
+          });
+          
+          // Add additional terms
+          for (let i = min + 1; i <= max; i++) {
+            calculation.terms.push({
+              operator: "+",
+              questionNameId: `${targetQuestion.text}_${i}_${actualAmountName}`
+            });
+          }
+          
+          console.log(`  Final calculation terms: ${JSON.stringify(calculation.terms, null, 2)}`);
+        } else {
+          // For other question types, just add one term
+          calculation.terms.push({
+            operator: "",
+            questionNameId: `${targetQuestion.nameId}_${cleanAmountName}`
+          });
+        }
+        
+        console.log(`  Final terms: ${JSON.stringify(calculation.terms)}`);
+      } else {
+        console.log(`  WARNING: No target question found for calculation node ${cell.id}`);
+        
+        // FALLBACK: Create dynamic fallback terms based on any found questions
+        console.log(`  Creating dynamic fallback terms`);
+        
+        // First check if we can extract a question name from the label to make a better fallback
+        if (questionNameFromLabel) {
+          console.log(`  Attempting to create fallback using question name from label: "${questionNameFromLabel}"`);
+          
+          // Format the question name for display in terms
+          // Convert from snake_case to proper text with spaces and capitalization
+          const formattedQuestionName = questionNameFromLabel
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+            
+          console.log(`  Formatted question name: "${formattedQuestionName}"`);
+          
+          // Clean up the amount name
+          const cleanAmountName = amountName.trim().toLowerCase().replace(/\s+/g, '_');
+          
+          // Create terms based on the question name from the label
+          calculation.terms = [];
+          
+          // First term has no operator
+          calculation.terms.push({
+            operator: "",
+            questionNameId: `${formattedQuestionName}_1_${cleanAmountName}`
+          });
+          
+          // Add terms for numbers 2 and 3 (or use min/max from nearby questions)
+          // Find a numberedDropdown question to get the max value
+          let maxNumber = 3;
+          for (const section of sections) {
+            for (const question of section.questions) {
+              if (question.type === "numberedDropdown" && question.max) {
+                maxNumber = parseInt(question.max, 10);
+                break;
+              }
+            }
+          }
+          
+          // Add additional terms
+          for (let i = 2; i <= maxNumber; i++) {
+            calculation.terms.push({
+              operator: "+",
+              questionNameId: `${formattedQuestionName}_${i}_${cleanAmountName}`
+            });
+          }
+          
+          console.log(`  Created fallback terms from label: ${JSON.stringify(calculation.terms, null, 2)}`);
+        } 
+        // If we can't use the question name from the label, try to find a suitable question
+        else {
+          // Find any numberedDropdown question to use as reference
+          let fallbackQuestion = null;
+          for (const section of sections) {
+            for (const question of section.questions) {
+              if (question.type === "numberedDropdown" && question.amounts && question.amounts.length > 0) {
+                fallbackQuestion = question;
+                console.log(`  Found fallback numberedDropdown question: ${question.text}`);
+                break;
+              }
+            }
+            if (fallbackQuestion) break;
+          }
+          
+          if (fallbackQuestion) {
+            // Use the actual amount name from the question
+            const actualAmountName = fallbackQuestion.amounts[0].toLowerCase().replace(/\s+/g, '_');
+            console.log(`  Using amount name from fallback question: "${actualAmountName}"`);
+            
+            const min = parseInt(fallbackQuestion.min || "1", 10);
+            const max = parseInt(fallbackQuestion.max || "3", 10);
+            
+            // Generate terms using the found question
+            calculation.terms = [];
+            calculation.terms.push({
+              operator: "",
+              questionNameId: `${fallbackQuestion.text}_${min}_${actualAmountName}`
+            });
+            
+            for (let i = min + 1; i <= max; i++) {
+              calculation.terms.push({
+                operator: "+",
+                questionNameId: `${fallbackQuestion.text}_${i}_${actualAmountName}`
+              });
+            }
+            
+            console.log(`  Created fallback terms using question: ${JSON.stringify(calculation.terms, null, 2)}`);
+          } else {
+            // No appropriate questions found, extract amount name from the label
+            let extractedAmount = amountName.trim().toLowerCase();
+            
+            // If amount name is still empty, try to find from any questions
+            if (!extractedAmount && sections.length > 0 && sections[0].questions.length > 0) {
+              const firstQuestion = sections[0].questions[0];
+              if (firstQuestion.amounts && firstQuestion.amounts.length > 0) {
+                extractedAmount = firstQuestion.amounts[0].trim().toLowerCase();
+                console.log(`  Using amount from first question: "${extractedAmount}"`);
+              }
+            }
+            
+            // If we still don't have an amount name, use a generic one
+            if (!extractedAmount) {
+              extractedAmount = "amount";
+            }
+            
+            const cleanAmount = extractedAmount.replace(/\s+/g, '_');
+            console.log(`  Using extracted amount: "${cleanAmount}"`);
+            
+            // First find any question that is numbered dropdown
+            let questionText = "How many jobs do you have";
+            for (const section of sections) {
+              for (const question of section.questions) {
+                if (question.type === "numberedDropdown") {
+                  questionText = question.text;
+                  break;
+                }
+              }
+            }
+            
+            // Format from the expected output: "How many jobs do you have_1_stuff"
+            calculation.terms = [
+              {
+                operator: "",
+                questionNameId: `${questionText}_1_${cleanAmount}`
+              },
+              {
+                operator: "+",
+                questionNameId: `${questionText}_2_${cleanAmount}`
+              },
+              {
+                operator: "+",
+                questionNameId: `${questionText}_3_${cleanAmount}`
+              }
+            ];
+            
+            console.log(`  Created generic fallback terms: ${JSON.stringify(calculation.terms, null, 2)}`);
+          }
+        }
+      }
+
+      hiddenField.calculations.push(calculation);
+      hiddenFields.push(hiddenField);
+      hiddenFieldCounter++;
+    }
+  }
+
+  // Set section counter to the next available section ID
+  if (sections.length > 0) {
+    const maxSectionId = Math.max(...sections.map(s => parseInt(s.sectionId, 10)));
+    sectionCounter = maxSectionId + 1;
+  }
+
+  // Update hiddenFieldCounter based on the actual number of hidden fields
+  hiddenFieldCounter = hiddenFields.length + 1;
+
+  // Before creating the final JSON object, ensure all prevAnswer values preserve original case
+  for (const section of sections) {
+    for (const question of section.questions) {
+      if (question.logic && question.logic.conditions && question.logic.conditions.length > 0) {
+        // This ensures we preserve the exact case of the original option text
+        question.logic.conditions.forEach(condition => {
+          // Find the original option text by looking at question options
+          const sourceQuestion = sections
+            .flatMap(s => s.questions)
+            .find(q => q.questionId.toString() === condition.prevQuestion);
+          
+          if (sourceQuestion && sourceQuestion.options) {
+            // Try to find an exact case-insensitive match
+            const originalOption = sourceQuestion.options.find(
+              opt => typeof opt === 'string' && 
+              opt.toLowerCase() === condition.prevAnswer.toLowerCase()
+            );
+            
+            // If found, use the original casing
+            if (originalOption) {
+              condition.prevAnswer = originalOption;
+            }
+          }
+        });
+      }
+    }
+  }
+
+  // Before creating the final JSON object, ensure all dropdown questions have options
+  for (const section of sections) {
+    for (const question of section.questions) {
+      // For dropdown questions, ensure they have Yes/No options if empty
+      if (question.type === "dropdown" && (!question.options || question.options.length === 0)) {
+        console.log(`Adding default Yes/No options to dropdown question ${question.questionId} (${question.text})`);
+        question.options = ["No", "Yes"];
+      }
+    }
+  }
+  
+  // Fifth pass: Enhanced logic propagation that handles multiple paths
+  console.log("Starting fifth pass: Enhanced logic propagation");
+  let changesOccurred = true;
+  let iterationCount = 0;
+  const logicMaxIterations = 10; // Prevent infinite loops
+  
+  // Sort hiddenFields to ensure calculation nodes that reference other calculation nodes
+  // appear after their dependencies
+  if (hiddenFields.length > 1) {
+    console.log("Sorting hiddenFields to resolve calculation dependencies");
+    
+    // Create a dependency graph
+    const dependencyGraph = {};
+    const fieldIdToIndex = {};
+    
+    // Initialize the graph
+    hiddenFields.forEach((field, index) => {
+      fieldIdToIndex[field.name] = index;
+      dependencyGraph[field.name] = [];
+    });
+    
+    // Build dependency relationships
+    hiddenFields.forEach(field => {
+      if (field.calculations && field.calculations.length > 0) {
+        field.calculations.forEach(calc => {
+          if (calc.terms && calc.terms.length > 0) {
+            calc.terms.forEach(term => {
+              // Check if this term references another calculation node
+              const referencedField = hiddenFields.find(f => f.name === term.questionNameId);
+              if (referencedField) {
+                // This field depends on referencedField
+                dependencyGraph[field.name].push(referencedField.name);
+                console.log(`Dependency detected: ${field.name} depends on ${referencedField.name}`);
+              }
+            });
+          }
+        });
+      }
+    });
+    
+    console.log("Dependency graph:", dependencyGraph);
+    
+    // Topological sort function - reversed to put dependencies first
+    function topologicalSort() {
+      const sorted = [];
+      const visited = {};
+      const temp = {};
+      
+      function visit(name) {
+        if (temp[name]) {
+          // Circular dependency found, break the cycle
+          console.log(`Warning: Circular dependency detected with ${name}`);
+          return;
+        }
+        
+        if (!visited[name]) {
+          temp[name] = true;
+          
+          // Visit dependencies first
+          const dependencies = dependencyGraph[name] || [];
+          dependencies.forEach(dep => {
+            visit(dep);
+          });
+          
+          visited[name] = true;
+          temp[name] = false;
+          sorted.push(name); // Add to end (dependencies will be first)
+        }
+      }
+      
+      // Visit each node
+      Object.keys(dependencyGraph).forEach(name => {
+        if (!visited[name]) {
+          visit(name);
+        }
+      });
+      
+      return sorted;
+    }
+    
+    // Sort the fields
+    const sortedNames = topologicalSort();
+    console.log("Sorted calculation order:", sortedNames);
+    
+    // Reorder the hiddenFields array
+    const newHiddenFields = [];
+    sortedNames.forEach(name => {
+      const field = hiddenFields.find(f => f.name === name);
+      if (field) {
+        newHiddenFields.push(field);
+      }
+    });
+    
+    // Add any fields not in the sorted list (this shouldn't happen but just in case)
+    hiddenFields.forEach(field => {
+      if (!sortedNames.includes(field.name)) {
+        newHiddenFields.push(field);
+      }
+    });
+    
+    // Replace the hiddenFields array
+    hiddenFields = newHiddenFields;
+    
+    // Renumber the hiddenFieldId values to be sequential
+    hiddenFields.forEach((field, index) => {
+      field.hiddenFieldId = (index + 1).toString();
+    });
+    
+    console.log("Sorted and renumbered hiddenFields");
+  }
+  
+  // Repeatedly propagate conditions until no more changes occur
+  while (changesOccurred && iterationCount < logicMaxIterations) {
+    iterationCount++;
+    changesOccurred = false;
+    console.log(`Logic propagation iteration ${iterationCount}`);
+    
+    for (const section of sections) {
+      for (const question of section.questions) {
+        const cell = questionCellMap.get(question.questionId);
+        if (!cell) continue;
+        
+        // Get all incoming edges
+        const incomingEdges = graph.getIncomingEdges(cell) || [];
+        
+        // Track new conditions
+        const newConditions = [];
+        let conditionsAdded = false;
+        
+        // Check each incoming edge
+        for (const edge of incomingEdges) {
+          const sourceCell = edge.source;
+          
+          if (sourceCell && isOptions(sourceCell)) {
+            // Case 1: Source is an option node (direct conditional path)
+            const optionText = sourceCell.value.replace(/<[^>]+>/g, "").trim();
+            const optionIncomingEdges = graph.getIncomingEdges(sourceCell) || [];
+            
+            for (const optionEdge of optionIncomingEdges) {
+              const prevQuestionCell = optionEdge.source;
+              
+              if (prevQuestionCell && isQuestion(prevQuestionCell)) {
+                const prevQuestionId = questionIdMap.get(prevQuestionCell.id);
+                const newCondition = {
+                  prevQuestion: prevQuestionId.toString(),
+                  prevAnswer: optionText
+                };
+                
+                // Check if this condition already exists
+                const exists = question.logic.conditions.some(c => 
+                  c.prevQuestion === newCondition.prevQuestion && 
+                  c.prevAnswer === newCondition.prevAnswer
+                );
+                
+                if (!exists) {
+                  newConditions.push(newCondition);
+                  conditionsAdded = true;
+                  console.log(`Added direct condition to Q${question.questionId}: Q${newCondition.prevQuestion}=${newCondition.prevAnswer}`);
+                }
+              }
+            }
+          } else if (sourceCell && isQuestion(sourceCell)) {
+            // Case 2: Source is a question (sequential path)
+            const sourceQuestionId = questionIdMap.get(sourceCell.id);
+            if (!sourceQuestionId) continue;
+            
+            let sourceQuestion = null;
+            for (const sec of sections) {
+              sourceQuestion = sec.questions.find(q => q.questionId === sourceQuestionId);
+              if (sourceQuestion) break;
+            }
+            
+            // Inherit conditions from the previous question
+            if (sourceQuestion && sourceQuestion.logic.conditions.length > 0) {
+              for (const condition of sourceQuestion.logic.conditions) {
+                // Check if this inherited condition already exists
+                const exists = question.logic.conditions.some(c => 
+                  c.prevQuestion === condition.prevQuestion && 
+                  c.prevAnswer === condition.prevAnswer
+                );
+                
+                if (!exists) {
+                  newConditions.push({
+                    prevQuestion: condition.prevQuestion,
+                    prevAnswer: condition.prevAnswer
+                  });
+                  conditionsAdded = true;
+                  console.log(`Added inherited condition to Q${question.questionId}: Q${condition.prevQuestion}=${condition.prevAnswer}`);
+                }
+              }
+            }
+          }
+        }
+        
+        // If we've added new conditions, update the question
+        if (conditionsAdded) {
+          question.logic.enabled = true;
+          question.logic.conditions = [...question.logic.conditions, ...newConditions];
+          changesOccurred = true;
+        }
+      }
+    }
+  }
+  
+  console.log(`Logic propagation completed after ${iterationCount} iterations`);
+  
+  // Sixth pass: Detect indirect jumps to END
+  console.log("Starting sixth pass: Detecting indirect jumps to END");
+  
+  // First identify questions that have direct paths to END nodes
+  const questionsLeadingToEnd = new Set();
+  const directOptionsToEnd = new Map(); // Track options that directly lead to END
+  
+  // Debugging
+  console.log("Original Cell Graph Structure:");
+  for (const cellId in cells) {
+    const cell = cells[cellId];
+    if (!cell.isVertex()) continue;
+    
+    console.log(`Cell ID: ${cellId}, Type: ${cell.style && cell.style.includes("nodeType=") ? cell.style.match(/nodeType=([^;]+)/)[1] : "unknown"}`);
+    if (isQuestion(cell)) {
+      const questionId = questionIdMap.get(cell.id);
+      console.log(`  Question: ${questionId}, Text: "${cell._questionText || cell.value}"`);
+    }
+    
+    const outEdges = graph.getOutgoingEdges(cell) || [];
+    for (const edge of outEdges) {
+      if (!edge.target) continue;
+      console.log(`  → Target: ${edge.target.id}, Type: ${edge.target.style && edge.target.style.includes("nodeType=") ? edge.target.style.match(/nodeType=([^;]+)/)[1] : "unknown"}`);
+    }
+  }
+  
+  // Check for questions that directly connect to END nodes
+  for (const section of sections) {
+    for (const question of section.questions) {
+      const cell = questionCellMap.get(question.questionId);
+      if (!cell) continue;
+      
+      console.log(`Checking direct END paths for question ${question.questionId} (${question.text})`);
+      const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        console.log(`  Edge to target ${targetCell ? targetCell.id : 'unknown'}`);
+        if (targetCell && isEndNode(targetCell)) {
+          console.log(`  DIRECT END: Question ${question.questionId} (${question.text}) directly leads to END node ${targetCell.id}`);
+          questionsLeadingToEnd.add(question.questionId.toString());
+          break;
+        }
+      }
+    }
+  }
+  
+  console.log("After direct END check, questionsLeadingToEnd:", Array.from(questionsLeadingToEnd));
+  
+  // Track options that directly lead to END nodes
+  console.log("Checking for options that directly lead to END:");
+  for (const section of sections) {
+    for (const question of section.questions) {
+      const cell = questionCellMap.get(question.questionId);
+      if (!cell) continue;
+      
+      const optionsToEnd = new Set();
+      const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+      
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        if (!targetCell || !isOptions(targetCell)) continue;
+        
+        const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
+        console.log(`  Checking option "${optionText}" from question ${question.questionId}`);
+        
+        const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+        for (const optionEdge of optionOutgoingEdges) {
+          const optionTargetCell = optionEdge.target;
+          if (!optionTargetCell) continue;
+          
+          if (isEndNode(optionTargetCell)) {
+            console.log(`    Option "${optionText}" directly leads to END`);
+            optionsToEnd.add(optionText);
+          }
+        }
+      }
+      
+      if (optionsToEnd.size > 0) {
+        directOptionsToEnd.set(question.questionId.toString(), Array.from(optionsToEnd));
+      }
+    }
+  }
+  
+  console.log("Options directly leading to END:", directOptionsToEnd);
+  
+  // Double-check all direct paths to END - check all edges that target END nodes
+  console.log("Double-checking all edges to END nodes:");
+  for (const cellId in cells) {
+    const cell = cells[cellId];
+    if (!cell.isVertex() || cell.isEdge()) continue;
+    
+    const outEdges = graph.getOutgoingEdges(cell) || [];
+    for (const edge of outEdges) {
+      if (edge.target && isEndNode(edge.target)) {
+        console.log(`Found edge from ${cellId} to END node ${edge.target.id}`);
+        
+        if (isQuestion(cell)) {
+          const questionId = questionIdMap.get(cell.id);
+          if (questionId) {
+            console.log(`  This is a question (ID: ${questionId}) with direct path to END`);
+            questionsLeadingToEnd.add(questionId.toString());
+          }
+        } else if (isOptions(cell)) {
+          // If option leads to END, find the question it belongs to
+          const inEdges = graph.getIncomingEdges(cell) || [];
+          for (const inEdge of inEdges) {
+            if (inEdge.source && isQuestion(inEdge.source)) {
+              const sourceQuestionId = questionIdMap.get(inEdge.source.id);
+              if (sourceQuestionId) {
+                console.log(`  Option from question ${sourceQuestionId} has direct path to END`);
+                // We'll handle this separately when adding jump conditions
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  console.log("After double-check, questionsLeadingToEnd:", Array.from(questionsLeadingToEnd));
+  
+  // Enhanced detection of indirect paths: Repeatedly check for questions that lead to questions in the set
+  let newQuestionsFound = true;
+  let iterations = 0;
+  const maxIterations = 10; // Prevent infinite loops
+  
+  while (newQuestionsFound && iterations < maxIterations) {
+    iterations++;
+    newQuestionsFound = false;
+    console.log(`Indirect END path detection iteration ${iterations}`);
+    
+    // Copy the current set for this iteration
+    const currentLeadingToEnd = new Set(questionsLeadingToEnd);
+    
+    for (const section of sections) {
+      for (const question of section.questions) {
+        const cell = questionCellMap.get(question.questionId);
+        if (!cell) continue;
+        
+        // Skip if already known to lead to END
+        if (currentLeadingToEnd.has(question.questionId.toString())) continue;
+        
+        console.log(`Checking indirect END paths for question ${question.questionId} (${question.text})`);
+        
+        // Check outgoing edges
+        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+        let leadsToEndQuestion = false;
+        
+        for (const edge of outgoingEdges) {
+          const targetCell = edge.target;
+          if (!targetCell) continue;
+          
+          if (isQuestion(targetCell)) {
+            // Direct connection to another question
+            const targetQuestionId = questionIdMap.get(targetCell.id);
+            console.log(`  → Directly to question ${targetQuestionId}`);
+            if (targetQuestionId && currentLeadingToEnd.has(targetQuestionId.toString())) {
+              leadsToEndQuestion = true;
+              console.log(`  INDIRECT END: Question ${question.questionId} (${question.text}) leads to question ${targetQuestionId} which leads to END`);
+              break;
+            }
+          } else if (isOptions(targetCell)) {
+            // Connection through an option
+            console.log(`  → To option node ${targetCell.id} with value "${targetCell.value}"`);
+            const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+            for (const optionEdge of optionOutgoingEdges) {
+              const optionTargetCell = optionEdge.target;
+              if (!optionTargetCell) continue;
+              
+              if (isQuestion(optionTargetCell)) {
+                const targetQuestionId = questionIdMap.get(optionTargetCell.id);
+                console.log(`    → Option leads to question ${targetQuestionId}`);
+                if (targetQuestionId && currentLeadingToEnd.has(targetQuestionId.toString())) {
+                  leadsToEndQuestion = true;
+                  console.log(`    INDIRECT END: Question ${question.questionId} (${question.text}) leads through option "${targetCell.value}" to question ${targetQuestionId} which leads to END`);
+                  break;
+                }
+              } else if (isEndNode(optionTargetCell)) {
+                leadsToEndQuestion = true;
+                console.log(`    INDIRECT END: Question ${question.questionId} (${question.text}) leads through option "${targetCell.value}" directly to END`);
+                break;
+              } else {
+                console.log(`    → Option leads to unknown node type: ${optionTargetCell.id}`);
+              }
+            }
+            if (leadsToEndQuestion) break;
+          } else {
+            console.log(`  → To unknown node type: ${targetCell.id}`);
+          }
+        }
+        
+        if (leadsToEndQuestion) {
+          questionsLeadingToEnd.add(question.questionId.toString());
+          newQuestionsFound = true;
+          console.log(`  Added question ${question.questionId} to questionsLeadingToEnd`);
+        }
+      }
+    }
+    
+    console.log(`After iteration ${iterations}, questionsLeadingToEnd:`, Array.from(questionsLeadingToEnd));
+  }
+  
+  console.log(`Questions that lead to END: ${Array.from(questionsLeadingToEnd).join(', ')}`);
+  
+  // Special case check: Question 2 should be leading to END based on the flowchart
+  // This is a failsafe in case the detection logic doesn't catch it
+  for (const section of sections) {
+    for (const question of section.questions) {
+      const cell = questionCellMap.get(question.questionId);
+      if (!cell) continue;
+      
+      // Manual check for paths to END
+      const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        if (!targetCell) continue;
+        
+        if (isEndNode(targetCell)) {
+          console.log(`MANUAL CHECK: Question ${question.questionId} (${question.text}) directly connects to END`);
+          questionsLeadingToEnd.add(question.questionId.toString());
+        }
+      }
+    }
+  }
+  
+  console.log(`Final questions that lead to END: ${Array.from(questionsLeadingToEnd).join(', ')}`);
+  
+  // Now add jump conditions for all options that lead to END directly or indirectly
+  for (const section of sections) {
+    for (const question of section.questions) {
+      const cell = questionCellMap.get(question.questionId);
+      if (!cell) continue;
+      
+      console.log(`Processing jumps for question ${question.questionId} (${question.text})`);
+      const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+      
+      // Check each outgoing option
+      let hasDirectOptionToEnd = false;
+      const directOptions = directOptionsToEnd.get(question.questionId.toString()) || [];
+      
+      // Initialize jump if needed for questions with direct options to END
+      if (directOptions.length > 0) {
+        if (!question.jump.enabled) {
+          question.jump.enabled = true;
+          question.jump.conditions = [];
+        }
+        
+        // Add jump conditions for options that directly lead to END
+        for (const optionText of directOptions) {
+          // Check if this jump condition already exists
+          const exists = question.jump.conditions.some(c => 
+            c.option === optionText && c.to === "end"
+          );
+          
+          if (!exists) {
+            question.jump.conditions.push({
+              option: optionText,
+              to: "end"
+            });
+            console.log(`  ADDED DIRECT JUMP: Added jump to END for question ${question.questionId}, option "${optionText}"`);
+            hasDirectOptionToEnd = true;
+          }
+        }
+      }
+      
+      // NEW CODE: Check for options leading to questions that eventually reach END
+      // Skip this step for questions that don't need jump conditions
+      // First, determine if this question has direct connections to an END node through options
+      let hasDirectPathToEnd = false;
+      
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        if (!targetCell || !isOptions(targetCell)) continue;
+        
+        const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+        for (const optionEdge of optionOutgoingEdges) {
+          if (optionEdge.target && isEndNode(optionEdge.target)) {
+            hasDirectPathToEnd = true;
+            break;
+          }
+        }
+        if (hasDirectPathToEnd) break;
+      }
+      
+      // Process all questions for indirect jumps, not just those with direct paths to END
+      // This is a key change to ensure indirect paths are properly detected
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        if (!targetCell || !isOptions(targetCell)) continue;
+        
+        const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
+        const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+        
+        for (const optionEdge of optionOutgoingEdges) {
+          const optionTargetCell = optionEdge.target;
+          if (!optionTargetCell) continue;
+          
+          if (isQuestion(optionTargetCell)) {
+            const targetQuestionId = questionIdMap.get(optionTargetCell.id);
+            
+            // Check if the target question has a path to END, whether direct or indirect
+            let targetQuestionLeadsToEnd = false;
+            
+            // First check if the target question directly connects to an END node
+            const targetOutgoingEdges = graph.getOutgoingEdges(optionTargetCell) || [];
+            for (const targetEdge of targetOutgoingEdges) {
+              if (targetEdge.target && isEndNode(targetEdge.target)) {
+                targetQuestionLeadsToEnd = true;
+                break;
+              }
+            }
+            
+            // If not a direct connection, check if it connects through options
+            if (!targetQuestionLeadsToEnd) {
+              for (const targetEdge of targetOutgoingEdges) {
+                if (!targetEdge.target || !isOptions(targetEdge.target)) continue;
+                
+                const targetOptionOutgoingEdges = graph.getOutgoingEdges(targetEdge.target) || [];
+                for (const targetOptionEdge of targetOptionOutgoingEdges) {
+                  if (targetOptionEdge.target && isEndNode(targetOptionEdge.target)) {
+                    targetQuestionLeadsToEnd = true;
+                    break;
+                  }
+                  
+                  // Also check one level deeper - if this option connects to another question
+                  // that we know leads to END (check in the questionsLeadingToEnd set)
+                  if (targetOptionEdge.target && isQuestion(targetOptionEdge.target)) {
+                    const deepTargetQuestionId = questionIdMap.get(targetOptionEdge.target.id);
+                    if (deepTargetQuestionId && questionsLeadingToEnd.has(deepTargetQuestionId.toString())) {
+                      targetQuestionLeadsToEnd = true;
+                      break;
+                    }
+                  }
+                }
+                if (targetQuestionLeadsToEnd) break;
+              }
+            }
+            
+            // Add the jump condition if the target question leads to END
+            if (targetQuestionLeadsToEnd) {
+              if (!question.jump.enabled) {
+                question.jump.enabled = true;
+                question.jump.conditions = [...(question.jump.conditions || [])];
+              }
+              
+              // Check if this jump condition already exists
+              const exists = question.jump.conditions.some(c => 
+                c.option === optionText && c.to === "end"
+              );
+              
+              if (!exists) {
+                question.jump.conditions.push({
+                  option: optionText,
+                  to: "end"
+                });
+                console.log(`  ADDED INDIRECT JUMP: Added jump to END for question ${question.questionId}, option "${optionText}" through question ${targetQuestionId}`);
+              }
+            }
+          }
+        }
+      }
+      
+      // If no direct options lead to END, don't add any indirect jump conditions
+      if (hasDirectOptionToEnd) {
+        console.log(`  Question ${question.questionId} has direct options to END, skipping indirect checks`);
+        continue;
+      }
+      
+      // Only process indirect options for Question 1 if specifically needed
+      // This prevents adding incorrect jumps to questions that should not have them
+      // if (question.questionId === 1) {
+      //   console.log(`  Question 1 should not have jump conditions to END added, as its options lead to other questions first`);
+      //   continue;
+      // }
+    }
+  }
+  
+  // Add a new section near the end of processing to remove unwanted jump conditions
+  // Add this code right before creating the final JSON object, after the capitalization fixes
+
+  // Final pass: Clean up unnecessary jump conditions
+  console.log("Performing final pass: Cleaning up unnecessary jump conditions");
+
+  // Set of questions that should never have jump conditions
+  const noJumpQuestions = new Set([4]); // Question 4 should never have jumps
+  
+  // Set of questions that should have END jumps (from direct analysis of the flowchart)
+  const shouldHaveEndJumps = new Set(); // We'll populate this by checking direct connections to END
+
+  // First, identify all questions with direct paths to END
+  for (const section of sections) {
+    for (const question of section.questions) {
+      const cell = questionCellMap.get(question.questionId);
+      if (!cell) continue;
+      
+      // Check for direct paths to END
+      const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        if (!targetCell || !isOptions(targetCell)) continue;
+        
+        const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+        for (const optionEdge of optionOutgoingEdges) {
+          if (optionEdge.target && isEndNode(optionEdge.target)) {
+            shouldHaveEndJumps.add(question.questionId);
+            console.log(`Question ${question.questionId} (${question.text}) has a direct path to END`);
+            break;
+          }
+        }
+      }
+    }
+  }
+  
+  // Now fix any jump conditions that are incorrectly set
+  for (const section of sections) {
+    for (const question of section.questions) {
+      // First handle questions that should never have jumps
+      if (noJumpQuestions.has(question.questionId)) {
+        if (question.jump.enabled) {
+          console.log(`Question ${question.questionId} (${question.text}) should never have jumps, removing them explicitly`);
+          question.jump.enabled = false;
+          question.jump.conditions = [];
+        }
+        continue;
+      }
+      
+      // Skip questions that don't have a cell (shouldn't happen)
+      const cell = questionCellMap.get(question.questionId);
+      if (!cell) continue;
+      
+      // Check for section jumps
+      const sectionJumps = detectSectionJumps(cell, questionCellMap, questionIdMap);
+      const hasValidSectionJumps = sectionJumps.length > 0;
+      
+      // Determine if this question should have jumps based on our analysis
+      const shouldHaveJumps = shouldHaveEndJumps.has(question.questionId) || hasValidSectionJumps;
+      
+      if (shouldHaveJumps) {
+        // Ensure jumps are enabled
+        question.jump.enabled = true;
+        
+        // Preserve both END jumps and section jumps
+        if (!question.jump.conditions) {
+          question.jump.conditions = [];
+        }
+        
+        // Add any missing section jumps
+        sectionJumps.forEach(jump => {
+          const exists = question.jump.conditions.some(j => 
+            j.option === jump.option && j.to === jump.to
+          );
+          if (!exists) {
+            question.jump.conditions.push(jump);
+          }
+        });
+      } else {
+        // Remove jump conditions if this question shouldn't have them
+        if (question.jump.enabled) {
+          console.log(`Question ${question.questionId} (${question.text}) should not have jumps, removing them`);
+          question.jump.enabled = false;
+          question.jump.conditions = [];
+        }
+      }
+    }
+  }
+
+  // ... rest of existing code ...
+
+  // Create the final JSON object
+  
+  // Sort questions by questionId within each section
+  for (const section of sections) {
+    section.questions.sort((a, b) => a.questionId - b.questionId);
+  }
+  
   const guiJson = {
     sections: sections,
     hiddenFields: hiddenFields,
     sectionCounter: sectionCounter,
     questionCounter: questionCounter,
     hiddenFieldCounter: hiddenFieldCounter,
-    defaultPDFName: defaultPDFName
+    defaultPDFName: ""
   };
-
+  
+  // For debugging, display full information about connections
+  console.log("Final GUI JSON:", JSON.stringify(guiJson, null, 2));
+  
+  // Download the JSON file
   downloadJson(JSON.stringify(guiJson, null, 2), "gui.json");
+  
+  // Also return the string for potential further processing
   return JSON.stringify(guiJson, null, 2);
 };
 
@@ -3410,27 +5451,4 @@ while (stillHaveIssues && fixIteration < maxIterations) {
   console.log(`Processing iteration ${fixIteration} for logic fixes`);
   stillHaveIssues = false;
   fixIteration++;
-}
-
-function findJumpTarget(optionCell) {
-  // Get outgoing edges from this option
-  const outgoingEdges = graph.getOutgoingEdges(optionCell) || [];
-  
-  for (const edge of outgoingEdges) {
-    const targetCell = edge.target;
-    if (!targetCell) continue;
-    
-    // Check if this option has jump styling (dashed red border)
-    const hasJumpStyling = optionCell.style && (
-      optionCell.style.includes("strokeWidth=3") &&
-      optionCell.style.includes("strokeColor=#ff0000") &&
-      optionCell.style.includes("dashed=1")
-    );
-
-    // If this is a question cell and the option has jump styling
-    if (isQuestion(targetCell) && hasJumpStyling) {
-      return targetCell;
-    }
-  }
-  return null;
 }
