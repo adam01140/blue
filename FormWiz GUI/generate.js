@@ -12,12 +12,13 @@ const questionSlugMap = {};
  * canonical sanitiser – visible
  * to all build-time code
  *───────────────────────────────*/
-function sanitizeQuestionText(str){
-    return String(str)
-        .toLowerCase()
-        .replace(/\\W+/g, "_")      // swap every non-word run for "_"
-        .replace(/^_+|_+$/g, "");   // trim leading / trailing "_"
+function sanitizeQuestionText (str){
+  return String(str)
+         .toLowerCase()
+        .replace(/\W+/g,  "_")   // <-- single “\” is correct here
+         .replace(/^_+|_+$/g, "");
 }
+
 
 
 
@@ -836,6 +837,16 @@ function getCbPrefix(qId){
 
   // 4) The rest of the main JS code
   formHTML += `
+  
+  
+  function sanitizeQuestionText (str){
+    return String(str)
+       .toLowerCase()
+        .replace(/\\W+/g, "_")   // ← double “\\” so the HTML gets “\W”
+        .replace(/^_+|_+$/g, "");
+}
+
+
 function toggleAmountField(amountFieldId, show) {
     const amountField = document.getElementById(amountFieldId);
     if (amountField) {
@@ -845,12 +856,7 @@ function toggleAmountField(amountFieldId, show) {
 }
 
 
-function sanitizeQuestionText(str){
-    return String(str)
-        .toLowerCase()
-        .replace(/\W+/g, "_")   // swap every non-word run for "
-        .replace(/^_+|_+$/g, "");  // trim leading/trailing _
-}
+
 
 
 function showTextboxLabels(questionId, count){
@@ -1261,30 +1267,27 @@ function runSingleHiddenTextCalculation(calcObj) {
     textField.value = finalValue;
 }
 
-function replacePlaceholderTokens(str){
-    return str.replace(/\$\$(.*?)\$\$/g, function(match, expressionInside){
-        return evaluatePlaceholderExpression(expressionInside);
+function replacePlaceholderTokens (str){
+    /* note the doubled back-slashes in the delimiters \$\$ */
+    return str.replace(/\\$\\$(.*?)\\$\\$/g, function (_match, innerExpr){
+        return evaluatePlaceholderExpression(innerExpr);
     });
 }
 
-function evaluatePlaceholderExpression(exprString){
-    var tokens = exprString.split(/(\+|\-|x|\/)/);
-    if(!tokens.length) return '0';
-    var currentVal = parseTokenValue(tokens[0]);
-    var i=1;
-    while(i<tokens.length){
-        var operator = tokens[i].trim();
-        var nextToken = tokens[i+1] || '';
-        var nextVal = parseTokenValue(nextToken);
+function evaluatePlaceholderExpression (exprString){
+    /* split on +  -  x  /   (all kept as separate tokens) */
+    var tokens = exprString.split(/([+\-x\/])/);          // ← every \ is **doubled**
+    if (!tokens.length) return '0';
 
-        if(operator==='+') currentVal += nextVal;
-        else if(operator==='-') currentVal -= nextVal;
-        else if(operator==='x') currentVal *= nextVal;
-        else if(operator==='/'){
-            if(nextVal!==0) currentVal /= nextVal;
-            else currentVal=0;
-        }
-        i+=2;
+    var currentVal = parseTokenValue(tokens[0]);
+    for (var i = 1; i < tokens.length; i += 2){
+        var op   = tokens[i];
+        var next = parseTokenValue(tokens[i + 1] || '0');
+
+        if      (op === '+') currentVal += next;
+        else if (op === '-') currentVal -= next;
+        else if (op === 'x') currentVal *= next;
+        else if (op === '/') currentVal  = next !== 0 ? currentVal / next : 0;
     }
     return currentVal.toString();
 }
