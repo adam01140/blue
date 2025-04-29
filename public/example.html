@@ -194,13 +194,6 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
             </span>
             <span class="checkbox-inline">
               <label class="checkbox-label">
-                <input type="checkbox" id="answer10_do_you_receive_any_of_the_following_none" name="answer10_do_you_receive_any_of_the_following_none" value="None"
-                       >
-                None
-              </label>
-            </span>
-            <span class="checkbox-inline">
-              <label class="checkbox-label">
                 <input type="checkbox" id="answer10_do_you_receive_any_of_the_following_ssp" name="answer10_do_you_receive_any_of_the_following_ssp" value="SSP"
                        >
                 SSP
@@ -254,7 +247,14 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
                        >
                 Unemployment
               </label>
-            </span></div><br></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(3)">Back</button><button type="button" onclick="handleNext(4)">Next</button></div></div><div id="section5" class="section"><h2>Household Income Qualifications</h2><div id="question-container-11" class="hidden"><label><h3>Is your household monthly income less than the amount below?</h3></label><br><img src="income.png" alt="Dropdown Image" width="1000" height="100"><br><select id="is_your_household_monthly_income_less_than_the_amount_below" name="is_your_household_monthly_income_less_than_the_amount_below"
+            </span>
+            <span class="checkbox-inline">
+              <label class="checkbox-label">
+                <input type="checkbox" id="answer10_none" name="answer10_none" value="None of the above"
+                       >
+                None of the above
+              </label>
+            </span></div><br></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(3)">Back</button><button type="button" onclick="handleNext(4)">Next</button></div></div><div id="section5" class="section"><h2>Household Income Qualifications</h2><div id="question-container-11"><label><h3>Is your household monthly income less than the amount below?</h3></label><br><img src="income.png" alt="Dropdown Image" width="1000" height="100"><br><select id="is_your_household_monthly_income_less_than_the_amount_below" name="is_your_household_monthly_income_less_than_the_amount_below"
                       onchange="dropdownMirror(this, 'is_your_household_monthly_income_less_than_the_amount_below')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_is_your_household_monthly_income_less_than_the_amount_below"></div>
@@ -448,7 +448,7 @@ function getCbPrefix(qId){
         }
     });
   var questionNameIds = {"1":"what_is_your_name","3":"what_is_your_phone_number","4":"are_you_currently_employed","6":"do_you_have_a_lawyer","8":"has_your_lawyer_agreed_to_cover_a_portion_of_your_fees","9":"have_you_filed_a_claim_before","10":"answer10","11":"is_your_household_monthly_income_less_than_the_amount_below","12":"what_would_you_like_the_court_to_do","13":"does_your_income_change_a_lot","14":"answer14","15":"does_anybody_else_live_in_your_home","16":"answer16","17":"does_your_income_change_a_lot_from_month_to_month","18":"answer18","19":"do_you_have_anybody_else_living_in_your_home","20":"answer20","21":"do_you_have_any_cash_savings","22":"how_much_cash_saving_do_you_have","23":"do_you_have_a_bank_account","24":"answer24","25":"do_you_own_any_cars_boats_and_other_vehicles","26":"answer26","27":"do_you_own_any_real_estate","28":"answer28","29":"do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect","30":"answer30","31":"do_you_have_any_payroll_deductions","32":"answer32","33":"answer33","34":"do_you_have_any_installment_payments","35":"answer35","36":"do_you_have_any_wagesearnings_withheld_by_the_court","37":"how_much_is_being_withheld","38":"do_you_have_any_other_monthly_expenses","39":"answer39"};
-var jumpLogics = [{"questionId":"10","questionType":"checkbox","jumpOption":"Supp Sec Inc","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"Food stamps","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"SSP","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"Medi-Cal","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"County Relief/Gen. Assist","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"IHHS","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"CalWorks or Tribal TANF","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"CAPI","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"WINC","jumpTo":"end","section":4},{"questionId":"10","questionType":"checkbox","jumpOption":"Unemployment","jumpTo":"end","section":4},{"questionId":"15","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":7},{"questionId":"15","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":7},{"questionId":"38","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":16},{"questionId":"38","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":16}];
+var jumpLogics = [{"questionId":"15","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":7},{"questionId":"15","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":7},{"questionId":"38","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":16},{"questionId":"38","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":16}];
 var conditionalPDFs = [];
 var conditionalAlerts = [];
 var labelMap = {"14":["Description"],"16":["Name","Age","Relationship"],"18":["Income Source"],"20":["Name","Age","Relationship"],"24":["Bank Name"],"26":["Make/Year"],"28":["Address"],"30":["Description"],"32":["Description"],"35":["Description"],"39":["Description"]};
@@ -708,35 +708,6 @@ var hiddenTextCalculations = [{"hiddenFieldName":"10b","calculations":[{"terms":
    var selectQuestion = "9";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-11");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="none";
-    var cPrevQNum="10";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var checkQuestion = "10";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  updateVisibility();
 })();
@@ -1870,13 +1841,31 @@ function showTextboxLabels(questionId, count){
     var theseLabels = labelMap[questionId] || [];
     var theseAmounts = amountMap[questionId] || [];
 
+    // Get the question text from the container
+    const questionContainer = document.getElementById('question-container-' + questionId);
+	
+   
+		
+		
+
+
+	const questionText = (questionContainer
+        ? questionContainer.querySelector('h3').textContent
+        : 'answer' + questionId)
+        .toLowerCase()
+        .replace(/\W+/g, "_")        // turn every non-word chunk into “_”
+        .replace(/^_+|_+$/g, "");     // **strip leading/trailing “_”**	
+
+
+
     for (var j=1; j <= count; j++) {
         // Labels
         for (var L=0; L < theseLabels.length; L++) {
             var labelTxt = theseLabels[L] || "Label";
-            var sanitizedLabel = labelTxt.replace(/\s+/g,"_").toLowerCase();
+           
+			var sanitizedLabel = labelTxt.replace(/\s+/g,"_").toLowerCase();
             // Add j to ID
-            var labelId = "label" + questionId + "_" + j + "_" + sanitizedLabel;
+            var labelId = questionText + "_" + j + "_" + sanitizedLabel;
             container.innerHTML += '<input type="text" id="' + labelId + '" ' +
                 'name="' + labelId + '" ' +
                 'placeholder="' + labelTxt + ' ' + j + '" ' +
@@ -1886,9 +1875,10 @@ function showTextboxLabels(questionId, count){
         // Amounts 
         for (var A=0; A < theseAmounts.length; A++) {
             var amtTxt = theseAmounts[A] || "Amount";
-            var sanitizedAmt = amtTxt.replace(/\s+/g,"_").toLowerCase();
-            // Add j to ID
-            var amtId = "amount" + questionId + "_" + j + "_" + sanitizedAmt;
+            
+			var sanitizedAmt = amtTxt.replace(/\s+/g,"_").toLowerCase();
+            // Add j to ID using question text
+            var amtId = questionText + "_" + j + "_" + sanitizedAmt;
             container.innerHTML += '<input type="number" id="' + amtId + '" ' +
                 'name="' + amtId + '" ' +
                 'placeholder="' + amtTxt + ' ' + j + '" ' +

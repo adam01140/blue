@@ -830,15 +830,27 @@ function showTextboxLabels(questionId, count){
 
     // Get the question text from the container
     const questionContainer = document.getElementById('question-container-' + questionId);
-    const questionText = questionContainer ? 
-        questionContainer.querySelector('h3').textContent.toLowerCase().replace(/\W+/g, '_') : 
-        'answer' + questionId;
+	
+   
+		
+		
+
+
+	const questionText = (questionContainer
+        ? questionContainer.querySelector('h3').textContent
+        : 'answer' + questionId)
+        .toLowerCase()
+        .replace(/\\W+/g, "_")        // turn every non-word chunk into “_”
+        .replace(/^_+|_+$/g, "");     // **strip leading/trailing “_”**	
+
+
 
     for (var j=1; j <= count; j++) {
         // Labels
         for (var L=0; L < theseLabels.length; L++) {
             var labelTxt = theseLabels[L] || "Label";
-            var sanitizedLabel = labelTxt.replace(/\s+/g,"_").toLowerCase();
+           
+			var sanitizedLabel = labelTxt.replace(/\\s+/g,"_").toLowerCase();
             // Add j to ID
             var labelId = questionText + "_" + j + "_" + sanitizedLabel;
             container.innerHTML += '<input type="text" id="' + labelId + '" ' +
@@ -850,7 +862,8 @@ function showTextboxLabels(questionId, count){
         // Amounts 
         for (var A=0; A < theseAmounts.length; A++) {
             var amtTxt = theseAmounts[A] || "Amount";
-            var sanitizedAmt = amtTxt.replace(/\s+/g,"_").toLowerCase();
+            
+			var sanitizedAmt = amtTxt.replace(/\\s+/g,"_").toLowerCase();
             // Add j to ID using question text
             var amtId = questionText + "_" + j + "_" + sanitizedAmt;
             container.innerHTML += '<input type="number" id="' + amtId + '" ' +
