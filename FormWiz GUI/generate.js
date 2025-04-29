@@ -5,6 +5,23 @@
  *   and a single <script> block for logic
  *********************************************/
 
+/* global map: questionId  →  canonical slug */
+const questionSlugMap = {};
+
+/*───────────────────────────────*
+ * canonical sanitiser – visible
+ * to all build-time code
+ *───────────────────────────────*/
+function sanitizeQuestionText(str){
+    return String(str)
+        .toLowerCase()
+        .replace(/\\W+/g, "_")      // swap every non-word run for "_"
+        .replace(/^_+|_+$/g, "");   // trim leading / trailing "_"
+}
+
+
+
+
 function getFormHTML() {
   // Top HTML (head, body, header, etc.)
   let formHTML = [
@@ -218,6 +235,13 @@ function getFormHTML() {
 
       const questionTextEl = qBlock.querySelector("#question" + questionId);
       const questionText = questionTextEl ? questionTextEl.value : "";
+	  // ----------  ADD THIS  ----------
+const slug = sanitizeQuestionText(questionText);
+questionSlugMap[questionId] = slug;
+// --------------------------------
+
+
+
 
       const questionTypeEl = qBlock.querySelector("#questionType" + questionId);
       const questionType = questionTypeEl ? questionTypeEl.value : "text";
@@ -820,61 +844,47 @@ function toggleAmountField(amountFieldId, show) {
     }
 }
 
-function showTextboxLabels(questionId, count){
-    var container = document.getElementById("labelContainer" + questionId);
-    if(!container) return;
-    container.innerHTML = "";
-    container.innerHTML += "<br>";
-    var theseLabels = labelMap[questionId] || [];
-    var theseAmounts = amountMap[questionId] || [];
 
-    // Get the question text from the container
-    const questionContainer = document.getElementById('question-container-' + questionId);
-	
-   
-		
-		
-
-
-	const questionText = (questionContainer
-        ? questionContainer.querySelector('h3').textContent
-        : 'answer' + questionId)
+function sanitizeQuestionText(str){
+    return String(str)
         .toLowerCase()
-        .replace(/\\W+/g, "_")        // turn every non-word chunk into “_”
-        .replace(/^_+|_+$/g, "");     // **strip leading/trailing “_”**	
+        .replace(/\W+/g, "_")   // swap every non-word run for "
+        .replace(/^_+|_+$/g, "");  // trim leading/trailing _
+}
 
 
+function showTextboxLabels(questionId, count){
+    const container = document.getElementById("labelContainer" + questionId);
+    if(!container) return;
 
-    for (var j=1; j <= count; j++) {
-        // Labels
-        for (var L=0; L < theseLabels.length; L++) {
-            var labelTxt = theseLabels[L] || "Label";
-           
-			var sanitizedLabel = labelTxt.replace(/\\s+/g,"_").toLowerCase();
-            // Add j to ID
-            var labelId = questionText + "_" + j + "_" + sanitizedLabel;
-            container.innerHTML += '<input type="text" id="' + labelId + '" ' +
-                'name="' + labelId + '" ' +
-                'placeholder="' + labelTxt + ' ' + j + '" ' +
-                'style="text-align:center;"><br>';
+    container.innerHTML = "<br>";
+    const theseLabels   = labelMap[questionId]   || [];
+    const theseAmounts  = amountMap[questionId]  || [];
+
+    /* get and sanitise the question's visible text exactly once */
+    const questionH3   = document
+        .getElementById("question-container-" + questionId)
+        ?.querySelector("h3")?.textContent || ("answer" + questionId);
+    const qSafe = sanitizeQuestionText(questionH3);
+
+    for(let j = 1; j <= count; j++){
+        /* label inputs */
+        for(const lbl of theseLabels){
+            const id = qSafe + "_" + j + "_" + sanitizeQuestionText(lbl);
+            container.innerHTML +=
+              '<input type="text" id="' + id + '" name="' + id + '" placeholder="' + lbl + ' ' + j + '" style="text-align:center;"><br>';
         }
-
-        // Amounts 
-        for (var A=0; A < theseAmounts.length; A++) {
-            var amtTxt = theseAmounts[A] || "Amount";
-            
-			var sanitizedAmt = amtTxt.replace(/\\s+/g,"_").toLowerCase();
-            // Add j to ID using question text
-            var amtId = questionText + "_" + j + "_" + sanitizedAmt;
-            container.innerHTML += '<input type="number" id="' + amtId + '" ' +
-                'name="' + amtId + '" ' +
-                'placeholder="' + amtTxt + ' ' + j + '" ' +
-                'style="text-align:center;"><br>';
+        /* amount inputs */
+        for(const amt of theseAmounts){
+            const id = qSafe + "_" + j + "_" + sanitizeQuestionText(amt);
+            container.innerHTML +=
+              '<input type="number" id="' + id + '" name="' + id + '" placeholder="' + amt + ' ' + j + '" style="text-align:center;"><br>';
         }
         container.innerHTML += "<br>";
     }
-    attachCalculationListeners(); // in case those new fields also matter
+    attachCalculationListeners();   // keep this
 }
+
 
 // Handle linked dropdown logic
 function handleLinkedDropdowns(sourceName, selectedValue) {
@@ -1252,13 +1262,13 @@ function runSingleHiddenTextCalculation(calcObj) {
 }
 
 function replacePlaceholderTokens(str){
-    return str.replace(/\\$\\$(.*?)\\$\\$/g, function(match, expressionInside){
+    return str.replace(/\$\$(.*?)\$\$/g, function(match, expressionInside){
         return evaluatePlaceholderExpression(expressionInside);
     });
 }
 
 function evaluatePlaceholderExpression(exprString){
-    var tokens = exprString.split(/(\\+|\\-|x|\\/)/);
+    var tokens = exprString.split(/(\+|\-|x|\/)/);
     if(!tokens.length) return '0';
     var currentVal = parseTokenValue(tokens[0]);
     var i=1;
@@ -1508,6 +1518,52 @@ function attachCalculationListeners() {
 }
 
 
+
+/*────────────────────────────────────────────────────────────*
+ * normaliseDesignerFieldRef(raw)
+ *   raw  – whatever string the designer stored
+ *   ←    – the runtime <input>.id that will exist in the HTML
+ *
+ *   Handles four cases:
+ *     ① already a real element in the live DOM         → keep
+ *     ② the full slug is already present               → keep
+ *     ③ it is the short builder-shorthand
+ *        “amount<X>_<index>_<field>” or
+ *        “answer<X>_<index>_<field>”                   → expand
+ *     ④ anything else                                  → best-effort
+ *────────────────────────────────────────────────────────────*/
+function normaliseDesignerFieldRef (raw){
+    raw = String(raw || "").trim();
+
+    /* ① live element?  …return untouched */
+    if (document.getElementById(raw)) return raw;
+
+    /* ② already looks like slug_#_field and the slug is *not*
+          “amount1” / “answer1” style (i.e. has a “_” in it)     */
+    const mSlug = raw.match(/^([a-z0-9]+_[a-z0-9_]+?)_(\d+)_(.+)$/);
+    if (mSlug && !/^amount\d+$/.test(mSlug[1]) && !/^answer\d+$/.test(mSlug[1]))
+        return raw;
+
+    /* ③ builder shorthand – rebuild it with the real slug */
+    let mShort = raw.match(/^amount(\d+)_(\d+)_(.+)$/) ||
+                 raw.match(/^answer(\d+)_(\d+)_(.+)$/);
+    if (mShort){
+        const [, qId, idx, field] = mShort;
+        const slug = questionSlugMap[qId] || ("answer" + qId);
+        return `${slug}_${idx}_${sanitizeQuestionText(field)}`;
+    }
+
+    /* ④ last fallback – try to sanitise whatever we can */
+    const mGeneric = raw.match(/^(.*)_(\d+)_(.+)$/);
+    if (!mGeneric) return sanitizeQuestionText(raw);
+
+    const [, qText, idx, field] = mGeneric;
+    return `${sanitizeQuestionText(qText)}_${idx}_${sanitizeQuestionText(field)}`;
+}
+
+
+
+
 /**
  * generateHiddenPDFFields()
  *  - Reads from #hiddenFieldsContainer
@@ -1516,233 +1572,105 @@ function attachCalculationListeners() {
  *  - Expands "numberedDropdown" amounts into multiple "amountX_Y_value" references
  *  - Supports ##fieldname## pattern in fillValue to display the calculation result
  */
-function generateHiddenPDFFields() {
+function generateHiddenPDFFields(){
     let hiddenFieldsHTML = '<div id="hidden_pdf_fields">';
-    
-    // Add hidden fields for user information
+
+    /* user-profile hidden fields .................................... */
     hiddenFieldsHTML += `
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
-<input type="hidden" id="user_lastname_hidden" name="user_lastname_hidden">
-<input type="hidden" id="user_email_hidden" name="user_email_hidden">
-<input type="hidden" id="user_phone_hidden" name="user_phone_hidden">
-<input type="hidden" id="user_street_hidden" name="user_street_hidden">
-<input type="hidden" id="user_city_hidden" name="user_city_hidden">
-<input type="hidden" id="user_state_hidden" name="user_state_hidden">
-<input type="hidden" id="user_zip_hidden" name="user_zip_hidden">`;
-    
-    const hiddenCheckboxCalculations = [];
-    const hiddenTextCalculations = [];
+<input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
+<input type="hidden" id="user_email_hidden"     name="user_email_hidden">
+<input type="hidden" id="user_phone_hidden"     name="user_phone_hidden">
+<input type="hidden" id="user_street_hidden"    name="user_street_hidden">
+<input type="hidden" id="user_city_hidden"      name="user_city_hidden">
+<input type="hidden" id="user_state_hidden"     name="user_state_hidden">
+<input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">`;
 
-    // Create a map of question text to ID for field name conversions
-    const questionTextToIdMap = {};
-    const questionNameIds = {}; // Also track ID to text mapping
-    
-    // Gather all question texts and IDs
-    const questionBlocks = document.querySelectorAll('.question-block');
-    questionBlocks.forEach(qBlock => {
-        const qId = qBlock.id.replace('questionBlock', '');
-        const txtEl = qBlock.querySelector('#question' + qId);
-        if (txtEl) {
-            const qText = txtEl.value.trim();
-            questionTextToIdMap[qText] = qId;
-            questionNameIds[qId] = qText;
+    const hiddenCheckboxCalculations = [];
+    const hiddenTextCalculations     = [];
+
+    /* walk every hidden-field block .................................. */
+    const hiddenFieldsContainer = document.getElementById("hiddenFieldsContainer");
+    if (!hiddenFieldsContainer)
+        return { hiddenFieldsHTML: hiddenFieldsHTML + "</div>",
+                 hiddenCheckboxCalculations,
+                 hiddenTextCalculations };
+
+    hiddenFieldsContainer.querySelectorAll(".hidden-field-block").forEach(block=>{
+        const hid    = block.id.replace("hiddenFieldBlock", "");
+        const fType  = block.querySelector("#hiddenFieldType"+hid)?.value || "text";
+        const fName  = block.querySelector("#hiddenFieldName"+hid)?.value.trim();
+        if(!fName) return;
+
+        /*──────────── TEXT hidden field ────────────*/
+        if (fType === "text"){
+            hiddenFieldsHTML += `\n<input type="text" id="${fName}" name="${fName}" style="display:none;">`;
+
+            const calcRows = block.querySelectorAll(`[id^="textCalculationRow${hid}_"]`);
+            if (calcRows.length){
+                const calcArr = [];
+                calcRows.forEach(row=>{
+                    const oneCalc = { terms:[], compareOperator:"=", threshold:"0", fillValue:"" };
+
+                    /* terms ..........................................*/
+                    row.querySelectorAll(".equation-term-text").forEach((termDiv,tIdx)=>{
+                        const qSel  = termDiv.querySelector('[id^="textTermQuestion"]');
+                        if(!qSel) return;
+                        oneCalc.terms.push({
+                            operator      : tIdx ? termDiv.querySelector('[id^="textTermOperator"]').value : "",
+                            questionNameId: normaliseDesignerFieldRef(qSel.value)
+                        });
+                    });
+
+                    if (!oneCalc.terms.length) return;
+
+                    /* other properties ...............................*/
+                    oneCalc.compareOperator = row.querySelector('[id^="textCompareOperator"]').value || "=";
+                    oneCalc.threshold       = row.querySelector('[id^="textThreshold"]').value.trim() || "0";
+                    oneCalc.fillValue       = row.querySelector('[id^="textFillValue"]').value.trim() || "";
+
+                    calcArr.push(oneCalc);
+                });
+                if (calcArr.length) hiddenTextCalculations.push({ hiddenFieldName:fName, calculations:calcArr });
+            }
+        }
+
+        /*──────────── CHECKBOX hidden field ────────────*/
+        if (fType === "checkbox"){
+            const isChecked = block.querySelector("#hiddenFieldChecked"+hid)?.checked;
+            hiddenFieldsHTML += `\n<div style="display:none;"><input type="checkbox" id="${fName}" name="${fName}" ${isChecked?"checked":""}></div>`;
+
+            const calcRows = block.querySelectorAll(`[id^="calculationRow${hid}_"]`);
+            if (calcRows.length){
+                const calcArr = [];
+                calcRows.forEach(row=>{
+                    const oneCalc = { terms:[], compareOperator:"=", threshold:"0", result:"checked" };
+
+                    /* terms ..........................................*/
+                    row.querySelectorAll(".equation-term-cb").forEach((termDiv,tIdx)=>{
+                        const qSel = termDiv.querySelector('[id^="calcTermQuestion"]');
+                        if(!qSel) return;
+                        oneCalc.terms.push({
+                            operator      : tIdx ? termDiv.querySelector('[id^="calcTermOperator"]').value : "",
+                            questionNameId: normaliseDesignerFieldRef(qSel.value)
+                        });
+                    });
+
+                    if (!oneCalc.terms.length) return;
+
+                    /* other properties ...............................*/
+                    oneCalc.compareOperator = row.querySelector('[id^="calcCompareOperator"]').value || "=";
+                    oneCalc.threshold       = row.querySelector('[id^="calcThreshold"]').value.trim() || "0";
+                    oneCalc.result          = row.querySelector('[id^="calcResult"]').value || "checked";
+
+                    calcArr.push(oneCalc);
+                });
+                if (calcArr.length) hiddenCheckboxCalculations.push({ hiddenFieldName:fName, calculations:calcArr });
+            }
         }
     });
 
-    const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
-    if (hiddenFieldsContainer) {
-        const fieldBlocks = hiddenFieldsContainer.querySelectorAll(".hidden-field-block");
-        
-        for (let fb = 0; fb < fieldBlocks.length; fb++) {
-            const block = fieldBlocks[fb];
-            const hid = block.id.replace("hiddenFieldBlock", "");
-            const fTypeEl = document.getElementById("hiddenFieldType" + hid);
-            const fType = fTypeEl ? fTypeEl.value : "text";
-            const fNameEl = document.getElementById("hiddenFieldName" + hid);
-            const fName = fNameEl ? fNameEl.value.trim() : "";
-            
-            if (!fName) continue;
-
-            // ------------------------------
-            // HIDDEN TEXT FIELD
-            // ------------------------------
-            if (fType === "text") {
-                // Add the hidden text field
-                //hide calc fields here
-                hiddenFieldsHTML += '\n<input type="text" id="' + fName + '" name="' + fName + '" placeholder="' + fName + '" style="display:none;">';
-    
-                // Process text calculations from UI
-                const textCalcBlock = block.querySelector("#textCalculationBlock" + hid);
-                if (textCalcBlock) {
-                    const calcRows = textCalcBlock.querySelectorAll('[id^="textCalculationRow' + hid + '_"]');
-                    
-                    if (calcRows.length > 0) {
-                        let calcArr = [];
-                        
-                        for (let c = 0; c < calcRows.length; c++) {
-                            const row = calcRows[c];
-                            const eqContainer = row.querySelector('[id^="textEquationContainer"]');
-                            let termsArr = [];
-                            
-                            if (eqContainer) {
-                                const termDivs = eqContainer.querySelectorAll('.equation-term-text');
-                                
-                                for (let t = 0; t < termDivs.length; t++) {
-                                    const termDiv = termDivs[t];
-                                    const termNumber = t + 1;
-                                    const opSel = termNumber > 1
-                                        ? termDiv.querySelector('[id^="textTermOperator"]')
-                                        : null;
-                                    const qSel = termDiv.querySelector('[id^="textTermQuestion"]');
-
-                                    const operatorVal = opSel ? opSel.value : "";
-                                    let questionNameIdVal = qSel ? qSel.value.trim() : "";
-                                    
-                                    if (questionNameIdVal) {
-                                        // Convert from text-based references to ID-based references
-                                        const textMatch = questionNameIdVal.match(/^(.+?)_(\d+)_(.+)$/);
-                                        if (textMatch) {
-                                            const questionText = textMatch[1];
-                                            const numValue = textMatch[2];
-                                            const fieldValue = textMatch[3];
-                                            
-                                            // If we can map this question text to an ID, do so
-                                            if (questionTextToIdMap[questionText]) {
-                                                questionNameIdVal = 'amount' + questionTextToIdMap[questionText] + '_' + numValue + '_' + fieldValue;
-                                            }
-                                        }
-                                        
-                                        termsArr.push({
-                                            operator: termNumber === 1 ? "" : operatorVal,
-                                            questionNameId: questionNameIdVal
-                                        });
-                                    }
-                                }
-                            }
-
-                            const cmpOp = row.querySelector('[id^="textCompareOperator"]');
-                            const thrEl = row.querySelector('[id^="textThreshold"]');
-                            const fillEl = row.querySelector('[id^="textFillValue"]');
-
-                            const cmpVal = cmpOp ? cmpOp.value : "=";
-                            const thrVal = thrEl ? thrEl.value.trim() : "0";
-                            const fillVal = fillEl ? fillEl.value.trim() : "";
-
-                            if (termsArr.length > 0) {
-                                calcArr.push({
-                                    terms: termsArr,
-                                    compareOperator: cmpVal,
-                                    threshold: thrVal,
-                                    fillValue: fillVal
-                                });
-                            }
-                        }
-
-                        if (calcArr.length > 0) {
-                            hiddenTextCalculations.push({
-                                hiddenFieldName: fName,
-                                calculations: calcArr
-                            });
-                        }
-                    }
-                }
-            } 
-            
-            // ------------------------------
-            // HIDDEN CHECKBOX FIELD
-            // ------------------------------
-            else if (fType === "checkbox") {
-                // Hidden checkbox field
-                const chkEl = document.getElementById("hiddenFieldChecked" + hid);
-                const isCheckedDefault = chkEl && chkEl.checked;
-                hiddenFieldsHTML += '\n<div style="display:none;">' + 
-                    '\n<input type="checkbox" id="' + fName + '" name="' + fName + '" ' + (isCheckedDefault ? "checked" : "") + '>' +
-                    '\n</div>';
-
-                // Process checkbox calculations from UI
-                const calcBlock = block.querySelector("#calculationBlock" + hid);
-                if (calcBlock) {
-                    const calcRows = calcBlock.querySelectorAll('[id^="calculationRow' + hid + '_"]');
-                    
-                    if (calcRows.length > 0) {
-                        let calcArr = [];
-                        
-                        for (let cr = 0; cr < calcRows.length; cr++) {
-                            const row = calcRows[cr];
-                            const eqContainer = row.querySelector('[id^="equationContainer"]');
-                            let termsArr = [];
-                            
-                            if (eqContainer) {
-                                const termDivs = eqContainer.querySelectorAll('.equation-term-cb');
-                                
-                                for (let t = 0; t < termDivs.length; t++) {
-                                    const termDiv = termDivs[t];
-                                    const termNumber = t + 1;
-                                    const opSel = termNumber > 1
-                                        ? termDiv.querySelector('[id^="calcTermOperator"]')
-                                        : null;
-                                    const qSel = termDiv.querySelector('[id^="calcTermQuestion"]');
-
-                                    const operatorVal = opSel ? opSel.value : "";
-                                    let questionNameIdVal = qSel ? qSel.value.trim() : "";
-                                    
-                                    if (questionNameIdVal) {
-                                        // Convert from text-based references to ID-based references
-                                        const textMatch = questionNameIdVal.match(/^(.+?)_(\d+)_(.+)$/);
-                                        if (textMatch) {
-                                            const questionText = textMatch[1];
-                                            const numValue = textMatch[2];
-                                            const fieldValue = textMatch[3];
-                                            
-                                            // If we can map this question text to an ID, do so
-                                            if (questionTextToIdMap[questionText]) {
-                                                questionNameIdVal = 'amount' + questionTextToIdMap[questionText] + '_' + numValue + '_' + fieldValue;
-                                            }
-                                        }
-                                        
-                                        termsArr.push({
-                                            operator: termNumber === 1 ? "" : operatorVal,
-                                            questionNameId: questionNameIdVal
-                                        });
-                                    }
-                                }
-                            }
-
-                            const cmpOp = row.querySelector('[id^="calcCompareOperator"]');
-                            const thrEl = row.querySelector('[id^="calcThreshold"]');
-                            const resEl = row.querySelector('[id^="calcResult"]');
-
-                            const cmpVal = cmpOp ? cmpOp.value : "=";
-                            const thrVal = thrEl ? thrEl.value.trim() : "0";
-                            const resVal = resEl ? resEl.value : "checked";
-
-                            if (termsArr.length > 0) {
-                                calcArr.push({
-                                    terms: termsArr,
-                                    compareOperator: cmpVal,
-                                    threshold: thrVal,
-                                    result: resVal
-                                });
-                            }
-                        }
-
-                        if (calcArr.length > 0) {
-                            hiddenCheckboxCalculations.push({
-                                hiddenFieldName: fName,
-                                calculations: calcArr
-                            });
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     hiddenFieldsHTML += "\n</div>";
-
-    return {
-        hiddenFieldsHTML,
-        hiddenCheckboxCalculations,
-        hiddenTextCalculations,
-    };
+    return { hiddenFieldsHTML, hiddenCheckboxCalculations, hiddenTextCalculations };
 }
+
