@@ -245,11 +245,149 @@ function setSection(cell, sectionNum) {
     };
     updateSectionLegend();
   }
+
+  // If this is a question node, update all connected option nodes
+  if (isQuestion(cell)) {
+    const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+    outgoingEdges.forEach(edge => {
+      const targetCell = edge.target;
+      if (targetCell && isOptions(targetCell)) {
+        // Recursively set section without triggering infinite loop
+        let targetStyle = targetCell.style || "";
+        targetStyle = targetStyle.replace(/section=[^;]+/, "");
+        targetStyle += `;section=${sectionNum};`;
+        graph.getModel().setStyle(targetCell, targetStyle);
+      }
+    });
+  }
+  // If this is an option node, check if it's connected to a question and match its section
+  else if (isOptions(cell)) {
+    const incomingEdges = graph.getIncomingEdges(cell) || [];
+    for (const edge of incomingEdges) {
+      const sourceCell = edge.source;
+      if (sourceCell && isQuestion(sourceCell)) {
+        const questionSection = getSection(sourceCell);
+        if (questionSection !== sectionNum) {
+          // Use the question's section instead
+          style = style.replace(/section=[^;]+/, "");
+          style += `;section=${questionSection};`;
+          graph.getModel().setStyle(cell, style);
+        }
+        break;
+      }
+    }
+  }
 }
+
 function getSection(cell) {
   const style = cell.style || "";
   const match = style.match(/section=([^;]+)/);
   return match ? match[1] : "1";
+}
+
+// Add these functions at the top level
+function deleteSection(sectionNum) {
+  const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
+  const sectionToDelete = parseInt(sectionNum);
+  
+  // If this is the only section, don't allow deletion
+  if (sections.length === 1) {
+    alert("Cannot delete the only remaining section");
+    return;
+  }
+  
+  // Start a graph update
+  graph.getModel().beginUpdate();
+  try {
+    const parent = graph.getDefaultParent();
+    const vertices = graph.getChildVertices(parent);
+    
+    // First, delete all cells in the section being deleted
+    const cellsToDelete = vertices.filter(cell => parseInt(getSection(cell) || "1", 10) === sectionToDelete);
+    if (cellsToDelete.length > 0) {
+      graph.removeCells(cellsToDelete);
+    }
+    
+    // Then move all cells from higher sections down one level
+    vertices.forEach(cell => {
+      const cellSection = parseInt(getSection(cell) || "1", 10);
+      if (cellSection > sectionToDelete) {
+        setSection(cell, cellSection - 1);
+      }
+    });
+    
+    // Update sectionPrefs
+    const newSectionPrefs = {};
+    Object.keys(sectionPrefs).forEach(sec => {
+      const secNum = parseInt(sec);
+      if (secNum < sectionToDelete) {
+        newSectionPrefs[sec] = sectionPrefs[sec];
+      } else if (secNum > sectionToDelete) {
+        // Move section down one level but keep its name
+        newSectionPrefs[(secNum - 1).toString()] = {
+          ...sectionPrefs[sec],
+          borderColor: getDefaultSectionColor(secNum - 1)
+        };
+      }
+    });
+    sectionPrefs = newSectionPrefs;
+    
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  
+  updateSectionLegend();
+  refreshAllCells();
+}
+
+function addSection(afterSectionNum) {
+  const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
+  const insertAfter = parseInt(afterSectionNum);
+  const newSectionNum = insertAfter + 1;
+  
+  // Start a graph update
+  graph.getModel().beginUpdate();
+  try {
+    // First, move all cells from higher sections up one level
+    const parent = graph.getDefaultParent();
+    const vertices = graph.getChildVertices(parent);
+    
+    vertices.forEach(cell => {
+      const cellSection = parseInt(getSection(cell) || "1", 10);
+      if (cellSection > insertAfter) {
+        setSection(cell, cellSection + 1);
+      }
+    });
+    
+    // Update sectionPrefs
+    const newSectionPrefs = {};
+    Object.keys(sectionPrefs).forEach(sec => {
+      const secNum = parseInt(sec);
+      if (secNum <= insertAfter) {
+        newSectionPrefs[sec] = sectionPrefs[sec];
+      } else {
+        // Move section up one level but keep its name
+        newSectionPrefs[(secNum + 1).toString()] = {
+          ...sectionPrefs[sec],
+          borderColor: getDefaultSectionColor(secNum + 1)
+        };
+      }
+    });
+    
+    // Add the new section
+    newSectionPrefs[newSectionNum.toString()] = {
+      borderColor: getDefaultSectionColor(newSectionNum),
+      name: `Section ${newSectionNum}`
+    };
+    
+    sectionPrefs = newSectionPrefs;
+    
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  
+  updateSectionLegend();
+  refreshAllCells();
 }
 
 function updateSectionLegend() {
@@ -259,9 +397,15 @@ function updateSectionLegend() {
   sections.forEach(sec => {
     innerHTML += `
       <div class="section-item" data-section="${sec}">
-        <div class="section-color-box" style="background-color: ${sectionPrefs[sec].borderColor};" data-section="${sec}"></div>
-        <span class="section-number">${sec}:</span>
-        <span class="section-name" contenteditable="true" data-section="${sec}">${sectionPrefs[sec].name}</span>
+        <div class="section-header">
+          <div class="section-color-box" style="background-color: ${sectionPrefs[sec].borderColor};" data-section="${sec}"></div>
+          <span class="section-number">${sec}:</span>
+          <span class="section-name" contenteditable="true" data-section="${sec}">${sectionPrefs[sec].name}</span>
+        </div>
+        <div class="section-buttons">
+          <button class="delete-section-btn" onclick="deleteSection('${sec}')">Delete</button>
+          <button class="add-section-btn" onclick="addSection('${sec}')">Add Below</button>
+        </div>
       </div>
     `;
   });
@@ -329,6 +473,17 @@ let lastSelectedCell = null;
 let jumpModeNode = null;
 const jumpBorderStyle = ";strokeWidth=3;strokeColor=#ff0000;dashed=1;dashPattern=4 4;";
 
+// Add this at the top level to track mouse position
+let currentMouseX = 0;
+let currentMouseY = 0;
+
+// Add this in the DOMContentLoaded event listener
+document.addEventListener('mousemove', function(e) {
+  // Convert client coordinates to graph coordinates
+  const pt = graph.getPointForEvent(e, false);
+  currentMouseX = pt.x;
+  currentMouseY = pt.y;
+});
 
 window.handleMultipleTextboxClick = function(event, cellId) {
   event.stopPropagation();
@@ -373,6 +528,7 @@ function loadFlowchartData(data) {
       updateSectionLegend();
     }
 
+    // First pass: Create all cells
     data.cells.forEach(item => {
       if (item.vertex) {
         const geo = new mxGeometry(
@@ -401,19 +557,13 @@ function loadFlowchartData(data) {
         if (item._calcThreshold !== undefined) newCell._calcThreshold = item._calcThreshold;
         if (item._calcFinalText !== undefined) newCell._calcFinalText = item._calcFinalText;
         if (item._calcTerms !== undefined) newCell._calcTerms = item._calcTerms;
-        // If we have _calcAmountLabel but no _calcTerms, create the terms array
-        if (item._calcAmountLabel !== undefined && item._calcTerms === undefined) {
-          newCell._calcTerms = [{
-            amountLabel: item._calcAmountLabel,
-            mathOperator: ""
-          }];
-        }
 
         graph.addCell(newCell, parent);
         createdCells[item.id] = newCell;
       }
     });
 
+    // Second pass: Create all edges
     data.cells.forEach(item => {
       if (item.edge) {
         const newEdge = new mxCell(item.value, new mxGeometry(), item.style);
@@ -422,6 +572,26 @@ function loadFlowchartData(data) {
         const src = createdCells[item.source];
         const trg = createdCells[item.target];
         graph.addCell(newEdge, parent, undefined, src, trg);
+      }
+    });
+
+    // Third pass: Fix option node sections
+    const vertices = graph.getChildVertices(parent);
+    vertices.forEach(cell => {
+      if (isOptions(cell)) {
+        const incomingEdges = graph.getIncomingEdges(cell) || [];
+        for (const edge of incomingEdges) {
+          const sourceCell = edge.source;
+          if (sourceCell && isQuestion(sourceCell)) {
+            const questionSection = getSection(sourceCell);
+            const optionSection = getSection(cell);
+            if (questionSection !== optionSection) {
+              console.log(`Fixing option node ${cell.id} section from ${optionSection} to ${questionSection} to match parent question`);
+              setSection(cell, questionSection);
+            }
+            break;
+          }
+        }
       }
     });
   } finally {
@@ -1067,7 +1237,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Copy/Paste
   keyHandler.bindControlKey(67, () => { copySelectedNodeAsJson(); });
-  keyHandler.bindControlKey(86, () => { pasteNodeFromJson(); });
+  keyHandler.bindControlKey(86, () => { 
+    // Use current mouse position for paste
+    pasteNodeFromJson(currentMouseX, currentMouseY);
+  });
   
   // Add listener for copy button
   document.getElementById('copyNodeButton').addEventListener('click', function() {
@@ -1112,22 +1285,35 @@ document.addEventListener("DOMContentLoaded", function() {
   graph.connectionHandler.addListener(mxEvent.CONNECT, function(sender, evt) {
     const edge = evt.getProperty("cell");
     if (!edge) return;
-    const parent = edge.source;
-    const child = edge.target;
-    const parentIsJump = (parent && parent === jumpModeNode);
-    if (!parentIsJump && parent && child) {
-      const parentSec = parseInt(getSection(parent) || "1", 10);
-      setSection(child, parentSec);
+    const source = edge.source;
+    const target = edge.target;
+    
+    // If connecting a question to an option
+    if (source && target && isQuestion(source) && isOptions(target)) {
+      const questionSection = getSection(source);
+      setSection(target, questionSection);
+    }
+    // If connecting an option to a question (reverse case)
+    else if (source && target && isOptions(source) && isQuestion(target)) {
+      const questionSection = getSection(target);
+      setSection(source, questionSection);
+    }
+    
+    // Handle jump mode
+    const parentIsJump = (source && source === jumpModeNode);
+    if (!parentIsJump && source && target) {
+      const parentSec = parseInt(getSection(source) || "1", 10);
+      setSection(target, parentSec);
     }
     let parentQuestion = null;
-    if (parent && isOptions(parent)) {
-      parentQuestion = parent.source;
-    } else if (parent && isQuestion(parent)) {
-      parentQuestion = parent;
+    if (source && isOptions(source)) {
+      parentQuestion = source.source;
+    } else if (source && isQuestion(source)) {
+      parentQuestion = source;
     }
     const gpIsJump = (parentQuestion && parentQuestion === jumpModeNode);
     if (parentIsJump || gpIsJump) {
-      addSkipReassign(child);
+      addSkipReassign(target);
     }
     refreshAllCells();
   });
@@ -5089,7 +5275,7 @@ function pasteNodeFromJson(x, y) {
       if (data.isMultiCopy && data.cells && data.cells.length > 0) {
         graph.getModel().beginUpdate();
         try {
-          // Use provided position or default to a fixed position
+          // Use provided position or current mouse position or default to a fixed position
           const posX = x !== undefined ? x : 50;
           const posY = y !== undefined ? y : 50;
           
@@ -5178,7 +5364,7 @@ function pasteNodeFromJson(x, y) {
         // Original single-cell paste
         graph.getModel().beginUpdate();
         try {
-          // Use provided position or default to a fixed position
+          // Use provided position or current mouse position or default to a fixed position
           const posX = x !== undefined ? x : 50;
           const posY = y !== undefined ? y : 50;
           

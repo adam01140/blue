@@ -181,9 +181,14 @@ input[type="file"] {
 }
 .section-item {
   display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  padding: 4px;
+}
+.section-header {
+  display: flex;
   align-items: center;
-  margin-bottom: 8px;
-  padding: 4px; /* for better spacing */
+  margin-bottom: 6px;
 }
 .section-color-box {
   width: 20px;
@@ -218,6 +223,21 @@ input[type="file"] {
 }
 #resetSectionColorsBtn:hover {
   background-color: #0056b3;
+}
+.section-buttons {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+.delete-section-btn,
+.add-section-btn {
+  padding: 2px 6px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+  flex: 1;
 }
 
 /* LOGIN OVERLAY */
@@ -389,7 +409,7 @@ input[type="file"] {
   margin-bottom: 4px;
 }
 
-/* Add padding around the entire “multiple textboxes” node */
+/* Add padding around the entire "multiple textboxes" node */
 .multiple-textboxes-node {
   padding: 12px;
   box-sizing: border-box; /* ensures padding doesn't shrink the box */
