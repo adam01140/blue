@@ -302,8 +302,11 @@ function deleteSection(sectionNum) {
     const parent = graph.getDefaultParent();
     const vertices = graph.getChildVertices(parent);
     
-    // First, delete all cells in the section being deleted
-    const cellsToDelete = vertices.filter(cell => parseInt(getSection(cell) || "1", 10) === sectionToDelete);
+    // First, delete all cells in the section being deleted, excluding calculation nodes
+    const cellsToDelete = vertices.filter(cell => {
+      const sec = parseInt(getSection(cell) || "1", 10);
+      return sec === sectionToDelete && !isCalculationNode(cell);
+    });
     if (cellsToDelete.length > 0) {
       graph.removeCells(cellsToDelete);
     }
@@ -398,9 +401,9 @@ function updateSectionLegend() {
     innerHTML += `
       <div class="section-item" data-section="${sec}">
         <div class="section-header">
-          <div class="section-color-box" style="background-color: ${sectionPrefs[sec].borderColor};" data-section="${sec}"></div>
-          <span class="section-number">${sec}:</span>
-          <span class="section-name" contenteditable="true" data-section="${sec}">${sectionPrefs[sec].name}</span>
+        <div class="section-color-box" style="background-color: ${sectionPrefs[sec].borderColor};" data-section="${sec}"></div>
+        <span class="section-number">${sec}:</span>
+        <span class="section-name" contenteditable="true" data-section="${sec}">${sectionPrefs[sec].name}</span>
         </div>
         <div class="section-buttons">
           <button class="delete-section-btn" onclick="deleteSection('${sec}')">Delete</button>
@@ -4834,7 +4837,7 @@ window.exportGuiJson = function() {
       }
     }
   }
-  
+
   // Now fix any jump conditions that are incorrectly set
   for (const section of sections) {
     for (const question of section.questions) {
@@ -4861,7 +4864,7 @@ window.exportGuiJson = function() {
       
       if (shouldHaveJumps) {
         // Ensure jumps are enabled
-        question.jump.enabled = true;
+          question.jump.enabled = true;
         
         // Preserve both END jumps and section jumps
         if (!question.jump.conditions) {
@@ -4875,7 +4878,7 @@ window.exportGuiJson = function() {
           );
           if (!exists) {
             question.jump.conditions.push(jump);
-          }
+        }
         });
       } else {
         // Remove jump conditions if this question shouldn't have them
@@ -4883,7 +4886,7 @@ window.exportGuiJson = function() {
           console.log(`Question ${question.questionId} (${question.text}) should not have jumps, removing them`);
           question.jump.enabled = false;
           question.jump.conditions = [];
-        }
+        } 
       }
     }
   }
