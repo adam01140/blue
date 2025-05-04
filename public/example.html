@@ -157,21 +157,305 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h2>Section 1</h2><div id="question-container-1"><label><h3>Do you have any of these</h3></label><div><center><div id="checkmark">
+        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h2>Employment Info</h2><div id="question-container-4"><label><h3>Are you currently employed</h3></label><select id="are_you_currently_employed" name="are_you_currently_employed"
+                      onchange="dropdownMirror(this, 'are_you_currently_employed')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_currently_employed"></div>
+              <input type="text" id="are_you_currently_employed_dropdown" name="are_you_currently_employed_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-5" class="hidden"><label><h3>Please enter your work info</h3></label><input type="text" id="please_enter_your_work_info_job_title" name="please_enter_your_work_info_job_title" placeholder="Job Title" style="text-align:center;"><br><input type="text" id="please_enter_your_work_info_job_address" name="please_enter_your_work_info_job_address" placeholder="Job Address" style="text-align:center;"><br><input type="text" id="please_enter_your_work_info_employer_name" name="please_enter_your_work_info_employer_name" placeholder="Employer Name" style="text-align:center;"><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><h2>Legal Info</h2><div id="question-container-6" class="hidden"><label><h3>Do you have a lawyer</h3></label><select id="do_you_have_a_lawyer" name="do_you_have_a_lawyer"
+                      onchange="dropdownMirror(this, 'do_you_have_a_lawyer')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_have_a_lawyer"></div>
+              <input type="text" id="do_you_have_a_lawyer_dropdown" name="do_you_have_a_lawyer_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-7" class="hidden"><label><h3>Please enter lawyer info</h3></label><input type="text" id="please_enter_lawyer_info_laywer_name" name="please_enter_lawyer_info_laywer_name" placeholder="Laywer name" style="text-align:center;"><br><input type="text" id="please_enter_lawyer_info_lawyer_firm" name="please_enter_lawyer_info_lawyer_firm" placeholder="Lawyer Firm" style="text-align:center;"><br><input type="text" id="please_enter_lawyer_info_laywer_address" name="please_enter_lawyer_info_laywer_address" placeholder="Laywer Address" style="text-align:center;"><br><input type="text" id="please_enter_lawyer_info_lawyer_phone_number" name="please_enter_lawyer_info_lawyer_phone_number" placeholder="Lawyer Phone Number" style="text-align:center;"><br><input type="text" id="please_enter_lawyer_info_state_bar_number" name="please_enter_lawyer_info_state_bar_number" placeholder="State Bar Number" style="text-align:center;"><br></div><div id="question-container-8" class="hidden"><label><h3>Has your lawyer agreed to cover a portion of your fees?</h3></label><select id="has_your_lawyer_agreed_to_cover_a_portion_of_your_fees" name="has_your_lawyer_agreed_to_cover_a_portion_of_your_fees"
+                      onchange="dropdownMirror(this, 'has_your_lawyer_agreed_to_cover_a_portion_of_your_fees')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_has_your_lawyer_agreed_to_cover_a_portion_of_your_fees"></div>
+              <input type="text" id="has_your_lawyer_agreed_to_cover_a_portion_of_your_fees_dropdown" name="has_your_lawyer_agreed_to_cover_a_portion_of_your_fees_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-9" class="hidden"><label><h3>Have you filed a claim before</h3></label><select id="have_you_filed_a_claim_before" name="have_you_filed_a_claim_before"
+                      onchange="dropdownMirror(this, 'have_you_filed_a_claim_before')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_have_you_filed_a_claim_before"></div>
+              <input type="text" id="have_you_filed_a_claim_before_dropdown" name="have_you_filed_a_claim_before_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(1)">Back</button><button type="button" onclick="handleNext(2)">Next</button></div></div><div id="section3" class="section"><h2>Qualified Assistance</h2><div id="question-container-10" class="hidden"><label><h3>Do you receive any of the following?</h3></label><div><center><div id="checkmark">
       <span class="checkbox-inline">
         <label class="checkbox-label">
-          <input type="checkbox" id="do_you_have_any_of_these_food_stamps" name="do_you_have_any_of_these_food_stamps" value="Food Stamps"
+          <input type="checkbox" id="do_you_receive_any_of_the_following_supp_sec_inc" name="do_you_receive_any_of_the_following_supp_sec_inc" value="Supp Sec Inc"
                  >
-          Food Stamps
+          Supp Sec Inc
         </label>
       </span>
       <span class="checkbox-inline">
         <label class="checkbox-label">
-          <input type="checkbox" id="do_you_have_any_of_these_skip" name="do_you_have_any_of_these_skip" value="Skip"
+          <input type="checkbox" id="do_you_receive_any_of_the_following_food_stamps" name="do_you_receive_any_of_the_following_food_stamps" value="Food stamps"
                  >
-          Skip
+          Food stamps
         </label>
-      </span></div><br></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><h2>Section 2</h2><div id="question-container-2"><label><h3>Whats his name?</h3></label><input type="text" id="answer2" name="answer2" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(1)">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
+      </span>
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="do_you_receive_any_of_the_following_ssp" name="do_you_receive_any_of_the_following_ssp" value="SSP"
+                 >
+          SSP
+        </label>
+      </span>
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="do_you_receive_any_of_the_following_medi-cal" name="do_you_receive_any_of_the_following_medi-cal" value="Medi-Cal"
+                 >
+          Medi-Cal
+        </label>
+      </span>
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="do_you_receive_any_of_the_following_county_relief/gen._assist" name="do_you_receive_any_of_the_following_county_relief/gen._assist" value="County Relief/Gen. Assist"
+                 >
+          County Relief/Gen. Assist
+        </label>
+      </span>
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="do_you_receive_any_of_the_following_ihhs" name="do_you_receive_any_of_the_following_ihhs" value="IHHS"
+                 >
+          IHHS
+        </label>
+      </span>
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="do_you_receive_any_of_the_following_calworks_or_tribal_tanf" name="do_you_receive_any_of_the_following_calworks_or_tribal_tanf" value="CalWorks or Tribal TANF"
+                 >
+          CalWorks or Tribal TANF
+        </label>
+      </span>
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="do_you_receive_any_of_the_following_capi" name="do_you_receive_any_of_the_following_capi" value="CAPI"
+                 >
+          CAPI
+        </label>
+      </span>
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="do_you_receive_any_of_the_following_winc" name="do_you_receive_any_of_the_following_winc" value="WINC"
+                 >
+          WINC
+        </label>
+      </span>
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="do_you_receive_any_of_the_following_unemployment" name="do_you_receive_any_of_the_following_unemployment" value="Unemployment"
+                 >
+          Unemployment
+        </label>
+      </span>
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="do_you_receive_any_of_the_following_none_of_the_above" name="do_you_receive_any_of_the_following_none_of_the_above" value="None of the above">
+          None of the above
+        </label>
+      </span></div><br></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(2)">Back</button><button type="button" onclick="handleNext(3)">Next</button></div></div><div id="section4" class="section"><h2>Household Income Qualifications</h2><div id="question-container-11"><label><h3>Is your household monthly income less than the amount below?</h3></label><br><img src="income.png" alt="Dropdown Image" width="1000" height="100"><br><select id="is_your_household_monthly_income_less_than_the_amount_below" name="is_your_household_monthly_income_less_than_the_amount_below"
+                      onchange="dropdownMirror(this, 'is_your_household_monthly_income_less_than_the_amount_below')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_is_your_household_monthly_income_less_than_the_amount_below"></div>
+              <input type="text" id="is_your_household_monthly_income_less_than_the_amount_below_dropdown" name="is_your_household_monthly_income_less_than_the_amount_below_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-12" class="hidden"><label><h3>What would you like the court to do?</h3></label><select id="what_would_you_like_the_court_to_do" name="what_would_you_like_the_court_to_do"
+                      onchange="dropdownMirror(this, 'what_would_you_like_the_court_to_do')">
+                       <option value="" disabled selected>Select an option</option><option value="Let me pay them over time">Let me pay them over time</option><option value="Waive some fees">Waive some fees</option><option value="Waive all fees">Waive all fees</option></select><br>
+              <div id="dropdowntext_what_would_you_like_the_court_to_do"></div>
+              <input type="text" id="what_would_you_like_the_court_to_do_dropdown" name="what_would_you_like_the_court_to_do_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(3)">Back</button><button type="button" onclick="handleNext(4)">Next</button></div></div><div id="section5" class="section"><h2>Income Sources</h2><div id="question-container-13" class="hidden"><label><h3>Does your income change a lot?</h3></label><select id="does_your_income_change_a_lot" name="does_your_income_change_a_lot"
+                      onchange="dropdownMirror(this, 'does_your_income_change_a_lot')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_does_your_income_change_a_lot"></div>
+              <input type="text" id="does_your_income_change_a_lot_dropdown" name="does_your_income_change_a_lot_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-14" class="hidden"><label><h3>How many sources of income do you have?</h3></label><select id="answer14" onchange="showTextboxLabels(14, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer14"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(4)">Back</button><button type="button" onclick="handleNext(5)">Next</button></div></div><div id="section6" class="section"><h2>Income Info</h2><div id="question-container-17" class="hidden"><label><h3>Does your income change a lot from month to month?</h3></label><select id="does_your_income_change_a_lot_from_month_to_month" name="does_your_income_change_a_lot_from_month_to_month"
+                      onchange="dropdownMirror(this, 'does_your_income_change_a_lot_from_month_to_month')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_does_your_income_change_a_lot_from_month_to_month"></div>
+              <input type="text" id="does_your_income_change_a_lot_from_month_to_month_dropdown" name="does_your_income_change_a_lot_from_month_to_month_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-18" class="hidden"><label><h3>How many sources of income do you currently have?</h3></label><select id="answer18" onchange="showTextboxLabels(18, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer18"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(5)">Back</button><button type="button" onclick="handleNext(6)">Next</button></div></div><div id="section7" class="section"><h2>Living Conditions</h2><div id="question-container-15" class="hidden"><label><h3>Does anybody else live in your home?</h3></label><select id="does_anybody_else_live_in_your_home" name="does_anybody_else_live_in_your_home"
+                      onchange="dropdownMirror(this, 'does_anybody_else_live_in_your_home')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_does_anybody_else_live_in_your_home"></div>
+              <input type="text" id="does_anybody_else_live_in_your_home_dropdown" name="does_anybody_else_live_in_your_home_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-16" class="hidden"><label><h3>How many other people live in your household?</h3></label><select id="answer16" onchange="showTextboxLabels(16, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer16"></div></div><div id="question-container-19" class="hidden"><label><h3>Do you have anybody else living in your home?</h3></label><select id="do_you_have_anybody_else_living_in_your_home" name="do_you_have_anybody_else_living_in_your_home"
+                      onchange="dropdownMirror(this, 'do_you_have_anybody_else_living_in_your_home')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_have_anybody_else_living_in_your_home"></div>
+              <input type="text" id="do_you_have_anybody_else_living_in_your_home_dropdown" name="do_you_have_anybody_else_living_in_your_home_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-20" class="hidden"><label><h3>How many other people currently live in your household?</h3></label><select id="answer20" onchange="showTextboxLabels(20, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer20"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(6)">Back</button><button type="button" onclick="handleNext(7)">Next</button></div></div><div id="section8" class="section"><h2>Financials</h2><div id="question-container-21" class="hidden"><label><h3>Do you have any cash savings?</h3></label><select id="do_you_have_any_cash_savings" name="do_you_have_any_cash_savings"
+                      onchange="dropdownMirror(this, 'do_you_have_any_cash_savings')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_have_any_cash_savings"></div>
+              <input type="text" id="do_you_have_any_cash_savings_dropdown" name="do_you_have_any_cash_savings_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-22" class="hidden"><label><h3>How much cash saving do you have?</h3></label><input type="number" id="how_much_cash_saving_do_you_have" name="how_much_cash_saving_do_you_have" min="0" step="0.01" placeholder="Enter amount"><br></div><div id="question-container-23" class="hidden"><label><h3>Do you have a bank account?</h3></label><select id="do_you_have_a_bank_account" name="do_you_have_a_bank_account"
+                      onchange="dropdownMirror(this, 'do_you_have_a_bank_account')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_have_a_bank_account"></div>
+              <input type="text" id="do_you_have_a_bank_account_dropdown" name="do_you_have_a_bank_account_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-24" class="hidden"><label><h3>How many bank accounts do you have?</h3></label><select id="answer24" onchange="showTextboxLabels(24, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer24"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(7)">Back</button><button type="button" onclick="handleNext(8)">Next</button></div></div><div id="section9" class="section"><h2>Assets Owned</h2><div id="question-container-25" class="hidden"><label><h3>Do you own any cars, boats, and other vehicles:</h3></label><select id="do_you_own_any_cars_boats_and_other_vehicles" name="do_you_own_any_cars_boats_and_other_vehicles"
+                      onchange="dropdownMirror(this, 'do_you_own_any_cars_boats_and_other_vehicles')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_own_any_cars_boats_and_other_vehicles"></div>
+              <input type="text" id="do_you_own_any_cars_boats_and_other_vehicles_dropdown" name="do_you_own_any_cars_boats_and_other_vehicles_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-26" class="hidden"><label><h3>How many vehicles do you own?</h3></label><select id="answer26" onchange="showTextboxLabels(26, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer26"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(8)">Back</button><button type="button" onclick="handleNext(9)">Next</button></div></div><div id="section10" class="section"><h2>Real Estate Assets</h2><div id="question-container-27" class="hidden"><label><h3>Do you own any real estate:</h3></label><select id="do_you_own_any_real_estate" name="do_you_own_any_real_estate"
+                      onchange="dropdownMirror(this, 'do_you_own_any_real_estate')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_own_any_real_estate"></div>
+              <input type="text" id="do_you_own_any_real_estate_dropdown" name="do_you_own_any_real_estate_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-28" class="hidden"><label><h3>How many real estate properties do you have?</h3></label><select id="answer28" onchange="showTextboxLabels(28, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option></select><br><div id="labelContainer28"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(9)">Back</button><button type="button" onclick="handleNext(10)">Next</button></div></div><div id="section11" class="section"><h2>Personal Property</h2><div id="question-container-29" class="hidden"><label><h3>Do you own any other personal property? (jewelry, furniture, furs, bonds, ect)</h3></label><select id="do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect" name="do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect"
+                      onchange="dropdownMirror(this, 'do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect"></div>
+              <input type="text" id="do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect_dropdown" name="do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-30" class="hidden"><label><h3>How many items</h3></label><select id="answer30" onchange="showTextboxLabels(30, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option></select><br><div id="labelContainer30"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(10)">Back</button><button type="button" onclick="handleNext(11)">Next</button></div></div><div id="section12" class="section"><h2>Payroll Deductions</h2><div id="question-container-31" class="hidden"><label><h3>Do you have any payroll deductions?</h3></label><select id="do_you_have_any_payroll_deductions" name="do_you_have_any_payroll_deductions"
+                      onchange="dropdownMirror(this, 'do_you_have_any_payroll_deductions')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_have_any_payroll_deductions"></div>
+              <input type="text" id="do_you_have_any_payroll_deductions_dropdown" name="do_you_have_any_payroll_deductions_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-32" class="hidden"><label><h3>How many deductions?</h3></label><select id="answer32" onchange="showTextboxLabels(32, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer32"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(11)">Back</button><button type="button" onclick="handleNext(12)">Next</button></div></div><div id="section13" class="section"><h2>Monthly Deductions & Expenses</h2><div id="question-container-33" class="hidden"><label><h3>Mark All That Apply:</h3></label><div><center><div id="checkmark">
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_medical_expenses" name="mark_all_that_apply_medical_expenses" value="Medical Expenses"
+                 onchange="toggleAmountField('mark_all_that_apply_medical_expenses_amount', this.checked)">
+          Medical Expenses
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_medical_expenses_amount"
+                 name="mark_all_that_apply_medical_expenses_amount"
+                 placeholder="Amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_utilities" name="mark_all_that_apply_utilities" value="Utilities"
+                 onchange="toggleAmountField('mark_all_that_apply_utilities_amount', this.checked)">
+          Utilities
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_utilities_amount"
+                 name="mark_all_that_apply_utilities_amount"
+                 placeholder="Amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_spouse_support" name="mark_all_that_apply_spouse_support" value="Spouse Support"
+                 onchange="toggleAmountField('mark_all_that_apply_spouse_support_amount', this.checked)">
+          Spouse Support
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_spouse_support_amount"
+                 name="mark_all_that_apply_spouse_support_amount"
+                 placeholder="Amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_insurance" name="mark_all_that_apply_insurance" value="Insurance"
+                 onchange="toggleAmountField('mark_all_that_apply_insurance_amount', this.checked)">
+          Insurance
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_insurance_amount"
+                 name="mark_all_that_apply_insurance_amount"
+                 placeholder="Amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_clothing" name="mark_all_that_apply_clothing" value="Clothing"
+                 onchange="toggleAmountField('mark_all_that_apply_clothing_amount', this.checked)">
+          Clothing
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_clothing_amount"
+                 name="mark_all_that_apply_clothing_amount"
+                 placeholder="Amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_food/household_supplies" name="mark_all_that_apply_food/household_supplies" value="Food/Household Supplies"
+                 onchange="toggleAmountField('mark_all_that_apply_food/household_supplies_amount', this.checked)">
+          Food/Household Supplies
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_food/household_supplies_amount"
+                 name="mark_all_that_apply_food/household_supplies_amount"
+                 placeholder="Amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_rent/house_payment" name="mark_all_that_apply_rent/house_payment" value="Rent/House Payment"
+                 onchange="toggleAmountField('mark_all_that_apply_rent/house_payment_amount', this.checked)">
+          Rent/House Payment
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_rent/house_payment_amount"
+                 name="mark_all_that_apply_rent/house_payment_amount"
+                 placeholder="Amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_child_care" name="mark_all_that_apply_child_care" value="Child Care"
+                 onchange="toggleAmountField('mark_all_that_apply_child_care_amount', this.checked)">
+          Child Care
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_child_care_amount"
+                 name="mark_all_that_apply_child_care_amount"
+                 placeholder="Amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_transportation" name="mark_all_that_apply_transportation" value="Transportation"
+                 onchange="toggleAmountField('mark_all_that_apply_transportation_amount', this.checked)">
+          Transportation
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_transportation_amount"
+                 name="mark_all_that_apply_transportation_amount"
+                 placeholder="Amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_laundry" name="mark_all_that_apply_laundry" value="Laundry"
+                 onchange="toggleAmountField('mark_all_that_apply_laundry_amount', this.checked)">
+          Laundry
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_laundry_amount"
+                 name="mark_all_that_apply_laundry_amount"
+                 placeholder="Amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_none_of_the_above" name="mark_all_that_apply_none_of_the_above" value="None of the above">
+          None of the above
+        </label>
+      </span></div><br></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(12)">Back</button><button type="button" onclick="handleNext(13)">Next</button></div></div><div id="section14" class="section"><h2>Payment Installments</h2><div id="question-container-34" class="hidden"><label><h3>Do you have any installment payments?</h3></label><select id="do_you_have_any_installment_payments" name="do_you_have_any_installment_payments"
+                      onchange="dropdownMirror(this, 'do_you_have_any_installment_payments')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_have_any_installment_payments"></div>
+              <input type="text" id="do_you_have_any_installment_payments_dropdown" name="do_you_have_any_installment_payments_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-35" class="hidden"><label><h3>How many installment payments do you have?</h3></label><select id="answer35" onchange="showTextboxLabels(35, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer35"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(13)">Back</button><button type="button" onclick="handleNext(14)">Next</button></div></div><div id="section15" class="section"><h2>Wage Garnishments</h2><div id="question-container-36" class="hidden"><label><h3>Do you have any wages/earnings withheld by the court:</h3></label><select id="do_you_have_any_wagesearnings_withheld_by_the_court" name="do_you_have_any_wagesearnings_withheld_by_the_court"
+                      onchange="dropdownMirror(this, 'do_you_have_any_wagesearnings_withheld_by_the_court')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_have_any_wagesearnings_withheld_by_the_court"></div>
+              <input type="text" id="do_you_have_any_wagesearnings_withheld_by_the_court_dropdown" name="do_you_have_any_wagesearnings_withheld_by_the_court_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-37" class="hidden"><label><h3>How much is being withheld?</h3></label><input type="number" id="how_much_is_being_withheld" name="how_much_is_being_withheld" min="0" step="0.01" placeholder="Enter amount"><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(14)">Back</button><button type="button" onclick="handleNext(15)">Next</button></div></div><div id="section16" class="section"><h2>Other Expenses</h2><div id="question-container-38" class="hidden"><label><h3>Do you have any other monthly expenses?</h3></label><select id="do_you_have_any_other_monthly_expenses" name="do_you_have_any_other_monthly_expenses"
+                      onchange="dropdownMirror(this, 'do_you_have_any_other_monthly_expenses')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_have_any_other_monthly_expenses"></div>
+              <input type="text" id="do_you_have_any_other_monthly_expenses_dropdown" name="do_you_have_any_other_monthly_expenses_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-39" class="hidden"><label><h3>How many other monthly expenses do you have?</h3></label><select id="answer39" onchange="showTextboxLabels(39, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer39"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="navigateSection(15)">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
@@ -180,6 +464,23 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
 <input type="hidden" id="user_city_hidden"      name="user_city_hidden">
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
+<input type="text" id="10b" name="10b" style="display:none;">
+<input type="text" id="alt8b" name="alt8b" style="display:none;">
+<input type="text" id="alt9b" name="alt9b" style="display:none;">
+<input type="text" id="8b" name="8b" style="display:none;">
+<input type="text" id="9b" name="9b" style="display:none;">
+<input type="text" id="10cmarket" name="10cmarket" style="display:none;">
+<input type="text" id="10cdebt" name="10cdebt" style="display:none;">
+<input type="text" id="10dmarket" name="10dmarket" style="display:none;">
+<input type="text" id="10emarket" name="10emarket" style="display:none;">
+<input type="text" id="10ddebt" name="10ddebt" style="display:none;">
+<input type="text" id="10edebt" name="10edebt" style="display:none;">
+<input type="text" id="11a" name="11a" style="display:none;">
+<input type="text" id="11l" name="11l" style="display:none;">
+<input type="text" id="11n" name="11n" style="display:none;">
+<input type="text" id="alt89total" name="alt89total" style="display:none;">
+<input type="text" id="89total" name="89total" style="display:none;">
+<input type="text" id="monthly_total" name="monthly_total" style="display:none;">
 </div></form>
 <div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
 </div>
@@ -193,29 +494,26 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
 /*───────────────────────────────*
  * return the true checkbox prefix
  *───────────────────────────────*/
-
-
+function getCbPrefix (qId){
+    if (questionSlugMap[qId]) return questionSlugMap[qId] + '_';
+    if (questionNameIds[qId]) return questionNameIds[qId] + '_';
+    return 'answer' + qId + '_';
+}
 
 /*───────────────────────────────*
  * buildCheckboxName(questionId, rawNameId, labelText)
  *───────────────────────────────*/
 function buildCheckboxName (questionId, rawNameId, labelText){
     const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
-
-    // If designer left the “name” blank, derive from the label
-    let namePart = rawNameId?.trim();
+    let namePart = (rawNameId || '').trim();
     if (!namePart){
-        namePart = labelText.replace(/W+/g, '_').toLowerCase();
+        namePart = labelText.replace(/\W+/g, '_').toLowerCase();
     }
-
-    // Ensure our prefix is present exactly once
     if (!namePart.startsWith(slugPrefix)){
         namePart = slugPrefix + namePart;
     }
     return namePart;
 }
-
-
 
     const firebaseConfig = {
         apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
@@ -256,16 +554,1553 @@ function buildCheckboxName (questionId, rawNameId, labelText){
            window.location.href="account.html";
         }
     });
-  var questionNameIds = {"1":"do_you_have_any_of_these","2":"answer2"};
-var jumpLogics = [{"questionId":"1","questionType":"checkbox","jumpOption":"Skip","jumpTo":"end","section":1}];
+  var questionSlugMap       = {"4":"are_you_currently_employed","5":"please_enter_your_work_info","6":"do_you_have_a_lawyer","7":"please_enter_lawyer_info","8":"has_your_lawyer_agreed_to_cover_a_portion_of_your_fees","9":"have_you_filed_a_claim_before","10":"do_you_receive_any_of_the_following","11":"is_your_household_monthly_income_less_than_the_amount_below","12":"what_would_you_like_the_court_to_do","13":"does_your_income_change_a_lot","14":"how_many_sources_of_income_do_you_have","15":"does_anybody_else_live_in_your_home","16":"how_many_other_people_live_in_your_household","17":"does_your_income_change_a_lot_from_month_to_month","18":"how_many_sources_of_income_do_you_currently_have","19":"do_you_have_anybody_else_living_in_your_home","20":"how_many_other_people_currently_live_in_your_household","21":"do_you_have_any_cash_savings","22":"how_much_cash_saving_do_you_have","23":"do_you_have_a_bank_account","24":"how_many_bank_accounts_do_you_have","25":"do_you_own_any_cars_boats_and_other_vehicles","26":"how_many_vehicles_do_you_own","27":"do_you_own_any_real_estate","28":"how_many_real_estate_properties_do_you_have","29":"do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect","30":"how_many_items","31":"do_you_have_any_payroll_deductions","32":"how_many_deductions","33":"mark_all_that_apply","34":"do_you_have_any_installment_payments","35":"how_many_installment_payments_do_you_have","36":"do_you_have_any_wages_earnings_withheld_by_the_court","37":"how_much_is_being_withheld","38":"do_you_have_any_other_monthly_expenses","39":"how_many_other_monthly_expenses_do_you_have"};
+var questionNameIds = {"4":"are_you_currently_employed","6":"do_you_have_a_lawyer","8":"has_your_lawyer_agreed_to_cover_a_portion_of_your_fees","9":"have_you_filed_a_claim_before","10":"do_you_receive_any_of_the_following","11":"is_your_household_monthly_income_less_than_the_amount_below","12":"what_would_you_like_the_court_to_do","13":"does_your_income_change_a_lot","14":"answer14","15":"does_anybody_else_live_in_your_home","16":"answer16","17":"does_your_income_change_a_lot_from_month_to_month","18":"answer18","19":"do_you_have_anybody_else_living_in_your_home","20":"answer20","21":"do_you_have_any_cash_savings","22":"how_much_cash_saving_do_you_have","23":"do_you_have_a_bank_account","24":"answer24","25":"do_you_own_any_cars_boats_and_other_vehicles","26":"answer26","27":"do_you_own_any_real_estate","28":"answer28","29":"do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect","30":"answer30","31":"do_you_have_any_payroll_deductions","32":"answer32","33":"mark_all_that_apply","34":"do_you_have_any_installment_payments","35":"answer35","36":"do_you_have_any_wagesearnings_withheld_by_the_court","37":"how_much_is_being_withheld","38":"do_you_have_any_other_monthly_expenses","39":"answer39"};
+var jumpLogics = [{"questionId":"10","questionType":"checkbox","jumpOption":"Supp Sec Inc","jumpTo":"end","section":3},{"questionId":"10","questionType":"checkbox","jumpOption":"Food stamps","jumpTo":"end","section":3},{"questionId":"10","questionType":"checkbox","jumpOption":"SSP","jumpTo":"end","section":3},{"questionId":"10","questionType":"checkbox","jumpOption":"Medi-Cal","jumpTo":"end","section":3},{"questionId":"10","questionType":"checkbox","jumpOption":"County Relief/Gen. Assist","jumpTo":"end","section":3},{"questionId":"10","questionType":"checkbox","jumpOption":"IHHS","jumpTo":"end","section":3},{"questionId":"10","questionType":"checkbox","jumpOption":"CalWorks or Tribal TANF","jumpTo":"end","section":3},{"questionId":"10","questionType":"checkbox","jumpOption":"CAPI","jumpTo":"end","section":3},{"questionId":"10","questionType":"checkbox","jumpOption":"WINC","jumpTo":"end","section":3},{"questionId":"10","questionType":"checkbox","jumpOption":"Unemployment","jumpTo":"end","section":3},{"questionId":"10","questionType":"checkbox","jumpOption":"","jumpTo":"end","section":3},{"questionId":"12","questionType":"dropdown","jumpOption":"Let me pay them over time","jumpTo":"6","section":4},{"questionId":"12","questionType":"dropdown","jumpOption":"Waive some fees","jumpTo":"6","section":4},{"questionId":"12","questionType":"dropdown","jumpOption":"Waive all fees","jumpTo":"6","section":4},{"questionId":"15","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":7},{"questionId":"15","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":7},{"questionId":"38","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":16},{"questionId":"38","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":16}];
 var conditionalPDFs = [];
 var conditionalAlerts = [];
-var labelMap = {};
-var amountMap = {};
+var labelMap = {"14":["Description"],"16":["Name","Age","Relationship"],"18":["Income Source"],"20":["Name","Age","Relationship"],"24":["Bank Name"],"26":["Make/Year"],"28":["Address"],"30":["Description"],"32":["Description"],"35":["Description"],"39":["Description"]};
+var amountMap = {"14":["Amount"],"16":["Monthly Income"],"18":["Income Value"],"20":["Monthly Income"],"24":["Amount"],"26":["Fair Market Value","Amount Owed"],"28":["Fair Market Value","Amount Owed"],"30":["Fair Market Value","Amount Owed"],"32":["Fair Market Value"],"35":["Amount"],"39":["Amount"]};
 var linkedDropdowns = [];
 var hiddenCheckboxCalculations = [];
-var hiddenTextCalculations = [];
+var hiddenTextCalculations = [{"hiddenFieldName":"10b","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_bank_accounts_do_you_have_1_amount"},{"operator":"+","questionNameId":"how_many_bank_accounts_do_you_have_2_amount"},{"operator":"+","questionNameId":"how_many_bank_accounts_do_you_have_3_amount"},{"operator":"+","questionNameId":"how_many_bank_accounts_do_you_have_4_amount"}],"compareOperator":">","threshold":"0","fillValue":"##10b##"}]},{"hiddenFieldName":"alt8b","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_sources_of_income_do_you_have_1_amount"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_have_2_amount"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_have_3_amount"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_have_4_amount"}],"compareOperator":">","threshold":"0","fillValue":"##alt8b##"}]},{"hiddenFieldName":"alt9b","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_other_people_live_in_your_household_1_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_2_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_3_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_4_monthly_income"}],"compareOperator":">","threshold":"0","fillValue":"##alt9b##"}]},{"hiddenFieldName":"8b","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_sources_of_income_do_you_currently_have_1_income_value"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_currently_have_2_income_value"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_currently_have_3_income_value"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_currently_have_4_income_value"}],"compareOperator":">","threshold":"0","fillValue":"##8b##"}]},{"hiddenFieldName":"9b","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_other_people_currently_live_in_your_household_1_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_currently_live_in_your_household_2_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_currently_live_in_your_household_3_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_currently_live_in_your_household_4_monthly_income"}],"compareOperator":">","threshold":"0","fillValue":"##9b##"}]},{"hiddenFieldName":"10cmarket","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_vehicles_do_you_own_1_fair_market_value"},{"operator":"+","questionNameId":"how_many_vehicles_do_you_own_2_fair_market_value"},{"operator":"+","questionNameId":"how_many_vehicles_do_you_own_3_fair_market_value"},{"operator":"+","questionNameId":"how_many_vehicles_do_you_own_4_fair_market_value"}],"compareOperator":">","threshold":"0","fillValue":"##10cmarket##"}]},{"hiddenFieldName":"10cdebt","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_vehicles_do_you_own_1_amount_owed"},{"operator":"+","questionNameId":"how_many_vehicles_do_you_own_2_amount_owed"},{"operator":"+","questionNameId":"how_many_vehicles_do_you_own_3_amount_owed"},{"operator":"+","questionNameId":"how_many_vehicles_do_you_own_4_amount_owed"}],"compareOperator":">","threshold":"0","fillValue":"##10cdebt##"}]},{"hiddenFieldName":"10dmarket","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_real_estate_properties_do_you_have_1_fair_market_value"},{"operator":"+","questionNameId":"how_many_real_estate_properties_do_you_have_2_fair_market_value"}],"compareOperator":">","threshold":"0","fillValue":"##10dmarket##"}]},{"hiddenFieldName":"10emarket","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_items_1_fair_market_value"},{"operator":"+","questionNameId":"how_many_items_2_fair_market_value"}],"compareOperator":">","threshold":"0","fillValue":"##10emarket##"}]},{"hiddenFieldName":"10ddebt","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_real_estate_properties_do_you_have_1_amount_owed"},{"operator":"+","questionNameId":"how_many_real_estate_properties_do_you_have_2_amount_owed"}],"compareOperator":">","threshold":"0","fillValue":"##10ddebtt##"}]},{"hiddenFieldName":"10edebt","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_items_1_amount_owed"},{"operator":"+","questionNameId":"how_many_items_2_amount_owed"}],"compareOperator":">","threshold":"0","fillValue":"##10emarket##"}]},{"hiddenFieldName":"11a","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_deductions_1_fair_market_value"},{"operator":"+","questionNameId":"how_many_deductions_2_fair_market_value"},{"operator":"+","questionNameId":"how_many_deductions_3_fair_market_value"},{"operator":"+","questionNameId":"how_many_deductions_4_fair_market_value"}],"compareOperator":">","threshold":"0","fillValue":"##11a##"}]},{"hiddenFieldName":"11l","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_installment_payments_do_you_have_1_amount"},{"operator":"+","questionNameId":"how_many_installment_payments_do_you_have_2_amount"},{"operator":"+","questionNameId":"how_many_installment_payments_do_you_have_3_amount"}],"compareOperator":">","threshold":"0","fillValue":"##11l##"}]},{"hiddenFieldName":"11n","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_other_monthly_expenses_do_you_have_1_amount"},{"operator":"+","questionNameId":"how_many_other_monthly_expenses_do_you_have_2_amount"},{"operator":"+","questionNameId":"how_many_other_monthly_expenses_do_you_have_3_amount"}],"compareOperator":">","threshold":"0","fillValue":"##11n##"}]},{"hiddenFieldName":"alt89total","calculations":[{"terms":[{"operator":"","questionNameId":"alt8b"},{"operator":"+","questionNameId":"alt9b"}],"compareOperator":">","threshold":"0","fillValue":"##alt89total##"}]},{"hiddenFieldName":"89total","calculations":[{"terms":[{"operator":"","questionNameId":"8b"},{"operator":"+","questionNameId":"9b"}],"compareOperator":">","threshold":"0","fillValue":"##alt89total##"}]},{"hiddenFieldName":"monthly_total","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_deductions_1_fair_market_value"},{"operator":"+","questionNameId":"how_many_deductions_2_fair_market_value"},{"operator":"+","questionNameId":"how_many_deductions_3_fair_market_value"},{"operator":"+","questionNameId":"how_many_deductions_4_fair_market_value"}],"compareOperator":"=","threshold":"0","fillValue":""}]}];
 
+
+(function(){
+ var thisQ=document.getElementById("question-container-5");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "4";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-6");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "4";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "4";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-7");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="6";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "6";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-8");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="6";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "6";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-9");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="6";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="8";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="8";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "6";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "8";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "8";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-10");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="9";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="9";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-12");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="11";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "11";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-13");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="11";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "11";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-14");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="13";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="13";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "13";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "13";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-17");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="let me pay them over time";
+    var cPrevQNum="12";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="waive some fees";
+    var cPrevQNum="12";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="waive all fees";
+    var cPrevQNum="12";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "12";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "12";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "12";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-18");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="17";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="17";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "17";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "17";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-15");
+ function updateVisibility(){
+  var anyMatch=false;
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "13";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "13";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-16");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="15";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "15";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-19");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="17";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="17";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "17";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "17";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-20");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="19";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "19";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-21");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="19";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="19";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "19";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "19";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-22");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="21";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "21";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-23");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="21";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="21";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "21";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "21";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-24");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="23";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "23";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-25");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="23";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="23";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "23";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "23";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-26");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="25";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "25";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-27");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="25";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="25";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "25";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "25";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-28");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="27";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "27";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-29");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="27";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="27";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "27";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "27";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-30");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="29";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "29";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-31");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="29";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="29";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "29";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "29";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-32");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="31";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "31";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-33");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="31";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="31";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "31";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "31";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-34");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="none of the above";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="laundry";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="transportation";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="child care";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="rent/house payment";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="food/household supplies";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="insurance";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="spouse support";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="utilities";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="clothing";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="medical expenses";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var checkQuestion = "33";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "33";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "33";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "33";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "33";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "33";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "33";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "33";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "33";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "33";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "33";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-35");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="34";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "34";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-36");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="34";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="34";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "34";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "34";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-37");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="36";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "36";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-38");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="36";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="36";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "36";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "36";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-39");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="38";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "38";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
 
 
   

@@ -774,34 +774,32 @@ formHTML += `</div><br></div>`;
   // Now we place ONE <script> block for everything:
   formHTML += "\n<script>\n";
   
-  formHTML += `
+ formHTML += `
 /*───────────────────────────────*
  * return the true checkbox prefix
  *───────────────────────────────*/
-
-
+function getCbPrefix (qId){
+    if (questionSlugMap[qId]) return questionSlugMap[qId] + '_';
+    if (questionNameIds[qId]) return questionNameIds[qId] + '_';
+    return 'answer' + qId + '_';
+}
 
 /*───────────────────────────────*
  * buildCheckboxName(questionId, rawNameId, labelText)
  *───────────────────────────────*/
 function buildCheckboxName (questionId, rawNameId, labelText){
     const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
-
-    // If designer left the “name” blank, derive from the label
-    let namePart = rawNameId?.trim();
+    let namePart = (rawNameId || '').trim();
     if (!namePart){
-        namePart = labelText.replace(/\W+/g, '_').toLowerCase();
+        namePart = labelText.replace(/\\W+/g, '_').toLowerCase();
     }
-
-    // Ensure our prefix is present exactly once
     if (!namePart.startsWith(slugPrefix)){
         namePart = slugPrefix + namePart;
     }
     return namePart;
 }
-
-
 `;
+
 
 
   // 1) Firebase config and check
@@ -848,6 +846,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   `;
 
   // 2) Our global objects
+  formHTML += `var questionSlugMap       = ${JSON.stringify(questionSlugMap)};\n`;
   formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds)};\n`;
   formHTML += `var jumpLogics = ${JSON.stringify(jumpLogics)};\n`;
   formHTML += `var conditionalPDFs = ${JSON.stringify(conditionalPDFs)};\n`;
