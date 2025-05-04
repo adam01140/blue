@@ -12,13 +12,49 @@ const questionSlugMap = {};
  * canonical sanitiser – visible
  * to all build-time code
  *───────────────────────────────*/
+
+
+
+
+
+
+
+
+
+/******************************************************************
+ * helpers that the generator itself uses ( NOT inside formHTML! )
+ ******************************************************************/
+
+/* canonical sanitiser (unchanged) */
 function sanitizeQuestionText (str){
-  return String(str)
-         .toLowerCase()
-        .replace(/\W+/g,  "_")   // <-- single “\” is correct here
-         .replace(/^_+|_+$/g, "");
+    return String(str).toLowerCase()
+                      .replace(/\W+/g, "_")
+                      .replace(/^_+|_+$/g, "");
 }
 
+/* slug‑aware prefix for any checkbox belonging to a question */
+function getCbPrefix (qId){
+    if (questionSlugMap[qId]) return questionSlugMap[qId] + '_';   // e.g. do_you_have_any_of_these_
+    if (questionNameIds[qId]) return questionNameIds[qId] + '_';
+    return 'answer' + qId + '_';
+}
+
+/* build the final <input>.id / name for a checkbox option */
+function buildCheckboxName (questionId, rawNameId, labelText){
+    const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
+
+    // if the designer left the name blank, derive it from the label
+    let namePart = (rawNameId || '').trim();
+    if (!namePart){
+        namePart = labelText.replace(/\W+/g, '_').toLowerCase();
+    }
+
+    // ensure we have our prefix exactly once
+    if (!namePart.startsWith(slugPrefix)){
+        namePart = slugPrefix + namePart;
+    }
+    return namePart;
+}
 
 
 
@@ -442,113 +478,87 @@ const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
           });
         }
       } else if (questionType === "checkbox") {
-        const cOptsDivs = qBlock.querySelectorAll(
-          `#checkboxOptions${questionId} > div`
-        );
-        const cboxOptions = [];
-        // Make sure to add this checkbox question to questionNameIds
-        questionNameIds[questionId] = "answer" + questionId;
-        formHTML += `<div><center><div id="checkmark">`;
-        for (let co = 0; co < cOptsDivs.length; co++) {
-          const optDiv = cOptsDivs[co];
-          const txtEl = optDiv.querySelector(
-            `#checkboxOptionText${questionId}_${co + 1}`
-          );
-          const nameEl = optDiv.querySelector(
-            `#checkboxOptionName${questionId}_${co + 1}`
-          );
-          const valEl = optDiv.querySelector(
-            `#checkboxOptionValue${questionId}_${co + 1}`
-          );
-          const hasAmountEl = optDiv.querySelector(
-            `#checkboxOptionHasAmount${questionId}_${co + 1}`
-          );
-          const amountNameEl = optDiv.querySelector(
-            `#checkboxOptionAmountName${questionId}_${co + 1}`
-          );
-          const amountPhEl = optDiv.querySelector(
-            `#checkboxOptionAmountPlaceholder${questionId}_${co + 1}`
-          );
+       /* ---------- CHECKBOX QUESTION ---------- */
+const cOptsDivs = qBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
+const cboxOptions = [];
 
-          const labelText =
-            txtEl && txtEl.value.trim()
-              ? txtEl.value.trim()
-              : "Option " + (co + 1);
-          let rawNameId =
-            nameEl && nameEl.value.trim() ? nameEl.value.trim() : "";
-          let rawVal =
-            valEl && valEl.value.trim() ? valEl.value.trim() : labelText;
+/* Use the slug as the base prefix (and store it for helpers) */
+const qSlug = questionSlugMap[questionId] || ('answer' + questionId);
+questionNameIds[questionId] = qSlug;      // so helpers know the base
 
-          const hasAmount = hasAmountEl && hasAmountEl.checked;
-          const amountName =
-            amountNameEl && amountNameEl.value.trim()
-              ? amountNameEl.value.trim()
-              : "";
-          const amountPlaceholder =
-            amountPhEl && amountPhEl.value.trim()
-              ? amountPhEl.value.trim()
-              : "Amount";
+formHTML += `<div><center><div id="checkmark">`;
 
-          const forcedPrefix = "answer" + questionId + "_";
-if (!rawNameId) {
-    const sanitized = labelText.replace(/\W+/g, "_").toLowerCase();
-    rawNameId = forcedPrefix + sanitized;
-} else if (!rawNameId.startsWith(forcedPrefix)) {
-    rawNameId = forcedPrefix + rawNameId;   // ← always keep the prefix
+/* ── render each checkbox option ───────────────────────────── */
+for (let co = 0; co < cOptsDivs.length; co++){
+    const optDiv        = cOptsDivs[co];
+    const txtEl         = optDiv.querySelector(`#checkboxOptionText${questionId}_${co+1}`);
+    const nameEl        = optDiv.querySelector(`#checkboxOptionName${questionId}_${co+1}`);
+    const valEl         = optDiv.querySelector(`#checkboxOptionValue${questionId}_${co+1}`);
+    const hasAmountEl   = optDiv.querySelector(`#checkboxOptionHasAmount${questionId}_${co+1}`);
+    const amountNameEl  = optDiv.querySelector(`#checkboxOptionAmountName${questionId}_${co+1}`);
+    const amountPhEl    = optDiv.querySelector(`#checkboxOptionAmountPlaceholder${questionId}_${co+1}`);
+
+    const labelText         = txtEl?.value.trim() || ('Option ' + (co+1));
+    const optionNameIdRaw   = nameEl?.value.trim() || '';
+    const optionNameId      = buildCheckboxName(questionId, optionNameIdRaw, labelText);
+
+    const optionValue       = valEl?.value.trim() || labelText;
+    const hasAmount         = hasAmountEl?.checked;
+    const amountName        = amountNameEl?.value.trim() || '';
+    const amountPlaceholder = amountPhEl?.value.trim() || 'Amount';
+
+    cboxOptions.push({
+        labelText,
+        optionNameId,
+        optionValue,
+        hasAmount,
+        amountName,
+        amountPlaceholder
+    });
+
+    /* actual input */
+    formHTML += `
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="${optionNameId}" name="${optionNameId}" value="${optionValue}"
+                 ${hasAmount ? `onchange="toggleAmountField('${optionNameId}_amount', this.checked)"` : ''}>
+          ${labelText}
+        </label>
+      </span>`;
+
+    /* optional amount field */
+    if (hasAmount){
+        formHTML += `
+          <input type="number" id="${optionNameId}_amount"
+                 name="${amountName || optionNameId + '_amount'}"
+                 placeholder="${amountPlaceholder}"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">`;
+    }
 }
 
-          cboxOptions.push({
-            labelText: labelText,
-            optionNameId: rawNameId,
-            optionValue: rawVal,
-            hasAmount: hasAmount,
-            amountName: amountName,
-            amountPlaceholder: amountPlaceholder,
-          });
+/* ── optional “None of the above” ─────────────────────────── */
+const noneEl = qBlock.querySelector(`#noneOfTheAbove${questionId}`);
+if (noneEl?.checked){
+    const noneStr      = 'None of the above';
+    const noneNameId   = buildCheckboxName(questionId, '', noneStr);
 
-          formHTML += `
-            <span class="checkbox-inline">
-              <label class="checkbox-label">
-                <input type="checkbox" id="${rawNameId}" name="${rawNameId}" value="${rawVal}"
-                       ${
-                         hasAmount
-                           ? `onchange="toggleAmountField('${rawNameId}_amount', this.checked)"`
-                           : ""
-                       }>
-                ${labelText}
-              </label>
-            </span>`;
+    cboxOptions.push({
+        labelText: noneStr,
+        optionNameId: noneNameId,
+        optionValue: noneStr
+    });
 
-          // If this checkbox has an associated "amount" input
-          if (hasAmount) {
-            formHTML += `
-              <input type="number" id="${rawNameId}_amount" name="${
-              amountName || rawNameId + "_amount"
-            }"
-                     placeholder="${amountPlaceholder}"
-                     style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">`;
-          }
-        }
-        const noneEl = qBlock.querySelector(`#noneOfTheAbove${questionId}`);
-        if (noneEl && noneEl.checked) {
-          const noneStr = "None of the above";
-          const forcedPrefix2 = "answer" + questionId + "_";
-          const sant = noneStr.replace(/\W+/g, "_").toLowerCase();
-          const notNameId = forcedPrefix2 + sant;
-          cboxOptions.push({
-            labelText: noneStr,
-            optionNameId: notNameId,
-            optionValue: noneStr,
-          });
-          formHTML += `
-            <span class="checkbox-inline">
-              <label class="checkbox-label">
-                <input type="checkbox" id="${notNameId}" name="${notNameId}" value="${noneStr}">
-                ${noneStr}
-              </label>
-            </span>`;
-        }
-        formHTML += `</div><br></div>`;
+    formHTML += `
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="${noneNameId}" name="${noneNameId}" value="${noneStr}">
+          ${noneStr}
+        </label>
+      </span>`;
+}
+
+formHTML += `</div><br></div>`;
+
 
         // If conditional PDF was enabled
         if (pdfEnabled) {
@@ -768,9 +778,29 @@ if (!rawNameId) {
 /*───────────────────────────────*
  * return the true checkbox prefix
  *───────────────────────────────*/
-function getCbPrefix(qId){
-    return (questionNameIds[qId] ? questionNameIds[qId] : ('answer' + qId)) + '_';
+
+
+
+/*───────────────────────────────*
+ * buildCheckboxName(questionId, rawNameId, labelText)
+ *───────────────────────────────*/
+function buildCheckboxName (questionId, rawNameId, labelText){
+    const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
+
+    // If designer left the “name” blank, derive from the label
+    let namePart = rawNameId?.trim();
+    if (!namePart){
+        namePart = labelText.replace(/\W+/g, '_').toLowerCase();
+    }
+
+    // Ensure our prefix is present exactly once
+    if (!namePart.startsWith(slugPrefix)){
+        namePart = slugPrefix + namePart;
+    }
+    return namePart;
 }
+
+
 `;
 
 
