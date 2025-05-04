@@ -262,7 +262,7 @@ function getFormHTML() {
     formHTML += `<div id="section${s}" class="section${
       s === 1 ? " active" : ""
     }">`;
-    formHTML += `<h2>${sectionName}</h2>`;
+    formHTML += `<h1 class="section-title">${sectionName}</h1>`;
 
     // Grab all questions in this section
     const questionsInSection = sectionBlock.querySelectorAll(".question-block");

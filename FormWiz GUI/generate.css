@@ -1,4 +1,8 @@
 /* Input Styles */
+
+
+
+
             input[type="text"],
             input[type="number"],
             textarea,
@@ -90,10 +94,7 @@
                 display: grid;
                 gap: 20px;
             }
-            section h1 {
-                color: #2980b9;
-                font-weight: normal;
-            }
+            
             section p {
                 margin-bottom: 20px;
             }
@@ -161,3 +162,19 @@
                     max-width: 100%;
                 }
             }
+			
+			/* put this in the same <style> block or an external CSS file */
+h1.section-title {          /* or just h1 if you target every H1 */
+    font-family: 'Montserrat', sans-serif;
+    color: #2c3e50;
+    font-weight: 700;
+    text-decoration: underline;
+    text-align: center;
+
+    /* ---- size & spacing ---- */
+    font-size: 1.7rem;   /* ≈ 38 px on most browsers */
+    line-height: 1.25;   /* keeps multi‑line headings tidy */
+    margin-bottom: 1.5rem;
+}
+
+
