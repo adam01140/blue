@@ -245,152 +245,11 @@ function setSection(cell, sectionNum) {
     };
     updateSectionLegend();
   }
-
-  // If this is a question node, update all connected option nodes
-  if (isQuestion(cell)) {
-    const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-    outgoingEdges.forEach(edge => {
-      const targetCell = edge.target;
-      if (targetCell && isOptions(targetCell)) {
-        // Recursively set section without triggering infinite loop
-        let targetStyle = targetCell.style || "";
-        targetStyle = targetStyle.replace(/section=[^;]+/, "");
-        targetStyle += `;section=${sectionNum};`;
-        graph.getModel().setStyle(targetCell, targetStyle);
-      }
-    });
-  }
-  // If this is an option node, check if it's connected to a question and match its section
-  else if (isOptions(cell)) {
-    const incomingEdges = graph.getIncomingEdges(cell) || [];
-    for (const edge of incomingEdges) {
-      const sourceCell = edge.source;
-      if (sourceCell && isQuestion(sourceCell)) {
-        const questionSection = getSection(sourceCell);
-        if (questionSection !== sectionNum) {
-          // Use the question's section instead
-          style = style.replace(/section=[^;]+/, "");
-          style += `;section=${questionSection};`;
-          graph.getModel().setStyle(cell, style);
-        }
-        break;
-      }
-    }
-  }
 }
-
 function getSection(cell) {
   const style = cell.style || "";
   const match = style.match(/section=([^;]+)/);
   return match ? match[1] : "1";
-}
-
-// Add these functions at the top level
-function deleteSection(sectionNum) {
-  const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
-  const sectionToDelete = parseInt(sectionNum);
-  
-  // If this is the only section, don't allow deletion
-  if (sections.length === 1) {
-    alert("Cannot delete the only remaining section");
-    return;
-  }
-  
-  // Start a graph update
-  graph.getModel().beginUpdate();
-  try {
-    const parent = graph.getDefaultParent();
-    const vertices = graph.getChildVertices(parent);
-    
-    // First, delete all cells in the section being deleted, excluding calculation nodes
-    const cellsToDelete = vertices.filter(cell => {
-      const sec = parseInt(getSection(cell) || "1", 10);
-      return sec === sectionToDelete && !isCalculationNode(cell);
-    });
-    if (cellsToDelete.length > 0) {
-      graph.removeCells(cellsToDelete);
-    }
-    
-    // Then move all cells from higher sections down one level
-    vertices.forEach(cell => {
-      const cellSection = parseInt(getSection(cell) || "1", 10);
-      if (cellSection > sectionToDelete) {
-        setSection(cell, cellSection - 1);
-      }
-    });
-    
-    // Update sectionPrefs
-    const newSectionPrefs = {};
-    Object.keys(sectionPrefs).forEach(sec => {
-      const secNum = parseInt(sec);
-      if (secNum < sectionToDelete) {
-        newSectionPrefs[sec] = sectionPrefs[sec];
-      } else if (secNum > sectionToDelete) {
-        // Move section down one level but keep its name
-        newSectionPrefs[(secNum - 1).toString()] = {
-          ...sectionPrefs[sec],
-          borderColor: getDefaultSectionColor(secNum - 1)
-        };
-      }
-    });
-    sectionPrefs = newSectionPrefs;
-    
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  
-  updateSectionLegend();
-  refreshAllCells();
-}
-
-function addSection(afterSectionNum) {
-  const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
-  const insertAfter = parseInt(afterSectionNum);
-  const newSectionNum = insertAfter + 1;
-  
-  // Start a graph update
-  graph.getModel().beginUpdate();
-  try {
-    // First, move all cells from higher sections up one level
-    const parent = graph.getDefaultParent();
-    const vertices = graph.getChildVertices(parent);
-    
-    vertices.forEach(cell => {
-      const cellSection = parseInt(getSection(cell) || "1", 10);
-      if (cellSection > insertAfter) {
-        setSection(cell, cellSection + 1);
-      }
-    });
-    
-    // Update sectionPrefs
-    const newSectionPrefs = {};
-    Object.keys(sectionPrefs).forEach(sec => {
-      const secNum = parseInt(sec);
-      if (secNum <= insertAfter) {
-        newSectionPrefs[sec] = sectionPrefs[sec];
-      } else {
-        // Move section up one level but keep its name
-        newSectionPrefs[(secNum + 1).toString()] = {
-          ...sectionPrefs[sec],
-          borderColor: getDefaultSectionColor(secNum + 1)
-        };
-      }
-    });
-    
-    // Add the new section
-    newSectionPrefs[newSectionNum.toString()] = {
-      borderColor: getDefaultSectionColor(newSectionNum),
-      name: `Section ${newSectionNum}`
-    };
-    
-    sectionPrefs = newSectionPrefs;
-    
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  
-  updateSectionLegend();
-  refreshAllCells();
 }
 
 function updateSectionLegend() {
@@ -400,15 +259,9 @@ function updateSectionLegend() {
   sections.forEach(sec => {
     innerHTML += `
       <div class="section-item" data-section="${sec}">
-        <div class="section-header">
         <div class="section-color-box" style="background-color: ${sectionPrefs[sec].borderColor};" data-section="${sec}"></div>
         <span class="section-number">${sec}:</span>
         <span class="section-name" contenteditable="true" data-section="${sec}">${sectionPrefs[sec].name}</span>
-        </div>
-        <div class="section-buttons">
-          <button class="delete-section-btn" onclick="deleteSection('${sec}')">Delete</button>
-          <button class="add-section-btn" onclick="addSection('${sec}')">Add Below</button>
-        </div>
       </div>
     `;
   });
@@ -476,17 +329,6 @@ let lastSelectedCell = null;
 let jumpModeNode = null;
 const jumpBorderStyle = ";strokeWidth=3;strokeColor=#ff0000;dashed=1;dashPattern=4 4;";
 
-// Add this at the top level to track mouse position
-let currentMouseX = 0;
-let currentMouseY = 0;
-
-// Add this in the DOMContentLoaded event listener
-document.addEventListener('mousemove', function(e) {
-  // Convert client coordinates to graph coordinates
-  const pt = graph.getPointForEvent(e, false);
-  currentMouseX = pt.x;
-  currentMouseY = pt.y;
-});
 
 window.handleMultipleTextboxClick = function(event, cellId) {
   event.stopPropagation();
@@ -531,7 +373,6 @@ function loadFlowchartData(data) {
       updateSectionLegend();
     }
 
-    // First pass: Create all cells
     data.cells.forEach(item => {
       if (item.vertex) {
         const geo = new mxGeometry(
@@ -559,14 +400,12 @@ function loadFlowchartData(data) {
         if (item._calcOperator !== undefined) newCell._calcOperator = item._calcOperator;
         if (item._calcThreshold !== undefined) newCell._calcThreshold = item._calcThreshold;
         if (item._calcFinalText !== undefined) newCell._calcFinalText = item._calcFinalText;
-        if (item._calcTerms !== undefined) newCell._calcTerms = item._calcTerms;
 
         graph.addCell(newCell, parent);
         createdCells[item.id] = newCell;
       }
     });
 
-    // Second pass: Create all edges
     data.cells.forEach(item => {
       if (item.edge) {
         const newEdge = new mxCell(item.value, new mxGeometry(), item.style);
@@ -575,26 +414,6 @@ function loadFlowchartData(data) {
         const src = createdCells[item.source];
         const trg = createdCells[item.target];
         graph.addCell(newEdge, parent, undefined, src, trg);
-      }
-    });
-
-    // Third pass: Fix option node sections
-    const vertices = graph.getChildVertices(parent);
-    vertices.forEach(cell => {
-      if (isOptions(cell)) {
-        const incomingEdges = graph.getIncomingEdges(cell) || [];
-        for (const edge of incomingEdges) {
-          const sourceCell = edge.source;
-          if (sourceCell && isQuestion(sourceCell)) {
-            const questionSection = getSection(sourceCell);
-            const optionSection = getSection(cell);
-            if (questionSection !== optionSection) {
-              console.log(`Fixing option node ${cell.id} section from ${optionSection} to ${questionSection} to match parent question`);
-              setSection(cell, questionSection);
-            }
-            break;
-          }
-        }
       }
     });
   } finally {
@@ -883,7 +702,7 @@ document.addEventListener("DOMContentLoaded", function() {
         } else if (isCalculationNode(newVertex)) {
           // Init calculation node data
           newVertex._calcTitle = "Calculation Title";
-          newVertex._calcTerms = [{amountLabel: "", mathOperator: ""}];
+          newVertex._calcAmountLabel = "";
           newVertex._calcOperator = "=";
           newVertex._calcThreshold = "0";
           newVertex._calcFinalText = "";
@@ -1240,10 +1059,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Copy/Paste
   keyHandler.bindControlKey(67, () => { copySelectedNodeAsJson(); });
-  keyHandler.bindControlKey(86, () => { 
-    // Use current mouse position for paste
-    pasteNodeFromJson(currentMouseX, currentMouseY);
-  });
+  keyHandler.bindControlKey(86, () => { pasteNodeFromJson(); });
   
   // Add listener for copy button
   document.getElementById('copyNodeButton').addEventListener('click', function() {
@@ -1288,35 +1104,22 @@ document.addEventListener("DOMContentLoaded", function() {
   graph.connectionHandler.addListener(mxEvent.CONNECT, function(sender, evt) {
     const edge = evt.getProperty("cell");
     if (!edge) return;
-    const source = edge.source;
-    const target = edge.target;
-    
-    // If connecting a question to an option
-    if (source && target && isQuestion(source) && isOptions(target)) {
-      const questionSection = getSection(source);
-      setSection(target, questionSection);
-    }
-    // If connecting an option to a question (reverse case)
-    else if (source && target && isOptions(source) && isQuestion(target)) {
-      const questionSection = getSection(target);
-      setSection(source, questionSection);
-    }
-    
-    // Handle jump mode
-    const parentIsJump = (source && source === jumpModeNode);
-    if (!parentIsJump && source && target) {
-      const parentSec = parseInt(getSection(source) || "1", 10);
-      setSection(target, parentSec);
+    const parent = edge.source;
+    const child = edge.target;
+    const parentIsJump = (parent && parent === jumpModeNode);
+    if (!parentIsJump && parent && child) {
+      const parentSec = parseInt(getSection(parent) || "1", 10);
+      setSection(child, parentSec);
     }
     let parentQuestion = null;
-    if (source && isOptions(source)) {
-      parentQuestion = source.source;
-    } else if (source && isQuestion(source)) {
-      parentQuestion = source;
+    if (parent && isOptions(parent)) {
+      parentQuestion = parent.source;
+    } else if (parent && isQuestion(parent)) {
+      parentQuestion = parent;
     }
     const gpIsJump = (parentQuestion && parentQuestion === jumpModeNode);
     if (parentIsJump || gpIsJump) {
-      addSkipReassign(target);
+      addSkipReassign(child);
     }
     refreshAllCells();
   });
@@ -1552,57 +1355,31 @@ document.addEventListener("DOMContentLoaded", function() {
  ********** RENUMBERING QUESTIONS BY POSITION **********
  *******************************************************/
 function renumberQuestionIds() {
-  // Commented out to preserve original question IDs
-  // const parent = graph.getDefaultParent();
-  // const vertices = graph.getChildVertices(parent);
-  // const questions = vertices.filter(cell => isQuestion(cell));
-  
-  // // Sort questions by vertical position (Y coordinate)
-  // questions.sort((a, b) => {
-  //   const aY = a.geometry.y;
-  //   const bY = b.geometry.y;
-  //   if (aY !== bY) return aY - bY;
-  //   return a.geometry.x - b.geometry.x;
-  // });
-
-  // let currentId = 1;
-  // questions.forEach((cell) => {
-  //   if (!cell._questionId) {
-  //     cell._questionId = currentId;
-  //     currentId++;
-  //   }
-  // });
-
-  // // Update existing IDs based on new order
-  // questions.forEach((cell, index) => {
-  //   cell._questionId = index + 1;
-  // });
-
-  // // If properties menu is open for a selected question, update displayed ID
-  // if (selectedCell && document.getElementById("propertiesMenu").style.display === "block") {
-  //   document.getElementById("propQuestionNumber").textContent = selectedCell._questionId;
-  // }
-  
-  // Just assign ID to new cells that don't have one
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
   const questions = vertices.filter(cell => isQuestion(cell));
   
-  let maxId = 0;
-  questions.forEach((cell) => {
-    if (cell._questionId && cell._questionId > maxId) {
-      maxId = cell._questionId;
-    }
+  // Sort questions by vertical position (Y coordinate)
+  questions.sort((a, b) => {
+    const aY = a.geometry.y;
+    const bY = b.geometry.y;
+    if (aY !== bY) return aY - bY;
+    return a.geometry.x - b.geometry.x;
   });
-  
-  // Only assign IDs to cells that don't have one
+
+  let currentId = 1;
   questions.forEach((cell) => {
     if (!cell._questionId) {
-      maxId++;
-      cell._questionId = maxId;
+      cell._questionId = currentId;
+      currentId++;
     }
   });
-  
+
+  // Update existing IDs based on new order
+  questions.forEach((cell, index) => {
+    cell._questionId = index + 1;
+  });
+
   // If properties menu is open for a selected question, update displayed ID
   if (selectedCell && document.getElementById("propertiesMenu").style.display === "block") {
     document.getElementById("propQuestionNumber").textContent = selectedCell._questionId;
@@ -1879,80 +1656,34 @@ function isCalculationNode(cell) {
  * We'll gather them in the format:
  *    "<question_id_text>_<amount_label>"
  * E.g. "how_many_cars_do_you_have_car_value"
- * Also include calculation node titles as potential sources
  */
 function gatherAllAmountLabels() {
   const labels = [];
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
-  
-  // First collect all calculation nodes
-  const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
-  
+
   vertices.forEach(cell => {
-    if (isCalculationNode(cell)) {
-      // Add calculation node titles as potential sources
-      if (cell._calcTitle) {
-        labels.push(cell._calcTitle);
-      }
-    } else if (isQuestion(cell)) {
-      const qType = getQuestionType(cell);
-
-      // Add number type questions
-      if (qType === "number") {
-        const style = cell.style || "";
-        const nodeIdMatch = style.match(/nodeId=([^;]+)/);
-        if (nodeIdMatch) {
-          const nodeId = decodeURIComponent(nodeIdMatch[1]);
-          labels.push(nodeId);
-          console.log(`Added number type question label: ${nodeId}`);
-        }
-      }
-      
-      if (qType === "multipleDropdownType") {
-        // We'll rename it "numberedDropdown" in final JSON
-        // If it has amounts, push them
-        if (cell._textboxes) {
-          const cleanQuestionName = (cell.value || cell._questionText || "unnamed_question")
-            .replace(/<[^>]+>/g, "")
-            .trim()
-            .replace(/[^\w\s]/gi, "")
-            .replace(/\s+/g, "_")
-            .toLowerCase();
-
-          // We also add amount for each isAmountOption
-          cell._textboxes.forEach(tb => {
-            if (tb.isAmountOption) {
-              // Preserve original spaces in the nameId by converting to underscores
-              // e.g. "how_many_cars_do_you_have_amount_plus" for "Amount Plus"
-              let amountName = tb.nameId.replace(/\s+/g, "_").toLowerCase();
-              let label = cleanQuestionName + "_" + amountName;
-              labels.push(label);
-            }
-          });
-        }
-      } else if (qType === "checkbox") {
-        // Find all amount options linked to this checkbox question
-        const cleanQuestionName = (cell.value || "unnamed_question")
+    if (!isQuestion(cell)) return;
+    const qType = getQuestionType(cell);
+    if (qType === "multipleDropdownType") {
+      // We'll rename it "numberedDropdown" in final JSON
+      // If it has amounts, push them
+      if (cell._textboxes) {
+        const cleanQuestionName = (cell.value || cell._questionText || "unnamed_question")
           .replace(/<[^>]+>/g, "")
           .trim()
           .replace(/[^\w\s]/gi, "")
           .replace(/\s+/g, "_")
           .toLowerCase();
-          
-        // Get all outgoing edges to find options
-        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-        for (const edge of outgoingEdges) {
-          const targetCell = edge.target;
-          if (targetCell && isOptions(targetCell) && isAmountOption(targetCell)) {
-            // For multi-word options, preserve the entire option text as one unit
-            const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
-            // Create label in format: "select_all_that_apply_car_payment"
-            const optionLabel = cleanQuestionName + "_" + optionText.toLowerCase().replace(/\s+/g, "_");
-            labels.push(optionLabel);
-            console.log(`Added checkbox amount option label: ${optionLabel}`);
+
+        // We also add "car_value" for each isAmountOption
+        cell._textboxes.forEach(tb => {
+          if (tb.isAmountOption) {
+            // e.g. "how_many_cars_do_you_have_car_value"
+            let label = cleanQuestionName + "_" + tb.nameId.replace(/\s+/g, "_").toLowerCase();
+            labels.push(label);
           }
-        }
+        });
       }
     }
   });
@@ -1971,91 +1702,38 @@ function gatherAllAmountLabels() {
 function updateCalculationNodeCell(cell) {
   // Prepare default fields if missing
   if (cell._calcTitle === undefined) cell._calcTitle = "Calculation Title";
-  if (cell._calcTerms === undefined) cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
+  if (cell._calcAmountLabel === undefined) cell._calcAmountLabel = "";
   if (cell._calcOperator === undefined) cell._calcOperator = "=";
   if (cell._calcThreshold === undefined) cell._calcThreshold = "0";
   if (cell._calcFinalText === undefined) cell._calcFinalText = "";
 
-  // For backward compatibility
-  if (cell._calcAmountLabel !== undefined && cell._calcTerms.length === 1 && !cell._calcTerms[0].amountLabel) {
-    cell._calcTerms[0].amountLabel = cell._calcAmountLabel;
-  }
-
   // Gather possible "amount" labels
   const allAmountLabels = gatherAllAmountLabels();
 
-  // Build the HTML for all calculation terms
-  let calcTermsHtml = '';
-  
-  cell._calcTerms.forEach((term, index) => {
-    // Build dropdown of amount labels for this term
-    let amountOptionsHtml = `<option value="">-- pick an amount label --</option>`;
-    allAmountLabels.forEach(lbl => {
-      const selected = (lbl === term.amountLabel) ? "selected" : "";
+  // Build dropdown of amount labels
+  let amountOptionsHtml = `<option value="">-- pick an amount label --</option>`;
+  allAmountLabels.forEach(lbl => {
+    const selected = (lbl === cell._calcAmountLabel) ? "selected" : "";
+    
+    // Clean up display name for the dropdown
+    let displayName = lbl;
+    
+    // Strip out common artifacts like delete_amount, add_option etc.
+    displayName = displayName.replace(/delete_amount_/g, "");
+    displayName = displayName.replace(/add_option_/g, "");
+    
+    // Find the last instance of the question name + underscore
+    const lastUnderscoreIndex = displayName.lastIndexOf("_");
+    if (lastUnderscoreIndex !== -1) {
+      const questionPart = displayName.substring(0, lastUnderscoreIndex);
+      const amountPart = displayName.substring(lastUnderscoreIndex + 1);
       
-      // Clean up display name for the dropdown
-      let displayName = lbl;
-      
-      // Strip out common artifacts like delete_amount, add_option etc.
-      displayName = displayName.replace(/delete_amount_/g, "");
-      displayName = displayName.replace(/add_option_/g, "");
-      
-      // Find the last instance of the question name + underscore
-      const lastUnderscoreIndex = displayName.lastIndexOf("_");
-      if (lastUnderscoreIndex !== -1) {
-        const questionPart = displayName.substring(0, lastUnderscoreIndex);
-        const amountPart = displayName.substring(lastUnderscoreIndex + 1);
-        
-        // Format: "how_many_cars_do_you_have + car_value"
-        displayName = `${questionPart}_${amountPart}`;
-      }
-      
-      amountOptionsHtml += `<option value="${escapeAttr(lbl)}" ${selected}>${displayName}</option>`;
-    });
-
-    // For the first term, don't show a math operator
-    if (index === 0) {
-      calcTermsHtml += `
-        <div class="calc-term" data-index="${index}">
-          <label>Calc ${index + 1}:</label>
-          <select onchange="window.updateCalcNodeTerm('${cell.id}', ${index}, 'amountLabel', this.value)" style="width:100%; max-width:500px;">
-            ${amountOptionsHtml}
-          </select>
-          <br/><br/>
-        </div>
-      `;
-    } else {
-      // For subsequent terms, show a math operator dropdown first
-      let mathOperatorOptionsHtml = "";
-      const mathOperators = ["+", "-", "*", "/"];
-      mathOperators.forEach(op => {
-        const selected = (op === term.mathOperator) ? "selected" : "";
-        mathOperatorOptionsHtml += `<option value="${op}" ${selected}>${op}</option>`;
-      });
-
-      calcTermsHtml += `
-        <div class="calc-term" data-index="${index}">
-          <label>Math Operator:</label>
-          <select onchange="window.updateCalcNodeTerm('${cell.id}', ${index}, 'mathOperator', this.value)" style="width:100px;">
-            ${mathOperatorOptionsHtml}
-          </select>
-          <label style="margin-left:10px;">Calc ${index + 1}:</label>
-          <select onchange="window.updateCalcNodeTerm('${cell.id}', ${index}, 'amountLabel', this.value)" style="width:calc(100% - 120px); max-width:380px;">
-            ${amountOptionsHtml}
-          </select>
-          <button onclick="window.removeCalcNodeTerm('${cell.id}', ${index})" style="margin-left:5px;">Remove</button>
-          <br/><br/>
-        </div>
-      `;
+      // Format: "how_many_cars_do_you_have + car_value"
+      displayName = `${questionPart}_${amountPart}`;
     }
+    
+    amountOptionsHtml += `<option value="${escapeAttr(lbl)}" ${selected}>${displayName}</option>`;
   });
-
-  // Add button for adding more terms
-  calcTermsHtml += `
-    <div style="margin-bottom:15px;">
-      <button onclick="window.addCalcNodeTerm('${cell.id}')">Add More</button>
-    </div>
-  `;
 
   // Operator dropdown
   const operators = ["=", ">", "<"];
@@ -2073,9 +1751,13 @@ function updateCalculationNodeCell(cell) {
       </div>
       <br/>
 
-      ${calcTermsHtml}
+      <label>Calc 1:</label>
+      <select onchange="window.updateCalcNodeAmountLabel('${cell.id}', this.value)" style="width:100%; max-width:500px;">
+        ${amountOptionsHtml}
+      </select>
+      <br/><br/>
 
-      <label>Comparison Operator:</label>
+      <label>Operator:</label>
       <select onchange="window.updateCalcNodeOperator('${cell.id}', this.value)">
         ${operatorOptionsHtml}
       </select>
@@ -2115,13 +1797,12 @@ function updateCalculationNodeCell(cell) {
     const geo = cell.geometry;
     if (geo) {
       // Set a generous minimum width for the calculation node to fit dropdowns
-      if (geo.width < 400) {
-        geo.width = 400;
+      if (geo.width < 300) {
+        geo.width = 300;
       }
-      // Ensure height is adequate (add 50px per term after the first)
-      const minHeight = 250 + (Math.max(0, cell._calcTerms.length - 1) * 50);
-      if (geo.height < minHeight) {
-        geo.height = minHeight;
+      // Ensure height is adequate
+      if (geo.height < 250) {
+        geo.height = 250;
       }
     }
   } finally {
@@ -2147,16 +1828,6 @@ window.updateCalcNodeAmountLabel = function(cellId, value) {
   graph.getModel().beginUpdate();
   try {
     cell._calcAmountLabel = value.trim();
-    
-    // Also update _calcTerms for backward compatibility
-    if (!cell._calcTerms || cell._calcTerms.length === 0) {
-      cell._calcTerms = [{
-        amountLabel: value.trim(),
-        mathOperator: ""
-      }];
-    } else if (cell._calcTerms.length > 0) {
-      cell._calcTerms[0].amountLabel = value.trim();
-    }
   } finally {
     graph.getModel().endUpdate();
   }
@@ -2195,78 +1866,6 @@ window.updateCalcNodeFinalText = (cellId, text) => {
   updateCalculationNodeCell(cell);
 };
 
-// New function to handle updating calculation terms
-window.updateCalcNodeTerm = (cellId, termIndex, property, value) => {
-  const cell = graph.getModel().getCell(cellId);
-  if (!cell || !isCalculationNode(cell)) return;
-  
-  graph.getModel().beginUpdate();
-  try {
-    // Initialize terms array if it doesn't exist
-    if (!cell._calcTerms) {
-      cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
-    }
-    
-    // Ensure the term exists
-    if (termIndex >= 0 && termIndex < cell._calcTerms.length) {
-      // Update the specified property
-      cell._calcTerms[termIndex][property] = value;
-      
-      // For backward compatibility, also update _calcAmountLabel if this is the first term
-      if (termIndex === 0 && property === 'amountLabel') {
-        cell._calcAmountLabel = value;
-      }
-    }
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  
-  updateCalculationNodeCell(cell);
-};
-
-// Add a new calculation term
-window.addCalcNodeTerm = (cellId) => {
-  const cell = graph.getModel().getCell(cellId);
-  if (!cell || !isCalculationNode(cell)) return;
-  
-  graph.getModel().beginUpdate();
-  try {
-    // Initialize terms array if it doesn't exist
-    if (!cell._calcTerms) {
-      cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
-    }
-    
-    // Add a new term with default values
-    cell._calcTerms.push({
-      amountLabel: "",
-      mathOperator: "+"  // Default to addition
-    });
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  
-  updateCalculationNodeCell(cell);
-};
-
-// Remove a calculation term
-window.removeCalcNodeTerm = (cellId, termIndex) => {
-  const cell = graph.getModel().getCell(cellId);
-  if (!cell || !isCalculationNode(cell)) return;
-  
-  graph.getModel().beginUpdate();
-  try {
-    // Ensure we have terms and the index is valid
-    if (cell._calcTerms && termIndex > 0 && termIndex < cell._calcTerms.length) {
-      // Remove the term at the specified index
-      cell._calcTerms.splice(termIndex, 1);
-    }
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  
-  updateCalculationNodeCell(cell);
-};
-
 /*******************************************************
  ************  HELPER / STYLING / JSON Exports  ********
  *******************************************************/
@@ -2289,10 +1888,6 @@ function isOptions(cell) {
     cell.style.includes("questionType=amountOption") ||
     cell.style.includes("questionType=imageOption")
   );
-}
-
-function isAmountOption(cell) {
-  return cell && cell.style && cell.style.includes("questionType=amountOption");
 }
 
 function setNodeId(cell, nodeId) {
@@ -2567,8 +2162,7 @@ function refreshAllCells() {
     }
   });
 
-  // Don't renumber question IDs automatically
-  // renumberQuestionIds();
+  renumberQuestionIds();
 }
 
 /*******************************************************
@@ -2624,7 +2218,6 @@ window.exportFlowchartJson = function () {
       cellData._calcOperator = cell._calcOperator || "=";
       cellData._calcThreshold = cell._calcThreshold || "0";
       cellData._calcFinalText = cell._calcFinalText || "";
-      cellData._calcTerms = cell._calcTerms || [{amountLabel: cell._calcAmountLabel || "", mathOperator: ""}];
     }
 
     data.cells.push(cellData);
@@ -2747,69 +2340,16 @@ function findAllUpstreamOptions(questionCell) {
   return results;
 }
 
-function detectSectionJumps(cell, questionCellMap, questionIdMap) {
-  const jumps = [];
-  const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-  
-  const cellSection = parseInt(getSection(cell) || "1", 10);
-  console.log(`Checking section jumps for cell in section ${cellSection}`);
-  
-  for (const edge of outgoingEdges) {
-    const targetCell = edge.target;
-    if (!targetCell || !isOptions(targetCell)) continue;
-    
-    const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
-    console.log(`  Checking option "${optionText}"`);
-    
-    const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
-    
-    for (const optionEdge of optionOutgoingEdges) {
-      const targetQuestionCell = optionEdge.target;
-      if (!targetQuestionCell || !isQuestion(targetQuestionCell)) continue;
-      
-      const sourceSection = parseInt(getSection(cell) || "1", 10);
-      const targetSection = parseInt(getSection(targetQuestionCell) || "1", 10);
-      
-      console.log(`    Option leads to question in section ${targetSection}`);
-      
-      // If target section is more than 1 section away
-      if (Math.abs(targetSection - sourceSection) > 1) {
-        const targetQuestionId = questionIdMap.get(targetQuestionCell.id);
-        if (targetQuestionId) {
-          // Check if this jump already exists
-          const exists = jumps.some(j => j.option === optionText && j.to === targetSection.toString());
-          if (!exists) {
-            console.log(`    Adding jump: "${optionText}" -> section ${targetSection}`);
-            jumps.push({
-              option: optionText,
-              to: targetSection.toString()
-            });
-          }
-        }
-      }
-    }
-  }
-  
-  if (jumps.length > 0) {
-    console.log(`Found ${jumps.length} section jumps:`, jumps);
-  }
-  
-  return jumps;
-}
-
 window.exportGuiJson = function() {
   // Get all cells
   const cells = graph.getModel().cells;
   const sections = [];
-  let hiddenFields = [];
+  const hiddenFields = [];
   let sectionCounter = 1;
   let questionCounter = 1;
   let hiddenFieldCounter = 1;
   let defaultPDFName = "";
 
-  // Store sections in a property of the function for external access
-  window.exportGuiJson.sections = sections;
-  
   // First pass: collect all sections and their questions
   const questionCellMap = new Map(); // Maps questionId to cell
   const questionIdMap = new Map(); // Maps cell.id to questionId
@@ -2840,12 +2380,9 @@ window.exportGuiJson = function() {
       const questionText = cell.getValue() || "";
       const nodeId = getNodeId(cell);
       
-      // Use the original _questionId from the cell instead of questionCounter
-      const questionId = cell._questionId || questionCounter++;
-      
       // Create question object
       const question = {
-        questionId: questionId,
+        questionId: questionCounter,
         text: "",
         type: questionType,
         logic: {
@@ -2887,13 +2424,11 @@ window.exportGuiJson = function() {
       }
 
       // Store mapping between question cells and questionIds
-      questionCellMap.set(questionId, cell);
-      questionIdMap.set(cell.id, questionId);
+      questionCellMap.set(questionCounter, cell);
+      questionIdMap.set(cell.id, questionCounter);
       
-      // Only increment counter for questions without _questionId
-      if (!cell._questionId) {
-        questionCounter++;
-      }
+      // Increment counter for next question
+      questionCounter++;
       
       section.questions.push(question);
     }
@@ -2906,38 +2441,6 @@ window.exportGuiJson = function() {
       if (!cell) continue;
       
       const questionType = getQuestionType(cell);
-      
-      // Initialize jump conditions if not already set
-      if (!question.jump) {
-        question.jump = {
-          enabled: false,
-          conditions: []
-        };
-      }
-      
-      // Check for section jumps
-      console.log(`\nProcessing question ${question.questionId} (${question.text})`);
-      const sectionJumps = detectSectionJumps(cell, questionCellMap, questionIdMap);
-      if (sectionJumps.length > 0) {
-        question.jump.enabled = true;
-        // Preserve any existing jump conditions
-        const existingJumps = question.jump.conditions || [];
-        console.log(`  Existing jumps:`, existingJumps);
-        
-        // Merge section jumps with existing jumps, avoiding duplicates
-        sectionJumps.forEach(jump => {
-          const exists = existingJumps.some(j => 
-            j.option === jump.option && 
-            ((j.to === jump.to) || (j.to === "end" && jump.to === "end"))
-          );
-          if (!exists) {
-            console.log(`  Adding section jump: "${jump.option}" -> section ${jump.to}`);
-            existingJumps.push(jump);
-          }
-        });
-        question.jump.conditions = existingJumps;
-        console.log(`  Final jumps:`, question.jump.conditions);
-      }
       
       // Map number type to money type for GUI JSON
       if (questionType === "number") {
@@ -3031,7 +2534,7 @@ window.exportGuiJson = function() {
                   label: label,
                   nameId: optionNameId,
                   value: "",
-                  hasAmount: isAmountOption(targetCell),
+                  hasAmount: false,
                   amountName: "",
                   amountPlaceholder: ""
                 };
@@ -3070,46 +2573,27 @@ window.exportGuiJson = function() {
                 if (optionTarget && isEndNode(optionTarget)) {
                   // Add to our list of options that jump to END
                   optionsWithJumpToEnd.push(optionText);
+                  // Debug log for jump to END detection
+                  console.log(`    FOUND: Option "${optionText}" jumps to END for question ${question.questionId}`);
                 }
               }
             }
           }
           
-          // If we found options that jump to END, add them to the question's jump conditions
+          // If we found options that jump to END, add them to the jump conditions
           if (optionsWithJumpToEnd.length > 0) {
-            console.log(`Found ${optionsWithJumpToEnd.length} options that jump to END for question ${question.questionId}`);
-            
-            // Enable jump conditions for this question
-            question.jump = question.jump || {};
             question.jump.enabled = true;
-            question.jump.conditions = question.jump.conditions || [];
             
-            // Add each option as a jump condition to "end"
-            for (const optionText of optionsWithJumpToEnd) {
-              // For checkbox questions, we need to find the properly capitalized label
-              let optionLabel = optionText;
-              if (questionType === "checkbox") {
-                const matchingOption = question.options.find(opt => 
-                  (typeof opt === 'object' && opt.label.toLowerCase() === optionText.toLowerCase())
-                );
-                if (matchingOption) {
-                  optionLabel = matchingOption.label;
-                }
-              }
-              
-              // Check if this jump condition already exists
-              const exists = question.jump.conditions.some(c => 
-                c.option === optionLabel && c.to === "end"
-              );
-              
-              if (!exists) {
-                question.jump.conditions.push({
-                  option: optionLabel,
-                  to: "end"
-                });
-                console.log(`Added jump condition for question ${question.questionId}: "${optionLabel}" -> END`);
-              }
-            }
+            // Process each option that jumps to END
+            optionsWithJumpToEnd.forEach(option => {
+              // Make sure to preserve the original case of the option
+              question.jump.conditions.push({
+                option: option,
+                to: "end"
+              });
+            });
+            
+            console.log(`Added jump conditions for question ${question.questionId}:`, JSON.stringify(question.jump.conditions));
           }
         }
         
@@ -3141,25 +2625,20 @@ window.exportGuiJson = function() {
       } else if (questionType === "multipleDropdownType") {
         // Rename to numberedDropdown for consistency
         question.type = "numberedDropdown";
-        console.log(`Converting multipleDropdownType to numberedDropdown for question ${question.questionId}: ${question.text}`);
         
         // Get min and max values
         if (cell._twoNumbers) {
           question.min = cell._twoNumbers.first || "1";
           question.max = cell._twoNumbers.second || "1";
-          console.log(`  Setting min=${question.min}, max=${question.max}`);
         }
         
         // Handle labels and amounts
         if (cell._textboxes) {
-          console.log(`  Processing ${cell._textboxes.length} textboxes for amount/label options`);
           for (const textbox of cell._textboxes) {
             if (textbox.isAmountOption) {
               question.amounts.push(textbox.nameId);
-              console.log(`  Added amount option: ${textbox.nameId}`);
             } else {
               question.labels.push(textbox.nameId);
-              console.log(`  Added label: ${textbox.nameId}`);
             }
           }
         }
@@ -3344,411 +2823,77 @@ window.exportGuiJson = function() {
         fillValue: calcFinalText
       };
 
-      // Collect all calculation nodes except the current one
-      const otherCalcNodes = [];
-      for (const otherId in cells) {
-        const otherCell = cells[otherId];
-        if (otherId !== cellId && otherCell.isVertex() && !otherCell.isEdge() && isCalculationNode(otherCell)) {
-          otherCalcNodes.push(otherCell);
+      // Find the question that contains the amount field
+      const amountLabel = cell._calcAmountLabel || "";
+      
+      // Extract the amount name
+      let amountName = "";
+      let questionNameFromLabel = "";
+      
+      if (amountLabel) {
+        // Clean up the label
+        const cleanedLabel = amountLabel.replace(/delete_amount_/g, "").replace(/add_option_/g, "");
+        const parts = cleanedLabel.split('_');
+        
+        // Get the amount name (last part)
+        if (parts.length > 0) {
+          amountName = parts[parts.length - 1].replace(/_/g, " ").trim();
+        }
+        
+        // Build the question name from everything except the last part
+        if (parts.length > 1) {
+          questionNameFromLabel = parts.slice(0, -1).join('_');
         }
       }
-
-      // For backward compatibility, if we have a single _calcAmountLabel but no _calcTerms
-      if (cell._calcAmountLabel && (!cell._calcTerms || cell._calcTerms.length === 0)) {
-        console.log(`  Converting legacy node with _calcAmountLabel to use _calcTerms`);
-        cell._calcTerms = [{
-          amountLabel: cell._calcAmountLabel,
-          mathOperator: ""
-        }];
-      }
-
-      // Process each term in the _calcTerms array
-      if (cell._calcTerms && cell._calcTerms.length > 0) {
-        console.log(`  Processing calculation node with terms: ${cell._calcTerms.length} terms`);
-        
-        // Process each term separately
-        calculation.terms = [];
-        
-        for (let i = 0; i < cell._calcTerms.length; i++) {
-          const term = cell._calcTerms[i];
-          const termAmountLabel = term.amountLabel || "";
-          const operator = i === 0 ? "" : (term.mathOperator || "+");
-          
-          console.log(`  Processing term ${i+1}: amount label="${termAmountLabel}", operator="${operator}"`);
-          
-          // First check if this term references another calculation node
-          let isTermCalcNodeReference = false;
-          let termCalcNodeTitle = "";
-          
-          for (const otherCalcNode of otherCalcNodes) {
-            if (otherCalcNode._calcTitle && otherCalcNode._calcTitle === termAmountLabel) {
-              isTermCalcNodeReference = true;
-              termCalcNodeTitle = otherCalcNode._calcTitle;
-              console.log(`  Term ${i+1} references calculation node: "${termCalcNodeTitle}"`);
-              break;
+      
+      // Find the target question for this calculation
+      let targetQuestion = null;
+      
+      // Search through all questions in all sections
+      for (const section of sections) {
+        for (const question of section.questions) {
+          // Check if this is a numberedDropdown question with amounts
+          if (question.type === "numberedDropdown" && question.amounts && question.amounts.length > 0) {
+            for (const amount of question.amounts) {
+              if (amount.toLowerCase() === amountName.toLowerCase() || 
+                  amount.toLowerCase().replace(/\s+/g, '_') === amountName.toLowerCase().replace(/\s+/g, '_')) {
+                targetQuestion = question;
+                break;
+              }
             }
           }
           
-          if (isTermCalcNodeReference) {
-            // This term references another calculation node
-            calculation.terms.push({
-              operator: operator,
-              questionNameId: termCalcNodeTitle
-            });
-            console.log(`  Added term referencing calculation: ${JSON.stringify(calculation.terms[calculation.terms.length-1])}`);
-            continue;
-          }
-
-          // If not a calculation reference, check if it's a number type question
-          let foundNumberTypeMatch = false;
-          for (const section of sections) {
-            for (const question of section.questions) {
-              if (question.type === "money") {  // number type is converted to money
-                const questionCell = questionCellMap.get(question.questionId);
-                if (questionCell) {
-                  const style = questionCell.style || "";
-                  const nodeIdMatch = style.match(/nodeId=([^;]+)/);
-                  if (nodeIdMatch) {
-                    const nodeId = decodeURIComponent(nodeIdMatch[1]);
-                    if (nodeId === termAmountLabel) {
-                      calculation.terms.push({
-                        operator: operator,
-                        questionNameId: nodeId
-                      });
-                      foundNumberTypeMatch = true;
-                      console.log(`  Found matching number type question. Using nodeId: ${nodeId}`);
-                      break;
-                    }
-                  }
-                }
-              }
-            }
-            if (foundNumberTypeMatch) break;
-          }
-
-          // If not a number type question, proceed with regular term processing
-          if (!foundNumberTypeMatch) {
-            // Extract amount name and question name from the label
-            let termAmountName = "";
-            let termQuestionName = "";
-            
-            if (termAmountLabel) {
-              // Clean up the label
-              const cleanedLabel = termAmountLabel.replace(/delete_amount_/g, "").replace(/add_option_/g, "");
-              console.log(`  Cleaned term label: "${cleanedLabel}"`);
-              
-              // Handle special cases first - direct checkbox amount options
-              const isCheckboxOption = /^([a-z0-9_]+)_([a-z0-9_]+(?:_[a-z0-9_]+)*)$/.test(cleanedLabel);
-              const isMultipleDropdownAmount = cleanedLabel.includes("_amount");
-              
-              console.log(`  Label format check: isCheckboxOption=${isCheckboxOption}, isMultipleDropdownAmount=${isMultipleDropdownAmount}`);
-              
-              // First try to match checkbox amount options which can have multi-word format
-              if (isCheckboxOption && !isMultipleDropdownAmount) {
-                // Find the last occurrence of the question name
-                const parts = cleanedLabel.split('_');
-                // For checkbox amount options with multiple words, we need to find where the question name ends
-                // and the option name begins. We know the format is: question_name_option_name
-                
-                // First, try to find a matching question to determine the split point
-                let matchedQuestionLength = 0;
-                let matchedQuestion = null;
-                
-                // Try progressively longer combinations of parts to find the question name
-                for (let i = 1; i < parts.length; i++) {
-                  const potentialQuestionName = parts.slice(0, i).join('_');
-                  for (const section of sections) {
-                    for (const question of section.questions) {
-                      if (question.type === "checkbox") {
-                        const questionText = question.text || "";
-                        const questionTextLower = questionText.toLowerCase();
-                        const questionTextAsId = questionTextLower.replace(/[^\w\s]/gi, "").replace(/\s+/g, "_");
-                        
-                        if (potentialQuestionName === questionTextAsId) {
-                          matchedQuestionLength = i;
-                          matchedQuestion = question;
-                          break;
-                        }
-                      }
-                    }
-                    if (matchedQuestionLength > 0) break;
-                  }
-                  if (matchedQuestionLength > 0) break;
-                }
-                
-                if (matchedQuestionLength > 0) {
-                  // We found the question, so we know where to split
-                  termQuestionName = parts.slice(0, matchedQuestionLength).join('_');
-                  termAmountName = parts.slice(matchedQuestionLength).join('_');
-                } else {
-                  // Fallback: assume the last part is the amount name
-                  termAmountName = parts[parts.length - 1];
-                  termQuestionName = parts.slice(0, -1).join('_');
-                }
-                console.log(`  Detected checkbox option. Question: "${termQuestionName}", Option/Amount: "${termAmountName}"`);
-              }
-              // For multi-word amounts like "amount_plus", we need to handle the extraction differently
-              else if (cleanedLabel.indexOf("_amount_") > 0) {
-                // This is likely a multi-word amount (like "amount_plus")
-                const questionNameEndPos = cleanedLabel.indexOf("_amount_");
-                termQuestionName = cleanedLabel.substring(0, questionNameEndPos);
-                termAmountName = "amount_" + cleanedLabel.substring(questionNameEndPos + 8); // Skip "_amount_"
-                console.log(`  Detected multi-word amount. Question: "${termQuestionName}", Amount: "${termAmountName}"`);
-              }
-              // Handle the simple case with just "amount" at the end
-              else if (cleanedLabel.endsWith("_amount")) {
-                termQuestionName = cleanedLabel.substring(0, cleanedLabel.length - 7); // Remove "_amount"
-                termAmountName = "amount";
-                console.log(`  Detected simple amount suffix. Question: "${termQuestionName}", Amount: "${termAmountName}"`);
-              }
-              // Try standard extraction with last underscore
-              else {
-                const lastIndex = cleanedLabel.lastIndexOf('_');
-                if (lastIndex > 0) {
-                  termAmountName = cleanedLabel.substring(lastIndex + 1).trim();
-                  termQuestionName = cleanedLabel.substring(0, lastIndex).trim();
-                  console.log(`  Standard extraction. Question: "${termQuestionName}", Amount: "${termAmountName}"`);
-                } else {
-                  // Fallback
-                  const parts = cleanedLabel.split('_');
-                  if (parts.length > 0) {
-                    termAmountName = parts[parts.length - 1].replace(/_/g, " ").trim();
-                  }
-                  if (parts.length > 1) {
-                    termQuestionName = parts.slice(0, -1).join('_');
-                  }
-                  console.log(`  Fallback extraction. Question: "${termQuestionName}", Amount: "${termAmountName}"`);
-                }
-              }
-              
-              console.log(`  Term ${i+1} extracted: question="${termQuestionName}", amount="${termAmountName}"`);
-              
-              // Find the matching question
-              let termTargetQuestion = null;
-              let isCheckboxAmount = false;
-              
-              // First, check if this is a checkbox amount option
-              for (const section of sections) {
-                for (const question of section.questions) {
-                  if (question.type === "checkbox") {
-                    const questionText = question.text || "";
-                    const questionTextLower = questionText.toLowerCase();
-                    const questionTextAsId = questionTextLower.replace(/[^\w\s]/gi, "").replace(/\s+/g, "_");
-                    
-                    // Check if the question name part matches this checkbox question
-                    if (termQuestionName.toLowerCase() === questionTextAsId) {
-                      // Check if this question has an option matching the amount name
-                      if (question.options && Array.isArray(question.options)) {
-                        for (const option of question.options) {
-                          // For object options
-                          if (typeof option === 'object' && option.hasAmount) {
-                            const optionLabel = option.label.toLowerCase().replace(/\s+/g, '_');
-                            if (optionLabel === termAmountName) {
-                              termTargetQuestion = question;
-                              isCheckboxAmount = true;
-                              console.log(`  Term ${i+1} matched checkbox question: "${questionText}" with amount option "${option.label}"`);
-                              break;
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                  if (termTargetQuestion) break;
-                }
-                if (termTargetQuestion) break;
-              }
-              
-              // If not a checkbox amount, look for a numbered dropdown question
-              if (!termTargetQuestion) {
-                // Look for matching question
-                for (const section of sections) {
-                  for (const question of section.questions) {
-                    if (question.type !== "numberedDropdown") continue;
-                    
-                    const questionText = question.text || "";
-                    const questionTextLower = questionText.toLowerCase();
-                    const questionTextAsId = questionTextLower.replace(/[^\w\s]/gi, "").replace(/\s+/g, "_");
-                    
-                    // Try multiple matching strategies
-                    const directMatch = termQuestionName.toLowerCase() === questionTextAsId;
-                    const containsMatch = termQuestionName.toLowerCase().includes(questionTextAsId) || 
-                                       questionTextAsId.includes(termQuestionName.toLowerCase());
-                    const simpleTextMatch = termQuestionName.toLowerCase().replace(/_/g, " ") === questionTextLower;
-                    
-                    if (directMatch || containsMatch || simpleTextMatch) {
-                      console.log(`  Term ${i+1} found potential question match: "${questionText}"`);
-                      
-                      // Check if this question has matching amounts
-                      if (question.amounts && Array.isArray(question.amounts)) {
-                        // For multi-word amounts, try both direct comparison and with spaces replaced by underscores
-                        const foundMatchingAmount = question.amounts.some(amount => {
-                          const amountLower = amount.toLowerCase();
-                          const amountUnderscores = amountLower.replace(/\s+/g, '_');
-                          const termAmountLower = termAmountName.toLowerCase();
-                          const termAmountSpaces = termAmountLower.replace(/_/g, ' ');
-                          
-                          return amountLower === termAmountLower || 
-                                 amountLower === termAmountSpaces || 
-                                 amountUnderscores === termAmountLower;
-                        });
-                        
-                        if (foundMatchingAmount) {
-                          termTargetQuestion = question;
-                          console.log(`  Term ${i+1} matched numberedDropdown question: "${questionText}" with matching amount`);
-                          break;
-                        } else {
-                          // Even if we don't find exact amount match, use this question if it has any amounts
-                          termTargetQuestion = question;
-                          console.log(`  Term ${i+1} matched numberedDropdown question: "${questionText}" but using fallback amount`);
-                          break;
-                        }
-                      }
-                    }
-                    if (termTargetQuestion) break;
-                  }
-                  if (termTargetQuestion) break;
-                }
-              }
-              
-              // If we found a matching question
-              if (termTargetQuestion) {
-                console.log(`  Term ${i+1} found target question: ${termTargetQuestion.questionId} (${termTargetQuestion.text})`);
-                
-                // For numberedDropdown questions, create terms for each number
-                if (termTargetQuestion.type === "numberedDropdown") {
-                  const min = parseInt(termTargetQuestion.min || "1", 10);
-                  const max = parseInt(termTargetQuestion.max || "1", 10);
-                  
-                  // For multi-word amounts like "amount_plus", use proper format
-                  let actualAmountName = termAmountName.trim().toLowerCase();
-                  
-                  // Find matching amount in the question's amounts array
-                  if (termTargetQuestion.amounts && termTargetQuestion.amounts.length > 0) {
-                    // Try to find exact match first (ignoring case and handling spaces vs underscores)
-                    const matchingAmount = termTargetQuestion.amounts.find(amount => {
-                      const amountLower = amount.toLowerCase();
-                      const amountUnderscores = amountLower.replace(/\s+/g, '_');
-                      const termAmountLower = termAmountName.toLowerCase();
-                      const termAmountSpaces = termAmountLower.replace(/_/g, ' ');
-                      
-                      return amountLower === termAmountLower || 
-                             amountLower === termAmountSpaces || 
-                             amountUnderscores === termAmountLower;
-                    });
-                    
-                    if (matchingAmount) {
-                      // Use the proper format with spaces replaced by underscores
-                      actualAmountName = matchingAmount.toLowerCase().replace(/\s+/g, '_');
-                      console.log(`  Found exact matching amount: "${matchingAmount}" -> "${actualAmountName}"`);
-                    } else {
-                      // Use the first amount as fallback
-                      actualAmountName = termTargetQuestion.amounts[0].toLowerCase().replace(/\s+/g, '_');
-                      console.log(`  Using fallback amount: "${termTargetQuestion.amounts[0]}" -> "${actualAmountName}"`);
-                    }
-                  }
-                  
-                  // Add first number with the appropriate operator
-                  calculation.terms.push({
-                    operator: operator,
-                    questionNameId: `${termTargetQuestion.text}_${min}_${actualAmountName}`
-                  });
-                  
-                  // Add additional numbers with + operator
-                  for (let j = min + 1; j <= max; j++) {
-                    calculation.terms.push({
-                      operator: "+",
-                      questionNameId: `${termTargetQuestion.text}_${j}_${actualAmountName}`
-                    });
-                  }
-                  
-                  console.log(`  Added terms for numberedDropdown: min=${min}, max=${max}, using amount="${actualAmountName}"`);
-                  continue; // Skip to next term
-                } else if (termTargetQuestion.type === "checkbox" && isCheckboxAmount) {
-                  // For checkbox amount options, use the direct format: questionName_optionName
-                  // This preserves the original format from gatherAllAmountLabels
-                  calculation.terms.push({
-                    operator: operator,
-                    questionNameId: `${termQuestionName}_${termAmountName}`
-                  });
-                  console.log(`  Added term for checkbox amount option using original format: ${termQuestionName}_${termAmountName}`);
-                  continue; // Skip to next term
-                } else {
-                  // For other question types
-                  calculation.terms.push({
-                    operator: operator,
-                    questionNameId: `${termTargetQuestion.nameId}_${termAmountName}`
-                  });
-                  console.log(`  Added term for regular question`);
-                  continue; // Skip to next term
-                }
-              }
-              
-              // If no target question found, try one more fallback approach for common question types
-              if (!termTargetQuestion) {
-                // For numbered dropdown questions (most common with amount options),
-                // try to find any numbered dropdown question and use its text
-                let fallbackQuestion = null;
-                for (const section of sections) {
-                  for (const question of section.questions) {
-                    if (question.type === "numberedDropdown") {
-                      fallbackQuestion = question;
-                      break;
-                    }
-                  }
-                  if (fallbackQuestion) break;
-                }
-                
-                if (fallbackQuestion) {
-                  console.log(`  Using fallback numbered dropdown question: "${fallbackQuestion.text}"`);
-                  const min = parseInt(fallbackQuestion.min || "1", 10);
-                  const max = parseInt(fallbackQuestion.max || "1", 10);
-                  
-                  // Use the termAmountName directly for the format
-                  // Convert spaces to underscores for consistent format
-                  const cleanedAmountName = termAmountName.trim().toLowerCase().replace(/\s+/g, '_');
-                  
-                  // Add first term with operator
-                  calculation.terms.push({
-                    operator: operator,
-                    questionNameId: `${fallbackQuestion.text}_${min}_${cleanedAmountName}`
-                  });
-                  
-                  // Add additional terms
-                  for (let j = min + 1; j <= max; j++) {
-                    calculation.terms.push({
-                      operator: "+",
-                      questionNameId: `${fallbackQuestion.text}_${j}_${cleanedAmountName}`
-                    });
-                  }
-                  
-                  console.log(`  Added fallback terms using first numberedDropdown question`);
-                  continue; // Skip to next term
-                }
-              }
-              
-              // If still no match, create a placeholder
-              console.log(`  Term ${i+1} no target question found, using placeholder`);
-              calculation.terms.push({
-                operator: operator,
-                questionNameId: `unknown_question_${termAmountName || i+1}`
-              });
-            }
-          }
+          if (targetQuestion) break;
         }
+        if (targetQuestion) break;
+      }
+
+      // Generate calculation terms
+      if (targetQuestion) {
+        // Clean up the amount name for consistency
+        const cleanAmountName = amountName.trim().toLowerCase().replace(/\s+/g, '_');
         
-        // Add the calculation to the hidden field
-        if (calculation.terms.length > 0) {
-          // Make sure fillValue uses the actual final text
-          calculation.fillValue = calcFinalText;
-          
-          hiddenField.calculations.push(calculation);
-          hiddenFields.push(hiddenField);
-          hiddenFieldCounter++;
-          
-          console.log(`  Final calculation terms: ${JSON.stringify(calculation.terms)}`);
+        // First term has no operator
+        calculation.terms.push({
+          operator: "",
+          questionNameId: `${targetQuestion.text}_1_${cleanAmountName}`
+        });
+        
+        // Add additional terms
+        const max = parseInt(targetQuestion.max || "4", 10);
+        
+        // Add terms for each number from 2 to max
+        for (let i = 2; i <= max; i++) {
+          calculation.terms.push({
+            operator: "+",
+            questionNameId: `${targetQuestion.text}_${i}_${cleanAmountName}`
+          });
         }
       }
+
+      hiddenField.calculations.push(calculation);
+      hiddenFields.push(hiddenField);
+      hiddenFieldCounter++;
     }
   }
 
@@ -3758,8 +2903,8 @@ window.exportGuiJson = function() {
     sectionCounter = maxSectionId + 1;
   }
 
-  // Update hiddenFieldCounter based on the actual number of hidden fields
-  hiddenFieldCounter = hiddenFields.length + 1;
+  // Explicitly set hiddenFieldCounter to 3
+  hiddenFieldCounter = 3;
 
   // Before creating the final JSON object, ensure all prevAnswer values preserve original case
   for (const section of sections) {
@@ -3805,111 +2950,6 @@ window.exportGuiJson = function() {
   let changesOccurred = true;
   let iterationCount = 0;
   const logicMaxIterations = 10; // Prevent infinite loops
-  
-  // Sort hiddenFields to ensure calculation nodes that reference other calculation nodes
-  // appear after their dependencies
-  if (hiddenFields.length > 1) {
-    console.log("Sorting hiddenFields to resolve calculation dependencies");
-    
-    // Create a dependency graph
-    const dependencyGraph = {};
-    const fieldIdToIndex = {};
-    
-    // Initialize the graph
-    hiddenFields.forEach((field, index) => {
-      fieldIdToIndex[field.name] = index;
-      dependencyGraph[field.name] = [];
-    });
-    
-    // Build dependency relationships
-    hiddenFields.forEach(field => {
-      if (field.calculations && field.calculations.length > 0) {
-        field.calculations.forEach(calc => {
-          if (calc.terms && calc.terms.length > 0) {
-            calc.terms.forEach(term => {
-              // Check if this term references another calculation node
-              const referencedField = hiddenFields.find(f => f.name === term.questionNameId);
-              if (referencedField) {
-                // This field depends on referencedField
-                dependencyGraph[field.name].push(referencedField.name);
-                console.log(`Dependency detected: ${field.name} depends on ${referencedField.name}`);
-              }
-            });
-          }
-        });
-      }
-    });
-    
-    console.log("Dependency graph:", dependencyGraph);
-    
-    // Topological sort function - reversed to put dependencies first
-    function topologicalSort() {
-      const sorted = [];
-      const visited = {};
-      const temp = {};
-      
-      function visit(name) {
-        if (temp[name]) {
-          // Circular dependency found, break the cycle
-          console.log(`Warning: Circular dependency detected with ${name}`);
-          return;
-        }
-        
-        if (!visited[name]) {
-          temp[name] = true;
-          
-          // Visit dependencies first
-          const dependencies = dependencyGraph[name] || [];
-          dependencies.forEach(dep => {
-            visit(dep);
-          });
-          
-          visited[name] = true;
-          temp[name] = false;
-          sorted.push(name); // Add to end (dependencies will be first)
-        }
-      }
-      
-      // Visit each node
-      Object.keys(dependencyGraph).forEach(name => {
-        if (!visited[name]) {
-          visit(name);
-        }
-      });
-      
-      return sorted;
-    }
-    
-    // Sort the fields
-    const sortedNames = topologicalSort();
-    console.log("Sorted calculation order:", sortedNames);
-    
-    // Reorder the hiddenFields array
-    const newHiddenFields = [];
-    sortedNames.forEach(name => {
-      const field = hiddenFields.find(f => f.name === name);
-      if (field) {
-        newHiddenFields.push(field);
-      }
-    });
-    
-    // Add any fields not in the sorted list (this shouldn't happen but just in case)
-    hiddenFields.forEach(field => {
-      if (!sortedNames.includes(field.name)) {
-        newHiddenFields.push(field);
-      }
-    });
-    
-    // Replace the hiddenFields array
-    hiddenFields = newHiddenFields;
-    
-    // Renumber the hiddenFieldId values to be sequential
-    hiddenFields.forEach((field, index) => {
-      field.hiddenFieldId = (index + 1).toString();
-    });
-    
-    console.log("Sorted and renumbered hiddenFields");
-  }
   
   // Repeatedly propagate conditions until no more changes occur
   while (changesOccurred && iterationCount < logicMaxIterations) {
@@ -4271,103 +3311,6 @@ window.exportGuiJson = function() {
         }
       }
       
-      // NEW CODE: Check for options leading to questions that eventually reach END
-      // Skip this step for questions that don't need jump conditions
-      // First, determine if this question has direct connections to an END node through options
-      let hasDirectPathToEnd = false;
-      
-      for (const edge of outgoingEdges) {
-        const targetCell = edge.target;
-        if (!targetCell || !isOptions(targetCell)) continue;
-        
-        const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
-        for (const optionEdge of optionOutgoingEdges) {
-          if (optionEdge.target && isEndNode(optionEdge.target)) {
-            hasDirectPathToEnd = true;
-            break;
-          }
-        }
-        if (hasDirectPathToEnd) break;
-      }
-      
-      // Process all questions for indirect jumps, not just those with direct paths to END
-      // This is a key change to ensure indirect paths are properly detected
-      for (const edge of outgoingEdges) {
-        const targetCell = edge.target;
-        if (!targetCell || !isOptions(targetCell)) continue;
-        
-        const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
-        const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
-        
-        for (const optionEdge of optionOutgoingEdges) {
-          const optionTargetCell = optionEdge.target;
-          if (!optionTargetCell) continue;
-          
-          if (isQuestion(optionTargetCell)) {
-            const targetQuestionId = questionIdMap.get(optionTargetCell.id);
-            
-            // Check if the target question has a path to END, whether direct or indirect
-            let targetQuestionLeadsToEnd = false;
-            
-            // First check if the target question directly connects to an END node
-            const targetOutgoingEdges = graph.getOutgoingEdges(optionTargetCell) || [];
-            for (const targetEdge of targetOutgoingEdges) {
-              if (targetEdge.target && isEndNode(targetEdge.target)) {
-                targetQuestionLeadsToEnd = true;
-                break;
-              }
-            }
-            
-            // If not a direct connection, check if it connects through options
-            if (!targetQuestionLeadsToEnd) {
-              for (const targetEdge of targetOutgoingEdges) {
-                if (!targetEdge.target || !isOptions(targetEdge.target)) continue;
-                
-                const targetOptionOutgoingEdges = graph.getOutgoingEdges(targetEdge.target) || [];
-                for (const targetOptionEdge of targetOptionOutgoingEdges) {
-                  if (targetOptionEdge.target && isEndNode(targetOptionEdge.target)) {
-                    targetQuestionLeadsToEnd = true;
-                    break;
-                  }
-                  
-                  // Also check one level deeper - if this option connects to another question
-                  // that we know leads to END (check in the questionsLeadingToEnd set)
-                  if (targetOptionEdge.target && isQuestion(targetOptionEdge.target)) {
-                    const deepTargetQuestionId = questionIdMap.get(targetOptionEdge.target.id);
-                    if (deepTargetQuestionId && questionsLeadingToEnd.has(deepTargetQuestionId.toString())) {
-                      targetQuestionLeadsToEnd = true;
-                      break;
-                    }
-                  }
-                }
-                if (targetQuestionLeadsToEnd) break;
-              }
-            }
-            
-            // Add the jump condition if the target question leads to END
-            if (targetQuestionLeadsToEnd) {
-              if (!question.jump.enabled) {
-                question.jump.enabled = true;
-                question.jump.conditions = [...(question.jump.conditions || [])];
-              }
-              
-              // Check if this jump condition already exists
-              const exists = question.jump.conditions.some(c => 
-                c.option === optionText && c.to === "end"
-              );
-              
-              if (!exists) {
-                question.jump.conditions.push({
-                  option: optionText,
-                  to: "end"
-                });
-                console.log(`  ADDED INDIRECT JUMP: Added jump to END for question ${question.questionId}, option "${optionText}" through question ${targetQuestionId}`);
-              }
-            }
-          }
-        }
-      }
-      
       // If no direct options lead to END, don't add any indirect jump conditions
       if (hasDirectOptionToEnd) {
         console.log(`  Question ${question.questionId} has direct options to END, skipping indirect checks`);
@@ -4376,111 +3319,14 @@ window.exportGuiJson = function() {
       
       // Only process indirect options for Question 1 if specifically needed
       // This prevents adding incorrect jumps to questions that should not have them
-      // if (question.questionId === 1) {
-      //   console.log(`  Question 1 should not have jump conditions to END added, as its options lead to other questions first`);
-      //   continue;
-      // }
-    }
-  }
-  
-  // Add a new section near the end of processing to remove unwanted jump conditions
-  // Add this code right before creating the final JSON object, after the capitalization fixes
-
-  // Final pass: Clean up unnecessary jump conditions
-  console.log("Performing final pass: Cleaning up unnecessary jump conditions");
-
-  // Set of questions that should never have jump conditions
-  const noJumpQuestions = new Set([4]); // Question 4 should never have jumps
-  
-  // Set of questions that should have END jumps (from direct analysis of the flowchart)
-  const shouldHaveEndJumps = new Set(); // We'll populate this by checking direct connections to END
-
-  // First, identify all questions with direct paths to END
-  for (const section of sections) {
-    for (const question of section.questions) {
-      const cell = questionCellMap.get(question.questionId);
-      if (!cell) continue;
-      
-      // Check for direct paths to END
-      const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-      for (const edge of outgoingEdges) {
-        const targetCell = edge.target;
-        if (!targetCell || !isOptions(targetCell)) continue;
-        
-        const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
-        for (const optionEdge of optionOutgoingEdges) {
-          if (optionEdge.target && isEndNode(optionEdge.target)) {
-            shouldHaveEndJumps.add(question.questionId);
-            console.log(`Question ${question.questionId} (${question.text}) has a direct path to END`);
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  // Now fix any jump conditions that are incorrectly set
-  for (const section of sections) {
-    for (const question of section.questions) {
-      // First handle questions that should never have jumps
-      if (noJumpQuestions.has(question.questionId)) {
-        if (question.jump.enabled) {
-          console.log(`Question ${question.questionId} (${question.text}) should never have jumps, removing them explicitly`);
-          question.jump.enabled = false;
-          question.jump.conditions = [];
-        }
+      if (question.questionId === 1) {
+        console.log(`  Question 1 should not have jump conditions to END added, as its options lead to other questions first`);
         continue;
       }
-      
-      // Skip questions that don't have a cell (shouldn't happen)
-      const cell = questionCellMap.get(question.questionId);
-      if (!cell) continue;
-      
-      // Check for section jumps
-      const sectionJumps = detectSectionJumps(cell, questionCellMap, questionIdMap);
-      const hasValidSectionJumps = sectionJumps.length > 0;
-      
-      // Determine if this question should have jumps based on our analysis
-      const shouldHaveJumps = shouldHaveEndJumps.has(question.questionId) || hasValidSectionJumps;
-      
-      if (shouldHaveJumps) {
-        // Ensure jumps are enabled
-          question.jump.enabled = true;
-        
-        // Preserve both END jumps and section jumps
-        if (!question.jump.conditions) {
-          question.jump.conditions = [];
-        }
-        
-        // Add any missing section jumps
-        sectionJumps.forEach(jump => {
-          const exists = question.jump.conditions.some(j => 
-            j.option === jump.option && j.to === jump.to
-          );
-          if (!exists) {
-            question.jump.conditions.push(jump);
-        }
-        });
-      } else {
-        // Remove jump conditions if this question shouldn't have them
-        if (question.jump.enabled) {
-          console.log(`Question ${question.questionId} (${question.text}) should not have jumps, removing them`);
-          question.jump.enabled = false;
-          question.jump.conditions = [];
-        } 
-      }
     }
   }
-
-  // ... rest of existing code ...
-
+  
   // Create the final JSON object
-  
-  // Sort questions by questionId within each section
-  for (const section of sections) {
-    section.questions.sort((a, b) => a.questionId - b.questionId);
-  }
-  
   const guiJson = {
     sections: sections,
     hiddenFields: hiddenFields,
@@ -4556,7 +3402,6 @@ function saveFlowchart() {
       cellData._calcOperator = cell._calcOperator || "=";
       cellData._calcThreshold = cell._calcThreshold || "0";
       cellData._calcFinalText = cell._calcFinalText || "";
-      cellData._calcTerms = cell._calcTerms || [{amountLabel: cell._calcAmountLabel || "", mathOperator: ""}];
     }
 
     data.cells.push(cellData);
@@ -4796,7 +3641,6 @@ function copySelectedNodeAsJson() {
       _calcOperator: cell._calcOperator,
       _calcThreshold: cell._calcThreshold,
       _calcFinalText: cell._calcFinalText || "",
-      _calcTerms: cell._calcTerms || (cell._calcAmountLabel ? [{amountLabel: cell._calcAmountLabel, mathOperator: ""}] : null),
       _image: cell._image
     }));
     
@@ -4840,7 +3684,6 @@ function copySelectedNodeAsJson() {
       _calcOperator: cell._calcOperator,
       _calcThreshold: cell._calcThreshold,
       _calcFinalText: cell._calcFinalText || "",
-      _calcTerms: cell._calcTerms || (cell._calcAmountLabel ? [{amountLabel: cell._calcAmountLabel, mathOperator: ""}] : null),
       _image: cell._image
     };
     navigator.clipboard.writeText(JSON.stringify(data)).then(() => {
@@ -4859,7 +3702,7 @@ function pasteNodeFromJson(x, y) {
       if (data.isMultiCopy && data.cells && data.cells.length > 0) {
         graph.getModel().beginUpdate();
         try {
-          // Use provided position or current mouse position or default to a fixed position
+          // Use provided position or default to a fixed position
           const posX = x !== undefined ? x : 50;
           const posY = y !== undefined ? y : 50;
           
@@ -4898,7 +3741,6 @@ function pasteNodeFromJson(x, y) {
             newCell._calcOperator = cellData._calcOperator;
             newCell._calcThreshold = cellData._calcThreshold;
             newCell._calcFinalText = cellData._calcFinalText;
-            newCell._calcTerms = cellData._calcTerms || (cellData._calcAmountLabel ? [{amountLabel: cellData._calcAmountLabel, mathOperator: ""}] : null);
             newCell._image = cellData._image;
             
             graph.addCell(newCell, graph.getDefaultParent());
@@ -4948,7 +3790,7 @@ function pasteNodeFromJson(x, y) {
         // Original single-cell paste
         graph.getModel().beginUpdate();
         try {
-          // Use provided position or current mouse position or default to a fixed position
+          // Use provided position or default to a fixed position
           const posX = x !== undefined ? x : 50;
           const posY = y !== undefined ? y : 50;
           
@@ -4969,7 +3811,6 @@ function pasteNodeFromJson(x, y) {
           newCell._calcOperator = data._calcOperator;
           newCell._calcThreshold = data._calcThreshold;
           newCell._calcFinalText = data._calcFinalText;
-          newCell._calcTerms = data._calcTerms || (data._calcAmountLabel ? [{amountLabel: data._calcAmountLabel, mathOperator: ""}] : null);
           newCell._image = data._image;
           
           graph.addCell(newCell, graph.getDefaultParent());
@@ -5137,88 +3978,3 @@ document.addEventListener('DOMContentLoaded', function() {
     toolbar.appendChild(exportGuiJsonBtn);
   }
 });
-
-// Fix the case sensitivity issue with the prevAnswer in logic conditions
-// Add this code at the end of the sixth pass, just before creating the final JSON object
-
-// Ensure checkbox options are properly capitalized in both the options and the conditions
-// Access the 'sections' variable from the exportGuiJson function scope
-window.fixCapitalizationInJumps = function() {
-  // Get reference to sections from the main exportGuiJson function
-  const sections = window.exportGuiJson.sections || [];
-  
-  for (const section of sections) {
-    for (const question of section.questions) {
-      // Fix capitalization of checkbox options
-      if (question.type === "checkbox" && Array.isArray(question.options)) {
-        // Create a mapping of lowercase option text to properly capitalized option text
-        const optionCapitalizationMap = {};
-        
-        // Special handling for checkbox questions and their options
-        if (Array.isArray(question.options)) {
-          for (const option of question.options) {
-            if (typeof option === 'object' && option.label) {
-              // Store both the lowercase and original versions
-              optionCapitalizationMap[option.label.toLowerCase()] = option.label;
-              
-              // Special case for "maybe" to ensure it's always properly capitalized
-              if (option.label.toLowerCase() === "maybe") {
-                optionCapitalizationMap["maybe"] = "Maybe";
-              }
-            }
-          }
-        }
-        
-        // Apply the capitalization fix to logic conditions
-        for (const section2 of sections) {
-          for (const question2 of section2.questions) {
-            // Fix logic conditions
-            if (question2.logic && question2.logic.conditions) {
-              for (const condition of question2.logic.conditions) {
-                if (condition.prevQuestion === question.questionId.toString()) {
-                  // Special case for "maybe"
-                  if (condition.prevAnswer && condition.prevAnswer.toLowerCase() === "maybe") {
-                    condition.prevAnswer = "Maybe";
-                    console.log(`Fixed capitalization: Changed logic condition prevAnswer to "Maybe"`);
-                  }
-                  // General case
-                  else if (condition.prevAnswer && optionCapitalizationMap[condition.prevAnswer.toLowerCase()]) {
-                    condition.prevAnswer = optionCapitalizationMap[condition.prevAnswer.toLowerCase()];
-                    console.log(`Fixed capitalization: Changed logic condition prevAnswer from "${condition.prevAnswer}" to "${optionCapitalizationMap[condition.prevAnswer.toLowerCase()]}"`);
-                  }
-                }
-              }
-            }
-            
-            // Also check jump conditions that might reference options
-            if (question2.jump && question2.jump.conditions) {
-              for (const jumpCondition of question2.jump.conditions) {
-                // For checkbox questions, make sure jump condition options match the case of option labels
-                if (question2.questionId === question.questionId && 
-                    jumpCondition.option && 
-                    optionCapitalizationMap[jumpCondition.option.toLowerCase()]) {
-                  jumpCondition.option = optionCapitalizationMap[jumpCondition.option.toLowerCase()];
-                  console.log(`Fixed capitalization: Changed jump condition option from "${jumpCondition.option}" to "${optionCapitalizationMap[jumpCondition.option.toLowerCase()]}"`);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-// Call the function to fix capitalization
-window.fixCapitalizationInJumps();
-
-// Final check - look for any remaining issues in our resulting logic constraints
-let stillHaveIssues = true;
-let fixIteration = 0;
-const maxIterations = 10; // Define maxIterations here instead of assuming it's already defined
-
-while (stillHaveIssues && fixIteration < maxIterations) {
-  console.log(`Processing iteration ${fixIteration} for logic fixes`);
-  stillHaveIssues = false;
-  fixIteration++;
-}
