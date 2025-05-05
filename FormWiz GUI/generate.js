@@ -8,6 +8,20 @@
 /* global map: questionId  →  canonical slug */
 const questionSlugMap = {};
 
+/* global maps and arrays for form data */
+const questionNameIds = {};
+const questionTypesMap = {};
+const conditionalPDFs = [];
+const conditionalAlerts = [];
+const jumpLogics = [];
+const labelMap = {};
+const amountMap = {}; // used for numberedDropdown with amounts
+const linkedDropdowns = []; // For storing linked dropdown pairs
+
+// We also create a buffer to store our conditional-logic code
+// so we can insert it later in one <script> block.
+let logicScriptBuffer = "";
+
 /*───────────────────────────────*
  * canonical sanitiser – visible
  * to all build-time code
@@ -225,20 +239,6 @@ function getFormHTML() {
     '    <div id="box">',
     '        <form id="customForm" onsubmit="return showThankYouMessage();">',
   ].join("\n");
-
-  // These will hold the data we need for logic and hidden fields:
-  const questionNameIds = {};
-  const questionTypesMap = {};
-  const conditionalPDFs = [];
-  const conditionalAlerts = [];
-  const jumpLogics = [];
-  const labelMap = {};
-  const amountMap = {}; // used for numberedDropdown with amounts
-  const linkedDropdowns = []; // For storing linked dropdown pairs
-
-  // We also create a buffer to store our conditional-logic code
-  // so we can insert it later in one <script> block.
-  let logicScriptBuffer = "";
 
   // Possibly read user's PDF name from an element on the page:
   const pdfFormNameInputEl = document.getElementById("formPDFName");
@@ -536,7 +536,7 @@ for (let co = 0; co < cOptsDivs.length; co++){
     }
 }
 
-/* ── optional “None of the above” ─────────────────────────── */
+/* ── optional "None of the above" ─────────────────────────── */
 const noneEl = qBlock.querySelector(`#noneOfTheAbove${questionId}`);
 if (noneEl?.checked){
     const noneStr      = 'None of the above';
@@ -871,7 +871,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   function sanitizeQuestionText (str){
     return String(str)
        .toLowerCase()
-        .replace(/\\W+/g, "_")   // ← double “\\” so the HTML gets “\W”
+        .replace(/\\W+/g, "_")   // ← double "\\" so the HTML gets "\\W"
         .replace(/^_+|_+$/g, "");
 }
 
@@ -1245,54 +1245,56 @@ function runAllHiddenTextCalculations(){
  * using the field's own name (or any other field name).
  */
 function runSingleHiddenTextCalculation(calcObj) {
-    var textField = document.getElementById(calcObj.hiddenFieldName);
+    const textField = document.getElementById(calcObj.hiddenFieldName);
     if (!textField) return;
 
-    // We'll assume that the last matched condition takes precedence,
-    // so we keep applying logic in order.
+    // We'll assume that the last matched condition takes precedence
     let finalValue = "";
 
     calcObj.calculations.forEach(function(oneCalc) {
         let val = 0;
+        
+        // Calculate the sum of all terms
         if (oneCalc.terms && oneCalc.terms.length > 0) {
-            val = parseFloat(getMoneyValue(oneCalc.terms[0].questionNameId)) || 0;
+            // Get the first term's value
+            const firstTerm = oneCalc.terms[0];
+            val = parseFloat(getMoneyValue(firstTerm.questionNameId)) || 0;
 
+            // Process remaining terms
             for (let t = 1; t < oneCalc.terms.length; t++) {
                 const term = oneCalc.terms[t];
-                const op = term.operator;
                 const termVal = parseFloat(getMoneyValue(term.questionNameId)) || 0;
 
-                switch(op) {
+                switch(term.operator) {
                     case '+': val += termVal; break;
                     case '-': val -= termVal; break;
                     case 'x': val *= termVal; break;
-                    case '/': val = (termVal !== 0) ? val / termVal : 0; break;
+                    case '/': val = termVal !== 0 ? val / termVal : 0; break;
                 }
             }
         }
 
         // Compare to threshold
-        const thr = parseFloat(oneCalc.threshold) || 0;
+        const threshold = parseFloat(oneCalc.threshold) || 0;
         let matched = false;
+
         switch(oneCalc.compareOperator) {
-            case '>':  matched = (val > thr);  break;
-            case '<':  matched = (val < thr);  break;
-            case '=':  matched = (val === thr); break;
+            case '>': matched = val > threshold; break;
+            case '<': matched = val < threshold; break;
+            case '=': matched = Math.abs(val - threshold) < 0.000001; break; // Use epsilon for float comparison
         }
 
         if (matched) {
-            // Check if fillValue is in ##fieldname## format - both "##total##" and general pattern
-            if (oneCalc.fillValue === "##total##" || (oneCalc.fillValue && oneCalc.fillValue.match(/^##(.+)##$/))) {
-                finalValue = val.toString();
+            // Handle special fillValue formats
+            if (oneCalc.fillValue === "##total##" || oneCalc.fillValue.match(/^##(.+)##$/)) {
+                finalValue = val.toFixed(2); // Format money values with 2 decimal places
             } else {
                 finalValue = oneCalc.fillValue;
             }
-        } else {
-            // Not matched => clear it out
-            finalValue = "";
         }
     });
 
+    // Update the text field
     textField.value = finalValue;
 }
 
@@ -1353,6 +1355,16 @@ function getMoneyValue(qId) {
         
         // Regular input field
         return parseFloat(el.value) || 0;
+    }
+    
+    // Try using the questionNameIds mapping
+    for (let questionId in questionNameIds) {
+        if (questionNameIds[questionId] === qId) {
+            const mappedEl = document.getElementById(questionNameIds[questionId]);
+            if (mappedEl) {
+                return parseFloat(mappedEl.value) || 0;
+            }
+        }
     }
     
     // No direct match - try alternatives:
@@ -1560,8 +1572,8 @@ function attachCalculationListeners() {
  *     ① already a real element in the live DOM         → keep
  *     ② the full slug is already present               → keep
  *     ③ it is the short builder-shorthand
- *        “amount<X>_<index>_<field>” or
- *        “answer<X>_<index>_<field>”                   → expand
+ *        "amount<X>_<index>_<field>" or
+ *        "answer<X>_<index>_<field>"                   → expand
  *     ④ anything else                                  → best-effort
  *────────────────────────────────────────────────────────────*/
 function normaliseDesignerFieldRef (raw){
@@ -1571,7 +1583,7 @@ function normaliseDesignerFieldRef (raw){
     if (document.getElementById(raw)) return raw;
 
     /* ② already looks like slug_#_field and the slug is *not*
-          “amount1” / “answer1” style (i.e. has a “_” in it)     */
+          "amount1" / "answer1" style (i.e. has a "_" in it)     */
     const mSlug = raw.match(/^([a-z0-9]+_[a-z0-9_]+?)_(\d+)_(.+)$/);
     if (mSlug && !/^amount\d+$/.test(mSlug[1]) && !/^answer\d+$/.test(mSlug[1]))
         return raw;
@@ -1636,7 +1648,7 @@ function generateHiddenPDFFields(){
 
         /*──────────── TEXT hidden field ────────────*/
         if (fType === "text"){
-            hiddenFieldsHTML += `\n<input type="text" id="${fName}" name="${fName}" style="display:none;">`;
+            hiddenFieldsHTML += `\n<input type="text" id="${fName}" name="${fName}" style="display:block;">`;
 
             const calcRows = block.querySelectorAll(`[id^="textCalculationRow${hid}_"]`);
             if (calcRows.length){
@@ -1648,9 +1660,14 @@ function generateHiddenPDFFields(){
                     row.querySelectorAll(".equation-term-text").forEach((termDiv,tIdx)=>{
                         const qSel  = termDiv.querySelector('[id^="textTermQuestion"]');
                         if(!qSel) return;
+                        
+                        // Get the question ID and look up its nameId
+                        const qId = qSel.value.trim();
+                        const nameId = questionNameIds[qId] || qId; // Use the nameId if available, otherwise use the ID directly
+                        
                         oneCalc.terms.push({
-                            operator      : tIdx ? termDiv.querySelector('[id^="textTermOperator"]').value : "",
-                            questionNameId: normaliseDesignerFieldRef(qSel.value)
+                            operator: tIdx ? termDiv.querySelector('[id^="textTermOperator"]').value : "",
+                            questionNameId: nameId
                         });
                     });
 
@@ -1682,9 +1699,14 @@ function generateHiddenPDFFields(){
                     row.querySelectorAll(".equation-term-cb").forEach((termDiv,tIdx)=>{
                         const qSel = termDiv.querySelector('[id^="calcTermQuestion"]');
                         if(!qSel) return;
+                        
+                        // Get the question ID and look up its nameId
+                        const qId = qSel.value.trim();
+                        const nameId = questionNameIds[qId] || qId; // Use the nameId if available, otherwise use the ID directly
+                        
                         oneCalc.terms.push({
-                            operator      : tIdx ? termDiv.querySelector('[id^="calcTermOperator"]').value : "",
-                            questionNameId: normaliseDesignerFieldRef(qSel.value)
+                            operator: tIdx ? termDiv.querySelector('[id^="calcTermOperator"]').value : "",
+                            questionNameId: nameId
                         });
                     });
 

@@ -763,7 +763,13 @@ function generateMoneyQuestionOptions() {
         const txtEl = qBlock.querySelector(`#question${qId}`);
         const qTxt = txtEl ? txtEl.value : (`Question ${qId}`);
         
-        if (qType === 'numberedDropdown') {
+        if (qType === 'money') {
+            // If it's a money question, we can reference it directly
+            const nmEl = qBlock.querySelector('#textboxName' + qId);
+            const fieldName = nmEl ? nmEl.value.trim() : ('answer' + qId);
+            optionsHTML += `<option value="${fieldName}">${qTxt} (money)</option>`;
+        }
+        else if (qType === 'numberedDropdown') {
             // 2) Grab min & max
             const stEl = qBlock.querySelector('#numberRangeStart' + qId);
             const enEl = qBlock.querySelector('#numberRangeEnd' + qId);
@@ -788,12 +794,6 @@ function generateMoneyQuestionOptions() {
                     optionsHTML += `<option value="${moneyId}">${qTxt} - ${rawLabel} #${i}</option>`;
                 }
             });
-        }
-        else if (qType === 'money') {
-            // If it's a money question, we can reference it directly
-            const nmEl = qBlock.querySelector('#textboxName' + qId);
-            const fieldName = nmEl ? nmEl.value.trim() : ('answer' + qId);
-            optionsHTML += `<option value="${fieldName}">${qTxt} (money)</option>`;
         }
         else if (qType === 'checkbox') {
             // For checkboxes, look for options with hasAmount enabled
