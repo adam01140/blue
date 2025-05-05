@@ -605,16 +605,16 @@ function addEquationTermText(hiddenFieldId, calcIndex) {
     var eqContainer = document.getElementById('textEquationContainer'+hiddenFieldId+'_'+calcIndex);
     if(!eqContainer) return;
 
-    var existingTerms= eqContainer.querySelectorAll('.equation-term-text').length;
-    var termNumber= existingTerms+1;
+    var existingTerms = eqContainer.querySelectorAll('.equation-term-text').length;
+    var termNumber = existingTerms + 1;
 
     var div = document.createElement('div');
-    div.className='equation-term-text';
-    div.id='equationTermText'+hiddenFieldId+'_'+calcIndex+'_'+termNumber;
+    div.className = 'equation-term-text';
+    div.id = 'equationTermText'+hiddenFieldId+'_'+calcIndex+'_'+termNumber;
 
-    var operatorHTML='';
-    if(termNumber>1){
-        operatorHTML=`
+    var operatorHTML = '';
+    if(termNumber > 1) {
+        operatorHTML = `
             <select id="textTermOperator${hiddenFieldId}_${calcIndex}_${termNumber}">
                 <option value="+">+</option>
                 <option value="-">-</option>
@@ -624,9 +624,22 @@ function addEquationTermText(hiddenFieldId, calcIndex) {
         `;
     }
 
-    div.innerHTML=`
+    // Get all checkbox questions to determine correct indices
+    const checkboxQuestions = {};
+    document.querySelectorAll('.question-block').forEach(qBlock => {
+        const qId = qBlock.id.replace('questionBlock', '');
+        const typeEl = qBlock.querySelector('select#questionType' + qId);
+        if (typeEl && typeEl.value === 'checkbox') {
+            const options = qBlock.querySelectorAll('#checkboxOptions' + qId + ' div');
+            checkboxQuestions[qId] = options.length;
+        }
+    });
+
+    div.innerHTML = `
         ${operatorHTML}
-        <select id="textTermQuestion${hiddenFieldId}_${calcIndex}_${termNumber}" style="width:200px;">
+        <select id="textTermQuestion${hiddenFieldId}_${calcIndex}_${termNumber}" 
+                onchange="updateAmountFieldIndex(this, ${JSON.stringify(checkboxQuestions).replace(/"/g, '&quot;')})" 
+                style="width:200px;">
             <option value="">-- Select money question --</option>
             ${generateMoneyQuestionOptions()}
         </select><br><br>
@@ -635,6 +648,25 @@ function addEquationTermText(hiddenFieldId, calcIndex) {
     
     // Force update all dropdowns to ensure consistent options
     updateAllCalculationDropdowns();
+}
+
+// Add this new function to handle index updates
+function updateAmountFieldIndex(selectEl, checkboxQuestions) {
+    const value = selectEl.value;
+    if (!value) return;
+
+    // Check if this is a checkbox amount field
+    const match = value.match(/^amount_(.+?)_(\d+)_(\d+)$/);
+    if (!match) return;
+
+    const [, baseId, questionNum, optionNum] = match;
+    const maxOptions = checkboxQuestions[questionNum] || 0;
+    
+    if (optionNum > maxOptions) {
+        // Correct the index to be within bounds
+        const correctedValue = `amount_${baseId}_${questionNum}_${Math.min(optionNum, maxOptions)}`;
+        selectEl.value = correctedValue;
+    }
 }
 
 /**
@@ -800,7 +832,6 @@ function generateMoneyQuestionOptions() {
             const checkboxOptionsDiv = qBlock.querySelector(`#checkboxOptions${qId}`);
             if (checkboxOptionsDiv) {
                 // Use a more robust selector that finds all divs inside checkboxOptionsDiv
-                // This works better with JSON-loaded forms where class names might not be exactly .option
                 const options = checkboxOptionsDiv.querySelectorAll('div');
                 
                 options.forEach((option, index) => {
@@ -822,31 +853,18 @@ function generateMoneyQuestionOptions() {
                     // Find if this checkbox has an amount field
                     const hasAmountCheckbox = option.querySelector(`input[id^="checkboxOptionHasAmount${qId}_"]`);
                     if (hasAmountCheckbox && hasAmountCheckbox.checked) {
-                        // Get the amount name or generate a default one
-                        const amountNameEl = option.querySelector(`input[id^="checkboxOptionAmountName${qId}_"]`);
-                        let amountName = '';
-                        
-                        if (amountNameEl && amountNameEl.value.trim()) {
-                            amountName = amountNameEl.value.trim();
-                        } else {
-                            // Default format for the field
-                            const sanitizedText = optionText.toLowerCase().replace(/[^a-z0-9]/g, '_');
-                            amountName = `amount_${sanitizedText}_${qId}_${index + 1}`;
-                        }
-                        
-                        // Add the amount field to the dropdown
-                        optionsHTML += `<option value="${amountName}">${qTxt} - ${optionText} (amount)</option>`;
+                        // For amount fields, we need to use the base part of the label without special characters
+                        const baseLabel = optionText.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+                        const amountId = `amount_${baseLabel}_${qId}_${index + 1}`;
+                        // Add the amount field to the dropdown (value is the nameId, not amountId)
+                        optionsHTML += `<option value="${nameId}">${qTxt} - ${optionText} (amount)</option>`;
                     }
-                    
-                    // For all checkboxes, also add the checkbox field itself as a direct reference option
-                    // This supports the new format for calculations
-                    optionsHTML += `<option value="${nameId}">${qTxt} - ${optionText} (checkbox)</option>`;
                 });
             }
         }
     });
 
-    // ---- INCLUDE ALL HIDDEN FIELDS AS REFERENCES ----
+    // Include all hidden fields as references
     const hiddenBlocks = document.querySelectorAll('.hidden-field-block');
     hiddenBlocks.forEach((block) => {
         const hid = block.id.replace('hiddenFieldBlock','');
@@ -858,7 +876,6 @@ function generateMoneyQuestionOptions() {
         const fName = fNameEl.value.trim();
         if (!fName) return;
 
-        // Include all hidden fields as options, not just the current one
         optionsHTML += `<option value="${fName}">(Hidden ${fType}) ${fName}</option>`;
     });
 

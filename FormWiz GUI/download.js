@@ -601,7 +601,12 @@ function exportForm() {
                     const amountPhEl = optionDiv.querySelector(`#checkboxOptionAmountPlaceholder${questionId}_${index + 1}`);
 
                     const optText = optTextEl ? optTextEl.value.trim() : `Option ${index + 1}`;
-                    const optNameId = optNameEl ? optNameEl.value.trim() : `answer${questionId}_${index + 1}`;
+                    let optNameId = optNameEl ? optNameEl.value.trim() : '';
+                    // If blank, generate a default nameId using the questionId and sanitized label
+                    if (!optNameId) {
+                        const sanitizedLabel = optText.replace(/\W+/g, '_').toLowerCase();
+                        optNameId = `answer${questionId}_${sanitizedLabel}`;
+                    }
                     const optValue = optValueEl ? optValueEl.value.trim() : optText;
                     const hasAmount = hasAmountEl ? hasAmountEl.checked : false;
                     const amountName = amountNameEl ? amountNameEl.value.trim() : '';
@@ -818,89 +823,29 @@ function exportForm() {
                                 const qSel = termDiv.querySelector(`#calcTermQuestion${hiddenFieldId}_${calcIndex}_${termNumber}`);
                                 let questionNameIdVal = qSel ? qSel.value.trim() : '';
                                 if (questionNameIdVal) {
-                                    // Transform amount IDs
-                                    // Check for standard format: amount{id}_{num}_{value}
-                                    let amountMatch = questionNameIdVal.match(/^amount(\d+)_(\d+)_(.+)$/);
-                                    
-                                    // Also check for alternative format: amount_{value}_{num}_{num}
-                                    if (!amountMatch) {
-                                        const altMatch = questionNameIdVal.match(/^amount_(.+?)_(\d+)_(\d+)$/);
-                                        if (altMatch) {
-                                            // Try to find the associated checkbox for this amount field
-                                            // In this format, the 'value' part corresponds to the checkbox option label
-                                            const checkboxLabelValue = altMatch[1]; // e.g. "rent"
-                                            
-                                            // Search all questions to find a checkbox with this label
-                                            for (let s = 1; s < sectionCounter; s++) {
-                                                const sectionBlock = document.getElementById(`sectionBlock${s}`);
-                                                if (!sectionBlock) continue;
-                                                
-                                                const questionsInSection = sectionBlock.querySelectorAll('.question-block');
-                                                for (const qBlock of questionsInSection) {
-                                                    const qId = qBlock.id.replace('questionBlock', '');
-                                                    const qTypeEl = qBlock.querySelector(`#questionType${qId}`);
-                                                    const qType = qTypeEl ? qTypeEl.value : '';
-                                                    
-                                                    if (qType === 'checkbox') {
-                                                        // Look for options with this label
-                                                        const optionsDivs = qBlock.querySelectorAll(`#checkboxOptions${qId} > div`);
-                                                        for (let o = 0; o < optionsDivs.length; o++) {
-                                                            const optDiv = optionsDivs[o];
-                                                            const txtEl = optDiv.querySelector(`#checkboxOptionText${qId}_${o + 1}`);
-                                                            const nameEl = optDiv.querySelector(`#checkboxOptionName${qId}_${o + 1}`);
-                                                            const hasAmountEl = optDiv.querySelector(`#checkboxOptionHasAmount${qId}_${o + 1}`);
-                                                            
-                                                            if (txtEl && hasAmountEl && hasAmountEl.checked) {
-                                                                const optText = txtEl.value.trim();
-                                                                const sanitizedLabel = optText.replace(/\s+/g, "_").toLowerCase();
-                                                                
-                                                                // If this label matches our amount field value
-                                                                if (sanitizedLabel === checkboxLabelValue) {
-                                                                    // Use the checkbox nameId directly
-                                                                    const optNameId = nameEl ? nameEl.value.trim() : '';
-                                                                    if (optNameId) {
-                                                                        questionNameIdVal = optNameId;
-                                                                        break;
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
+                                    // For checkboxes with amounts, always use the real nameId (not amount_*)
+                                    // If this is a checkbox with an amount, resolve to the nameId
+                                    let resolvedNameId = questionNameIdVal;
+                                    // Try to resolve if it's an amount_* reference for a checkbox
+                                    let amountCheckboxMatch = questionNameIdVal.match(/^amount_(.+?)_(\d+)_(\d+)$/);
+                                    if (amountCheckboxMatch) {
+                                        // Find the checkbox question and option
+                                        const baseLabel = amountCheckboxMatch[1];
+                                        const questionNum = amountCheckboxMatch[2];
+                                        const optionNum = amountCheckboxMatch[3];
+                                        // Find the checkbox option with this label
+                                        const options = findCheckboxOptionsByQuestionId(questionNum);
+                                        if (options && options.length > 0) {
+                                            const idx = parseInt(optionNum, 10) - 1;
+                                            if (idx >= 0 && idx < options.length) {
+                                                resolvedNameId = options[idx].nameId;
                                             }
                                         }
                                     }
-                                    
-                                    // Handle standard format if matched
-                                    if (amountMatch) {
-                                        const qId = amountMatch[1];
-                                        const numValue = amountMatch[2];
-                                        const fieldValue = amountMatch[3];
-                                        
-                                        // Find if this is from a checkbox with amount field
-                                        const checkboxOptions = findCheckboxOptionsByQuestionId(qId);
-                                        if (checkboxOptions && checkboxOptions.length > 0) {
-                                            // Try to find a matching checkbox option with amount field
-                                            for (const option of checkboxOptions) {
-                                                // Look for a match: either by comparing the checkbox label or by direct field name
-                                                const lowerFieldValue = fieldValue.toLowerCase();
-                                                const lowerLabel = option.label.replace(/\s+/g, "_").toLowerCase();
-                                                
-                                                if (option.hasAmount && (lowerFieldValue === lowerLabel || fieldValue === option.amountName)) {
-                                                    // Use the checkbox nameId directly instead of amount field reference
-                                                    questionNameIdVal = option.nameId;
-                                                    break;
-                                                }
-                                            }
-                                        } else if (questionTextMap[qId]) {
-                                            // Fall back to the text-based format for numbered dropdown questions
-                                            questionNameIdVal = `${questionTextMap[qId]}_${numValue}_${fieldValue}`;
-                                        }
-                                    }
-                                    
+                                    // Otherwise, keep as is (for money, numberedDropdown, etc)
                                     termsArr.push({
                                         operator: (termNumber===1 ? '' : operatorVal),
-                                        questionNameId: questionNameIdVal
+                                        questionNameId: resolvedNameId
                                     });
                                 }
                             });
@@ -964,89 +909,24 @@ function exportForm() {
                                 const qSel = termDiv.querySelector(`#textTermQuestion${hiddenFieldId}_${calcIndex}_${termNumber}`);
                                 let questionNameIdVal = qSel ? qSel.value.trim() : '';
                                 if (questionNameIdVal) {
-                                    // Transform amount IDs
-                                    // Check for standard format: amount{id}_{num}_{value}
-                                    let amountMatch = questionNameIdVal.match(/^amount(\d+)_(\d+)_(.+)$/);
-                                    
-                                    // Also check for alternative format: amount_{value}_{num}_{num}
-                                    if (!amountMatch) {
-                                        const altMatch = questionNameIdVal.match(/^amount_(.+?)_(\d+)_(\d+)$/);
-                                        if (altMatch) {
-                                            // Try to find the associated checkbox for this amount field
-                                            // In this format, the 'value' part corresponds to the checkbox option label
-                                            const checkboxLabelValue = altMatch[1]; // e.g. "rent"
-                                            
-                                            // Search all questions to find a checkbox with this label
-                                            for (let s = 1; s < sectionCounter; s++) {
-                                                const sectionBlock = document.getElementById(`sectionBlock${s}`);
-                                                if (!sectionBlock) continue;
-                                                
-                                                const questionsInSection = sectionBlock.querySelectorAll('.question-block');
-                                                for (const qBlock of questionsInSection) {
-                                                    const qId = qBlock.id.replace('questionBlock', '');
-                                                    const qTypeEl = qBlock.querySelector(`#questionType${qId}`);
-                                                    const qType = qTypeEl ? qTypeEl.value : '';
-                                                    
-                                                    if (qType === 'checkbox') {
-                                                        // Look for options with this label
-                                                        const optionsDivs = qBlock.querySelectorAll(`#checkboxOptions${qId} > div`);
-                                                        for (let o = 0; o < optionsDivs.length; o++) {
-                                                            const optDiv = optionsDivs[o];
-                                                            const txtEl = optDiv.querySelector(`#checkboxOptionText${qId}_${o + 1}`);
-                                                            const nameEl = optDiv.querySelector(`#checkboxOptionName${qId}_${o + 1}`);
-                                                            const hasAmountEl = optDiv.querySelector(`#checkboxOptionHasAmount${qId}_${o + 1}`);
-                                                            
-                                                            if (txtEl && hasAmountEl && hasAmountEl.checked) {
-                                                                const optText = txtEl.value.trim();
-                                                                const sanitizedLabel = optText.replace(/\s+/g, "_").toLowerCase();
-                                                                
-                                                                // If this label matches our amount field value
-                                                                if (sanitizedLabel === checkboxLabelValue) {
-                                                                    // Use the checkbox nameId directly
-                                                                    const optNameId = nameEl ? nameEl.value.trim() : '';
-                                                                    if (optNameId) {
-                                                                        questionNameIdVal = optNameId;
-                                                                        break;
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
+                                    // For checkboxes with amounts, always use the real nameId (not amount_*)
+                                    let resolvedNameId = questionNameIdVal;
+                                    let amountCheckboxMatch = questionNameIdVal.match(/^amount_(.+?)_(\d+)_(\d+)$/);
+                                    if (amountCheckboxMatch) {
+                                        const baseLabel = amountCheckboxMatch[1];
+                                        const questionNum = amountCheckboxMatch[2];
+                                        const optionNum = amountCheckboxMatch[3];
+                                        const options = findCheckboxOptionsByQuestionId(questionNum);
+                                        if (options && options.length > 0) {
+                                            const idx = parseInt(optionNum, 10) - 1;
+                                            if (idx >= 0 && idx < options.length) {
+                                                resolvedNameId = options[idx].nameId;
                                             }
                                         }
                                     }
-                                    
-                                    // Handle standard format if matched
-                                    if (amountMatch) {
-                                        const qId = amountMatch[1];
-                                        const numValue = amountMatch[2];
-                                        const fieldValue = amountMatch[3];
-                                        
-                                        // Find if this is from a checkbox with amount field
-                                        const checkboxOptions = findCheckboxOptionsByQuestionId(qId);
-                                        if (checkboxOptions && checkboxOptions.length > 0) {
-                                            // Try to find a matching checkbox option with amount field
-                                            for (const option of checkboxOptions) {
-                                                // Look for a match: either by comparing the checkbox label or by direct field name
-                                                const lowerFieldValue = fieldValue.toLowerCase();
-                                                const lowerLabel = option.label.replace(/\s+/g, "_").toLowerCase();
-                                                
-                                                if (option.hasAmount && (lowerFieldValue === lowerLabel || fieldValue === option.amountName)) {
-                                                    // Use the checkbox nameId directly instead of amount field reference
-                                                    questionNameIdVal = option.nameId;
-                                                    break;
-                                                }
-                                            }
-                                        } else if (questionTextMap[qId]) {
-                                            // Fall back to the text-based format for numbered dropdown questions
-                                            questionNameIdVal = `${questionTextMap[qId]}_${numValue}_${fieldValue}`;
-                                        }
-                                    }
-                                    
                                     termsArr.push({
                                         operator: (termNumber===1 ? '' : operatorVal),
-                                        questionNameId: questionNameIdVal
+                                        questionNameId: resolvedNameId
                                     });
                                 }
                             });

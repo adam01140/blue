@@ -1352,11 +1352,18 @@ function getMoneyValue(qId) {
             // No amount field or not checked
             return el.checked ? 1 : 0;
         }
-        
         // Regular input field
         return parseFloat(el.value) || 0;
     }
-    
+    // For numberedDropdowns, support amountX_Y_Z style
+    const numberedDropdownMatch = qId.match(/^amount(\d+)_(\d+)_(.+)$/);
+    if (numberedDropdownMatch) {
+        // This is for numberedDropdowns only
+        const el2 = document.getElementById(qId);
+        if (el2) {
+            return parseFloat(el2.value) || 0;
+        }
+    }
     // Try using the questionNameIds mapping
     for (let questionId in questionNameIds) {
         if (questionNameIds[questionId] === qId) {
@@ -1366,74 +1373,12 @@ function getMoneyValue(qId) {
             }
         }
     }
-    
-    // No direct match - try alternatives:
-    
-    // 1. Check if this is directly an amount field (with "_amount" suffix removed)
-    if (qId.endsWith("_amount")) {
-        const baseId = qId.slice(0, -7); // Remove "_amount"
-        const amountField = document.getElementById(qId);
-        if (amountField) {
-            return parseFloat(amountField.value) || 0;
-        }
-    }
-    
-    // 2. Look for elements with the qId as their name
+    // Look for elements with the qId as their name
     const namedElements = document.getElementsByName(qId);
     if (namedElements && namedElements.length > 0) {
         const namedEl = namedElements[0];
         return parseFloat(namedEl.value) || 0;
     }
-    
-    // 3. Find prefixed IDs like "answerX_qId"
-    const possiblePrefixedIds = Array.from(document.querySelectorAll('[id*="_' + qId + '"]'));
-    for (let i = 0; i < possiblePrefixedIds.length; i++) {
-        const prefixedEl = possiblePrefixedIds[i];
-        if (prefixedEl.id.endsWith('_' + qId)) {
-            if (prefixedEl.type === 'checkbox') {
-                // If found checkbox, look for its amount field
-                const amountFieldId = prefixedEl.id + "_amount";
-                const amountField = document.getElementById(amountFieldId);
-                
-                if (amountField && prefixedEl.checked) {
-                    return parseFloat(amountField.value) || 0;
-                }
-                return prefixedEl.checked ? 1 : 0;
-            }
-            return parseFloat(prefixedEl.value) || 0;
-        }
-    }
-    
-    // 4. Look for amount field directly by ID + "_amount"
-    const amountFieldId = qId + "_amount";
-    const amountField = document.getElementById(amountFieldId);
-    if (amountField) {
-        // Now we need to check if the associated checkbox is checked
-        // Find checkbox that controls this amount field
-        const checkboxSelector = 'input[type="checkbox"][onchange*="' + amountFieldId + '"]';
-        const checkboxEl = document.querySelector(checkboxSelector);
-        
-        if (checkboxEl && checkboxEl.checked) {
-            return parseFloat(amountField.value) || 0;
-        }
-        return 0; // Checkbox not checked, so amount is 0
-    }
-    
-    // 5. Finally, try to find elements by name pattern
-    const elementsWithAmountName = document.querySelectorAll('input[name="' + qId + '"]');
-    if (elementsWithAmountName.length > 0) {
-        const amountEl = elementsWithAmountName[0];
-        if (amountEl.type === 'number') {
-            // Find associated checkbox through naming convention
-            const checkboxId = amountEl.id.replace('_amount', '');
-            const checkboxEl = document.getElementById(checkboxId);
-            
-            if (checkboxEl && checkboxEl.checked) {
-                return parseFloat(amountEl.value) || 0;
-            }
-        }
-    }
-    
     // Nothing found
     return 0;
 }
@@ -1665,9 +1610,14 @@ function generateHiddenPDFFields(){
                         const qId = qSel.value.trim();
                         const nameId = questionNameIds[qId] || qId; // Use the nameId if available, otherwise use the ID directly
                         
+                        // For checkbox amount fields, append "_amount" to the nameId
+                        const questionType = questionTypesMap[qId];
+                        const isCheckboxAmount = questionType === 'checkbox' && termDiv.querySelector('[id^="textTermIsAmount"]')?.checked;
+                        const finalNameId = isCheckboxAmount ? nameId + "_amount" : nameId;
+                        
                         oneCalc.terms.push({
                             operator: tIdx ? termDiv.querySelector('[id^="textTermOperator"]').value : "",
-                            questionNameId: nameId
+                            questionNameId: finalNameId
                         });
                     });
 
@@ -1704,9 +1654,14 @@ function generateHiddenPDFFields(){
                         const qId = qSel.value.trim();
                         const nameId = questionNameIds[qId] || qId; // Use the nameId if available, otherwise use the ID directly
                         
+                        // For checkbox amount fields, append "_amount" to the nameId
+                        const questionType = questionTypesMap[qId];
+                        const isCheckboxAmount = questionType === 'checkbox' && termDiv.querySelector('[id^="calcTermIsAmount"]')?.checked;
+                        const finalNameId = isCheckboxAmount ? nameId + "_amount" : nameId;
+                        
                         oneCalc.terms.push({
                             operator: tIdx ? termDiv.querySelector('[id^="calcTermOperator"]').value : "",
-                            questionNameId: nameId
+                            questionNameId: finalNameId
                         });
                     });
 
