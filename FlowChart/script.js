@@ -302,17 +302,62 @@ function deleteSection(sectionNum) {
     const parent = graph.getDefaultParent();
     const vertices = graph.getChildVertices(parent);
     
-    // First, delete all cells in the section being deleted, excluding calculation nodes
+    // First identify question nodes in the section being deleted
+    const questionsInSection = vertices.filter(cell => {
+      const sec = parseInt(getSection(cell) || "1", 10);
+      return sec === sectionToDelete && isQuestion(cell);
+    });
+    
+    // Find all calculation nodes that depend on these questions
+    const calcNodesToDependencies = new Map(); // Map to track calc nodes and their dependencies
+    
+    questionsInSection.forEach(questionCell => {
+      const dependentCalcNodes = findCalcNodesDependentOnQuestion(questionCell);
+      
+      dependentCalcNodes.forEach(calcNode => {
+        if (!calcNodesToDependencies.has(calcNode.id)) {
+          calcNodesToDependencies.set(calcNode.id, {
+            cell: calcNode,
+            dependencies: []
+          });
+        }
+        
+        // Add this question to the dependency list
+        calcNodesToDependencies.get(calcNode.id).dependencies.push(questionCell);
+      });
+    });
+    
+    // Log the found dependencies
+    if (calcNodesToDependencies.size > 0) {
+      console.log(`Found ${calcNodesToDependencies.size} calculation nodes dependent on questions in section ${sectionToDelete}`);
+      calcNodesToDependencies.forEach((data, id) => {
+        const depNames = data.dependencies.map(q => getNodeId(q) || q.value || 'unnamed').join(', ');
+        console.log(`  - Calc node ${id} depends on: ${depNames}`);
+      });
+    }
+    
+    // Collect all calc nodes to delete
+    const calcNodesToDelete = Array.from(calcNodesToDependencies.values()).map(data => data.cell);
+    
+    // Delete all cells in the section being deleted (excluding calculation nodes)
     const cellsToDelete = vertices.filter(cell => {
       const sec = parseInt(getSection(cell) || "1", 10);
       return sec === sectionToDelete && !isCalculationNode(cell);
     });
-    if (cellsToDelete.length > 0) {
-      graph.removeCells(cellsToDelete);
+    
+    // Add the dependent calculation nodes to the deletion list
+    const allCellsToDelete = [...cellsToDelete, ...calcNodesToDelete];
+    
+    if (allCellsToDelete.length > 0) {
+      graph.removeCells(allCellsToDelete);
+      console.log(`Deleted ${cellsToDelete.length} cells from section ${sectionToDelete} and ${calcNodesToDelete.length} dependent calculation nodes`);
     }
     
     // Then move all cells from higher sections down one level
     vertices.forEach(cell => {
+      // Skip cells that were already deleted
+      if (!cell.parent) return;
+      
       const cellSection = parseInt(getSection(cell) || "1", 10);
       if (cellSection > sectionToDelete) {
         setSection(cell, cellSection - 1);
