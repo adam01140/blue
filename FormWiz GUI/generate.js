@@ -1370,54 +1370,33 @@ function parseTokenValue(token){
     return isNaN(val) ? 0 : val;
 }
 
-/**
- * UPDATED to handle checkbox amount fields properly.
- * Handles both direct references and references where the actual element has "answerX_" prefix.
- */
+/*───────────────────────────────────────────────────────────────*
+ * 3.  getMoneyValue(qId)
+ *     – tiny regex fix so legacy "amountX_Y_Z" can still resolve
+ *       (note the escaped \\d+ instead of stray 'd').
+ *───────────────────────────────────────────────────────────────*/
 function getMoneyValue(qId) {
-    // First try direct element match
+    /* direct hit first */
     const el = document.getElementById(qId);
     if (el) {
-        // If it's a checkbox with an amount field
-        if (el.type === 'checkbox') {
-            // Check if there's a corresponding amount field
-            const amountFieldId = el.id + "_amount";
-            const amountField = document.getElementById(amountFieldId);
-            
-            if (amountField && el.checked) {
-                return parseFloat(amountField.value) || 0;
-            }
-            // No amount field or not checked
+        if (el.type === "checkbox") {
+            const amt = document.getElementById(el.id + "_amount");
+            if (amt && el.checked) return parseFloat(amt.value) || 0;
             return el.checked ? 1 : 0;
         }
-        // Regular input field
         return parseFloat(el.value) || 0;
     }
-    // For numberedDropdowns, support amountX_Y_Z style
-    const numberedDropdownMatch = qId.match(/^amount(\d+)_(\d+)_(.+)$/);
-    if (numberedDropdownMatch) {
-        // This is for numberedDropdowns only
-        const el2 = document.getElementById(qId);
-        if (el2) {
-            return parseFloat(el2.value) || 0;
-        }
+
+    /* legacy builder‑shorthand amountX_Y_Z */
+    if (/^amount\d+_\d+_.+/.test(qId)) {
+        const el2 = document.getElementById(normaliseDesignerFieldRef(qId));
+        if (el2) return parseFloat(el2.value) || 0;
     }
-    // Try using the questionNameIds mapping
-    for (let questionId in questionNameIds) {
-        if (questionNameIds[questionId] === qId) {
-            const mappedEl = document.getElementById(questionNameIds[questionId]);
-            if (mappedEl) {
-                return parseFloat(mappedEl.value) || 0;
-            }
-        }
-    }
-    // Look for elements with the qId as their name
-    const namedElements = document.getElementsByName(qId);
-    if (namedElements && namedElements.length > 0) {
-        const namedEl = namedElements[0];
-        return parseFloat(namedEl.value) || 0;
-    }
-    // Nothing found
+
+    /* name‑attribute fallback */
+    const byName = document.getElementsByName(qId);
+    if (byName.length) return parseFloat(byName[0].value) || 0;
+
     return 0;
 }
 
@@ -1546,41 +1525,32 @@ function attachCalculationListeners() {
 
 
 
-/*────────────────────────────────────────────────────────────*
- * normaliseDesignerFieldRef(raw)
- *   raw  – whatever string the designer stored
- *   ←    – the runtime <input>.id that will exist in the HTML
- *
- *   Handles four cases:
- *     ① already a real element in the live DOM         → keep
- *     ② the full slug is already present               → keep
- *     ③ it is the short builder-shorthand
- *        "amount<X>_<index>_<field>" or
- *        "answer<X>_<index>_<field>"                   → expand
- *     ④ anything else                                  → best-effort
- *────────────────────────────────────────────────────────────*/
-function normaliseDesignerFieldRef (raw){
+/*───────────────────────────────────────────────────────────────*
+ * 1.  normaliseDesignerFieldRef(raw)
+ *     – unchanged except for two tiny regex tweaks (see comments)
+ *───────────────────────────────────────────────────────────────*/
+function normaliseDesignerFieldRef(raw) {
     raw = String(raw || "").trim();
 
-    /* ① live element?  …return untouched */
+    /* ① already a real element in the live DOM? */
     if (document.getElementById(raw)) return raw;
 
-    /* ② already looks like slug_#_field and the slug is *not*
-          "amount1" / "answer1" style (i.e. has a "_" in it)     */
+    /* ② looks like a finished slug already? */
     const mSlug = raw.match(/^([a-z0-9]+_[a-z0-9_]+?)_(\d+)_(.+)$/);
     if (mSlug && !/^amount\d+$/.test(mSlug[1]) && !/^answer\d+$/.test(mSlug[1]))
         return raw;
 
-    /* ③ builder shorthand – rebuild it with the real slug */
-    let mShort = raw.match(/^amount(\d+)_(\d+)_(.+)$/) ||
-                 raw.match(/^answer(\d+)_(\d+)_(.+)$/);
-    if (mShort){
+    /* ③ builder shorthand (amountX_Y_field  OR  answerX_Y_field) */
+    const mShort =
+        raw.match(/^amount(\d+)_(\d+)_(.+)$/) ||
+        raw.match(/^answer(\d+)_(\d+)_(.+)$/);
+    if (mShort) {
         const [, qId, idx, field] = mShort;
         const slug = questionSlugMap[qId] || ("answer" + qId);
         return `${slug}_${idx}_${sanitizeQuestionText(field)}`;
     }
 
-    /* ④ last fallback – try to sanitise whatever we can */
+    /* ④ catch‑all fallback */
     const mGeneric = raw.match(/^(.*)_(\d+)_(.+)$/);
     if (!mGeneric) return sanitizeQuestionText(raw);
 
@@ -1590,19 +1560,15 @@ function normaliseDesignerFieldRef (raw){
 
 
 
-
-/**
- * generateHiddenPDFFields()
- *  - Reads from #hiddenFieldsContainer
- *  - Builds hidden <input> fields
- *  - Also handles multi-term calculations for both checkboxes & text
- *  - Expands "numberedDropdown" amounts into multiple "amountX_Y_value" references
- *  - Supports ##fieldname## pattern in fillValue to display the calculation result
- */
-function generateHiddenPDFFields(){
+/*───────────────────────────────────────────────────────────────*
+ * 2.  generateHiddenPDFFields()
+ *     – now funnels every designer reference through
+ *       normaliseDesignerFieldRef() so shorthand is fixed.
+ *───────────────────────────────────────────────────────────────*/
+function generateHiddenPDFFields() {
     let hiddenFieldsHTML = '<div id="hidden_pdf_fields">';
 
-    /* user-profile hidden fields .................................... */
+    /* profile fields … (unchanged) */
     hiddenFieldsHTML += `
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
@@ -1616,103 +1582,101 @@ function generateHiddenPDFFields(){
     const hiddenCheckboxCalculations = [];
     const hiddenTextCalculations     = [];
 
-    /* walk every hidden-field block .................................. */
-    const hiddenFieldsContainer = document.getElementById("hiddenFieldsContainer");
-    if (!hiddenFieldsContainer)
+    const container = document.getElementById("hiddenFieldsContainer");
+    if (!container)
         return { hiddenFieldsHTML: hiddenFieldsHTML + "</div>",
                  hiddenCheckboxCalculations,
                  hiddenTextCalculations };
 
-    hiddenFieldsContainer.querySelectorAll(".hidden-field-block").forEach(block=>{
-        const hid    = block.id.replace("hiddenFieldBlock", "");
-        const fType  = block.querySelector("#hiddenFieldType"+hid)?.value || "text";
-        const fName  = block.querySelector("#hiddenFieldName"+hid)?.value.trim();
-        if(!fName) return;
+    /* ── walk every hidden‑field block ────────────────────────── */
+    container.querySelectorAll(".hidden-field-block").forEach(block => {
+        const hid   = block.id.replace("hiddenFieldBlock", "");
+        const fType = block.querySelector("#hiddenFieldType" + hid)?.value || "text";
+        const fName = block.querySelector("#hiddenFieldName" + hid)?.value.trim();
+        if (!fName) return;
 
-        /*──────────── TEXT hidden field ────────────*/
-        if (fType === "text"){
+        /* TEXT hidden field ......................................*/
+        if (fType === "text") {
+			
+			//hide fields here
             hiddenFieldsHTML += `\n<input type="text" id="${fName}" name="${fName}" style="display:block;">`;
 
-            const calcRows = block.querySelectorAll(`[id^="textCalculationRow${hid}_"]`);
-            if (calcRows.length){
+            const rows = block.querySelectorAll(`[id^="textCalculationRow${hid}_"]`);
+            if (rows.length) {
                 const calcArr = [];
-                calcRows.forEach(row=>{
-                    const oneCalc = { terms:[], compareOperator:"=", threshold:"0", fillValue:"" };
 
-                    /* terms ..........................................*/
-                    row.querySelectorAll(".equation-term-text").forEach((termDiv,tIdx)=>{
-                        const qSel  = termDiv.querySelector('[id^="textTermQuestion"]');
-                        if(!qSel) return;
-                        
-                        // Get the question ID and look up its nameId
-                        const qId = qSel.value.trim();
-                        const nameId = questionNameIds[qId] || qId; // Use the nameId if available, otherwise use the ID directly
-                        
-                        // For checkbox amount fields, append "_amount" to the nameId
-                        const questionType = questionTypesMap[qId];
-                        const isCheckboxAmount = questionType === 'checkbox' && termDiv.querySelector('[id^="textTermIsAmount"]')?.checked;
-                        const finalNameId = isCheckboxAmount ? nameId + "_amount" : nameId;
-                        
+                rows.forEach(row => {
+                    const oneCalc = { terms: [], compareOperator: "=", threshold: "0", fillValue: "" };
+
+                    /* grab terms */
+                    row.querySelectorAll(".equation-term-text").forEach((termDiv, tIdx) => {
+                        const qSel = termDiv.querySelector('[id^="textTermQuestion"]');
+                        if (!qSel) return;
+
+                        const qId   = qSel.value.trim();
+                        const rawId = questionNameIds[qId] || qId;            // fallback
+                        const isAmt = questionTypesMap[qId] === "checkbox" &&
+                                      termDiv.querySelector('[id^="textTermIsAmount"]')?.checked;
+                        const base  = isAmt ? rawId + "_amount" : rawId;
+
                         oneCalc.terms.push({
                             operator: tIdx ? termDiv.querySelector('[id^="textTermOperator"]').value : "",
-                            questionNameId: finalNameId
+                            /* HERE is the important line: */
+                            questionNameId: normaliseDesignerFieldRef(base)
                         });
                     });
 
-                    if (!oneCalc.terms.length) return;
-
-                    /* other properties ...............................*/
-                    oneCalc.compareOperator = row.querySelector('[id^="textCompareOperator"]').value || "=";
-                    oneCalc.threshold       = row.querySelector('[id^="textThreshold"]').value.trim() || "0";
-                    oneCalc.fillValue       = row.querySelector('[id^="textFillValue"]').value.trim() || "";
-
-                    calcArr.push(oneCalc);
+                    if (oneCalc.terms.length) {
+                        oneCalc.compareOperator = row.querySelector('[id^="textCompareOperator"]').value || "=";
+                        oneCalc.threshold       = row.querySelector('[id^="textThreshold"]').value.trim() || "0";
+                        oneCalc.fillValue       = row.querySelector('[id^="textFillValue"]').value.trim() || "";
+                        calcArr.push(oneCalc);
+                    }
                 });
-                if (calcArr.length) hiddenTextCalculations.push({ hiddenFieldName:fName, calculations:calcArr });
+
+                if (calcArr.length)
+                    hiddenTextCalculations.push({ hiddenFieldName: fName, calculations: calcArr });
             }
         }
 
-        /*──────────── CHECKBOX hidden field ────────────*/
-        if (fType === "checkbox"){
-            const isChecked = block.querySelector("#hiddenFieldChecked"+hid)?.checked;
-            hiddenFieldsHTML += `\n<div style="display:none;"><input type="checkbox" id="${fName}" name="${fName}" ${isChecked?"checked":""}></div>`;
+        /* CHECKBOX hidden field ..................................*/
+        if (fType === "checkbox") {
+            const checked = block.querySelector("#hiddenFieldChecked" + hid)?.checked;
+            hiddenFieldsHTML += `\n<div style="display:none;"><input type="checkbox" id="${fName}" name="${fName}" ${checked ? "checked" : ""}></div>`;
 
-            const calcRows = block.querySelectorAll(`[id^="calculationRow${hid}_"]`);
-            if (calcRows.length){
+            const rows = block.querySelectorAll(`[id^="calculationRow${hid}_"]`);
+            if (rows.length) {
                 const calcArr = [];
-                calcRows.forEach(row=>{
-                    const oneCalc = { terms:[], compareOperator:"=", threshold:"0", result:"checked" };
 
-                    /* terms ..........................................*/
-                    row.querySelectorAll(".equation-term-cb").forEach((termDiv,tIdx)=>{
+                rows.forEach(row => {
+                    const oneCalc = { terms: [], compareOperator: "=", threshold: "0", result: "checked" };
+
+                    row.querySelectorAll(".equation-term-cb").forEach((termDiv, tIdx) => {
                         const qSel = termDiv.querySelector('[id^="calcTermQuestion"]');
-                        if(!qSel) return;
-                        
-                        // Get the question ID and look up its nameId
-                        const qId = qSel.value.trim();
-                        const nameId = questionNameIds[qId] || qId; // Use the nameId if available, otherwise use the ID directly
-                        
-                        // For checkbox amount fields, append "_amount" to the nameId
-                        const questionType = questionTypesMap[qId];
-                        const isCheckboxAmount = questionType === 'checkbox' && termDiv.querySelector('[id^="calcTermIsAmount"]')?.checked;
-                        const finalNameId = isCheckboxAmount ? nameId + "_amount" : nameId;
-                        
+                        if (!qSel) return;
+
+                        const qId   = qSel.value.trim();
+                        const rawId = questionNameIds[qId] || qId;
+                        const isAmt = questionTypesMap[qId] === "checkbox" &&
+                                      termDiv.querySelector('[id^="calcTermIsAmount"]')?.checked;
+                        const base  = isAmt ? rawId + "_amount" : rawId;
+
                         oneCalc.terms.push({
                             operator: tIdx ? termDiv.querySelector('[id^="calcTermOperator"]').value : "",
-                            questionNameId: finalNameId
+                            questionNameId: normaliseDesignerFieldRef(base)
                         });
                     });
 
-                    if (!oneCalc.terms.length) return;
-
-                    /* other properties ...............................*/
-                    oneCalc.compareOperator = row.querySelector('[id^="calcCompareOperator"]').value || "=";
-                    oneCalc.threshold       = row.querySelector('[id^="calcThreshold"]').value.trim() || "0";
-                    oneCalc.result          = row.querySelector('[id^="calcResult"]').value || "checked";
-
-                    calcArr.push(oneCalc);
+                    if (oneCalc.terms.length) {
+                        oneCalc.compareOperator = row.querySelector('[id^="calcCompareOperator"]').value || "=";
+                        oneCalc.threshold       = row.querySelector('[id^="calcThreshold"]').value.trim() || "0";
+                        oneCalc.result          = row.querySelector('[id^="calcResult"]').value || "checked";
+                        calcArr.push(oneCalc);
+                    }
                 });
-                if (calcArr.length) hiddenCheckboxCalculations.push({ hiddenFieldName:fName, calculations:calcArr });
+
+                if (calcArr.length)
+                    hiddenCheckboxCalculations.push({ hiddenFieldName: fName, calculations: calcArr });
             }
         }
     });

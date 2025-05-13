@@ -157,29 +157,8 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h1 class="section-title">Enter Name</h1><div id="question-container-1"><label><h3>mark all that apply</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
-      <span class="checkbox-inline">
-        <label class="checkbox-label">
-          <input type="checkbox" id="mark_all_that_apply_rent" name="mark_all_that_apply_rent" value="Rent" 
-                 onchange="toggleAmountField('mark_all_that_apply_rent_amount', this.checked); toggleNoneOption(this, 1);">
-          Rent
-        </label>
-      </span>
-          <input type="number" id="mark_all_that_apply_rent_amount"
-                 name="mark_all_that_apply_rent_amount"
-                 placeholder="Amount"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
-      <span class="checkbox-inline">
-        <label class="checkbox-label">
-          <input type="checkbox" id="mark_all_that_apply_food" name="mark_all_that_apply_food" value="Food" 
-                 onchange="toggleAmountField('mark_all_that_apply_food_amount', this.checked); toggleNoneOption(this, 1);">
-          Food
-        </label>
-      </span>
-          <input type="number" id="mark_all_that_apply_food_amount"
-                 name="mark_all_that_apply_food_amount"
-                 placeholder="Amount"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"></div><br></div></div><br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
+        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h1 class="section-title">Enter Name</h1><div id="question-container-1"><label><h3>How many cars?</h3></label><select id="answer1" onchange="showTextboxLabels(1, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
@@ -188,8 +167,7 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
 <input type="hidden" id="user_city_hidden"      name="user_city_hidden">
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
-<input type="text" id="calc1" name="calc1" style="display:block;">
-<input type="text" id="calc2" name="calc2" style="display:block;">
+<input type="text" id="Calculation Title" name="Calculation Title" style="display:block;">
 </div></form>
 <div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
 </div>
@@ -263,16 +241,16 @@ function buildCheckboxName (questionId, rawNameId, labelText){
            window.location.href="account.html";
         }
     });
-  var questionSlugMap       = {"1":"mark_all_that_apply"};
-var questionNameIds = {"1":"mark_all_that_apply"};
+  var questionSlugMap       = {"1":"how_many_cars"};
+var questionNameIds = {"1":"answer1"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var conditionalAlerts = [];
-var labelMap = {};
-var amountMap = {};
+var labelMap = {"1":[]};
+var amountMap = {"1":["car value"]};
 var linkedDropdowns = [];
 var hiddenCheckboxCalculations = [];
-var hiddenTextCalculations = [{"hiddenFieldName":"calc1","calculations":[{"terms":[{"operator":"","questionNameId":"mark_all_that_apply_rent"},{"operator":"+","questionNameId":"mark_all_that_apply_food"}],"compareOperator":">","threshold":"0","fillValue":"##calc1##"}]},{"hiddenFieldName":"calc2","calculations":[{"terms":[{"operator":"","questionNameId":"calc1"}],"compareOperator":">","threshold":"0","fillValue":"##calc2##"}]}];
+var hiddenTextCalculations = [{"hiddenFieldName":"Calculation Title","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_cars_1_car_value"},{"operator":"+","questionNameId":"how_many_cars_2_car_value"},{"operator":"+","questionNameId":"how_many_cars_3_car_value"}],"compareOperator":">","threshold":"0","fillValue":"hello"}]}];
 
 
 

@@ -70,6 +70,12 @@ function generateAndDownloadForm() {
 }
 
 function showPreview() {
+    // Check if the getFormHTML function exists
+    if (typeof getFormHTML !== 'function') {
+        alert("Preview function not available in this context. Please try again from the form editor.");
+        return;
+    }
+    
     const formHTML = getFormHTML();
     const previewModal = document.getElementById('previewModal');
     const previewFrame = document.getElementById('previewFrame');
@@ -1228,4 +1234,52 @@ function updateFormAfterImport() {
         // Run this with a slight delay to ensure DOM is ready
         setTimeout(updateAllCalculationDropdowns, 100);
     }
+}
+
+function updateConditionAnswers(hiddenFieldId, condId) {
+    const questionSelect = document.getElementById(`conditionQuestion${hiddenFieldId}_${condId}`);
+    if (!questionSelect) return;
+    
+    const questionId = questionSelect.value;
+    if (!questionId) return;
+    
+    // Find the question block
+    const questionBlock = document.getElementById(`questionBlock${questionId}`);
+    if (!questionBlock) return;
+    
+    const questionType = questionBlock.querySelector(`#questionType${questionId}`).value;
+    const answerSelect = document.getElementById(`conditionAnswer${hiddenFieldId}_${condId}`);
+    if (!answerSelect) return;
+    
+    // Clear existing options
+    answerSelect.innerHTML = '<option value="">Select an answer</option>';
+    
+    if (questionType === 'checkbox') {
+        const optionsDiv = questionBlock.querySelector(`#checkboxOptions${questionId}`);
+        if (optionsDiv) {
+            const optionDivs = optionsDiv.querySelectorAll('div');
+            optionDivs.forEach((optDiv, index) => {
+                const textInput = optDiv.querySelector(`#checkboxOptionText${questionId}_${index + 1}`);
+                if (textInput) {
+                    const optionText = textInput.value.trim();
+                    if (optionText) {
+                        const option = document.createElement('option');
+                        option.value = optionText.toLowerCase();
+                        option.textContent = optionText;
+                        answerSelect.appendChild(option);
+                    }
+                }
+            });
+            
+            // Check if "None of the above" option is enabled
+            const noneCheckbox = document.querySelector(`#noneOfTheAbove${questionId}`);
+            if (noneCheckbox && noneCheckbox.checked) {
+                const noneOption = document.createElement('option');
+                noneOption.value = 'none of the above';
+                noneOption.textContent = 'None of the above';
+                answerSelect.appendChild(noneOption);
+            }
+        }
+    }
+    // Other question types handling...
 }
