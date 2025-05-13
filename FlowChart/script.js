@@ -1901,19 +1901,10 @@ function gatherAllAmountLabels() {
         // We'll rename it "numberedDropdown" in final JSON
         // If it has amounts, push them
         if (cell._textboxes) {
-          const cleanQuestionName = (cell.value || cell._questionText || "unnamed_question")
-            .replace(/<[^>]+>/g, "")
-            .trim()
-            .replace(/[^\w\s]/gi, "")
-            .replace(/\s+/g, "_")
-            .toLowerCase();
-
-          // We also add amount for each isAmountOption
+          const cleanQuestionName = sanitizeNameId(cell.value || cell._questionText || "unnamed_question");
           cell._textboxes.forEach(tb => {
             if (tb.isAmountOption) {
-              // Preserve original spaces in the nameId by converting to underscores
-              // e.g. "how_many_cars_do_you_have_amount_plus" for "Amount Plus"
-              let amountName = tb.nameId.replace(/\s+/g, "_").toLowerCase();
+              let amountName = sanitizeNameId(tb.nameId || "");
               let label = cleanQuestionName + "_" + amountName;
               labels.push(label);
             }
@@ -1921,20 +1912,12 @@ function gatherAllAmountLabels() {
         }
       } else if (qType === "checkbox") {
         // Find all amount options linked to this checkbox question
-        const cleanQuestionName = (cell.value || "unnamed_question")
-          .replace(/<[^>]+>/g, "")
-          .trim()
-          .replace(/[^\w\s]/gi, "")
-          .replace(/\s+/g, "_")
-          .toLowerCase();
-          
-        // Get all outgoing edges to find options
+        const cleanQuestionName = sanitizeNameId(cell.value || "unnamed_question");
         const outgoingEdges = graph.getOutgoingEdges(cell) || [];
         for (const edge of outgoingEdges) {
           const targetCell = edge.target;
           if (targetCell && isOptions(targetCell) && isAmountOption(targetCell)) {
-            const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim().toLowerCase().replace(/\s+/g, "_");
-            // Create label in format: "mark_all_that_apply_rent"
+            const optionText = sanitizeNameId(targetCell.value || "");
             const optionLabel = cleanQuestionName + "_" + optionText;
             labels.push(optionLabel);
           }
@@ -2962,7 +2945,26 @@ window.exportGuiJson = function() {
           }
         }
 
-        // Process unique target cells
+        // Collect all option cells for sorting (when it's a checkbox question)
+        let optionCells = [];
+        if (questionType === "checkbox") {
+          // For checkbox questions, collect all option cells first to sort by x-coordinate
+          for (const targetCell of uniqueTargetMap.values()) {
+            if (targetCell && isOptions(targetCell) && getQuestionType(targetCell) !== "imageOption") {
+              optionCells.push(targetCell);
+            }
+          }
+          
+          // Sort option cells by x-coordinate (left to right)
+          optionCells.sort((a, b) => {
+            return a.geometry.x - b.geometry.x;
+          });
+
+          // Reset options array to ensure we're working with a clean slate
+          question.options = [];
+        }
+
+        // Process image nodes first
         for (const targetCell of uniqueTargetMap.values()) {
           // Check if this is an image option node
           if (isOptions(targetCell) && getQuestionType(targetCell) === "imageOption") {
@@ -2974,9 +2976,14 @@ window.exportGuiJson = function() {
                 height: parseInt(targetCell._image.height) || 0
               };
             }
-            // Skip adding as an option
-            continue;
           }
+        }
+        
+        // Process option cells (either sorted or as-is)
+        const cellsToProcess = questionType === "checkbox" ? optionCells : uniqueTargetMap.values();
+        for (const targetCell of cellsToProcess) {
+          // Skip image option nodes as we already processed them
+          if (isOptions(targetCell) && getQuestionType(targetCell) === "imageOption") continue;
           
           if (targetCell && isOptions(targetCell)) {
             const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
@@ -2989,11 +2996,6 @@ window.exportGuiJson = function() {
               
               // For checkbox questions, create structured options
               if (questionType === "checkbox") {
-                // Reset options array if it contains strings
-                if (question.options.length > 0 && typeof question.options[0] === 'string') {
-                  question.options = [];
-                }
-                
                 // Extract the full question nameId for consistent option naming
                 let fullQuestionNameId = question.nameId;
                 if (cell.style && cell.style.includes("nodeId=")) {
@@ -3007,7 +3009,7 @@ window.exportGuiJson = function() {
                 }
                 
                 // Create a nameId by combining the full question nameId and the option text
-                const optionNameId = fullQuestionNameId.toLowerCase() + "_" + optionText.toLowerCase().replace(/\s+/g, '_');
+                const optionNameId = sanitizeNameId(fullQuestionNameId) + "_" + sanitizeNameId(optionText);
                 
                 // Capitalize first letter of option label
                 const label = optionText.charAt(0).toUpperCase() + optionText.slice(1);
@@ -3155,7 +3157,7 @@ window.exportGuiJson = function() {
         
         if (cell._textboxes) {
           cell._textboxes.forEach((tb, index) => {
-            const nameId = question.nameId.toLowerCase() + "_" + (tb.nameId || "").toLowerCase().replace(/\s+/g, '_');
+            const nameId = sanitizeNameId(question.nameId) + "_" + sanitizeNameId(tb.nameId || "").toLowerCase().replace(/\s+/g, '_');
             
             question.textboxes.push({
               label: "", // Empty label as requested
@@ -5641,3 +5643,13 @@ while (stillHaveIssues && fixIteration < maxIterations) {
   stillHaveIssues = false;
   fixIteration++;
 }
+
+// --- PATCH START: sanitize option nameId generation ---
+function sanitizeNameId(str) {
+  return str
+    .toLowerCase()
+    .replace(/<[^>]+>/g, "")
+    .replace(/[^a-z0-9]+/gi, "_") // replace any sequence of non-alphanumeric chars with _
+    .replace(/^_+|_+$/g, ""); // trim leading/trailing underscores
+}
+// --- PATCH END ---

@@ -1593,7 +1593,7 @@ function generateHiddenPDFFields(){
 
         /*──────────── TEXT hidden field ────────────*/
         if (fType === "text"){
-            hiddenFieldsHTML += `\n<input type="text" id="${fName}" name="${fName}" style="display:block;">`;
+            hiddenFieldsHTML += `\n<input type="text" id="${fName}" name="${fName}" style="display:none;">`;
 
             const calcRows = block.querySelectorAll(`[id^="textCalculationRow${hid}_"]`);
             if (calcRows.length){
