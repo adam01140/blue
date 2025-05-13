@@ -153,51 +153,94 @@ function loadFormData(formData) {
                 // Question-type-specific rebuild
                 // -----------------------------
                 // In the checkbox section of loadFormData()
-if (question.type === 'checkbox') {
-    // Rebuild checkbox options
-    const checkboxOptionsDiv = questionBlock.querySelector(`#checkboxOptions${question.questionId}`);
-    if (checkboxOptionsDiv) {
-        checkboxOptionsDiv.innerHTML = '';
-        (question.options || []).forEach((optData, idx) => {
-            const optionDiv = document.createElement('div');
-            optionDiv.className = `option${idx + 1}`;
-            optionDiv.innerHTML = `
-                <label>Option ${idx + 1} Text:</label>
-                <input type="text" id="checkboxOptionText${question.questionId}_${idx + 1}"
-                       value="${optData.label}" placeholder="Enter option text"><br><br>
-                <label>Name/ID:</label>
-                <input type="text" id="checkboxOptionName${question.questionId}_${idx + 1}"
-                       value="${optData.nameId}" placeholder="Enter Name/ID"><br><br>
-                <label>Value (optional):</label>
-                <input type="text" id="checkboxOptionValue${question.questionId}_${idx + 1}"
-                       value="${optData.value}" placeholder="Enter Value"><br><br>
-                <label>
-                    <input type="checkbox" id="checkboxOptionHasAmount${question.questionId}_${idx + 1}" 
-                           ${optData.hasAmount ? 'checked' : ''}
-                           onchange="toggleAmountPlaceholder(${question.questionId}, ${idx + 1})">
-                    Enable amount field
-                </label>
-                <div id="checkboxOptionAmountDetails${question.questionId}_${idx + 1}" 
-                     style="display:${optData.hasAmount ? 'block' : 'none'}; margin-top:8px;">
-                    <label>Amount Field Name:</label>
-                    <input type="text" id="checkboxOptionAmountName${question.questionId}_${idx + 1}"
-                           value="${optData.amountName || ''}" placeholder="Enter amount field name"><br><br>
-                    <label>Amount Placeholder:</label>
-                    <input type="text" id="checkboxOptionAmountPlaceholder${question.questionId}_${idx + 1}"
-                           value="${optData.amountPlaceholder || ''}" placeholder="Enter amount placeholder"><br>
-                </div>
-                <button type="button"
-                        onclick="removeCheckboxOption(${question.questionId}, ${idx + 1})">
-                    Remove
-                </button>
-                <hr>
-            `;
-            checkboxOptionsDiv.appendChild(optionDiv);
-        });
-        // "None of the above" logic
-        updateConditionalPDFAnswersForCheckbox(question.questionId);
-    }
-}
+                if (question.type === 'checkbox') {
+                    // Rebuild checkbox options
+                    const checkboxOptionsDiv = questionBlock.querySelector(`#checkboxOptions${question.questionId}`);
+                    if (checkboxOptionsDiv) {
+                        checkboxOptionsDiv.innerHTML = '';
+                        
+                        // Check if we have a "None of the above" option that needs special handling
+                        let hasNoneOption = false;
+                        let noneOfTheAboveOption = null;
+                        
+                        for (const optData of (question.options || [])) {
+                            if (optData.label === "None of the above" || optData.nameId.endsWith("_none")) {
+                                hasNoneOption = true;
+                                noneOfTheAboveOption = optData;
+                                break;
+                            }
+                        }
+                        
+                        // Add regular options (excluding "None of the above")
+                        let regularOptions = question.options || [];
+                        if (hasNoneOption) {
+                            regularOptions = regularOptions.filter(opt => 
+                                opt.label !== "None of the above" && !opt.nameId.endsWith("_none"));
+                        }
+                        
+                        regularOptions.forEach((optData, idx) => {
+                            const optionDiv = document.createElement('div');
+                            optionDiv.className = `option${idx + 1}`;
+                            optionDiv.innerHTML = `
+                                <label>Option ${idx + 1} Text:</label>
+                                <input type="text" id="checkboxOptionText${question.questionId}_${idx + 1}"
+                                       value="${optData.label}" placeholder="Enter option text"><br><br>
+                                <label>Name/ID:</label>
+                                <input type="text" id="checkboxOptionName${question.questionId}_${idx + 1}"
+                                       value="${optData.nameId}" placeholder="Enter Name/ID"><br><br>
+                                <label>Value (optional):</label>
+                                <input type="text" id="checkboxOptionValue${question.questionId}_${idx + 1}"
+                                       value="${optData.value || ''}" placeholder="Enter Value"><br><br>
+                                <label>
+                                    <input type="checkbox" id="checkboxOptionHasAmount${question.questionId}_${idx + 1}" 
+                                           ${optData.hasAmount ? 'checked' : ''}
+                                           onchange="toggleAmountPlaceholder(${question.questionId}, ${idx + 1})">
+                                    Enable amount field
+                                </label>
+                                <div id="checkboxOptionAmountDetails${question.questionId}_${idx + 1}" 
+                                     style="display:${optData.hasAmount ? 'block' : 'none'}; margin-top:8px;">
+                                    <label>Amount Field Name:</label>
+                                    <input type="text" id="checkboxOptionAmountName${question.questionId}_${idx + 1}"
+                                           value="${optData.amountName || ''}" placeholder="Enter amount field name"><br><br>
+                                    <label>Amount Placeholder:</label>
+                                    <input type="text" id="checkboxOptionAmountPlaceholder${question.questionId}_${idx + 1}"
+                                           value="${optData.amountPlaceholder || ''}" placeholder="Enter amount placeholder"><br>
+                                </div>
+                                <button type="button"
+                                        onclick="removeCheckboxOption(${question.questionId}, ${idx + 1})">
+                                    Remove
+                                </button>
+                                <hr>
+                            `;
+                            checkboxOptionsDiv.appendChild(optionDiv);
+                        });
+                        
+                        // Add the "None of the above" checkbox if it exists in the data
+                        if (hasNoneOption) {
+                            // Find the container for the "None of the above" option
+                            let noneContainer = document.createElement('div');
+                            noneContainer.id = `noneOfTheAboveContainer${question.questionId}`;
+                            noneContainer.style.marginTop = '10px';
+                            noneContainer.style.marginBottom = '10px';
+                            noneContainer.innerHTML = `
+                                <label>
+                                    <input type="checkbox" id="noneOfTheAbove${question.questionId}" checked>
+                                    Include "None of the above" option
+                                </label>
+                            `;
+                            
+                            // Add it right after the options div
+                            if (checkboxOptionsDiv.nextSibling) {
+                                checkboxOptionsDiv.parentNode.insertBefore(noneContainer, checkboxOptionsDiv.nextSibling);
+                            } else {
+                                checkboxOptionsDiv.parentNode.appendChild(noneContainer);
+                            }
+                        }
+                        
+                        // Update conditional PDF answers for checkbox
+                        updateConditionalPDFAnswersForCheckbox(question.questionId);
+                    }
+                }
                 else if (question.type === 'dropdown') {
                     // Rebuild dropdown options
                     const dropdownOptionsDiv = questionBlock.querySelector(`#dropdownOptions${question.questionId}`);
@@ -289,45 +332,45 @@ if (question.type === 'checkbox') {
                     }
                 }
                // In the numbered dropdown section of loadFormData()
-else if (question.type === 'numberedDropdown') {
-    // Numbered dropdown
-    const rangeStartEl = questionBlock.querySelector(`#numberRangeStart${question.questionId}`);
-    const rangeEndEl = questionBlock.querySelector(`#numberRangeEnd${question.questionId}`);
-    if (rangeStartEl) rangeStartEl.value = question.min || '';
-    if (rangeEndEl) rangeEndEl.value = question.max || '';
+                else if (question.type === 'numberedDropdown') {
+                    // Numbered dropdown
+                    const rangeStartEl = questionBlock.querySelector(`#numberRangeStart${question.questionId}`);
+                    const rangeEndEl = questionBlock.querySelector(`#numberRangeEnd${question.questionId}`);
+                    if (rangeStartEl) rangeStartEl.value = question.min || '';
+                    if (rangeEndEl) rangeEndEl.value = question.max || '';
 
-    // Rebuild custom text labels
-    const textboxLabelsDiv = questionBlock.querySelector(`#textboxLabels${question.questionId}`);
-    if (textboxLabelsDiv) {
-        textboxLabelsDiv.innerHTML = '';
-        (question.labels || []).forEach((labelValue, ldx) => {
-            addTextboxLabel(question.questionId);
-            const labelInput = textboxLabelsDiv.querySelector(
-                `#label${question.questionId}_${ldx + 1}`
-            );
-            if (labelInput) labelInput.value = labelValue;
-        });
-    }
+                    // Rebuild custom text labels
+                    const textboxLabelsDiv = questionBlock.querySelector(`#textboxLabels${question.questionId}`);
+                    if (textboxLabelsDiv) {
+                        textboxLabelsDiv.innerHTML = '';
+                        (question.labels || []).forEach((labelValue, ldx) => {
+                            addTextboxLabel(question.questionId);
+                            const labelInput = textboxLabelsDiv.querySelector(
+                                `#label${question.questionId}_${ldx + 1}`
+                            );
+                            if (labelInput) labelInput.value = labelValue;
+                        });
+                    }
 
-    // Rebuild amount labels - ADD THIS SECTION
-    const textboxAmountsDiv = questionBlock.querySelector(`#textboxAmounts${question.questionId}`);
-    if (textboxAmountsDiv) {
-        textboxAmountsDiv.innerHTML = '';
-        (question.amounts || []).forEach((amountValue, adx) => {
-            addTextboxAmount(question.questionId);
-            const amountInput = textboxAmountsDiv.querySelector(
-                `#amount${question.questionId}_${adx + 1}`
-            );
-            if (amountInput) amountInput.value = amountValue;
-        });
-    }
-    
-    // After setting min/max values, update any jump logic dropdowns
-    // This ensures the number range options are populated correctly
-    if (question.jump && question.jump.enabled) {
-        updateJumpOptionsForNumberedDropdown(question.questionId);
-    }
-}
+                    // Rebuild amount labels - ADD THIS SECTION
+                    const textboxAmountsDiv = questionBlock.querySelector(`#textboxAmounts${question.questionId}`);
+                    if (textboxAmountsDiv) {
+                        textboxAmountsDiv.innerHTML = '';
+                        (question.amounts || []).forEach((amountValue, adx) => {
+                            addTextboxAmount(question.questionId);
+                            const amountInput = textboxAmountsDiv.querySelector(
+                                `#amount${question.questionId}_${adx + 1}`
+                            );
+                            if (amountInput) amountInput.value = amountValue;
+                        });
+                    }
+                    
+                    // After setting min/max values, update any jump logic dropdowns
+                    // This ensures the number range options are populated correctly
+                    if (question.jump && question.jump.enabled) {
+                        updateJumpOptionsForNumberedDropdown(question.questionId);
+                    }
+                }
                 else if (
                     // Text-like question types
                     question.type === 'text' ||
@@ -367,46 +410,46 @@ else if (question.type === 'numberedDropdown') {
 
               
               // ===== Updated Jump Logic Import =====
-        if (question.jump && question.jump.enabled) {
-            const jumpCbox = questionBlock.querySelector(`#enableJump${question.questionId}`);
-            if (jumpCbox) {
-                jumpCbox.checked = true;
-                toggleJumpLogic(question.questionId);
-            }
+                if (question.jump && question.jump.enabled) {
+                    const jumpCbox = questionBlock.querySelector(`#enableJump${question.questionId}`);
+                    if (jumpCbox) {
+                        jumpCbox.checked = true;
+                        toggleJumpLogic(question.questionId);
+                    }
 
-            // Clear any existing conditions
-            const jumpConditionsDiv = questionBlock.querySelector(`#jumpConditions${question.questionId}`);
-            if (jumpConditionsDiv) jumpConditionsDiv.innerHTML = '';
+                    // Clear any existing conditions
+                    const jumpConditionsDiv = questionBlock.querySelector(`#jumpConditions${question.questionId}`);
+                    if (jumpConditionsDiv) jumpConditionsDiv.innerHTML = '';
 
-            // For numbered dropdown, populate options based on min/max first
-            if (question.type === 'numberedDropdown') {
-                updateJumpOptionsForNumberedDropdown(question.questionId);
-            }
+                    // For numbered dropdown, populate options based on min/max first
+                    if (question.type === 'numberedDropdown') {
+                        updateJumpOptionsForNumberedDropdown(question.questionId);
+                    }
 
-            // Add all conditions from import
-            (question.jump.conditions || []).forEach((cond, index) => {
-                addJumpCondition(question.questionId);
-                const conditionId = index + 1;
-                
-                // Update options for the dropdown based on question type
-                if (question.type === 'dropdown') {
-                    updateJumpOptions(question.questionId, conditionId);
-                } else if (question.type === 'radio') {
-                    updateJumpOptionsForRadio(question.questionId, conditionId);
-                } else if (question.type === 'checkbox') {
-                    updateJumpOptionsForCheckbox(question.questionId, conditionId);
-                } else if (question.type === 'numberedDropdown') {
-                    updateJumpOptionsForNumberedDropdown(question.questionId, conditionId);
+                    // Add all conditions from import
+                    (question.jump.conditions || []).forEach((cond, index) => {
+                        addJumpCondition(question.questionId);
+                        const conditionId = index + 1;
+                        
+                        // Update options for the dropdown based on question type
+                        if (question.type === 'dropdown') {
+                            updateJumpOptions(question.questionId, conditionId);
+                        } else if (question.type === 'radio') {
+                            updateJumpOptionsForRadio(question.questionId, conditionId);
+                        } else if (question.type === 'checkbox') {
+                            updateJumpOptionsForCheckbox(question.questionId, conditionId);
+                        } else if (question.type === 'numberedDropdown') {
+                            updateJumpOptionsForNumberedDropdown(question.questionId, conditionId);
+                        }
+                        
+                        // After options are populated, set the selected value
+                        const jumpOptionSelect = questionBlock.querySelector(`#jumpOption${question.questionId}_${conditionId}`);
+                        const jumpToInput = questionBlock.querySelector(`#jumpTo${question.questionId}_${conditionId}`);
+                        
+                        if (jumpOptionSelect) jumpOptionSelect.value = cond.option;
+                        if (jumpToInput) jumpToInput.value = cond.to;
+                    });
                 }
-                
-                // After options are populated, set the selected value
-                const jumpOptionSelect = questionBlock.querySelector(`#jumpOption${question.questionId}_${conditionId}`);
-                const jumpToInput = questionBlock.querySelector(`#jumpTo${question.questionId}_${conditionId}`);
-                
-                if (jumpOptionSelect) jumpOptionSelect.value = cond.option;
-                if (jumpToInput) jumpToInput.value = cond.to;
-            });
-        }
               
                
 
@@ -625,9 +668,12 @@ function exportForm() {
                 // Check if user included "None of the above"
                 const noneOfTheAboveCheckbox = questionBlock.querySelector(`#noneOfTheAbove${questionId}`);
                 if (noneOfTheAboveCheckbox && noneOfTheAboveCheckbox.checked) {
+                    const slug = questionSlugMap[questionId] || ('answer' + questionId);
+                    const noneNameId = `${slug}_none`;
+                    
                     questionData.options.push({
                         label: "None of the above",
-                        nameId: `answer${questionId}_none`,
+                        nameId: noneNameId,
                         value: "None of the above",
                         hasAmount: false
                     });

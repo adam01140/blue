@@ -486,7 +486,7 @@ const cboxOptions = [];
 const qSlug = questionSlugMap[questionId] || ('answer' + questionId);
 questionNameIds[questionId] = qSlug;      // so helpers know the base
 
-formHTML += `<div><center><div id="checkmark">`;
+formHTML += `<div><center><div id="checkmark" class="checkbox-group-${questionId}">`;
 
 /* ── render each checkbox option ───────────────────────────── */
 for (let co = 0; co < cOptsDivs.length; co++){
@@ -520,8 +520,9 @@ for (let co = 0; co < cOptsDivs.length; co++){
     formHTML += `
       <span class="checkbox-inline">
         <label class="checkbox-label">
-          <input type="checkbox" id="${optionNameId}" name="${optionNameId}" value="${optionValue}"
-                 ${hasAmount ? `onchange="toggleAmountField('${optionNameId}_amount', this.checked)"` : ''}>
+          <input type="checkbox" id="${optionNameId}" name="${optionNameId}" value="${optionValue}" 
+                 ${hasAmount ? `onchange="toggleAmountField('${optionNameId}_amount', this.checked); toggleNoneOption(this, ${questionId});"` : 
+                               `onchange="toggleNoneOption(this, ${questionId});"`}>
           ${labelText}
         </label>
       </span>`;
@@ -540,7 +541,8 @@ for (let co = 0; co < cOptsDivs.length; co++){
 const noneEl = qBlock.querySelector(`#noneOfTheAbove${questionId}`);
 if (noneEl?.checked){
     const noneStr      = 'None of the above';
-    const noneNameId   = buildCheckboxName(questionId, '', noneStr);
+    // Ensure we use the designated pattern for the "none" option
+    const noneNameId   = `${qSlug}_none`;
 
     cboxOptions.push({
         labelText: noneStr,
@@ -551,7 +553,8 @@ if (noneEl?.checked){
     formHTML += `
       <span class="checkbox-inline">
         <label class="checkbox-label">
-          <input type="checkbox" id="${noneNameId}" name="${noneNameId}" value="${noneStr}">
+          <input type="checkbox" id="${noneNameId}" name="${noneNameId}" value="${noneStr}" 
+                 onchange="handleNoneOfTheAboveToggle(this, ${questionId});">
           ${noneStr}
         </label>
       </span>`;
@@ -884,8 +887,43 @@ function toggleAmountField(amountFieldId, show) {
     }
 }
 
+/*──────────────────────────────────────────────────────────────*
+ * Handle "None of the above" checkbox functionality
+ *──────────────────────────────────────────────────────────────*/
+function toggleNoneOption(checkbox, questionId) {
+    if (!checkbox.checked) return;
 
+    // Find the "None of the above" checkbox using more robust selectors
+    const cbPrefix = getCbPrefix(questionId);
+    const noneCheckbox = document.querySelector('input[id="' + cbPrefix + 'none"]') || 
+                         document.querySelector('input[id^="' + cbPrefix + '"][id$="_none"]');
+                         
+    if (noneCheckbox && noneCheckbox.checked) {
+        // Uncheck the "None of the above" option when any other option is checked
+        noneCheckbox.checked = false;
+    }
+}
 
+function handleNoneOfTheAboveToggle(noneCheckbox, questionId) {
+    if (!noneCheckbox.checked) return;
+    
+    // When "None of the above" is checked, uncheck all other options
+    const container = document.querySelector('.checkbox-group-' + questionId);
+    if (!container) return;
+    
+    const allCheckboxes = container.querySelectorAll('input[type="checkbox"]');
+    allCheckboxes.forEach(checkbox => {
+        // Skip the "None" checkbox itself
+        const isNoneCheckbox = checkbox.id.endsWith('_none') || checkbox.id.endsWith('none');
+        if (checkbox !== noneCheckbox && !isNoneCheckbox) {
+            checkbox.checked = false;
+            
+            // If this checkbox has an amount field, hide it
+            const amountId = checkbox.id + '_amount';
+            toggleAmountField(amountId, false);
+        }
+    });
+}
 
 
 function showTextboxLabels(questionId, count){
