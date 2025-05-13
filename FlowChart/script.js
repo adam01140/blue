@@ -946,6 +946,18 @@ document.addEventListener("DOMContentLoaded", function() {
   deleteNodeButton.addEventListener("click", () => {
     const cells = graph.getSelectionCells();
     if (cells.length > 0) {
+      // Process question cells first to update dependent calculation nodes
+      const questionCells = cells.filter(cell => isQuestion(cell));
+      
+      // For each question cell that will be deleted, handle dependent calc nodes
+      if (questionCells.length > 0) {
+        questionCells.forEach(cell => {
+          const oldNodeId = getNodeId(cell);
+          // Update or remove dependent calculation nodes
+          updateAllCalcNodesOnQuestionChange(null, true, oldNodeId);
+        });
+      }
+      
       graph.removeCells(cells);
       refreshAllCells();
     }
@@ -1155,6 +1167,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function onNodeTextFieldChange(newText) {
     if (!selectedCell) return;
+    
+    // Store the old nodeId before making changes (for tracking calculation dependencies)
+    const oldNodeId = isQuestion(selectedCell) ? getNodeId(selectedCell) : null;
+    
     graph.getModel().beginUpdate();
     try {
       if (isQuestion(selectedCell)) {
@@ -1170,6 +1186,12 @@ document.addEventListener("DOMContentLoaded", function() {
           selectedCell.value = newText.trim();
         }
         refreshNodeIdFromLabel(selectedCell);
+        
+        // Update dependent calculation nodes if the text changed 
+        // (which would change the nodeId)
+        if (oldNodeId && oldNodeId !== getNodeId(selectedCell)) {
+          updateAllCalcNodesOnQuestionChange(selectedCell, false, oldNodeId);
+        }
       } else if (isOptions(selectedCell)) {
         selectedCell.value = newText.trim();
         refreshOptionNodeId(selectedCell);
@@ -1266,9 +1288,18 @@ document.addEventListener("DOMContentLoaded", function() {
   graph.getModel().addListener(mxEvent.EVENT_CHANGE, function(sender, evt) {
     const changes = evt.getProperty("changes");
     if (!changes) return;
+    
+    const modifiedQuestionCells = new Set();
+    
     changes.forEach(change => {
       if (change.constructor.name === "mxValueChange") {
         const { cell, value } = change;
+        
+        // Track modified question cells
+        if (isQuestion(cell)) {
+          modifiedQuestionCells.add(cell);
+        }
+        
         if (value && typeof value === "string") {
           // If a label ends with "?", treat as question
           if (value.trim().endsWith("?")) {
@@ -1282,6 +1313,12 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       }
     });
+    
+    // Update calculation nodes that depend on modified questions
+    modifiedQuestionCells.forEach(questionCell => {
+      updateAllCalcNodesOnQuestionChange(questionCell, false);
+    });
+    
     refreshAllCells();
   });
 
@@ -1476,6 +1513,12 @@ document.addEventListener("DOMContentLoaded", function() {
         
         // If a cell is selected and it's not the root cell
         if (selectedCell && selectedCell.id !== '0' && selectedCell.id !== '1') {
+          // If it's a question, handle calculation node dependencies
+          if (isQuestion(selectedCell)) {
+            const oldNodeId = getNodeId(selectedCell);
+            updateAllCalcNodesOnQuestionChange(null, true, oldNodeId);
+          }
+          
           // Delete the cell
           graph.removeCells([selectedCell]);
           
@@ -1514,6 +1557,17 @@ document.addEventListener("DOMContentLoaded", function() {
           );
           
           if (cellsToRemove.length > 0) {
+            // Process question cells first to update dependent calculation nodes
+            const questionCells = cellsToRemove.filter(cell => isQuestion(cell));
+            
+            if (questionCells.length > 0) {
+              questionCells.forEach(cell => {
+                const oldNodeId = getNodeId(cell);
+                // Update or remove dependent calculation nodes
+                updateAllCalcNodesOnQuestionChange(null, true, oldNodeId);
+              });
+            }
+            
             // Delete the cells
             graph.removeCells(cellsToRemove);
             
@@ -2394,6 +2448,9 @@ function setQuestionType(cell, newType) {
   let style = cell.style || "";
   style = style.replace(/questionType=[^;]+/, "");
 
+  // Keep track of the old node ID for dependent calculation nodes
+  const oldNodeId = getNodeId(cell);
+
   if (newType === "multipleTextboxes" || newType === "multipleDropdownType") {
     style += `;questionType=${newType};pointerEvents=1;overflow=fill;`;
     if (!cell._questionText) {
@@ -2432,6 +2489,16 @@ function setQuestionType(cell, newType) {
 
   graph.getModel().setStyle(cell, style);
   refreshNodeIdFromLabel(cell);
+  
+  // Update calculation nodes that might depend on this node
+  // Especially important if changing from checkbox/multipleDropdownType to another type
+  // that doesn't support amount options
+  const newNodeId = getNodeId(cell);
+  if (oldNodeId !== newNodeId) {
+    updateAllCalcNodesOnQuestionChange(cell, false, oldNodeId);
+  } else {
+    updateAllCalcNodesOnQuestionChange(cell, false);
+  }
 }
 
 /**************************************************
@@ -3050,15 +3117,33 @@ window.exportGuiJson = function() {
               console.log(`  Checking option "${optionText}" for question ${question.questionId}`);
               const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
               
+              // Track where this option leads
+              let optionLeadsToEnd = false;
+              let optionLeadsToQuestion = false;
+              let targetQuestionId = null;
+              
               for (const optionEdge of optionOutgoingEdges) {
                 const optionTarget = optionEdge.target;
                 console.log(`    Option ${optionText} leads to cell ID ${optionTarget ? optionTarget.id : 'unknown'}, style: ${optionTarget ? optionTarget.style : 'unknown'}`);
                 
                 // Check if this option leads to an END node
                 if (optionTarget && isEndNode(optionTarget)) {
-                  // Add to our list of options that jump to END
+                  optionLeadsToEnd = true;
                   optionsWithJumpToEnd.push(optionText);
+                  break;
                 }
+                
+                // Check if this option leads to another question instead
+                if (optionTarget && isQuestion(optionTarget)) {
+                  optionLeadsToQuestion = true;
+                  targetQuestionId = questionIdMap.get(optionTarget.id);
+                }
+              }
+              
+              // For checkbox questions specifically, we need to handle each option independently
+              // Only add to optionsWithJumpToEnd if this specific option leads to END
+              if (questionType === "checkbox" && !optionLeadsToEnd && optionLeadsToQuestion) {
+                console.log(`    Checkbox option "${optionText}" leads to question ${targetQuestionId}, not to END`);
               }
             }
           }
@@ -4660,7 +4745,10 @@ window.exportGuiJson = function() {
       const cell = questionCellMap.get(question.questionId);
       if (!cell) continue;
       
-      console.log(`Processing jumps for question ${question.questionId} (${question.text})`);
+      // Get question type - needed for special checkbox handling
+      const questionType = getQuestionType(cell);
+      
+      console.log(`Processing jumps for question ${question.questionId} (${question.text}), type: ${questionType}`);
       const outgoingEdges = graph.getOutgoingEdges(cell) || [];
       
       // Check each outgoing option
@@ -4692,6 +4780,93 @@ window.exportGuiJson = function() {
         }
       }
       
+      // Special handling for checkbox questions - we need to be more careful about indirect paths
+      if (questionType === "checkbox") {
+        // For checkbox questions, we need to track which options lead where
+        const optionDestinations = new Map(); // Map of option text -> destination
+        
+        // Process each option and track its destination
+        for (const edge of outgoingEdges) {
+          const targetCell = edge.target;
+          if (!targetCell || !isOptions(targetCell)) continue;
+          
+          const optionText = targetCell.value.replace(/<[^>]+>/g, "").trim();
+          const optionOutgoingEdges = graph.getOutgoingEdges(targetCell) || [];
+          
+          // Check where this specific option leads
+          let optionLeadsToEnd = false;
+          let optionDestination = null;
+          
+          for (const optionEdge of optionOutgoingEdges) {
+            const optionTarget = optionEdge.target;
+            if (!optionTarget) continue;
+            
+            if (isEndNode(optionTarget)) {
+              // This option leads directly to END
+              optionLeadsToEnd = true;
+              optionDestination = "end";
+              break;
+            } else if (isQuestion(optionTarget)) {
+              // This option leads to another question
+              const targetQuestionId = questionIdMap.get(optionTarget.id);
+              if (targetQuestionId) {
+                optionDestination = targetQuestionId.toString();
+              }
+            }
+          }
+          
+          // Store this option's destination
+          if (optionDestination) {
+            optionDestinations.set(optionText, optionDestination);
+          }
+        }
+        
+        // Now check if we need to add jump conditions based on whether options lead to END
+        if (optionDestinations.size > 0) {
+          // Enable jump conditions for this checkbox question
+          if (!question.jump.enabled) {
+            question.jump.enabled = true;
+            question.jump.conditions = [];
+          }
+          
+          // For each option, add a jump condition if it leads to END
+          for (const [optionText, destination] of optionDestinations.entries()) {
+            if (destination === "end") {
+              // Check if this jump condition already exists
+              const exists = question.jump.conditions.some(c => 
+                c.option === optionText && c.to === "end"
+              );
+              
+              if (!exists) {
+                // For checkbox questions, we need to find the properly capitalized label
+                let optionLabel = optionText;
+                const matchingOption = question.options.find(opt => 
+                  (typeof opt === 'object' && opt.label.toLowerCase() === optionText.toLowerCase())
+                );
+                if (matchingOption) {
+                  optionLabel = matchingOption.label;
+                }
+                
+                question.jump.conditions.push({
+                  option: optionLabel,
+                  to: "end"
+                });
+                console.log(`  CHECKBOX JUMP: Added jump to END for checkbox question ${question.questionId}, option "${optionLabel}"`);
+              }
+            } 
+            // For options that lead to other questions, we don't add jumps to end automatically
+            else {
+              console.log(`  CHECKBOX INFO: Option "${optionText}" leads to question ${destination}, not adding jump to END`);
+            }
+          }
+        }
+        
+        // Skip the rest of the processing for checkbox questions
+        // This prevents adding extra jumps that would make all options jump to END
+        continue;
+      }
+      
+      // Regular processing for non-checkbox questions continues as before...
       // NEW CODE: Check for options leading to questions that eventually reach END
       // Skip this step for questions that don't need jump conditions
       // First, determine if this question has direct connections to an END node through options
@@ -4794,13 +4969,6 @@ window.exportGuiJson = function() {
         console.log(`  Question ${question.questionId} has direct options to END, skipping indirect checks`);
         continue;
       }
-      
-      // Only process indirect options for Question 1 if specifically needed
-      // This prevents adding incorrect jumps to questions that should not have them
-      // if (question.questionId === 1) {
-      //   console.log(`  Question 1 should not have jump conditions to END added, as its options lead to other questions first`);
-      //   continue;
-      // }
     }
   }
   
@@ -4866,7 +5034,7 @@ window.exportGuiJson = function() {
       
       if (shouldHaveJumps) {
         // Ensure jumps are enabled
-          question.jump.enabled = true;
+        question.jump.enabled = true;
         
         // Preserve both END jumps and section jumps
         if (!question.jump.conditions) {
@@ -4880,7 +5048,7 @@ window.exportGuiJson = function() {
           );
           if (!exists) {
             question.jump.conditions.push(jump);
-        }
+          }
         });
       } else {
         // Remove jump conditions if this question shouldn't have them
@@ -5653,3 +5821,157 @@ function sanitizeNameId(str) {
     .replace(/^_+|_+$/g, ""); // trim leading/trailing underscores
 }
 // --- PATCH END ---
+
+/**************************************************
+ *           CALCULATION NODE DEPENDENCY MANAGEMENT     *
+ **************************************************/
+
+/**
+ * Finds all calculation nodes that depend on the given question node.
+ * A calculation node depends on a question if it uses an amount value 
+ * from that question in any of its terms.
+ * 
+ * @param {mxCell} questionCell The question node to check dependencies for
+ * @returns {Array} Array of calculation node cells that depend on this question
+ */
+function findCalcNodesDependentOnQuestion(questionCell) {
+  if (!questionCell || !isQuestion(questionCell)) return [];
+
+  const dependentCalcNodes = [];
+  const questionId = getNodeId(questionCell) || "";
+  const questionText = questionCell._questionText || questionCell.value || "";
+  const cleanQuestionName = sanitizeNameId(questionText);
+  
+  // Also get the questionId directly if available
+  const directQuestionId = questionCell._questionId;
+  
+  // Get all calculation nodes in the graph
+  const parent = graph.getDefaultParent();
+  const vertices = graph.getChildVertices(parent);
+  const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
+  
+  // For each calculation node, check if it depends on this question
+  calculationNodes.forEach(calcNode => {
+    if (!calcNode._calcTerms) return;
+    
+    let isDependentNode = false;
+    
+    // Check each calculation term
+    calcNode._calcTerms.forEach(term => {
+      if (!term.amountLabel) return;
+      
+      // Check if this term references the question directly by name or nodeId
+      if (term.amountLabel.toLowerCase().includes(questionId.toLowerCase()) ||
+          term.amountLabel.toLowerCase().includes(cleanQuestionName.toLowerCase())) {
+        isDependentNode = true;
+      }
+      
+      // For multiple dropdown questions, check if term references any of its amounts
+      if (getQuestionType(questionCell) === "multipleDropdownType" && questionCell._textboxes) {
+        questionCell._textboxes.forEach(tb => {
+          if (tb.isAmountOption && tb.nameId) {
+            const amountPattern = cleanQuestionName + "_" + sanitizeNameId(tb.nameId);
+            if (term.amountLabel.toLowerCase().includes(amountPattern.toLowerCase())) {
+              isDependentNode = true;
+            }
+          }
+        });
+      }
+      
+      // For checkbox questions, check for matching option nodes
+      if (getQuestionType(questionCell) === "checkbox") {
+        const outgoingEdges = graph.getOutgoingEdges(questionCell) || [];
+        for (const edge of outgoingEdges) {
+          const targetCell = edge.target;
+          if (targetCell && isOptions(targetCell) && isAmountOption(targetCell)) {
+            const optionText = sanitizeNameId(targetCell.value || "");
+            const optionPattern = cleanQuestionName + "_" + optionText;
+            if (term.amountLabel.toLowerCase().includes(optionPattern.toLowerCase())) {
+              isDependentNode = true;
+            }
+          }
+        }
+      }
+    });
+    
+    if (isDependentNode) {
+      dependentCalcNodes.push(calcNode);
+    }
+  });
+  
+  return dependentCalcNodes;
+}
+
+/**
+ * Updates or deletes calculation nodes when a question node changes or is deleted.
+ * 
+ * @param {mxCell} questionCell The question node that was changed or null if deleted
+ * @param {boolean} isDeleted True if the question was deleted, false if just modified
+ * @param {string} oldNodeId The previous node ID if changed (optional)
+ */
+function updateAllCalcNodesOnQuestionChange(questionCell, isDeleted, oldNodeId = null) {
+  if (isDeleted && !oldNodeId) {
+    console.error("When deleting a question, must provide its oldNodeId");
+    return;
+  }
+  
+  const questionId = isDeleted ? oldNodeId : (getNodeId(questionCell) || "");
+  const parent = graph.getDefaultParent();
+  const vertices = graph.getChildVertices(parent);
+  const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
+  
+  // If the question was deleted, find and delete any calc nodes that depend on it
+  if (isDeleted) {
+    // Gather a list of calc nodes to delete
+    const calcNodesToDelete = [];
+    
+    calculationNodes.forEach(calcNode => {
+      if (!calcNode._calcTerms) return;
+      
+      let dependsOnDeletedQuestion = false;
+      calcNode._calcTerms.forEach(term => {
+        if (!term.amountLabel) return;
+        
+        if (term.amountLabel.toLowerCase().includes(oldNodeId.toLowerCase())) {
+          dependsOnDeletedQuestion = true;
+        }
+      });
+      
+      if (dependsOnDeletedQuestion) {
+        calcNodesToDelete.push(calcNode);
+      }
+    });
+    
+    // Delete the dependent calc nodes
+    if (calcNodesToDelete.length > 0) {
+      graph.getModel().beginUpdate();
+      try {
+        graph.removeCells(calcNodesToDelete);
+        console.log(`Deleted ${calcNodesToDelete.length} calculation nodes that depended on deleted question`);
+      } finally {
+        graph.getModel().endUpdate();
+      }
+    }
+  }
+  // If the question was modified, update all dependent calculation nodes
+  else {
+    const dependentCalcNodes = findCalcNodesDependentOnQuestion(questionCell);
+    if (dependentCalcNodes.length > 0) {
+      graph.getModel().beginUpdate();
+      try {
+        // Update each calculation node
+        dependentCalcNodes.forEach(calcNode => {
+          updateCalculationNodeCell(calcNode);
+        });
+        
+        console.log(`Updated ${dependentCalcNodes.length} calculation nodes that depend on modified question`);
+      } finally {
+        graph.getModel().endUpdate();
+      }
+    }
+  }
+}
+
+/**************************************************
+ *           COLORING & REFRESHING CELLS          *
+ **************************************************/
