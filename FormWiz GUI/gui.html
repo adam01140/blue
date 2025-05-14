@@ -5,6 +5,66 @@
     <title>Custom Form Builder</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="form.css">
+    <style>
+        .container {
+            text-align: center;
+        }
+        #pdfContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .pdf-input-group {
+            margin-bottom: 10px;
+            text-align: center;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .pdf-input-group input {
+            margin: 0 auto 10px auto;
+            width: 60%;
+            padding: 8px;
+            box-sizing: border-box;
+            display: block;
+        }
+        .pdf-input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .pdf-input-group button {
+            margin: 0 auto;
+            display: block;
+        }
+        .modal {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); 
+            z-index: 1000; 
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff; 
+            border-radius: 8px; 
+            padding: 20px;
+            width: 90%;
+            max-width: 1200px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .modal-content iframe {
+            width: 100%; 
+            height: 800px;
+            border: none;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -17,65 +77,25 @@
     </header>
     <section>
         <div class="container">
-            <center>
-                <h2>FormWiz Developer GUI</h2>
-                <div id="pdfContainer">
-                    <div class="pdf-input-group" id="pdfGroup_0">
-                        <label>Choose Form PDF:</label><center>
-                        <input type="text" id="formPDFName" placeholder="Enter PDF form name (e.g., sc100.pdf)">
-                    </div>
+            <h2>FormWiz Developer GUI</h2>
+            <div id="pdfContainer">
+                <div class="pdf-input-group" id="pdfGroup_0">
+                    <label>Choose Form PDF:</label>
+                    <input type="text" id="formPDFName" placeholder="Enter PDF form name (e.g., sc100.pdf)">
                 </div>
-                <button type="button" onclick="addPdfInput()">Add PDF</button><br><br>
-                <button onclick="generateAndDownloadForm()">Export HTML</button>
-                <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importForm(event)">
-                <button onclick="document.getElementById('importFileInput').click();">Import JSON</button>
-                <button onclick="exportForm()">Export JSON</button>
-                <button type="button" id="previewButton" onclick="showPreview()">Preview</button>
-                <div id="previewModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close" onclick="closePreview()">&times;</span>
-        <iframe id="previewFrame"></iframe>
-    </div>
-</div>
-
-<style>
-    .modal {
-        position: fixed; 
-        top: 0; 
-        left: 0; 
-        width: 100%; 
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5); 
-        z-index: 1000; 
-        display: flex;
-        justify-content: center; 
-        align-items: center;
-    }
-    .modal-content {
-        background-color: #fff; 
-        border-radius: 8px; 
-        padding: 20px;
-        width: 90%; /* Increase this to 95% or 100% if you'd like more width */
-        max-width: 1200px; /* Increase max-width as needed */
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        position: relative;
-    }
-    .modal-content iframe {
-        width: 100%; 
-        height: 800px; /* Increase this value */
-        border: none;
-    }
-    /* Style for PDF input groups */
-    .pdf-input-group {
-        margin-bottom: 10px;
-    }
-    .pdf-input-group input {
-        margin-right: 10px;
-    }
-</style>
-
-
-            </center>
+            </div>
+            <button type="button" onclick="addPdfInput()">Add PDF</button><br><br>
+            <button onclick="generateAndDownloadForm()">Export HTML</button>
+            <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importForm(event)">
+            <button onclick="document.getElementById('importFileInput').click();">Import JSON</button>
+            <button onclick="exportForm()">Export JSON</button>
+            <button type="button" id="previewButton" onclick="showPreview()">Preview</button>
+            <div id="previewModal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close" onclick="closePreview()">&times;</span>
+                    <iframe id="previewFrame"></iframe>
+                </div>
+            </div>
         </div>
     </section>
     <section>
@@ -107,11 +127,25 @@
             const pdfGroup = document.createElement('div');
             pdfGroup.className = 'pdf-input-group';
             pdfGroup.id = `pdfGroup_${newPdfId}`;
-            pdfGroup.innerHTML = `
-                <label>Additional PDF File:</label>
-                <input type="text" id="additionalPdfName_${newPdfId}" placeholder="Enter PDF form name (e.g., sc100.pdf)">
-                <button type="button" onclick="removePdfInput(${newPdfId})">Delete</button>
-            `;
+            
+            // Create label
+            const label = document.createElement('label');
+            label.textContent = 'Additional PDF File:';
+            pdfGroup.appendChild(label);
+            
+            // Create input
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = `additionalPdfName_${newPdfId}`;
+            input.placeholder = 'Enter PDF form name (e.g., sc100.pdf)';
+            pdfGroup.appendChild(input);
+            
+            // Create delete button
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = 'Delete';
+            button.onclick = function() { removePdfInput(newPdfId); };
+            pdfGroup.appendChild(button);
             
             pdfContainer.appendChild(pdfGroup);
         }
