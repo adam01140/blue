@@ -20,7 +20,7 @@ const linkedDropdowns = []; // For storing linked dropdown pairs
 
 
 /*------------------------------------------------------------------
- * HISTORY STACK for accurate “Back” navigation
+ * HISTORY STACK for accurate "Back" navigation
  *-----------------------------------------------------------------*/
 let sectionStack = [];          // push every section you LEAVE
 let currentSectionNumber = 1;   // updated by navigateSection()
@@ -883,13 +883,14 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns)};\n`;
   
   /*---------------------------------------------------------------
- * HISTORY STACK – must exist in the final HTML before functions
+ * HISTORY STACK – must exist in the final HTML before functions
  *--------------------------------------------------------------*/
 /*---------------------------------------------------------------
- * HISTORY STACK – must exist in the final HTML before functions
+ * HISTORY STACK – must exist in the final HTML before functions
  *--------------------------------------------------------------*/
 formHTML += `var sectionStack = [];\n`;      // pushes as you LEAVE a section
 formHTML += `var currentSectionNumber = 1;\n`;  // updated by navigateSection()
+formHTML += `var pdfFileName = "${escapedPdfFormName}";\n`;  // Store the PDF name for later use
 
 
 
@@ -1110,7 +1111,7 @@ function handleNext(currentSection){
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
 
-    /* remember the place we’re leaving */
+    /* remember the place we're leaving */
     sectionStack.push(currentSection);
 
     let nextSection = currentSection + 1;
@@ -1137,9 +1138,9 @@ function handleNext(currentSection){
         }
     }
 
-    /* ---------- special “end” shortcut ---------- */
+    /* ---------- special "end" shortcut ---------- */
     if (nextSection === 'end'){
-        editAndDownloadPDF('form').then(()=>navigateSection('end'));
+        editAndDownloadPDF(pdfFileName).then(()=>navigateSection('end'));
         return;
     }
 
@@ -1244,7 +1245,7 @@ function handleConditionalAlerts(){
 
 /*──── main submit handler ────*/
 function showThankYouMessage () {
-    editAndDownloadPDF('form').then(() => {
+    editAndDownloadPDF(pdfFileName).then(() => {
         document.getElementById('customForm').style.display = 'none';
         document.getElementById('thankYouMessage').style.display = 'block';
     });
