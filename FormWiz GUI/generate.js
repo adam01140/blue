@@ -264,7 +264,7 @@ logicScriptBuffer = "";
     '        <form id="customForm" onsubmit="return showThankYouMessage();">',
   ].join("\n");
 
-  // Possibly read user's PDF name from an element on the page:
+  // Get all PDF names
   const pdfFormNameInputEl = document.getElementById("formPDFName");
   const pdfFormName = pdfFormNameInputEl
     ? pdfFormNameInputEl.value.trim()
@@ -273,6 +273,22 @@ logicScriptBuffer = "";
     .replace(/\\/g, "\\\\")
     .replace(/'/g, "\\'")
     .replace(/"/g, '\\"');
+    
+  // Get additional PDF names
+  const additionalPdfNames = [];
+  const additionalPdfInputs = document.querySelectorAll('[id^="additionalPdfName_"]');
+  additionalPdfInputs.forEach(input => {
+    if (input.value.trim()) {
+      additionalPdfNames.push(input.value.trim());
+    }
+  });
+  
+  // Escape additional PDF names
+  const escapedAdditionalPdfNames = additionalPdfNames.map(name => 
+    name.replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"')
+  );
 
   // Build each Section & its questions
   for (let s = 1; s < sectionCounter; s++) {
@@ -890,7 +906,9 @@ function buildCheckboxName (questionId, rawNameId, labelText){
  *--------------------------------------------------------------*/
 formHTML += `var sectionStack = [];\n`;      // pushes as you LEAVE a section
 formHTML += `var currentSectionNumber = 1;\n`;  // updated by navigateSection()
-formHTML += `var pdfFileName = "${escapedPdfFormName}";\n`;  // Store the PDF name for later use
+formHTML += `var pdfFileName = "${escapedPdfFormName}";\n`;  // Main PDF name
+formHTML += `var additionalPdfFileNames = ${JSON.stringify(escapedAdditionalPdfNames)};\n`;  // Additional PDF names
+formHTML += `var allPdfFileNames = ["${escapedPdfFormName}", ${escapedAdditionalPdfNames.map(name => `"${name}"`).join(", ")}];\n`;  // All PDF names in an array
 
 
 
@@ -1140,7 +1158,7 @@ function handleNext(currentSection){
 
     /* ---------- special "end" shortcut ---------- */
     if (nextSection === 'end'){
-        editAndDownloadPDF(pdfFileName).then(()=>navigateSection('end'));
+        processAllPdfs().then(()=>navigateSection('end'));
         return;
     }
 
@@ -1245,19 +1263,31 @@ function handleConditionalAlerts(){
 
 /*──── main submit handler ────*/
 function showThankYouMessage () {
-    editAndDownloadPDF(pdfFileName).then(() => {
+    processAllPdfs().then(() => {
         document.getElementById('customForm').style.display = 'none';
         document.getElementById('thankYouMessage').style.display = 'block';
     });
     return false;                       // prevent page reload
 }
+
+/*──── process all PDFs sequentially ────*/
+async function processAllPdfs() {
+    for (const pdfName of allPdfFileNames) {
+        if (pdfName) {
+            await editAndDownloadPDF(pdfName);
+        }
+    }
+}
+
 /*──── build FormData with **everything inside the form** ────*/
 async function editAndDownloadPDF (pdfName) {
+    /* this grabs every control that belongs to <form id="customForm">,
+       including those specified with form="customForm" attributes   */
     const fd = new FormData(document.getElementById('customForm'));
-    
-    // Remove the .pdf extension if it exists, since the server adds it automatically
+
+    // Use the /edit_pdf endpoint with the PDF name as a query parameter
+    // Remove the .pdf extension if present since server adds it automatically
     const baseName = pdfName.replace(/\.pdf$/i, '');
-    
     const res = await fetch('/edit_pdf?pdf=' + encodeURIComponent(baseName), { 
         method: 'POST', 
         body: fd 
@@ -1274,7 +1304,7 @@ async function editAndDownloadPDF (pdfName) {
     a.click();
     document.body.removeChild(a);
 
-    // inline preview
+    // inline preview - only show the last one
     const frame = document.getElementById('pdfFrame');
     frame.src = url;
     frame.style.display = 'block';
