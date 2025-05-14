@@ -30,7 +30,9 @@ const defaultColors = {
 function hideContextMenu() {
   document.getElementById('contextMenu').style.display = 'none';
   document.getElementById('typeSubmenu').style.display = 'none';
+  document.getElementById('calcSubmenu').style.display = 'none';
   document.getElementById('emptySpaceMenu').style.display = 'none';
+  document.getElementById('propertiesMenu').style.display = 'none';
 }
 
 // Determine the type of a node (question, options, etc.)
@@ -605,6 +607,10 @@ function loadFlowchartData(data) {
         if (item._calcThreshold !== undefined) newCell._calcThreshold = item._calcThreshold;
         if (item._calcFinalText !== undefined) newCell._calcFinalText = item._calcFinalText;
         if (item._calcTerms !== undefined) newCell._calcTerms = item._calcTerms;
+        // subtitle
+        if (item._subtitleText !== undefined) newCell._subtitleText = item._subtitleText;
+        // info
+        if (item._infoText !== undefined) newCell._infoText = item._infoText;
 
         graph.addCell(newCell, parent);
         createdCells[item.id] = newCell;
@@ -666,6 +672,20 @@ function loadFlowchartData(data) {
         updateImageOptionCell(cell);
       } else if (isCalculationNode(cell)) {
         updateCalculationNodeCell(cell);
+      } else if (isSubtitleNode(cell)) {
+        // Extract text from HTML value if _subtitleText is not set
+        if (!cell._subtitleText && cell.value) {
+          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+          cell._subtitleText = cleanValue || "Subtitle text";
+        }
+        updateSubtitleNodeCell(cell);
+      } else if (isInfoNode(cell)) {
+        // Extract text from HTML value if _infoText is not set
+        if (!cell._infoText && cell.value) {
+          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+          cell._infoText = cleanValue || "Information text";
+        }
+        updateInfoNodeCell(cell);
       }
     });
   } finally {
@@ -708,6 +728,10 @@ document.addEventListener("DOMContentLoaded", function() {
   const newSectionButton = document.getElementById("newSectionNode");
 
   const typeSubmenu = document.getElementById("typeSubmenu");
+  const calcSubmenu = document.getElementById("calcSubmenu");
+  const calcTypeBtn = document.getElementById("calcType");
+  const subtitleTypeBtn = document.getElementById("subtitleType");
+  const infoTypeBtn = document.getElementById("infoType");
   const dropdownTypeBtn = document.getElementById("dropdownType");
   const checkboxTypeBtn = document.getElementById("checkboxType");
   const textTypeBtn = document.getElementById("textType");
@@ -1032,9 +1056,17 @@ document.addEventListener("DOMContentLoaded", function() {
   // 'Change Type' -> Show submenu
   changeTypeButton.addEventListener("click", () => {
     const rect = contextMenu.getBoundingClientRect();
-    typeSubmenu.style.display = "block";
-    typeSubmenu.style.left = rect.right + "px";
-    typeSubmenu.style.top = rect.top + "px";
+    if (selectedCell && isQuestion(selectedCell)) {
+      typeSubmenu.style.display = "block";
+      typeSubmenu.style.left = rect.right + "px";
+      typeSubmenu.style.top = rect.top + "px";
+      calcSubmenu.style.display = "none";
+    } else if (selectedCell && (isCalculationNode(selectedCell) || isSubtitleNode(selectedCell) || isInfoNode(selectedCell))) {
+      calcSubmenu.style.display = "block";
+      calcSubmenu.style.left = rect.right + "px";
+      calcSubmenu.style.top = rect.top + "px";
+      typeSubmenu.style.display = "none";
+    }
   });
 
   // Submenu question-type events
@@ -1082,6 +1114,60 @@ document.addEventListener("DOMContentLoaded", function() {
     if (selectedCell && isQuestion(selectedCell)) {
       setQuestionType(selectedCell, "bigParagraph");
       selectedCell.value = "Big Paragraph question node";
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  // Calc submenu buttons
+  calcTypeBtn.addEventListener("click", () => {
+    if (selectedCell) {
+      // Convert to calculation node
+      graph.getModel().beginUpdate();
+      try {
+        selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=calculation");
+        selectedCell._calcTitle = "Calculation Title";
+        selectedCell._calcAmountLabel = "";
+        selectedCell._calcOperator = "=";
+        selectedCell._calcThreshold = "0";
+        selectedCell._calcFinalText = "";
+        selectedCell._calcTerms = [{amountLabel: "", mathOperator: ""}];
+        updateCalculationNodeCell(selectedCell);
+      } finally {
+        graph.getModel().endUpdate();
+      }
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  subtitleTypeBtn.addEventListener("click", () => {
+    if (selectedCell) {
+      // Convert to subtitle node
+      graph.getModel().beginUpdate();
+      try {
+        selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=subtitle");
+        selectedCell._subtitleText = "Subtitle text";
+        updateSubtitleNodeCell(selectedCell);
+      } finally {
+        graph.getModel().endUpdate();
+      }
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  infoTypeBtn.addEventListener("click", () => {
+    if (selectedCell) {
+      // Convert to info node
+      graph.getModel().beginUpdate();
+      try {
+        selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=info");
+        selectedCell._infoText = "Information text";
+        updateInfoNodeCell(selectedCell);
+      } finally {
+        graph.getModel().endUpdate();
+      }
       refreshAllCells();
     }
     hideContextMenu();
@@ -1176,6 +1262,10 @@ document.addEventListener("DOMContentLoaded", function() {
       propNodeType.textContent = "options";
     } else if (isCalculationNode(cell)) {
       propNodeType.textContent = "calculation";
+    } else if (isSubtitleNode(cell)) {
+      propNodeType.textContent = "subtitle";
+    } else if (isInfoNode(cell)) {
+      propNodeType.textContent = "info";
     } else {
       propNodeType.textContent = "other";
     }
@@ -1244,6 +1334,12 @@ document.addEventListener("DOMContentLoaded", function() {
         // This is the "title" for the calculation node
         selectedCell._calcTitle = newText.trim();
         updateCalculationNodeCell(selectedCell);
+      } else if (isSubtitleNode(selectedCell)) {
+        selectedCell._subtitleText = newText.trim();
+        updateSubtitleNodeCell(selectedCell);
+      } else if (isInfoNode(selectedCell)) {
+        selectedCell._infoText = newText.trim();
+        updateInfoNodeCell(selectedCell);
       }
     } finally {
       graph.getModel().endUpdate();
@@ -1429,6 +1525,16 @@ document.addEventListener("DOMContentLoaded", function() {
     hideContextMenu();
   });
   
+  document.getElementById('placeSubtitleNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('subtitle');
+    hideContextMenu();
+  });
+  
+  document.getElementById('placeInfoNode').addEventListener('click', function() {
+    placeNodeAtClickLocation('info');
+    hideContextMenu();
+  });
+  
   document.getElementById('placeImageNode').addEventListener('click', function() {
     placeNodeAtClickLocation('imageOption');
     hideContextMenu();
@@ -1464,6 +1570,12 @@ document.addEventListener("DOMContentLoaded", function() {
       } else if (nodeType === 'calculation') {
         style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=calculation;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;";
         label = "Calculation node";
+      } else if (nodeType === 'subtitle') {
+        style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=subtitle;spacing=12;fontSize=14;fontStyle=italic;";
+        label = "Subtitle text";
+      } else if (nodeType === 'info') {
+        style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=info;spacing=12;fontSize=14;";
+        label = "Information text";
       } else if (nodeType === 'imageOption') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=imageOption;spacing=12;fontSize=16;";
         label = "Image Option";
@@ -1515,6 +1627,12 @@ document.addEventListener("DOMContentLoaded", function() {
         cell._calcThreshold = "0";
         cell._calcFinalText = "";
         updateCalculationNodeCell(cell);
+      } else if (nodeType === 'subtitle') {
+        cell._subtitleText = "Subtitle text";
+        updateSubtitleNodeCell(cell);
+      } else if (nodeType === 'info') {
+        cell._infoText = "Information text";
+        updateInfoNodeCell(cell);
       } else if (nodeType === 'imageOption') {
         cell._image = {
           url: "",
@@ -1971,6 +2089,28 @@ window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
  *******************************************************/
 function isCalculationNode(cell) {
   return cell && cell.style && cell.style.includes("nodeType=calculation");
+}
+
+function isSubtitleNode(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=subtitle");
+}
+
+function isInfoNode(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=info");
+}
+
+function updateSubtitleNodeCell(cell) {
+  if (!cell) return;
+  cell._subtitleText = cell._subtitleText || "Add subtitle text";
+  cell.value = `<span style="font-size: 14px; font-style: italic;">${escapeHtml(cell._subtitleText)}</span>`;
+  colorCell(cell);
+}
+
+function updateInfoNodeCell(cell) {
+  if (!cell) return;
+  cell._infoText = cell._infoText || "Add information text";
+  cell.value = `<span style="font-size: 14px; color: #555;">${escapeHtml(cell._infoText)}</span>`;
+  colorCell(cell);
 }
 
 /**
@@ -2895,6 +3035,10 @@ window.exportGuiJson = function() {
   const questionCellMap = new Map(); // Maps questionId to cell
   const questionIdMap = new Map(); // Maps cell.id to questionId
   
+  // Additional maps to track subtitle and info nodes
+  const subtitleMap = new Map(); // Maps target question id to subtitle cell
+  const infoBoxMap = new Map(); // Maps target question id to infoBox cell
+  
   for (const cellId in cells) {
     const cell = cells[cellId];
     if (!cell.isVertex() || cell.isEdge() || cell.id === "0" || cell.id === "1") continue;
@@ -2948,6 +3092,15 @@ window.exportGuiJson = function() {
           prevAnswer: "",
           text: ""
         },
+        // Initialize subtitle and infoBox properties
+        subtitle: {
+          enabled: false,
+          text: ""
+        },
+        infoBox: {
+          enabled: false,
+          text: ""
+        },
         options: [],
         labels: [],
         nameId: nodeId,
@@ -2977,6 +3130,72 @@ window.exportGuiJson = function() {
       }
       
       section.questions.push(question);
+    } else if (isSubtitleNode(cell)) {
+      // Track subtitle nodes for later association
+      const outEdges = graph.getOutgoingEdges(cell) || [];
+      const inEdges = graph.getIncomingEdges(cell) || [];
+      
+      // Process both incoming and outgoing edges to find connected question nodes
+      const allEdges = [...outEdges, ...inEdges];
+      for (const edge of allEdges) {
+        let questionCell;
+        
+        // Check if this edge connects to a question
+        if (edge.source === cell && isQuestion(edge.target)) {
+          questionCell = edge.target;
+        } else if (edge.target === cell && isQuestion(edge.source)) {
+          questionCell = edge.source;
+        }
+        
+        if (questionCell) {
+          const questionId = questionCell._questionId || questionIdMap.get(questionCell.id);
+          if (questionId) {
+            // Clean up HTML tags if text is coming from value
+            const subtitleText = cell._subtitleText || (
+              typeof cell.value === 'string' ? 
+              cell.value.replace(/<\/?[^>]+(>|$)/g, "") : ""
+            ).trim();
+            
+            subtitleMap.set(questionId, {
+              enabled: true,
+              text: subtitleText
+            });
+          }
+        }
+      }
+    } else if (isInfoNode(cell)) {
+      // Track info nodes for later association
+      const outEdges = graph.getOutgoingEdges(cell) || [];
+      const inEdges = graph.getIncomingEdges(cell) || [];
+      
+      // Process both incoming and outgoing edges to find connected question nodes
+      const allEdges = [...outEdges, ...inEdges];
+      for (const edge of allEdges) {
+        let questionCell;
+        
+        // Check if this edge connects to a question
+        if (edge.source === cell && isQuestion(edge.target)) {
+          questionCell = edge.target;
+        } else if (edge.target === cell && isQuestion(edge.source)) {
+          questionCell = edge.source;
+        }
+        
+        if (questionCell) {
+          const questionId = questionCell._questionId || questionIdMap.get(questionCell.id);
+          if (questionId) {
+            // Clean up HTML tags if text is coming from value
+            const infoText = cell._infoText || (
+              typeof cell.value === 'string' ? 
+              cell.value.replace(/<\/?[^>]+(>|$)/g, "") : ""
+            ).trim();
+            
+            infoBoxMap.set(questionId, {
+              enabled: true,
+              text: infoText
+            });
+          }
+        }
+      }
     }
   }
 
@@ -3028,6 +3247,17 @@ window.exportGuiJson = function() {
       // Use the _nameId property if available instead of nodeId
       if (cell._nameId) {
         question.nameId = cell._nameId;
+      }
+      
+      // Apply subtitle and infoBox text if they exist
+      if (subtitleMap.has(question.questionId)) {
+        question.subtitle = subtitleMap.get(question.questionId);
+        console.log(`Applied subtitle to question ${question.questionId}: "${question.subtitle.text}"`);
+      }
+      
+      if (infoBoxMap.has(question.questionId)) {
+        question.infoBox = infoBoxMap.get(question.questionId);
+        console.log(`Applied infoBox to question ${question.questionId}: "${question.infoBox.text}"`);
       }
       
       // Set to track added options to prevent duplicates
@@ -3145,15 +3375,18 @@ window.exportGuiJson = function() {
           }
         }
         
-        // Check for options that connect to END nodes
-        let optionsWithJumpToEnd = [];
-                
-        // For numbered dropdown/dropdown/checkbox question types, check if the outgoing edges lead to END nodes
-        if (questionType === "numberedDropdown" || questionType === "dropdown" || questionType === "checkbox") {
+              // This section is replaced by the more comprehensive subtitle and infoBox handling
+      // that's now done during the first pass and applied earlier in this function
+
+      // Check for options that connect to END nodes
+      let optionsWithJumpToEnd = [];
+              
+      // For numbered dropdown/dropdown/checkbox question types, check if the outgoing edges lead to END nodes
+      if (questionType === "numberedDropdown" || questionType === "dropdown" || questionType === "checkbox") {
           console.log(`Checking if question ${question.questionId} (${question.text}) has options leading to END`);
-          const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+          const optionsOutgoingEdges = graph.getOutgoingEdges(cell) || [];
           
-          for (const edge of outgoingEdges) {
+          for (const edge of optionsOutgoingEdges) {
             const targetCell = edge.target;
             
             // If it's an option node, check where it leads
@@ -5121,7 +5354,8 @@ window.exportGuiJson = function() {
     sectionCounter: sectionCounter,
     questionCounter: questionCounter,
     hiddenFieldCounter: hiddenFieldCounter,
-    defaultPDFName: ""
+    defaultPDFName: "",
+    additionalPDFs: []
   };
   
   // For debugging, display full information about connections
@@ -5191,6 +5425,16 @@ function saveFlowchart() {
       cellData._calcThreshold = cell._calcThreshold || "0";
       cellData._calcFinalText = cell._calcFinalText || "";
       cellData._calcTerms = cell._calcTerms || [{amountLabel: cell._calcAmountLabel || "", mathOperator: ""}];
+    }
+    
+    // If it's a subtitle node
+    if (isSubtitleNode(cell)) {
+      cellData._subtitleText = cell._subtitleText || "";
+    }
+    
+    // If it's an info node
+    if (isInfoNode(cell)) {
+      cellData._infoText = cell._infoText || "";
     }
 
     data.cells.push(cellData);
