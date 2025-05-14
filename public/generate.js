@@ -5,7 +5,99 @@
  *   and a single <script> block for logic
  *********************************************/
 
+/* global map: questionId  →  canonical slug */
+const questionSlugMap = {};
+
+/* global maps and arrays for form data */
+const questionNameIds = {};
+const questionTypesMap = {};
+const conditionalPDFs = [];
+const conditionalAlerts = [];
+const jumpLogics = [];
+const labelMap = {};
+const amountMap = {}; // used for numberedDropdown with amounts
+const linkedDropdowns = []; // For storing linked dropdown pairs
+
+
+/*------------------------------------------------------------------
+ * HISTORY STACK for accurate “Back” navigation
+ *-----------------------------------------------------------------*/
+let sectionStack = [];          // push every section you LEAVE
+let currentSectionNumber = 1;   // updated by navigateSection()
+
+
+
+// We also create a buffer to store our conditional-logic code
+// so we can insert it later in one <script> block.
+let logicScriptBuffer = "";
+
+/*───────────────────────────────*
+ * canonical sanitiser – visible
+ * to all build-time code
+ *───────────────────────────────*/
+
+
+
+
+
+
+
+
+
+/******************************************************************
+ * helpers that the generator itself uses ( NOT inside formHTML! )
+ ******************************************************************/
+
+/* canonical sanitiser (unchanged) */
+function sanitizeQuestionText (str){
+    return String(str).toLowerCase()
+                      .replace(/\W+/g, "_")
+                      .replace(/^_+|_+$/g, "");
+}
+
+/* slug‑aware prefix for any checkbox belonging to a question */
+function getCbPrefix (qId){
+    if (questionSlugMap[qId]) return questionSlugMap[qId] + '_';   // e.g. do_you_have_any_of_these_
+    if (questionNameIds[qId]) return questionNameIds[qId] + '_';
+    return 'answer' + qId + '_';
+}
+
+/* build the final <input>.id / name for a checkbox option */
+function buildCheckboxName (questionId, rawNameId, labelText){
+    const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
+
+    // if the designer left the name blank, derive it from the label
+    let namePart = (rawNameId || '').trim();
+    if (!namePart){
+        namePart = labelText.replace(/\W+/g, '_').toLowerCase();
+    }
+
+    // ensure we have our prefix exactly once
+    if (!namePart.startsWith(slugPrefix)){
+        namePart = slugPrefix + namePart;
+    }
+    return namePart;
+}
+
+
+
+
 function getFormHTML() {
+	
+	// RESET all globals before building
+Object.keys(questionSlugMap).forEach(key => delete questionSlugMap[key]);
+Object.keys(questionNameIds).forEach(key => delete questionNameIds[key]);
+Object.keys(questionTypesMap).forEach(key => delete questionTypesMap[key]);
+conditionalPDFs.length = 0;
+conditionalAlerts.length = 0;
+jumpLogics.length = 0;
+linkedDropdowns.length = 0;
+labelMap.length = 0;
+amountMap.length = 0;
+logicScriptBuffer = "";
+
+
+
   // Top HTML (head, body, header, etc.)
   let formHTML = [
     "<!DOCTYPE html>",
@@ -35,7 +127,97 @@ function getFormHTML() {
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
     "",
-
+    '<script>',
+    
+    '/*──────── mirror a dropdown → textbox and checkbox ────────*/',
+    'function dropdownMirror(selectEl, baseName){',
+    '    const wrap = document.getElementById("dropdowntext_"+baseName);',
+    '    if(!wrap) return;',
+    '',
+    '    const val = selectEl.value.trim();',
+    '    if(!val) {',
+    '        wrap.innerHTML = "";',
+    '        return;',
+    '    }',
+    '',
+    '    const textId = baseName + "_dropdown";',
+    '    const textField = document.getElementById(textId);',
+    '    ',
+    '    if(textField) {',
+    '        textField.value = val;',
+    '        textField.style.display = "none";',
+    '    }',
+    '',
+    '    const existingCheckboxes = wrap.querySelectorAll("div");',
+    '    existingCheckboxes.forEach(div => div.remove());',
+    '',
+    '    const idSuffix = val.replace(/\\W+/g, "_").toLowerCase();',
+    '    const checkboxId = baseName + "_" + idSuffix;',
+    '    ',
+    '    const checkboxDiv = document.createElement("div");',
+    '    checkboxDiv.style.display = "none";',
+    '    checkboxDiv.innerHTML = "<input type=\'checkbox\' id=\'" + checkboxId + "\' name=\'" + checkboxId + "\' checked>" +',
+    '                     "<label for=\'" + checkboxId + "\'> " + baseName + "_" + idSuffix + "</label>";',
+    '    ',
+    '    wrap.appendChild(checkboxDiv);',
+    '    handleLinkedDropdowns(baseName, val);',
+    '}',
+    '',
+    // Add a flag to prevent recursive calls
+    'let isHandlingLink = false;',
+    '',
+    '// Handle linked dropdown logic',
+    'function handleLinkedDropdowns(sourceName, selectedValue) {',
+    '    if (!linkedDropdowns || linkedDropdowns.length === 0 || isHandlingLink) return;',
+    '    ',
+    '    try {',
+    '        isHandlingLink = true;  // Set flag before handling links',
+    '        linkedDropdowns.forEach(linkPair => {',
+    '            if (linkPair.sourceNameId === sourceName) {',
+    '                const targetDropdown = document.getElementById(linkPair.targetNameId);',
+    '                if (targetDropdown && targetDropdown.value !== selectedValue) {  // Only if value is different',
+    '                    let optionExists = false;',
+    '                    for (let i = 0; i < targetDropdown.options.length; i++) {',
+    '                        if (targetDropdown.options[i].value === selectedValue) {',
+    '                            optionExists = true;',
+    '                            targetDropdown.value = selectedValue;',
+    '                            // Trigger change event only if value actually changed',
+    '                            const event = new Event("change");',
+    '                            targetDropdown.dispatchEvent(event);',
+    '                            break;',
+    '                        }',
+    '                    }',
+    '                    if (!optionExists && selectedValue) {',
+    '                        console.warn("Option \'" + selectedValue + "\' does not exist in linked dropdown " + linkPair.targetNameId);',
+    '                    }',
+    '                }',
+    '            }',
+    '            else if (linkPair.targetNameId === sourceName) {',
+    '                const sourceDropdown = document.getElementById(linkPair.sourceNameId);',
+    '                if (sourceDropdown && sourceDropdown.value !== selectedValue) {  // Only if value is different',
+    '                    let optionExists = false;',
+    '                    for (let i = 0; i < sourceDropdown.options.length; i++) {',
+    '                        if (sourceDropdown.options[i].value === selectedValue) {',
+    '                            optionExists = true;',
+    '                            sourceDropdown.value = selectedValue;',
+    '                            // Trigger change event only if value actually changed',
+    '                            const event = new Event("change");',
+    '                            sourceDropdown.dispatchEvent(event);',
+    '                            break;',
+    '                        }',
+    '                    }',
+    '                    if (!optionExists && selectedValue) {',
+    '                        console.warn("Option \'" + selectedValue + "\' does not exist in linked dropdown " + linkPair.sourceNameId);',
+    '                    }',
+    '                }',
+    '            }',
+    '        });',
+    '    } finally {',
+    '        isHandlingLink = false;  // Always reset flag when done',
+    '    }',
+    '}',
+    '</script>',
+    "",
     '<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: none;">',
     '    <h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50;">Your Information</h3>',
     '    <div style="display: flex; gap: 15px; margin-bottom: 15px;">',
@@ -82,19 +264,6 @@ function getFormHTML() {
     '        <form id="customForm" onsubmit="return showThankYouMessage();">',
   ].join("\n");
 
-  // These will hold the data we need for logic and hidden fields:
-  const questionNameIds = {};
-  const questionTypesMap = {};
-  const conditionalPDFs = [];
-  const conditionalAlerts = [];
-  const jumpLogics = [];
-  const labelMap = {};
-  const amountMap = {}; // used for numberedDropdown with amounts
-
-  // We also create a buffer to store our conditional-logic code
-  // so we can insert it later in one <script> block.
-  let logicScriptBuffer = "";
-
   // Possibly read user's PDF name from an element on the page:
   const pdfFormNameInputEl = document.getElementById("formPDFName");
   const pdfFormName = pdfFormNameInputEl
@@ -117,7 +286,7 @@ function getFormHTML() {
     formHTML += `<div id="section${s}" class="section${
       s === 1 ? " active" : ""
     }">`;
-    formHTML += `<h2>${sectionName}</h2>`;
+    formHTML += `<h1 class="section-title">${sectionName}</h1>`;
 
     // Grab all questions in this section
     const questionsInSection = sectionBlock.querySelectorAll(".question-block");
@@ -127,6 +296,13 @@ function getFormHTML() {
 
       const questionTextEl = qBlock.querySelector("#question" + questionId);
       const questionText = questionTextEl ? questionTextEl.value : "";
+	  // ----------  ADD THIS  ----------
+const slug = sanitizeQuestionText(questionText);
+questionSlugMap[questionId] = slug;
+// --------------------------------
+
+
+
 
       const questionTypeEl = qBlock.querySelector("#questionType" + questionId);
       const questionType = questionTypeEl ? questionTypeEl.value : "text";
@@ -255,6 +431,29 @@ function getFormHTML() {
           ddNameEl && ddNameEl.value ? ddNameEl.value : "answer" + questionId;
         questionNameIds[questionId] = ddNm;
 
+        // Check if linking logic is enabled
+        const linkingEnabledEl = qBlock.querySelector("#enableLinking" + questionId);
+        const linkingEnabled = linkingEnabledEl && linkingEnabledEl.checked;
+        if (linkingEnabled) {
+          const linkingTargetEl = qBlock.querySelector("#linkingTarget" + questionId);
+          const linkingTargetId = linkingTargetEl ? linkingTargetEl.value : "";
+		  
+		  
+		  const targetQuestionBlock = document.getElementById("questionBlock" + linkingTargetId);
+const targetNameInput = targetQuestionBlock?.querySelector("#textboxName" + linkingTargetId);
+const actualTargetNameId = targetNameInput?.value || "answer" + linkingTargetId;
+
+
+          if (linkingTargetId) {
+            linkedDropdowns.push({
+  sourceId: questionId,
+  sourceNameId: ddNm,
+  targetId: linkingTargetId,
+  targetNameId: actualTargetNameId
+});
+          }
+        }
+
         // 1) Possibly grab user-entered image data
         const imgUrlEl = qBlock.querySelector("#dropdownImageURL" + questionId);
         const imgWidthEl = qBlock.querySelector(
@@ -276,11 +475,8 @@ function getFormHTML() {
         }
 
         // 2) The <select> itself
-       
-formHTML += `<select id="${ddNm}" name="${ddNm}"
-                    onchange="dropdownMirror(this, '${ddNm}')">`;
-
-
+        formHTML += `<select id="${ddNm}" name="${ddNm}"
+                      onchange="dropdownMirror(this, '${ddNm}')">
                        <option value="" disabled selected>Select an option</option>`;
         const ddOps = qBlock.querySelectorAll(
           `#dropdownOptions${questionId} input`
@@ -291,9 +487,10 @@ formHTML += `<select id="${ddNm}" name="${ddNm}"
             formHTML += `<option value="${val}">${val}</option>`;
           }
         }
-         formHTML += `</select><br>
-              <div id="dropdowntext_${ddNm}"></div>`;
-
+        formHTML += `</select><br>
+              <div id="dropdowntext_${ddNm}"></div>
+              <input type="text" id="${ddNm}_dropdown" name="${ddNm}_dropdown"
+                   readonly style="display:none;">`;
         // handle PDF logic
         if (pdfEnabled) {
           conditionalPDFs.push({
@@ -305,112 +502,90 @@ formHTML += `<select id="${ddNm}" name="${ddNm}"
           });
         }
       } else if (questionType === "checkbox") {
-        const cOptsDivs = qBlock.querySelectorAll(
-          `#checkboxOptions${questionId} > div`
-        );
-        const cboxOptions = [];
-        // Make sure to add this checkbox question to questionNameIds
-        questionNameIds[questionId] = "answer" + questionId;
-        formHTML += `<div><center><div id="checkmark">`;
-        for (let co = 0; co < cOptsDivs.length; co++) {
-          const optDiv = cOptsDivs[co];
-          const txtEl = optDiv.querySelector(
-            `#checkboxOptionText${questionId}_${co + 1}`
-          );
-          const nameEl = optDiv.querySelector(
-            `#checkboxOptionName${questionId}_${co + 1}`
-          );
-          const valEl = optDiv.querySelector(
-            `#checkboxOptionValue${questionId}_${co + 1}`
-          );
-          const hasAmountEl = optDiv.querySelector(
-            `#checkboxOptionHasAmount${questionId}_${co + 1}`
-          );
-          const amountNameEl = optDiv.querySelector(
-            `#checkboxOptionAmountName${questionId}_${co + 1}`
-          );
-          const amountPhEl = optDiv.querySelector(
-            `#checkboxOptionAmountPlaceholder${questionId}_${co + 1}`
-          );
+       /* ---------- CHECKBOX QUESTION ---------- */
+const cOptsDivs = qBlock.querySelectorAll(`#checkboxOptions${questionId} > div`);
+const cboxOptions = [];
 
-          const labelText =
-            txtEl && txtEl.value.trim()
-              ? txtEl.value.trim()
-              : "Option " + (co + 1);
-          let rawNameId =
-            nameEl && nameEl.value.trim() ? nameEl.value.trim() : "";
-          let rawVal =
-            valEl && valEl.value.trim() ? valEl.value.trim() : labelText;
+/* Use the slug as the base prefix (and store it for helpers) */
+const qSlug = questionSlugMap[questionId] || ('answer' + questionId);
+questionNameIds[questionId] = qSlug;      // so helpers know the base
 
-          const hasAmount = hasAmountEl && hasAmountEl.checked;
-          const amountName =
-            amountNameEl && amountNameEl.value.trim()
-              ? amountNameEl.value.trim()
-              : "";
-          const amountPlaceholder =
-            amountPhEl && amountPhEl.value.trim()
-              ? amountPhEl.value.trim()
-              : "Amount";
+formHTML += `<div><center><div id="checkmark" class="checkbox-group-${questionId}">`;
 
-          const forcedPrefix = "answer" + questionId + "_";
-          if (!rawNameId) {
-            const sanitized = labelText.replace(/\W+/g, "_").toLowerCase();
-            rawNameId = forcedPrefix + sanitized;
-          } else if (!rawNameId.startsWith(forcedPrefix)) {
-            rawNameId = forcedPrefix + rawNameId;
-          }
-          cboxOptions.push({
-            labelText: labelText,
-            optionNameId: rawNameId,
-            optionValue: rawVal,
-            hasAmount: hasAmount,
-            amountName: amountName,
-            amountPlaceholder: amountPlaceholder,
-          });
+/* ── render each checkbox option ───────────────────────────── */
+for (let co = 0; co < cOptsDivs.length; co++){
+    const optDiv        = cOptsDivs[co];
+    const txtEl         = optDiv.querySelector(`#checkboxOptionText${questionId}_${co+1}`);
+    const nameEl        = optDiv.querySelector(`#checkboxOptionName${questionId}_${co+1}`);
+    const valEl         = optDiv.querySelector(`#checkboxOptionValue${questionId}_${co+1}`);
+    const hasAmountEl   = optDiv.querySelector(`#checkboxOptionHasAmount${questionId}_${co+1}`);
+    const amountNameEl  = optDiv.querySelector(`#checkboxOptionAmountName${questionId}_${co+1}`);
+    const amountPhEl    = optDiv.querySelector(`#checkboxOptionAmountPlaceholder${questionId}_${co+1}`);
 
-          formHTML += `
-            <span class="checkbox-inline">
-              <label class="checkbox-label">
-                <input type="checkbox" id="${rawNameId}" name="${rawNameId}" value="${rawVal}"
-                       ${
-                         hasAmount
-                           ? `onchange="toggleAmountField('${rawNameId}_amount', this.checked)"`
-                           : ""
-                       }>
-                ${labelText}
-              </label>
-            </span>`;
+    const labelText         = txtEl?.value.trim() || ('Option ' + (co+1));
+    const optionNameIdRaw   = nameEl?.value.trim() || '';
+    const optionNameId      = buildCheckboxName(questionId, optionNameIdRaw, labelText);
 
-          // If this checkbox has an associated "amount" input
-          if (hasAmount) {
-            formHTML += `
-              <input type="number" id="${rawNameId}_amount" name="${
-              amountName || rawNameId + "_amount"
-            }"
-                     placeholder="${amountPlaceholder}"
-                     style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">`;
-          }
-        }
-        const noneEl = qBlock.querySelector(`#noneOfTheAbove${questionId}`);
-        if (noneEl && noneEl.checked) {
-          const noneStr = "None of the above";
-          const forcedPrefix2 = "answer" + questionId + "_";
-          const sant = noneStr.replace(/\W+/g, "_").toLowerCase();
-          const notNameId = forcedPrefix2 + sant;
-          cboxOptions.push({
-            labelText: noneStr,
-            optionNameId: notNameId,
-            optionValue: noneStr,
-          });
-          formHTML += `
-            <span class="checkbox-inline">
-              <label class="checkbox-label">
-                <input type="checkbox" id="${notNameId}" name="${notNameId}" value="${noneStr}">
-                ${noneStr}
-              </label>
-            </span>`;
-        }
-        formHTML += `</div><br></div>`;
+    const optionValue       = valEl?.value.trim() || labelText;
+    const hasAmount         = hasAmountEl?.checked;
+    const amountName        = amountNameEl?.value.trim() || '';
+    const amountPlaceholder = amountPhEl?.value.trim() || 'Amount';
+
+    cboxOptions.push({
+        labelText,
+        optionNameId,
+        optionValue,
+        hasAmount,
+        amountName,
+        amountPlaceholder
+    });
+
+    /* actual input */
+    formHTML += `
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="${optionNameId}" name="${optionNameId}" value="${optionValue}" 
+                 ${hasAmount ? `onchange="toggleAmountField('${optionNameId}_amount', this.checked); toggleNoneOption(this, ${questionId});"` : 
+                               `onchange="toggleNoneOption(this, ${questionId});"`}>
+          ${labelText}
+        </label>
+      </span>`;
+
+    /* optional amount field */
+    if (hasAmount){
+        formHTML += `
+          <input type="number" id="${optionNameId}_amount"
+                 name="${amountName || optionNameId + '_amount'}"
+                 placeholder="${amountPlaceholder}"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">`;
+    }
+}
+
+/* ── optional "None of the above" ─────────────────────────── */
+const noneEl = qBlock.querySelector(`#noneOfTheAbove${questionId}`);
+if (noneEl?.checked){
+    const noneStr      = 'None of the above';
+    // Ensure we use the designated pattern for the "none" option
+    const noneNameId   = `${qSlug}_none`;
+
+    cboxOptions.push({
+        labelText: noneStr,
+        optionNameId: noneNameId,
+        optionValue: noneStr
+    });
+
+    formHTML += `
+      <span class="checkbox-inline">
+        <label class="checkbox-label">
+          <input type="checkbox" id="${noneNameId}" name="${noneNameId}" value="${noneStr}" 
+                 onchange="handleNoneOfTheAboveToggle(this, ${questionId});">
+          ${noneStr}
+        </label>
+      </span>`;
+}
+
+formHTML += `</div><br></div>`;
+
 
         // If conditional PDF was enabled
         if (pdfEnabled) {
@@ -522,7 +697,9 @@ formHTML += `<select id="${ddNm}" name="${ddNm}"
             logicScriptBuffer += `    var cPrevAns="${paVal}";\n`;
             logicScriptBuffer += `    var cPrevQNum="${pqVal}";\n`;
             logicScriptBuffer += `    if(cPrevType==="checkbox"){\n`;
-            logicScriptBuffer += `      var cbPrefix = (questionNameIds[cPrevQNum] && questionNameIds[cPrevQNum].startsWith("answer")) ? questionNameIds[cPrevQNum]+"_" : "answer"+cPrevQNum+"_";\n`;
+            logicScriptBuffer += `      var cbPrefix = getCbPrefix(cPrevQNum);\n`;
+			
+
             logicScriptBuffer += `      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');\n`;
             logicScriptBuffer += `      var checkedVals=[];\n`;
             logicScriptBuffer += `      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}\n`;
@@ -558,7 +735,7 @@ formHTML += `<select id="${ddNm}" name="${ddNm}"
               logicScriptBuffer += ` (function(){\n`;
               // Use explicit question ID value rather than relying on variable scope
               logicScriptBuffer += `   var checkQuestion = "${pqVal2}";\n`;
-              logicScriptBuffer += `   var cbs=document.querySelectorAll('input[id^="answer'+checkQuestion+'_"]');\n`;
+              logicScriptBuffer += `   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');\n`;
               logicScriptBuffer += `   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}\n`;
               logicScriptBuffer += ` })();\n`;
             } else if (pType2 === "dropdown" || pType2 === "radio" || pType2 === "numberedDropdown") {
@@ -590,11 +767,11 @@ formHTML += `<select id="${ddNm}" name="${ddNm}"
 
     // Section nav
     formHTML += '<br><br><div class="navigation-buttons">';
-    if (s > 1) {
-      formHTML += `<button type="button" onclick="navigateSection(${
-        s - 1
-      })">Back</button>`;
-    }
+if (s > 1){
+    /* OLD:  <button type="button" onclick="navigateSection('+ (s-1) +')">Back</button> */
+    formHTML += '<button type="button" onclick="goBack()">Back</button>';
+}
+
     if (s === sectionCounter - 1) {
       formHTML += `<button type="submit">Submit</button>`;
     } else {
@@ -623,6 +800,34 @@ formHTML += `<select id="${ddNm}" name="${ddNm}"
 
   // Now we place ONE <script> block for everything:
   formHTML += "\n<script>\n";
+  
+ formHTML += `
+/*───────────────────────────────*
+ * return the true checkbox prefix
+ *───────────────────────────────*/
+function getCbPrefix (qId){
+    if (questionSlugMap[qId]) return questionSlugMap[qId] + '_';
+    if (questionNameIds[qId]) return questionNameIds[qId] + '_';
+    return 'answer' + qId + '_';
+}
+
+/*───────────────────────────────*
+ * buildCheckboxName(questionId, rawNameId, labelText)
+ *───────────────────────────────*/
+function buildCheckboxName (questionId, rawNameId, labelText){
+    const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
+    let namePart = (rawNameId || '').trim();
+    if (!namePart){
+        namePart = labelText.replace(/\\W+/g, '_').toLowerCase();
+    }
+    if (!namePart.startsWith(slugPrefix)){
+        namePart = slugPrefix + namePart;
+    }
+    return namePart;
+}
+`;
+
+
 
   // 1) Firebase config and check
   formHTML += `
@@ -668,12 +873,28 @@ formHTML += `<select id="${ddNm}" name="${ddNm}"
   `;
 
   // 2) Our global objects
+  formHTML += `var questionSlugMap       = ${JSON.stringify(questionSlugMap)};\n`;
   formHTML += `var questionNameIds = ${JSON.stringify(questionNameIds)};\n`;
   formHTML += `var jumpLogics = ${JSON.stringify(jumpLogics)};\n`;
   formHTML += `var conditionalPDFs = ${JSON.stringify(conditionalPDFs)};\n`;
   formHTML += `var conditionalAlerts = ${JSON.stringify(conditionalAlerts)};\n`;
   formHTML += `var labelMap = ${JSON.stringify(labelMap)};\n`;
   formHTML += `var amountMap = ${JSON.stringify(amountMap)};\n`;
+  formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns)};\n`;
+  
+  /*---------------------------------------------------------------
+ * HISTORY STACK – must exist in the final HTML before functions
+ *--------------------------------------------------------------*/
+/*---------------------------------------------------------------
+ * HISTORY STACK – must exist in the final HTML before functions
+ *--------------------------------------------------------------*/
+formHTML += `var sectionStack = [];\n`;      // pushes as you LEAVE a section
+formHTML += `var currentSectionNumber = 1;\n`;  // updated by navigateSection()
+
+
+
+
+
   formHTML += `var hiddenCheckboxCalculations = ${JSON.stringify(
     genHidden.hiddenCheckboxCalculations || []
   )};\n`;
@@ -686,6 +907,16 @@ formHTML += `<select id="${ddNm}" name="${ddNm}"
 
   // 4) The rest of the main JS code
   formHTML += `
+  
+  
+  function sanitizeQuestionText (str){
+    return String(str)
+       .toLowerCase()
+        .replace(/\\W+/g, "_")   // ← double "\\" so the HTML gets "\\W"
+        .replace(/^_+|_+$/g, "");
+}
+
+
 function toggleAmountField(amountFieldId, show) {
     const amountField = document.getElementById(amountFieldId);
     if (amountField) {
@@ -694,135 +925,299 @@ function toggleAmountField(amountFieldId, show) {
     }
 }
 
-function showTextboxLabels(questionId, count){
-    var container = document.getElementById("labelContainer" + questionId);
-    if(!container) return;
-    container.innerHTML = "";
-    container.innerHTML += "<br>";
-    var theseLabels = labelMap[questionId] || [];
-    var theseAmounts = amountMap[questionId] || [];
+/*──────────────────────────────────────────────────────────────*
+ * Handle "None of the above" checkbox functionality
+ *──────────────────────────────────────────────────────────────*/
+function toggleNoneOption(checkbox, questionId) {
+    if (!checkbox.checked) return;
 
-    for (var j=1; j <= count; j++) {
-        // Labels
-        for (var L=0; L < theseLabels.length; L++) {
-            var labelTxt = theseLabels[L] || "Label";
-            var sanitizedLabel = labelTxt.replace(/\\s+/g,"_").toLowerCase();
-            // Add j to ID
-            var labelId = "label" + questionId + "_" + j + "_" + sanitizedLabel;
-            container.innerHTML += '<input type="text" id="' + labelId + '" ' +
-                'name="' + labelId + '" ' +
-                'placeholder="' + labelTxt + ' ' + j + '" ' +
-                'style="text-align:center;"><br>';
+    // Find the "None of the above" checkbox using more robust selectors
+    const cbPrefix = getCbPrefix(questionId);
+    const noneCheckbox = document.querySelector('input[id="' + cbPrefix + 'none"]') || 
+                         document.querySelector('input[id^="' + cbPrefix + '"][id$="_none"]');
+                         
+    if (noneCheckbox && noneCheckbox.checked) {
+        // Uncheck the "None of the above" option when any other option is checked
+        noneCheckbox.checked = false;
+    }
+}
+
+function handleNoneOfTheAboveToggle(noneCheckbox, questionId) {
+    if (!noneCheckbox.checked) return;
+    
+    // When "None of the above" is checked, uncheck all other options
+    const container = document.querySelector('.checkbox-group-' + questionId);
+    if (!container) return;
+    
+    const allCheckboxes = container.querySelectorAll('input[type="checkbox"]');
+    allCheckboxes.forEach(checkbox => {
+        // Skip the "None" checkbox itself
+        const isNoneCheckbox = checkbox.id.endsWith('_none') || checkbox.id.endsWith('none');
+        if (checkbox !== noneCheckbox && !isNoneCheckbox) {
+            checkbox.checked = false;
+            
+            // If this checkbox has an amount field, hide it
+            const amountId = checkbox.id + '_amount';
+            toggleAmountField(amountId, false);
         }
+    });
+}
 
-        // Amounts 
-        for (var A=0; A < theseAmounts.length; A++) {
-            var amtTxt = theseAmounts[A] || "Amount";
-            var sanitizedAmt = amtTxt.replace(/\\s+/g,"_").toLowerCase();
-            // Add j to ID
-            var amtId = "amount" + questionId + "_" + j + "_" + sanitizedAmt;
-            container.innerHTML += '<input type="number" id="' + amtId + '" ' +
-                'name="' + amtId + '" ' +
-                'placeholder="' + amtTxt + ' ' + j + '" ' +
-                'style="text-align:center;"><br>';
+
+function showTextboxLabels(questionId, count){
+    const container = document.getElementById("labelContainer" + questionId);
+    if(!container) return;
+
+    container.innerHTML = "<br>";
+    const theseLabels   = labelMap[questionId]   || [];
+    const theseAmounts  = amountMap[questionId]  || [];
+
+    /* get and sanitise the question's visible text exactly once */
+    const questionH3   = document
+        .getElementById("question-container-" + questionId)
+        ?.querySelector("h3")?.textContent || ("answer" + questionId);
+    const qSafe = sanitizeQuestionText(questionH3);
+
+    for(let j = 1; j <= count; j++){
+        /* label inputs */
+        for(const lbl of theseLabels){
+            const id = qSafe + "_" + j + "_" + sanitizeQuestionText(lbl);
+            container.innerHTML +=
+              '<input type="text" id="' + id + '" name="' + id + '" placeholder="' + lbl + ' ' + j + '" style="text-align:center;"><br>';
+        }
+        /* amount inputs */
+        for(const amt of theseAmounts){
+            const id = qSafe + "_" + j + "_" + sanitizeQuestionText(amt);
+            container.innerHTML +=
+              '<input type="number" id="' + id + '" name="' + id + '" placeholder="' + amt + ' ' + j + '" style="text-align:center;"><br>';
         }
         container.innerHTML += "<br>";
     }
-    attachCalculationListeners(); // in case those new fields also matter
+    attachCalculationListeners();   // keep this
 }
 
-function handleNext(currentSection){
-    // run hidden calculations first, so if we jump, they remain up-to-date
-    runAllHiddenCheckboxCalculations();
-    runAllHiddenTextCalculations();
 
-    var nextSection = currentSection + 1;
-    var relevantJumps = [];
-    for(var i=0; i<jumpLogics.length; i++){
-        if(jumpLogics[i].section === currentSection){
-            relevantJumps.push(jumpLogics[i]);
-        }
-    }
-    for(var j=0; j<relevantJumps.length; j++){
-        var jl = relevantJumps[j];
-        var qId = jl.questionId;
-        var qType = jl.questionType;
-        var jOpt = jl.jumpOption;
-        var jTo  = jl.jumpTo;
-        var nmId = questionNameIds[qId] || ("answer"+qId);
-
-        if(qType==="radio" || qType==="dropdown" || qType==="numberedDropdown"){
-            var el= document.getElementById(nmId);
-            if(el && el.value.trim().toLowerCase() === jOpt.trim().toLowerCase()){
-                nextSection = jTo.toLowerCase();
-                break;
-            }
-        } else if(qType==="checkbox"){
-            var cbs= document.querySelectorAll('input[id^="answer'+qId+'_"]');
-            if(cbs && cbs.length){
-                var chosen=[];
-                for(var c=0;c<cbs.length;c++){
-                    if(cbs[c].checked){
-                        chosen.push(cbs[c].value.trim().toLowerCase());
+// Handle linked dropdown logic
+function handleLinkedDropdowns(sourceName, selectedValue) {
+    if (!linkedDropdowns || linkedDropdowns.length === 0 || isHandlingLink) return;
+    
+    try {
+        isHandlingLink = true;  // Set flag before handling links
+        
+        linkedDropdowns.forEach(linkPair => {
+            if (linkPair.sourceNameId === sourceName) {
+                const targetDropdown = document.getElementById(linkPair.targetNameId);
+                if (targetDropdown && targetDropdown.value !== selectedValue) {  // Only if value is different
+                    let optionExists = false;
+                    for (let i = 0; i < targetDropdown.options.length; i++) {
+                        if (targetDropdown.options[i].value === selectedValue) {
+                            optionExists = true;
+                            targetDropdown.value = selectedValue;
+                            // Trigger change event only if value actually changed
+                            const event = new Event('change');
+                            targetDropdown.dispatchEvent(event);
+                            break;
+                        }
+                    }
+                    
+                    if (!optionExists && selectedValue) {
+                        console.warn("Option '" + selectedValue + "' does not exist in linked dropdown " + linkPair.targetNameId);
                     }
                 }
-                if(chosen.indexOf(jOpt.trim().toLowerCase())!==-1){
-                    nextSection = jTo.toLowerCase();
-                    break;
+            }
+            else if (linkPair.targetNameId === sourceName) {
+                const sourceDropdown = document.getElementById(linkPair.sourceNameId);
+                if (sourceDropdown && sourceDropdown.value !== selectedValue) {  // Only if value is different
+                    let optionExists = false;
+                    for (let i = 0; i < sourceDropdown.options.length; i++) {
+                        if (sourceDropdown.options[i].value === selectedValue) {
+                            optionExists = true;
+                            sourceDropdown.value = selectedValue;
+                            // Trigger change event only if value actually changed
+                            const event = new Event('change');
+                            sourceDropdown.dispatchEvent(event);
+                            break;
+                        }
+                    }
+                    
+                    if (!optionExists && selectedValue) {
+                        console.warn("Option '" + selectedValue + "' does not exist in linked dropdown " + linkPair.sourceNameId);
+                    }
                 }
+            }
+        });
+    } finally {
+        isHandlingLink = false;  // Always reset flag when done
+    }
+}
+
+/*──────── mirror a dropdown → textbox and checkbox ────────*/
+function dropdownMirror(selectEl, baseName){
+    const wrap = document.getElementById("dropdowntext_"+baseName);
+    if(!wrap) return;
+
+    const val = selectEl.value.trim();
+    if(!val) {
+        wrap.innerHTML = "";
+        return;
+    }
+
+    const textId = baseName + "_dropdown";
+    const textField = document.getElementById(textId);
+    
+    if(textField) {
+        textField.value = val;
+        textField.style.display = "none";
+    }
+
+    const existingCheckboxes = wrap.querySelectorAll("div");
+    existingCheckboxes.forEach(div => div.remove());
+
+    const idSuffix = val.replace(/\\W+/g, "_").toLowerCase();
+    const checkboxId = baseName + "_" + idSuffix;
+    
+    const checkboxDiv = document.createElement("div");
+    checkboxDiv.style.display = "none";
+    checkboxDiv.innerHTML = "<input type='checkbox' id='" + checkboxId + "' name='" + checkboxId + "' checked>" +
+                     "<label for='" + checkboxId + "'> " + baseName + "_" + idSuffix + "</label>";
+    
+    wrap.appendChild(checkboxDiv);
+    handleLinkedDropdowns(baseName, val);
+}
+
+function getQuestionInputs (questionId, type = null) {
+  /* 1️⃣ First look inside the question container, if it exists */
+  const container = document.getElementById('question-container-' + questionId);
+  if (container) {
+    return container.querySelectorAll(
+      type ? 'input[type="' + type + '"]' : 'input, select, textarea'
+    );
+  }
+
+  /* 2️⃣ Fallback to the old prefix‑style that your generator sometimes uses */
+  const prefix = 'input[id^="' + getCbPrefix(questionId) + '"]';
+
+  return document.querySelectorAll(
+    type ? prefix + '[type="' + type + '"]' : prefix + ', select[id^="answer' + questionId + '"]'
+  );
+}
+
+/*------------------------------------------------------------------
+ *  handleNext(currentSection)
+ *  – pushes the section you are leaving and works out where to go
+ *-----------------------------------------------------------------*/
+function handleNext(currentSection){
+    runAllHiddenCheckboxCalculations();
+    runAllHiddenTextCalculations();
+
+    /* remember the place we’re leaving */
+    sectionStack.push(currentSection);
+
+    let nextSection = currentSection + 1;
+
+    /* ---------- evaluate jump rules ---------- */
+    const relevantJumps = jumpLogics.filter(jl => jl.section === currentSection);
+    for (const jl of relevantJumps){
+        const nmId = questionNameIds[jl.questionId] || ('answer'+jl.questionId);
+
+        if (['radio','dropdown','numberedDropdown'].includes(jl.questionType)){
+            const el = document.getElementById(nmId);
+            if (el && el.value.trim().toLowerCase() === jl.jumpOption.trim().toLowerCase()){
+                nextSection = jl.jumpTo.toLowerCase();
+                break;
+            }
+        } else if (jl.questionType === 'checkbox'){
+            const cbs = getQuestionInputs(jl.questionId, 'checkbox');
+            const chosen = Array.from(cbs).filter(cb=>cb.checked)
+                                .map(cb=>cb.value.trim().toLowerCase());
+            if (chosen.includes(jl.jumpOption.trim().toLowerCase())){
+                nextSection = jl.jumpTo.toLowerCase();
+                break;
             }
         }
     }
 
-    // Handle 'end' as a special string
-    if(nextSection === 'end') {
-        navigateSection('end');
-    } else {
-        nextSection = parseInt(nextSection, 10);
-        if(isNaN(nextSection)) nextSection = currentSection + 1;
-        navigateSection(nextSection);
+    /* ---------- special “end” shortcut ---------- */
+    if (nextSection === 'end'){
+        editAndDownloadPDF('form').then(()=>navigateSection('end'));
+        return;
     }
-    
-    // re-run if needed
+
+    nextSection = parseInt(nextSection,10);
+    if (isNaN(nextSection)) nextSection = currentSection + 1;
+    navigateSection(nextSection);
+
+    /* recalc hidden fields after navigation */
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
 }
 
+
+/*------------------------------------------------------------------
+ *  navigateSection(sectionNumber)
+ *  – shows exactly one section (or Thank‑you) and records history
+ *-----------------------------------------------------------------*/
+
+
+
 function navigateSection(sectionNumber){
-    var sections= document.querySelectorAll(".section");
-    var form = document.getElementById("customForm");
-    var thankYou = document.getElementById("thankYouMessage");
+    const sections  = document.querySelectorAll('.section');
+    const form      = document.getElementById('customForm');
+    const thankYou  = document.getElementById('thankYouMessage');
 
-    // Hide all sections and thank you message initially
-    sections.forEach(s => s.classList.remove("active"));
-    thankYou.style.display = "none";
-    form.style.display = "block";
+    /* hide everything first */
+    sections.forEach(sec => sec.classList.remove('active'));
+    thankYou.style.display = 'none';
+    form.style.display     = 'block';
 
-    if(sectionNumber === 'end') {
-        // means skip directly to Thank You
-        form.style.display = "none";
-        thankYou.style.display = "block";
-    } else if(sectionNumber >= sections.length){
-        // if user typed something bigger than total sections
-        sections[sections.length-1].classList.add("active");
-    } else {
-        var target= document.getElementById("section"+sectionNumber);
-        if(target){
-            target.classList.add("active");
-        } else {
-            sections[sections.length-1].classList.add("active");
-        }
+    if (sectionNumber === 'end'){
+        form.style.display   = 'none';
+        thankYou.style.display = 'block';
+        currentSectionNumber = 'end';
+        return;
+    }
+
+    /* ── corrected bounds check ────────────────────────────── */
+    const maxSection = sections.length;   // 1‑based section numbers
+    if (sectionNumber < 1)           sectionNumber = 1;
+    if (sectionNumber > maxSection)  sectionNumber = maxSection;
+
+    /* show the requested section */
+    const target = document.getElementById('section' + sectionNumber);
+    (target || sections[maxSection - 1]).classList.add('active');
+
+    currentSectionNumber = sectionNumber;
+}
+
+
+
+/*------------------------------------------------------------------
+ *  goBack()
+ *  – pops the history stack; falls back to numeric −1 if empty
+ *-----------------------------------------------------------------*/
+function goBack(){
+    if (sectionStack.length > 0){
+        const prev = sectionStack.pop();
+        navigateSection(prev);
+    }else if (typeof currentSectionNumber === 'number' && currentSectionNumber > 1){
+        navigateSection(currentSectionNumber - 1);
     }
 }
 
-function setCurrentDate(){
-    var today = new Date();
-    var dd= String(today.getDate()).padStart(2,"0");
-    var mm= String(today.getMonth()+1).padStart(2,"0");
-    var yyyy= today.getFullYear();
-    var val= yyyy+"-"+mm+"-"+dd;
-    document.getElementById("current_date").value= val;
+
+/*──────────────── helpers ───────────────*/
+function setCurrentDate () {
+    const t = new Date();
+    document.getElementById('current_date').value =
+        t.getFullYear() + '-' +
+        String(t.getMonth() + 1).padStart(2, '0') + '-' +
+        String(t.getDate()).padStart(2, '0');
 }
+
+
+
+
+
 window.onload=function(){
     setCurrentDate();
     attachCalculationListeners();
@@ -847,73 +1242,40 @@ function handleConditionalAlerts(){
     }
 }
 
-function showThankYouMessage(){
-    // Copy user's name to hidden field before submitting
-    document.getElementById('user_firstname_hidden').value = document.getElementById('user_firstname').value;
-    document.getElementById('user_lastname_hidden').value = document.getElementById('user_lastname').value;
-    document.getElementById('user_email_hidden').value = document.getElementById('user_email').value;
-    document.getElementById('user_phone_hidden').value = document.getElementById('user_phone').value;
-    document.getElementById('user_street_hidden').value = document.getElementById('user_street').value;
-    document.getElementById('user_city_hidden').value = document.getElementById('user_city').value;
-    document.getElementById('user_state_hidden').value = document.getElementById('user_state').value;
-    document.getElementById('user_zip_hidden').value = document.getElementById('user_zip').value;
-    
-    // run final hidden calculations
-    runAllHiddenCheckboxCalculations();
-    runAllHiddenTextCalculations();
-
-    // PDF name
-    var pdfName = "${escapedPdfFormName}".replace(".pdf","");
-    editAndDownloadPDF(pdfName).then(function(){
-        // handle conditional PDFs
-        for(var i=0; i<conditionalPDFs.length; i++){
-            var pdfObj= conditionalPDFs[i];
-            if(pdfObj.questionType==="checkbox"){
-                var cbox= document.getElementById(pdfObj.questionNameId);
-                if(cbox && cbox.checked && cbox.value=== pdfObj.conditionalAnswer){
-                    editAndDownloadPDF(pdfObj.pdfName.replace(".pdf",""));
-                }
-            } else {
-                var valEl= document.getElementById(pdfObj.questionNameId);
-                var val2= valEl ? valEl.value : "";
-                if(val2 === pdfObj.conditionalAnswer){
-                    editAndDownloadPDF(pdfObj.pdfName.replace(".pdf",""));
-                }
-            }
-        }
-        handleConditionalAlerts();
-        document.getElementById("customForm").style.display="none";
-        document.getElementById("thankYouMessage").style.display="block";
+/*──── main submit handler ────*/
+function showThankYouMessage () {
+    editAndDownloadPDF('form').then(() => {
+        document.getElementById('customForm').style.display = 'none';
+        document.getElementById('thankYouMessage').style.display = 'block';
     });
-    return false;
+    return false;                       // prevent page reload
+}
+/*──── build FormData with **everything inside the form** ────*/
+async function editAndDownloadPDF (pdfName) {
+    /* this grabs every control that belongs to <form id="customForm">,
+       including those specified with form="customForm" attributes   */
+    const fd = new FormData(document.getElementById('customForm'));
+
+    const res  = await fetch('/edit_pdf?pdf=' + pdfName, { method: 'POST', body: fd });
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+
+    // trigger download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Edited_' + pdfName + '.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    // inline preview
+    const frame = document.getElementById('pdfFrame');
+    frame.src = url;
+    frame.style.display = 'block';
+    //for showing the pdf preview
+    document.getElementById('pdfPreview').style.display = 'none';
 }
 
-function downloadPDF(url, filename){
-    var link= document.createElement("a");
-    link.href= url;
-    link.download= filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-async function editAndDownloadPDF(pdfName){
-    var formData= new FormData();
-    var inputs= document.querySelectorAll("#questions input, #questions select, #questions textarea");
-    for(var i=0; i<inputs.length; i++){
-        var inp= inputs[i];
-        if(inp.type==="checkbox"){
-            formData.append(inp.name, inp.checked?"Yes":"No");
-        } else {
-            formData.append(inp.name, inp.value);
-        }
-    }
-    return fetch("/edit_pdf?pdf="+pdfName, {method:"POST", body:formData})
-        .then(function(res){ return res.blob(); })
-        .then(function(blob){
-            var url= URL.createObjectURL(blob);
-            downloadPDF(url, "Edited_"+pdfName+".pdf");
-        });
-}
 
 /***********************************************
  * Hidden Checkbox Calculations
@@ -988,81 +1350,80 @@ function runAllHiddenTextCalculations(){
  * using the field's own name (or any other field name).
  */
 function runSingleHiddenTextCalculation(calcObj) {
-    var textField = document.getElementById(calcObj.hiddenFieldName);
+    const textField = document.getElementById(calcObj.hiddenFieldName);
     if (!textField) return;
 
-    // We'll assume that the last matched condition takes precedence,
-    // so we keep applying logic in order.
+    // We'll assume that the last matched condition takes precedence
     let finalValue = "";
 
     calcObj.calculations.forEach(function(oneCalc) {
         let val = 0;
+        
+        // Calculate the sum of all terms
         if (oneCalc.terms && oneCalc.terms.length > 0) {
-            val = parseFloat(getMoneyValue(oneCalc.terms[0].questionNameId)) || 0;
+            // Get the first term's value
+            const firstTerm = oneCalc.terms[0];
+            val = parseFloat(getMoneyValue(firstTerm.questionNameId)) || 0;
 
+            // Process remaining terms
             for (let t = 1; t < oneCalc.terms.length; t++) {
                 const term = oneCalc.terms[t];
-                const op = term.operator;
                 const termVal = parseFloat(getMoneyValue(term.questionNameId)) || 0;
 
-                switch(op) {
+                switch(term.operator) {
                     case '+': val += termVal; break;
                     case '-': val -= termVal; break;
                     case 'x': val *= termVal; break;
-                    case '/': val = (termVal !== 0) ? val / termVal : 0; break;
+                    case '/': val = termVal !== 0 ? val / termVal : 0; break;
                 }
             }
         }
 
         // Compare to threshold
-        const thr = parseFloat(oneCalc.threshold) || 0;
+        const threshold = parseFloat(oneCalc.threshold) || 0;
         let matched = false;
+
         switch(oneCalc.compareOperator) {
-            case '>':  matched = (val > thr);  break;
-            case '<':  matched = (val < thr);  break;
-            case '=':  matched = (val === thr); break;
+            case '>': matched = val > threshold; break;
+            case '<': matched = val < threshold; break;
+            case '=': matched = Math.abs(val - threshold) < 0.000001; break; // Use epsilon for float comparison
         }
 
         if (matched) {
-            // Check if fillValue is in ##fieldname## format - both "##total##" and general pattern
-            if (oneCalc.fillValue === "##total##" || (oneCalc.fillValue && oneCalc.fillValue.match(/^##(.+)##$/))) {
-                finalValue = val.toString();
+            // Handle special fillValue formats
+            if (oneCalc.fillValue === "##total##" || oneCalc.fillValue.match(/^##(.+)##$/)) {
+                finalValue = val.toFixed(2); // Format money values with 2 decimal places
             } else {
                 finalValue = oneCalc.fillValue;
             }
-        } else {
-            // Not matched => clear it out
-            finalValue = "";
         }
     });
 
+    // Update the text field
     textField.value = finalValue;
 }
 
-function replacePlaceholderTokens(str){
-    return str.replace(/\\$\\$(.*?)\\$\\$/g, function(match, expressionInside){
-        return evaluatePlaceholderExpression(expressionInside);
+function replacePlaceholderTokens (str){
+    /* note the doubled back-slashes in the delimiters \$\$ */
+    return str.replace(/\\$\\$(.*?)\\$\\$/g, function (_match, innerExpr){
+        return evaluatePlaceholderExpression(innerExpr);
     });
 }
 
-function evaluatePlaceholderExpression(exprString){
-    var tokens = exprString.split(/(\\+|\\-|x|\\/)/);
-    if(!tokens.length) return '0';
-    var currentVal = parseTokenValue(tokens[0]);
-    var i=1;
-    while(i<tokens.length){
-        var operator = tokens[i].trim();
-        var nextToken = tokens[i+1] || '';
-        var nextVal = parseTokenValue(nextToken);
+function evaluatePlaceholderExpression (exprString){
+    /* split on +  -  x  /   (all kept as separate tokens) */
+    var tokens = exprString.split(/([+\-x\/])/);          // ← every \ is **doubled**
+    if (!tokens.length) return '0';
 
-        if(operator==='+') currentVal += nextVal;
-        else if(operator==='-') currentVal -= nextVal;
-        else if(operator==='x') currentVal *= nextVal;
-        else if(operator==='/'){
-            if(nextVal!==0) currentVal /= nextVal;
-            else currentVal=0;
-        }
-        i+=2;
+    var currentVal = parseTokenValue(tokens[0]);
+    for (var i = 1; i < tokens.length; i += 2){
+        var op   = tokens[i];
+        var next = parseTokenValue(tokens[i + 1] || '0');
+
+        if      (op === '+') currentVal += next;
+        else if (op === '-') currentVal -= next;
+        else if (op === 'x') currentVal *= next;
+        else if (op === '/') currentVal  = next !== 0 ? currentVal / next : 0;
     }
     return currentVal.toString();
 }
@@ -1076,101 +1437,38 @@ function parseTokenValue(token){
     return isNaN(val) ? 0 : val;
 }
 
-/**
- * UPDATED to handle checkbox amount fields properly.
- * Handles both direct references and references where the actual element has "answerX_" prefix.
- */
+/*───────────────────────────────────────────────────────────────*
+ * 3.  getMoneyValue(qId)
+ *     – tiny regex fix so legacy "amountX_Y_Z" can still resolve
+ *       (note the escaped \\d+ instead of stray 'd').
+ *───────────────────────────────────────────────────────────────*/
 function getMoneyValue(qId) {
-    // First try direct element match
+    /* direct hit first */
     const el = document.getElementById(qId);
     if (el) {
-        // If it's a checkbox with an amount field
-        if (el.type === 'checkbox') {
-            // Check if there's a corresponding amount field
-            const amountFieldId = el.id + "_amount";
-            const amountField = document.getElementById(amountFieldId);
-            
-            if (amountField && el.checked) {
-                return parseFloat(amountField.value) || 0;
-            }
-            // No amount field or not checked
+        if (el.type === "checkbox") {
+            const amt = document.getElementById(el.id + "_amount");
+            if (amt && el.checked) return parseFloat(amt.value) || 0;
             return el.checked ? 1 : 0;
         }
-        
-        // Regular input field
         return parseFloat(el.value) || 0;
     }
-    
-    // No direct match - try alternatives:
-    
-    // 1. Check if this is directly an amount field (with "_amount" suffix removed)
-    if (qId.endsWith("_amount")) {
-        const baseId = qId.slice(0, -7); // Remove "_amount"
-        const amountField = document.getElementById(qId);
-        if (amountField) {
-            return parseFloat(amountField.value) || 0;
-        }
+
+    /* legacy builder‑shorthand amountX_Y_Z */
+    if (/^amount\d+_\d+_.+/.test(qId)) {
+        const el2 = document.getElementById(normaliseDesignerFieldRef(qId));
+        if (el2) return parseFloat(el2.value) || 0;
     }
-    
-    // 2. Look for elements with the qId as their name
-    const namedElements = document.getElementsByName(qId);
-    if (namedElements && namedElements.length > 0) {
-        const namedEl = namedElements[0];
-        return parseFloat(namedEl.value) || 0;
-    }
-    
-    // 3. Find prefixed IDs like "answerX_qId"
-    const possiblePrefixedIds = Array.from(document.querySelectorAll('[id*="_' + qId + '"]'));
-    for (let i = 0; i < possiblePrefixedIds.length; i++) {
-        const prefixedEl = possiblePrefixedIds[i];
-        if (prefixedEl.id.endsWith('_' + qId)) {
-            if (prefixedEl.type === 'checkbox') {
-                // If found checkbox, look for its amount field
-                const amountFieldId = prefixedEl.id + "_amount";
-                const amountField = document.getElementById(amountFieldId);
-                
-                if (amountField && prefixedEl.checked) {
-                    return parseFloat(amountField.value) || 0;
-                }
-                return prefixedEl.checked ? 1 : 0;
-            }
-            return parseFloat(prefixedEl.value) || 0;
-        }
-    }
-    
-    // 4. Look for amount field directly by ID + "_amount"
-    const amountFieldId = qId + "_amount";
-    const amountField = document.getElementById(amountFieldId);
-    if (amountField) {
-        // Now we need to check if the associated checkbox is checked
-        // Find checkbox that controls this amount field
-        const checkboxSelector = 'input[type="checkbox"][onchange*="' + amountFieldId + '"]';
-        const checkboxEl = document.querySelector(checkboxSelector);
-        
-        if (checkboxEl && checkboxEl.checked) {
-            return parseFloat(amountField.value) || 0;
-        }
-        return 0; // Checkbox not checked, so amount is 0
-    }
-    
-    // 5. Finally, try to find elements by name pattern
-    const elementsWithAmountName = document.querySelectorAll('input[name="' + qId + '"]');
-    if (elementsWithAmountName.length > 0) {
-        const amountEl = elementsWithAmountName[0];
-        if (amountEl.type === 'number') {
-            // Find associated checkbox through naming convention
-            const checkboxId = amountEl.id.replace('_amount', '');
-            const checkboxEl = document.getElementById(checkboxId);
-            
-            if (checkboxEl && checkboxEl.checked) {
-                return parseFloat(amountEl.value) || 0;
-            }
-        }
-    }
-    
-    // Nothing found
+
+    /* name‑attribute fallback */
+    const byName = document.getElementsByName(qId);
+    if (byName.length) return parseFloat(byName[0].value) || 0;
+
     return 0;
 }
+
+
+
 
 function attachCalculationListeners() {
     // Universal function to attach listeners in a consistent way
@@ -1283,40 +1581,6 @@ function attachCalculationListeners() {
     runAllHiddenTextCalculations();
 }
 
-
-
-
-
-
-
-
-/*──────────────── mirror a dropdown → textbox ───────────────*/
-function dropdownMirror(selectEl, baseName){
-    const wrap = document.getElementById('dropdowntext_'+baseName);
-    if(!wrap) return;
-
-    // erase previous box (if any)
-    wrap.innerHTML = '';
-
-    const val = selectEl.value.trim();
-    if(!val) return;                      // user re‑selected the blank option
-
-    const idSuffix = val.replace(/\W+/g,'_').toLowerCase(); // "Yes" → "yes"
-    const fullId   = baseName + '_' + idSuffix;
-
-    // readonly textbox that carries the chosen text
-    wrap.innerHTML =
-        `<input type="text"
-                id="${fullId}"
-                name="${fullId}"
-                value="${val}"
-                readonly
-                style="margin-top:6px;width:200px;text-align:center;">`;
-}
-
-
-
-
 </script>
 </body>
 </html>
@@ -1327,241 +1591,164 @@ function dropdownMirror(selectEl, baseName){
 }
 
 
-/**
- * generateHiddenPDFFields()
- *  - Reads from #hiddenFieldsContainer
- *  - Builds hidden <input> fields
- *  - Also handles multi-term calculations for both checkboxes & text
- *  - Expands "numberedDropdown" amounts into multiple "amountX_Y_value" references
- *  - Supports ##fieldname## pattern in fillValue to display the calculation result
- */
+
+/*───────────────────────────────────────────────────────────────*
+ * 1.  normaliseDesignerFieldRef(raw)
+ *     – unchanged except for two tiny regex tweaks (see comments)
+ *───────────────────────────────────────────────────────────────*/
+function normaliseDesignerFieldRef(raw) {
+    raw = String(raw || "").trim();
+
+    /* ① already a real element in the live DOM? */
+    if (document.getElementById(raw)) return raw;
+
+    /* ② looks like a finished slug already? */
+    const mSlug = raw.match(/^([a-z0-9]+_[a-z0-9_]+?)_(\d+)_(.+)$/);
+    if (mSlug && !/^amount\d+$/.test(mSlug[1]) && !/^answer\d+$/.test(mSlug[1]))
+        return raw;
+
+    /* ③ builder shorthand (amountX_Y_field  OR  answerX_Y_field) */
+    const mShort =
+        raw.match(/^amount(\d+)_(\d+)_(.+)$/) ||
+        raw.match(/^answer(\d+)_(\d+)_(.+)$/);
+    if (mShort) {
+        const [, qId, idx, field] = mShort;
+        const slug = questionSlugMap[qId] || ("answer" + qId);
+        return `${slug}_${idx}_${sanitizeQuestionText(field)}`;
+    }
+
+    /* ④ catch‑all fallback */
+    const mGeneric = raw.match(/^(.*)_(\d+)_(.+)$/);
+    if (!mGeneric) return sanitizeQuestionText(raw);
+
+    const [, qText, idx, field] = mGeneric;
+    return `${sanitizeQuestionText(qText)}_${idx}_${sanitizeQuestionText(field)}`;
+}
+
+
+
+/*───────────────────────────────────────────────────────────────*
+ * 2.  generateHiddenPDFFields()
+ *     – now funnels every designer reference through
+ *       normaliseDesignerFieldRef() so shorthand is fixed.
+ *───────────────────────────────────────────────────────────────*/
 function generateHiddenPDFFields() {
     let hiddenFieldsHTML = '<div id="hidden_pdf_fields">';
-    
-    // Add hidden fields for user information
+
+    /* profile fields … (unchanged) */
     hiddenFieldsHTML += `
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
-<input type="hidden" id="user_lastname_hidden" name="user_lastname_hidden">
-<input type="hidden" id="user_email_hidden" name="user_email_hidden">
-<input type="hidden" id="user_phone_hidden" name="user_phone_hidden">
-<input type="hidden" id="user_street_hidden" name="user_street_hidden">
-<input type="hidden" id="user_city_hidden" name="user_city_hidden">
-<input type="hidden" id="user_state_hidden" name="user_state_hidden">
-<input type="hidden" id="user_zip_hidden" name="user_zip_hidden">`;
-    
-    const hiddenCheckboxCalculations = [];
-    const hiddenTextCalculations = [];
+<input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
+<input type="hidden" id="user_email_hidden"     name="user_email_hidden">
+<input type="hidden" id="user_phone_hidden"     name="user_phone_hidden">
+<input type="hidden" id="user_street_hidden"    name="user_street_hidden">
+<input type="hidden" id="user_city_hidden"      name="user_city_hidden">
+<input type="hidden" id="user_state_hidden"     name="user_state_hidden">
+<input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">`;
 
-    // Create a map of question text to ID for field name conversions
-    const questionTextToIdMap = {};
-    const questionNameIds = {}; // Also track ID to text mapping
-    
-    // Gather all question texts and IDs
-    const questionBlocks = document.querySelectorAll('.question-block');
-    questionBlocks.forEach(qBlock => {
-        const qId = qBlock.id.replace('questionBlock', '');
-        const txtEl = qBlock.querySelector('#question' + qId);
-        if (txtEl) {
-            const qText = txtEl.value.trim();
-            questionTextToIdMap[qText] = qId;
-            questionNameIds[qId] = qText;
+    const hiddenCheckboxCalculations = [];
+    const hiddenTextCalculations     = [];
+
+    const container = document.getElementById("hiddenFieldsContainer");
+    if (!container)
+        return { hiddenFieldsHTML: hiddenFieldsHTML + "</div>",
+                 hiddenCheckboxCalculations,
+                 hiddenTextCalculations };
+
+    /* ── walk every hidden‑field block ────────────────────────── */
+    container.querySelectorAll(".hidden-field-block").forEach(block => {
+        const hid   = block.id.replace("hiddenFieldBlock", "");
+        const fType = block.querySelector("#hiddenFieldType" + hid)?.value || "text";
+        const fName = block.querySelector("#hiddenFieldName" + hid)?.value.trim();
+        if (!fName) return;
+
+        /* TEXT hidden field ......................................*/
+        if (fType === "text") {
+			
+			//hide fields here
+            hiddenFieldsHTML += `\n<input type="text" id="${fName}" name="${fName}" style="display:block;">`;
+
+            const rows = block.querySelectorAll(`[id^="textCalculationRow${hid}_"]`);
+            if (rows.length) {
+                const calcArr = [];
+
+                rows.forEach(row => {
+                    const oneCalc = { terms: [], compareOperator: "=", threshold: "0", fillValue: "" };
+
+                    /* grab terms */
+                    row.querySelectorAll(".equation-term-text").forEach((termDiv, tIdx) => {
+                        const qSel = termDiv.querySelector('[id^="textTermQuestion"]');
+                        if (!qSel) return;
+
+                        const qId   = qSel.value.trim();
+                        const rawId = questionNameIds[qId] || qId;            // fallback
+                        const isAmt = questionTypesMap[qId] === "checkbox" &&
+                                      termDiv.querySelector('[id^="textTermIsAmount"]')?.checked;
+                        const base  = isAmt ? rawId + "_amount" : rawId;
+
+                        oneCalc.terms.push({
+                            operator: tIdx ? termDiv.querySelector('[id^="textTermOperator"]').value : "",
+                            /* HERE is the important line: */
+                            questionNameId: normaliseDesignerFieldRef(base)
+                        });
+                    });
+
+                    if (oneCalc.terms.length) {
+                        oneCalc.compareOperator = row.querySelector('[id^="textCompareOperator"]').value || "=";
+                        oneCalc.threshold       = row.querySelector('[id^="textThreshold"]').value.trim() || "0";
+                        oneCalc.fillValue       = row.querySelector('[id^="textFillValue"]').value.trim() || "";
+                        calcArr.push(oneCalc);
+                    }
+                });
+
+                if (calcArr.length)
+                    hiddenTextCalculations.push({ hiddenFieldName: fName, calculations: calcArr });
+            }
+        }
+
+        /* CHECKBOX hidden field ..................................*/
+        if (fType === "checkbox") {
+            const checked = block.querySelector("#hiddenFieldChecked" + hid)?.checked;
+            hiddenFieldsHTML += `\n<div style="display:none;"><input type="checkbox" id="${fName}" name="${fName}" ${checked ? "checked" : ""}></div>`;
+
+            const rows = block.querySelectorAll(`[id^="calculationRow${hid}_"]`);
+            if (rows.length) {
+                const calcArr = [];
+
+                rows.forEach(row => {
+                    const oneCalc = { terms: [], compareOperator: "=", threshold: "0", result: "checked" };
+
+                    row.querySelectorAll(".equation-term-cb").forEach((termDiv, tIdx) => {
+                        const qSel = termDiv.querySelector('[id^="calcTermQuestion"]');
+                        if (!qSel) return;
+
+                        const qId   = qSel.value.trim();
+                        const rawId = questionNameIds[qId] || qId;
+                        const isAmt = questionTypesMap[qId] === "checkbox" &&
+                                      termDiv.querySelector('[id^="calcTermIsAmount"]')?.checked;
+                        const base  = isAmt ? rawId + "_amount" : rawId;
+
+                        oneCalc.terms.push({
+                            operator: tIdx ? termDiv.querySelector('[id^="calcTermOperator"]').value : "",
+                            questionNameId: normaliseDesignerFieldRef(base)
+                        });
+                    });
+
+                    if (oneCalc.terms.length) {
+                        oneCalc.compareOperator = row.querySelector('[id^="calcCompareOperator"]').value || "=";
+                        oneCalc.threshold       = row.querySelector('[id^="calcThreshold"]').value.trim() || "0";
+                        oneCalc.result          = row.querySelector('[id^="calcResult"]').value || "checked";
+                        calcArr.push(oneCalc);
+                    }
+                });
+
+                if (calcArr.length)
+                    hiddenCheckboxCalculations.push({ hiddenFieldName: fName, calculations: calcArr });
+            }
         }
     });
 
-    const hiddenFieldsContainer = document.getElementById('hiddenFieldsContainer');
-    if (hiddenFieldsContainer) {
-        const fieldBlocks = hiddenFieldsContainer.querySelectorAll(".hidden-field-block");
-        
-        for (let fb = 0; fb < fieldBlocks.length; fb++) {
-            const block = fieldBlocks[fb];
-            const hid = block.id.replace("hiddenFieldBlock", "");
-            const fTypeEl = document.getElementById("hiddenFieldType" + hid);
-            const fType = fTypeEl ? fTypeEl.value : "text";
-            const fNameEl = document.getElementById("hiddenFieldName" + hid);
-            const fName = fNameEl ? fNameEl.value.trim() : "";
-            
-            if (!fName) continue;
-
-            // ------------------------------
-            // HIDDEN TEXT FIELD
-            // ------------------------------
-            if (fType === "text") {
-                // Add the hidden text field
-                //hide calc fields here
-                hiddenFieldsHTML += '\n<input type="text" id="' + fName + '" name="' + fName + '" placeholder="' + fName + '" style="display:none;">';
-    
-                // Process text calculations from UI
-                const textCalcBlock = block.querySelector("#textCalculationBlock" + hid);
-                if (textCalcBlock) {
-                    const calcRows = textCalcBlock.querySelectorAll('[id^="textCalculationRow' + hid + '_"]');
-                    
-                    if (calcRows.length > 0) {
-                        let calcArr = [];
-                        
-                        for (let c = 0; c < calcRows.length; c++) {
-                            const row = calcRows[c];
-                            const eqContainer = row.querySelector('[id^="textEquationContainer"]');
-                            let termsArr = [];
-                            
-                            if (eqContainer) {
-                                const termDivs = eqContainer.querySelectorAll('.equation-term-text');
-                                
-                                for (let t = 0; t < termDivs.length; t++) {
-                                    const termDiv = termDivs[t];
-                                    const termNumber = t + 1;
-                                    const opSel = termNumber > 1
-                                        ? termDiv.querySelector('[id^="textTermOperator"]')
-                                        : null;
-                                    const qSel = termDiv.querySelector('[id^="textTermQuestion"]');
-
-                                    const operatorVal = opSel ? opSel.value : "";
-                                    let questionNameIdVal = qSel ? qSel.value.trim() : "";
-                                    
-                                    if (questionNameIdVal) {
-                                        // Convert from text-based references to ID-based references
-                                        const textMatch = questionNameIdVal.match(/^(.+?)_(\d+)_(.+)$/);
-                                        if (textMatch) {
-                                            const questionText = textMatch[1];
-                                            const numValue = textMatch[2];
-                                            const fieldValue = textMatch[3];
-                                            
-                                            // If we can map this question text to an ID, do so
-                                            if (questionTextToIdMap[questionText]) {
-                                                questionNameIdVal = 'amount' + questionTextToIdMap[questionText] + '_' + numValue + '_' + fieldValue;
-                                            }
-                                        }
-                                        
-                                        termsArr.push({
-                                            operator: termNumber === 1 ? "" : operatorVal,
-                                            questionNameId: questionNameIdVal
-                                        });
-                                    }
-                                }
-                            }
-
-                            const cmpOp = row.querySelector('[id^="textCompareOperator"]');
-                            const thrEl = row.querySelector('[id^="textThreshold"]');
-                            const fillEl = row.querySelector('[id^="textFillValue"]');
-
-                            const cmpVal = cmpOp ? cmpOp.value : "=";
-                            const thrVal = thrEl ? thrEl.value.trim() : "0";
-                            const fillVal = fillEl ? fillEl.value.trim() : "";
-
-                            if (termsArr.length > 0) {
-                                calcArr.push({
-                                    terms: termsArr,
-                                    compareOperator: cmpVal,
-                                    threshold: thrVal,
-                                    fillValue: fillVal
-                                });
-                            }
-                        }
-
-                        if (calcArr.length > 0) {
-                            hiddenTextCalculations.push({
-                                hiddenFieldName: fName,
-                                calculations: calcArr
-                            });
-                        }
-                    }
-                }
-            } 
-            
-            // ------------------------------
-            // HIDDEN CHECKBOX FIELD
-            // ------------------------------
-            else if (fType === "checkbox") {
-                // Hidden checkbox field
-                const chkEl = document.getElementById("hiddenFieldChecked" + hid);
-                const isCheckedDefault = chkEl && chkEl.checked;
-                hiddenFieldsHTML += '\n<div style="display:none;">' + 
-                    '\n<input type="checkbox" id="' + fName + '" name="' + fName + '" ' + (isCheckedDefault ? "checked" : "") + '>' +
-                    '\n</div>';
-
-                // Process checkbox calculations from UI
-                const calcBlock = block.querySelector("#calculationBlock" + hid);
-                if (calcBlock) {
-                    const calcRows = calcBlock.querySelectorAll('[id^="calculationRow' + hid + '_"]');
-                    
-                    if (calcRows.length > 0) {
-                        let calcArr = [];
-                        
-                        for (let cr = 0; cr < calcRows.length; cr++) {
-                            const row = calcRows[cr];
-                            const eqContainer = row.querySelector('[id^="equationContainer"]');
-                            let termsArr = [];
-                            
-                            if (eqContainer) {
-                                const termDivs = eqContainer.querySelectorAll('.equation-term-cb');
-                                
-                                for (let t = 0; t < termDivs.length; t++) {
-                                    const termDiv = termDivs[t];
-                                    const termNumber = t + 1;
-                                    const opSel = termNumber > 1
-                                        ? termDiv.querySelector('[id^="calcTermOperator"]')
-                                        : null;
-                                    const qSel = termDiv.querySelector('[id^="calcTermQuestion"]');
-
-                                    const operatorVal = opSel ? opSel.value : "";
-                                    let questionNameIdVal = qSel ? qSel.value.trim() : "";
-                                    
-                                    if (questionNameIdVal) {
-                                        // Convert from text-based references to ID-based references
-                                        const textMatch = questionNameIdVal.match(/^(.+?)_(\d+)_(.+)$/);
-                                        if (textMatch) {
-                                            const questionText = textMatch[1];
-                                            const numValue = textMatch[2];
-                                            const fieldValue = textMatch[3];
-                                            
-                                            // If we can map this question text to an ID, do so
-                                            if (questionTextToIdMap[questionText]) {
-                                                questionNameIdVal = 'amount' + questionTextToIdMap[questionText] + '_' + numValue + '_' + fieldValue;
-                                            }
-                                        }
-                                        
-                                        termsArr.push({
-                                            operator: termNumber === 1 ? "" : operatorVal,
-                                            questionNameId: questionNameIdVal
-                                        });
-                                    }
-                                }
-                            }
-
-                            const cmpOp = row.querySelector('[id^="calcCompareOperator"]');
-                            const thrEl = row.querySelector('[id^="calcThreshold"]');
-                            const resEl = row.querySelector('[id^="calcResult"]');
-
-                            const cmpVal = cmpOp ? cmpOp.value : "=";
-                            const thrVal = thrEl ? thrEl.value.trim() : "0";
-                            const resVal = resEl ? resEl.value : "checked";
-
-                            if (termsArr.length > 0) {
-                                calcArr.push({
-                                    terms: termsArr,
-                                    compareOperator: cmpVal,
-                                    threshold: thrVal,
-                                    result: resVal
-                                });
-                            }
-                        }
-
-                        if (calcArr.length > 0) {
-                            hiddenCheckboxCalculations.push({
-                                hiddenFieldName: fName,
-                                calculations: calcArr
-                            });
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     hiddenFieldsHTML += "\n</div>";
-
-    return {
-        hiddenFieldsHTML,
-        hiddenCheckboxCalculations,
-        hiddenTextCalculations,
-    };
+    return { hiddenFieldsHTML, hiddenCheckboxCalculations, hiddenTextCalculations };
 }
+
