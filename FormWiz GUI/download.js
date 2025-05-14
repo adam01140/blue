@@ -181,6 +181,21 @@ function loadFormData(formData) {
                     toggleOptions(question.questionId);
                 }
 
+                // -- Restore subtitle if present --
+                if (question.subtitle && question.subtitle.enabled) {
+                    const subtitleCheckbox = questionBlock.querySelector(`#enableSubtitle${question.questionId}`);
+                    const subtitleTextInput = questionBlock.querySelector(`#subtitleText${question.questionId}`);
+                    
+                    if (subtitleCheckbox) {
+                        subtitleCheckbox.checked = true;
+                        toggleSubtitle(question.questionId);
+                        
+                        if (subtitleTextInput && question.subtitle.text) {
+                            subtitleTextInput.value = question.subtitle.text;
+                        }
+                    }
+                }
+
                 // -----------------------------
                 // Question-type-specific rebuild
                 // -----------------------------
@@ -671,6 +686,10 @@ function exportForm() {
                     prevQuestion: alertPrevQ,
                     prevAnswer: alertPrevA,
                     text: alertText
+                },
+                subtitle: {
+                    enabled: questionBlock.querySelector(`#enableSubtitle${questionId}`)?.checked || false,
+                    text: questionBlock.querySelector(`#subtitleText${questionId}`)?.value || ""
                 },
                 options: [],
                 labels: []

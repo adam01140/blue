@@ -392,6 +392,15 @@ questionSlugMap[questionId] = slug;
       }>`;
       formHTML += `<label><h3>${questionText}</h3></label>`;
 
+      // Add subtitle if enabled
+      const subtitleEnabled = qBlock.querySelector(`#enableSubtitle${questionId}`)?.checked || false;
+      if (subtitleEnabled) {
+        const subtitleText = qBlock.querySelector(`#subtitleText${questionId}`)?.value || "";
+        if (subtitleText) {
+          formHTML += `<p class="question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">${subtitleText}</p>`;
+        }
+      }
+
       // Render the question by type
       if (questionType === "text") {
         const nmEl = qBlock.querySelector("#textboxName" + questionId);
