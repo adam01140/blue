@@ -18,6 +18,15 @@ const labelMap = {};
 const amountMap = {}; // used for numberedDropdown with amounts
 const linkedDropdowns = []; // For storing linked dropdown pairs
 
+
+/*------------------------------------------------------------------
+ * HISTORY STACK for accurate “Back” navigation
+ *-----------------------------------------------------------------*/
+let sectionStack = [];          // push every section you LEAVE
+let currentSectionNumber = 1;   // updated by navigateSection()
+
+
+
 // We also create a buffer to store our conditional-logic code
 // so we can insert it later in one <script> block.
 let logicScriptBuffer = "";
@@ -74,6 +83,21 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 
 
 function getFormHTML() {
+	
+	// RESET all globals before building
+Object.keys(questionSlugMap).forEach(key => delete questionSlugMap[key]);
+Object.keys(questionNameIds).forEach(key => delete questionNameIds[key]);
+Object.keys(questionTypesMap).forEach(key => delete questionTypesMap[key]);
+conditionalPDFs.length = 0;
+conditionalAlerts.length = 0;
+jumpLogics.length = 0;
+linkedDropdowns.length = 0;
+labelMap.length = 0;
+amountMap.length = 0;
+logicScriptBuffer = "";
+
+
+
   // Top HTML (head, body, header, etc.)
   let formHTML = [
     "<!DOCTYPE html>",
@@ -743,11 +767,11 @@ formHTML += `</div><br></div>`;
 
     // Section nav
     formHTML += '<br><br><div class="navigation-buttons">';
-    if (s > 1) {
-      formHTML += `<button type="button" onclick="navigateSection(${
-        s - 1
-      })">Back</button>`;
-    }
+if (s > 1){
+    /* OLD:  <button type="button" onclick="navigateSection('+ (s-1) +')">Back</button> */
+    formHTML += '<button type="button" onclick="goBack()">Back</button>';
+}
+
     if (s === sectionCounter - 1) {
       formHTML += `<button type="submit">Submit</button>`;
     } else {
@@ -857,6 +881,20 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var labelMap = ${JSON.stringify(labelMap)};\n`;
   formHTML += `var amountMap = ${JSON.stringify(amountMap)};\n`;
   formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns)};\n`;
+  
+  /*---------------------------------------------------------------
+ * HISTORY STACK – must exist in the final HTML before functions
+ *--------------------------------------------------------------*/
+/*---------------------------------------------------------------
+ * HISTORY STACK – must exist in the final HTML before functions
+ *--------------------------------------------------------------*/
+formHTML += `var sectionStack = [];\n`;      // pushes as you LEAVE a section
+formHTML += `var currentSectionNumber = 1;\n`;  // updated by navigateSection()
+
+
+
+
+
   formHTML += `var hiddenCheckboxCalculations = ${JSON.stringify(
     genHidden.hiddenCheckboxCalculations || []
   )};\n`;
@@ -1064,79 +1102,108 @@ function getQuestionInputs (questionId, type = null) {
   );
 }
 
-function handleNext(currentSection) {
-  
+/*------------------------------------------------------------------
+ *  handleNext(currentSection)
+ *  – pushes the section you are leaving and works out where to go
+ *-----------------------------------------------------------------*/
+function handleNext(currentSection){
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
+
+    /* remember the place we’re leaving */
+    sectionStack.push(currentSection);
 
     let nextSection = currentSection + 1;
 
-    // ── evaluate jump rules ──
+    /* ---------- evaluate jump rules ---------- */
     const relevantJumps = jumpLogics.filter(jl => jl.section === currentSection);
-    for (const jl of relevantJumps) {
-        const nmId = questionNameIds[jl.questionId] || ('answer' + jl.questionId);
+    for (const jl of relevantJumps){
+        const nmId = questionNameIds[jl.questionId] || ('answer'+jl.questionId);
 
-        if (jl.questionType === 'radio' || jl.questionType === 'dropdown' || jl.questionType === 'numberedDropdown') {
+        if (['radio','dropdown','numberedDropdown'].includes(jl.questionType)){
             const el = document.getElementById(nmId);
-            if (el && el.value.trim().toLowerCase() === jl.jumpOption.trim().toLowerCase()) {
+            if (el && el.value.trim().toLowerCase() === jl.jumpOption.trim().toLowerCase()){
                 nextSection = jl.jumpTo.toLowerCase();
                 break;
             }
-        } else if (jl.questionType === 'checkbox') {
+        } else if (jl.questionType === 'checkbox'){
             const cbs = getQuestionInputs(jl.questionId, 'checkbox');
-            const chosen = Array.from(cbs).filter(cb => cb.checked).map(cb => cb.value.trim().toLowerCase());
-            if (chosen.includes(jl.jumpOption.trim().toLowerCase())) {
+            const chosen = Array.from(cbs).filter(cb=>cb.checked)
+                                .map(cb=>cb.value.trim().toLowerCase());
+            if (chosen.includes(jl.jumpOption.trim().toLowerCase())){
                 nextSection = jl.jumpTo.toLowerCase();
                 break;
             }
         }
     }
 
-    /* ---------- NEW PART ---------- */
-    if (nextSection === 'end') {
-        /* generate the PDF first, then show the Thank‑you screen */
-        editAndDownloadPDF('form').then(() => {
-            navigateSection('end');
-        });
-        return;                 // stop; we've already handled navigation
+    /* ---------- special “end” shortcut ---------- */
+    if (nextSection === 'end'){
+        editAndDownloadPDF('form').then(()=>navigateSection('end'));
+        return;
     }
-    /* ---------- END NEW PART ------ */
 
-    nextSection = parseInt(nextSection, 10);
+    nextSection = parseInt(nextSection,10);
     if (isNaN(nextSection)) nextSection = currentSection + 1;
     navigateSection(nextSection);
 
-    // update any calculated fields again
+    /* recalc hidden fields after navigation */
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
 }
 
+
+/*------------------------------------------------------------------
+ *  navigateSection(sectionNumber)
+ *  – shows exactly one section (or Thank‑you) and records history
+ *-----------------------------------------------------------------*/
+
+
+
 function navigateSection(sectionNumber){
-    var sections= document.querySelectorAll(".section");
-    var form = document.getElementById("customForm");
-    var thankYou = document.getElementById("thankYouMessage");
+    const sections  = document.querySelectorAll('.section');
+    const form      = document.getElementById('customForm');
+    const thankYou  = document.getElementById('thankYouMessage');
 
-    // Hide all sections and thank you message initially
-    sections.forEach(s => s.classList.remove("active"));
-    thankYou.style.display = "none";
-    form.style.display = "block";
+    /* hide everything first */
+    sections.forEach(sec => sec.classList.remove('active'));
+    thankYou.style.display = 'none';
+    form.style.display     = 'block';
 
-    if(sectionNumber === 'end') {
-        // means skip directly to Thank You
-        form.style.display = "none";
-        thankYou.style.display = "block";
-    } else if(sectionNumber >= sections.length){
-        // if user typed something bigger than total sections
-        sections[sections.length-1].classList.add("active");
-    } else {
-        var target= document.getElementById("section"+sectionNumber);
-        if(target){
-            target.classList.add("active");
-        } else {
-            sections[sections.length-1].classList.add("active");
-        }
+    if (sectionNumber === 'end'){
+        form.style.display   = 'none';
+        thankYou.style.display = 'block';
+        currentSectionNumber = 'end';
+        return;
+    }
+
+    /* ── corrected bounds check ────────────────────────────── */
+    const maxSection = sections.length;   // 1‑based section numbers
+    if (sectionNumber < 1)           sectionNumber = 1;
+    if (sectionNumber > maxSection)  sectionNumber = maxSection;
+
+    /* show the requested section */
+    const target = document.getElementById('section' + sectionNumber);
+    (target || sections[maxSection - 1]).classList.add('active');
+
+    currentSectionNumber = sectionNumber;
+}
+
+
+
+/*------------------------------------------------------------------
+ *  goBack()
+ *  – pops the history stack; falls back to numeric −1 if empty
+ *-----------------------------------------------------------------*/
+function goBack(){
+    if (sectionStack.length > 0){
+        const prev = sectionStack.pop();
+        navigateSection(prev);
+    }else if (typeof currentSectionNumber === 'number' && currentSectionNumber > 1){
+        navigateSection(currentSectionNumber - 1);
     }
 }
+
 
 /*──────────────── helpers ───────────────*/
 function setCurrentDate () {
