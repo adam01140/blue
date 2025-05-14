@@ -324,6 +324,14 @@ function addQuestion(sectionId, questionId = null) {
             <input type="text" id="subtitleText${currentQuestionId}" placeholder="Enter subtitle text">
         </div><br>
 
+        <!-- Info Box Feature -->
+        <label>Enable Info Box: </label>
+        <input type="checkbox" id="enableInfoBox${currentQuestionId}" onchange="toggleInfoBox(${currentQuestionId})">
+        <div id="infoBoxBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
+            <label>Information Text:</label>
+            <textarea id="infoBoxText${currentQuestionId}" placeholder="Enter information for tooltip/popup" rows="3" style="width: 100%;"></textarea>
+        </div><br>
+
         <!-- Conditional Logic -->
         <label>Enable Conditional Logic: </label>
         <input type="checkbox" id="logic${currentQuestionId}" onchange="toggleLogic(${currentQuestionId})">
@@ -1252,4 +1260,11 @@ function toggleSubtitle(questionId) {
     const subtitleEnabled = document.getElementById(`enableSubtitle${questionId}`).checked;
     const subtitleBlock = document.getElementById(`subtitleBlock${questionId}`);
     subtitleBlock.style.display = subtitleEnabled ? 'block' : 'none';
+}
+
+// New function for Info Box feature
+function toggleInfoBox(questionId) {
+    const infoBoxEnabled = document.getElementById(`enableInfoBox${questionId}`).checked;
+    const infoBoxBlock = document.getElementById(`infoBoxBlock${questionId}`);
+    infoBoxBlock.style.display = infoBoxEnabled ? 'block' : 'none';
 }

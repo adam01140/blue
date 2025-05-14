@@ -249,21 +249,21 @@ function addQuestion(sectionId, questionId = null) {
         </div>
 
         <!-- Numbered Dropdown Options -->
-       <div id="numberedDropdownBlock${currentQuestionId}" class="numbered-dropdown-options" style="display: none;">
-    <label>Number Range: </label>
-    <input type="number" id="numberRangeStart${currentQuestionId}" placeholder="Start" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})">
-    <input type="number" id="numberRangeEnd${currentQuestionId}" placeholder="End" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})"><br><br>
+        <div id="numberedDropdownBlock${currentQuestionId}" class="numbered-dropdown-options" style="display: none;">
+            <label>Number Range: </label>
+            <input type="number" id="numberRangeStart${currentQuestionId}" placeholder="Start" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})">
+            <input type="number" id="numberRangeEnd${currentQuestionId}" placeholder="End" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})"><br><br>
 
-    <label>Textbox Labels:</label>
-    <div id="textboxLabels${currentQuestionId}"></div>
-    <button type="button" onclick="addTextboxLabel(${currentQuestionId})">Add Label</button>
-    
-    <br><br>
-    
-    <label>Amount Labels:</label>
-    <div id="textboxAmounts${currentQuestionId}"></div>
-    <button type="button" onclick="addTextboxAmount(${currentQuestionId})">Add Amount</button>
-</div><br>
+            <label>Textbox Labels:</label>
+            <div id="textboxLabels${currentQuestionId}"></div>
+            <button type="button" onclick="addTextboxLabel(${currentQuestionId})">Add Label</button>
+            
+            <br><br>
+            
+            <label>Amount Labels:</label>
+            <div id="textboxAmounts${currentQuestionId}"></div>
+            <button type="button" onclick="addTextboxAmount(${currentQuestionId})">Add Amount</button>
+        </div><br>
 
 
         <!-- Dropdown Options -->
@@ -274,49 +274,65 @@ function addQuestion(sectionId, questionId = null) {
         </div><br>
 		
 		 <!-- ADD THIS IMAGE BLOCK -->
-    <div id="dropdownImageBlock${currentQuestionId}" class="dropdown-image-options" style="display:none;">
-        <button type="button" onclick="toggleDropdownImageFields(${currentQuestionId})">Add Image</button>
-        <div id="dropdownImageFields${currentQuestionId}" style="display:none; margin-top:8px;">
-            <label>Image URL:</label><br>
-            <input type="text" id="dropdownImageURL${currentQuestionId}" placeholder="Enter image URL"><br><br>
-            <label>Width:</label><br>
-            <input type="number" id="dropdownImageWidth${currentQuestionId}" placeholder="Width"><br><br>
-            <label>Height:</label><br>
-            <input type="number" id="dropdownImageHeight${currentQuestionId}" placeholder="Height"><br>
-        </div>
-    </div><br>
+        <div id="dropdownImageBlock${currentQuestionId}" class="dropdown-image-options" style="display:none;">
+            <button type="button" onclick="toggleDropdownImageFields(${currentQuestionId})">Add Image</button>
+            <div id="dropdownImageFields${currentQuestionId}" style="display:none; margin-top:8px;">
+                <label>Image URL:</label><br>
+                <input type="text" id="dropdownImageURL${currentQuestionId}" placeholder="Enter image URL"><br><br>
+                <label>Width:</label><br>
+                <input type="number" id="dropdownImageWidth${currentQuestionId}" placeholder="Width"><br><br>
+                <label>Height:</label><br>
+                <input type="number" id="dropdownImageHeight${currentQuestionId}" placeholder="Height"><br><br>
+            </div>
+        </div><br>
 
-        <!-- Linking Logic UI -->
-        <div id="linkingLogicBlock${currentQuestionId}" class="linking-logic-options" style="display:none;">
-            <label>Enable Linking Logic: </label>
+        <!-- Dropdown Options -->
+        <div id="checkboxOptionsBlock${currentQuestionId}" class="checkbox-options" style="display: none;">
+            <label>Options: </label>
+            <div id="checkboxOptions${currentQuestionId}"></div>
+            <button type="button" onclick="addCheckboxOption(${currentQuestionId})">Add Option</button>
+            
+            <div id="noneOfTheAboveContainer${currentQuestionId}" style="margin-top:10px; margin-bottom:10px;">
+                <label><input type="checkbox" id="noneOfTheAbove${currentQuestionId}">Include "None of the above" option</label>
+            </div>
+        </div><br>
+        
+        <!-- Multiple Textboxes Options -->
+        <div id="multipleTextboxesOptionsBlock${currentQuestionId}" class="multiple-textboxes-options" style="display: none;">
+            <label>Textboxes: </label>
+            <div id="multipleTextboxesOptions${currentQuestionId}"></div>
+            <button type="button" onclick="addMultipleTextboxOption(${currentQuestionId})">Add Textbox</button>
+        </div><br>
+        
+        <!-- Linking Logic for Dropdown -->
+        <div id="linkingLogicBlock${currentQuestionId}" class="linking-options" style="display: none;">
+            <label>Enable Dropdown Linking: </label>
             <input type="checkbox" id="enableLinking${currentQuestionId}" onchange="toggleLinkingLogic(${currentQuestionId})">
-            <div id="linkingLogicFields${currentQuestionId}" style="display:none; margin-top:8px;">
-                <label>Choose question to link to:</label><br>
-                <select id="linkingTarget${currentQuestionId}" style="width: 100%;">
-                    <option value="" disabled selected>Select a dropdown question</option>
+            <div id="linkingBlock${currentQuestionId}" style="display:none; margin-top:10px;">
+                <label>Link with question:</label>
+                <select id="linkingTarget${currentQuestionId}">
+                    <option value="">Select a question</option>
                 </select>
             </div>
         </div><br>
 
-        <!-- Checkbox Options -->
-        <div id="checkboxBlock${currentQuestionId}" class="checkbox-options" style="display: none;">
-            <label>Checkbox Options: </label>
-            <div id="checkboxOptions${currentQuestionId}"></div>
-            <button type="button" onclick="addCheckboxOption(${currentQuestionId})">Add Option</button>
-            <div style="margin-top: 10px;">
-                <input type="checkbox" id="noneOfTheAbove${currentQuestionId}" onchange="updateConditionalPDFAnswersForCheckbox(${currentQuestionId})">
-                <label for="noneOfTheAbove${currentQuestionId}">Include "None of the above" option</label>
-            </div>
+        <!-- Subtitle Feature -->
+        <label>Enable Subtitle: </label>
+        <input type="checkbox" id="enableSubtitle${currentQuestionId}" onchange="toggleSubtitle(${currentQuestionId})">
+        <div id="subtitleBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
+            <label>Subtitle Text:</label>
+            <input type="text" id="subtitleText${currentQuestionId}" placeholder="Enter subtitle text">
         </div><br>
 
-        <!-- Multiple Textboxes Options -->
-        <div id="multipleTextboxesBlock${currentQuestionId}" class="multiple-textboxes-options" style="display: none;">
-            <label>Textbox Options: </label>
-            <div id="multipleTextboxesOptions${currentQuestionId}"></div>
-            <button type="button" onclick="addMultipleTextboxOption(${currentQuestionId})">Add Textbox</button>
+        <!-- Info Box Feature -->
+        <label>Enable Info Box: </label>
+        <input type="checkbox" id="enableInfoBox${currentQuestionId}" onchange="toggleInfoBox(${currentQuestionId})">
+        <div id="infoBoxBlock${currentQuestionId}" style="display: none; margin-top: 10px;">
+            <label>Information Text:</label>
+            <textarea id="infoBoxText${currentQuestionId}" placeholder="Enter information for tooltip/popup" rows="3" style="width: 100%;"></textarea>
         </div><br>
 
-        <!-- ===== MULTIPLE-OR LOGIC BLOCK ===== -->
+        <!-- Conditional Logic -->
         <label>Enable Conditional Logic: </label>
         <input type="checkbox" id="logic${currentQuestionId}" onchange="toggleLogic(${currentQuestionId})">
         <div id="logicBlock${currentQuestionId}" style="display: none;">
@@ -326,17 +342,17 @@ function addQuestion(sectionId, questionId = null) {
         </div><br>
 
        <!-- Jump Logic -->
-    <label>Enable Jump Logic: </label>
-    <div id="jumpLogic${currentQuestionId}">
-        <input type="checkbox" id="enableJump${currentQuestionId}" 
-               onchange="toggleJumpLogic(${currentQuestionId})">
-        <div id="jumpBlock${currentQuestionId}" style="display: none;">
-            <div id="jumpConditions${currentQuestionId}"></div>
-            <button type="button" onclick="addJumpCondition(${currentQuestionId})">
-                + Add Jump Option
-            </button>
-        </div>
-    </div><br>
+        <label>Enable Jump Logic: </label>
+        <div id="jumpLogic${currentQuestionId}">
+            <input type="checkbox" id="enableJump${currentQuestionId}" 
+                onchange="toggleJumpLogic(${currentQuestionId})">
+            <div id="jumpBlock${currentQuestionId}" style="display: none;">
+                <div id="jumpConditions${currentQuestionId}"></div>
+                <button type="button" onclick="addJumpCondition(${currentQuestionId})">
+                    + Add Jump Option
+                </button>
+            </div>
+        </div><br>
 
         <!-- Conditional PDF Logic -->
         <div id="conditionalPDFLogic${currentQuestionId}" style="display: none;">
@@ -356,7 +372,7 @@ function addQuestion(sectionId, questionId = null) {
         <!-- Conditional Alert Logic -->
         <div id="conditionalAlertLogic${currentQuestionId}" style="display: none;">
             <label>Enable Conditional Alert: </label>
-            <input type="checkbox" id="enableConditionalAlert${currentQuestionId}" onchange="toggleConditionalAlertLogic(${currentQuestionId})"><br><br>
+            <input type="checkbox" id="enableConditionalAlert${currentQuestionId}" onchange="toggleConditionalAlertLogic(${currentQuestionId})">
             <div id="conditionalAlertBlock${currentQuestionId}" style="display: none;">
                 <label>Trigger this alert if: </label><br>
                 <input type="number" placeholder="Previous question number" id="alertPrevQuestion${currentQuestionId}"><br>
@@ -492,9 +508,9 @@ function toggleOptions(questionId) {
     if (!questionTypeSelect) return;
     const questionType = questionTypeSelect.value;
     const optionsBlock = document.getElementById(`optionsBlock${questionId}`);
-    const checkboxBlock = document.getElementById(`checkboxBlock${questionId}`);
+    const checkboxBlock = document.getElementById(`checkboxOptionsBlock${questionId}`);
     const numberedDropdownBlock = document.getElementById(`numberedDropdownBlock${questionId}`);
-    const multipleTextboxesBlock = document.getElementById(`multipleTextboxesBlock${questionId}`);
+    const multipleTextboxesBlock = document.getElementById(`multipleTextboxesOptionsBlock${questionId}`);
     const textboxOptionsBlock = document.getElementById(`textboxOptions${questionId}`);
     const dropdownImageBlock = document.getElementById(`dropdownImageBlock${questionId}`);
     const linkingLogicBlock = document.getElementById(`linkingLogicBlock${questionId}`);
@@ -1204,7 +1220,7 @@ function generateAllQuestionOptions() {
 // ------------------------------------------------
 function toggleLinkingLogic(questionId) {
     const linkingEnabled = document.getElementById(`enableLinking${questionId}`).checked;
-    const linkingFields = document.getElementById(`linkingLogicFields${questionId}`);
+    const linkingFields = document.getElementById(`linkingBlock${questionId}`);
     linkingFields.style.display = linkingEnabled ? 'block' : 'none';
     
     if (linkingEnabled) {
@@ -1238,4 +1254,17 @@ function updateLinkingTargets(questionId) {
         option.textContent = questionText;
         targetDropdown.appendChild(option);
     });
+}
+
+function toggleSubtitle(questionId) {
+    const subtitleEnabled = document.getElementById(`enableSubtitle${questionId}`).checked;
+    const subtitleBlock = document.getElementById(`subtitleBlock${questionId}`);
+    subtitleBlock.style.display = subtitleEnabled ? 'block' : 'none';
+}
+
+// New function for Info Box feature
+function toggleInfoBox(questionId) {
+    const infoBoxEnabled = document.getElementById(`enableInfoBox${questionId}`).checked;
+    const infoBoxBlock = document.getElementById(`infoBoxBlock${questionId}`);
+    infoBoxBlock.style.display = infoBoxEnabled ? 'block' : 'none';
 }

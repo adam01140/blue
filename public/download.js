@@ -114,6 +114,32 @@ function loadFormData(formData) {
         }
     }
 
+    // 3.1) Load additional PDFs if present
+    if (formData.additionalPDFs && formData.additionalPDFs.length > 0) {
+        // Clear existing additional PDF inputs first (except the main one)
+        const pdfContainer = document.getElementById('pdfContainer');
+        const existingPdfGroups = pdfContainer.querySelectorAll('.pdf-input-group');
+        for (let i = 1; i < existingPdfGroups.length; i++) {
+            existingPdfGroups[i].remove();
+        }
+        
+        // Add PDF inputs for each additional PDF
+        formData.additionalPDFs.forEach((pdfName, index) => {
+            const pdfId = index + 1; // Start from 1 since 0 is the main PDF
+            
+            const pdfGroup = document.createElement('div');
+            pdfGroup.className = 'pdf-input-group';
+            pdfGroup.id = `pdfGroup_${pdfId}`;
+            pdfGroup.innerHTML = `
+                <label>Additional PDF File:</label>
+                <input type="text" id="additionalPdfName_${pdfId}" value="${pdfName}" placeholder="Enter PDF form name (e.g., sc100.pdf)">
+                <button type="button" onclick="removePdfInput(${pdfId})">Delete</button>
+            `;
+            
+            pdfContainer.appendChild(pdfGroup);
+        });
+    }
+
     // 4) Initialize hidden-fields module (if your GUI uses it)
     initializeHiddenPDFFieldsModule();
 
@@ -153,6 +179,36 @@ function loadFormData(formData) {
                 if (questionTypeSelect) {
                     questionTypeSelect.value = question.type;
                     toggleOptions(question.questionId);
+                }
+
+                // -- Restore subtitle if present --
+                if (question.subtitle && question.subtitle.enabled) {
+                    const subtitleCheckbox = questionBlock.querySelector(`#enableSubtitle${question.questionId}`);
+                    const subtitleTextInput = questionBlock.querySelector(`#subtitleText${question.questionId}`);
+                    
+                    if (subtitleCheckbox) {
+                        subtitleCheckbox.checked = true;
+                        toggleSubtitle(question.questionId);
+                        
+                        if (subtitleTextInput && question.subtitle.text) {
+                            subtitleTextInput.value = question.subtitle.text;
+                        }
+                    }
+                }
+
+                // -- Restore info box if present --
+                if (question.infoBox && question.infoBox.enabled) {
+                    const infoBoxCheckbox = questionBlock.querySelector(`#enableInfoBox${question.questionId}`);
+                    const infoBoxTextArea = questionBlock.querySelector(`#infoBoxText${question.questionId}`);
+                    
+                    if (infoBoxCheckbox) {
+                        infoBoxCheckbox.checked = true;
+                        toggleInfoBox(question.questionId);
+                        
+                        if (infoBoxTextArea && question.infoBox.text) {
+                            infoBoxTextArea.value = question.infoBox.text;
+                        }
+                    }
                 }
 
                 // -----------------------------
@@ -538,8 +594,20 @@ function exportForm() {
         hiddenFieldCounter: hiddenFieldCounter,
         defaultPDFName: document.getElementById('formPDFName')
             ? document.getElementById('formPDFName').value.trim()
-            : ''
+            : '',
+        additionalPDFs: [] // New field for additional PDFs
     };
+
+    // Collect all additional PDF names
+    const pdfGroups = document.querySelectorAll('.pdf-input-group');
+    pdfGroups.forEach((group, index) => {
+        if (index > 0) { // Skip the main PDF input (it's already in defaultPDFName)
+            const input = group.querySelector('input');
+            if (input && input.value.trim()) {
+                formData.additionalPDFs.push(input.value.trim());
+            }
+        }
+    });
 
     // Create a map of questionId to question text for easy lookup
     const questionTextMap = {};
@@ -633,6 +701,14 @@ function exportForm() {
                     prevQuestion: alertPrevQ,
                     prevAnswer: alertPrevA,
                     text: alertText
+                },
+                subtitle: {
+                    enabled: questionBlock.querySelector(`#enableSubtitle${questionId}`)?.checked || false,
+                    text: questionBlock.querySelector(`#subtitleText${questionId}`)?.value || ""
+                },
+                infoBox: {
+                    enabled: questionBlock.querySelector(`#enableInfoBox${questionId}`)?.checked || false,
+                    text: questionBlock.querySelector(`#infoBoxText${questionId}`)?.value || ""
                 },
                 options: [],
                 labels: []

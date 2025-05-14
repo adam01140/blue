@@ -196,6 +196,21 @@ function loadFormData(formData) {
                     }
                 }
 
+                // -- Restore info box if present --
+                if (question.infoBox && question.infoBox.enabled) {
+                    const infoBoxCheckbox = questionBlock.querySelector(`#enableInfoBox${question.questionId}`);
+                    const infoBoxTextArea = questionBlock.querySelector(`#infoBoxText${question.questionId}`);
+                    
+                    if (infoBoxCheckbox) {
+                        infoBoxCheckbox.checked = true;
+                        toggleInfoBox(question.questionId);
+                        
+                        if (infoBoxTextArea && question.infoBox.text) {
+                            infoBoxTextArea.value = question.infoBox.text;
+                        }
+                    }
+                }
+
                 // -----------------------------
                 // Question-type-specific rebuild
                 // -----------------------------
@@ -690,6 +705,10 @@ function exportForm() {
                 subtitle: {
                     enabled: questionBlock.querySelector(`#enableSubtitle${questionId}`)?.checked || false,
                     text: questionBlock.querySelector(`#subtitleText${questionId}`)?.value || ""
+                },
+                infoBox: {
+                    enabled: questionBlock.querySelector(`#enableInfoBox${questionId}`)?.checked || false,
+                    text: questionBlock.querySelector(`#infoBoxText${questionId}`)?.value || ""
                 },
                 options: [],
                 labels: []

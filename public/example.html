@@ -4,6 +4,64 @@
     <meta charset="UTF-8">
     <title>Custom Form</title>
     <link rel="stylesheet" href="generate.css">
+    <style>
+      /* Info icon and tooltip styles */
+      .question-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .info-icon {
+        position: relative;
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border: 1px solid #007bff;
+        border-radius: 50%;
+        color: #007bff;
+        font-size: 14px;
+        line-height: 18px;
+        text-align: center;
+        font-weight: bold;
+        cursor: pointer;
+        user-select: none;
+      }
+      .info-icon .info-tooltip {
+        visibility: hidden;
+        position: absolute;
+        top: calc(100% + 5px);
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        width: 200px;
+        z-index: 100;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 1.4;
+        text-align: left;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        opacity: 0;
+        transition: opacity 0.3s, visibility 0.3s;
+      }
+      .info-icon:hover .info-tooltip,
+      .info-icon:focus .info-tooltip {
+        visibility: visible;
+        opacity: 1;
+      }
+      .info-icon .info-tooltip::after {
+        content: '';
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent transparent #333 transparent;
+      }
+    </style>
 </head>
 <body>
 <header>
@@ -157,7 +215,15 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h1 class="section-title">Section 1</h1><div id="question-container-1"><label><h3>Do you have a lawyer</h3></label>
+        <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><h1 class="section-title">Section 1</h1><div id="question-container-1">
+          <div class="question-header">
+            <label><h3>Do you have a lawyer</h3></label>
+            <div class="info-icon" tabindex="0">
+              <span>i</span>
+              <div class="info-tooltip">example text</div>
+            </div>
+          </div>
+        <p class="question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">be fr</p>
           <select id="answer1" name="answer1">
             <option value="" disabled selected>Select an option</option>
             <option value="Yes">Yes</option>

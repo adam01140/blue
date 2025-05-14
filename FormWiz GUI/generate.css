@@ -177,4 +177,10 @@ h1.section-title {          /* or just h1 if you target every H1 */
     margin-bottom: 1.5rem;
 }
 
+.question-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 

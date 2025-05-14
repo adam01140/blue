@@ -106,6 +106,64 @@ logicScriptBuffer = "";
     '    <meta charset="UTF-8">',
     "    <title>Custom Form</title>",
     '    <link rel="stylesheet" href="generate.css">',
+    "    <style>",
+    "      /* Info icon and tooltip styles */",
+    "      .question-header {",
+    "        display: flex;",
+    "        align-items: center;",
+    "        gap: 10px;",
+    "      }",
+    "      .info-icon {",
+    "        position: relative;",
+    "        display: inline-block;",
+    "        width: 18px;",
+    "        height: 18px;",
+    "        border: 1px solid #007bff;",
+    "        border-radius: 50%;",
+    "        color: #007bff;",
+    "        font-size: 14px;",
+    "        line-height: 18px;",
+    "        text-align: center;",
+    "        font-weight: bold;",
+    "        cursor: pointer;",
+    "        user-select: none;",
+    "      }",
+    "      .info-icon .info-tooltip {",
+    "        visibility: hidden;",
+    "        position: absolute;",
+    "        top: calc(100% + 5px);",
+    "        left: 50%;",
+    "        transform: translateX(-50%);",
+    "        background-color: #333;",
+    "        color: white;",
+    "        padding: 8px 12px;",
+    "        border-radius: 4px;",
+    "        width: 200px;",
+    "        z-index: 100;",
+    "        font-weight: normal;",
+    "        font-size: 14px;",
+    "        line-height: 1.4;",
+    "        text-align: left;",
+    "        box-shadow: 0 2px 8px rgba(0,0,0,0.2);",
+    "        opacity: 0;",
+    "        transition: opacity 0.3s, visibility 0.3s;",
+    "      }",
+    "      .info-icon:hover .info-tooltip,",
+    "      .info-icon:focus .info-tooltip {",
+    "        visibility: visible;",
+    "        opacity: 1;",
+    "      }",
+    "      .info-icon .info-tooltip::after {",
+    "        content: '';",
+    "        position: absolute;",
+    "        bottom: 100%;",
+    "        left: 50%;",
+    "        margin-left: -5px;",
+    "        border-width: 5px;",
+    "        border-style: solid;",
+    "        border-color: transparent transparent #333 transparent;",
+    "      }",
+    "    </style>",
     "</head>",
     "<body>",
     "<header>",
@@ -264,7 +322,7 @@ logicScriptBuffer = "";
     '        <form id="customForm" onsubmit="return showThankYouMessage();">',
   ].join("\n");
 
-  // Possibly read user's PDF name from an element on the page:
+  // Get all PDF names
   const pdfFormNameInputEl = document.getElementById("formPDFName");
   const pdfFormName = pdfFormNameInputEl
     ? pdfFormNameInputEl.value.trim()
@@ -273,6 +331,22 @@ logicScriptBuffer = "";
     .replace(/\\/g, "\\\\")
     .replace(/'/g, "\\'")
     .replace(/"/g, '\\"');
+    
+  // Get additional PDF names
+  const additionalPdfNames = [];
+  const additionalPdfInputs = document.querySelectorAll('[id^="additionalPdfName_"]');
+  additionalPdfInputs.forEach(input => {
+    if (input.value.trim()) {
+      additionalPdfNames.push(input.value.trim());
+    }
+  });
+  
+  // Escape additional PDF names
+  const escapedAdditionalPdfNames = additionalPdfNames.map(name => 
+    name.replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"')
+  );
 
   // Build each Section & its questions
   for (let s = 1; s < sectionCounter; s++) {
@@ -374,7 +448,37 @@ questionSlugMap[questionId] = slug;
       formHTML += `<div id="question-container-${questionId}"${
         logicEnabled ? ' class="hidden"' : ""
       }>`;
-      formHTML += `<label><h3>${questionText}</h3></label>`;
+      
+      // Check if info box is enabled
+      const infoBoxEnabled = qBlock.querySelector(`#enableInfoBox${questionId}`)?.checked || false;
+      let infoBoxText = "";
+      if (infoBoxEnabled) {
+        infoBoxText = qBlock.querySelector(`#infoBoxText${questionId}`)?.value || "";
+      }
+      
+      // Add question title with info icon if needed
+      if (infoBoxEnabled && infoBoxText) {
+        formHTML += `
+          <div class="question-header">
+            <label><h3>${questionText}</h3></label>
+            <div class="info-icon" tabindex="0">
+              <span>i</span>
+              <div class="info-tooltip">${infoBoxText}</div>
+            </div>
+          </div>
+        `;
+      } else {
+        formHTML += `<label><h3>${questionText}</h3></label>`;
+      }
+
+      // Add subtitle if enabled
+      const subtitleEnabled = qBlock.querySelector(`#enableSubtitle${questionId}`)?.checked || false;
+      if (subtitleEnabled) {
+        const subtitleText = qBlock.querySelector(`#subtitleText${questionId}`)?.value || "";
+        if (subtitleText) {
+          formHTML += `<p class="question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">${subtitleText}</p>`;
+        }
+      }
 
       // Render the question by type
       if (questionType === "text") {
@@ -890,7 +994,9 @@ function buildCheckboxName (questionId, rawNameId, labelText){
  *--------------------------------------------------------------*/
 formHTML += `var sectionStack = [];\n`;      // pushes as you LEAVE a section
 formHTML += `var currentSectionNumber = 1;\n`;  // updated by navigateSection()
-formHTML += `var pdfFileName = "${escapedPdfFormName}";\n`;  // Store the PDF name for later use
+formHTML += `var pdfFileName = "${escapedPdfFormName}";\n`;  // Main PDF name
+formHTML += `var additionalPdfFileNames = ${JSON.stringify(escapedAdditionalPdfNames)};\n`;  // Additional PDF names
+formHTML += `var allPdfFileNames = ["${escapedPdfFormName}", ${escapedAdditionalPdfNames.map(name => `"${name}"`).join(", ")}];\n`;  // All PDF names in an array
 
 
 
@@ -1140,7 +1246,7 @@ function handleNext(currentSection){
 
     /* ---------- special "end" shortcut ---------- */
     if (nextSection === 'end'){
-        editAndDownloadPDF(pdfFileName).then(()=>navigateSection('end'));
+        processAllPdfs().then(()=>navigateSection('end'));
         return;
     }
 
@@ -1245,35 +1351,51 @@ function handleConditionalAlerts(){
 
 /*──── main submit handler ────*/
 function showThankYouMessage () {
-    editAndDownloadPDF(pdfFileName).then(() => {
+    processAllPdfs().then(() => {
         document.getElementById('customForm').style.display = 'none';
         document.getElementById('thankYouMessage').style.display = 'block';
     });
     return false;                       // prevent page reload
 }
+
+/*──── process all PDFs sequentially ────*/
+async function processAllPdfs() {
+    for (const pdfName of allPdfFileNames) {
+        if (pdfName) {
+            await editAndDownloadPDF(pdfName);
+        }
+    }
+}
+
 /*──── build FormData with **everything inside the form** ────*/
 async function editAndDownloadPDF (pdfName) {
     /* this grabs every control that belongs to <form id="customForm">,
        including those specified with form="customForm" attributes   */
     const fd = new FormData(document.getElementById('customForm'));
 
-    const res  = await fetch('/edit_pdf?pdf=' + pdfName, { method: 'POST', body: fd });
+    // Use the /edit_pdf endpoint with the PDF name as a query parameter
+    // Remove the .pdf extension if present since server adds it automatically
+    const baseName = pdfName.replace(/\.pdf$/i, '');
+    const res = await fetch('/edit_pdf?pdf=' + encodeURIComponent(baseName), { 
+        method: 'POST', 
+        body: fd 
+    });
+    
     const blob = await res.blob();
-    const url  = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
 
     // trigger download
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'Edited_' + pdfName + '.pdf';
+    a.download = 'Edited_' + pdfName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
 
-    // inline preview
+    // inline preview - only show the last one
     const frame = document.getElementById('pdfFrame');
     frame.src = url;
     frame.style.display = 'block';
-    //for showing the pdf preview
     document.getElementById('pdfPreview').style.display = 'none';
 }
 

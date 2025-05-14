@@ -106,6 +106,64 @@ logicScriptBuffer = "";
     '    <meta charset="UTF-8">',
     "    <title>Custom Form</title>",
     '    <link rel="stylesheet" href="generate.css">',
+    "    <style>",
+    "      /* Info icon and tooltip styles */",
+    "      .question-header {",
+    "        display: flex;",
+    "        align-items: center;",
+    "        gap: 10px;",
+    "      }",
+    "      .info-icon {",
+    "        position: relative;",
+    "        display: inline-block;",
+    "        width: 18px;",
+    "        height: 18px;",
+    "        border: 1px solid #007bff;",
+    "        border-radius: 50%;",
+    "        color: #007bff;",
+    "        font-size: 14px;",
+    "        line-height: 18px;",
+    "        text-align: center;",
+    "        font-weight: bold;",
+    "        cursor: pointer;",
+    "        user-select: none;",
+    "      }",
+    "      .info-icon .info-tooltip {",
+    "        visibility: hidden;",
+    "        position: absolute;",
+    "        top: calc(100% + 5px);",
+    "        left: 50%;",
+    "        transform: translateX(-50%);",
+    "        background-color: #333;",
+    "        color: white;",
+    "        padding: 8px 12px;",
+    "        border-radius: 4px;",
+    "        width: 200px;",
+    "        z-index: 100;",
+    "        font-weight: normal;",
+    "        font-size: 14px;",
+    "        line-height: 1.4;",
+    "        text-align: left;",
+    "        box-shadow: 0 2px 8px rgba(0,0,0,0.2);",
+    "        opacity: 0;",
+    "        transition: opacity 0.3s, visibility 0.3s;",
+    "      }",
+    "      .info-icon:hover .info-tooltip,",
+    "      .info-icon:focus .info-tooltip {",
+    "        visibility: visible;",
+    "        opacity: 1;",
+    "      }",
+    "      .info-icon .info-tooltip::after {",
+    "        content: '';",
+    "        position: absolute;",
+    "        bottom: 100%;",
+    "        left: 50%;",
+    "        margin-left: -5px;",
+    "        border-width: 5px;",
+    "        border-style: solid;",
+    "        border-color: transparent transparent #333 transparent;",
+    "      }",
+    "    </style>",
     "</head>",
     "<body>",
     "<header>",
@@ -390,7 +448,28 @@ questionSlugMap[questionId] = slug;
       formHTML += `<div id="question-container-${questionId}"${
         logicEnabled ? ' class="hidden"' : ""
       }>`;
-      formHTML += `<label><h3>${questionText}</h3></label>`;
+      
+      // Check if info box is enabled
+      const infoBoxEnabled = qBlock.querySelector(`#enableInfoBox${questionId}`)?.checked || false;
+      let infoBoxText = "";
+      if (infoBoxEnabled) {
+        infoBoxText = qBlock.querySelector(`#infoBoxText${questionId}`)?.value || "";
+      }
+      
+      // Add question title with info icon if needed
+      if (infoBoxEnabled && infoBoxText) {
+        formHTML += `
+          <div class="question-header">
+            <label><h3>${questionText}</h3></label>
+            <div class="info-icon" tabindex="0">
+              <span>i</span>
+              <div class="info-tooltip">${infoBoxText}</div>
+            </div>
+          </div>
+        `;
+      } else {
+        formHTML += `<label><h3>${questionText}</h3></label>`;
+      }
 
       // Add subtitle if enabled
       const subtitleEnabled = qBlock.querySelector(`#enableSubtitle${questionId}`)?.checked || false;
