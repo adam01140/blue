@@ -5227,8 +5227,189 @@ window.importFlowchartJsonDirectly = function(jsonString) {
 
 // Add a UI element to import JSON directly
 document.addEventListener('DOMContentLoaded', function() {
-  // No longer adding buttons dynamically
+  // Create keyboard navigation help tooltip
+  createKeyboardNavigationHelp();
 });
+
+/**
+ * Creates a small tooltip in the bottom corner showing keyboard navigation instructions
+ */
+function createKeyboardNavigationHelp() {
+  const helpDiv = document.createElement('div');
+  helpDiv.innerHTML = `
+    <div style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); 
+                color: white; padding: 10px; border-radius: 5px; font-size: 12px; 
+                z-index: 1000; max-width: 300px;">
+      <strong>Keyboard Navigation:</strong>
+      <ul style="margin: 5px 0; padding-left: 20px;">
+        <li>Arrow Keys / WASD: Pan canvas</li>
+        <li>Z: Zoom in</li>
+        <li>X: Zoom out</li>
+      </ul>
+      <button onclick="this.parentNode.style.display='none';" 
+              style="background: #444; border: none; color: white; padding: 3px 8px; 
+                    border-radius: 3px; cursor: pointer;">
+        Dismiss
+      </button>
+    </div>
+  `;
+  document.body.appendChild(helpDiv);
+}
+
+/**************************************************
+ ********** KEYBOARD NAVIGATION CONTROLS **********
+ **************************************************/
+// Track which movement keys are currently pressed
+const keysPressed = {
+  left: false,
+  right: false,
+  up: false,
+  down: false,
+  zoom: 0 // 1 for zoom in, -1 for zoom out
+};
+
+// Animation frame request ID for smooth movement
+let animationFrameId = null;
+
+// Speed and smoothness settings
+const MOVEMENT_SPEED = 8; // pixels per frame
+const ZOOM_FACTOR = 1.01; // zoom factor per frame
+
+// Handle key down events - start movement
+document.addEventListener('keydown', function(evt) {
+  // Skip if user is typing in a text field
+  if (isUserTyping()) return;
+  
+  // Skip if modifier keys are pressed (to avoid interfering with browser shortcuts)
+  if (evt.ctrlKey || evt.altKey || evt.metaKey) return;
+  
+  let keyHandled = true;
+  
+  switch (evt.key) {
+    // Arrow keys and WASD for panning
+    case 'ArrowLeft':
+    case 'a':
+    case 'A':
+      keysPressed.left = true;
+      break;
+    case 'ArrowRight':
+    case 'd':
+    case 'D':
+      keysPressed.right = true;
+      break;
+    case 'ArrowUp':
+    case 'w':
+    case 'W':
+      keysPressed.up = true;
+      break;
+    case 'ArrowDown':
+    case 's':
+    case 'S':
+      keysPressed.down = true;
+      break;
+    
+    // Z/X keys for zooming
+    case 'z':
+    case 'Z':
+      keysPressed.zoom = 1;
+      break;
+    case 'x':
+    case 'X':
+      keysPressed.zoom = -1;
+      break;
+    default:
+      keyHandled = false;
+  }
+  
+  if (keyHandled) {
+    evt.preventDefault();
+    // Start the animation if not already running
+    if (!animationFrameId) {
+      animationFrameId = requestAnimationFrame(updateCanvasPosition);
+    }
+  }
+});
+
+// Handle key up events - stop movement
+document.addEventListener('keyup', function(evt) {
+  switch (evt.key) {
+    case 'ArrowLeft':
+    case 'a':
+    case 'A':
+      keysPressed.left = false;
+      break;
+    case 'ArrowRight':
+    case 'd':
+    case 'D':
+      keysPressed.right = false;
+      break;
+    case 'ArrowUp':
+    case 'w':
+    case 'W':
+      keysPressed.up = false;
+      break;
+    case 'ArrowDown':
+    case 's':
+    case 'S':
+      keysPressed.down = false;
+      break;
+    case 'z':
+    case 'Z':
+    case 'x':
+    case 'X':
+      keysPressed.zoom = 0;
+      break;
+  }
+  
+  // If no keys are pressed, cancel the animation frame
+  if (!keysPressed.left && !keysPressed.right && !keysPressed.up && !keysPressed.down && keysPressed.zoom === 0) {
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+  }
+});
+
+// Animation function to update the canvas position
+function updateCanvasPosition() {
+  const translator = graph.view.getTranslate();
+  let dx = 0;
+  let dy = 0;
+  
+  // Calculate the translation change
+  if (keysPressed.left) dx += MOVEMENT_SPEED;
+  if (keysPressed.right) dx -= MOVEMENT_SPEED;
+  if (keysPressed.up) dy += MOVEMENT_SPEED;
+  if (keysPressed.down) dy -= MOVEMENT_SPEED;
+  
+  // Apply translation change if needed
+  if (dx !== 0 || dy !== 0) {
+    graph.view.setTranslate(translator.x + dx / graph.view.scale, translator.y + dy / graph.view.scale);
+  }
+  
+  // Apply zoom change if needed
+  if (keysPressed.zoom !== 0) {
+    if (keysPressed.zoom > 0) {
+      // Smooth zoom in
+      graph.view.setScale(graph.view.scale * ZOOM_FACTOR);
+    } else {
+      // Smooth zoom out
+      graph.view.setScale(graph.view.scale / ZOOM_FACTOR);
+    }
+  }
+  
+  // Refresh the graph if any changes were made
+  if (dx !== 0 || dy !== 0 || keysPressed.zoom !== 0) {
+    graph.view.refresh();
+  }
+  
+  // Continue the animation if any key is still pressed
+  if (keysPressed.left || keysPressed.right || keysPressed.up || keysPressed.down || keysPressed.zoom !== 0) {
+    animationFrameId = requestAnimationFrame(updateCanvasPosition);
+  } else {
+    animationFrameId = null;
+  }
+}
 
 // Fix the case sensitivity issue with the prevAnswer in logic conditions
 // Add this code at the end of the sixth pass, just before creating the final JSON object

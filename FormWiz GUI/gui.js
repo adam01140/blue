@@ -237,6 +237,9 @@ function addQuestion(sectionId, questionId = null) {
             <option value="multipleTextboxes">Multiple Textboxes</option>
             <option value="money">Money</option>
             <option value="date">Date</option>
+            <option value="dateRange">Date Range</option>
+            <option value="email">Email</option>
+            <option value="phone">Phone</option>
             <option value="bigParagraph">Big Paragraph</option>
         </select><br><br>
 
@@ -283,6 +286,7 @@ function addQuestion(sectionId, questionId = null) {
                 <input type="number" id="dropdownImageWidth${currentQuestionId}" placeholder="Width"><br><br>
                 <label>Height:</label><br>
                 <input type="number" id="dropdownImageHeight${currentQuestionId}" placeholder="Height"><br><br>
+                <button type="button" onclick="deleteDropdownImage(${currentQuestionId})">Delete Image</button>
             </div>
         </div><br>
 
@@ -529,6 +533,9 @@ function toggleOptions(questionId) {
         case 'bigParagraph':
         case 'radio':
         case 'dropdown':
+        case 'email':
+        case 'phone':
+        case 'dateRange':
             textboxOptionsBlock.style.display = 'block';
             if (questionType === 'radio' || questionType === 'dropdown') {
                 if (questionType === 'dropdown') {
@@ -1267,4 +1274,16 @@ function toggleInfoBox(questionId) {
     const infoBoxEnabled = document.getElementById(`enableInfoBox${questionId}`).checked;
     const infoBoxBlock = document.getElementById(`infoBoxBlock${questionId}`);
     infoBoxBlock.style.display = infoBoxEnabled ? 'block' : 'none';
+}
+
+function deleteDropdownImage(questionId) {
+    const urlInput = document.getElementById(`dropdownImageURL${questionId}`);
+    const widthInput = document.getElementById(`dropdownImageWidth${questionId}`);
+    const heightInput = document.getElementById(`dropdownImageHeight${questionId}`);
+    
+    if (urlInput) urlInput.value = '';
+    if (widthInput) widthInput.value = '';
+    if (heightInput) heightInput.value = '';
+    
+    alert('Image deleted successfully');
 }

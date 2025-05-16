@@ -344,10 +344,16 @@ function loadFormData(formData) {
                         const urlEl = questionBlock.querySelector(`#dropdownImageURL${question.questionId}`);
                         const wEl = questionBlock.querySelector(`#dropdownImageWidth${question.questionId}`);
                         const hEl = questionBlock.querySelector(`#dropdownImageHeight${question.questionId}`);
+                        const imageFields = questionBlock.querySelector(`#dropdownImageFields${question.questionId}`);
 
                         if (urlEl) urlEl.value = question.image.url || '';
                         if (wEl) wEl.value = question.image.width || 0;
                         if (hEl) hEl.value = question.image.height || 0;
+                        
+                        // Automatically display the image fields if there's image data
+                        if (imageFields && question.image.url) {
+                            imageFields.style.display = 'block';
+                        }
                     }
                     
                     // Restore linking logic
@@ -439,7 +445,10 @@ function loadFormData(formData) {
                     question.type === 'bigParagraph' ||
                     question.type === 'radio' ||
                     question.type === 'money' ||
-                    question.type === 'date'
+                    question.type === 'date' ||
+                    question.type === 'email' ||
+                    question.type === 'phone' ||
+                    question.type === 'dateRange'
                 ) {
                     const nameInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
                     const placeholderInput = questionBlock.querySelector(`#textboxPlaceholder${question.questionId}`);
@@ -873,7 +882,10 @@ function exportForm() {
                 questionType === 'bigParagraph' ||
                 questionType === 'radio' ||
                 questionType === 'money' ||
-                questionType === 'date'
+                questionType === 'date' ||
+                questionType === 'email' ||
+                questionType === 'phone' ||
+                questionType === 'dateRange'
             ) {
                 const nameId = questionBlock.querySelector(`#textboxName${questionId}`)?.value.trim() || `answer${questionId}`;
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';

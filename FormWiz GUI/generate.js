@@ -224,7 +224,7 @@ logicScriptBuffer = "";
     // Add a flag to prevent recursive calls
     'let isHandlingLink = false;',
     '',
-    '// Handle linked dropdown logic',
+    // Handle linked dropdown logic
     'function handleLinkedDropdowns(sourceName, selectedValue) {',
     '    if (!linkedDropdowns || linkedDropdowns.length === 0 || isHandlingLink) return;',
     '    ',
@@ -505,8 +505,110 @@ questionSlugMap[questionId] = slug;
         questionNameIds[questionId] = mnName;
         formHTML += `<input type="number" id="${mnName}" name="${mnName}" min="0" step="0.01" placeholder="${mnPh}"><br>`;
       } else if (questionType === "date") {
-        questionNameIds[questionId] = "answer" + questionId;
-        formHTML += `<input type="date" id="answer${questionId}" name="answer${questionId}"><br>`;
+        const nmEl = qBlock.querySelector("#textboxName" + questionId);
+        const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
+        questionNameIds[questionId] = nameId;
+        formHTML += `
+          <div class="date-container">
+            <input type="date" id="${nameId}" name="${nameId}" class="date-input">
+          </div><br>`;
+      } else if (questionType === "dateRange") {
+        const nmEl = qBlock.querySelector("#textboxName" + questionId);
+        const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
+        questionNameIds[questionId] = nameId;
+        
+        // Create two date inputs with IDs based on the slug (nameId_1 and nameId_2)
+        formHTML += `
+          <div class="date-range-container">
+            <div class="date-input-group">
+              <label for="${nameId}_1">Start Date</label>
+              <input type="date" id="${nameId}_1" name="${nameId}_1" class="date-input start-date">
+            </div>
+            <div class="date-range-separator">to</div>
+            <div class="date-input-group">
+              <label for="${nameId}_2">End Date</label>
+              <input type="date" id="${nameId}_2" name="${nameId}_2" class="date-input end-date">
+            </div>
+          </div><br>
+          <script>
+            // Add validation for date range (end date >= start date)
+            document.addEventListener('DOMContentLoaded', function() {
+              const startDate = document.getElementById('${nameId}_1');
+              const endDate = document.getElementById('${nameId}_2');
+              
+              if (startDate && endDate) {
+                // Update min date for end date when start date changes
+                startDate.addEventListener('change', function() {
+                  if (startDate.value) {
+                    endDate.min = startDate.value;
+                    
+                    // If end date is before start date, reset it
+                    if (endDate.value && endDate.value < startDate.value) {
+                      endDate.value = '';
+                    }
+                  }
+                });
+                
+                // Set initial min value if start date has a value
+                if (startDate.value) {
+                  endDate.min = startDate.value;
+                }
+              }
+            });
+          </script>`;
+      } else if (questionType === "email") {
+        const nmEl = qBlock.querySelector("#textboxName" + questionId);
+        const phEl = qBlock.querySelector("#textboxPlaceholder" + questionId);
+        const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
+        const placeholder = phEl && phEl.value ? phEl.value : "example@domain.com";
+        questionNameIds[questionId] = nameId;
+        formHTML += `
+          <div class="email-input-container">
+            <input type="email" id="${nameId}" name="${nameId}" 
+                   placeholder="${placeholder}" 
+                   pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+                   class="email-input">
+            <div class="email-validation-icon"></div>
+          </div><br>
+          <script>
+            // Add validation feedback for email input
+            document.addEventListener('DOMContentLoaded', function() {
+              const emailInput = document.getElementById('${nameId}');
+              if (emailInput) {
+                emailInput.addEventListener('blur', function() {
+                  const isValid = emailInput.checkValidity();
+                  const container = emailInput.closest('.email-input-container');
+                  if (container) {
+                    if (emailInput.value === '') {
+                      container.classList.remove('valid', 'invalid');
+                    } else {
+                      container.classList.toggle('valid', isValid);
+                      container.classList.toggle('invalid', !isValid);
+                    }
+                  }
+                });
+                
+                emailInput.addEventListener('input', function() {
+                  const container = emailInput.closest('.email-input-container');
+                  if (container && (container.classList.contains('valid') || container.classList.contains('invalid'))) {
+                    const isValid = emailInput.checkValidity();
+                    container.classList.toggle('valid', isValid && emailInput.value !== '');
+                    container.classList.toggle('invalid', !isValid && emailInput.value !== '');
+                  }
+                });
+              }
+            });
+          </script>`;
+      } else if (questionType === "phone") {
+        const nmEl = qBlock.querySelector("#textboxName" + questionId);
+        const phEl = qBlock.querySelector("#textboxPlaceholder" + questionId);
+        const nameId = nmEl && nmEl.value ? nmEl.value : "answer" + questionId;
+        const placeholder = phEl && phEl.value ? phEl.value : "(123) 456-7890";
+        questionNameIds[questionId] = nameId;
+        formHTML += `
+          <div class="phone-input-container">
+            <input type="tel" id="${nameId}" name="${nameId}" placeholder="${placeholder}" class="phone-input" maxlength="14">
+          </div><br>`;
       } else if (questionType === "radio") {
         const radNameEl = qBlock.querySelector("#textboxName" + questionId);
         const radName =
@@ -1022,6 +1124,43 @@ formHTML += `var allPdfFileNames = ["${escapedPdfFormName}", ${escapedAdditional
         .replace(/\\W+/g, "_")   // ← double "\\" so the HTML gets "\\W"
         .replace(/^_+|_+$/g, "");
 }
+
+// Phone number formatter function
+function formatPhoneNumber(value) {
+  if (!value) return value;
+  
+  const phoneNumber = value.replace(/\\D/g, '');
+  const phoneNumberLength = phoneNumber.length;
+  
+  if (phoneNumberLength < 4) {
+    return phoneNumberLength > 0 ? '(' + phoneNumber : '';
+  } else if (phoneNumberLength < 7) {
+    return '(' + phoneNumber.substring(0, 3) + ') ' + phoneNumber.substring(3);
+  } else {
+    return '(' + phoneNumber.substring(0, 3) + ') ' + 
+           phoneNumber.substring(3, 6) + '-' + 
+           phoneNumber.substring(6, 10);
+  }
+}
+
+// Initialize all phone inputs on the page
+document.addEventListener('DOMContentLoaded', function() {
+  const phoneInputs = document.querySelectorAll('.phone-input');
+  
+  phoneInputs.forEach(phoneInput => {
+    // Format existing value if any
+    if (phoneInput.value) {
+      phoneInput.value = formatPhoneNumber(phoneInput.value);
+    }
+    
+    // Set up event listener for input
+    phoneInput.addEventListener('input', function(e) {
+      const input = e.target;
+      const value = input.value.replace(/\\D/g, '').substring(0, 10); // Strip non-digits and limit to 10 digits
+      input.value = formatPhoneNumber(value);
+    });
+  });
+});
 
 
 function toggleAmountField(amountFieldId, show) {
