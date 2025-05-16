@@ -539,6 +539,7 @@ graph.getEditingValue = function (cell, evt) {
 graph.addListener(mxEvent.LABEL_CHANGED, (sender, evt) => {
   const cell  = evt.getProperty("cell");
   let   value = evt.getProperty("value");   // plain text the user typed
+  
   if (isSimpleHtmlQuestion(cell)) {
     value = mxUtils.htmlEntities(value || "");           // escape <>&
     graph.getModel().setValue(
@@ -552,6 +553,22 @@ graph.addListener(mxEvent.LABEL_CHANGED, (sender, evt) => {
     }
     
     evt.consume();   // stop mxGraph from writing the raw text
+  } else if (isOptions(cell) && !getQuestionType(cell).includes('image') && !getQuestionType(cell).includes('amount')) {
+    // For regular option nodes, update the label and node ID
+    graph.getModel().beginUpdate();
+    try {
+      // Set the clean value
+      value = value.trim() || "Option";
+      graph.getModel().setValue(cell, value);
+      
+      // Update the option node ID based on the new label
+      refreshOptionNodeId(cell);
+    } finally {
+      graph.getModel().endUpdate();
+    }
+    
+    refreshAllCells();
+    evt.consume();
   }
 });
 
@@ -579,6 +596,14 @@ graph.dblClick = function (evt, cell) {
       }
     }
   }
+  
+  // Add direct editing for option nodes on double-click
+  if (cell && isOptions(cell) && !getQuestionType(cell).includes('image') && !getQuestionType(cell).includes('amount')) {
+    // Enable direct editing for option nodes
+    graph.startEditingAtCell(cell);
+    mxEvent.consume(evt);
+    return;
+  }
 
   // anything else keeps the stock behaviour
   originalDblClick(evt, cell);
@@ -605,6 +630,10 @@ graph.isCellEditable = function (cell) {
   }
   // Allow text2 to be edited directly with double-click
   if (qt === 'text2') {
+    return true;
+  }
+  // Allow option nodes to be edited directly with double-click
+  if (isOptions(cell) && !qt.includes('image') && !qt.includes('amount')) {
     return true;
   }
   return true;
@@ -2221,8 +2250,17 @@ function refreshAllCells() {
     if (isEndNode(cell)) {
       updateEndNodeCell(cell);
     }
-    if (isOptions(cell) && getQuestionType(cell) === "imageOption") {
-      updateImageOptionCell(cell);
+    
+    // Handle different option node types
+    if (isOptions(cell)) {
+      if (getQuestionType(cell) === "imageOption") {
+        updateImageOptionCell(cell);
+      } else if (getQuestionType(cell) === "amountOption") {
+        // Amount option has its own handling
+      } else {
+        // Regular option nodes
+        updateOptionNodeCell(cell);
+      }
     }
     
     // If it's a text2 node, make sure we update _questionText from value
@@ -5133,7 +5171,7 @@ function createYesNoOptions(parentCell) {
     const noX = geo.x + geo.width - 50;
     const noY = geo.y + geo.height + 50;
     let noStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;pointerEvents=1;overflow=fill;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
-    const noNode = graph.insertVertex(parent, null, "No", noX, noY, 100, 60, noStyle);
+    const noNode = graph.insertVertex(parent, null, "<div style=\"text-align:center;\">No</div>", noX, noY, 100, 60, noStyle);
     refreshOptionNodeId(noNode);
     if (parentCell !== jumpModeNode) {
       setSection(noNode, parentSection);
@@ -5143,12 +5181,16 @@ function createYesNoOptions(parentCell) {
     const yesX = geo.x - 40;
     const yesY = geo.y + geo.height + 50;
     let yesStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;pointerEvents=1;overflow=fill;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
-    const yesNode = graph.insertVertex(parent, null, "Yes", yesX, yesY, 100, 60, yesStyle);
+    const yesNode = graph.insertVertex(parent, null, "<div style=\"text-align:center;\">Yes</div>", yesX, yesY, 100, 60, yesStyle);
     refreshOptionNodeId(yesNode);
     if (parentCell !== jumpModeNode) {
       setSection(yesNode, parentSection);
     }
     graph.insertEdge(parent, null, "", parentCell, yesNode);
+
+    // Make sure the option nodes are properly formatted
+    updateOptionNodeCell(noNode);
+    updateOptionNodeCell(yesNode);
 
   } finally {
     graph.getModel().endUpdate();
@@ -5359,3 +5401,36 @@ window.updateText2Handler = function(cellId, text) {
   
   refreshNodeIdFromLabel(cell);
 };
+
+/**
+ * Create or update a standard option node cell
+ * This ensures option nodes have consistent styling and behavior
+ */
+function updateOptionNodeCell(cell) {
+  if (!cell || !isOptions(cell)) return;
+  
+  // Skip image and amount options as they have their own handlers
+  const qt = getQuestionType(cell);
+  if (qt === "imageOption" || qt === "amountOption") return;
+  
+  // Get the current label text
+  const currentValue = cell.value || "Option";
+  let labelText = currentValue;
+  
+  // If it's an HTML string, extract the text
+  if (typeof currentValue === 'string' && currentValue.includes('<')) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = currentValue;
+    labelText = (tmp.textContent || tmp.innerText || "Option").trim();
+  }
+  
+  // Create a simple centered div with the text
+  const html = `<div style="text-align:center;">${escapeHtml(labelText)}</div>`;
+  
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, html);
+  } finally {
+    graph.getModel().endUpdate();
+  }
+}
