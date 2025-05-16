@@ -119,29 +119,7 @@ const closeFlowchartListBtn = document.getElementById("closeFlowchartListBtn");
 
 const logoutBtn = document.getElementById("logoutBtn");
 
-function showLoginOverlay() {
-  loginOverlay.style.display = "flex";
-}
-function hideLoginOverlay() {
-  loginOverlay.style.display = "none";
-}
-function setCookie(name, value, days) {
-  const d = new Date();
-  d.setTime(d.getTime() + days*24*60*60*1000);
-  const expires = "expires="+ d.toUTCString();
-  document.cookie = name + "=" + value + ";" + expires + ";path=/";
-}
-function getCookie(name) {
-  const ca = document.cookie.split(';');
-  name = name + "=";
-  for (let i=0; i < ca.length; i++) {
-    let c = ca[i].trim();
-    if (c.indexOf(name) === 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
-}
+// Login overlay and cookie functions have been moved to auth.js
 
 loginButton.addEventListener("click", () => {
   const email = loginEmail.value.trim();
@@ -190,22 +168,7 @@ logoutBtn.addEventListener("click", () => {
     });
 });
 
-function checkForSavedLogin() {
-  const savedUid = getCookie("flowchart_uid");
-  if (savedUid) {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user && user.uid === savedUid) {
-        currentUser = user;
-        hideLoginOverlay();
-        loadUserColorPrefs();
-      } else {
-        showLoginOverlay();
-      }
-    });
-  } else {
-    showLoginOverlay();
-  }
-}
+// checkForSavedLogin has been moved to auth.js
 
 function loadUserColorPrefs() {
   if (!currentUser) return;
@@ -245,337 +208,11 @@ function saveUserColorPrefs() {
 /**************************************************
  ************ Section Preferences & Legend ********
  **************************************************/
-function getDefaultSectionColor(sectionNum) {
-  let lightness = Math.max(30, 80 - (sectionNum - 1) * 10);
-  return `hsl(0, 100%, ${lightness}%)`;
-}
-
-function setSection(cell, sectionNum) {
-  let style = cell.style || "";
-  style = style.replace(/section=[^;]+/, "");
-  style += `;section=${sectionNum};`;
-  graph.getModel().setStyle(cell, style);
-  if (!sectionPrefs[sectionNum]) {
-    sectionPrefs[sectionNum] = {
-      borderColor: getDefaultSectionColor(parseInt(sectionNum)),
-      name: "Enter section name"
-    };
-    updateSectionLegend();
-  }
-
-  // If this is a question node, update all connected option nodes
-  if (isQuestion(cell)) {
-    const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-    outgoingEdges.forEach(edge => {
-      const targetCell = edge.target;
-      if (targetCell && isOptions(targetCell)) {
-        // Recursively set section without triggering infinite loop
-        let targetStyle = targetCell.style || "";
-        targetStyle = targetStyle.replace(/section=[^;]+/, "");
-        targetStyle += `;section=${sectionNum};`;
-        graph.getModel().setStyle(targetCell, targetStyle);
-      }
-    });
-  }
-  // If this is an option node, check if it's connected to a question and match its section
-  else if (isOptions(cell)) {
-    const incomingEdges = graph.getIncomingEdges(cell) || [];
-    for (const edge of incomingEdges) {
-      const sourceCell = edge.source;
-      if (sourceCell && isQuestion(sourceCell)) {
-        const questionSection = getSection(sourceCell);
-        if (questionSection !== sectionNum) {
-          // Use the question's section instead
-          style = style.replace(/section=[^;]+/, "");
-          style += `;section=${questionSection};`;
-          graph.getModel().setStyle(cell, style);
-        }
-        break;
-      }
-    }
-  }
-}
-
-function getSection(cell) {
-  const style = cell.style || "";
-  const match = style.match(/section=([^;]+)/);
-  return match ? match[1] : "1";
-}
+// Section-related functions have been moved to legend.js
 
 // Add these functions at the top level
-function deleteSection(sectionNum) {
-  const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
-  const sectionToDelete = parseInt(sectionNum);
-  
-  // If this is the only section, don't allow deletion
-  if (sections.length === 1) {
-    alert("Cannot delete the only remaining section");
-    return;
-  }
-  
-  // Start a graph update
-  graph.getModel().beginUpdate();
-  try {
-    const parent = graph.getDefaultParent();
-    const vertices = graph.getChildVertices(parent);
-    
-    // First identify question nodes in the section being deleted
-    const questionsInSection = vertices.filter(cell => {
-      const sec = parseInt(getSection(cell) || "1", 10);
-      return sec === sectionToDelete && isQuestion(cell);
-    });
-    
-    // Find all calculation nodes that depend on these questions
-    const calcNodesToDependencies = new Map(); // Map to track calc nodes and their dependencies
-    
-    questionsInSection.forEach(questionCell => {
-      const dependentCalcNodes = findCalcNodesDependentOnQuestion(questionCell);
-      
-      dependentCalcNodes.forEach(calcNode => {
-        if (!calcNodesToDependencies.has(calcNode.id)) {
-          calcNodesToDependencies.set(calcNode.id, {
-            cell: calcNode,
-            dependencies: []
-          });
-        }
-        
-        // Add this question to the dependency list
-        calcNodesToDependencies.get(calcNode.id).dependencies.push(questionCell);
-      });
-    });
-    
-    // Log the found dependencies
-    if (calcNodesToDependencies.size > 0) {
-      console.log(`Found ${calcNodesToDependencies.size} calculation nodes dependent on questions in section ${sectionToDelete}`);
-      calcNodesToDependencies.forEach((data, id) => {
-        const depNames = data.dependencies.map(q => getNodeId(q) || q.value || 'unnamed').join(', ');
-        console.log(`  - Calc node ${id} depends on: ${depNames}`);
-      });
-    }
-    
-    // Collect all calc nodes to delete
-    const calcNodesToDelete = Array.from(calcNodesToDependencies.values()).map(data => data.cell);
-    
-    // Delete all cells in the section being deleted (excluding calculation nodes)
-    const cellsToDelete = vertices.filter(cell => {
-      const sec = parseInt(getSection(cell) || "1", 10);
-      return sec === sectionToDelete && !isCalculationNode(cell);
-    });
-    
-    // Add the dependent calculation nodes to the deletion list
-    const allCellsToDelete = [...cellsToDelete, ...calcNodesToDelete];
-    
-    if (allCellsToDelete.length > 0) {
-      graph.removeCells(allCellsToDelete);
-      console.log(`Deleted ${cellsToDelete.length} cells from section ${sectionToDelete} and ${calcNodesToDelete.length} dependent calculation nodes`);
-    }
-    
-    // Then move all cells from higher sections down one level
-    vertices.forEach(cell => {
-      // Skip cells that were already deleted
-      if (!cell.parent) return;
-      
-      const cellSection = parseInt(getSection(cell) || "1", 10);
-      if (cellSection > sectionToDelete) {
-        setSection(cell, cellSection - 1);
-      }
-    });
-    
-    // Update sectionPrefs
-    const newSectionPrefs = {};
-    Object.keys(sectionPrefs).forEach(sec => {
-      const secNum = parseInt(sec);
-      if (secNum < sectionToDelete) {
-        newSectionPrefs[sec] = sectionPrefs[sec];
-      } else if (secNum > sectionToDelete) {
-        // Move section down one level but keep its name
-        newSectionPrefs[(secNum - 1).toString()] = {
-          ...sectionPrefs[sec],
-          borderColor: getDefaultSectionColor(secNum - 1)
-        };
-      }
-    });
-    sectionPrefs = newSectionPrefs;
-    
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  
-  updateSectionLegend();
-  refreshAllCells();
-}
-
-function addSection(afterSectionNum) {
-  const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
-  const insertAfter = parseInt(afterSectionNum);
-  const newSectionNum = insertAfter + 1;
-  
-  // Start a graph update
-  graph.getModel().beginUpdate();
-  try {
-    // First, move all cells from higher sections up one level
-    const parent = graph.getDefaultParent();
-    const vertices = graph.getChildVertices(parent);
-    
-    vertices.forEach(cell => {
-      const cellSection = parseInt(getSection(cell) || "1", 10);
-      if (cellSection > insertAfter) {
-        setSection(cell, cellSection + 1);
-      }
-    });
-    
-    // Update sectionPrefs
-    const newSectionPrefs = {};
-    Object.keys(sectionPrefs).forEach(sec => {
-      const secNum = parseInt(sec);
-      if (secNum <= insertAfter) {
-        newSectionPrefs[sec] = sectionPrefs[sec];
-      } else {
-        // Move section up one level but keep its name
-        newSectionPrefs[(secNum + 1).toString()] = {
-          ...sectionPrefs[sec],
-          borderColor: getDefaultSectionColor(secNum + 1)
-        };
-      }
-    });
-    
-    // Add the new section
-    newSectionPrefs[newSectionNum.toString()] = {
-      borderColor: getDefaultSectionColor(newSectionNum),
-      name: `Section ${newSectionNum}`
-    };
-    
-    sectionPrefs = newSectionPrefs;
-    
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  
-  updateSectionLegend();
-  refreshAllCells();
-}
-
-function updateSectionLegend() {
-  const legend = document.getElementById("sectionLegend");
-  let innerHTML = "<h4>Section Names</h4>";
-  const sections = Object.keys(sectionPrefs).sort((a, b) => parseInt(a) - parseInt(b));
-  sections.forEach(sec => {
-    innerHTML += `
-      <div class="section-item" data-section="${sec}">
-        <div class="section-header">
-        <div class="section-color-box" style="background-color: ${sectionPrefs[sec].borderColor};" data-section="${sec}"></div>
-        <span class="section-number">${sec}:</span>
-        <span class="section-name" contenteditable="true" data-section="${sec}">${sectionPrefs[sec].name}</span>
-        </div>
-        <div class="section-buttons">
-          <button class="delete-section-btn" onclick="deleteSection('${sec}')">Delete</button>
-          <button class="add-section-btn" onclick="addSection('${sec}')">Add Below</button>
-        </div>
-      </div>
-    `;
-  });
-  innerHTML += `<button id="resetSectionColorsBtn">Reset Colors</button>`;
-  legend.innerHTML = innerHTML;
-
-  const colorBoxes = legend.querySelectorAll(".section-color-box");
-  colorBoxes.forEach(box => {
-    box.addEventListener("click", (e) => {
-      const sec = e.target.getAttribute("data-section");
-      selectedSectionForColor = sec;
-      const picker = document.getElementById("sectionColorPicker");
-      picker.value = rgbToHex(getComputedStyle(e.target).backgroundColor);
-      picker.click();
-    });
-  });
-  
-  // Add click handler for section items
-  const sectionItems = legend.querySelectorAll(".section-item");
-  sectionItems.forEach(item => {
-    // Clicking on section item (except on buttons or editable fields)
-    item.addEventListener("click", (e) => {
-      // Ignore clicks on buttons or editable fields
-      if (e.target.tagName === "BUTTON" || e.target.contentEditable === "true" || e.target.classList.contains("section-color-box")) {
-        return;
-      }
-      
-      const sec = item.getAttribute("data-section");
-      
-      // Select all cells in this section
-      const vertices = graph.getChildVertices(graph.getDefaultParent());
-      const cellsInSection = vertices.filter(cell => getSection(cell) === sec);
-      
-      // Clear existing selection
-      graph.clearSelection();
-      
-      // Select all cells in this section
-      graph.addSelectionCells(cellsInSection);
-      
-      // Highlight this section in the legend
-      highlightSectionInLegend(sec);
-    });
-  });
-  
-  const nameFields = legend.querySelectorAll(".section-name");
-  nameFields.forEach(field => {
-    field.addEventListener("blur", (e) => {
-      const sec = e.target.getAttribute("data-section");
-      sectionPrefs[sec].name = e.target.textContent.trim() || "Enter section name";
-      if (selectedCell && getSection(selectedCell) === sec) {
-        document.getElementById("propSectionName").textContent = sectionPrefs[sec].name;
-      }
-    });
-    field.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        e.target.blur();
-      }
-    });
-  });
-  document.getElementById("resetSectionColorsBtn").addEventListener("click", () => {
-    Object.keys(sectionPrefs).forEach(sec => {
-      sectionPrefs[sec].borderColor = getDefaultSectionColor(parseInt(sec));
-    });
-    updateSectionLegend();
-    refreshAllCells();
-  });
-  
-  // If there's a currently selected cell, highlight its section
-  if (selectedCell) {
-    const sec = getSection(selectedCell);
-    highlightSectionInLegend(sec);
-  }
-}
-
-// Helper function to highlight a section in the legend
-function highlightSectionInLegend(sectionNum) {
-  // Remove highlighting from all section items
-  const allSectionItems = document.querySelectorAll(".section-item");
-  allSectionItems.forEach(item => {
-    item.classList.remove("highlighted");
-  });
-  
-  // Add highlighting to the specified section
-  const sectionItem = document.querySelector(`.section-item[data-section="${sectionNum}"]`);
-  if (sectionItem) {
-    sectionItem.classList.add("highlighted");
-  }
-}
-
-function rgbToHex(rgb) {
-  const result = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/.exec(rgb);
-  return result ? "#" +
-    ("0" + parseInt(result[1], 10).toString(16)).slice(-2) +
-    ("0" + parseInt(result[2], 10).toString(16)).slice(-2) +
-    ("0" + parseInt(result[3], 10).toString(16)).slice(-2) : rgb;
-}
+// Section-related functions have been moved to legend.js
 let selectedSectionForColor = null;
-document.getElementById("sectionColorPicker").addEventListener("input", (e) => {
-  if (selectedSectionForColor) {
-    sectionPrefs[selectedSectionForColor].borderColor = e.target.value;
-    updateSectionLegend();
-    refreshAllCells();
-  }
-});
 
 /**************************************************
  ************  GRAPH, NODES, CONTEXT MENU, etc. ********
@@ -605,6 +242,9 @@ window.handleMultipleTextboxClick = function(event, cellId) {
   graph.selectionModel.setCell(cell);
 };
 
+
+
+
 window.handleMultipleTextboxFocus = function(event, cellId) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell) return;
@@ -617,19 +257,73 @@ window.handleMultipleTextboxFocus = function(event, cellId) {
 
 // ----------  ↓  NEW  ↓  (place after handleMultipleTextboxFocus) ----------
 window.handleDropdownClick = function (event, cellId) {
-  event.stopPropagation();                       // don’t let mxGraph steal the mouse
-  const cell = graph.getModel().getCell(cellId); // keep the node selected
-  graph.selectionModel.setCell(cell);
+  // Only stop propagation if clicking on the container div
+  if (event.target.classList.contains('dropdown-question')) {
+    event.stopPropagation();
+    const cell = graph.getModel().getCell(cellId);
+    if (cell) graph.selectionModel.setCell(cell);
+  }
+  // Let all events bubble naturally for the contenteditable text
 };
 
+// Helper to make text selection in dropdown nodes work
+window.initDropdownTextEditing = function(element) {
+  if (!element) return;
+  
+  const textDiv = element.querySelector('.question-text');
+  if (!textDiv) return;
+  
+  // Override any parent styles that might interfere with text editing
+  textDiv.style.userSelect = 'text';
+  textDiv.style.webkitUserSelect = 'text';
+  textDiv.style.msUserSelect = 'text';
+  textDiv.style.mozUserSelect = 'text';
+  textDiv.style.pointerEvents = 'auto';
+  textDiv.style.cursor = 'text';
+  
+  // Remove any event handlers that might interfere
+  textDiv.onmousedown = null;
+  textDiv.onmousemove = null;
+  textDiv.onmouseup = null;
+  
+  // Prevent the default mxGraph handlers from running when clicking inside the text
+  textDiv.addEventListener('mousedown', function(e) {
+    e.stopPropagation();
+  });
+  
+  // Allow normal clipboard operations
+  textDiv.addEventListener('copy', function(e) {
+    e.stopPropagation();
+  });
+  
+  textDiv.addEventListener('cut', function(e) {
+    e.stopPropagation();
+  });
+  
+  textDiv.addEventListener('paste', function(e) {
+    e.stopPropagation();
+  });
+};
+
+// Update handleDropdownFocus to initialize text editing
 window.handleDropdownFocus = function (event, cellId) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell) return;
+  
+  // Initialize text editing capabilities
+  window.initDropdownTextEditing(event.target.parentElement);
+  
   if (event.target.innerText === "Enter dropdown question") {
-    event.target.innerText = "";                 // clear the placeholder
+    event.target.innerText = "";
   }
 };
 // ----------  ↑  NEW  ↑  ----------------------------------------------------
+// ----------  ↓  NEW  ↓  (place immediately after handleDropdownFocus) ----------
+window.handleDropdownMouseDown = function (event) {
+  /* We're not using this handler anymore to allow normal text selection */
+  // No operation - existing for backward compatibility
+};
+// ----------  ↑  NEW  ↑  -------------------------------------------------------
 
 
 /**
@@ -657,6 +351,7 @@ function loadFlowchartData(data) {
 
     if (data.sectionPrefs) {
       sectionPrefs = data.sectionPrefs;
+      // updateSectionLegend is defined in legend.js
       updateSectionLegend();
     }
 
@@ -723,6 +418,7 @@ function loadFlowchartData(data) {
             const optionSection = getSection(cell);
             if (questionSection !== optionSection) {
               console.log(`Fixing option node ${cell.id} section from ${optionSection} to ${questionSection} to match parent question`);
+              // setSection is defined in legend.js
               setSection(cell, questionSection);
             }
             break;
@@ -780,25 +476,7 @@ function loadFlowchartData(data) {
 document.addEventListener("DOMContentLoaded", function() {
   checkForSavedLogin();
   
-  // Auto-fill login credentials and login automatically
-  function autoLogin() {
-    const loginEmail = document.getElementById("loginEmail");
-    const loginPassword = document.getElementById("loginPassword");
-    const loginButton = document.getElementById("loginButton");
-    
-    if (loginEmail && loginPassword && loginButton) {
-      loginEmail.value = "defaultemail0114@gmail.com";
-      loginPassword.value = "adam0114";
-      
-      // Add a small delay to ensure the form is filled before clicking
-      setTimeout(() => {
-        loginButton.click();
-      }, 500);
-    }
-  }
-  
-  // Call the auto-login function
-  autoLogin();
+  // autoLogin has been moved to auth.js
 
   const container = document.getElementById("graphContainer");
   const contextMenu = document.getElementById("contextMenu");
@@ -814,7 +492,6 @@ document.addEventListener("DOMContentLoaded", function() {
   const calcTypeBtn = document.getElementById("calcType");
   const subtitleTypeBtn = document.getElementById("subtitleType");
   const infoTypeBtn = document.getElementById("infoType");
-  const dropdownTypeBtn = document.getElementById("dropdownType");
   const checkboxTypeBtn = document.getElementById("checkboxType");
   const textTypeBtn = document.getElementById("textType");
   const moneyTypeBtn = document.getElementById("moneyType");
@@ -844,7 +521,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function isSimpleHtmlQuestion(cell) {
   if (!cell || !isQuestion(cell)) return false;
   const qt = getQuestionType(cell);
-  return ["text", "date", "number", "bigParagraph"].includes(qt);
+  return ["text", "text2", "date", "number", "bigParagraph"].includes(qt);
 }
 
 /* ----------  a) what the in-place editor should display  ---------- */
@@ -868,6 +545,12 @@ graph.addListener(mxEvent.LABEL_CHANGED, (sender, evt) => {
       cell,
       `<div style="text-align:center;">${value}</div>`
     );
+    
+    // For text2 cells, also update _questionText for export
+    if (getQuestionType(cell) === "text2") {
+      cell._questionText = value;
+    }
+    
     evt.consume();   // stop mxGraph from writing the raw text
   }
 });
@@ -919,6 +602,10 @@ graph.isCellEditable = function (cell) {
       qt === 'multipleDropdownType' ||
       qt === 'dropdown') {          // new ✱
     return false;
+  }
+  // Allow text2 to be edited directly with double-click
+  if (qt === 'text2') {
+    return true;
   }
   return true;
 };
@@ -1094,13 +781,14 @@ graph.isCellEditable = function (cell) {
           refreshNodeIdFromLabel(newVertex);
         } else if (isOptions(newVertex)) {
           refreshOptionNodeId(newVertex);
-        } else if (isCalculationNode(newVertex)) {
+        } else   if (isCalculationNode(newVertex)) {
           // Init calculation node data
           newVertex._calcTitle = "Calculation Title";
           newVertex._calcTerms = [{amountLabel: "", mathOperator: ""}];
           newVertex._calcOperator = "=";
           newVertex._calcThreshold = "0";
           newVertex._calcFinalText = "";
+          // updateCalculationNodeCell is defined in calc.js
           updateCalculationNodeCell(newVertex);
         }
 
@@ -1215,14 +903,6 @@ graph.isCellEditable = function (cell) {
   });
 
   // Submenu question-type events
-  dropdownTypeBtn.addEventListener("click", () => {
-    if (selectedCell && isQuestion(selectedCell)) {
-      setQuestionType(selectedCell, "dropdown");
-      selectedCell.value = "Dropdown question node";
-      refreshAllCells();
-    }
-    hideContextMenu();
-  });
   checkboxTypeBtn.addEventListener("click", () => {
     if (selectedCell && isQuestion(selectedCell)) {
       setQuestionType(selectedCell, "checkbox");
@@ -1235,6 +915,17 @@ graph.isCellEditable = function (cell) {
     if (selectedCell && isQuestion(selectedCell)) {
       setQuestionType(selectedCell, "text");
       selectedCell.value = "Text question node";
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+  
+  // Text2 type (Textbox Dropdown) button
+  const text2TypeBtn = document.getElementById("text2Type");
+  text2TypeBtn.addEventListener("click", () => {
+    if (selectedCell && isQuestion(selectedCell)) {
+      setQuestionType(selectedCell, "text2");
+      selectedCell.value = "Textbox Dropdown node";
       refreshAllCells();
     }
     hideContextMenu();
@@ -1362,7 +1053,9 @@ graph.isCellEditable = function (cell) {
   // Increase the "section number" for a question
   newSectionButton.addEventListener("click", () => {
     if (selectedCell) {
+      // getSection is defined in legend.js
       const currentSection = parseInt(getSection(selectedCell) || "1", 10);
+      // setSection is defined in legend.js
       setSection(selectedCell, currentSection + 1);
       refreshAllCells();
     }
@@ -1508,6 +1201,7 @@ graph.isCellEditable = function (cell) {
     if (isNaN(num)) return;
     graph.getModel().beginUpdate();
     try {
+      // setSection is defined in legend.js
       setSection(selectedCell, num);
     } finally {
       graph.getModel().endUpdate();
@@ -1516,8 +1210,10 @@ graph.isCellEditable = function (cell) {
   }
   function onSectionNameFieldChange(newName) {
     if (!selectedCell) return;
+    // getSection is defined in legend.js
     const sec = getSection(selectedCell);
     sectionPrefs[sec].name = newName.trim() || "Enter section name";
+    // updateSectionLegend is defined in legend.js
     updateSectionLegend();
   }
 
@@ -1665,6 +1361,7 @@ keyHandler.bindControlKey(86, () => {
   });
 
   updateLegendColors();
+  // updateSectionLegend is defined in legend.js
   updateSectionLegend();
 
   // Add event listeners for empty space menu buttons
@@ -2205,11 +1902,10 @@ window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
 };
 
 /*******************************************************
- ************ Calculation Node: RENDER & EDITS *********
+ ************ Subtitle and Info Nodes: RENDER & EDITS *********
  *******************************************************/
-function isCalculationNode(cell) {
-  return cell && cell.style && cell.style.includes("nodeType=calculation");
-}
+// isCalculationNode is now in calc.js but referenced here
+// function isCalculationNode(cell) is defined in calc.js
 
 function isSubtitleNode(cell) {
   return cell && cell.style && cell.style.includes("nodeType=subtitle");
@@ -2233,406 +1929,7 @@ function updateInfoNodeCell(cell) {
   colorCell(cell);
 }
 
-/**
- * Build a list of all "amount" labels from numbered dropdown questions.
- * We'll gather them in the format:
- *    "<question_id_text>_<amount_label>"
- * E.g. "how_many_cars_do_you_have_car_value"
- * Also include calculation node titles as potential sources
- */
-function gatherAllAmountLabels() {
-  const labels = [];
-  const parent = graph.getDefaultParent();
-  const vertices = graph.getChildVertices(parent);
-  
-  // First collect all calculation nodes
-  const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
-  
-  vertices.forEach(cell => {
-    if (isCalculationNode(cell)) {
-      // Add calculation node titles as potential sources
-      if (cell._calcTitle) {
-        labels.push(cell._calcTitle);
-      }
-    } else if (isQuestion(cell)) {
-      const qType = getQuestionType(cell);
-      if (qType === "multipleDropdownType") {
-        // We'll rename it "numberedDropdown" in final JSON
-        // If it has amounts, push them
-        if (cell._textboxes) {
-          const cleanQuestionName = sanitizeNameId(cell.value || cell._questionText || "unnamed_question");
-          cell._textboxes.forEach(tb => {
-            if (tb.isAmountOption) {
-              let amountName = sanitizeNameId(tb.nameId || "");
-              let label = cleanQuestionName + "_" + amountName;
-              labels.push(label);
-            }
-          });
-        }
-      } else if (qType === "checkbox") {
-        // Find all amount options linked to this checkbox question
-        const cleanQuestionName = sanitizeNameId(cell.value || "unnamed_question");
-        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-        for (const edge of outgoingEdges) {
-          const targetCell = edge.target;
-          if (targetCell && isOptions(targetCell) && isAmountOption(targetCell)) {
-            const optionText = sanitizeNameId(targetCell.value || "");
-            const optionLabel = cleanQuestionName + "_" + optionText;
-            labels.push(optionLabel);
-          }
-        }
-      } else if (qType === "money" || qType === "number") {
-        // Add number/money type questions directly
-        const cleanQuestionName = sanitizeNameId(cell.value || "unnamed_question");
-        const nodeId = getNodeId(cell) || "";
-        
-        // Use answer{questionId} format for consistent JSON export
-        const questionId = cell._questionId || nodeId.split('_').pop() || "";
-        const label = `answer${questionId}`;
-        
-        // Add the question text as label for better user identification
-        const displayLabel = `${cleanQuestionName} (${label})`;
-        
-        // Store with a special prefix to identify it's a direct question value
-        labels.push(`question_value:${label}:${displayLabel}`);
-      }
-    }
-  });
-
-  return labels;
-}
-
-/**
- * Renders the Calculation Node as HTML:
- * - Title (editable)
- * - 1st dropdown: any amount labels
- * - 2nd dropdown: operator (=, >, <)
- * - threshold number
- * - final text
- */
-function updateCalculationNodeCell(cell) {
-  // Prepare default fields if missing
-  if (cell._calcTitle === undefined) cell._calcTitle = "Calculation Title";
-  if (cell._calcTerms === undefined) cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
-  if (cell._calcOperator === undefined) cell._calcOperator = "=";
-  if (cell._calcThreshold === undefined) cell._calcThreshold = "0";
-  if (cell._calcFinalText === undefined) cell._calcFinalText = "";
-
-  // For backward compatibility
-  if (cell._calcAmountLabel !== undefined && cell._calcTerms.length === 1 && !cell._calcTerms[0].amountLabel) {
-    cell._calcTerms[0].amountLabel = cell._calcAmountLabel;
-  }
-
-  // Gather possible "amount" labels
-  const allAmountLabels = gatherAllAmountLabels();
-
-  // Build the HTML for all calculation terms
-  let calcTermsHtml = '';
-  
-  cell._calcTerms.forEach((term, index) => {
-    // Build dropdown of amount labels for this term
-    let amountOptionsHtml = `<option value="">-- pick an amount label --</option>`;
-    allAmountLabels.forEach(lbl => {
-      // Check if this is a direct question value (number/money type)
-      const isQuestionValue = lbl.startsWith('question_value:');
-      
-      let value = lbl;
-      let displayName = lbl;
-      
-      if (isQuestionValue) {
-        // Format: question_value:label:displayName
-        const parts = lbl.split(':');
-        if (parts.length >= 3) {
-          value = parts[1]; // The actual value to store (answer1, etc.)
-          displayName = parts[2]; // The display name for the dropdown
-        }
-      } else {
-        // Regular calculation label formatting
-        // Strip out common artifacts like delete_amount, add_option etc.
-        displayName = displayName.replace(/delete_amount_/g, "");
-        displayName = displayName.replace(/add_option_/g, "");
-        
-        // Find the last instance of the question name + underscore
-        const lastUnderscoreIndex = displayName.lastIndexOf("_");
-        if (lastUnderscoreIndex !== -1) {
-          const questionPart = displayName.substring(0, lastUnderscoreIndex);
-          const amountPart = displayName.substring(lastUnderscoreIndex + 1);
-          
-          // Format: "how_many_cars_do_you_have + car_value"
-          displayName = `${questionPart}_${amountPart}`;
-        }
-      }
-      
-      // Check if this option should be selected
-      let selected = "";
-      if (isQuestionValue) {
-        // For question values, check if the stored value matches
-        if (term.amountLabel === value) {
-          selected = "selected";
-        }
-      } else {
-        // For regular values, check direct match
-        if (lbl === term.amountLabel) {
-          selected = "selected";
-        }
-      }
-      
-      amountOptionsHtml += `<option value="${escapeAttr(value)}" ${selected}>${displayName}</option>`;
-    });
-
-    // For the first term, don't show a math operator
-    if (index === 0) {
-      calcTermsHtml += `
-        <div class="calc-term" data-index="${index}">
-          <label>Calc ${index + 1}:</label>
-          <select onchange="window.updateCalcNodeTerm('${cell.id}', ${index}, 'amountLabel', this.value)" style="width:100%; max-width:500px;">
-            ${amountOptionsHtml}
-          </select>
-          <br/><br/>
-        </div>
-      `;
-    } else {
-      // For subsequent terms, show a math operator dropdown first
-      let mathOperatorOptionsHtml = "";
-      const mathOperators = ["+", "-", "*", "/"];
-      mathOperators.forEach(op => {
-        const selected = (op === term.mathOperator) ? "selected" : "";
-        mathOperatorOptionsHtml += `<option value="${op}" ${selected}>${op}</option>`;
-      });
-
-      calcTermsHtml += `
-        <div class="calc-term" data-index="${index}">
-          <label>Math Operator:</label>
-          <select onchange="window.updateCalcNodeTerm('${cell.id}', ${index}, 'mathOperator', this.value)" style="width:100px;">
-            ${mathOperatorOptionsHtml}
-          </select>
-          <label style="margin-left:10px;">Calc ${index + 1}:</label>
-          <select onchange="window.updateCalcNodeTerm('${cell.id}', ${index}, 'amountLabel', this.value)" style="width:calc(100% - 120px); max-width:380px;">
-            ${amountOptionsHtml}
-          </select>
-          <button onclick="window.removeCalcNodeTerm('${cell.id}', ${index})" style="margin-left:5px;">Remove</button>
-          <br/><br/>
-        </div>
-      `;
-    }
-  });
-
-  // Add button for adding more terms
-  calcTermsHtml += `
-    <div style="margin-bottom:15px;">
-      <button onclick="window.addCalcNodeTerm('${cell.id}')">Add More</button>
-    </div>
-  `;
-
-  // Operator dropdown
-  const operators = ["=", ">", "<"];
-  let operatorOptionsHtml = "";
-  operators.forEach(op => {
-    const selected = (op === cell._calcOperator) ? "selected" : "";
-    operatorOptionsHtml += `<option value="${op}" ${selected}>${op}</option>`;
-  });
-
-  const html = `
-    <div style="padding:10px; width:100%;" class="multiple-textboxes-node">
-      <label>Calculation Title:</label><br/>
-      <div class="textbox-entry">
-        <input type="text" value="${escapeAttr(cell._calcTitle)}" onblur="window.updateCalcNodeTitle('${cell.id}', this.value)" style="width:100%;" />
-      </div>
-      <br/>
-
-      ${calcTermsHtml}
-
-      <label>Comparison Operator:</label>
-      <select onchange="window.updateCalcNodeOperator('${cell.id}', this.value)">
-        ${operatorOptionsHtml}
-      </select>
-      <br/><br/>
-
-      <label>Number:</label>
-      <input type="number" value="${escapeAttr(cell._calcThreshold)}" onblur="window.updateCalcNodeThreshold('${cell.id}', this.value)"/>
-      <br/><br/>
-
-      <label>Final Text:</label><br/>
-      <div class="textbox-entry">
-        <input type="text" value="${escapeAttr(cell._calcFinalText)}" onblur="window.updateCalcNodeFinalText('${cell.id}', this.value)" style="width:100%;" />
-      </div>
-    </div>
-  `;
-
-  graph.getModel().beginUpdate();
-  try {
-    graph.getModel().setValue(cell, html);
-    let st = cell.style || "";
-    // Ensure it's a rounded rectangle
-    if (st.includes("shape=hexagon")) {
-      st = st.replace("shape=hexagon", "shape=roundRect;rounded=1;arcSize=10");
-    }
-    if (!st.includes("rounded=1")) {
-      st += "rounded=1;arcSize=10;";
-    }
-    if (!st.includes("pointerEvents=")) {
-      st += "pointerEvents=1;overflow=fill;";
-    }
-    if (!st.includes("html=1")) {
-      st += "html=1;";
-    }
-    graph.getModel().setStyle(cell, st);
-    
-    // Set minimum size for the calculation node
-    const geo = cell.geometry;
-    if (geo) {
-      // Set a generous minimum width for the calculation node to fit dropdowns
-      if (geo.width < 400) {
-        geo.width = 400;
-      }
-      // Ensure height is adequate (add 50px per term after the first)
-      const minHeight = 250 + (Math.max(0, cell._calcTerms.length - 1) * 50);
-      if (geo.height < minHeight) {
-        geo.height = minHeight;
-      }
-    }
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  
-  // Force update cell size to fit content
-  graph.updateCellSize(cell);
-}
-
-// Calculation node field updates
-window.updateCalcNodeTitle = (cellId, title) => {
-  const cell = graph.model.getCell(cellId);
-  if (!cell) return;
-  
-  cell._calcTitle = title;
-  updateCalculationNodeCell(cell);
-};
-
-window.updateCalcNodeAmountLabel = function(cellId, value) {
-  const cell = graph.getModel().getCell(cellId);
-  if (!cell || !isCalculationNode(cell)) return;
-  graph.getModel().beginUpdate();
-  try {
-    cell._calcAmountLabel = value.trim();
-    
-    // Also update _calcTerms for backward compatibility
-    if (!cell._calcTerms || cell._calcTerms.length === 0) {
-      cell._calcTerms = [{
-        amountLabel: value.trim(),
-        mathOperator: ""
-      }];
-    } else if (cell._calcTerms.length > 0) {
-      cell._calcTerms[0].amountLabel = value.trim();
-    }
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  updateCalculationNodeCell(cell);
-};
-
-window.updateCalcNodeOperator = function(cellId, value) {
-  const cell = graph.getModel().getCell(cellId);
-  if (!cell || !isCalculationNode(cell)) return;
-  graph.getModel().beginUpdate();
-  try {
-    cell._calcOperator = value;
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  updateCalculationNodeCell(cell);
-};
-
-window.updateCalcNodeThreshold = function(cellId, value) {
-  const cell = graph.getModel().getCell(cellId);
-  if (!cell || !isCalculationNode(cell)) return;
-  graph.getModel().beginUpdate();
-  try {
-    cell._calcThreshold = value;
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  updateCalculationNodeCell(cell);
-};
-
-window.updateCalcNodeFinalText = (cellId, text) => {
-  const cell = graph.model.getCell(cellId);
-  if (!cell) return;
-  
-  cell._calcFinalText = text;
-  updateCalculationNodeCell(cell);
-};
-
-// New function to handle updating calculation terms
-window.updateCalcNodeTerm = (cellId, termIndex, property, value) => {
-  const cell = graph.getModel().getCell(cellId);
-  if (!cell || !isCalculationNode(cell)) return;
-  
-  graph.getModel().beginUpdate();
-  try {
-    // Initialize terms array if it doesn't exist
-    if (!cell._calcTerms) {
-      cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
-    }
-    
-    // Ensure the term exists
-    if (termIndex >= 0 && termIndex < cell._calcTerms.length) {
-      // Update the specified property
-      cell._calcTerms[termIndex][property] = value;
-      
-      // For backward compatibility, also update _calcAmountLabel if this is the first term
-      if (termIndex === 0 && property === 'amountLabel') {
-        cell._calcAmountLabel = value;
-      }
-    }
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  
-  updateCalculationNodeCell(cell);
-};
-
-// Add a new calculation term
-window.addCalcNodeTerm = (cellId) => {
-  const cell = graph.getModel().getCell(cellId);
-  if (!cell || !isCalculationNode(cell)) return;
-  
-  graph.getModel().beginUpdate();
-  try {
-    // Initialize terms array if it doesn't exist
-    if (!cell._calcTerms) {
-      cell._calcTerms = [{amountLabel: "", mathOperator: ""}];
-    }
-    
-    // Add a new term with default values
-    cell._calcTerms.push({
-      amountLabel: "",
-      mathOperator: "+"  // Default to addition
-    });
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  
-  updateCalculationNodeCell(cell);
-};
-
-// Remove a calculation term
-window.removeCalcNodeTerm = (cellId, termIndex) => {
-  const cell = graph.getModel().getCell(cellId);
-  if (!cell || !isCalculationNode(cell)) return;
-  
-  graph.getModel().beginUpdate();
-  try {
-    // Ensure we have terms and the index is valid
-    if (cell._calcTerms && termIndex > 0 && termIndex < cell._calcTerms.length) {
-      // Remove the term at the specified index
-      cell._calcTerms.splice(termIndex, 1);
-    }
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  
-  updateCalculationNodeCell(cell);
-};
+// The calculation node functions have been moved to calc.js
 
 /*******************************************************
  ************  HELPER / STYLING / JSON Exports  ********
@@ -2792,47 +2089,43 @@ window.pickTypeForCell = function(cellId, val) {
  *                setQuestionType                 *
  *  – now stores plain text for the simple types  *
  **************************************************/
+/**************************************************
+ *                setQuestionType                 *
+ **************************************************/
+/* ----------  REPLACE ENTIRE FUNCTION  ---------- */
 function setQuestionType (cell, newType) {
-  //------------------  style  -------------------
-  let st = cell.style || '';
-  st = st.replace(/questionType=[^;]+/, '');          // nuke any previous q-type
+  /* —— 1. update style —— */
+  let st = (cell.style || '').replace(/questionType=[^;]+/, '');
   st += `;questionType=${newType};align=center;verticalAlign=middle;spacing=12;`;
+  
+  // For text2, allow double-click editing directly
+  if (newType === 'text2') {
+    st += 'editable=1;';
+  } else if (!/pointerEvents=/.test(st)) {
+    st += 'pointerEvents=1;overflow=fill;';
+  }
+  
   graph.getModel().setStyle(cell, st);
 
-  //------------------  value / internals  -------
+  /* —— 2. update internals —— */
   graph.getModel().beginUpdate();
   try {
-
     switch (newType) {
 
-      /* ===== plain-looking types that still store a wrapper ===== */
-      case 'text':
-      case 'date':
-      case 'number':
-      case 'bigParagraph':
-        const nice = newType.charAt(0).toUpperCase() + newType.slice(1);
+      /* plain wrappers */
+      case 'text': case 'date': case 'number': case 'bigParagraph':
+        const nice = newType[0].toUpperCase() + newType.slice(1);
         cell.value = `<div style="text-align:center;">${nice} question node</div>`;
         break;
 
-
-
-      /* CHECKBOX / DROPDOWN keep their richer HTML wrappers */
-      case 'checkbox':
-      case 'dropdown':
-        cell._questionText = `Enter ${newType} question`;
-
-         // guarantee the wrapper lets the user click & paste
- let st2 = cell.style || "";
- if (!st2.includes("pointerEvents=")) {
-   st2 += "pointerEvents=1;overflow=fill;";
-   graph.getModel().setStyle(cell, st2);
- }
-
-
-        window.updateDropdownQuestionText(cell.id, cell._questionText);      // reuse existing helper
+      /* text2: textbox that works like dropdown but has better text editing */
+      case 'text2':
+        cell._questionText = 'Enter dropdown question';
+        // Use a simple HTML display like text nodes for double-click editing
+        cell.value = `<div style="text-align:center;">${cell._questionText || "Enter dropdown question"}</div>`;
         break;
 
-      /* COMPLEX TYPES you already had */
+      /* complex types left unchanged */
       case 'multipleTextboxes':
         cell._questionText = 'Enter question text';
         cell._textboxes    = [{ nameId:'', placeholder:'Enter value' }];
@@ -2846,20 +2139,18 @@ function setQuestionType (cell, newType) {
         updatemultipleDropdownTypeCell(cell);
         break;
 
-      /* default fallback */
       default:
         cell.value = `<div style="text-align:center;">${newType} question node</div>`;
     }
 
-    /* refresh the node-id so calc-nodes stay in sync */
     refreshNodeIdFromLabel(cell);
-
   } finally {
     graph.getModel().endUpdate();
   }
-
   refreshAllCells();
 }
+/* ----------  END OF REPLACEMENT  #2 ------------- */
+
 
 
 /**************************************************
@@ -2884,6 +2175,7 @@ function colorCell(cell) {
       case "text":         fillColor = colorPreferences.text; break;
       case "checkbox":     fillColor = colorPreferences.checkbox; break;
       case "dropdown":     fillColor = colorPreferences.dropdown; break;
+      case "text2":        fillColor = colorPreferences.dropdown; break; // Text2 uses dropdown color
       case "number":       fillColor = colorPreferences.money; break;
       case "date":         fillColor = colorPreferences.date; break;
       case "bigParagraph": fillColor = colorPreferences.bigParagraph; break;
@@ -2933,16 +2225,18 @@ function refreshAllCells() {
       updateImageOptionCell(cell);
     }
     
-    // If it's a dropdown with _questionText but not yet formatted
-    if (isQuestion(cell) && getQuestionType(cell) === "dropdown" && cell._questionText) {
-      let html = `<div class="dropdown-question" style="display:flex; flex-direction:column; align-items:center;">
-        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}" ondblclick="event.stopPropagation(); this.focus();" onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
-          ${escapeHtml(cell._questionText)}
-        </div>
-      </div>`;
-      
-      cell.value = html;
+    // If it's a text2 node, make sure we update _questionText from value
+    if (isQuestion(cell) && getQuestionType(cell) === "text2") {
+      // Extract text from HTML value if present
+      if (cell.value) {
+        const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+        if (cleanValue) {
+          cell._questionText = cleanValue;
+        }
+      }
     }
+    
+
     
     // If newly dropped question node is just placeholder
     if (isQuestion(cell) &&
@@ -2952,8 +2246,8 @@ function refreshAllCells() {
           <select style="margin:auto;" oninput="window.pickTypeForCell('${cell.id}', this.value)">
             <option value="">-- Choose Type --</option>
             <option value="text">Text</option>
+            <option value="text2">Dropdown</option>
             <option value="checkbox">Checkbox</option>
-            <option value="dropdown">Dropdown</option>
             <option value="number">Number</option>
             <option value="date">Date</option>
             <option value="bigParagraph">Big Paragraph</option>
@@ -2971,111 +2265,7 @@ function refreshAllCells() {
 /*******************************************************
  ************ Export/Import Flowchart JSON  ************
  *******************************************************/
-function downloadJson(str, filename) {
-  const blob = new Blob([str], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-window.exportFlowchartJson = function () {
-  const data = {};
-  data.cells = [];
-  const cells = graph.getModel().cells;
-  for (let id in cells) {
-    if (id === "0" || id === "1") continue;
-    const cell = cells[id];
-
-    const cellData = {
-      id: cell.id,
-      value: (cell.value === undefined ? "" : cell.value),
-      geometry: cell.geometry ? {
-        x: cell.geometry.x || 0,
-        y: cell.geometry.y || 0,
-        width: cell.geometry.width || 0,
-        height: cell.geometry.height || 0
-      } : null,
-      style: cleanStyle(cell.style || ""),
-      vertex: !!cell.vertex,
-      edge: !!cell.edge,
-      source: cell.edge ? (cell.source ? cell.source.id : null) : null,
-      target: cell.edge ? (cell.target ? cell.target.id : null) : null,
-      _textboxes: cell._textboxes || null,
-      _questionText: cell._questionText || null,
-      _twoNumbers: cell._twoNumbers || null,
-      _nameId: cell._nameId || null,
-      _placeholder: cell._placeholder || "",
-      _questionId: cell._questionId || null,
-      _image: cell._image || null
-    };
-
-    // If it's a calculation node, store the special fields
-    if (isCalculationNode(cell)) {
-      cellData._calcTitle = cell._calcTitle || "";
-      cellData._calcAmountLabel = cell._calcAmountLabel || "";
-      cellData._calcOperator = cell._calcOperator || "=";
-      cellData._calcThreshold = cell._calcThreshold || "0";
-      cellData._calcFinalText = cell._calcFinalText || "";
-      cellData._calcTerms = cell._calcTerms || [{amountLabel: cell._calcAmountLabel || "", mathOperator: ""}];
-    }
-
-    data.cells.push(cellData);
-  }
-  data.sectionPrefs = sectionPrefs;
-
-  downloadJson(JSON.stringify(data, null, 2), "flowchart_data.json");
-};
-
-window.importFlowchartJson = function (evt) {
-  const file = evt.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      let jsonString = e.target.result;
-      
-      // Add debugging
-      console.log("Original input:", jsonString.substring(0, 100) + "...");
-      
-      // Check if the string starts and ends with quotes (might be a quoted JSON string)
-      if (jsonString.startsWith('"') && jsonString.endsWith('"')) {
-        console.log("Detected quoted JSON string, unquoting...");
-        // Remove the outer quotes and unescape internal quotes
-        jsonString = jsonString.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-        console.log("After unquoting:", jsonString.substring(0, 100) + "...");
-      }
-      
-      // Alternative approach: Try to parse the JSON directly
-      let jsonData;
-      try {
-        jsonData = JSON.parse(jsonString);
-      } catch (parseError) {
-        console.log("Initial parsing failed, trying workaround...", parseError);
-        // Try an alternative approach - this can handle double-stringified JSON
-        jsonData = JSON.parse(JSON.stringify(eval("(" + jsonString + ")")));
-      }
-      
-      // Validate that it has cells property
-      if (!jsonData || !jsonData.cells || !Array.isArray(jsonData.cells)) {
-        console.error("Invalid JSON structure:", jsonData);
-        throw new Error("Invalid flowchart data: missing cells array");
-      }
-      
-      console.log("Successfully parsed JSON with", jsonData.cells.length, "cells");
-      loadFlowchartData(jsonData);
-      currentFlowchartName = null;
-    } catch (error) {
-      console.error("Error importing flowchart:", error);
-      alert("Error importing flowchart: " + error.message);
-    }
-  };
-  reader.readAsText(file);
-};
+// downloadJson, exportFlowchartJson, and importFlowchartJson have been moved to library.js
 
 /*******************************************************
  ************ BFS + Export GUI JSON (with BFS) *********
@@ -3420,6 +2610,16 @@ window.exportGuiJson = function() {
         question.type = "money";
       }
       
+      // Map text2 to dropdown for GUI JSON
+      if (questionType === "text2") {
+        question.type = "dropdown";
+        // Save the text from _questionText
+        if (cell._questionText) {
+          question.text = cell._questionText;
+        }
+        console.log(`Converting text2 to dropdown for question ${question.questionId}: ${question.text}`);
+      }
+      
       // For money/number questions, use getNodeId (not _nameId) for better calculations reference
       if (questionType === "money" || questionType === "number") {
         const rawNodeId = getNodeId(cell);
@@ -3446,9 +2646,9 @@ window.exportGuiJson = function() {
       // Set to track added options to prevent duplicates
       let addedOptions = new Set();
       
-      if (questionType === "dropdown" || questionType === "checkbox") {
-        // Add empty image object for dropdown questions by default
-        if (questionType === "dropdown") {
+      if (questionType === "dropdown" || questionType === "text2" || questionType === "checkbox") {
+        // Add empty image object for dropdown and text2 questions by default
+        if (questionType === "dropdown" || questionType === "text2") {
           question.image = {
             url: "",
             width: 0,
@@ -3493,8 +2693,8 @@ window.exportGuiJson = function() {
         for (const targetCell of uniqueTargetMap.values()) {
           // Check if this is an image option node
           if (isOptions(targetCell) && getQuestionType(targetCell) === "imageOption") {
-            // Found an image node, update the question's image property
-            if (questionType === "dropdown" && targetCell._image) {
+            // Found an image node, update the question's image property for dropdown or text2 questions
+            if ((questionType === "dropdown" || questionType === "text2") && targetCell._image) {
               question.image = {
                 url: targetCell._image.url || "",
                 width: parseInt(targetCell._image.width) || 0,
@@ -3565,7 +2765,7 @@ window.exportGuiJson = function() {
       let optionsWithJumpToEnd = [];
               
       // For numbered dropdown/dropdown/checkbox question types, check if the outgoing edges lead to END nodes
-      if (questionType === "numberedDropdown" || questionType === "dropdown" || questionType === "checkbox") {
+      if (questionType === "numberedDropdown" || questionType === "dropdown" || questionType === "text2" || questionType === "checkbox") {
           console.log(`Checking if question ${question.questionId} (${question.text}) has options leading to END`);
           const optionsOutgoingEdges = graph.getOutgoingEdges(cell) || [];
           
@@ -5611,208 +4811,8 @@ window.exportGuiJson = function() {
 /***********************************************
  *           SAVE & VIEW FLOWCHARTS           *
  ***********************************************/
-function saveFlowchart() {
-  if (!currentUser) {
-    alert("Please log in first.");
-    return;
-  }
-  
-  renumberQuestionIds(); // ensure question numbering is updated
-
-  let flowchartName = currentFlowchartName;
-  if (!flowchartName) {
-    flowchartName = prompt("Enter a name for this flowchart:");
-    if (!flowchartName || !flowchartName.trim()) return;
-    currentFlowchartName = flowchartName;
-  }
-
-  const data = {};
-  data.cells = [];
-
-  const cells = graph.getModel().cells;
-  for (let id in cells) {
-    if (id === "0" || id === "1") continue;
-    const cell = cells[id];
-
-    const cellData = {
-      id: cell.id,
-      value: cell.value || "",
-      geometry: cell.geometry ? {
-        x: cell.geometry.x || 0,
-        y: cell.geometry.y || 0,
-        width: cell.geometry.width || 0,
-        height: cell.geometry.height || 0
-      } : null,
-      style: cell.style || "",
-      vertex: !!cell.vertex,
-      edge: !!cell.edge,
-      source: cell.edge ? (cell.source ? cell.source.id : null) : null,
-      target: cell.edge ? (cell.target ? cell.target.id : null) : null,
-      _textboxes: cell._textboxes || null,
-      _questionText: cell._questionText || null,
-      _twoNumbers: cell._twoNumbers || null,
-      _nameId: cell._nameId || null,
-      _placeholder: cell._placeholder || "",
-      _questionId: cell._questionId || null,
-      _image: cell._image || null
-    };
-
-    // If it's a calculation node
-    if (isCalculationNode(cell)) {
-      cellData._calcTitle = cell._calcTitle || "";
-      cellData._calcAmountLabel = cell._calcAmountLabel || "";
-      cellData._calcOperator = cell._calcOperator || "=";
-      cellData._calcThreshold = cell._calcThreshold || "0";
-      cellData._calcFinalText = cell._calcFinalText || "";
-      cellData._calcTerms = cell._calcTerms || [{amountLabel: cell._calcAmountLabel || "", mathOperator: ""}];
-    }
-    
-    // If it's a subtitle node
-    if (isSubtitleNode(cell)) {
-      cellData._subtitleText = cell._subtitleText || "";
-    }
-    
-    // If it's an info node
-    if (isInfoNode(cell)) {
-      cellData._infoText = cell._infoText || "";
-    }
-
-    data.cells.push(cellData);
-  }
-  data.sectionPrefs = sectionPrefs;
-
-  db.collection("users")
-    .doc(currentUser.uid)
-    .collection("flowcharts")
-    .doc(flowchartName)
-    .set({ flowchart: data })
-    .then(() => {
-      alert("Flowchart saved as: " + flowchartName);
-    })
-    .catch(err => {
-      console.error("Error saving flowchart:", err);
-      alert("Error saving flowchart: " + err);
-    });
-}
-
-function viewSavedFlowcharts() {
-  if (!currentUser) {
-    alert("Please log in first.");
-    return;
-  }
-  db.collection("users")
-    .doc(currentUser.uid)
-    .collection("flowcharts")
-    .get()
-    .then(snapshot => {
-      let html = "";
-      if (snapshot.empty) {
-        html = "<p>You currently have no saved flowcharts.</p>";
-      } else {
-        snapshot.forEach(doc => {
-          const name = doc.id;
-          html += `
-            <div class="flowchart-item">
-              <strong ondblclick="renameFlowchart('${name}', this)">${name}</strong>
-              <button onclick="openSavedFlowchart('${name}')">Open</button>
-              <button onclick="deleteSavedFlowchart('${name}')">Delete</button>
-            </div>
-          `;
-        });
-      }
-      flowchartListDiv.innerHTML = html;
-      showFlowchartListOverlay();
-    })
-    .catch(err => {
-      console.error("Error fetching flowcharts:", err);
-      alert("Error fetching flowcharts: " + err);
-    });
-}
-function showFlowchartListOverlay() {
-  document.getElementById("flowchartListOverlay").style.display = "flex";
-}
-function hideFlowchartListOverlay() {
-  document.getElementById("flowchartListOverlay").style.display = "none";
-}
-document.getElementById("closeFlowchartListBtn").addEventListener("click", hideFlowchartListOverlay);
-
-window.openSavedFlowchart = function(name) {
-  if (!currentUser) return;
-  db.collection("users")
-    .doc(currentUser.uid)
-    .collection("flowcharts")
-    .doc(name)
-    .get()
-    .then(docSnap => {
-      if (!docSnap.exists) {
-        alert("No flowchart named " + name);
-        return;
-      }
-      const data = docSnap.data();
-      if (!data.flowchart) {
-        alert("No flowchart data found for " + name);
-        return;
-      }
-      loadFlowchartData(data.flowchart);
-      currentFlowchartName = name;
-      hideFlowchartListOverlay();
-    })
-    .catch(err => {
-      console.error("Error loading flowchart:", err);
-      alert("Error loading flowchart: " + err);
-    });
-};
-
-window.renameFlowchart = function(oldName, element) {
-  let newName = prompt("Enter new name for this flowchart:", oldName);
-  if (!newName || newName.trim() === "" || newName === oldName) return;
-  newName = newName.trim();
-  const docRef = db.collection("users").doc(currentUser.uid).collection("flowcharts").doc(oldName);
-  docRef.get().then(docSnap => {
-    if (docSnap.exists) {
-      const data = docSnap.data();
-      db.collection("users")
-        .doc(currentUser.uid)
-        .collection("flowcharts")
-        .doc(newName)
-        .set(data)
-        .then(() => {
-          docRef.delete();
-          element.textContent = newName;
-          if(currentFlowchartName === oldName) {
-            currentFlowchartName = newName;
-          }
-          alert("Flowchart renamed to: " + newName);
-        })
-        .catch(err => {
-          console.error("Error renaming flowchart:", err);
-          alert("Error renaming flowchart: " + err);
-        });
-    }
-  });
-};
-
-window.deleteSavedFlowchart = function(name) {
-  if (!currentUser) return;
-  const confirmDel = confirm("Are you sure you want to delete '" + name + "'?");
-  if (!confirmDel) return;
-  db.collection("users")
-    .doc(currentUser.uid)
-    .collection("flowcharts")
-    .doc(name)
-    .delete()
-    .then(() => {
-      alert("Deleted flowchart: " + name);
-      if (currentFlowchartName === name) {
-        currentFlowchartName = null;
-      }
-      viewSavedFlowcharts();
-    })
-    .catch(err => {
-      console.error("Error deleting flowchart:", err);
-      alert("Error deleting flowchart: " + err);
-    });
-};
+// saveFlowchart, viewSavedFlowcharts, showFlowchartListOverlay, hideFlowchartListOverlay,
+// and all flowchart operations have been moved to library.js
 
 /**
  * Render HTML for an Image Option Node, storing the image data in cell._image.
@@ -6156,44 +5156,7 @@ function createYesNoOptions(parentCell) {
   refreshAllCells();
 }
 
-// For dropdown questions
-window.updateDropdownQuestionText = function(cellId, text) {
-  const cell = graph.getModel().getCell(cellId);
-  if (cell && getQuestionType(cell) === "dropdown") {
-    graph.getModel().beginUpdate();
-    try {
-      cell._questionText = text.trim() || "Enter dropdown question";
-      
-      // Recreate the HTML with the updated text
-      let html = `<div class="dropdown-question" style="display:flex; flex-direction:column; align-items:center;">
-    <div class="question-text" style="text-align:center; padding:8px; width:100%;"
-         contenteditable="true"
-         onclick="window.handleDropdownClick(event, '${cell.id}')"
-         onfocus="window.handleDropdownFocus(event, '${cell.id}')"
-        ondblclick="event.stopPropagation(); this.focus();"
-        onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
-      ${escapeHtml(cell._questionText)}
-   </div>
- </div>`;
-      
-      cell.value = html;
 
-      // make sure the inner div actually gets the mouse/keyboard events
-let st = cell.style || "";
-if (!st.includes("pointerEvents=")) {
-  st += "pointerEvents=1;overflow=fill;";
-  graph.getModel().setStyle(cell, st);
-}
-
-
-
-      refreshNodeIdFromLabel(cell);
-    } finally {
-      graph.getModel().endUpdate();
-    }
-    graph.updateCellSize(cell);
-  }
-};
 
 // Add a function to directly import a JSON string
 window.importFlowchartJsonDirectly = function(jsonString) {
@@ -6343,177 +5306,56 @@ function sanitizeNameId(str) {
 }
 // --- PATCH END ---
 
-/**************************************************
- *           CALCULATION NODE DEPENDENCY MANAGEMENT     *
- **************************************************/
-
-/**
- * Finds all calculation nodes that depend on the given question node.
- * A calculation node depends on a question if it uses an amount value 
- * from that question in any of its terms.
- * 
- * @param {mxCell} questionCell The question node to check dependencies for
- * @returns {Array} Array of calculation node cells that depend on this question
- */
-function findCalcNodesDependentOnQuestion(questionCell) {
-  if (!questionCell || !isQuestion(questionCell)) return [];
-
-  const dependentCalcNodes = [];
-  const questionId = getNodeId(questionCell) || "";
-  const questionText = questionCell._questionText || questionCell.value || "";
-  const cleanQuestionName = sanitizeNameId(questionText);
-  
-  // Also get the questionId directly if available
-  const directQuestionId = questionCell._questionId || (questionId.split('_').pop() || "");
-  
-  // Get all calculation nodes in the graph
-  const parent = graph.getDefaultParent();
-  const vertices = graph.getChildVertices(parent);
-  const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
-  
-  // For each calculation node, check if it depends on this question
-  calculationNodes.forEach(calcNode => {
-    if (!calcNode._calcTerms) return;
-    
-    let isDependentNode = false;
-    
-    // Check each calculation term
-    calcNode._calcTerms.forEach(term => {
-      if (!term.amountLabel) return;
-      
-      // Check if this term references the question directly by name or nodeId
-      if (term.amountLabel.toLowerCase().includes(questionId.toLowerCase()) ||
-          term.amountLabel.toLowerCase().includes(cleanQuestionName.toLowerCase())) {
-        isDependentNode = true;
-      }
-      
-      // Check if this is a direct answer reference for money/number type questions
-      if (getQuestionType(questionCell) === "money" || getQuestionType(questionCell) === "number") {
-        // Format for direct question references: answer{questionId}
-        const answerPattern = `answer${directQuestionId}`;
-        if (term.amountLabel === answerPattern) {
-          isDependentNode = true;
-        }
-      }
-      
-      // For multiple dropdown questions, check if term references any of its amounts
-      if (getQuestionType(questionCell) === "multipleDropdownType" && questionCell._textboxes) {
-        questionCell._textboxes.forEach(tb => {
-          if (tb.isAmountOption && tb.nameId) {
-            const amountPattern = cleanQuestionName + "_" + sanitizeNameId(tb.nameId);
-            if (term.amountLabel.toLowerCase().includes(amountPattern.toLowerCase())) {
-              isDependentNode = true;
-            }
-          }
-        });
-      }
-      
-      // For checkbox questions, check for matching option nodes
-      if (getQuestionType(questionCell) === "checkbox") {
-        const outgoingEdges = graph.getOutgoingEdges(questionCell) || [];
-        for (const edge of outgoingEdges) {
-          const targetCell = edge.target;
-          if (targetCell && isOptions(targetCell) && isAmountOption(targetCell)) {
-            const optionText = sanitizeNameId(targetCell.value || "");
-            const optionPattern = cleanQuestionName + "_" + optionText;
-            if (term.amountLabel.toLowerCase().includes(optionPattern.toLowerCase())) {
-              isDependentNode = true;
-            }
-          }
-        }
-      }
-    });
-    
-    if (isDependentNode) {
-      dependentCalcNodes.push(calcNode);
-    }
-  });
-  
-  return dependentCalcNodes;
-}
-
-/**
- * Updates or deletes calculation nodes when a question node changes or is deleted.
- * 
- * @param {mxCell} questionCell The question node that was changed or null if deleted
- * @param {boolean} isDeleted True if the question was deleted, false if just modified
- * @param {string} oldNodeId The previous node ID if changed (optional)
- */
-function updateAllCalcNodesOnQuestionChange(questionCell, isDeleted, oldNodeId = null) {
-  if (isDeleted && !oldNodeId) {
-    console.error("When deleting a question, must provide its oldNodeId");
-    return;
-  }
-  
-  const questionId = isDeleted ? oldNodeId : (getNodeId(questionCell) || "");
-  const parent = graph.getDefaultParent();
-  const vertices = graph.getChildVertices(parent);
-  const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
-  
-  // For direct references to number/money fields, we need to extract the question ID
-  const directQuestionId = isDeleted ? 
-    (oldNodeId.split('_').pop() || "") : 
-    (questionCell._questionId || (questionId.split('_').pop() || ""));
-  
-  // If the question was deleted, find and delete any calc nodes that depend on it
-  if (isDeleted) {
-    // Gather a list of calc nodes to delete
-    const calcNodesToDelete = [];
-    
-    calculationNodes.forEach(calcNode => {
-      if (!calcNode._calcTerms) return;
-      
-      let dependsOnDeletedQuestion = false;
-      calcNode._calcTerms.forEach(term => {
-        if (!term.amountLabel) return;
-        
-        // Check for direct references to the question ID
-        if (term.amountLabel.toLowerCase().includes(oldNodeId.toLowerCase())) {
-          dependsOnDeletedQuestion = true;
-        }
-        
-        // Check for direct answer references (money/number types)
-        const answerPattern = `answer${directQuestionId}`;
-        if (term.amountLabel === answerPattern) {
-          dependsOnDeletedQuestion = true;
-        }
-      });
-      
-      if (dependsOnDeletedQuestion) {
-        calcNodesToDelete.push(calcNode);
-      }
-    });
-    
-    // Delete the dependent calc nodes
-    if (calcNodesToDelete.length > 0) {
-      graph.getModel().beginUpdate();
-      try {
-        graph.removeCells(calcNodesToDelete);
-        console.log(`Deleted ${calcNodesToDelete.length} calculation nodes that depended on deleted question`);
-      } finally {
-        graph.getModel().endUpdate();
-      }
-    }
-  }
-  // If the question was modified, update all dependent calculation nodes
-  else {
-    const dependentCalcNodes = findCalcNodesDependentOnQuestion(questionCell);
-    if (dependentCalcNodes.length > 0) {
-      graph.getModel().beginUpdate();
-      try {
-        // Update each calculation node
-        dependentCalcNodes.forEach(calcNode => {
-          updateCalculationNodeCell(calcNode);
-        });
-        
-        console.log(`Updated ${dependentCalcNodes.length} calculation nodes that depend on modified question`);
-      } finally {
-        graph.getModel().endUpdate();
-      }
-    }
-  }
-}
+// Calculation node dependency management functions have been moved to calc.js
 
 /**************************************************
  *           COLORING & REFRESHING CELLS          *
  **************************************************/
+
+/**
+ * Create a cell for text2 - a textbox that functions like a dropdown but 
+ * has better text editing capabilities
+ */
+function updateText2Cell(cell) {
+  if (!cell) return;
+  
+  // Ensure we have question text
+  if (!cell._questionText) {
+    cell._questionText = "Enter dropdown question";
+  }
+  
+  // Create the HTML content with a structure similar to multiple textboxes
+  // which has good text selection/editing support
+  const html = `
+    <div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center; width:100%;">
+      <div class="question-text" 
+           style="text-align:center; padding:8px; width:100%; user-select:text;"
+           contenteditable="true" 
+           onmousedown="event.stopPropagation();"
+           onclick="window.handleMultipleTextboxClick(event, '${cell.id}')" 
+           onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')" 
+           onblur="window.updateText2Handler('${cell.id}', this.innerText)">
+        ${escapeHtml(cell._questionText)}
+      </div>
+    </div>`;
+  
+  graph.getModel().setValue(cell, html);
+}
+
+/**
+ * Handler for text2 question text changes
+ */
+window.updateText2Handler = function(cellId, text) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || getQuestionType(cell) !== "text2") return;
+  
+      graph.getModel().beginUpdate();
+      try {
+    cell._questionText = text.trim() || "Enter dropdown question";
+    updateText2Cell(cell);
+      } finally {
+        graph.getModel().endUpdate();
+      }
+  
+  refreshNodeIdFromLabel(cell);
+};

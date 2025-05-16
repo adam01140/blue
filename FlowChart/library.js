@@ -4,63 +4,85 @@
 
 // Utility to download JSON
 function downloadJson(str, filename) {
-  const blob = new Blob([str], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(str);
+  const dlAnchorElem = document.createElement("a");
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", filename);
+  document.body.appendChild(dlAnchorElem);
+  dlAnchorElem.click();
+  document.body.removeChild(dlAnchorElem);
 }
 
 // Export the flowchart structure as JSON
 window.exportFlowchartJson = function () {
-  const data = {};
-  data.cells = [];
-  const cells = graph.getModel().cells;
+  const parent = graph.getDefaultParent();
+  const encoder = new mxCodec();
+  const cells = graph.getChildCells(parent, true, true);
 
-  for (let id in cells) {
-    if (id === "0" || id === "1") continue;
-    const cell = cells[id];
+  // Map cells, keeping only needed properties
+  const simplifiedCells = cells.map(cell => {
+    // Basic info about the cell
     const cellData = {
       id: cell.id,
-      value: (cell.value === undefined ? "" : cell.value),
-      geometry: cell.geometry ? {
-        x: cell.geometry.x || 0,
-        y: cell.geometry.y || 0,
-        width: cell.geometry.width || 0,
-        height: cell.geometry.height || 0
-      } : null,
-      style: cleanStyle(cell.style || ""),
-      vertex: !!cell.vertex,
-      edge: !!cell.edge,
-      source: cell.edge ? (cell.source ? cell.source.id : null) : null,
-      target: cell.edge ? (cell.target ? cell.target.id : null) : null,
-      _textboxes: cell._textboxes || null,
-      _questionText: cell._questionText || null,
-      _twoNumbers: cell._twoNumbers || null,
-      _nameId: cell._nameId || null,
-      _placeholder: cell._placeholder || "",
-      _questionId: cell._questionId || null,
-      _image: cell._image || null
+      vertex: cell.vertex,
+      edge: cell.edge,
+      value: cell.value,
+      style: cell.style,
     };
 
-    if (isCalculationNode(cell)) {
-      cellData._calcTitle = cell._calcTitle || "";
-      cellData._calcAmountLabel = cell._calcAmountLabel || "";
-      cellData._calcOperator = cell._calcOperator || "=";
-      cellData._calcThreshold = cell._calcThreshold || "0";
-      cellData._calcFinalText = cell._calcFinalText || "";
-      cellData._calcTerms = cell._calcTerms || [{amountLabel: cell._calcAmountLabel || "", mathOperator: ""}];
+    // Handle geometry 
+    if (cell.geometry) {
+      cellData.geometry = {
+        x: cell.geometry.x,
+        y: cell.geometry.y,
+        width: cell.geometry.width,
+        height: cell.geometry.height,
+      };
     }
 
-    data.cells.push(cellData);
-  }
+    // Add source and target for edges
+    if (cell.edge && cell.source && cell.target) {
+      cellData.source = cell.source.id;
+      cellData.target = cell.target.id;
+    }
 
-  data.sectionPrefs = sectionPrefs;
-  downloadJson(JSON.stringify(data, null, 2), "flowchart_data.json");
+    // Custom fields for specific nodes
+    if (cell._textboxes) cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
+    if (cell._questionText) cellData._questionText = cell._questionText;
+    if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
+    if (cell._nameId) cellData._nameId = cell._nameId;
+    if (cell._placeholder) cellData._placeholder = cell._placeholder;
+    if (cell._questionId) cellData._questionId = cell._questionId;
+    
+    // textbox properties
+    if (cell._amountName) cellData._amountName = cell._amountName;
+    if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
+    
+    // image option
+    if (cell._image) cellData._image = cell._image;
+    
+    // calculation node properties
+    if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
+    if (cell._calcAmountLabel !== undefined) cellData._calcAmountLabel = cell._calcAmountLabel;
+    if (cell._calcOperator !== undefined) cellData._calcOperator = cell._calcOperator;
+    if (cell._calcThreshold !== undefined) cellData._calcThreshold = cell._calcThreshold;
+    if (cell._calcFinalText !== undefined) cellData._calcFinalText = cell._calcFinalText;
+    if (cell._calcTerms !== undefined) cellData._calcTerms = JSON.parse(JSON.stringify(cell._calcTerms));
+    
+    // subtitle & info nodes
+    if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
+    if (cell._infoText !== undefined) cellData._infoText = cell._infoText;
+
+    return cellData;
+  });
+
+  const exportObj = {
+    cells: simplifiedCells,
+    sectionPrefs: sectionPrefs
+  };
+
+  const jsonStr = JSON.stringify(exportObj, null, 2);
+  downloadJson(jsonStr, "flowchart.json");
 };
 
 // Import a flowchart JSON file
@@ -223,4 +245,620 @@ window.deleteSavedFlowchart = function(name) {
   db.collection("users").doc(currentUser.uid).collection("flowcharts").doc(name).delete()
     .then(()=>{ alert("Deleted: " + name); if(currentFlowchartName===name) currentFlowchartName=null; window.viewSavedFlowcharts(); })
     .catch(err=>alert("Error deleting: " + err));
-}; 
+};
+
+/**************************************************
+ *            FILE I/O OPERATIONS               *
+ **************************************************/
+
+/**
+ * Downloads a string as a JSON file.
+ */
+function downloadJson(str, filename) {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(str);
+  const dlAnchorElem = document.createElement("a");
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", filename);
+  document.body.appendChild(dlAnchorElem);
+  dlAnchorElem.click();
+  document.body.removeChild(dlAnchorElem);
+}
+
+/**
+ * Exports the flowchart to a JSON file.
+ */
+function exportFlowchartJson() {
+  const parent = graph.getDefaultParent();
+  const encoder = new mxCodec();
+  const cells = graph.getChildCells(parent, true, true);
+
+  // Map cells, keeping only needed properties
+  const simplifiedCells = cells.map(cell => {
+    // Basic info about the cell
+    const cellData = {
+      id: cell.id,
+      vertex: cell.vertex,
+      edge: cell.edge,
+      value: cell.value,
+      style: cell.style,
+    };
+
+    // Handle geometry 
+    if (cell.geometry) {
+      cellData.geometry = {
+        x: cell.geometry.x,
+        y: cell.geometry.y,
+        width: cell.geometry.width,
+        height: cell.geometry.height,
+      };
+    }
+
+    // Add source and target for edges
+    if (cell.edge && cell.source && cell.target) {
+      cellData.source = cell.source.id;
+      cellData.target = cell.target.id;
+    }
+
+    // Custom fields for specific nodes
+    if (cell._textboxes) cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
+    if (cell._questionText) cellData._questionText = cell._questionText;
+    if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
+    if (cell._nameId) cellData._nameId = cell._nameId;
+    if (cell._placeholder) cellData._placeholder = cell._placeholder;
+    if (cell._questionId) cellData._questionId = cell._questionId;
+    
+    // textbox properties
+    if (cell._amountName) cellData._amountName = cell._amountName;
+    if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
+    
+    // image option
+    if (cell._image) cellData._image = cell._image;
+    
+    // calculation node properties
+    if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
+    if (cell._calcAmountLabel !== undefined) cellData._calcAmountLabel = cell._calcAmountLabel;
+    if (cell._calcOperator !== undefined) cellData._calcOperator = cell._calcOperator;
+    if (cell._calcThreshold !== undefined) cellData._calcThreshold = cell._calcThreshold;
+    if (cell._calcFinalText !== undefined) cellData._calcFinalText = cell._calcFinalText;
+    if (cell._calcTerms !== undefined) cellData._calcTerms = JSON.parse(JSON.stringify(cell._calcTerms));
+    
+    // subtitle & info nodes
+    if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
+    if (cell._infoText !== undefined) cellData._infoText = cell._infoText;
+
+    return cellData;
+  });
+
+  const exportObj = {
+    cells: simplifiedCells,
+    sectionPrefs: sectionPrefs
+  };
+
+  const jsonStr = JSON.stringify(exportObj, null, 2);
+  downloadJson(jsonStr, "flowchart.json");
+}
+
+/**
+ * Exports the flowchart to a GUI-usable JSON format.
+ */
+function exportGuiJson() {
+  const parent = graph.getDefaultParent();
+  const questionCellMap = new Map();
+  const questionIdMap = new Map();
+  const optionCellMap = new Map();
+  const vertices = graph.getChildVertices(parent);
+
+  // Filter only question nodes
+  const questions = vertices.filter(cell => isQuestion(cell));
+
+  // Create a table for the question nodes first
+  questions.forEach(cell => {
+    // If this node has multiple textboxes, handle specially
+    const questionType = getQuestionType(cell); 
+    const sectionNum = getSection(cell);
+    
+    const uniqueNodeId = getNodeId(cell) || "unnamed";
+    questionCellMap.set(cell.id, cell); // Map by ID
+    questionIdMap.set(uniqueNodeId, cell); // Map by text/nodeId
+    
+    const outgoingEdges = graph.getOutgoingEdges(cell);
+  });
+
+  // For more complex cases, identify & record section jumps
+  let jumps = [];
+  vertices.forEach(cell => {
+    if (isOptions(cell)) {
+      detectSectionJumps(cell, questionCellMap, questionIdMap, jumps);
+    }
+  });
+
+  // Clean up the jumps - filter out any duplicate jumps for the same option leading to the same section
+  jumps = jumps.filter((jump, index, self) => 
+    index === self.findIndex(j => (j.from === jump.from && j.option === jump.option && j.to === jump.to))
+  );
+
+  // Sort questions by section number then question number
+  const sortedQuestions = [...questionCellMap.values()].sort((a, b) => {
+    const sectionA = parseInt(getSection(a) || "1");
+    const sectionB = parseInt(getSection(b) || "1");
+    if (sectionA !== sectionB) return sectionA - sectionB;
+    
+    // First try sorting by questionId if both have one
+    if (a._questionId && b._questionId) {
+      return parseInt(a._questionId) - parseInt(b._questionId);
+    }
+    
+    // Fall back to sorting by value if no questionId
+    return (a.value || "").localeCompare(b.value || "");
+  });
+
+  // Build the sections
+  const sections = {};
+  Object.keys(sectionPrefs).forEach(secNum => {
+    sections[secNum] = {
+      name: sectionPrefs[secNum].name,
+      color: sectionPrefs[secNum].borderColor,
+      questions: []
+    };
+  });
+
+  // Now format each question with its options
+  sortedQuestions.forEach(cell => {
+    const qType = getQuestionType(cell) || "dropdown";
+    const qId = getNodeId(cell) || sanitizeNameId(cell.value || "unnamed");
+    const qSection = getSection(cell);
+    
+    const questionObj = {
+      id: qId,
+      text: cell._questionText || cell.value || "",
+      type: qType,
+      questionNumber: cell._questionId || "",
+      options: []
+    };
+    
+    // Special handling for multipleTextboxes
+    if (qType === "multipleTextboxes" && cell._textboxes) {
+      questionObj.textboxes = cell._textboxes;
+    }
+    
+    // Special handling for multipleDropdownType
+    if (qType === "multipleDropdownType" && cell._textboxes) {
+      questionObj.textboxes = cell._textboxes;
+    }
+    
+    // Get all options for this question
+    const outgoingEdges = graph.getOutgoingEdges(cell) || [];
+    outgoingEdges.forEach(edge => {
+      const targetCell = edge.target;
+      if (targetCell && isOptions(targetCell)) {
+        const optionText = targetCell.value || "";
+        const targetOptions = graph.getOutgoingEdges(targetCell) || [];
+        
+        // Check if this option leads to another question
+        let nextQuestion = null;
+        if (targetOptions.length > 0) {
+          const firstOptionTarget = targetOptions[0].target;
+          if (firstOptionTarget && isQuestion(firstOptionTarget)) {
+            const targetId = getNodeId(firstOptionTarget) || "";
+            // Only set nextQuestion if it's in a different section
+            if (getSection(firstOptionTarget) === qSection) {
+              nextQuestion = targetId;
+            }
+          }
+        }
+        
+        const optionObj = {
+          text: optionText,
+        };
+        
+        if (nextQuestion) optionObj.nextQuestion = nextQuestion;
+        
+        // If this is an amount option, add amount properties
+        if (getQuestionType(targetCell) === "amountOption") {
+          optionObj.amount = {
+            name: targetCell._amountName || "value",
+            placeholder: targetCell._amountPlaceholder || "Enter value"
+          };
+        }
+        
+        // If this is an image option, add image URL
+        if (getQuestionType(targetCell) === "imageOption" && targetCell._image) {
+          optionObj.image = targetCell._image;
+        }
+        
+        questionObj.options.push(optionObj);
+      }
+    });
+    
+    sections[qSection].questions.push(questionObj);
+  });
+  
+  // Add calculation nodes
+  const calcNodes = vertices.filter(cell => isCalculationNode(cell));
+  const calculationNodes = calcNodes.map(cell => {
+    return {
+      id: sanitizeNameId(cell._calcTitle || "calc"),
+      title: cell._calcTitle || "Calculation",
+      terms: cell._calcTerms || [],
+      operator: cell._calcOperator || "=",
+      threshold: cell._calcThreshold || "0",
+      resultText: cell._calcFinalText || ""
+    };
+  });
+
+  // Build the final output
+  const output = {
+    flowTitle: "Flowchart Title",
+    sections: Object.values(sections),
+    jumps: jumps,
+    calculations: calculationNodes
+  };
+
+  // Download the JSON
+  const jsonStr = JSON.stringify(output, null, 2);
+  downloadJson(jsonStr, "flowchart_gui.json");
+}
+
+/**
+ * Load a flowchart from JSON data.
+ */
+function loadFlowchartData(data) {
+  if (!data.cells) {
+    alert("Invalid flowchart data");
+    return;
+  }
+  
+  // Check if we have edges without an existing edge style - add default style
+  data.cells.forEach(item => {
+    if (item.edge && (!item.style || item.style === "")) {
+      item.style = "edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;";
+    }
+  });
+
+  graph.getModel().beginUpdate();
+  try {
+    const parent = graph.getDefaultParent();
+    graph.removeCells(graph.getChildVertices(parent));
+    const createdCells = {};
+
+    if (data.sectionPrefs) {
+      sectionPrefs = data.sectionPrefs;
+      // updateSectionLegend is defined in legend.js
+      updateSectionLegend();
+    }
+
+    // First pass: Create all cells
+    data.cells.forEach(item => {
+      if (item.vertex) {
+        const geo = new mxGeometry(
+          item.geometry.x,
+          item.geometry.y,
+          item.geometry.width,
+          item.geometry.height
+        );
+        const newCell = new mxCell(item.value, geo, item.style);
+        newCell.vertex = true;
+        newCell.id = item.id;
+        
+        // Restore custom fields
+        newCell._textboxes = item._textboxes || null;
+        newCell._questionText = item._questionText || null;
+        newCell._twoNumbers = item._twoNumbers || null;
+        newCell._nameId = item._nameId || null;
+        newCell._placeholder = item._placeholder || "";
+        newCell._questionId = item._questionId || null;
+        // image
+        if (item._image) newCell._image = item._image;
+        // calculation
+        if (item._calcTitle !== undefined) newCell._calcTitle = item._calcTitle;
+        if (item._calcAmountLabel !== undefined) newCell._calcAmountLabel = item._calcAmountLabel;
+        if (item._calcOperator !== undefined) newCell._calcOperator = item._calcOperator;
+        if (item._calcThreshold !== undefined) newCell._calcThreshold = item._calcThreshold;
+        if (item._calcFinalText !== undefined) newCell._calcFinalText = item._calcFinalText;
+        if (item._calcTerms !== undefined) newCell._calcTerms = item._calcTerms;
+        // subtitle
+        if (item._subtitleText !== undefined) newCell._subtitleText = item._subtitleText;
+        // info
+        if (item._infoText !== undefined) newCell._infoText = item._infoText;
+
+        graph.addCell(newCell, parent);
+        createdCells[item.id] = newCell;
+      }
+    });
+
+    // Second pass: Create all edges
+    data.cells.forEach(item => {
+      if (item.edge) {
+        const newEdge = new mxCell(item.value, new mxGeometry(), item.style);
+        newEdge.edge = true;
+        newEdge.id = item.id;
+        const src = createdCells[item.source];
+        const trg = createdCells[item.target];
+        graph.addCell(newEdge, parent, undefined, src, trg);
+      }
+    });
+
+    // Third pass: Fix option node sections
+    const vertices = graph.getChildVertices(parent);
+    vertices.forEach(cell => {
+      if (isOptions(cell)) {
+        const incomingEdges = graph.getIncomingEdges(cell) || [];
+        for (const edge of incomingEdges) {
+          const sourceCell = edge.source;
+          if (sourceCell && isQuestion(sourceCell)) {
+            const questionSection = getSection(sourceCell);
+            const optionSection = getSection(cell);
+            if (questionSection !== optionSection) {
+              console.log(`Fixing option node ${cell.id} section from ${optionSection} to ${questionSection} to match parent question`);
+              // setSection is defined in legend.js
+              setSection(cell, questionSection);
+            }
+            break;
+          }
+        }
+      }
+    });
+  } finally {
+    graph.getModel().endUpdate();
+  }
+
+  // Renumber based on loaded positions
+  renumberQuestionIds();
+
+  // Rebuild HTML for special/certain nodes
+  const parent = graph.getDefaultParent();
+  const vertices = graph.getChildVertices(parent);
+  graph.getModel().beginUpdate();
+  try {
+    vertices.forEach(cell => {
+      if (isQuestion(cell)) {
+        const qType = getQuestionType(cell);
+        if (qType === "multipleTextboxes") {
+          updateMultipleTextboxesCell(cell);
+        } else if (qType === "multipleDropdownType") {
+          updatemultipleDropdownTypeCell(cell);
+        }
+      } else if (isOptions(cell) && getQuestionType(cell) === "imageOption") {
+        updateImageOptionCell(cell);
+      } else if (isCalculationNode(cell)) {
+        updateCalculationNodeCell(cell);
+      } else if (isSubtitleNode(cell)) {
+        // Extract text from HTML value if _subtitleText is not set
+        if (!cell._subtitleText && cell.value) {
+          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+          cell._subtitleText = cleanValue || "Subtitle text";
+        }
+        updateSubtitleNodeCell(cell);
+      } else if (isInfoNode(cell)) {
+        // Extract text from HTML value if _infoText is not set
+        if (!cell._infoText && cell.value) {
+          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+          cell._infoText = cleanValue || "Information text";
+        }
+        updateInfoNodeCell(cell);
+      }
+    });
+  } finally {
+    graph.getModel().endUpdate();
+  }
+
+  refreshAllCells();
+}
+
+/**
+ * Import a flowchart from a JSON file.
+ */
+function importFlowchartJson(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const jsonData = JSON.parse(e.target.result);
+      loadFlowchartData(jsonData);
+    };
+    reader.readAsText(file);
+  }
+}
+
+/**
+ * Save the current flowchart to Firebase.
+ */
+function saveFlowchart() {
+  // Check if user is authenticated
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    showLoginOverlay();
+    return;
+  }
+  
+  // Before starting, clean up node IDs that might be duplicate or too similar
+  renumberQuestionIds();  
+  
+  const flowchartName = prompt("Enter a name for this flowchart:", "MyFlowchart");
+  if (!flowchartName) return; // User cancelled
+
+  const parent = graph.getDefaultParent();
+  const encoder = new mxCodec();
+  
+  // Prepare cells for saving
+  const cells = graph.getChildCells(parent, true, true);
+  const simplifiedCells = cells.map(cell => {
+    const cellData = {
+      id: cell.id,
+      vertex: cell.vertex,
+      edge: cell.edge,
+      value: cell.value,
+      style: cell.style,
+    };
+
+    if (cell.geometry) {
+      cellData.geometry = {
+        x: cell.geometry.x,
+        y: cell.geometry.y,
+        width: cell.geometry.width,
+        height: cell.geometry.height,
+      };
+    }
+
+    if (cell.edge && cell.source && cell.target) {
+      cellData.source = cell.source.id;
+      cellData.target = cell.target.id;
+    }
+    
+    // Save special properties
+    if (cell._textboxes) cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
+    if (cell._questionText) cellData._questionText = cell._questionText;
+    if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
+    if (cell._nameId) cellData._nameId = cell._nameId;
+    if (cell._placeholder) cellData._placeholder = cell._placeholder;
+    if (cell._questionId) cellData._questionId = cell._questionId;
+    
+    // amount option properties
+    if (cell._amountName) cellData._amountName = cell._amountName;
+    if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
+    
+    // image option
+    if (cell._image) cellData._image = cell._image;
+    
+    // calculation node properties
+    if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
+    if (cell._calcAmountLabel !== undefined) cellData._calcAmountLabel = cell._calcAmountLabel;
+    if (cell._calcOperator !== undefined) cellData._calcOperator = cell._calcOperator;
+    if (cell._calcThreshold !== undefined) cellData._calcThreshold = cell._calcThreshold;
+    if (cell._calcFinalText !== undefined) cellData._calcFinalText = cell._calcFinalText;
+    if (cell._calcTerms !== undefined) cellData._calcTerms = JSON.parse(JSON.stringify(cell._calcTerms));
+    
+    // subtitle & info nodes
+    if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
+    if (cell._infoText !== undefined) cellData._infoText = cell._infoText;
+    
+    return cellData;
+  });
+
+  const saveData = {
+    name: flowchartName,
+    userId: user.uid,
+    cells: simplifiedCells,
+    sectionPrefs: sectionPrefs,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  firebase.firestore().collection("flowcharts").add(saveData)
+    .then((docRef) => {
+      console.log("Flowchart saved with ID: ", docRef.id);
+      alert(`Flowchart "${flowchartName}" saved successfully!`);
+    })
+    .catch((error) => {
+      console.error("Error saving flowchart: ", error);
+      alert("Error saving flowchart. Please try again.");
+    });
+}
+
+/**
+ * List all saved flowcharts for the current user.
+ */
+function viewSavedFlowcharts() {
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    showLoginOverlay();
+    return;
+  }
+  
+  const flowchartList = document.getElementById("flowchartList");
+  flowchartList.innerHTML = "Loading...";
+  
+  firebase.firestore().collection("flowcharts")
+    .where("userId", "==", user.uid)
+    .orderBy("updatedAt", "desc")
+    .get()
+    .then((querySnapshot) => {
+      if (querySnapshot.empty) {
+        flowchartList.innerHTML = "<p>No saved flowcharts found.</p>";
+        return;
+      }
+      
+      let html = "<ul>";
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const date = data.updatedAt ? data.updatedAt.toDate().toLocaleString() : "Unknown date";
+        html += `
+          <li>
+            <div class="flowchart-item">
+              <span class="flowchart-name">${data.name}</span>
+              <span class="flowchart-date">${date}</span>
+              <div class="flowchart-actions">
+                <button onclick="loadFlowchartById('${doc.id}')">Load</button>
+                <button onclick="deleteFlowchartById('${doc.id}')">Delete</button>
+              </div>
+            </div>
+          </li>
+        `;
+      });
+      html += "</ul>";
+      
+      flowchartList.innerHTML = html;
+    })
+    .catch((error) => {
+      console.error("Error getting flowcharts: ", error);
+      flowchartList.innerHTML = "<p>Error loading flowcharts. Please try again.</p>";
+    });
+  
+  showFlowchartListOverlay();
+}
+
+/**
+ * Show the flowchart list overlay.
+ */
+function showFlowchartListOverlay() {
+  document.getElementById("flowchartListOverlay").style.display = "flex";
+}
+
+/**
+ * Hide the flowchart list overlay.
+ */
+function hideFlowchartListOverlay() {
+  document.getElementById("flowchartListOverlay").style.display = "none";
+}
+
+/**
+ * Load a flowchart by its ID from Firebase.
+ */
+function loadFlowchartById(id) {
+  firebase.firestore().collection("flowcharts").doc(id).get()
+    .then((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        loadFlowchartData(data);
+        hideFlowchartListOverlay();
+      } else {
+        alert("Flowchart not found.");
+      }
+    })
+    .catch((error) => {
+      console.error("Error loading flowchart: ", error);
+      alert("Error loading flowchart. Please try again.");
+    });
+}
+
+/**
+ * Delete a flowchart by its ID from Firebase.
+ */
+function deleteFlowchartById(id) {
+  if (confirm("Are you sure you want to delete this flowchart?")) {
+    firebase.firestore().collection("flowcharts").doc(id).delete()
+      .then(() => {
+        console.log("Flowchart successfully deleted.");
+        viewSavedFlowcharts(); // Refresh the list
+      })
+      .catch((error) => {
+        console.error("Error deleting flowchart: ", error);
+        alert("Error deleting flowchart. Please try again.");
+      });
+  }
+}
+
+// Event listener for the close button in the flowchart list overlay
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById("closeFlowchartListBtn").addEventListener("click", hideFlowchartListOverlay);
+}); 

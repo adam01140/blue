@@ -440,3 +440,25 @@ input[type="file"] {
 .multiple-textboxes-container {
   margin-top: 10px;
 }
+
+.dropdown-question .question-text {
+  font-weight: normal;
+  margin-bottom: 8px;
+  outline: none;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  cursor: text !important;
+}
+
+.dropdown-question .question-text:focus {
+  background: #fff;
+  outline: none;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 4px rgba(0,123,255,0.25);
+  pointer-events: auto !important;
+  cursor: text !important;
+}
