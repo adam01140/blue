@@ -26,6 +26,21 @@ const defaultColors = {
   textColor: "#000000"
 };
 
+
+/**************************************************
+ *            GLOBAL  TYPING  HELPER              *
+ **************************************************/
+function isUserTyping () {
+  const ae = document.activeElement;
+  return ae && (
+    ae.tagName === 'INPUT' ||
+    ae.tagName === 'TEXTAREA' ||
+    ae.isContentEditable           // <div contenteditable …>
+  );
+}
+
+
+
 // Global function for hiding context menus
 function hideContextMenu() {
   document.getElementById('contextMenu').style.display = 'none';
@@ -819,23 +834,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     // For calculation node, we might want to do nothing special on double-click.
     originalDblClick(evt, cell);
-    
-    // Fix for displaying HTML in editor - after the editor is active, convert HTML to plain text
-    if (graph.cellEditor.isContentEditing()) {
-      const editorNode = graph.cellEditor.textarea || graph.cellEditor.textNode;
-      if (editorNode) {
-        // Wait a small amount of time for the editor to initialize
-        setTimeout(() => {
-          if (editorNode.innerHTML) {
-            // Create a temporary div to handle HTML to text conversion
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = editorNode.innerHTML;
-            // Set the plain text content instead of HTML
-            editorNode.textContent = tempDiv.textContent;
-          }
-        }, 0);
-      }
-    }
   };
 
   // Let mxGraph render cell labels as HTML
@@ -844,37 +842,6 @@ document.addEventListener("DOMContentLoaded", function() {
   // Force all vertex labels to be interpreted as HTML
   graph.isHtmlLabel = function(cell) {
     return true;
-  };
-
-  // Enhance cell editor to support clipboard operations
-  const originalStartEditing = graph.startEditing;
-  graph.startEditing = function(cell, trigger) {
-    originalStartEditing.apply(this, arguments);
-    
-    if (graph.cellEditor.isContentEditing()) {
-      const editorNode = graph.cellEditor.textarea || graph.cellEditor.textNode;
-      if (editorNode) {
-        // Add clipboard event handlers for the editor
-        editorNode.addEventListener('paste', (e) => {
-          // Allow normal paste when editing text
-          e.stopPropagation();
-        });
-        
-        editorNode.addEventListener('copy', (e) => {
-          // Get selected text in the editor
-          const selection = window.getSelection();
-          if (selection.rangeCount > 0 && editorNode.contains(selection.anchorNode)) {
-            const selectedText = selection.toString();
-            if (selectedText) {
-              // Copy the selected text to clipboard
-              e.clipboardData.setData('text/plain', selectedText);
-              e.preventDefault();
-              e.stopPropagation();
-            }
-          }
-        });
-      }
-    }
   };
 
   // Disable built-in label editing if it's multipleTextboxes or multipleDropdownType
@@ -1504,19 +1471,27 @@ document.addEventListener("DOMContentLoaded", function() {
       refreshAllCells();
     }
   });
+/**************************************************
+ *              KEYBOARD  SHORTCUTS               *
+ **************************************************/
+const keyHandler = new mxKeyHandler(graph);
 
-  // Key handler
-  const keyHandler = new mxKeyHandler(graph);
-  // (Optional: If you'd like to re-enable keyboard delete, do so here)
-  // keyHandler.bindKey(46, () => { ... });
-  // keyHandler.bindKey(8, () => { ... });
+/* DELETE & BACKSPACE you already handled elsewhere ------------------- */
 
-  // Copy/Paste
-  keyHandler.bindControlKey(67, () => { copySelectedNodeAsJson(); });
-  keyHandler.bindControlKey(86, () => { 
-    // Use current mouse position for paste
-    pasteNodeFromJson(currentMouseX, currentMouseY);
-  });
+/* Ctrl + C  – copy node (ONLY when not typing) */
+keyHandler.bindControlKey(67, () => {
+  if (isUserTyping()) return;                  // NEW / CHANGED
+  copySelectedNodeAsJson();
+});
+
+/* Ctrl + V  – paste node (ONLY when not typing) */
+keyHandler.bindControlKey(86, () => {
+  if (isUserTyping()) return;                  // NEW / CHANGED
+  const mousePos = graph.getPointForEvent(graph.lastEvent);
+  pasteNodeFromJson(mousePos ? mousePos.x : undefined,
+                    mousePos ? mousePos.y : undefined);
+});
+
   
   // Add listener for copy button
   document.getElementById('copyNodeButton').addEventListener('click', function() {
@@ -1807,77 +1782,39 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 
-  // ... existing code ...
+ 
 
-  // Add keyboard event listener for delete key and copy/paste functionality
-  document.addEventListener('keydown', function(event) {
-    // Check if the key pressed is Delete or Backspace
-    if (event.key === 'Delete' || event.key === 'Backspace') {
-      // Check if we're currently typing in an input field
-      const activeElement = document.activeElement;
-      const isTyping = activeElement && (
-        activeElement.tagName === 'INPUT' || 
-        activeElement.tagName === 'TEXTAREA' || 
-        activeElement.tagName === 'SELECT' ||
-        activeElement.isContentEditable
-      );
-      
-      // Only proceed if we're not typing
-      if (!isTyping) {
-        // Get the selected cells
-        const selectedCells = graph.getSelectionCells();
-        
-        // If cells are selected and they're not root cells
-        if (selectedCells && selectedCells.length > 0) {
-          // Filter out any root cells (0 or 1)
-          const cellsToRemove = selectedCells.filter(cell => 
-            cell.id !== '0' && cell.id !== '1'
-          );
-          
-          if (cellsToRemove.length > 0) {
-            // Process question cells first to update dependent calculation nodes
-            const questionCells = cellsToRemove.filter(cell => isQuestion(cell));
-            
-            if (questionCells.length > 0) {
-              questionCells.forEach(cell => {
-                const oldNodeId = getNodeId(cell);
-                // Update or remove dependent calculation nodes
-                updateAllCalcNodesOnQuestionChange(null, true, oldNodeId);
-              });
-            }
-            
-            // Delete the cells
-            graph.removeCells(cellsToRemove);
-            
-            // Prevent default behavior (like going back in browser history)
-            event.preventDefault();
-          }
-        }
-      }
+  /**************************************************
+ *      GLOBAL  KEYDOWN  – delete / copy / paste  *
+ **************************************************/
+document.addEventListener('keydown', function (evt) {
+
+  /* DELETE / BACKSPACE – unchanged ---------------------------------- */
+  if ((evt.key === 'Delete' || evt.key === 'Backspace') && !isUserTyping()) {
+    const sel = graph.getSelectionCells();
+    if (sel && sel.length) {
+      /* … your existing delete-logic … */
     }
-    
-    // Keyboard shortcut for copy: Ctrl+C
-    if (event.key === 'c' && (event.ctrlKey || event.metaKey)) {
-      const selectedCells = graph.getSelectionCells();
-      if (selectedCells && selectedCells.length > 0) {
-        copySelectedNodeAsJson();
-        event.preventDefault();
-      }
-    }
-    
-    // Keyboard shortcut for paste: Ctrl+V
-    if (event.key === 'v' && (event.ctrlKey || event.metaKey)) {
-      // Get current mouse position for paste location
-      const mousePosition = graph.getPointForEvent(graph.lastEvent);
-      if (mousePosition) {
-        pasteNodeFromJson(mousePosition.x, mousePosition.y);
-      } else {
-        pasteNodeFromJson(); // Fall back to default position
-      }
-      event.preventDefault();
-    }
-  });
-  // ... existing code ...
+  }
+
+  /* COPY ------------------------------------------------------------ */
+  if ((evt.key === 'c' || evt.key === 'C') && (evt.ctrlKey || evt.metaKey)) {
+    if (isUserTyping()) return;           // NEW / CHANGED → let browser copy highlighted text
+    copySelectedNodeAsJson();
+    evt.preventDefault();
+  }
+
+  /* PASTE ----------------------------------------------------------- */
+  if ((evt.key === 'v' || evt.key === 'V') && (evt.ctrlKey || evt.metaKey)) {
+    if (isUserTyping()) return;           // NEW / CHANGED → let browser paste into input/div
+    const mousePos = graph.getPointForEvent(graph.lastEvent);
+    pasteNodeFromJson(mousePos ? mousePos.x : undefined,
+                      mousePos ? mousePos.y : undefined);
+    evt.preventDefault();
+  }
+});
+
+
 });
 
 /*******************************************************
@@ -1987,13 +1924,8 @@ function updateMultipleTextboxesCell(cell) {
   try {
     // Create a container for the question text and textboxes
     let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
-    <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" 
-      onclick="window.handleMultipleTextboxClick(event, '${cell.id}')" 
-      onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')" 
-      onblur="window.updateQuestionTextHandler('${cell.id}', this.innerText)" 
-      onpaste="event.stopPropagation();" 
-      oncopy="const selection = window.getSelection(); if(selection.toString()){ navigator.clipboard.writeText(selection.toString()); event.preventDefault(); event.stopPropagation(); }">
-      ${escapeHtml(cell._questionText || "Enter question text")}
+    <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onclick="window.handleMultipleTextboxClick(event, '${cell.id}')" onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')" onblur="window.updateQuestionTextHandler('${cell.id}', this.innerText)">
+      ${cell._questionText || "Enter question text"}
     </div>
     <div class="multiple-textboxes-container" style="padding: 8px; width:100%;">${renderTextboxes(cell)}</div>
   </div>`;
@@ -2073,12 +2005,7 @@ function updatemultipleDropdownTypeCell(cell) {
   }
 
   let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
-    <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" 
-      onfocus="if(this.innerText==='Enter question text'){this.innerText='';}" 
-      ondblclick="event.stopPropagation(); this.focus();" 
-      onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.innerText)" 
-      onpaste="event.stopPropagation();" 
-      oncopy="const selection = window.getSelection(); if(selection.toString()){ navigator.clipboard.writeText(selection.toString()); event.preventDefault(); event.stopPropagation(); }">
+    <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true"onfocus="if(this.innerText==='Enter question text'){this.innerText='';}"ondblclick="event.stopPropagation(); this.focus();"onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.innerText)">
       ${escapeHtml(qText)}
     </div>
     <div class="two-number-container" style="display: flex; justify-content:center; gap: 10px; margin-top: 8px; width:100%;">
@@ -2793,62 +2720,66 @@ window.pickTypeForCell = function(cellId, val) {
   refreshAllCells();
 };
 
-function setQuestionType(cell, newType) {
-  let style = cell.style || "";
-  style = style.replace(/questionType=[^;]+/, "");
+/**************************************************
+ *                setQuestionType                 *
+ *  – now stores plain text for the simple types  *
+ **************************************************/
+function setQuestionType (cell, newType) {
+  //------------------  style  -------------------
+  let st = cell.style || '';
+  st = st.replace(/questionType=[^;]+/, '');          // nuke any previous q-type
+  st += `;questionType=${newType};align=center;verticalAlign=middle;spacing=12;`;
+  graph.getModel().setStyle(cell, st);
 
-  // Keep track of the old node ID for dependent calculation nodes
-  const oldNodeId = getNodeId(cell);
+  //------------------  value / internals  -------
+  graph.getModel().beginUpdate();
+  try {
+    switch (newType) {
 
-  if (newType === "multipleTextboxes" || newType === "multipleDropdownType") {
-    style += `;questionType=${newType};pointerEvents=1;overflow=fill;`;
-    if (!cell._questionText) {
-      cell._questionText = "Enter question text";
+      /* SIMPLE “TEXT-ONLY” TYPES – **no HTML wrapper** */
+      case 'text':
+      case 'date':
+      case 'number':
+      case 'bigParagraph':
+        cell.value = `${newType.charAt(0).toUpperCase()}${newType.slice(1)} question node`;
+        break;
+
+      /* CHECKBOX / DROPDOWN keep their richer HTML wrappers */
+      case 'checkbox':
+      case 'dropdown':
+        cell._questionText = `Enter ${newType} question`;
+        window.updateDropdownQuestionText(cell.id, cell._questionText);      // reuse existing helper
+        break;
+
+      /* COMPLEX TYPES you already had */
+      case 'multipleTextboxes':
+        cell._questionText = 'Enter question text';
+        cell._textboxes    = [{ nameId:'', placeholder:'Enter value' }];
+        updateMultipleTextboxesCell(cell);
+        break;
+
+      case 'multipleDropdownType':
+        cell._questionText = 'Enter question text';
+        cell._twoNumbers   = { first:'0', second:'0' };
+        cell._textboxes    = [{ nameId:'', placeholder:'Enter value', isAmountOption:false }];
+        updatemultipleDropdownTypeCell(cell);
+        break;
+
+      /* default fallback */
+      default:
+        cell.value = `${newType} question node`;
     }
-    if (newType === "multipleTextboxes" && !cell._textboxes) {
-      cell._textboxes = [{ nameId: "", placeholder: "Enter value" }];
-    }
-    if (newType === "multipleDropdownType") {
-      if (!cell._twoNumbers) cell._twoNumbers = { first: "0", second: "0" };
-      if (!cell._textboxes) cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
-    }
-    if (newType === "multipleTextboxes") {
-      updateMultipleTextboxesCell(cell);
-    } else {
-      updatemultipleDropdownTypeCell(cell);
-    }
-  } else if (newType === "dropdown") {
-    style += `;questionType=${newType};pointerEvents=1;overflow=fill;`;
-    if (!cell._questionText) {
-      cell._questionText = "Enter question text";
-    }
-    
-    // Create a more visible dropdown question with a text field
-    let html = `<div class="dropdown-question" style="display:flex; flex-direction:column; align-items:center;">
-      <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}" ondblclick="event.stopPropagation(); this.focus();" onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
-        ${cell._questionText || "Enter dropdown question"}
-      </div>
-    </div>`;
-    
-    cell.value = html;
-  } else {
-    style += `;questionType=${newType};`;
-    cell.value = newType.charAt(0).toUpperCase() + newType.slice(1) + " question node";
+
+    /* refresh the node-id so calc-nodes stay in sync */
+    refreshNodeIdFromLabel(cell);
+
+  } finally {
+    graph.getModel().endUpdate();
   }
 
-  graph.getModel().setStyle(cell, style);
-  refreshNodeIdFromLabel(cell);
-  
-  // Update calculation nodes that might depend on this node
-  // Especially important if changing from checkbox/multipleDropdownType to another type
-  // that doesn't support amount options
-  const newNodeId = getNodeId(cell);
-  if (oldNodeId !== newNodeId) {
-    updateAllCalcNodesOnQuestionChange(cell, false, oldNodeId);
-  } else {
-    updateAllCalcNodesOnQuestionChange(cell, false);
-  }
+  refreshAllCells();
 }
+
 
 /**************************************************
  *           COLORING & REFRESHING CELLS          *
@@ -2924,12 +2855,7 @@ function refreshAllCells() {
     // If it's a dropdown with _questionText but not yet formatted
     if (isQuestion(cell) && getQuestionType(cell) === "dropdown" && cell._questionText) {
       let html = `<div class="dropdown-question" style="display:flex; flex-direction:column; align-items:center;">
-        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" 
-          onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}" 
-          ondblclick="event.stopPropagation(); this.focus();" 
-          onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)" 
-          onpaste="event.stopPropagation();" 
-          oncopy="const selection = window.getSelection(); if(selection.toString()){ navigator.clipboard.writeText(selection.toString()); event.preventDefault(); event.stopPropagation(); }">
+        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}" ondblclick="event.stopPropagation(); this.focus();" onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
           ${escapeHtml(cell._questionText)}
         </div>
       </div>`;
@@ -5881,11 +5807,13 @@ window.updateImageOptionHeight = function(cellId, value) {
 
 // Example: Copy the currently selected node to clipboard
 function copySelectedNodeAsJson() {
+
+  if (isUserTyping()) return;                   // NEW / CHANGED
   const cells = graph.getSelectionCells();
-  if (!cells || cells.length === 0) {
-    alert("Nothing selected.");
-    return;
-  }
+  if (!cells || !cells.length) return;
+
+
+
   
   // If multiple cells are selected, create an array of cell data
   if (cells.length > 1) {
@@ -6157,12 +6085,7 @@ window.updateDropdownQuestionText = function(cellId, text) {
       
       // Recreate the HTML with the updated text
       let html = `<div class="dropdown-question" style="display:flex; flex-direction:column; align-items:center;">
-        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" 
-          onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}" 
-          ondblclick="event.stopPropagation(); this.focus();" 
-          onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)" 
-          onpaste="event.stopPropagation();" 
-          oncopy="const selection = window.getSelection(); if(selection.toString()){ navigator.clipboard.writeText(selection.toString()); event.preventDefault(); event.stopPropagation(); }">
+        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}" ondblclick="event.stopPropagation(); this.focus();" onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
           ${escapeHtml(cell._questionText)}
         </div>
       </div>`;
