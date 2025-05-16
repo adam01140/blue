@@ -330,9 +330,13 @@ window.handleDropdownMouseDown = function (event) {
  * Clean up redundant semicolons in style string
  */
 function cleanStyle(style) {
+  if (!style) return "";
+  
   return style
     .replace(/;+$/, "")     // Remove trailing semicolons
-    .replace(/;+;/g, ";");  // Replace double semicolons
+    .replace(/;+;/g, ";")   // Replace double semicolons
+    .replace(/;{2,}/g, ";") // Replace multiple semicolons with a single one
+    .replace(/;+$/, "");    // Clean trailing semicolons again (in case the previous operation created them)
 }
 
 // loadFlowchartData
@@ -527,7 +531,7 @@ function isSimpleHtmlQuestion(cell) {
 /* ----------  a) what the in-place editor should display  ---------- */
 const origGetEditingValue = graph.getEditingValue.bind(graph);
 graph.getEditingValue = function (cell, evt) {
-  if (isSimpleHtmlQuestion(cell)) {
+  if (isSimpleHtmlQuestion(cell) || (isOptions(cell) && !getQuestionType(cell).includes('image') && !getQuestionType(cell).includes('amount'))) {
     const tmp = document.createElement("div");
     tmp.innerHTML = cell.value || "";
     return tmp.textContent || tmp.innerText || "";
@@ -559,6 +563,8 @@ graph.addListener(mxEvent.LABEL_CHANGED, (sender, evt) => {
     try {
       // Set the clean value
       value = value.trim() || "Option";
+      // Wrap the plain text in a centered div, escaping any HTML
+      value = `<div style="text-align:center;">${mxUtils.htmlEntities(value)}</div>`;
       graph.getModel().setValue(cell, value);
       
       // Update the option node ID based on the new label
@@ -1615,55 +1621,23 @@ document.addEventListener('keydown', function (evt) {
  ********** RENUMBERING QUESTIONS BY POSITION **********
  *******************************************************/
 function renumberQuestionIds() {
-  // Commented out to preserve original question IDs
-  // const parent = graph.getDefaultParent();
-  // const vertices = graph.getChildVertices(parent);
-  // const questions = vertices.filter(cell => isQuestion(cell));
-  
-  // // Sort questions by vertical position (Y coordinate)
-  // questions.sort((a, b) => {
-  //   const aY = a.geometry.y;
-  //   const bY = b.geometry.y;
-  //   if (aY !== bY) return aY - bY;
-  //   return a.geometry.x - b.geometry.x;
-  // });
-
-  // let currentId = 1;
-  // questions.forEach((cell) => {
-  //   if (!cell._questionId) {
-  //     cell._questionId = currentId;
-  //     currentId++;
-  //   }
-  // });
-
-  // // Update existing IDs based on new order
-  // questions.forEach((cell, index) => {
-  //   cell._questionId = index + 1;
-  // });
-
-  // // If properties menu is open for a selected question, update displayed ID
-  // if (selectedCell && document.getElementById("propertiesMenu").style.display === "block") {
-  //   document.getElementById("propQuestionNumber").textContent = selectedCell._questionId;
-  // }
-  
-  // Just assign ID to new cells that don't have one
   const parent = graph.getDefaultParent();
   const vertices = graph.getChildVertices(parent);
   const questions = vertices.filter(cell => isQuestion(cell));
   
-  let maxId = 0;
-  questions.forEach((cell) => {
-    if (cell._questionId && cell._questionId > maxId) {
-      maxId = cell._questionId;
+  // Sort questions by vertical position (Y coordinate)
+  questions.sort((a, b) => {
+    const aY = a.geometry.y;
+    const bY = b.geometry.y;
+    if (Math.abs(aY - bY) < 10) { // If Y positions are very close, sort by X
+      return a.geometry.x - b.geometry.x;
     }
+    return aY - bY;
   });
-  
-  // Only assign IDs to cells that don't have one
-  questions.forEach((cell) => {
-    if (!cell._questionId) {
-      maxId++;
-      cell._questionId = maxId;
-    }
+
+  // Assign sequential IDs based on vertical position
+  questions.forEach((cell, index) => {
+    cell._questionId = index + 1;
   });
   
   // If properties menu is open for a selected question, update displayed ID
@@ -2423,6 +2397,9 @@ function detectSectionJumps(cell, questionCellMap, questionIdMap) {
 }
 
 window.exportGuiJson = function() {
+  // Renumber questions by Y position before export
+  renumberQuestionIds();
+  
   // Get all cells
   const cells = graph.getModel().cells;
   const sections = [];

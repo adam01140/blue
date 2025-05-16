@@ -27,7 +27,7 @@ window.exportFlowchartJson = function () {
       vertex: cell.vertex,
       edge: cell.edge,
       value: cell.value,
-      style: cell.style,
+      style: cleanStyle(cell.style), // Clean the style to remove excessive semicolons
     };
 
     // Handle geometry 
@@ -170,10 +170,17 @@ window.saveFlowchart = function() {
     if (id === "0" || id === "1") continue;
     const cell = cells[id];
     const cellData = {
-      id: cell.id, value: cell.value || "",
-      geometry: cell.geometry ? { x:cell.geometry.x, y:cell.geometry.y, width:cell.geometry.width, height:cell.geometry.height } : null,
-      style: cell.style || "",
-      vertex: !!cell.vertex, edge: !!cell.edge,
+      id: cell.id, 
+      value: cell.value || "",
+      geometry: cell.geometry ? { 
+        x: cell.geometry.x, 
+        y: cell.geometry.y, 
+        width: cell.geometry.width, 
+        height: cell.geometry.height 
+      } : null,
+      style: cleanStyle(cell.style || ""),
+      vertex: !!cell.vertex, 
+      edge: !!cell.edge,
       source: cell.edge ? (cell.source? cell.source.id:null) : null,
       target: cell.edge ? (cell.target? cell.target.id:null) : null,
       _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
