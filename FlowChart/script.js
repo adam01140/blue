@@ -819,6 +819,23 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     // For calculation node, we might want to do nothing special on double-click.
     originalDblClick(evt, cell);
+    
+    // Fix for displaying HTML in editor - after the editor is active, convert HTML to plain text
+    if (graph.cellEditor.isContentEditing()) {
+      const editorNode = graph.cellEditor.textarea || graph.cellEditor.textNode;
+      if (editorNode) {
+        // Wait a small amount of time for the editor to initialize
+        setTimeout(() => {
+          if (editorNode.innerHTML) {
+            // Create a temporary div to handle HTML to text conversion
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = editorNode.innerHTML;
+            // Set the plain text content instead of HTML
+            editorNode.textContent = tempDiv.textContent;
+          }
+        }, 0);
+      }
+    }
   };
 
   // Let mxGraph render cell labels as HTML
@@ -827,6 +844,37 @@ document.addEventListener("DOMContentLoaded", function() {
   // Force all vertex labels to be interpreted as HTML
   graph.isHtmlLabel = function(cell) {
     return true;
+  };
+
+  // Enhance cell editor to support clipboard operations
+  const originalStartEditing = graph.startEditing;
+  graph.startEditing = function(cell, trigger) {
+    originalStartEditing.apply(this, arguments);
+    
+    if (graph.cellEditor.isContentEditing()) {
+      const editorNode = graph.cellEditor.textarea || graph.cellEditor.textNode;
+      if (editorNode) {
+        // Add clipboard event handlers for the editor
+        editorNode.addEventListener('paste', (e) => {
+          // Allow normal paste when editing text
+          e.stopPropagation();
+        });
+        
+        editorNode.addEventListener('copy', (e) => {
+          // Get selected text in the editor
+          const selection = window.getSelection();
+          if (selection.rangeCount > 0 && editorNode.contains(selection.anchorNode)) {
+            const selectedText = selection.toString();
+            if (selectedText) {
+              // Copy the selected text to clipboard
+              e.clipboardData.setData('text/plain', selectedText);
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }
+        });
+      }
+    }
   };
 
   // Disable built-in label editing if it's multipleTextboxes or multipleDropdownType
@@ -1939,8 +1987,13 @@ function updateMultipleTextboxesCell(cell) {
   try {
     // Create a container for the question text and textboxes
     let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
-    <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onclick="window.handleMultipleTextboxClick(event, '${cell.id}')" onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')" onblur="window.updateQuestionTextHandler('${cell.id}', this.innerText)">
-      ${cell._questionText || "Enter question text"}
+    <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" 
+      onclick="window.handleMultipleTextboxClick(event, '${cell.id}')" 
+      onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')" 
+      onblur="window.updateQuestionTextHandler('${cell.id}', this.innerText)" 
+      onpaste="event.stopPropagation();" 
+      oncopy="const selection = window.getSelection(); if(selection.toString()){ navigator.clipboard.writeText(selection.toString()); event.preventDefault(); event.stopPropagation(); }">
+      ${escapeHtml(cell._questionText || "Enter question text")}
     </div>
     <div class="multiple-textboxes-container" style="padding: 8px; width:100%;">${renderTextboxes(cell)}</div>
   </div>`;
@@ -2020,7 +2073,12 @@ function updatemultipleDropdownTypeCell(cell) {
   }
 
   let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
-    <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true"onfocus="if(this.innerText==='Enter question text'){this.innerText='';}"ondblclick="event.stopPropagation(); this.focus();"onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.innerText)">
+    <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" 
+      onfocus="if(this.innerText==='Enter question text'){this.innerText='';}" 
+      ondblclick="event.stopPropagation(); this.focus();" 
+      onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.innerText)" 
+      onpaste="event.stopPropagation();" 
+      oncopy="const selection = window.getSelection(); if(selection.toString()){ navigator.clipboard.writeText(selection.toString()); event.preventDefault(); event.stopPropagation(); }">
       ${escapeHtml(qText)}
     </div>
     <div class="two-number-container" style="display: flex; justify-content:center; gap: 10px; margin-top: 8px; width:100%;">
@@ -2866,7 +2924,12 @@ function refreshAllCells() {
     // If it's a dropdown with _questionText but not yet formatted
     if (isQuestion(cell) && getQuestionType(cell) === "dropdown" && cell._questionText) {
       let html = `<div class="dropdown-question" style="display:flex; flex-direction:column; align-items:center;">
-        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}" ondblclick="event.stopPropagation(); this.focus();" onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
+        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" 
+          onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}" 
+          ondblclick="event.stopPropagation(); this.focus();" 
+          onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)" 
+          onpaste="event.stopPropagation();" 
+          oncopy="const selection = window.getSelection(); if(selection.toString()){ navigator.clipboard.writeText(selection.toString()); event.preventDefault(); event.stopPropagation(); }">
           ${escapeHtml(cell._questionText)}
         </div>
       </div>`;
@@ -6094,7 +6157,12 @@ window.updateDropdownQuestionText = function(cellId, text) {
       
       // Recreate the HTML with the updated text
       let html = `<div class="dropdown-question" style="display:flex; flex-direction:column; align-items:center;">
-        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}" ondblclick="event.stopPropagation(); this.focus();" onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
+        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" 
+          onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}" 
+          ondblclick="event.stopPropagation(); this.focus();" 
+          onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)" 
+          onpaste="event.stopPropagation();" 
+          oncopy="const selection = window.getSelection(); if(selection.toString()){ navigator.clipboard.writeText(selection.toString()); event.preventDefault(); event.stopPropagation(); }">
           ${escapeHtml(cell._questionText)}
         </div>
       </div>`;
