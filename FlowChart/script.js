@@ -817,6 +817,44 @@ document.addEventListener("DOMContentLoaded", function() {
   // Create graph
   graph = new mxGraph(container);
 
+
+  /*****************************************************************
+ * SHOW-ONLY-THE-TEXT   (hides the wrapper while the user edits)
+ *****************************************************************/
+
+// helper – is it one of the simple HTML-wrapped question types?
+function isSimpleHtmlQuestion(cell) {
+  if (!cell || !isQuestion(cell)) return false;
+  const qt = getQuestionType(cell);
+  return ["text", "date", "number", "bigParagraph"].includes(qt);
+}
+
+/* ----------  a) what the in-place editor should display  ---------- */
+const origGetEditingValue = graph.getEditingValue.bind(graph);
+graph.getEditingValue = function (cell, evt) {
+  if (isSimpleHtmlQuestion(cell)) {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = cell.value || "";
+    return tmp.textContent || tmp.innerText || "";
+  }
+  return origGetEditingValue(cell, evt);
+};
+
+/* ----------  b) what to save after the user finishes editing  ---------- */
+graph.addListener(mxEvent.LABEL_CHANGED, (sender, evt) => {
+  const cell  = evt.getProperty("cell");
+  let   value = evt.getProperty("value");   // plain text the user typed
+  if (isSimpleHtmlQuestion(cell)) {
+    value = mxUtils.htmlEntities(value || "");           // escape <>&
+    graph.getModel().setValue(
+      cell,
+      `<div style="text-align:center;">${value}</div>`
+    );
+    evt.consume();   // stop mxGraph from writing the raw text
+  }
+});
+
+
   // Enable double-click editing for multipleTextboxes cells
   const originalDblClick = graph.dblClick.bind(graph);
   graph.dblClick = function(evt, cell) {
@@ -2734,15 +2772,19 @@ function setQuestionType (cell, newType) {
   //------------------  value / internals  -------
   graph.getModel().beginUpdate();
   try {
+
     switch (newType) {
 
-      /* SIMPLE “TEXT-ONLY” TYPES – **no HTML wrapper** */
+      /* ===== plain-looking types that still store a wrapper ===== */
       case 'text':
       case 'date':
       case 'number':
       case 'bigParagraph':
-        cell.value = `${newType.charAt(0).toUpperCase()}${newType.slice(1)} question node`;
+        const nice = newType.charAt(0).toUpperCase() + newType.slice(1);
+        cell.value = `<div style="text-align:center;">${nice} question node</div>`;
         break;
+
+
 
       /* CHECKBOX / DROPDOWN keep their richer HTML wrappers */
       case 'checkbox':
@@ -2767,7 +2809,7 @@ function setQuestionType (cell, newType) {
 
       /* default fallback */
       default:
-        cell.value = `${newType} question node`;
+        cell.value = `<div style="text-align:center;">${newType} question node</div>`;
     }
 
     /* refresh the node-id so calc-nodes stay in sync */
