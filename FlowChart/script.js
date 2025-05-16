@@ -614,6 +614,24 @@ window.handleMultipleTextboxFocus = function(event, cellId) {
   }
 };
 
+
+// ----------  ↓  NEW  ↓  (place after handleMultipleTextboxFocus) ----------
+window.handleDropdownClick = function (event, cellId) {
+  event.stopPropagation();                       // don’t let mxGraph steal the mouse
+  const cell = graph.getModel().getCell(cellId); // keep the node selected
+  graph.selectionModel.setCell(cell);
+};
+
+window.handleDropdownFocus = function (event, cellId) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell) return;
+  if (event.target.innerText === "Enter dropdown question") {
+    event.target.innerText = "";                 // clear the placeholder
+  }
+};
+// ----------  ↑  NEW  ↑  ----------------------------------------------------
+
+
 /**
  * Clean up redundant semicolons in style string
  */
@@ -855,24 +873,34 @@ graph.addListener(mxEvent.LABEL_CHANGED, (sender, evt) => {
 });
 
 
-  // Enable double-click editing for multipleTextboxes cells
-  const originalDblClick = graph.dblClick.bind(graph);
-  graph.dblClick = function(evt, cell) {
-    if (cell && isQuestion(cell) && getQuestionType(cell) === 'multipleTextboxes') {
+  // ----------  AFTER  ----------
+const originalDblClick = graph.dblClick.bind(graph);
+graph.dblClick = function (evt, cell) {
+
+  // make multiple-textbox **and** dropdown-style questions
+  // jump straight into the inner <div class="question-text">
+  if (cell && isQuestion(cell)) {
+    const qt = getQuestionType(cell);
+    if (qt === 'multipleTextboxes' ||
+        qt === 'multipleDropdownType' ||   // numbered-dropdown
+        qt === 'dropdown') {               // simple dropdown
       const state = graph.view.getState(cell);
       if (state && state.text && state.text.node) {
-        const questionTextDiv = state.text.node.querySelector('.question-text');
-        if (questionTextDiv) {
-          graph.selectionModel.setCell(cell);
-          questionTextDiv.focus();
+        const qDiv = state.text.node.querySelector('.question-text');
+        if (qDiv) {
+          graph.selectionModel.setCell(cell); // keep node selected
+          qDiv.focus();                       // put caret inside
           mxEvent.consume(evt);
           return;
         }
       }
     }
-    // For calculation node, we might want to do nothing special on double-click.
-    originalDblClick(evt, cell);
-  };
+  }
+
+  // anything else keeps the stock behaviour
+  originalDblClick(evt, cell);
+};
+
 
   // Let mxGraph render cell labels as HTML
   graph.setHtmlLabels(true);
@@ -883,16 +911,18 @@ graph.addListener(mxEvent.LABEL_CHANGED, (sender, evt) => {
   };
 
   // Disable built-in label editing if it's multipleTextboxes or multipleDropdownType
-  graph.isCellEditable = function(cell) {
-    if (!cell) return false;
-    if (cell.style && (
-      cell.style.includes("multipleTextboxes") ||
-      cell.style.includes("multipleDropdownType")
-    )) {
-      return false; 
-    }
-    return true;
-  };
+  // ----------  AFTER  ----------
+graph.isCellEditable = function (cell) {
+  if (!cell) return false;
+  const qt = getQuestionType(cell);
+  if (qt === 'multipleTextboxes' ||
+      qt === 'multipleDropdownType' ||
+      qt === 'dropdown') {          // new ✱
+    return false;
+  }
+  return true;
+};
+
 
   // Enter => newline
   graph.setEnterStopsCellEditing(false);
@@ -2790,6 +2820,15 @@ function setQuestionType (cell, newType) {
       case 'checkbox':
       case 'dropdown':
         cell._questionText = `Enter ${newType} question`;
+
+         // guarantee the wrapper lets the user click & paste
+ let st2 = cell.style || "";
+ if (!st2.includes("pointerEvents=")) {
+   st2 += "pointerEvents=1;overflow=fill;";
+   graph.getModel().setStyle(cell, st2);
+ }
+
+
         window.updateDropdownQuestionText(cell.id, cell._questionText);      // reuse existing helper
         break;
 
@@ -6127,12 +6166,27 @@ window.updateDropdownQuestionText = function(cellId, text) {
       
       // Recreate the HTML with the updated text
       let html = `<div class="dropdown-question" style="display:flex; flex-direction:column; align-items:center;">
-        <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onfocus="if(this.innerText==='Enter dropdown question'){this.innerText='';}" ondblclick="event.stopPropagation(); this.focus();" onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
-          ${escapeHtml(cell._questionText)}
-        </div>
-      </div>`;
+    <div class="question-text" style="text-align:center; padding:8px; width:100%;"
+         contenteditable="true"
+         onclick="window.handleDropdownClick(event, '${cell.id}')"
+         onfocus="window.handleDropdownFocus(event, '${cell.id}')"
+        ondblclick="event.stopPropagation(); this.focus();"
+        onblur="window.updateDropdownQuestionText('${cell.id}', this.innerText)">
+      ${escapeHtml(cell._questionText)}
+   </div>
+ </div>`;
       
       cell.value = html;
+
+      // make sure the inner div actually gets the mouse/keyboard events
+let st = cell.style || "";
+if (!st.includes("pointerEvents=")) {
+  st += "pointerEvents=1;overflow=fill;";
+  graph.getModel().setStyle(cell, st);
+}
+
+
+
       refreshNodeIdFromLabel(cell);
     } finally {
       graph.getModel().endUpdate();
