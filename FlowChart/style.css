@@ -180,15 +180,21 @@ input[type="file"] {
   margin-bottom: 6px;
 }
 .section-item {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 12px;
-  padding: 4px;
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.section-item.highlighted {
+  border: 2px solid #007bff;
+  background-color: rgba(0, 123, 255, 0.1);
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
 }
 .section-header {
   display: flex;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 .section-color-box {
   width: 20px;
@@ -287,10 +293,19 @@ input[type="file"] {
   border-radius: 6px;
   min-width: 300px;
   text-align: center;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
 }
 #flowchartListPanel h3 {
   margin-top: 0;
   text-align: center;
+}
+#flowchartList {
+  overflow-y: auto;
+  max-height: calc(80vh - 100px);
+  padding-right: 10px;
+  margin-bottom: 10px;
 }
 .flowchart-item {
   margin-bottom: 16px; /* More space below each item */
@@ -307,8 +322,6 @@ input[type="file"] {
 .flowchart-item button {
   margin-right: 6px;
 }
-
-
 
 /* MULTIPLE TEXTBOXES CUSTOM STYLES */
 .multiple-textboxes-node .question-text {

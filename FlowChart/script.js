@@ -472,6 +472,34 @@ function updateSectionLegend() {
       picker.click();
     });
   });
+  
+  // Add click handler for section items
+  const sectionItems = legend.querySelectorAll(".section-item");
+  sectionItems.forEach(item => {
+    // Clicking on section item (except on buttons or editable fields)
+    item.addEventListener("click", (e) => {
+      // Ignore clicks on buttons or editable fields
+      if (e.target.tagName === "BUTTON" || e.target.contentEditable === "true" || e.target.classList.contains("section-color-box")) {
+        return;
+      }
+      
+      const sec = item.getAttribute("data-section");
+      
+      // Select all cells in this section
+      const vertices = graph.getChildVertices(graph.getDefaultParent());
+      const cellsInSection = vertices.filter(cell => getSection(cell) === sec);
+      
+      // Clear existing selection
+      graph.clearSelection();
+      
+      // Select all cells in this section
+      graph.addSelectionCells(cellsInSection);
+      
+      // Highlight this section in the legend
+      highlightSectionInLegend(sec);
+    });
+  });
+  
   const nameFields = legend.querySelectorAll(".section-name");
   nameFields.forEach(field => {
     field.addEventListener("blur", (e) => {
@@ -495,6 +523,27 @@ function updateSectionLegend() {
     updateSectionLegend();
     refreshAllCells();
   });
+  
+  // If there's a currently selected cell, highlight its section
+  if (selectedCell) {
+    const sec = getSection(selectedCell);
+    highlightSectionInLegend(sec);
+  }
+}
+
+// Helper function to highlight a section in the legend
+function highlightSectionInLegend(sectionNum) {
+  // Remove highlighting from all section items
+  const allSectionItems = document.querySelectorAll(".section-item");
+  allSectionItems.forEach(item => {
+    item.classList.remove("highlighted");
+  });
+  
+  // Add highlighting to the specified section
+  const sectionItem = document.querySelector(`.section-item[data-section="${sectionNum}"]`);
+  if (sectionItem) {
+    sectionItem.classList.add("highlighted");
+  }
 }
 
 function rgbToHex(rgb) {
@@ -911,6 +960,19 @@ document.addEventListener("DOMContentLoaded", function() {
       autoUpdateNodeIdBasedOnLabel(lastSelectedCell);
     }
     lastSelectedCell = graph.getSelectionCell();
+    
+    // Highlight the section in the legend if a cell is selected
+    const selectedCell = graph.getSelectionCell();
+    if (selectedCell) {
+      const sec = getSection(selectedCell);
+      highlightSectionInLegend(sec);
+    } else {
+      // If no cell is selected, remove all highlights
+      const allSectionItems = document.querySelectorAll(".section-item");
+      allSectionItems.forEach(item => {
+        item.classList.remove("highlighted");
+      });
+    }
   });
 
   // Draggable shapes (including new Calculation Node)
@@ -1476,8 +1538,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     // If connecting an option to a question (reverse case)
     else if (source && target && isOptions(source) && isQuestion(target)) {
-      const questionSection = getSection(target);
-      setSection(source, questionSection);
+      const optionSection = parseInt(getSection(source) || "1", 10);
+      const questionSection = parseInt(getSection(target) || "1", 10);
+      
+      // Only update the question section if the option's section is higher
+      if (optionSection > questionSection) {
+        setSection(target, optionSection);
+      }
     }
     
     // Handle jump mode
@@ -2161,6 +2228,20 @@ function gatherAllAmountLabels() {
             labels.push(optionLabel);
           }
         }
+      } else if (qType === "money" || qType === "number") {
+        // Add number/money type questions directly
+        const cleanQuestionName = sanitizeNameId(cell.value || "unnamed_question");
+        const nodeId = getNodeId(cell) || "";
+        
+        // Use answer{questionId} format for consistent JSON export
+        const questionId = cell._questionId || nodeId.split('_').pop() || "";
+        const label = `answer${questionId}`;
+        
+        // Add the question text as label for better user identification
+        const displayLabel = `${cleanQuestionName} (${label})`;
+        
+        // Store with a special prefix to identify it's a direct question value
+        labels.push(`question_value:${label}:${displayLabel}`);
       }
     }
   });
@@ -2199,26 +2280,51 @@ function updateCalculationNodeCell(cell) {
     // Build dropdown of amount labels for this term
     let amountOptionsHtml = `<option value="">-- pick an amount label --</option>`;
     allAmountLabels.forEach(lbl => {
-      const selected = (lbl === term.amountLabel) ? "selected" : "";
+      // Check if this is a direct question value (number/money type)
+      const isQuestionValue = lbl.startsWith('question_value:');
       
-      // Clean up display name for the dropdown
+      let value = lbl;
       let displayName = lbl;
       
-      // Strip out common artifacts like delete_amount, add_option etc.
-      displayName = displayName.replace(/delete_amount_/g, "");
-      displayName = displayName.replace(/add_option_/g, "");
-      
-      // Find the last instance of the question name + underscore
-      const lastUnderscoreIndex = displayName.lastIndexOf("_");
-      if (lastUnderscoreIndex !== -1) {
-        const questionPart = displayName.substring(0, lastUnderscoreIndex);
-        const amountPart = displayName.substring(lastUnderscoreIndex + 1);
+      if (isQuestionValue) {
+        // Format: question_value:label:displayName
+        const parts = lbl.split(':');
+        if (parts.length >= 3) {
+          value = parts[1]; // The actual value to store (answer1, etc.)
+          displayName = parts[2]; // The display name for the dropdown
+        }
+      } else {
+        // Regular calculation label formatting
+        // Strip out common artifacts like delete_amount, add_option etc.
+        displayName = displayName.replace(/delete_amount_/g, "");
+        displayName = displayName.replace(/add_option_/g, "");
         
-        // Format: "how_many_cars_do_you_have + car_value"
-        displayName = `${questionPart}_${amountPart}`;
+        // Find the last instance of the question name + underscore
+        const lastUnderscoreIndex = displayName.lastIndexOf("_");
+        if (lastUnderscoreIndex !== -1) {
+          const questionPart = displayName.substring(0, lastUnderscoreIndex);
+          const amountPart = displayName.substring(lastUnderscoreIndex + 1);
+          
+          // Format: "how_many_cars_do_you_have + car_value"
+          displayName = `${questionPart}_${amountPart}`;
+        }
       }
       
-      amountOptionsHtml += `<option value="${escapeAttr(lbl)}" ${selected}>${displayName}</option>`;
+      // Check if this option should be selected
+      let selected = "";
+      if (isQuestionValue) {
+        // For question values, check if the stored value matches
+        if (term.amountLabel === value) {
+          selected = "selected";
+        }
+      } else {
+        // For regular values, check direct match
+        if (lbl === term.amountLabel) {
+          selected = "selected";
+        }
+      }
+      
+      amountOptionsHtml += `<option value="${escapeAttr(value)}" ${selected}>${displayName}</option>`;
     });
 
     // For the first term, don't show a math operator
@@ -3244,8 +3350,15 @@ window.exportGuiJson = function() {
         question.type = "money";
       }
       
-      // Use the _nameId property if available instead of nodeId
-      if (cell._nameId) {
+      // For money/number questions, use getNodeId (not _nameId) for better calculations reference
+      if (questionType === "money" || questionType === "number") {
+        const rawNodeId = getNodeId(cell);
+        if (rawNodeId) {
+          question.nameId = rawNodeId.toLowerCase();
+        }
+      }
+      // For other questions, use _nameId if available
+      else if (cell._nameId) {
         question.nameId = cell._nameId;
       }
       
@@ -3796,6 +3909,63 @@ window.exportGuiJson = function() {
             continue;
           }
           
+          // Check if this is a direct reference to a money/number type question
+          // It would use the format "answer{questionId}" 
+          if (termAmountLabel.startsWith("answer")) {
+            console.log(`  Found direct money/number question reference: "${termAmountLabel}"`);
+            
+            // Find the referenced question in our sections
+            let found = false;
+            let actualQuestionNameId = termAmountLabel; // Default to using as-is
+            
+            for (const section of sections) {
+              for (const question of section.questions) {
+                // Check if this is a money question with matching nameId pattern
+                if ((question.type === "money" || question.type === "number")) {
+                  // If it's a direct match, use it
+                  if (question.nameId === termAmountLabel) {
+                    console.log(`  Found exact match with question: ${question.questionId} - ${question.text}`);
+                    found = true;
+                    break;
+                  }
+                  
+                  // Get the question cell to check its nodeId
+                  const questionCell = questionCellMap.get(question.questionId);
+                  if (questionCell) {
+                    const nodeId = getNodeId(questionCell);
+                    if (nodeId) {
+                      // Multiple ways this could be referenced:
+                      const amountLabelLower = termAmountLabel.toLowerCase();
+                      const nodeIdLower = nodeId.toLowerCase();
+                      
+                      // Case 1: termAmountLabel is "answernodeid"
+                      if (amountLabelLower === "answer" + nodeIdLower) {
+                        console.log(`  Found match by nodeId: ${question.questionId} - ${question.text} (nodeId: ${nodeId})`);
+                        actualQuestionNameId = nodeIdLower; // Use just the nodeId
+                        found = true;
+                        break;
+                      }
+                    }
+                  }
+                }
+              }
+              if (found) break;
+            }
+            
+            // Add the term with the proper question reference
+            calculation.terms.push({
+              operator: operator,
+              questionNameId: actualQuestionNameId
+            });
+            
+            if (found) {
+              console.log(`  Added direct money/number reference: ${JSON.stringify(calculation.terms[calculation.terms.length-1])}`);
+            } else {
+              console.log(`  Warning: Could not find exact matching question for ${termAmountLabel}, using as-is`);
+            }
+            continue;
+          }
+          
           // Extract amount name and question name from the label
           let termAmountName = "";
           let termQuestionName = "";
@@ -4020,7 +4190,7 @@ window.exportGuiJson = function() {
                   });
                   
                   if (matchingAmount) {
-                    // Use the proper format with spaces replaced by underscores
+                    // Use the properly formatted amount with spaces replaced by underscores
                     actualAmountName = matchingAmount.toLowerCase().replace(/\s+/g, '_');
                     console.log(`  Found exact matching amount: "${matchingAmount}" -> "${actualAmountName}"`);
                   } else {
@@ -5972,7 +6142,7 @@ window.importFlowchartJsonDirectly = function(jsonString) {
     // Validate the JSON data
     if (!jsonData || !jsonData.cells || !Array.isArray(jsonData.cells)) {
       console.error("Invalid JSON structure:", jsonData);
-      throw new Error("Invalid flowchart data: missing cells array. Make sure you're importing a flowchart JSON, not a GUI JSON.");
+      throw new Error("Invalid flowchart data: missing cells array");
     }
     
     console.log("Successfully parsed JSON with", jsonData.cells.length, "cells");
@@ -5988,32 +6158,7 @@ window.importFlowchartJsonDirectly = function(jsonString) {
 
 // Add a UI element to import JSON directly
 document.addEventListener('DOMContentLoaded', function() {
-  // Add button to the toolbar
-  const toolbar = document.querySelector('.toolbar');
-  if (toolbar) {
-    // Import flowchart JSON button
-    const importDirectlyBtn = document.createElement('button');
-    importDirectlyBtn.textContent = 'Import Flowchart JSON';
-    importDirectlyBtn.className = 'toolbar-button';
-    importDirectlyBtn.title = 'Import a flowchart JSON (with cells property), not a GUI JSON';
-    importDirectlyBtn.onclick = function() {
-      const jsonString = prompt("Paste your flowchart JSON here (must have cells property):");
-      if (jsonString) {
-        window.importFlowchartJsonDirectly(jsonString);
-      }
-    };
-    toolbar.appendChild(importDirectlyBtn);
-    
-    // Export GUI JSON button
-    const exportGuiJsonBtn = document.createElement('button');
-    exportGuiJsonBtn.textContent = 'Export GUI JSON';
-    exportGuiJsonBtn.className = 'toolbar-button';
-    exportGuiJsonBtn.title = 'Export the current flowchart as GUI JSON (sections format)';
-    exportGuiJsonBtn.onclick = function() {
-      window.exportGuiJson();
-    };
-    toolbar.appendChild(exportGuiJsonBtn);
-  }
+  // No longer adding buttons dynamically
 });
 
 // Fix the case sensitivity issue with the prevAnswer in logic conditions
@@ -6132,7 +6277,7 @@ function findCalcNodesDependentOnQuestion(questionCell) {
   const cleanQuestionName = sanitizeNameId(questionText);
   
   // Also get the questionId directly if available
-  const directQuestionId = questionCell._questionId;
+  const directQuestionId = questionCell._questionId || (questionId.split('_').pop() || "");
   
   // Get all calculation nodes in the graph
   const parent = graph.getDefaultParent();
@@ -6153,6 +6298,15 @@ function findCalcNodesDependentOnQuestion(questionCell) {
       if (term.amountLabel.toLowerCase().includes(questionId.toLowerCase()) ||
           term.amountLabel.toLowerCase().includes(cleanQuestionName.toLowerCase())) {
         isDependentNode = true;
+      }
+      
+      // Check if this is a direct answer reference for money/number type questions
+      if (getQuestionType(questionCell) === "money" || getQuestionType(questionCell) === "number") {
+        // Format for direct question references: answer{questionId}
+        const answerPattern = `answer${directQuestionId}`;
+        if (term.amountLabel === answerPattern) {
+          isDependentNode = true;
+        }
       }
       
       // For multiple dropdown questions, check if term references any of its amounts
@@ -6209,6 +6363,11 @@ function updateAllCalcNodesOnQuestionChange(questionCell, isDeleted, oldNodeId =
   const vertices = graph.getChildVertices(parent);
   const calculationNodes = vertices.filter(cell => isCalculationNode(cell));
   
+  // For direct references to number/money fields, we need to extract the question ID
+  const directQuestionId = isDeleted ? 
+    (oldNodeId.split('_').pop() || "") : 
+    (questionCell._questionId || (questionId.split('_').pop() || ""));
+  
   // If the question was deleted, find and delete any calc nodes that depend on it
   if (isDeleted) {
     // Gather a list of calc nodes to delete
@@ -6221,7 +6380,14 @@ function updateAllCalcNodesOnQuestionChange(questionCell, isDeleted, oldNodeId =
       calcNode._calcTerms.forEach(term => {
         if (!term.amountLabel) return;
         
+        // Check for direct references to the question ID
         if (term.amountLabel.toLowerCase().includes(oldNodeId.toLowerCase())) {
+          dependsOnDeletedQuestion = true;
+        }
+        
+        // Check for direct answer references (money/number types)
+        const answerPattern = `answer${directQuestionId}`;
+        if (term.amountLabel === answerPattern) {
           dependsOnDeletedQuestion = true;
         }
       });
