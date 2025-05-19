@@ -114,7 +114,7 @@ logicScriptBuffer = "";
     "        gap: 10px;",
     "      }",
     "      .info-icon {",
-    "        position: relative;",
+    "        position: center;",
     "        display: inline-block;",
     "        width: 18px;",
     "        height: 18px;",

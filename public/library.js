@@ -806,43 +806,6 @@ function loadFlowchartData(data) {
   }
 
   refreshAllCells();
-  
-  // Find node with highest y-position (lowest on screen) and center on it
-  setTimeout(() => {
-    const vertices = graph.getChildVertices(graph.getDefaultParent());
-    if (vertices.length > 0) {
-      // Find the node with the highest y-position (lowest on the screen)
-      let highestNode = vertices[0];
-      let highestY = vertices[0].geometry.y;
-      
-      vertices.forEach(cell => {
-        // Get the bottom of the cell (y + height)
-        const bottomY = cell.geometry.y + cell.geometry.height;
-        if (bottomY > highestY) {
-          highestY = bottomY;
-          highestNode = cell;
-        }
-      });
-      
-      // Center the view on the highest node
-      if (highestNode) {
-        const centerX = highestNode.geometry.x + highestNode.geometry.width / 2;
-        const centerY = highestNode.geometry.y + highestNode.geometry.height / 2;
-        
-        // Calculate the translation needed to center on this node
-        const containerWidth = graph.container.clientWidth;
-        const containerHeight = graph.container.clientHeight;
-        
-        // Set the translation to center the node
-        const scale = graph.view.scale;
-        const tx = (containerWidth / 2 - centerX * scale);
-        const ty = (containerHeight / 2 - centerY * scale);
-        
-        graph.view.setTranslate(tx / scale, ty / scale);
-        graph.view.refresh();
-      }
-    }
-  }, 100); // Small delay to ensure all rendering is complete
 }
 
 /**

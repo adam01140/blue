@@ -102,9 +102,6 @@ function updateLegendColors() {
   document.getElementById("colorDropdown").style.backgroundColor = colorPreferences.dropdown;
   document.getElementById("colorMoney").style.backgroundColor = colorPreferences.money;
   document.getElementById("colorDate").style.backgroundColor = colorPreferences.date;
-  document.getElementById("colorDateRange").style.backgroundColor = colorPreferences.date;
-  document.getElementById("colorEmail").style.backgroundColor = colorPreferences.text;
-  document.getElementById("colorPhone").style.backgroundColor = colorPreferences.text;
   document.getElementById("colorBigParagraph").style.backgroundColor = colorPreferences.bigParagraph;
   document.getElementById("colorTextColor").style.backgroundColor = colorPreferences.textColor;
 }
@@ -531,7 +528,7 @@ const phoneTypeBtn = document.getElementById("phoneType");
 function isSimpleHtmlQuestion(cell) {
   if (!cell || !isQuestion(cell)) return false;
   const qt = getQuestionType(cell);
-  return ["text", "text2", "date", "number", "bigParagraph", "dateRange", "email", "phone"].includes(qt);
+  return ["text", "text2", "date", "number", "bigParagraph"].includes(qt);
 }
 
 /* ----------  a) what the in-place editor should display  ---------- */
@@ -2343,9 +2340,6 @@ function refreshAllCells() {
             <option value="bigParagraph">Big Paragraph</option>
             <option value="multipleTextboxes">Multiple Textboxes</option>
             <option value="multipleDropdownType">Multiple Dropdown Type</option>
-            <option value="dateRange">Date Range</option>
-            <option value="email">Email</option>
-            <option value="phone">Phone</option>
           </select>
         </div>`;
     }
@@ -5346,29 +5340,14 @@ const keysPressed = {
   right: false,
   up: false,
   down: false,
-  zoom: 0, // 1 for zoom in, -1 for zoom out
-  // Fast movement tracking
-  leftFast: false,
-  rightFast: false,
-  upFast: false,
-  downFast: false
-};
-
-// Double-tap detection vars
-const doubleTapTime = 300; // ms between taps to count as double-tap
-const keyLastPressed = {
-  left: 0,
-  right: 0,
-  up: 0,
-  down: 0
+  zoom: 0 // 1 for zoom in, -1 for zoom out
 };
 
 // Animation frame request ID for smooth movement
 let animationFrameId = null;
 
 // Speed and smoothness settings
-const MOVEMENT_SPEED = 12; // pixels per frame (increased from 8)
-const FAST_MOVEMENT_MULTIPLIER = 2.5; // how much faster when double-tapped
+const MOVEMENT_SPEED = 8; // pixels per frame
 const ZOOM_FACTOR = 1.01; // zoom factor per frame
 
 // Handle key down events - start movement
@@ -5379,7 +5358,6 @@ document.addEventListener('keydown', function(evt) {
   // Skip if modifier keys are pressed (to avoid interfering with browser shortcuts)
   if (evt.ctrlKey || evt.altKey || evt.metaKey) return;
   
-  const now = Date.now();
   let keyHandled = true;
   
   switch (evt.key) {
@@ -5387,55 +5365,21 @@ document.addEventListener('keydown', function(evt) {
     case 'ArrowLeft':
     case 'a':
     case 'A':
-      // Handle double-tap detection
-      if (!keysPressed.left) {
-        const lastPress = keyLastPressed.left;
-        keyLastPressed.left = now;
-        
-        // Check for double-tap (if pressed twice within doubleTapTime ms)
-        if (now - lastPress < doubleTapTime) {
-          keysPressed.leftFast = true;
-        }
-      }
       keysPressed.left = true;
       break;
     case 'ArrowRight':
     case 'd':
     case 'D':
-      if (!keysPressed.right) {
-        const lastPress = keyLastPressed.right;
-        keyLastPressed.right = now;
-        
-        if (now - lastPress < doubleTapTime) {
-          keysPressed.rightFast = true;
-        }
-      }
       keysPressed.right = true;
       break;
     case 'ArrowUp':
     case 'w':
     case 'W':
-      if (!keysPressed.up) {
-        const lastPress = keyLastPressed.up;
-        keyLastPressed.up = now;
-        
-        if (now - lastPress < doubleTapTime) {
-          keysPressed.upFast = true;
-        }
-      }
       keysPressed.up = true;
       break;
     case 'ArrowDown':
     case 's':
     case 'S':
-      if (!keysPressed.down) {
-        const lastPress = keyLastPressed.down;
-        keyLastPressed.down = now;
-        
-        if (now - lastPress < doubleTapTime) {
-          keysPressed.downFast = true;
-        }
-      }
       keysPressed.down = true;
       break;
     
@@ -5468,25 +5412,21 @@ document.addEventListener('keyup', function(evt) {
     case 'a':
     case 'A':
       keysPressed.left = false;
-      keysPressed.leftFast = false;
       break;
     case 'ArrowRight':
     case 'd':
     case 'D':
       keysPressed.right = false;
-      keysPressed.rightFast = false;
       break;
     case 'ArrowUp':
     case 'w':
     case 'W':
       keysPressed.up = false;
-      keysPressed.upFast = false;
       break;
     case 'ArrowDown':
     case 's':
     case 'S':
       keysPressed.down = false;
-      keysPressed.downFast = false;
       break;
     case 'z':
     case 'Z':
@@ -5511,19 +5451,11 @@ function updateCanvasPosition() {
   let dx = 0;
   let dy = 0;
   
-  // Calculate the translation change, applying speed multiplier for fast movement
-  if (keysPressed.left) {
-    dx += keysPressed.leftFast ? MOVEMENT_SPEED * FAST_MOVEMENT_MULTIPLIER : MOVEMENT_SPEED;
-  }
-  if (keysPressed.right) {
-    dx -= keysPressed.rightFast ? MOVEMENT_SPEED * FAST_MOVEMENT_MULTIPLIER : MOVEMENT_SPEED;
-  }
-  if (keysPressed.up) {
-    dy += keysPressed.upFast ? MOVEMENT_SPEED * FAST_MOVEMENT_MULTIPLIER : MOVEMENT_SPEED;
-  }
-  if (keysPressed.down) {
-    dy -= keysPressed.downFast ? MOVEMENT_SPEED * FAST_MOVEMENT_MULTIPLIER : MOVEMENT_SPEED;
-  }
+  // Calculate the translation change
+  if (keysPressed.left) dx += MOVEMENT_SPEED;
+  if (keysPressed.right) dx -= MOVEMENT_SPEED;
+  if (keysPressed.up) dy += MOVEMENT_SPEED;
+  if (keysPressed.down) dy -= MOVEMENT_SPEED;
   
   // Apply translation change if needed
   if (dx !== 0 || dy !== 0) {
@@ -5735,25 +5667,3 @@ function updateOptionNodeCell(cell) {
     graph.getModel().endUpdate();
   }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-  // Force refresh of the type submenu
-  const typeSubmenu = document.getElementById("typeSubmenu");
-  
-  // Make sure all type buttons are visible
-  const allButtons = typeSubmenu.querySelectorAll("button");
-  allButtons.forEach(button => {
-    button.style.display = "block";
-  });
-  
-  // Double-check specific buttons
-  ["dateRangeType", "emailType", "phoneType"].forEach(id => {
-    const btn = document.getElementById(id);
-    if (btn) {
-      btn.style.display = "block";
-      console.log(`Fixed ${id} display`);
-    } else {
-      console.error(`Button ${id} not found!`);
-    }
-  });
-});
