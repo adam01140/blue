@@ -500,9 +500,9 @@ document.addEventListener("DOMContentLoaded", function() {
   const subtitleTypeBtn = document.getElementById("subtitleType");
   const infoTypeBtn = document.getElementById("infoType");
   const checkboxTypeBtn = document.getElementById("checkboxType");
-const textTypeBtn = document.getElementById("textType");
-const moneyTypeBtn = document.getElementById("moneyType");
-const dateTypeBtn = document.getElementById("dateType");
+  const textTypeBtn = document.getElementById("textType");
+  const moneyTypeBtn = document.getElementById("moneyType");
+  const dateTypeBtn = document.getElementById("dateType");
 const dateRangeTypeBtn = document.getElementById("dateRangeType");
 const emailTypeBtn = document.getElementById("emailType");
 const phoneTypeBtn = document.getElementById("phoneType");
@@ -1118,7 +1118,7 @@ graph.isCellEditable = function (cell) {
     }
     hideContextMenu();
   });
-  
+
   multipleTextboxesTypeBtn.addEventListener("click", () => {
     if (selectedCell && isQuestion(selectedCell)) {
       setQuestionType(selectedCell, "multipleTextboxes");
@@ -2190,7 +2190,7 @@ function setQuestionType (cell, newType) {
     switch (newType) {
 
       /* plain wrappers */
-      case 'text': case 'date': case 'number': case 'bigParagraph': 
+      case 'text': case 'date': case 'number': case 'bigParagraph':
       case 'dateRange': case 'email': case 'phone':
         const nice = newType[0].toUpperCase() + newType.slice(1);
         cell.value = `<div style="text-align:center;">${nice} question node</div>`;
@@ -5367,7 +5367,7 @@ const keyLastPressed = {
 let animationFrameId = null;
 
 // Speed and smoothness settings
-const MOVEMENT_SPEED = 12; // pixels per frame (increased from 8)
+const MOVEMENT_SPEED = 2; // pixels per frame (much slower for single tap)
 const FAST_MOVEMENT_MULTIPLIER = 2.5; // how much faster when double-tapped
 const ZOOM_FACTOR = 1.01; // zoom factor per frame
 
@@ -5530,22 +5530,62 @@ function updateCanvasPosition() {
     graph.view.setTranslate(translator.x + dx / graph.view.scale, translator.y + dy / graph.view.scale);
   }
   
-  // Apply zoom change if needed
+  // Apply zoom change if needed (centered on mouse)
   if (keysPressed.zoom !== 0) {
-    if (keysPressed.zoom > 0) {
-      // Smooth zoom in
-      graph.view.setScale(graph.view.scale * ZOOM_FACTOR);
+    const container = graph.container;
+    const rect = container.getBoundingClientRect();
+    // Use the last mouse position relative to the container
+    // (If mouse is outside, just use center of container)
+    let mouseX = currentMouseX, mouseY = currentMouseY;
+    // Convert graph coordinates to screen coordinates
+    // But for zooming, we want the mouse position in container (screen) coordinates
+    let mx = 0, my = 0;
+    if (
+      typeof window.event !== 'undefined' &&
+      window.event.clientX !== undefined &&
+      window.event.clientY !== undefined &&
+      window.event.type &&
+      window.event.type.startsWith('mouse')
+    ) {
+      mx = window.event.clientX - rect.left;
+      my = window.event.clientY - rect.top;
     } else {
-      // Smooth zoom out
-      graph.view.setScale(graph.view.scale / ZOOM_FACTOR);
+      // Fallback: use last known mouse position in graph coordinates, convert to screen
+      // (graphX, graphY) -> screen: (graphX + tx) * scale
+      mx = (mouseX + graph.view.getTranslate().x) * graph.view.scale;
+      my = (mouseY + graph.view.getTranslate().y) * graph.view.scale;
+      // If mouse is not over the container, fallback to center
+      if (mx < 0 || mx > container.clientWidth || my < 0 || my > container.clientHeight) {
+        mx = container.clientWidth / 2;
+        my = container.clientHeight / 2;
+      }
     }
+    // Current scale and translation
+    const oldScale = graph.view.scale;
+    const oldTx = graph.view.getTranslate().x;
+    const oldTy = graph.view.getTranslate().y;
+    // Graph coordinates under mouse before zoom
+    const graphX = (mx / oldScale) - oldTx;
+    const graphY = (my / oldScale) - oldTy;
+    // New scale
+    let newScale;
+    if (keysPressed.zoom > 0) {
+      newScale = oldScale * ZOOM_FACTOR;
+    } else {
+      newScale = oldScale / ZOOM_FACTOR;
+    }
+    // New translation so that (graphX, graphY) stays under mouse
+    const newTx = mx / newScale - graphX;
+    const newTy = my / newScale - graphY;
+    graph.view.setScale(newScale);
+    graph.view.setTranslate(newTx, newTy);
   }
-  
+
   // Refresh the graph if any changes were made
   if (dx !== 0 || dy !== 0 || keysPressed.zoom !== 0) {
     graph.view.refresh();
   }
-  
+
   // Continue the animation if any key is still pressed
   if (keysPressed.left || keysPressed.right || keysPressed.up || keysPressed.down || keysPressed.zoom !== 0) {
     animationFrameId = requestAnimationFrame(updateCanvasPosition);

@@ -86,9 +86,9 @@ window.exportFlowchartJson = function () {
 };
 
 // Import a flowchart JSON file
-window.importFlowchartJson = function (evt) {
-  const file = evt.target.files[0];
-  if (!file) return;
+function importFlowchartJson(event) {
+  const file = event.target.files[0];
+  if (file) {
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
@@ -109,7 +109,9 @@ window.importFlowchartJson = function (evt) {
     }
   };
   reader.readAsText(file);
-};
+  }
+}
+window.importFlowchartJson = importFlowchartJson;
 
 // Direct import from pasted JSON string
 window.importFlowchartJsonDirectly = function(jsonString) {
@@ -742,7 +744,7 @@ function loadFlowchartData(data) {
         // Subtitle and info node properties - preserve exact text
         if (item._subtitleText !== undefined) newCell._subtitleText = item._subtitleText;
         if (item._infoText !== undefined) newCell._infoText = item._infoText;
-        
+
         graph.addCell(newCell, parent);
         createdCells[item.id] = newCell;
       }
@@ -767,8 +769,8 @@ function loadFlowchartData(data) {
     });
 
     // Third pass: Update cell displays based on types
-    graph.getModel().beginUpdate();
-    try {
+  graph.getModel().beginUpdate();
+  try {
       Object.values(createdCells).forEach(cell => {
         if (getQuestionType(cell) === 'multipleTextboxes') {
           updateMultipleTextboxesCell(cell);
@@ -779,25 +781,25 @@ function loadFlowchartData(data) {
         } else if (getQuestionType(cell) === 'amountOption') {
           // Amount options are handled in refreshAllCells
         } else if (getQuestionType(cell) === 'imageOption') {
-          updateImageOptionCell(cell);
-        } else if (isCalculationNode(cell)) {
-          updateCalculationNodeCell(cell);
-        } else if (isSubtitleNode(cell)) {
+        updateImageOptionCell(cell);
+      } else if (isCalculationNode(cell)) {
+        updateCalculationNodeCell(cell);
+      } else if (isSubtitleNode(cell)) {
           // Use the _subtitleText property if available, otherwise extract from value
-          if (!cell._subtitleText && cell.value) {
-            const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
-            cell._subtitleText = cleanValue || "Subtitle text";
-          }
-          updateSubtitleNodeCell(cell);
-        } else if (isInfoNode(cell)) {
-          // Use the _infoText property if available, otherwise extract from value
-          if (!cell._infoText && cell.value) {
-            const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
-            cell._infoText = cleanValue || "Information text";
-          }
-          updateInfoNodeCell(cell);
+        if (!cell._subtitleText && cell.value) {
+          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+          cell._subtitleText = cleanValue || "Subtitle text";
         }
-      });
+        updateSubtitleNodeCell(cell);
+      } else if (isInfoNode(cell)) {
+          // Use the _infoText property if available, otherwise extract from value
+        if (!cell._infoText && cell.value) {
+          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+          cell._infoText = cleanValue || "Information text";
+        }
+        updateInfoNodeCell(cell);
+      }
+    });
     } finally {
       graph.getModel().endUpdate();
     }
@@ -807,258 +809,31 @@ function loadFlowchartData(data) {
 
   refreshAllCells();
   
-  // Find node with highest y-position (lowest on screen) and center on it
+  // Find node with smallest y-position (topmost on screen) and center on it
   setTimeout(() => {
     const vertices = graph.getChildVertices(graph.getDefaultParent());
     if (vertices.length > 0) {
-      // Find the node with the highest y-position (lowest on the screen)
-      let highestNode = vertices[0];
-      let highestY = vertices[0].geometry.y;
-      
+      // Find the node with the smallest y-position (topmost on the screen)
+      let topNode = vertices[0];
+      let minY = vertices[0].geometry.y;
       vertices.forEach(cell => {
-        // Get the bottom of the cell (y + height)
-        const bottomY = cell.geometry.y + cell.geometry.height;
-        if (bottomY > highestY) {
-          highestY = bottomY;
-          highestNode = cell;
+        if (cell.geometry.y < minY) {
+          minY = cell.geometry.y;
+          topNode = cell;
         }
       });
-      
-      // Center the view on the highest node
-      if (highestNode) {
-        const centerX = highestNode.geometry.x + highestNode.geometry.width / 2;
-        const centerY = highestNode.geometry.y + highestNode.geometry.height / 2;
-        
-        // Calculate the translation needed to center on this node
+      // Center the view on the topmost node
+      if (topNode) {
+        const centerX = topNode.geometry.x + topNode.geometry.width / 2;
+        const centerY = topNode.geometry.y + topNode.geometry.height / 2;
         const containerWidth = graph.container.clientWidth;
         const containerHeight = graph.container.clientHeight;
-        
-        // Set the translation to center the node
         const scale = graph.view.scale;
         const tx = (containerWidth / 2 - centerX * scale);
         const ty = (containerHeight / 2 - centerY * scale);
-        
         graph.view.setTranslate(tx / scale, ty / scale);
         graph.view.refresh();
       }
     }
   }, 100); // Small delay to ensure all rendering is complete
 }
-
-/**
- * Import a flowchart from a JSON file.
- */
-function importFlowchartJson(event) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const jsonData = JSON.parse(e.target.result);
-      loadFlowchartData(jsonData);
-    };
-    reader.readAsText(file);
-  }
-}
-
-/**
- * Save the current flowchart to Firebase.
- */
-function saveFlowchart() {
-  // Check if user is authenticated
-  const user = firebase.auth().currentUser;
-  if (!user) {
-    showLoginOverlay();
-    return;
-  }
-  
-  // Before starting, clean up node IDs that might be duplicate or too similar
-  renumberQuestionIds();  
-  
-  const flowchartName = prompt("Enter a name for this flowchart:", "MyFlowchart");
-  if (!flowchartName) return; // User cancelled
-
-  const parent = graph.getDefaultParent();
-  const encoder = new mxCodec();
-  
-  // Prepare cells for saving
-  const cells = graph.getChildCells(parent, true, true);
-  const simplifiedCells = cells.map(cell => {
-    const cellData = {
-      id: cell.id,
-      vertex: cell.vertex,
-      edge: cell.edge,
-      value: cell.value,
-      style: cell.style,
-    };
-
-    if (cell.geometry) {
-      cellData.geometry = {
-        x: cell.geometry.x,
-        y: cell.geometry.y,
-        width: cell.geometry.width,
-        height: cell.geometry.height,
-      };
-    }
-
-    if (cell.edge && cell.source && cell.target) {
-      cellData.source = cell.source.id;
-      cellData.target = cell.target.id;
-    }
-    
-    // Save special properties
-    if (cell._textboxes) cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
-    if (cell._questionText) cellData._questionText = cell._questionText;
-    if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
-    if (cell._nameId) cellData._nameId = cell._nameId;
-    if (cell._placeholder) cellData._placeholder = cell._placeholder;
-    if (cell._questionId) cellData._questionId = cell._questionId;
-    
-    // amount option properties
-    if (cell._amountName) cellData._amountName = cell._amountName;
-    if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
-    
-    // image option
-    if (cell._image) cellData._image = cell._image;
-    
-    // calculation node properties
-    if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
-    if (cell._calcAmountLabel !== undefined) cellData._calcAmountLabel = cell._calcAmountLabel;
-    if (cell._calcOperator !== undefined) cellData._calcOperator = cell._calcOperator;
-    if (cell._calcThreshold !== undefined) cellData._calcThreshold = cell._calcThreshold;
-    if (cell._calcFinalText !== undefined) cellData._calcFinalText = cell._calcFinalText;
-    if (cell._calcTerms !== undefined) cellData._calcTerms = JSON.parse(JSON.stringify(cell._calcTerms));
-    
-    // subtitle & info nodes
-    if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
-    if (cell._infoText !== undefined) cellData._infoText = cell._infoText;
-    
-    return cellData;
-  });
-
-  const saveData = {
-    name: flowchartName,
-    userId: user.uid,
-    cells: simplifiedCells,
-    sectionPrefs: sectionPrefs,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  };
-
-  firebase.firestore().collection("flowcharts").add(saveData)
-    .then((docRef) => {
-      console.log("Flowchart saved with ID: ", docRef.id);
-      alert(`Flowchart "${flowchartName}" saved successfully!`);
-    })
-    .catch((error) => {
-      console.error("Error saving flowchart: ", error);
-      alert("Error saving flowchart. Please try again.");
-    });
-}
-
-/**
- * List all saved flowcharts for the current user.
- */
-function viewSavedFlowcharts() {
-  const user = firebase.auth().currentUser;
-  if (!user) {
-    showLoginOverlay();
-    return;
-  }
-  
-  const flowchartList = document.getElementById("flowchartList");
-  flowchartList.innerHTML = "Loading...";
-  
-  firebase.firestore().collection("flowcharts")
-    .where("userId", "==", user.uid)
-    .orderBy("updatedAt", "desc")
-    .get()
-    .then((querySnapshot) => {
-      if (querySnapshot.empty) {
-        flowchartList.innerHTML = "<p>No saved flowcharts found.</p>";
-        return;
-      }
-      
-      let html = "<ul>";
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const date = data.updatedAt ? data.updatedAt.toDate().toLocaleString() : "Unknown date";
-        html += `
-          <li>
-            <div class="flowchart-item">
-              <span class="flowchart-name">${data.name}</span>
-              <span class="flowchart-date">${date}</span>
-              <div class="flowchart-actions">
-                <button onclick="loadFlowchartById('${doc.id}')">Load</button>
-                <button onclick="deleteFlowchartById('${doc.id}')">Delete</button>
-              </div>
-            </div>
-          </li>
-        `;
-      });
-      html += "</ul>";
-      
-      flowchartList.innerHTML = html;
-    })
-    .catch((error) => {
-      console.error("Error getting flowcharts: ", error);
-      flowchartList.innerHTML = "<p>Error loading flowcharts. Please try again.</p>";
-    });
-  
-  showFlowchartListOverlay();
-}
-
-/**
- * Show the flowchart list overlay.
- */
-function showFlowchartListOverlay() {
-  document.getElementById("flowchartListOverlay").style.display = "flex";
-}
-
-/**
- * Hide the flowchart list overlay.
- */
-function hideFlowchartListOverlay() {
-  document.getElementById("flowchartListOverlay").style.display = "none";
-}
-
-/**
- * Load a flowchart by its ID from Firebase.
- */
-function loadFlowchartById(id) {
-  firebase.firestore().collection("flowcharts").doc(id).get()
-    .then((doc) => {
-      if (doc.exists) {
-        const data = doc.data();
-        loadFlowchartData(data);
-        hideFlowchartListOverlay();
-      } else {
-        alert("Flowchart not found.");
-      }
-    })
-    .catch((error) => {
-      console.error("Error loading flowchart: ", error);
-      alert("Error loading flowchart. Please try again.");
-    });
-}
-
-/**
- * Delete a flowchart by its ID from Firebase.
- */
-function deleteFlowchartById(id) {
-  if (confirm("Are you sure you want to delete this flowchart?")) {
-    firebase.firestore().collection("flowcharts").doc(id).delete()
-      .then(() => {
-        console.log("Flowchart successfully deleted.");
-        viewSavedFlowcharts(); // Refresh the list
-      })
-      .catch((error) => {
-        console.error("Error deleting flowchart: ", error);
-        alert("Error deleting flowchart. Please try again.");
-      });
-  }
-}
-
-// Event listener for the close button in the flowchart list overlay
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById("closeFlowchartListBtn").addEventListener("click", hideFlowchartListOverlay);
-}); 

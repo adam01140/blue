@@ -1,0 +1,262 @@
+{
+"cells": \[
+{
+"id": "4",
+"vertex": true,
+"edge": false,
+"value": "\<div class="multiple-textboxes-node" style="display\:flex; flex-direction\:column; align-items\:center;">\n    \<div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onclick="window\.handleMultipleTextboxClick(event, '4')" onfocus="window\.handleMultipleTextboxFocus(event, '4')" onblur="window\.updateQuestionTextHandler('4', this.innerText)">\n      Enter your full name\n    </div>\n    \<div class="multiple-textboxes-container" style="padding: 8px; width:100%;">\<div class="textbox-entry" style="margin-bottom:8px; text-align\:center;">\n        \<input type="text" value="First Name" data-index="0" placeholder="First Name" onblur="window\.updateMultipleTextboxHandler('4', 0, this.value)"/>\n        \<button onclick="window\.deleteMultipleTextboxHandler('4', 0)">Delete</button>\n      </div>\<div class="textbox-entry" style="margin-bottom:8px; text-align\:center;">\n        \<input type="text" value="Middle Inital" data-index="1" placeholder="Middle Inital" onblur="window\.updateMultipleTextboxHandler('4', 1, this.value)"/>\n        \<button onclick="window\.deleteMultipleTextboxHandler('4', 1)">Delete</button>\n      </div>\<div class="textbox-entry" style="margin-bottom:8px; text-align\:center;">\n        \<input type="text" value="Last Name" data-index="2" placeholder="Last Name" onblur="window\.updateMultipleTextboxHandler('4', 2, this.value)"/>\n        \<button onclick="window\.deleteMultipleTextboxHandler('4', 2)">Delete</button>\n      </div>\<div style="text-align\:center; margin-top:8px;">\<button onclick="window\.addMultipleTextboxHandler('4')">Add Option</button></div></div>\n  </div>",
+"style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;align=center;verticalAlign=middle;section=1;questionType=multipleTextboxes;align=center;verticalAlign=middle;spacing=12;nodeId=enter\_your\_full\_name;fillColor=#cce6ff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+"geometry": {
+"x": 340,
+"y": 110,
+"width": 340,
+"height": 330
+},
+"\_textboxes": \[
+{
+"nameId": "First Name",
+"placeholder": "First Name"
+},
+{
+"nameId": "Middle Inital",
+"placeholder": "Middle Inital"
+},
+{
+"nameId": "Last Name",
+"placeholder": "Last Name"
+}
+],
+"\_questionText": "Enter your full name",
+"\_nameId": "answer2",
+"\_questionId": 1
+},
+{
+"id": "7",
+"vertex": true,
+"edge": false,
+"value": "\<div style="text-align\:center;">Whats your date of birth?</div>",
+"style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;questionType=date;align=center;verticalAlign=middle;spacing=12;spacingTop=10;verticalAlign=middle;section=1;nodeId=whats\_your\_date\_of\_birth;fillColor=#4da6ff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+"geometry": {
+"x": 430,
+"y": 560,
+"width": 160,
+"height": 80
+},
+"\_nameId": "answer2",
+"\_questionId": 2
+},
+{
+"id": "9",
+"vertex": true,
+"edge": false,
+"value": "\<div style="text-align\:center;">What is the best phone number to reach you at?</div>",
+"style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;questionType=text;align=center;verticalAlign=middle;spacing=12;spacingTop=10;verticalAlign=middle;section=1;nodeId=what\_is\_the\_best\_phone\_number\_to\_reach\_you\_at;fillColor=#cce6ff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+"geometry": {
+"x": 440,
+"y": 730,
+"width": 150,
+"height": 80
+},
+"\_nameId": "answer3",
+"\_questionId": 3
+},
+{
+"id": "13",
+"vertex": true,
+"edge": false,
+"value": "\<div style="text-align\:center;">What type of photo ID do you have?</div>",
+"style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;align=center;verticalAlign=middle;questionType=text2;align=center;verticalAlign=middle;spacing=12;editable=1;spacingTop=10;verticalAlign=middle;section=1;nodeId=what\_type\_of\_photo\_id\_do\_you\_have;fillColor=#99ccff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+"geometry": {
+"x": 430,
+"y": 880,
+"width": 160,
+"height": 80
+},
+"\_questionText": "What type of photo ID do you have?",
+"\_nameId": "answer4",
+"\_questionId": 4
+},
+{
+"id": "15",
+"vertex": true,
+"edge": false,
+"value": "\<div style="text-align\:center;">Passport</div>",
+"style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;pointerEvents=1;overflow=fill;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;section=1;nodeId=what\_type\_of\_photo\_id\_do\_you\_have%3Cdiv\_style%3D%22text-align%3Acenter%3B%22%3EPassport%3C%2Fdiv%3E;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+"geometry": {
+"x": 540,
+"y": 1010,
+"width": 100,
+"height": 60
+}
+},
+{
+"id": "17",
+"vertex": true,
+"edge": false,
+"value": "\<div style="text-align\:center;">Driver’s License</div>",
+"style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;pointerEvents=1;overflow=fill;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;section=1;nodeId=what\_type\_of\_photo\_id\_do\_you\_have%3Cdiv\_style%3D%22text-align%3Acenter%3B%22%3EDriver%E2%80%99s\_License%3C%2Fdiv%3E;fillColor=#ffffff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+"geometry": {
+"x": 390,
+"y": 1010,
+"width": 100,
+"height": 60
+}
+},
+{
+"id": "20",
+"vertex": true,
+"edge": false,
+"value": "\<div style="text-align\:center;">What is the ID number on your photo ID?</div>",
+"style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;questionType=text;align=center;verticalAlign=middle;spacing=12;spacingTop=10;verticalAlign=middle;section=1;nodeId=what\_is\_the\_id\_number\_on\_your\_photo\_id;fillColor=#cce6ff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+"geometry": {
+"x": 444.0001220703125,
+"y": 1176.2223205566406,
+"width": 160,
+"height": 80
+},
+"\_nameId": "answer7",
+"\_questionId": 5
+},
+{
+"id": "23",
+"vertex": true,
+"edge": false,
+"value": "\<div style="text-align\:center;">Which government issued this ID?</div>",
+"style": "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;questionType=text;align=center;verticalAlign=middle;spacing=12;spacingTop=10;verticalAlign=middle;section=1;nodeId=which\_government\_issued\_this\_id;fillColor=#cce6ff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)",
+"geometry": {
+"x": 439.9977099609375,
+"y": 1349.99783203125,
+"width": 160,
+"height": 80
+},
+"\_nameId": "answer8",
+"\_questionId": 6
+},
+{
+"id": "8",
+"vertex": false,
+"edge": true,
+"value": null,
+"style": "",
+"geometry": {
+"x": 0,
+"y": 0,
+"width": 0,
+"height": 0
+},
+"source": "4",
+"target": "7"
+},
+{
+"id": "10",
+"vertex": false,
+"edge": true,
+"value": null,
+"style": "",
+"geometry": {
+"x": 0,
+"y": 0,
+"width": 0,
+"height": 0
+},
+"source": "7",
+"target": "9"
+},
+{
+"id": "14",
+"vertex": false,
+"edge": true,
+"value": null,
+"style": "",
+"geometry": {
+"x": 0,
+"y": 0,
+"width": 0,
+"height": 0
+},
+"source": "9",
+"target": "13"
+},
+{
+"id": "16",
+"vertex": false,
+"edge": true,
+"value": "",
+"style": "",
+"geometry": {
+"x": 0,
+"y": 0,
+"width": 0,
+"height": 0
+},
+"source": "13",
+"target": "15"
+},
+{
+"id": "18",
+"vertex": false,
+"edge": true,
+"value": "",
+"style": "",
+"geometry": {
+"x": 0,
+"y": 0,
+"width": 0,
+"height": 0
+},
+"source": "13",
+"target": "17"
+},
+{
+"id": "21",
+"vertex": false,
+"edge": true,
+"value": null,
+"style": "",
+"geometry": {
+"x": 0,
+"y": 0,
+"width": 0,
+"height": 0
+},
+"source": "17",
+"target": "20"
+},
+{
+"id": "22",
+"vertex": false,
+"edge": true,
+"value": null,
+"style": "",
+"geometry": {
+"x": 0,
+"y": 0,
+"width": 0,
+"height": 0
+},
+"source": "15",
+"target": "20"
+},
+{
+"id": "24",
+"vertex": false,
+"edge": true,
+"value": null,
+"style": "",
+"geometry": {
+"x": 0,
+"y": 0,
+"width": 0,
+"height": 0
+},
+"source": "20",
+"target": "23"
+}
+],
+"sectionPrefs": {
+"1": {
+"borderColor": "hsl(0, 100%, 80%)",
+"name": "Personal Information"
+}
+}
+}
