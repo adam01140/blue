@@ -163,6 +163,50 @@ logicScriptBuffer = "";
     "        border-style: solid;",
     "        border-color: transparent transparent #333 transparent;",
     "      }",
+    // Progress Bar Styles
+    "      .progress-bar-container {",
+    "        width: 100%;",
+    "        max-width: 800px;",
+    "        margin: 0 auto 20px auto;",
+    "        padding: 0 0 10px 0;",
+    "        background: none;",
+    "      }",
+    "      .progress-bar-bg {",
+    "        width: 100%;",
+    "        height: 18px;",
+    "        background: linear-gradient(90deg, #e0e7ef 0%, #f5f7fa 100%);",
+    "        border-radius: 10px;",
+    "        box-shadow: 0 2px 8px rgba(44,62,80,0.07);",
+    "        overflow: hidden;",
+    "        position: relative;",
+    "      }",
+    "      .progress-bar-fill {",
+    "        height: 100%;",
+    "        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);",
+    "        border-radius: 10px 0 0 10px;",
+    "        width: 0%;",
+    "        transition: width 0.5s cubic-bezier(.4,1.4,.6,1), background 0.3s;",
+    "        box-shadow: 0 2px 8px rgba(44,62,80,0.13);",
+    "        position: absolute;",
+    "        left: 0;",
+    "        top: 0;",
+    "      }",
+    "      .progress-bar-label {",
+    "        position: absolute;",
+    "        width: 100%;",
+    "        text-align: center;",
+    "        top: 0;",
+    "        left: 0;",
+    "        height: 100%;",
+    "        line-height: 18px;",
+    "        font-size: 13px;",
+    "        color: #2c3e50;",
+    "        font-weight: 600;",
+    "        letter-spacing: 0.5px;",
+    "        pointer-events: none;",
+    "        z-index: 2;",
+    "        text-shadow: 0 1px 2px #fff, 0 0 2px #fff;",
+    "      }",
     "    </style>",
     "</head>",
     "<body>",
@@ -360,6 +404,13 @@ logicScriptBuffer = "";
     formHTML += `<div id="section${s}" class="section${
       s === 1 ? " active" : ""
     }">`;
+    // Insert progress bar at the top of each section
+    formHTML += `<div class="progress-bar-container">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBarFill${s}"></div>
+        <div class="progress-bar-label" id="progressBarLabel${s}"></div>
+      </div>
+    </div>`;
     formHTML += `<h1 class="section-title">${sectionName}</h1>`;
 
     // Grab all questions in this section
@@ -1420,6 +1471,7 @@ function navigateSection(sectionNumber){
         form.style.display   = 'none';
         thankYou.style.display = 'block';
         currentSectionNumber = 'end';
+        updateProgressBar();
         return;
     }
 
@@ -1433,6 +1485,7 @@ function navigateSection(sectionNumber){
     (target || sections[maxSection - 1]).classList.add('active');
 
     currentSectionNumber = sectionNumber;
+    updateProgressBar();
 }
 
 
@@ -1448,6 +1501,7 @@ function goBack(){
     }else if (typeof currentSectionNumber === 'number' && currentSectionNumber > 1){
         navigateSection(currentSectionNumber - 1);
     }
+    updateProgressBar();
 }
 
 
@@ -1842,6 +1896,37 @@ function attachCalculationListeners() {
     runAllHiddenCheckboxCalculations();
     runAllHiddenTextCalculations();
 }
+
+// Progress Bar Logic
+function updateProgressBar() {
+  const sections = document.querySelectorAll('.section');
+  let activeIndex = -1;
+  let totalSections = 0;
+  let visibleSections = [];
+  sections.forEach((sec, idx) => {
+    if (!sec.classList.contains('hidden')) {
+      totalSections++;
+      visibleSections.push(sec);
+      if (sec.classList.contains('active')) {
+        activeIndex = totalSections - 1;
+      }
+    }
+  });
+  if (activeIndex === -1) activeIndex = 0;
+  if (totalSections === 0) totalSections = 1;
+  const percent = ((activeIndex + 1) / totalSections) * 100;
+  const percentText = Math.round(percent) + '%';
+  for (let i = 0; i < visibleSections.length; i++) {
+    const fill = visibleSections[i].querySelector('.progress-bar-fill');
+    const label = visibleSections[i].querySelector('.progress-bar-label');
+    if (fill) fill.style.width = percent + '%';
+    if (label) label.textContent = 'Section ' + (activeIndex + 1) + ' of ' + totalSections + ' (' + percentText + ')';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  updateProgressBar();
+});
 
 </script>
 </body>
