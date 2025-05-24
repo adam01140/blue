@@ -207,6 +207,18 @@ logicScriptBuffer = "";
     "        z-index: 2;",
     "        text-shadow: 0 1px 2px #fff, 0 0 2px #fff;",
     "      }",
+    "      .navigation-buttons {",
+    "        display: flex;",
+    "        gap: 15px;",
+    "        justify-content: center;",
+    "        margin-top: 10px;",
+    "      }",
+    "      .navigation-buttons button {",
+    "        width: auto;",
+    "        max-width: none;",
+    "        margin: 0;",
+    "        display: inline-flex;",
+    "      }",
     "    </style>",
     "</head>",
     "<body>",
@@ -1919,9 +1931,40 @@ function updateProgressBar() {
   for (let i = 0; i < visibleSections.length; i++) {
     const fill = visibleSections[i].querySelector('.progress-bar-fill');
     const label = visibleSections[i].querySelector('.progress-bar-label');
-    if (fill) fill.style.width = percent + '%';
+    if (fill) animateProgressBarFill(fill, percent);
     if (label) label.textContent = 'Section ' + (activeIndex + 1) + ' of ' + totalSections + ' (' + percentText + ')';
   }
+}
+
+// Animate the progress bar fill width smoothly
+function animateProgressBarFill(fillEl, targetPercent) {
+  if (!fillEl) return;
+  // Cancel any previous animation
+  if (fillEl._progressAnimFrame) {
+    cancelAnimationFrame(fillEl._progressAnimFrame);
+    fillEl._progressAnimFrame = null;
+  }
+  const currentWidth = parseFloat(fillEl.style.width) || 0;
+  const start = currentWidth;
+  const end = targetPercent;
+  const duration = 500; // ms, should match CSS transition
+  const startTime = performance.now();
+
+  function animate(now) {
+    const elapsed = now - startTime;
+    const t = Math.min(elapsed / duration, 1);
+    // Use easeInOutCubic for a nice effect
+    const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const newWidth = start + (end - start) * ease;
+    fillEl.style.width = newWidth + '%';
+    if (t < 1) {
+      fillEl._progressAnimFrame = requestAnimationFrame(animate);
+    } else {
+      fillEl.style.width = end + '%';
+      fillEl._progressAnimFrame = null;
+    }
+  }
+  requestAnimationFrame(animate);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
