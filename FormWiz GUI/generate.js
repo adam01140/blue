@@ -875,8 +875,20 @@ formHTML += `</div><br></div>`;
         const multiBlocks = qBlock.querySelectorAll(
           `#multipleTextboxesOptions${questionId} > div`
         );
+        // Separate textboxes and amounts
+        const textboxInputs = [];
+        const amountInputs = [];
         for (let mb = 0; mb < multiBlocks.length; mb++) {
           const dEl = multiBlocks[mb];
+          if (dEl.classList.contains('amount-block')) {
+            amountInputs.push(dEl);
+          } else {
+            textboxInputs.push(dEl);
+          }
+        }
+        // Render textboxes
+        for (let mb = 0; mb < textboxInputs.length; mb++) {
+          const dEl = textboxInputs[mb];
           const lblInput = dEl.querySelector(
             `#multipleTextboxLabel${questionId}_${mb + 1}`
           );
@@ -886,7 +898,6 @@ formHTML += `</div><br></div>`;
           const phInput = dEl.querySelector(
             `#multipleTextboxPlaceholder${questionId}_${mb + 1}`
           );
-
           const lblVal = lblInput ? lblInput.value.trim() : "";
           const nmVal = nmInput
             ? nmInput.value.trim()
@@ -896,6 +907,28 @@ formHTML += `</div><br></div>`;
             formHTML += `<label><h3>${lblVal}</h3></label><br>`;
           }
           formHTML += `<input type="text" id="${nmVal}" name="${nmVal}" placeholder="${phVal}" style="text-align:center;"><br>`;
+        }
+        // Render amounts
+        for (let ab = 0; ab < amountInputs.length; ab++) {
+          const dEl = amountInputs[ab];
+          const lblInput = dEl.querySelector(
+            `#multipleAmountLabel${questionId}_${ab + 1}`
+          );
+          const nmInput = dEl.querySelector(
+            `#multipleAmountName${questionId}_${ab + 1}`
+          );
+          const phInput = dEl.querySelector(
+            `#multipleAmountPlaceholder${questionId}_${ab + 1}`
+          );
+          const lblVal = lblInput ? lblInput.value.trim() : "";
+          const nmVal = nmInput
+            ? nmInput.value.trim()
+            : "amount" + questionId + "_" + (ab + 1);
+          const phVal = phInput ? phInput.value.trim() : "";
+          if (lblVal) {
+            formHTML += `<label><h3>${lblVal}</h3></label><br>`;
+          }
+          formHTML += `<input type="number" id="${nmVal}" name="${nmVal}" placeholder="${phVal}" style="text-align:center;" pattern="[0-9]*" inputmode="numeric"><br>`;
         }
       } else if (questionType === "numberedDropdown") {
         const stEl = qBlock.querySelector("#numberRangeStart" + questionId);

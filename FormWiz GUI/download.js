@@ -397,6 +397,21 @@ function loadFormData(formData) {
                             if (nameIdInput)       nameIdInput.value = tb.nameId || '';
                             if (placeholderInput)  placeholderInput.value = tb.placeholder || '';
                         });
+                        (question.amounts || []).forEach((amt, idx) => {
+                            addMultipleAmountOption(question.questionId);
+                            const labelInput = questionBlock.querySelector(
+                                `#multipleAmountLabel${question.questionId}_${idx + 1}`
+                            );
+                            const nameIdInput = questionBlock.querySelector(
+                                `#multipleAmountName${question.questionId}_${idx + 1}`
+                            );
+                            const placeholderInput = questionBlock.querySelector(
+                                `#multipleAmountPlaceholder${question.questionId}_${idx + 1}`
+                            );
+                            if (labelInput)        labelInput.value = amt.label || '';
+                            if (nameIdInput)       nameIdInput.value = amt.nameId || '';
+                            if (placeholderInput)  placeholderInput.value = amt.placeholder || '';
+                        });
                     }
                 }
                // In the numbered dropdown section of loadFormData()
@@ -839,42 +854,34 @@ function exportForm() {
             else if (questionType === 'multipleTextboxes') {
                 const multiBlocks = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
                 questionData.textboxes = [];
+                questionData.amounts = [];
                 multiBlocks.forEach((optionDiv, index) => {
-                    const labelInput = optionDiv.querySelector(`#multipleTextboxLabel${questionId}_${index + 1}`);
-                    const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
-                    const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
-
-                    // Handle each case separately to preserve empty strings
-                    let labelText, nameId, placeholder;
-                    
-                    // For label: preserve empty string if input exists
-                    if (!labelInput) {
-                        labelText = `Textbox ${index + 1}`;
+                    // Check if this is a textbox or amount block
+                    if (optionDiv.classList.contains('amount-block')) {
+                        const labelInput = optionDiv.querySelector(`#multipleAmountLabel${questionId}_${index + 1}`);
+                        const nameIdInput = optionDiv.querySelector(`#multipleAmountName${questionId}_${index + 1}`);
+                        const placeholderInput = optionDiv.querySelector(`#multipleAmountPlaceholder${questionId}_${index + 1}`);
+                        let labelText = labelInput ? (labelInput.value === '' ? '' : labelInput.value.trim()) : `Amount ${index + 1}`;
+                        let nameId = (!nameIdInput || nameIdInput.value.trim() === '') ? `amount${questionId}_${index + 1}` : nameIdInput.value.trim();
+                        let placeholder = placeholderInput ? (placeholderInput.value === '' ? '' : placeholderInput.value.trim()) : '';
+                        questionData.amounts.push({
+                            label: labelText,
+                            nameId: nameId,
+                            placeholder: placeholder
+                        });
                     } else {
-                        // Don't trim if the value is explicitly an empty string
-                        labelText = labelInput.value === '' ? '' : labelInput.value.trim();
+                        const labelInput = optionDiv.querySelector(`#multipleTextboxLabel${questionId}_${index + 1}`);
+                        const nameIdInput = optionDiv.querySelector(`#multipleTextboxName${questionId}_${index + 1}`);
+                        const placeholderInput = optionDiv.querySelector(`#multipleTextboxPlaceholder${questionId}_${index + 1}`);
+                        let labelText = labelInput ? (labelInput.value === '' ? '' : labelInput.value.trim()) : `Textbox ${index + 1}`;
+                        let nameId = (!nameIdInput || nameIdInput.value.trim() === '') ? `answer${questionId}_${index + 1}` : nameIdInput.value.trim();
+                        let placeholder = placeholderInput ? (placeholderInput.value === '' ? '' : placeholderInput.value.trim()) : '';
+                        questionData.textboxes.push({
+                            label: labelText,
+                            nameId: nameId,
+                            placeholder: placeholder
+                        });
                     }
-                    
-                    // For nameId: default only if input doesn't exist or value is empty
-                    if (!nameIdInput || nameIdInput.value.trim() === '') {
-                        nameId = `answer${questionId}_${index + 1}`;
-                    } else {
-                        nameId = nameIdInput.value.trim();
-                    }
-                    
-                    // For placeholder: preserve empty string if input exists
-                    if (!placeholderInput) {
-                        placeholder = '';
-                    } else {
-                        // Don't trim if the value is explicitly an empty string
-                        placeholder = placeholderInput.value === '' ? '' : placeholderInput.value.trim();
-                    }
-
-                    questionData.textboxes.push({
-                        label: labelText,
-                        nameId: nameId,
-                        placeholder: placeholder
-                    });
                 });
             }
             else if (

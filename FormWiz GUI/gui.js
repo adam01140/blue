@@ -241,6 +241,7 @@ function addQuestion(sectionId, questionId = null) {
             <option value="email">Email</option>
             <option value="phone">Phone</option>
             <option value="bigParagraph">Big Paragraph</option>
+            <option value="location">Location</option>
         </select><br><br>
 
         <!-- Name/ID and Placeholder for Text, Big Paragraph, Money, etc. -->
@@ -306,6 +307,7 @@ function addQuestion(sectionId, questionId = null) {
             <label>Textboxes: </label>
             <div id="multipleTextboxesOptions${currentQuestionId}"></div>
             <button type="button" onclick="addMultipleTextboxOption(${currentQuestionId})">Add Textbox</button>
+            <button type="button" onclick="addMultipleAmountOption(${currentQuestionId})">Add Amount</button>
         </div><br>
         
         <!-- Linking Logic for Dropdown -->
@@ -510,7 +512,7 @@ function updateJumpOptionsForCheckbox(questionId, conditionId = null) {
 function toggleOptions(questionId) {
     const questionTypeSelect = document.getElementById(`questionType${questionId}`);
     if (!questionTypeSelect) return;
-    const questionType = questionTypeSelect.value;
+    let questionType = questionTypeSelect.value;
     const optionsBlock = document.getElementById(`optionsBlock${questionId}`);
     const checkboxBlock = document.getElementById(`checkboxOptionsBlock${questionId}`);
     const numberedDropdownBlock = document.getElementById(`numberedDropdownBlock${questionId}`);
@@ -527,6 +529,30 @@ function toggleOptions(questionId) {
     multipleTextboxesBlock.style.display = 'none';
     dropdownImageBlock.style.display = 'none';
     linkingLogicBlock.style.display = 'none';
+
+    // Handle location type: auto-populate as multipleTextboxes
+    if (questionType === 'location') {
+        // Switch to multipleTextboxes visually and in data
+        questionTypeSelect.value = 'multipleTextboxes';
+        questionType = 'multipleTextboxes';
+        multipleTextboxesBlock.style.display = 'block';
+        // Only add if not already present (avoid duplicates)
+        const optionsDiv = document.getElementById(`multipleTextboxesOptions${questionId}`);
+        if (optionsDiv && optionsDiv.children.length === 0) {
+            // Add State, City, Street, Zip textboxes
+            for (let i = 1; i <= 4; i++) {
+                addMultipleTextboxOption(questionId);
+            }
+            // Set placeholders
+            const placeholders = ['State', 'City', 'Street', 'Zip'];
+            for (let i = 1; i <= 4; i++) {
+                const phInput = document.getElementById(`multipleTextboxPlaceholder${questionId}_${i}`);
+                if (phInput) phInput.value = placeholders[i-1];
+            }
+            // Do NOT add an amount field by default
+        }
+        return; // Don't run the rest of the switch, already handled
+    }
 
     switch (questionType) {
         case 'text':
@@ -1286,4 +1312,41 @@ function deleteDropdownImage(questionId) {
     if (heightInput) heightInput.value = '';
     
     alert('Image deleted successfully');
+}
+
+function addMultipleAmountOption(questionId) {
+    const multipleTextboxesOptionsDiv = document.getElementById(`multipleTextboxesOptions${questionId}`);
+    const amountCount = multipleTextboxesOptionsDiv.querySelectorAll('.amount-block').length + 1;
+
+    const amountDiv = document.createElement('div');
+    amountDiv.className = `amount-block amount${amountCount}`;
+    amountDiv.innerHTML = `
+        <h4>Amount ${amountCount}</h4>
+        <label>Label:</label>
+        <input type="text" id="multipleAmountLabel${questionId}_${amountCount}" placeholder="Label ${amountCount}"><br><br>
+        <label>Name/ID:</label>
+        <input type="text" id="multipleAmountName${questionId}_${amountCount}" placeholder="Name/ID ${amountCount}"><br><br>
+        <label>Placeholder:</label>
+        <input type="text" id="multipleAmountPlaceholder${questionId}_${amountCount}" placeholder="Placeholder ${amountCount}">
+        <button type="button" onclick="removeMultipleAmountOption(${questionId}, ${amountCount})">Remove Amount</button>
+        <hr>
+    `;
+    multipleTextboxesOptionsDiv.appendChild(amountDiv);
+}
+
+function removeMultipleAmountOption(questionId, amountNumber) {
+    const amountDiv = document.querySelector(`#multipleTextboxesOptions${questionId} .amount${amountNumber}`);
+    if (amountDiv) {
+        amountDiv.remove();
+        const amounts = document.querySelectorAll(`#multipleTextboxesOptions${questionId} .amount-block`);
+        amounts.forEach((amt, idx) => {
+            const newAmountNumber = idx + 1;
+            amt.className = `amount-block amount${newAmountNumber}`;
+            amt.querySelector('h4').innerText = `Amount ${newAmountNumber}`;
+            amt.querySelector(`input[id^="multipleAmountLabel"]`).id = `multipleAmountLabel${questionId}_${newAmountNumber}`;
+            amt.querySelector(`input[id^="multipleAmountName"]`).id = `multipleAmountName${questionId}_${newAmountNumber}`;
+            amt.querySelector(`input[id^="multipleAmountPlaceholder"]`).id = `multipleAmountPlaceholder${questionId}_${newAmountNumber}`;
+            amt.querySelector('button').setAttribute('onclick', `removeMultipleAmountOption(${questionId}, ${newAmountNumber})`);
+        });
+    }
 }
