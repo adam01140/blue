@@ -462,3 +462,170 @@ input[type="file"] {
   pointer-events: auto !important;
   cursor: text !important;
 }
+
+/* --- Apple-style Node Visual Overhaul (Expanded & Override) --- */
+
+/* Universal node container style (applies to all mxGraph nodes and custom node HTML) */
+.mxCell, .mxCell[style*="nodeType="], .mxCellEditor, .mxCellOverlay,
+.multiple-textboxes-node, .numbered-dropdown-node, .dropdown-question, .image-option-node {
+  background: linear-gradient(135deg, rgba(255,255,255,0.85) 60%, rgba(240,245,255,0.65) 100%) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 6px 24px 0 rgba(0,0,0,0.10), 0 1.5px 6px 0 rgba(0,0,0,0.08) !important;
+  border: 1.5px solid rgba(200,200,200,0.25) !important;
+  backdrop-filter: blur(8px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.2) !important;
+  transition: box-shadow 0.2s, border 0.2s, background 0.2s;
+}
+
+/* Remove all old flat backgrounds, borders, and box-shadows from nodes */
+.mxCell, .mxCell[style*="nodeType="], .mxCellEditor, .mxCellOverlay,
+.multiple-textboxes-node, .numbered-dropdown-node, .dropdown-question, .image-option-node {
+  background-color: transparent !important;
+  border-width: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Re-apply new style on top (so only new style is visible) */
+.mxCell, .mxCell[style*="nodeType="], .mxCellEditor, .mxCellOverlay,
+.multiple-textboxes-node, .numbered-dropdown-node, .dropdown-question, .image-option-node {
+  background: linear-gradient(135deg, rgba(255,255,255,0.85) 60%, rgba(240,245,255,0.65) 100%) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 6px 24px 0 rgba(0,0,0,0.10), 0 1.5px 6px 0 rgba(0,0,0,0.08) !important;
+  border: 1.5px solid rgba(200,200,200,0.25) !important;
+  backdrop-filter: blur(8px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.2) !important;
+}
+
+/* Node hover effect */
+.mxCell:hover, .mxCell[style*="nodeType="]:hover, .mxCellEditor:hover, .mxCellOverlay:hover,
+.multiple-textboxes-node:hover, .numbered-dropdown-node:hover, .dropdown-question:hover, .image-option-node:hover {
+  box-shadow: 0 12px 32px 0 rgba(0,0,0,0.16), 0 2px 8px 0 rgba(0,0,0,0.10) !important;
+  border: 2px solid rgba(0, 123, 255, 0.18) !important;
+  background: rgba(255,255,255,0.80) !important;
+}
+
+/* Node label text */
+.mxCell div, .mxCellEditor div, .multiple-textboxes-node .question-text, .numbered-dropdown-node .question-text, .dropdown-question .question-text, .image-option-node p {
+  font-family: 'San Francisco', 'Segoe UI', 'Arial', sans-serif !important;
+  font-size: 1.08em !important;
+  color: #222 !important;
+  letter-spacing: 0.01em !important;
+  font-weight: 500 !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.7) !important;
+  line-height: 1.5 !important;
+  background: transparent !important;
+}
+
+/* End node special style */
+.mxCell[style*="nodeType=end"], .mxCell.end-node, .multiple-textboxes-node.end-node {
+  background: linear-gradient(120deg, #e0e0e0 60%, #f8f8f8 100%) !important;
+  color: #222 !important;
+  border: 2px solid #bbb !important;
+  font-weight: bold !important;
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.10) !important;
+}
+
+/* Calculation node special style */
+.mxCell[style*="nodeType=calculation"], .multiple-textboxes-node[style*="nodeType=calculation"] {
+  background: linear-gradient(135deg, #fffbe6 60%, #ffe9e3 100%) !important;
+  border: 2px solid #ffd580 !important;
+  box-shadow: 0 8px 32px 0 rgba(255, 215, 128, 0.10) !important;
+}
+
+/* Option node special style */
+.mxCell[style*="nodeType=options"], .dropdown-question, .image-option-node {
+  background: linear-gradient(135deg, #f8faff 60%, #eaf3ff 100%) !important;
+  border: 1.5px solid #b3d1ff !important;
+}
+
+/* Subtitle/info node style */
+.mxCell[style*="nodeType=subtitle"], .mxCell[style*="nodeType=info"] {
+  background: linear-gradient(135deg, #f7f7fa 60%, #e9e9f3 100%) !important;
+  border: 1.5px solid #d1d1e0 !important;
+  color: #555 !important;
+}
+
+/* Node input fields and buttons */
+.multiple-textboxes-node input, .multiple-textboxes-node button, .numbered-dropdown-node input, .numbered-dropdown-node button, .dropdown-question input, .dropdown-question button, .image-option-node input, .image-option-node button {
+  border-radius: 8px !important;
+  border: 1.2px solid #d0d7e2 !important;
+  background: rgba(255,255,255,0.85) !important;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.04) !important;
+  font-size: 1em !important;
+  padding: 6px 10px !important;
+  margin: 2px 0 !important;
+  transition: border 0.2s, box-shadow 0.2s !important;
+}
+.multiple-textboxes-node input:focus, .numbered-dropdown-node input:focus, .dropdown-question input:focus, .image-option-node input:focus {
+  border: 1.5px solid #007aff !important;
+  box-shadow: 0 0 0 2px rgba(0,122,255,0.10) !important;
+  outline: none !important;
+}
+.multiple-textboxes-node button, .numbered-dropdown-node button, .dropdown-question button, .image-option-node button {
+  background: linear-gradient(90deg, #e3eaff 0%, #f7faff 100%) !important;
+  color: #007aff !important;
+  border: none !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.04) !important;
+}
+.multiple-textboxes-node button:hover, .numbered-dropdown-node button:hover, .dropdown-question button:hover, .image-option-node button:hover {
+  background: linear-gradient(90deg, #d0e2ff 0%, #eaf3ff 100%) !important;
+  color: #0051a8 !important;
+}
+
+/* Remove default mxGraph border for a cleaner look */
+.mxGraph .mxCellEditor, .mxGraph .mxCellOverlay, .mxCellEditor, .mxCellEditor div, .mxCell {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* --- End Apple-style Node Visual Overhaul (Expanded & Override) --- */
+
+/* --- Force Only Stylized Nodes, Remove All Flat SVG/Shape Backgrounds --- */
+
+/* Hide all SVG shapes (rect, path, g) inside mxGraph nodes */
+.mxGraph .mxCell rect,
+.mxGraph .mxCell path,
+.mxGraph .mxCell ellipse,
+.mxGraph .mxCell polygon,
+.mxGraph .mxCell g,
+.mxGraph .mxCell polyline {
+  fill: transparent !important;
+  stroke: none !important;
+  opacity: 0 !important;
+}
+
+/* Hide all SVG shapes for all node types (option, dropdown, checkbox, end, etc) */
+.mxGraph [style*="nodeType=options"] rect,
+.mxGraph [style*="nodeType=dropdown"] rect,
+.mxGraph [style*="nodeType=checkbox"] rect,
+.mxGraph [style*="nodeType=end"] rect,
+.mxGraph [style*="nodeType=question"] rect,
+.mxGraph [style*="nodeType=calculation"] rect,
+.mxGraph [style*="nodeType=subtitle"] rect,
+.mxGraph [style*="nodeType=info"] rect {
+  fill: transparent !important;
+  stroke: none !important;
+  opacity: 0 !important;
+}
+
+/* Ensure all HTML overlays are above SVG shapes */
+.mxCell > div,
+.multiple-textboxes-node,
+.numbered-dropdown-node,
+.dropdown-question,
+.image-option-node {
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* Remove any background from mxCell containers */
+.mxCell, .mxCell[style*="nodeType="], .mxCellEditor, .mxCellOverlay {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* --- End: Only Stylized Nodes Visible --- */
