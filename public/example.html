@@ -12,7 +12,6 @@
         gap: 10px;
       }
       .info-icon {
-        position: center;
         display: inline-block;
         width: 18px;
         height: 18px;
@@ -28,7 +27,6 @@
       }
       .info-icon .info-tooltip {
         visibility: hidden;
-        position: absolute;
         top: calc(100% + 5px);
         left: 50%;
         transform: translateX(-50%);
@@ -61,7 +59,6 @@
         border-style: solid;
         border-color: transparent transparent #333 transparent;
       }
-      /* Progress Bar Styles */
       .progress-bar-container {
         width: 100%;
         max-width: 800px;
@@ -104,6 +101,18 @@
         pointer-events: none;
         z-index: 2;
         text-shadow: 0 1px 2px #fff, 0 0 2px #fff;
+      }
+      .navigation-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 10px;
+      }
+      .navigation-buttons button {
+        width: auto;
+        max-width: none;
+        margin: 0;
+        display: inline-flex;
       }
     </style>
 </head>
@@ -259,16 +268,19 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
     <section>
     <div id="box">
         <form id="customForm" onsubmit="return showThankYouMessage();"><div id="section1" class="section active"><div class="progress-bar-container">
-  <div class="progress-bar-bg">
-    <div class="progress-bar-fill" id="progressBarFill"></div>
-    <div class="progress-bar-label" id="progressBarLabel"></div>
-  </div>
-</div><h1 class="section-title">Section 1</h1><div id="question-container-1"><label><h3>Whats your name</h3></label><input type="text" id="answer1" name="answer1" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><div class="progress-bar-container">
-  <div class="progress-bar-bg">
-    <div class="progress-bar-fill" id="progressBarFill"></div>
-    <div class="progress-bar-label" id="progressBarLabel"></div>
-  </div>
-</div><h1 class="section-title">Section 2</h1><div id="question-container-2"><label><h3>What do you like to eat</h3></label><input type="text" id="answer2" name="answer2" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBarFill1"></div>
+        <div class="progress-bar-label" id="progressBarLabel1"></div>
+      </div>
+    </div><center><h1 class="section-title">Section 1</h1><div id="question-container-1">
+          <div class="question-header">
+            <label><h3>Do you have a lawyer</h3></label>
+            <div class="info-icon" tabindex="0">
+              <span>i</span>
+              <div class="info-tooltip">Lawyers are cool</div>
+            </div>
+          </div>
+        <p class="question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">Your lawyer is the guy you hired</p><input type="text" id="answer1" name="answer1" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
@@ -350,8 +362,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
            window.location.href="account.html";
         }
     });
-  var questionSlugMap       = {"1":"whats_your_name","2":"what_do_you_like_to_eat"};
-var questionNameIds = {"1":"answer1","2":"answer2"};
+  var questionSlugMap       = {"1":"do_you_have_a_lawyer"};
+var questionNameIds = {"1":"answer1"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var conditionalAlerts = [];
@@ -1103,9 +1115,11 @@ function updateProgressBar() {
   const sections = document.querySelectorAll('.section');
   let activeIndex = -1;
   let totalSections = 0;
+  let visibleSections = [];
   sections.forEach((sec, idx) => {
     if (!sec.classList.contains('hidden')) {
       totalSections++;
+      visibleSections.push(sec);
       if (sec.classList.contains('active')) {
         activeIndex = totalSections - 1;
       }
@@ -1115,15 +1129,46 @@ function updateProgressBar() {
   if (totalSections === 0) totalSections = 1;
   const percent = ((activeIndex + 1) / totalSections) * 100;
   const percentText = Math.round(percent) + '%';
-  document.querySelectorAll('.progress-bar-fill').forEach(fill => {
-    fill.style.width = percent + '%';
-  });
-  document.querySelectorAll('.progress-bar-label').forEach(label => {
-    label.textContent = `Section ${activeIndex + 1} of ${totalSections} (${percentText})`;
-  });
+  for (let i = 0; i < visibleSections.length; i++) {
+    const fill = visibleSections[i].querySelector('.progress-bar-fill');
+    const label = visibleSections[i].querySelector('.progress-bar-label');
+    if (fill) animateProgressBarFill(fill, percent);
+    if (label) label.textContent = 'Section ' + (activeIndex + 1) + ' of ' + totalSections + ' (' + percentText + ')';
+  }
 }
 
-window.addEventListener('DOMContentLoaded', function() {
+// Animate the progress bar fill width smoothly
+function animateProgressBarFill(fillEl, targetPercent) {
+  if (!fillEl) return;
+  // Cancel any previous animation
+  if (fillEl._progressAnimFrame) {
+    cancelAnimationFrame(fillEl._progressAnimFrame);
+    fillEl._progressAnimFrame = null;
+  }
+  const currentWidth = parseFloat(fillEl.style.width) || 0;
+  const start = currentWidth;
+  const end = targetPercent;
+  const duration = 500; // ms, should match CSS transition
+  const startTime = performance.now();
+
+  function animate(now) {
+    const elapsed = now - startTime;
+    const t = Math.min(elapsed / duration, 1);
+    // Use easeInOutCubic for a nice effect
+    const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const newWidth = start + (end - start) * ease;
+    fillEl.style.width = newWidth + '%';
+    if (t < 1) {
+      fillEl._progressAnimFrame = requestAnimationFrame(animate);
+    } else {
+      fillEl.style.width = end + '%';
+      fillEl._progressAnimFrame = null;
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
   updateProgressBar();
 });
 

@@ -114,7 +114,6 @@ logicScriptBuffer = "";
     "        gap: 10px;",
     "      }",
     "      .info-icon {",
-    "        position: center;",
     "        display: inline-block;",
     "        width: 18px;",
     "        height: 18px;",
@@ -130,7 +129,6 @@ logicScriptBuffer = "";
     "      }",
     "      .info-icon .info-tooltip {",
     "        visibility: hidden;",
-    "        position: absolute;",
     "        top: calc(100% + 5px);",
     "        left: 50%;",
     "        transform: translateX(-50%);",
@@ -423,7 +421,7 @@ logicScriptBuffer = "";
         <div class="progress-bar-label" id="progressBarLabel${s}"></div>
       </div>
     </div>`;
-    formHTML += `<h1 class="section-title">${sectionName}</h1>`;
+    formHTML += `<center><h1 class="section-title">${sectionName}</h1>`;
 
     // Grab all questions in this section
     const questionsInSection = sectionBlock.querySelectorAll(".question-block");
