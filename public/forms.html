@@ -898,12 +898,16 @@
     }
     
     async function addFormToPortfolio(formId, formUrl, formName) {
-        const userId = auth.currentUser.uid;
-        
+        const user = auth.currentUser;
+        if (!user) {
+            // Not signed in, just go to the form
+            window.location.href = formUrl;
+            return;
+        }
+        const userId = user.uid;
         try {
             // Check if form exists in user's collection
             const formDoc = await db.collection('users').doc(userId).collection('forms').doc(formId).get();
-            
             if (formDoc.exists) {
                 alert('You already have this form in your portfolio.');
             } else {
@@ -913,7 +917,6 @@
                     url: formUrl,
                     addedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                
                 // Refresh the forms list
                 fetchMyForms(userId);
             }
