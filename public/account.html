@@ -370,6 +370,13 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
+  // Redirect if already logged in
+  auth.onAuthStateChanged(function(user) {
+    if (user) {
+      window.location.href = 'forms.html';
+    }
+  });
+
   // DOM
   const accountInfoContainer = document.getElementById('account-info-container');
   const loginContainer = document.getElementById('login-container');
