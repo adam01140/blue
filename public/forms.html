@@ -522,6 +522,32 @@
             font-weight: 700;
             color: var(--text-color);
         }
+
+        #portfolio-section {
+            display: none;
+        }
+
+        .sign-in-btn {
+            background: #fff;
+            color: #222;
+            font-weight: 700;
+            font-size: 1.08em;
+            border: none;
+            border-radius: 22px;
+            padding: 8px 28px;
+            margin-left: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            outline: none;
+            display: none;
+        }
+        .sign-in-btn:hover {
+            background: #f4f4f4;
+            color: #2980b9;
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+        }
     </style>
 </head>
 <body>
@@ -541,6 +567,7 @@
         <div class="user-info">
             <span class="welcome-message" id="welcome-message"></span>
             <button class="settings-button" id="settings-button">👤</button>
+            <a href="account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
         </div>
     </header>
 
@@ -656,7 +683,7 @@
 	
 
 <div class="main-forms-wrapper">
-    <div class="forms-card">
+    <div id="portfolio-section" class="forms-card">
         <h1>My Form Portfolio</h1><br>
         <div class="subtitle">All your saved forms in one place. Open, manage, or remove forms below.</div><br>
         <ul id="my-forms-list" class="forms-list">
@@ -718,6 +745,7 @@
     const availableFormsList = document.getElementById('available-forms-list');
     const noFormsMessage = document.getElementById('no-forms-message');
     const removeSelectedButton = document.getElementById('remove-selected-button');
+    const signInBtn = document.getElementById('sign-in-btn');
 
     // Keep track of selected forms
     const selectedForms = new Set();
@@ -948,6 +976,10 @@
     // Update the auth state listener in forms.html
     auth.onAuthStateChanged(async (user) => {
         if (user) {
+            document.getElementById('portfolio-section').style.display = 'block';
+            settingsButton.style.display = 'inline-block';
+            logoutButton.style.display = 'block';
+            signInBtn.style.display = 'none';
             try {
                 // Get user document from Firestore
                 const userDoc = await db.collection('users').doc(user.uid).get();
@@ -1003,7 +1035,10 @@
             
             settingsButton.addEventListener('click', openSettings);
         } else {
-            window.location.href = 'account.html';
+            document.getElementById('portfolio-section').style.display = 'none';
+            settingsButton.style.display = 'none';
+            logoutButton.style.display = 'none';
+            signInBtn.style.display = 'inline-block';
         }
     });
 </script>

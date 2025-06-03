@@ -361,10 +361,12 @@
         #remove-selected-button:hover {
             background-color: #c0392b;
         }
+
+        .protected-section { display: none; }
     </style>
 </head>
 <body>
-    <header>
+    <header class="protected-section">
         <img src="logo.png" alt="FormWiz Logo" onclick="location.href='index.html';">
         <nav>
             <a href="index.html">Home</a>
@@ -378,7 +380,7 @@
     </header>
 
     <!-- Settings Modal -->
-    <div id="settings-modal" class="modal">
+    <div id="settings-modal" class="modal protected-section">
         <div class="modal-content">
             <span class="close-modal" onclick="closeSettings()">&times;</span>
             <h2>User Information</h2>
@@ -484,11 +486,11 @@
 	
 	<br>
 	<center>
-	<h2 id="portfolio-welcome-message" style="color: var(--text-color); margin-bottom: 10px;"></h2>
+	<h2 id="portfolio-welcome-message" class="protected-section" style="color: var(--text-color); margin-bottom: 10px;"></h2>
 	</center>
 	
 
-<section class="forms-section">
+<section class="forms-section protected-section">
 
  
  
@@ -519,7 +521,7 @@
 
     <center>
 	<br>
-        <button class="logout-button" id="logout-button">Logout</button>
+        <button class="logout-button protected-section" id="logout-button">Logout</button>
     </center><br><br>
 
     <footer>
@@ -789,18 +791,15 @@
     // Update the auth state listener in forms.html
     auth.onAuthStateChanged(async (user) => {
         if (user) {
+            // Show protected sections
+            document.querySelectorAll('.protected-section').forEach(el => el.style.display = '');
             try {
                 // Get user document from Firestore
                 const userDoc = await db.collection('users').doc(user.uid).get();
-                
                 if (userDoc.exists) {
                     const userData = userDoc.data();
-                    
-                    // Update welcome message with actual name
                     welcomeMessage.textContent = `${userData.firstName} ${userData.lastName}`;
                     document.getElementById('portfolio-welcome-message').textContent = `Welcome, ${userData.firstName} ${userData.lastName}`;
-
-                    // Pre-populate settings form
                     document.getElementById('settings-first-name').value = userData.firstName || '';
                     document.getElementById('settings-last-name').value = userData.lastName || '';
                     document.getElementById('settings-email').value = userData.email || user.email || '';
@@ -809,14 +808,9 @@
                     document.getElementById('settings-city').value = userData.address?.city || '';
                     document.getElementById('settings-state').value = userData.address?.state || '';
                     document.getElementById('settings-zip').value = userData.address?.zip || '';
-                    
-                    // Load user's forms
                     fetchMyForms(user.uid);
-                    
-                    // Render available forms with buttons
                     renderAvailableForms();
                 } else {
-                    // Create user document if it doesn't exist
                     const newUserData = {
                         firstName: '',
                         lastName: '',
@@ -830,21 +824,55 @@
                         },
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
-                    
                     await db.collection('users').doc(user.uid).set(newUserData);
                     welcomeMessage.textContent = `Welcome User`;
-                    
-                    // Render available forms with buttons
                     renderAvailableForms();
                 }
             } catch (error) {
                 console.error('Error loading user data:', error);
                 welcomeMessage.textContent = 'Welcome User';
             }
-            
             settingsButton.addEventListener('click', openSettings);
         } else {
-            window.location.href = 'account.html';
+            // Hide protected sections
+            document.querySelectorAll('.protected-section').forEach(el => el.style.display = 'none');
+            // DO NOT redirect to account.html here anymore
+            // Only handle available forms section and click handlers
+            const availableSection = document.querySelectorAll('.forms-section')[1];
+            availableSection.querySelector('h1').textContent = 'Available Forms';
+            let desc = availableSection.querySelector('.available-desc');
+            if (!desc) {
+                desc = document.createElement('div');
+                desc.className = 'available-desc';
+                availableSection.insertBefore(desc, availableSection.querySelector('ul'));
+            }
+            desc.textContent = 'Browse through a wide variety of the forms we offer.';
+            // Remove all add buttons if present, then re-render with click handler
+            const availableFormsList = document.getElementById('available-forms-list');
+            availableFormsList.querySelectorAll('button.form-action-button').forEach(btn => btn.remove());
+            const formItems = availableFormsList.querySelectorAll('li');
+            formItems.forEach(li => {
+                const anchor = li.querySelector('a');
+                if (anchor) {
+                    // Remove any existing button
+                    const oldBtn = li.querySelector('button.form-action-button');
+                    if (oldBtn) oldBtn.remove();
+                    // Add Click Here button
+                    const addButton = document.createElement('button');
+                    addButton.textContent = 'Click Here';
+                    addButton.classList.add('form-action-button');
+                    addButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        window.location.href = 'account.html';
+                    });
+                    li.appendChild(addButton);
+                    // Also, clicking the form name should redirect
+                    anchor.onclick = (e) => {
+                        e.preventDefault();
+                        window.location.href = 'account.html';
+                    };
+                }
+            });
         }
     });
 </script>
