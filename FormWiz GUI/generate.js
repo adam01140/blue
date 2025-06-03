@@ -217,7 +217,8 @@ logicScriptBuffer = "";
     "        margin: 0;",
     "        display: inline-flex;",
     "      }",
-    "    </style>",
+    "      /* Stepper Progress Bar Styles */",
+    "      .stepper-progress-bar {\n        display: flex;\n        align-items: center;\n        justify-content: center;\n        margin: 12px auto 0 auto;\n        width: 100%;\n        max-width: 700px;\n        background: none;\n        gap: 0;\n      }\n      .stepper-step {\n        display: flex;\n        flex-direction: column;\n        align-items: center;\n        position: relative;\n        z-index: 2;\n        min-width: 90px;\n      }\n      .stepper-circle {\n        width: 32px;\n        height: 32px;\n        border-radius: 50%;\n        background: #e0e7ef;\n        color: #2c3e50;\n        display: flex;\n        align-items: center;\n        justify-content: center;\n        font-weight: bold;\n        font-size: 18px;\n        border: 2px solid #4f8cff;\n        transition: background 0.3s, color 0.3s, border 0.3s;\n      }\n      .stepper-step.active .stepper-circle,\n      .stepper-step.completed .stepper-circle {\n        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);\n        color: #fff;\n        border: 2px solid #38d39f;\n      }\n      .stepper-label {\n        margin-top: 8px;\n        font-size: 15px;\n        color: #2c3e50;\n        font-weight: 600;\n        text-align: center;\n        min-width: 80px;\n      }\n      .stepper-step.completed .stepper-label {\n        color: #38d39f;\n      }\n      .stepper-step.active .stepper-label {\n        color: #4f8cff;\n      }\n      .stepper-line {\n        flex: 1;\n        height: 4px;\n        background: #e0e7ef;\n        margin: 0 0px;\n        position: relative;\n        z-index: 1;\n        transition: background 0.5s cubic-bezier(.4,1.4,.6,1);\n      }\n      .stepper-line.filled {\n        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);\n      }\n    </style>",
     "</head>",
     "<body>",
     "<header>",
@@ -402,25 +403,30 @@ logicScriptBuffer = "";
         .replace(/"/g, '\\"')
   );
 
+  // Insert stepper progress bar above the form, only once
+  formHTML += `<div class="stepper-progress-bar" id="stepperProgressBar">`;
+  for (let step = 1; step < sectionCounter; step++) {
+    formHTML += `<div class="stepper-step" data-step="${step}">`;
+    formHTML += `<div class="stepper-circle">${step}</div>`;
+    const sectionNameEl = document.getElementById("sectionBlock" + step)?.querySelector("#sectionName" + step);
+    const sectionName = sectionNameEl ? sectionNameEl.value : `Section ${step}`;
+    formHTML += `<div class="stepper-label">${sectionName}</div>`;
+    formHTML += `</div>`;
+    if (step < sectionCounter - 1) {
+      formHTML += `<div class="stepper-line"></div>`;
+    }
+  }
+  formHTML += `</div>`;
+
   // Build each Section & its questions
   for (let s = 1; s < sectionCounter; s++) {
     let sectionBlock = document.getElementById("sectionBlock" + s);
     if (!sectionBlock) continue;
-
     const sectionNameEl = sectionBlock.querySelector("#sectionName" + s);
     const sectionName = sectionNameEl ? sectionNameEl.value : "Section " + s;
-
     // Start the section
-    formHTML += `<div id="section${s}" class="section${
-      s === 1 ? " active" : ""
-    }">`;
-    // Insert progress bar at the top of each section
-    formHTML += `<div class="progress-bar-container">
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="progressBarFill${s}"></div>
-        <div class="progress-bar-label" id="progressBarLabel${s}"></div>
-      </div>
-    </div>`;
+    formHTML += `<div id="section${s}" class="section${s === 1 ? " active" : ""}">`;
+    // Only add the section title, not the stepper
     formHTML += `<center><h1 class="section-title">${sectionName}</h1>`;
 
     // Grab all questions in this section
@@ -1942,29 +1948,33 @@ function attachCalculationListeners() {
 
 // Progress Bar Logic
 function updateProgressBar() {
-  const sections = document.querySelectorAll('.section');
-  let activeIndex = -1;
-  let totalSections = 0;
-  let visibleSections = [];
-  sections.forEach((sec, idx) => {
-    if (!sec.classList.contains('hidden')) {
-      totalSections++;
-      visibleSections.push(sec);
-      if (sec.classList.contains('active')) {
-        activeIndex = totalSections - 1;
-      }
+  // Stepper logic
+  const stepper = document.getElementById('stepperProgressBar');
+  if (!stepper) return;
+  const steps = stepper.querySelectorAll('.stepper-step');
+  let activeStep = 1;
+  if (typeof currentSectionNumber === 'number') {
+    activeStep = currentSectionNumber;
+  } else if (currentSectionNumber === 'end') {
+    activeStep = steps.length;
+  }
+  steps.forEach((step, idx) => {
+    step.classList.remove('active', 'completed');
+    if (idx + 1 < activeStep) {
+      step.classList.add('completed');
+    } else if (idx + 1 === activeStep) {
+      step.classList.add('active');
     }
   });
-  if (activeIndex === -1) activeIndex = 0;
-  if (totalSections === 0) totalSections = 1;
-  const percent = ((activeIndex + 1) / totalSections) * 100;
-  const percentText = Math.round(percent) + '%';
-  for (let i = 0; i < visibleSections.length; i++) {
-    const fill = visibleSections[i].querySelector('.progress-bar-fill');
-    const label = visibleSections[i].querySelector('.progress-bar-label');
-    if (fill) animateProgressBarFill(fill, percent);
-    if (label) label.textContent = 'Section ' + (activeIndex + 1) + ' of ' + totalSections + ' (' + percentText + ')';
-  }
+  // Animate lines between completed steps
+  const lines = stepper.querySelectorAll('.stepper-line');
+  lines.forEach((line, idx) => {
+    if (idx < activeStep - 1) {
+      line.classList.add('filled');
+    } else {
+      line.classList.remove('filled');
+    }
+  });
 }
 
 // Animate the progress bar fill width smoothly
