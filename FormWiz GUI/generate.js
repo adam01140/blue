@@ -218,9 +218,88 @@ logicScriptBuffer = "";
     "        display: inline-flex;",
     "      }",
     "      /* Stepper Progress Bar Styles */",
-    "      .stepper-progress-bar {\n        display: flex;\n        align-items: center;\n        justify-content: center;\n        margin: 12px auto 0 auto;\n        width: 100%;\n        max-width: 700px;\n        background: none;\n        gap: 0;\n      }\n      .stepper-step {\n        display: flex;\n        flex-direction: column;\n        align-items: center;\n        position: relative;\n        z-index: 2;\n        min-width: 90px;\n      }\n      .stepper-circle {\n        width: 32px;\n        height: 32px;\n        border-radius: 50%;\n        background: #e0e7ef;\n        color: #2c3e50;\n        display: flex;\n        align-items: center;\n        justify-content: center;\n        font-weight: bold;\n        font-size: 18px;\n        border: 2px solid #4f8cff;\n        transition: background 0.3s, color 0.3s, border 0.3s;\n      }\n      .stepper-step.active .stepper-circle,\n      .stepper-step.completed .stepper-circle {\n        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);\n        color: #fff;\n        border: 2px solid #38d39f;\n      }\n      .stepper-label {\n        margin-top: 8px;\n        font-size: 15px;\n        color: #2c3e50;\n        font-weight: 600;\n        text-align: center;\n        min-width: 80px;\n      }\n      .stepper-step.completed .stepper-label {\n        color: #38d39f;\n      }\n      .stepper-step.active .stepper-label {\n        color: #4f8cff;\n      }\n      .stepper-line {\n        flex: 1;\n        height: 4px;\n        background: #e0e7ef;\n        margin: 0 0px;\n        position: relative;\n        z-index: 1;\n        transition: background 0.5s cubic-bezier(.4,1.4,.6,1);\n      }\n      .stepper-line.filled {\n        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);\n      }\n    </style>",
+    "      .stepper-progress-bar {\n        display: flex;\n        align-items: center;\n        justify-content: center;\n        margin: 12px auto 0 auto;\n        width: 100%;\n        max-width: 700px;\n        background: none;\n        gap: 0;\n      }\n      .stepper-step {\n        display: flex;\n        flex-direction: column;\n        align-items: center;\n        position: relative;\n        z-index: 2;\n        min-width: 90px;\n      }\n      .stepper-circle {\n        width: 32px;\n        height: 32px;\n        border-radius: 50%;\n        background: #e0e7ef;\n        color: #2c3e50;\n        display: flex;\n        align-items: center;\n        justify-content: center;\n        font-weight: bold;\n        font-size: 18px;\n        border: 2px solid #4f8cff;\n        transition: background 0.3s, color 0.3s, border 0.3s;\n      }\n      .stepper-step.active .stepper-circle,\n      .stepper-step.completed .stepper-circle {\n        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);\n        color: #fff;\n        border: 2px solid #38d39f;\n      }\n      .stepper-label {\n        margin-top: 8px;\n        font-size: 15px;\n        color: #2c3e50;\n        font-weight: 600;\n        text-align: center;\n        min-width: 80px;\n      }\n      .stepper-step.completed .stepper-label {\n        color: #38d39f;\n      }\n      .stepper-step.active .stepper-label {\n        color: #4f8cff;\n      }\n      .stepper-line {\n        flex: 1;\n        height: 4px;\n        background: #e0e7ef;\n        margin: 0 0px;\n        position: relative;\n        z-index: 1;\n        transition: background 0.5s cubic-bezier(.4,1.4,.6,1);\n      }\n      .stepper-line.filled {\n        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);\n      }\n  ",
+    // Insert modal CSS
+    `      /* Custom Modal Styles */
+      .custom-modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(44, 62, 80, 0.45);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s;
+      }
+      .custom-modal {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(44,62,80,0.18);
+        padding: 32px 28px 24px 28px;
+        max-width: 370px;
+        width: 90%;
+        text-align: center;
+        position: relative;
+        animation: modalPopIn 0.35s cubic-bezier(.4,1.4,.6,1);
+      }
+      @keyframes modalPopIn {
+        0% { transform: scale(0.85); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      .custom-modal h2 {
+        margin-top: 0;
+        color: #2c3e50;
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+      .custom-modal p {
+        color: #4f8cff;
+        font-size: 1.08rem;
+        margin-bottom: 28px;
+      }
+      .custom-modal .modal-buttons {
+        display: flex;
+        gap: 18px;
+        justify-content: center;
+      }
+      .custom-modal button {
+        padding: 8px 22px;
+        border-radius: 6px;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+      }
+      .custom-modal .modal-back {
+        background: #e0e7ef;
+        color: #2c3e50;
+      }
+      .custom-modal .modal-back:hover {
+        background: #cfd8e3;
+      }
+      .custom-modal .modal-continue {
+        background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
+        color: #fff;
+        border: none;
+      }
+      .custom-modal .modal-continue:hover {
+        background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);
+      }</style>`,
     "</head>",
     "<body>",
+    // Insert modal HTML right after <body>
+    '<div id="loginRequiredModal" class="custom-modal-overlay" style="display:none;">\n' +
+    '  <div class="custom-modal">\n' +
+    '    <h2>Account Required</h2>\n' +
+    '    <p>You must create an account to continue filling out the form.</p>\n' +
+    '    <div class="modal-buttons">\n' +
+    '      <button class="modal-back" id="modalBackBtn" type="button">Back</button>\n' +
+    '      <button class="modal-continue" id="modalContinueBtn" type="button">Continue</button>\n' +
+    '    </div>\n' +
+    '  </div>\n' +
+    '</div>',
     "<header>",
     '    <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href=\'index.html\';">',
     "    <nav>",
@@ -1137,6 +1216,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 
   // 1) Firebase config and check
   formHTML += `
+    let isUserLoggedIn = false;
     const firebaseConfig = {
         apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
         authDomain: "formwiz-3f4fd.firebaseapp.com",
@@ -1153,6 +1233,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
     let userId = null;
     firebase.auth().onAuthStateChanged(async function(user){
         if(user){ 
+            isUserLoggedIn = true;
             userId=user.uid;
             // Fetch user data and display welcome message
             try {
@@ -1172,8 +1253,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
                 console.error("Error fetching user data:", error);
             }
         } else {
-           console.log("User not logged in.");
-           window.location.href="account.html";
+            isUserLoggedIn = false;
+            // Do NOT redirect. Just let the user fill the form.
         }
     });
   `;
@@ -2011,6 +2092,34 @@ function animateProgressBarFill(fillEl, targetPercent) {
 document.addEventListener('DOMContentLoaded', function() {
   updateProgressBar();
 });
+
+// Modal logic
+function showLoginRequiredModal() {
+  document.getElementById('loginRequiredModal').style.display = 'flex';
+}
+function hideLoginRequiredModal() {
+  document.getElementById('loginRequiredModal').style.display = 'none';
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var backBtn = document.getElementById('modalBackBtn');
+  var contBtn = document.getElementById('modalContinueBtn');
+  if (backBtn) backBtn.onclick = hideLoginRequiredModal;
+  if (contBtn) contBtn.onclick = function() {
+    window.location.href = 'account.html';
+  };
+});
+
+// Patch handleNext to check login before advancing
+if (typeof handleNext === 'function') {
+  var originalHandleNext = handleNext;
+  window.handleNext = function(currentSection) {
+    if (!isUserLoggedIn) {
+      showLoginRequiredModal();
+      return;
+    }
+    originalHandleNext(currentSection);
+  };
+}
 
 </script>
 </body>
