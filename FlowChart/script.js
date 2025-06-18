@@ -1531,11 +1531,14 @@ keyHandler.bindControlKey(86, () => {
     try {
       let style = "";
       let label = "";
+      let width = 160;
+      let height = 80;
       
       if (nodeType === 'question') {
-        // Use default style for question, but do not set a static label
-        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;questionType=text;spacing=12;fontSize=16;align=center;verticalAlign=middle;";
+        // Use default style for question, but do not set a static label or questionType
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;align=center;verticalAlign=middle;";
         label = ""; // No static label
+        width = 260; // Ensure wide enough for dropdown
       } else if (nodeType === 'options') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;align=center;";
         label = "Option Text";
@@ -1560,9 +1563,6 @@ keyHandler.bindControlKey(86, () => {
       }
       
       // Create cell with appropriate width/height based on type
-      let width = 160;
-      let height = 80;
-      
       if (nodeType === 'calculation') {
         width = 300;
         height = 250;
@@ -1585,7 +1585,7 @@ keyHandler.bindControlKey(86, () => {
       // Set IDs and section
       if (nodeType === 'question') {
         setNodeId(cell, 'Question_' + Date.now().toString().slice(-4));
-        setQuestionType(cell, 'text'); // Immediately render as editable text question
+        // Do NOT call setQuestionType or set questionType here; let refreshAllCells show the dropdown
       } else if (nodeType === 'options') {
         setNodeId(cell, 'Option_' + Date.now().toString().slice(-4));
       }
@@ -2125,21 +2125,26 @@ function getQuestionType(cell) {
  * Define pickTypeForCell globally
  */
 window.pickTypeForCell = function(cellId, val) {
+  console.log('[pickTypeForCell] called with cellId:', cellId, 'val:', val); // DEBUG
+  if (!val) {
+    console.log('[pickTypeForCell] No value selected, returning');
+    return; // Do nothing if no type selected
+  }
   const c = graph.getModel().getCell(cellId);
-  if (!c) return;
+  if (!c) {
+    console.log('[pickTypeForCell] No cell found for id', cellId);
+    return;
+  }
 
   graph.getModel().beginUpdate();
   try {
     setQuestionType(c, val);
-
     if (!c._nameId) {
       c._nameId = "answer" + graph.getChildVertices(graph.getDefaultParent()).length;
       c._placeholder = "";
     }
-
-    if (val === "number") {
-      c.value = "Number question node";
-    } else if (val === "multipleTextboxes") {
+    // Only handle special cases for multi types
+    if (val === "multipleTextboxes") {
       c._questionText = "Enter question text";
       c._textboxes = [{ nameId: "", placeholder: "Enter value" }];
       updateMultipleTextboxesCell(c);
@@ -2148,10 +2153,8 @@ window.pickTypeForCell = function(cellId, val) {
       c._twoNumbers = { first: "0", second: "0" };
       c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
       updatemultipleDropdownTypeCell(c);
-    } else {
-      c.value = `<div style="text-align:center;">${val.charAt(0).toUpperCase() + val.slice(1)} question node</div>`;
-      graph.getModel().setStyle(c, c.style + ";spacingTop=10;verticalAlign=middle;");
     }
+    // For all other types, setQuestionType handles rendering
   } finally {
     graph.getModel().endUpdate();
   }
@@ -2159,6 +2162,7 @@ window.pickTypeForCell = function(cellId, val) {
   graph.setSelectionCell(c);
   graph.startEditingAtCell(c);
   refreshAllCells();
+  console.log('[pickTypeForCell] Finished updating cell', c);
 };
 
 /******************************************************************
@@ -2446,13 +2450,17 @@ function refreshAllCells() {
     
 
     
-    // If newly dropped question node is just placeholder
-    if (isQuestion(cell) &&
-       (cell.value === "question node" || cell.value === "Question Node")) {
+    // If newly dropped question node is just placeholder or has empty value
+    if (isQuestion(cell) && (!cell.value || /^\s*$/.test(cell.value) || cell.value === "question node" || cell.value === "Question Node")) {
       cell.value = `
         <div style="display: flex; justify-content: center; align-items: center; height:100%;">
-          <select style="margin:auto;" oninput="window.pickTypeForCell('${cell.id}', this.value)">
-            <option value="">-- Choose Type --</option>
+          <select class="question-type-dropdown" data-cell-id="${cell.id}" style="margin:auto; font-size: 1.1em; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #b0b8c9; box-shadow: 0 2px 8px rgba(0,0,0,0.07); background: #f8faff; color: #222; transition: border-color 0.2s, box-shadow 0.2s; outline: none; min-width: 220px; cursor:pointer;"
+            onfocus="this.style.borderColor='#4a90e2'; this.style.boxShadow='0 0 0 2px #b3d4fc';"
+            onblur="this.style.borderColor='#b0b8c9'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.07)';"
+            onmouseover="this.style.borderColor='#4a90e2';"
+            onmouseout="this.style.borderColor='#b0b8c9';"
+            onchange="window.pickTypeForCell('${cell.id}', this.value)">
+            <option value="">-- Choose Question Type --</option>
             <option value="text">Text</option>
             <option value="text2">Dropdown</option>
             <option value="checkbox">Checkbox</option>
@@ -5821,20 +5829,10 @@ function updateText2Cell(cell) {
   if (!cell._questionText) {
     cell._questionText = "Enter dropdown question";
   }
-  // Create the HTML content with a structure similar to multiple textboxes
-  // which has good text selection/editing support
+  // Create the HTML content as a single line
   const html = `
     <div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center; width:100%;">
-      <div class="question-text"
-           style="text-align:center; padding:8px; width:100%; user-select:text;"
-           contenteditable
-           onkeydown="window.handleTitleInputKeydown(event)"
-           onmousedown="event.stopPropagation();"
-           onclick="window.handleMultipleTextboxClick(event, '${cell.id}')"
-           onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')"
-           onblur="window.updateText2Handler('${cell.id}', this.innerText)">
-        ${escapeHtml(cell._questionText)}
-      </div>
+      <div class="question-text" style="text-align:center; padding:8px; width:100%; user-select:text;"contenteditable onkeydown="window.handleTitleInputKeydown(event)"onmousedown="event.stopPropagation();"onclick="window.handleMultipleTextboxClick(event, '${cell.id}')"onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')"onblur="window.updateText2Handler('${cell.id}', this.innerText)">${escapeHtml(cell._questionText)}</div>
     </div>`;
   graph.getModel().setValue(cell, html);
 }
@@ -6106,3 +6104,61 @@ document.addEventListener("DOMContentLoaded", function() {
   // ... existing code ...
 });
 // ... existing code ...
+
+/**
+ * Define pickTypeForCell globally
+ */
+window.pickTypeForCell = function(cellId, val) {
+  console.log('[pickTypeForCell] called with cellId:', cellId, 'val:', val); // DEBUG
+  if (!val) {
+    console.log('[pickTypeForCell] No value selected, returning');
+    return; // Do nothing if no type selected
+  }
+  const c = graph.getModel().getCell(cellId);
+  if (!c) {
+    console.log('[pickTypeForCell] No cell found for id', cellId);
+    return;
+  }
+
+  graph.getModel().beginUpdate();
+  try {
+    setQuestionType(c, val);
+    if (!c._nameId) {
+      c._nameId = "answer" + graph.getChildVertices(graph.getDefaultParent()).length;
+      c._placeholder = "";
+    }
+    // Only handle special cases for multi types
+    if (val === "multipleTextboxes") {
+      c._questionText = "Enter question text";
+      c._textboxes = [{ nameId: "", placeholder: "Enter value" }];
+      updateMultipleTextboxesCell(c);
+    } else if (val === "multipleDropdownType") {
+      c._questionText = "Enter question text";
+      c._twoNumbers = { first: "0", second: "0" };
+      c._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
+      updatemultipleDropdownTypeCell(c);
+    }
+    // For all other types, setQuestionType handles rendering
+  } finally {
+    graph.getModel().endUpdate();
+  }
+
+  graph.setSelectionCell(c);
+  graph.startEditingAtCell(c);
+  refreshAllCells();
+  console.log('[pickTypeForCell] Finished updating cell', c);
+};
+
+// --- Ensure event handler is attached for all .question-type-dropdown selects (event delegation) ---
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.classList.contains('question-type-dropdown')) {
+    const cellId = e.target.getAttribute('data-cell-id');
+    const val = e.target.value;
+    console.log('[delegated change] .question-type-dropdown changed:', cellId, val); // DEBUG
+    if (window.pickTypeForCell) {
+      window.pickTypeForCell(cellId, val);
+    } else {
+      console.error('window.pickTypeForCell is not defined!');
+    }
+  }
+});
