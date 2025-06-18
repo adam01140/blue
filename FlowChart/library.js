@@ -326,7 +326,7 @@ window.fixCapitalizationInJumps();
 
 // Save flowchart to Firebase
 window.saveFlowchart = function() {
-  if (!currentUser) { alert("Please log in first."); return;}  
+  if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to save flowcharts. Guest users cannot save."); return;}  
   renumberQuestionIds();
   let flowchartName = currentFlowchartName;
   if (!flowchartName) {
@@ -370,15 +370,15 @@ window.saveFlowchart = function() {
     data.cells.push(cellData);
   }
   data.sectionPrefs = sectionPrefs;
-  db.collection("users").doc(currentUser.uid).collection("flowcharts").doc(flowchartName).set({ flowchart: data })
+  db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ flowchart: data })
     .then(()=>alert("Flowchart saved as: " + flowchartName))
     .catch(err=>alert("Error saving: " + err));
 };
 
 // View saved flowcharts
 window.viewSavedFlowcharts = function() {
-  if (!currentUser) { alert("Please log in first."); return; }
-  db.collection("users").doc(currentUser.uid).collection("flowcharts").get()
+  if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to view saved flowcharts. Guest users cannot load."); return; }
+  db.collection("users").doc(window.currentUser.uid).collection("flowcharts").get()
     .then(snapshot=>{
       let html = snapshot.empty ? "<p>No saved flowcharts.</p>" : "";
       snapshot.forEach(doc=>{
@@ -394,8 +394,8 @@ window.viewSavedFlowcharts = function() {
 };
 
 window.openSavedFlowchart = function(name) {
-  if (!currentUser) return;
-  db.collection("users").doc(currentUser.uid).collection("flowcharts").doc(name)
+  if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to open saved flowcharts. Guest users cannot load."); return; }
+  db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
     .get().then(docSnap=>{
       if (!docSnap.exists) { alert("No flowchart named " + name); return; }
       loadFlowchartData(docSnap.data().flowchart);
@@ -405,12 +405,13 @@ window.openSavedFlowchart = function(name) {
 };
 
 window.renameFlowchart = function(oldName, element) {
+  if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to rename flowcharts. Guest users cannot rename."); return; }
   let newName = prompt("New name:", oldName);
   if (!newName||!newName.trim()||newName===oldName) return;
-  const docRef = db.collection("users").doc(currentUser.uid).collection("flowcharts").doc(oldName);
+  const docRef = db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(oldName);
   docRef.get().then(docSnap=>{
     if (docSnap.exists) {
-      db.collection("users").doc(currentUser.uid).collection("flowcharts").doc(newName).set(docSnap.data())
+      db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(newName).set(docSnap.data())
         .then(()=>{ docRef.delete(); element.textContent=newName; if(currentFlowchartName===oldName) currentFlowchartName=newName; alert("Renamed to: " + newName); })
         .catch(err=>alert("Error renaming: " + err));
     }
@@ -418,9 +419,9 @@ window.renameFlowchart = function(oldName, element) {
 };
 
 window.deleteSavedFlowchart = function(name) {
-  if (!currentUser) return;
+  if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to delete flowcharts. Guest users cannot delete."); return; }
   if (!confirm("Delete '"+name+"'?")) return;
-  db.collection("users").doc(currentUser.uid).collection("flowcharts").doc(name).delete()
+  db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name).delete()
     .then(()=>{ alert("Deleted: " + name); if(currentFlowchartName===name) currentFlowchartName=null; window.viewSavedFlowcharts(); })
     .catch(err=>alert("Error deleting: " + err));
 };

@@ -75,6 +75,7 @@ function checkForSavedLogin() {
     firebase.auth().signInWithEmailAndPassword(savedEmail, savedToken)
       .then((userCredential) => {
         // User is signed in
+        window.currentUser = userCredential.user;
         console.log("Auto-signed in user:", userCredential.user.email);
         hideLoginOverlay();
         
@@ -83,6 +84,7 @@ function checkForSavedLogin() {
           firebase.auth().signOut().then(() => {
             setCookie("flowchart_email", "", -1);
             setCookie("flowchart_token", "", -1);
+            window.currentUser = null;
             showLoginOverlay();
           }).catch((error) => {
             console.error("Logout error:", error);
@@ -90,11 +92,24 @@ function checkForSavedLogin() {
         });
       })
       .catch((error) => {
-        console.error("Auto-sign in error:", error);
-        // Clear invalid cookies
-        setCookie("flowchart_email", "", -1);
-        setCookie("flowchart_token", "", -1);
-        showLoginOverlay();
+        if (error.code === 'auth/quota-exceeded') {
+          // Sign in as guest
+          window.currentUser = {
+            uid: 'guest',
+            email: 'guest@guest.com',
+            displayName: 'Guest',
+            isGuest: true
+          };
+          setCookie("flowchart_email", "", -1);
+          setCookie("flowchart_token", "", -1);
+          hideLoginOverlay();
+          document.getElementById("loginError").textContent = "Signed in as guest due to exceeded quota.";
+        } else {
+          // Clear invalid cookies
+          setCookie("flowchart_email", "", -1);
+          setCookie("flowchart_token", "", -1);
+          showLoginOverlay();
+        }
       });
   } else {
     showLoginOverlay();
@@ -119,14 +134,28 @@ function setupAuthListeners() {
     
     firebase.auth().signInWithEmailAndPassword(email, password)
       .then((userCredential) => {
-        // Save login info
         setCookie("flowchart_email", email, 30);
         setCookie("flowchart_token", password, 30); // Note: storing passwords in cookies is not secure
+        window.currentUser = userCredential.user;
         hideLoginOverlay();
         errorDiv.textContent = "";
       })
       .catch((error) => {
-        errorDiv.textContent = error.message;
+        if (error.code === 'auth/quota-exceeded') {
+          // Sign in as guest
+          window.currentUser = {
+            uid: 'guest',
+            email: 'guest@guest.com',
+            displayName: 'Guest',
+            isGuest: true
+          };
+          setCookie("flowchart_email", "", -1);
+          setCookie("flowchart_token", "", -1);
+          hideLoginOverlay();
+          errorDiv.textContent = "Signed in as guest due to exceeded quota.";
+        } else {
+          errorDiv.textContent = error.message;
+        }
       });
   });
 
@@ -147,22 +176,42 @@ function setupAuthListeners() {
     
     firebase.auth().createUserWithEmailAndPassword(email, password)
       .then((userCredential) => {
-        // Save login info
         setCookie("flowchart_email", email, 30);
         setCookie("flowchart_token", password, 30);
+        window.currentUser = userCredential.user;
         hideLoginOverlay();
         errorDiv.textContent = "";
       })
       .catch((error) => {
-        errorDiv.textContent = error.message;
+        if (error.code === 'auth/quota-exceeded') {
+          // Sign in as guest
+          window.currentUser = {
+            uid: 'guest',
+            email: 'guest@guest.com',
+            displayName: 'Guest',
+            isGuest: true
+          };
+          setCookie("flowchart_email", "", -1);
+          setCookie("flowchart_token", "", -1);
+          hideLoginOverlay();
+          errorDiv.textContent = "Signed in as guest due to exceeded quota.";
+        } else {
+          errorDiv.textContent = error.message;
+        }
       });
   });
 
   // Set up logout button
   document.getElementById("logoutBtn").addEventListener("click", () => {
+    if (window.currentUser && window.currentUser.isGuest) {
+      window.currentUser = null;
+      showLoginOverlay();
+      return;
+    }
     firebase.auth().signOut().then(() => {
       setCookie("flowchart_email", "", -1);
       setCookie("flowchart_token", "", -1);
+      window.currentUser = null;
       showLoginOverlay();
     }).catch((error) => {
       console.error("Logout error:", error);

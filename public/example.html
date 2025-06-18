@@ -179,7 +179,7 @@
       .stepper-line.filled {
         background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
       }
-    </style>
+  
       /* Custom Modal Styles */
       .custom-modal-overlay {
         position: fixed;
@@ -246,7 +246,7 @@
       }
       .custom-modal .modal-continue:hover {
         background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);
-      }
+      }</style>
 </head>
 <body>
 <div id="loginRequiredModal" class="custom-modal-overlay" style="display:none;">
@@ -409,7 +409,7 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage();"><div class="stepper-progress-bar" id="stepperProgressBar"></div><div id="hidden_pdf_fields">
+        <form id="customForm" onsubmit="return showThankYouMessage();"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1"><label><h3>Do you have a lawyer</h3></label><input type="text" id="answer1" name="answer1" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-2"><label><h3>Hungry?</h3></label><input type="text" id="answer2" name="answer2" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
@@ -493,8 +493,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
             // Do NOT redirect. Just let the user fill the form.
         }
     });
-  var questionSlugMap       = {};
-var questionNameIds = {};
+  var questionSlugMap       = {"1":"do_you_have_a_lawyer","2":"hungry"};
+var questionNameIds = {"1":"answer1","2":"answer2"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var conditionalAlerts = [];

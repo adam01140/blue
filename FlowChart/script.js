@@ -30,13 +30,14 @@ const defaultColors = {
 /**************************************************
  *            GLOBAL  TYPING  HELPER              *
  **************************************************/
-function isUserTyping () {
-  const ae = document.activeElement;
-  return ae && (
-    ae.tagName === 'INPUT' ||
-    ae.tagName === 'TEXTAREA' ||
-    ae.isContentEditable           // <div contenteditable …>
-  );
+function isUserTyping (evt = null) {
+  // Prefer the event target if we got one, otherwise fall back to activeElement
+  const el = (evt && evt.target) || document.activeElement;
+  if (!el) return false;
+  // Direct hit?
+  if (el.matches('input, textarea, [contenteditable="true"]')) return true;
+  // Something nested inside a foreignObject? walk up the DOM
+  return !!el.closest('input, textarea, [contenteditable="true"]');
 }
 
 
@@ -174,9 +175,9 @@ logoutBtn.addEventListener("click", () => {
 // checkForSavedLogin has been moved to auth.js
 
 function loadUserColorPrefs() {
-  if (!currentUser) return;
+  if (!window.currentUser || window.currentUser.isGuest) return;
   db.collection("users")
-    .doc(currentUser.uid)
+    .doc(window.currentUser.uid)
     .collection("preferences")
     .doc("colors")
     .get()
@@ -200,9 +201,9 @@ function loadUserColorPrefs() {
 }
 
 function saveUserColorPrefs() {
-  if (!currentUser) return Promise.resolve();
+  if (!window.currentUser || window.currentUser.isGuest) return Promise.resolve();
   return db.collection("users")
-    .doc(currentUser.uid)
+    .doc(window.currentUser.uid)
     .collection("preferences")
     .doc("colors")
     .set(colorPreferences, { merge: true });
@@ -531,7 +532,7 @@ const phoneTypeBtn = document.getElementById("phoneType");
 function isSimpleHtmlQuestion(cell) {
   if (!cell || !isQuestion(cell)) return false;
   const qt = getQuestionType(cell);
-  return ["text", "text2", "date", "number", "bigParagraph", "dateRange", "email", "phone"].includes(qt);
+  return ["text", "text2", "date", "number", "bigParagraph", "dateRange", "email", "phone", "checkbox"].includes(qt);
 }
 
 /* ----------  a) what the in-place editor should display  ---------- */
@@ -704,7 +705,8 @@ graph.isCellEditable = function (cell) {
   graph.setPanning(true);
   graph.panningHandler.useLeftButtonForPanning = true;
 
-  mxEvent.disableContextMenu(container);
+  // Comment out the line that disables the context menu on the graph container
+  // mxEvent.disableContextMenu(container);   // comment this out
   graph.setCellsMovable(true);
   graph.setConnectable(true);
   graph.setCellsResizable(true);
@@ -715,6 +717,10 @@ graph.isCellEditable = function (cell) {
   
   // Context menu handling
   graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
+    // NEW – let native menu appear inside inputs / textareas / contenteditable
+    if (evt.target.closest('input, textarea, [contenteditable="true"]')) {
+      return null;            // don't build a graph menu, don't call preventDefault
+    }
     propertiesMenu.style.display = "none";
     typeSubmenu.style.display = "none";
     selectedCell = cell;
@@ -864,7 +870,8 @@ graph.isCellEditable = function (cell) {
 
         // If question
         if (isQuestion(newVertex)) {
-          refreshNodeIdFromLabel(newVertex);
+          // Immediately force proper html for its actual type
+          setQuestionType(newVertex, getQuestionType(newVertex));
         } else if (isOptions(newVertex)) {
           refreshOptionNodeId(newVertex);
         } else   if (isCalculationNode(newVertex)) {
@@ -992,7 +999,8 @@ graph.isCellEditable = function (cell) {
   checkboxTypeBtn.addEventListener("click", () => {
     if (selectedCell && isQuestion(selectedCell)) {
       setQuestionType(selectedCell, "checkbox");
-      selectedCell.value = "Checkbox question node";
+      // Remove the line that sets selectedCell.value directly
+      // Instead, rely on setQuestionType to handle rendering
       refreshAllCells();
     }
     hideContextMenu();
@@ -1525,9 +1533,9 @@ keyHandler.bindControlKey(86, () => {
       let label = "";
       
       if (nodeType === 'question') {
-        // Include more styling to ensure content is properly centered and aligned
-        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;spacing=12;fontSize=16;align=center;verticalAlign=middle;";
-        label = "question node"; // Use lowercase to match the pattern in refreshAllCells
+        // Use default style for question, but do not set a static label
+        style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;questionType=text;spacing=12;fontSize=16;align=center;verticalAlign=middle;";
+        label = ""; // No static label
       } else if (nodeType === 'options') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;align=center;";
         label = "Option Text";
@@ -1577,6 +1585,7 @@ keyHandler.bindControlKey(86, () => {
       // Set IDs and section
       if (nodeType === 'question') {
         setNodeId(cell, 'Question_' + Date.now().toString().slice(-4));
+        setQuestionType(cell, 'text'); // Immediately render as editable text question
       } else if (nodeType === 'options') {
         setNodeId(cell, 'Option_' + Date.now().toString().slice(-4));
       }
@@ -1664,7 +1673,7 @@ keyHandler.bindControlKey(86, () => {
 document.addEventListener('keydown', function (evt) {
 
   /* DELETE / BACKSPACE – unchanged ---------------------------------- */
-  if ((evt.key === 'Delete' || evt.key === 'Backspace') && !isUserTyping()) {
+  if ((evt.key === 'Delete' || evt.key === 'Backspace') && !isUserTyping(evt)) {
     const sel = graph.getSelectionCells();
     if (sel && sel.length) {
       /* … your existing delete-logic … */
@@ -1673,14 +1682,14 @@ document.addEventListener('keydown', function (evt) {
 
   /* COPY ------------------------------------------------------------ */
   if ((evt.key === 'c' || evt.key === 'C') && (evt.ctrlKey || evt.metaKey)) {
-    if (isUserTyping()) return;           // NEW / CHANGED → let browser copy highlighted text
+    if (isUserTyping(evt)) return;           // NEW / CHANGED → let browser copy highlighted text
     copySelectedNodeAsJson();
     evt.preventDefault();
   }
 
   /* PASTE ----------------------------------------------------------- */
   if ((evt.key === 'v' || evt.key === 'V') && (evt.ctrlKey || evt.metaKey)) {
-    if (isUserTyping()) return;           // NEW / CHANGED → let browser paste into input/div
+    if (isUserTyping(evt)) return;           // NEW / CHANGED → let browser paste into input/div
     const mousePos = graph.getPointForEvent(graph.lastEvent);
     pasteNodeFromJson(mousePos ? mousePos.x : undefined,
                       mousePos ? mousePos.y : undefined);
@@ -1750,7 +1759,7 @@ function renderTextboxes(cell) {
     const ph = tb.placeholder || "Enter value";
     html += 
       `<div class="textbox-entry" style="margin-bottom:8px; text-align:center;">
-        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)"/>
+        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)"/>
         <button onclick="window.deleteMultipleTextboxHandler('${cell.id}', ${index})">Delete</button>
       </div>`;
   });
@@ -1764,14 +1773,10 @@ function renderTextboxes(cell) {
 function updateMultipleTextboxesCell(cell) {
   graph.getModel().beginUpdate();
   try {
-    // Create a container for the question text and textboxes
     let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
-    <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true" onclick="window.handleMultipleTextboxClick(event, '${cell.id}')" onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')" onblur="window.updateQuestionTextHandler('${cell.id}', this.innerText)">
-      ${cell._questionText || "Enter question text"}
-    </div>
-    <div class="multiple-textboxes-container" style="padding: 8px; width:100%;">${renderTextboxes(cell)}</div>
-  </div>`;
-    
+      <input class="question-title-input" type="text" value="${escapeAttr(cell._questionText || "")}" placeholder="Enter question text" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updateInputQuestionTitle('${cell.id}', this.value)" style="margin-bottom:8px; width:90%; text-align:center;" />
+      <div class="multiple-textboxes-container" style="padding: 8px; width:100%;">${renderTextboxes(cell)}</div>
+    </div>`;
     cell.value = html;
   } finally {
     graph.getModel().endUpdate();
@@ -1840,29 +1845,25 @@ window.deleteMultipleTextboxHandler = function(cellId, index) {
  ********** multipleDropdownType: RENDER & EDITS *******
  *******************************************************/
 function updatemultipleDropdownTypeCell(cell) {
-  const qText = cell._questionText || "Enter question text";
-  const twoNums = cell._twoNumbers || { first: "0", second: "0" };
+  const qText = cell._questionText || '';
+  const twoNums = cell._twoNumbers || { first: '0', second: '0' };
   if (!cell._textboxes) {
-    cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
+    cell._textboxes = [{ nameId: '', placeholder: 'Enter value', isAmountOption: false }];
   }
-
   let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
-    <div class="question-text" style="text-align: center; padding: 8px; width:100%;" contenteditable="true"onfocus="if(this.innerText==='Enter question text'){this.innerText='';}"ondblclick="event.stopPropagation(); this.focus();"onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.innerText)">
-      ${escapeHtml(qText)}
-    </div>
+    <input class="question-title-input" type="text" value="${escapeAttr(qText)}" placeholder="Enter question text" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.value)" style="margin-bottom:8px; width:90%; text-align:center;" />
     <div class="two-number-container" style="display: flex; justify-content:center; gap: 10px; margin-top: 8px; width:100%;">
-      <input type="number" value="${escapeAttr(twoNums.first)}"onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'first', this.value)"/>
-      <input type="number" value="${escapeAttr(twoNums.second)}"onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)"/>
+      <input type="number" value="${escapeAttr(twoNums.first)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'first', this.value)"/>
+      <input type="number" value="${escapeAttr(twoNums.second)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)"/>
     </div>
     <div class="multiple-textboxes-container" style="margin-top: 8px; width:100%;">`;
-
   cell._textboxes.forEach((tb, index) => {
-    const val = tb.nameId || "";
-    const ph = tb.placeholder || "Enter value";
-    const checked = tb.isAmountOption ? "checked" : "";
+    const val = tb.nameId || '';
+    const ph = tb.placeholder || 'Enter value';
+    const checked = tb.isAmountOption ? 'checked' : '';
     html += `
       <div class="textbox-entry" style="margin-bottom:4px; text-align:center;">
-        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}"onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)"/>
+        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)"/>
         <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
         <label>
           <input type="checkbox" ${checked} onclick="window.toggleMultipleDropdownAmount('${cell.id}', ${index}, this.checked)" />
@@ -1870,17 +1871,15 @@ function updatemultipleDropdownTypeCell(cell) {
         </label>
       </div>`;
   });
-
   html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button></div>
     </div>
   </div>`;
-
   graph.getModel().beginUpdate();
   try {
     graph.getModel().setValue(cell, html);
-    let st = cell.style || "";
-    if (!st.includes("verticalAlign=middle")) {
-      st += "verticalAlign=middle;";
+    let st = cell.style || '';
+    if (!st.includes('verticalAlign=middle')) {
+      st += 'verticalAlign=middle;';
     }
   } finally {
     graph.getModel().endUpdate();
@@ -2162,6 +2161,133 @@ window.pickTypeForCell = function(cellId, val) {
   refreshAllCells();
 };
 
+/******************************************************************
+ * 1) Universal key-down guard – put this in your global helpers  *
+ ******************************************************************/
+window.handleTitleInputKeydown = function (evt) {
+  // Let the browser handle native shortcuts, but don't let mxGraph see them
+  if ((evt.ctrlKey || evt.metaKey) &&
+      ['c', 'v', 'x', 'a'].includes(evt.key.toLowerCase())) {
+    evt.stopPropagation(); // <-- added line
+    return;
+  }
+  evt.stopPropagation(); // existing line for all other keys
+  if (evt.key === 'Enter') {
+    evt.preventDefault();
+    evt.target.blur();
+  }
+};
+
+/******************************************************************
+ * 2) renderTextboxes() – used by multiple-textboxes questions     *
+ *    (full replacement)                                          *
+ ******************************************************************/
+function renderTextboxes(cell) {
+  if (!cell._textboxes) {
+    cell._textboxes = [{ nameId: "", placeholder: "Enter value" }];
+  }
+
+  let html = "";
+
+  cell._textboxes.forEach((tb, index) => {
+    const val = tb.nameId || "";
+    const ph  = tb.placeholder || "Enter value";
+
+    html += `
+      <div class="textbox-entry" style="margin-bottom:8px;text-align:center;">
+        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}"onkeydown="window.handleTitleInputKeydown(event)"onblur="window.updateMultipleTextboxHandler('${cell.id}', ${index}, this.value)" />
+        <button onclick="window.deleteMultipleTextboxHandler('${cell.id}', ${index})">Delete</button>
+      </div>`;
+  });
+
+  html += `
+    <div style="text-align:center;margin-top:8px;">
+      <button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button>
+    </div>`;
+
+  return html;
+}
+
+/******************************************************************
+ * 3) updatemultipleDropdownTypeCell() – full replacement          *
+ ******************************************************************/
+function updatemultipleDropdownTypeCell(cell) {
+  const qText   = cell._questionText || "";
+  const twoNums = cell._twoNumbers   || { first: "0", second: "0" };
+
+  if (!cell._textboxes) {
+    cell._textboxes = [{ nameId: "", placeholder: "Enter value", isAmountOption: false }];
+  }
+
+  let html = `
+    <div class="multiple-textboxes-node"
+         style="display:flex;flex-direction:column;align-items:center;">
+      <input class="question-title-input"
+             type="text"
+             value="${escapeAttr(qText)}"
+             placeholder="Enter question text"
+             onkeydown="window.handleTitleInputKeydown(event)"
+             onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.value)"
+             style="margin-bottom:8px;width:90%;text-align:center;" />
+
+      <div class="two-number-container"
+           style="display:flex;justify-content:center;gap:10px;margin-top:8px;width:100%;">
+        <input type="number"
+               value="${escapeAttr(twoNums.first)}"
+               onkeydown="window.handleTitleInputKeydown(event)"
+               onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'first', this.value)" />
+        <input type="number"
+               value="${escapeAttr(twoNums.second)}"
+               onkeydown="window.handleTitleInputKeydown(event)"
+               onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)" />
+      </div>
+
+      <div class="multiple-textboxes-container" style="margin-top:8px;width:100%;">`;
+
+  cell._textboxes.forEach((tb, index) => {
+    const val      = tb.nameId      || "";
+    const ph       = tb.placeholder || "Enter value";
+    const checked  = tb.isAmountOption ? "checked" : "";
+
+    html += `
+      <div class="textbox-entry" style="margin-bottom:4px;text-align:center;">
+        <input type="text"value="${escapeAttr(val)}"data-index="${index}"placeholder="${escapeAttr(ph)}"onkeydown="window.handleTitleInputKeydown(event)"onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)" />
+        <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
+        <label>
+          <input type="checkbox" ${checked}
+                 onclick="window.toggleMultipleDropdownAmount('${cell.id}', ${index}, this.checked)" />
+          Amount?
+        </label>
+      </div>`;
+  });
+
+  html += `
+        <div style="text-align:center;margin-top:8px;">
+          <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
+        </div>
+      </div>
+    </div>`;
+
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, html);
+
+    // make sure the style keeps pointer events enabled
+    let st = cell.style || "";
+    if (!/pointerEvents=/.test(st)) {
+      st += "pointerEvents=1;overflow=fill;";
+    }
+    if (!/verticalAlign=middle/.test(st)) {
+      st += "verticalAlign=middle;";
+    }
+    graph.getModel().setStyle(cell, st);
+  } finally {
+    graph.getModel().endUpdate();
+  }
+
+  graph.updateCellSize(cell);
+}
+
 /**************************************************
  *                setQuestionType                 *
  *  – now stores plain text for the simple types  *
@@ -2188,39 +2314,31 @@ function setQuestionType (cell, newType) {
   graph.getModel().beginUpdate();
   try {
     switch (newType) {
-
-      /* plain wrappers */
       case 'text': case 'date': case 'number': case 'bigParagraph':
-      case 'dateRange': case 'email': case 'phone':
-        const nice = newType[0].toUpperCase() + newType.slice(1);
-        cell.value = `<div style="text-align:center;">${nice} question node</div>`;
+      case 'dateRange': case 'email': case 'phone': case 'checkbox':
+        // Always clear _questionText and strip any HTML if present
+        cell._questionText = '';
+        updateSimpleQuestionCell(cell);
         break;
-
-      /* text2: textbox that works like dropdown but has better text editing */
       case 'text2':
-        cell._questionText = 'Enter dropdown question';
-        // Use a simple HTML display like text nodes for double-click editing
-        cell.value = `<div style="text-align:center;">${cell._questionText || "Enter dropdown question"}</div>`;
+        cell._questionText = '';
+        updateText2Cell(cell);
         break;
-
-      /* complex types left unchanged */
       case 'multipleTextboxes':
-        cell._questionText = 'Enter question text';
-        cell._textboxes    = [{ nameId:'', placeholder:'Enter value' }];
+        cell._questionText = '';
+        cell._textboxes = [{ nameId:'', placeholder:'Enter value' }];
         updateMultipleTextboxesCell(cell);
         break;
-
       case 'multipleDropdownType':
-        cell._questionText = 'Enter question text';
-        cell._twoNumbers   = { first:'0', second:'0' };
-        cell._textboxes    = [{ nameId:'', placeholder:'Enter value', isAmountOption:false }];
+        cell._questionText = '';
+        cell._twoNumbers = { first:'0', second:'0' };
+        cell._textboxes = [{ nameId:'', placeholder:'Enter value', isAmountOption:false }];
         updatemultipleDropdownTypeCell(cell);
         break;
-
       default:
-        cell.value = `<div style="text-align:center;">${newType} question node</div>`;
+        cell._questionText = '';
+        updateSimpleQuestionCell(cell);
     }
-
     refreshNodeIdFromLabel(cell);
   } finally {
     graph.getModel().endUpdate();
@@ -4875,8 +4993,6 @@ window.exportGuiJson = function() {
     }
   }
 
-  // ... rest of existing code ...
-
   // Create the final JSON object
   
   // Sort questions by questionId within each section
@@ -5374,7 +5490,7 @@ const ZOOM_FACTOR = 1.01; // zoom factor per frame
 // Handle key down events - start movement
 document.addEventListener('keydown', function(evt) {
   // Skip if user is typing in a text field
-  if (isUserTyping()) return;
+  if (isUserTyping(evt)) return;
   
   // Skip if modifier keys are pressed (to avoid interfering with browser shortcuts)
   if (evt.ctrlKey || evt.altKey || evt.metaKey) return;
@@ -5701,27 +5817,25 @@ function sanitizeNameId(str) {
  */
 function updateText2Cell(cell) {
   if (!cell) return;
-  
   // Ensure we have question text
   if (!cell._questionText) {
     cell._questionText = "Enter dropdown question";
   }
-  
   // Create the HTML content with a structure similar to multiple textboxes
   // which has good text selection/editing support
   const html = `
     <div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center; width:100%;">
-      <div class="question-text" 
+      <div class="question-text"
            style="text-align:center; padding:8px; width:100%; user-select:text;"
-           contenteditable="true" 
+           contenteditable
+           onkeydown="window.handleTitleInputKeydown(event)"
            onmousedown="event.stopPropagation();"
-           onclick="window.handleMultipleTextboxClick(event, '${cell.id}')" 
-           onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')" 
+           onclick="window.handleMultipleTextboxClick(event, '${cell.id}')"
+           onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')"
            onblur="window.updateText2Handler('${cell.id}', this.innerText)">
         ${escapeHtml(cell._questionText)}
       </div>
     </div>`;
-  
   graph.getModel().setValue(cell, html);
 }
 
@@ -5797,3 +5911,198 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
+
+// --- Standardized Question Title Input (for all question types) ---
+
+// Helper: Render a single-line contenteditable div for simple question types
+function renderSimpleQuestionTitle(cell, placeholder) {
+  const text = cell._questionText || '';
+  // Remove all inline styles, only use the class
+  return `<div class="question-title-input"  onfocus="if(this.innerText==='${placeholder}')this.innerText='';" onblur="window.updateSimpleQuestionTitle('${cell.id}', this.innerText)" onkeydown="window.handleTitleInputKeydown(event, '${cell.id}')">${escapeHtml(text) || placeholder}</div>`;
+}
+
+// Helper: Render a real <input> for multi-textbox/multi-dropdown types
+function renderInputQuestionTitle(cell, placeholder) {
+  const text = cell._questionText || '';
+  // Remove all inline styles, only use the class
+  return `<input class="question-title-input" type="text" value="${escapeAttr(text)}" placeholder="${placeholder}" oninput="window.updateInputQuestionTitle('${cell.id}', this.value)" onblur="window.updateInputQuestionTitle('${cell.id}', this.value)" onkeydown="window.handleTitleInputKeydown(event, '${cell.id}')" />`;
+}
+
+// Update for simple question types
+window.updateSimpleQuestionTitle = function(cellId, text) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell) return;
+  graph.getModel().beginUpdate();
+  try {
+    cell._questionText = text.replace(/<[^>]+>/g, '').trim() || '';
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  // Only re-render on blur, not on every input
+  updateSimpleQuestionCell(cell);
+  refreshNodeIdFromLabel(cell);
+};
+
+// Update for input-based question types
+window.updateInputQuestionTitle = function(cellId, text) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell) return;
+  graph.getModel().beginUpdate();
+  try {
+    cell._questionText = text.trim();
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  // Only re-render on blur, not on every input
+  if (getQuestionType(cell) === 'multipleTextboxes') {
+    updateMultipleTextboxesCell(cell);
+  } else if (getQuestionType(cell) === 'multipleDropdownType') {
+    updatemultipleDropdownTypeCell(cell);
+  }
+  refreshNodeIdFromLabel(cell);
+};
+
+// Handle Enter key: blur on Enter
+window.handleTitleInputKeydown = function(event, cellId) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    event.target.blur();
+  }
+  // Do not stop propagation for copy/cut/paste
+};
+
+// Update rendering for simple question types
+function updateSimpleQuestionCell(cell) {
+  const placeholder = getQuestionType(cell).charAt(0).toUpperCase() + getQuestionType(cell).slice(1) + ' question node';
+  // Strip any HTML from _questionText before rendering
+  let text = cell._questionText || '';
+  text = text.replace(/<[^>]+>/g, '').trim();
+  cell._questionText = text; // keep it clean for future edits
+  const html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center; width:100%;">
+    ${renderSimpleQuestionTitle(cell, placeholder)}
+  </div>`;
+  graph.getModel().setValue(cell, html);
+}
+
+// Patch setQuestionType to use new rendering for all question types
+function setQuestionType(cell, newType) {
+  let st = (cell.style || '').replace(/questionType=[^;]+/, '');
+  st += `;questionType=${newType};align=center;verticalAlign=middle;spacing=12;`;
+  if (newType === 'text2') {
+    st += 'editable=1;';
+  } else if (!/pointerEvents=/.test(st)) {
+    st += 'pointerEvents=1;overflow=fill;';
+  }
+  graph.getModel().setStyle(cell, st);
+  graph.getModel().beginUpdate();
+  try {
+    switch (newType) {
+      case 'text': case 'date': case 'number': case 'bigParagraph':
+      case 'dateRange': case 'email': case 'phone': case 'checkbox':
+        // Always clear _questionText and strip any HTML if present
+        cell._questionText = '';
+        updateSimpleQuestionCell(cell);
+        break;
+      case 'text2':
+        cell._questionText = '';
+        updateText2Cell(cell);
+        break;
+      case 'multipleTextboxes':
+        cell._questionText = '';
+        cell._textboxes = [{ nameId:'', placeholder:'Enter value' }];
+        updateMultipleTextboxesCell(cell);
+        break;
+      case 'multipleDropdownType':
+        cell._questionText = '';
+        cell._twoNumbers = { first:'0', second:'0' };
+        cell._textboxes = [{ nameId:'', placeholder:'Enter value', isAmountOption:false }];
+        updatemultipleDropdownTypeCell(cell);
+        break;
+      default:
+        cell._questionText = '';
+        updateSimpleQuestionCell(cell);
+    }
+    refreshNodeIdFromLabel(cell);
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  refreshAllCells();
+}
+
+// Patch updateMultipleTextboxesCell to use <input> for title
+function updateMultipleTextboxesCell(cell) {
+  graph.getModel().beginUpdate();
+  try {
+    let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
+      <input class="question-title-input" type="text" value="${escapeAttr(cell._questionText || "")}" placeholder="Enter question text" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updateInputQuestionTitle('${cell.id}', this.value)" style="margin-bottom:8px; width:90%; text-align:center;" />
+      <div class="multiple-textboxes-container" style="padding: 8px; width:100%;">${renderTextboxes(cell)}</div>
+    </div>`;
+    cell.value = html;
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  graph.updateCellSize(cell);
+}
+
+// Patch updatemultipleDropdownTypeCell to use <input> for title
+function updatemultipleDropdownTypeCell(cell) {
+  const qText = cell._questionText || '';
+  const twoNums = cell._twoNumbers || { first: '0', second: '0' };
+  if (!cell._textboxes) {
+    cell._textboxes = [{ nameId: '', placeholder: 'Enter value', isAmountOption: false }];
+  }
+  let html = `<div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center;">
+    <input class="question-title-input" type="text" value="${escapeAttr(qText)}" placeholder="Enter question text" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeTextHandler('${cell.id}', this.value)" style="margin-bottom:8px; width:90%; text-align:center;" />
+    <div class="two-number-container" style="display: flex; justify-content:center; gap: 10px; margin-top: 8px; width:100%;">
+      <input type="number" value="${escapeAttr(twoNums.first)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'first', this.value)"/>
+      <input type="number" value="${escapeAttr(twoNums.second)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)"/>
+    </div>
+    <div class="multiple-textboxes-container" style="margin-top:8px;width:100%;">`;
+  cell._textboxes.forEach((tb, index) => {
+    const val = tb.nameId || '';
+    const ph = tb.placeholder || 'Enter value';
+    const checked = tb.isAmountOption ? 'checked' : '';
+    html += `
+      <div class="textbox-entry" style="margin-bottom:4px; text-align:center;">
+        <input type="text" value="${escapeAttr(val)}" data-index="${index}" placeholder="${escapeAttr(ph)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeHandler('${cell.id}', ${index}, this.value)"/>
+        <button onclick="window.deletemultipleDropdownTypeHandler('${cell.id}', ${index})">Delete</button>
+        <label>
+          <input type="checkbox" ${checked} onclick="window.toggleMultipleDropdownAmount('${cell.id}', ${index}, this.checked)" />
+          Amount?
+        </label>
+      </div>`;
+  });
+  html += `<div style="text-align:center; margin-top:8px;"><button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button></div>
+    </div>
+  </div>`;
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, html);
+    let st = cell.style || '';
+    if (!st.includes('verticalAlign=middle')) {
+      st += 'verticalAlign=middle;';
+    }
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  graph.updateCellSize(cell);
+}
+// ... existing code ...
+
+// Add this in the DOMContentLoaded event listener
+
+document.addEventListener("DOMContentLoaded", function() {
+  // ... existing code ...
+
+  // Prevent browser context menu on empty space (graph background),
+  // but allow it inside input, textarea, or contenteditable elements
+  const container = document.getElementById("graphContainer");
+  container.addEventListener("contextmenu", function(e) {
+    // Allow native context menu in text fields/contenteditable
+    if (e.target.closest('input, textarea, [contenteditable="true"]')) return;
+    e.preventDefault();
+  });
+
+  // ... existing code ...
+});
+// ... existing code ...
