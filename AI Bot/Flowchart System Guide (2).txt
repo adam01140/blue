@@ -149,3 +149,20 @@ End of Updated Guide
 - The flowchart logic must match the intended paperwork flow, with no missing or duplicate links.
 - When a user provides a corrected or improved JSON, update this documentation to reflect the new linking and logic standards.
 - This ensures future versions always follow the most up-to-date linking and branching logic, and never have to relearn these best practices. 
+12. Yes/No Question Design Rule
+- Always implement yes/no questions as dropdowns with explicit yes/no option nodes and edges.
+
+13. Linking Rule
+- Never link a question to multiple subsequent questions unless the logic requires branching. Each question should have a single, clear next step unless conditional branching is intended. 
+14. Option Node Placement and Linking Best Practices
+- To mathematically center Yes/No option nodes under a parent question node, set their x so that the center of each option aligns symmetrically with the parent node's center, with equal horizontal spacing. For a parent at x=X, width=W, and option width w, Yes at x=X+(W/2)-(w+spacing), No at x=X+(W/2)+spacing.
+- Always use consistent vertical spacing between the parent question and its options, and between options and the next question.
+- For dropdown/checkbox questions, always link the question node to its option nodes, and each option node to the next question (or branch). Never link questions directly to other questions for these types.
+- Never link an option node to multiple questions unless conditional branching is required. Each option node should have a single, clear next step. 
+15. Horizontal Spacing Rule
+- There must always be 100px of horizontal space between each question/option node for visual clarity and to avoid a squished appearance.
+- Update the option node placement formula:
+  - For a parent at x=X, width=W, option width=w, and spacing=s (100px):
+    - Yes: x = (X + W/2) - (w/2) - s/2
+    - No:  x = (X + W/2) + (w/2) + s/2
+- This ensures option nodes are perfectly centered and spaced for a visually balanced flowchart. 

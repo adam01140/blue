@@ -6162,3 +6162,8 @@ document.addEventListener('change', function(e) {
     }
   }
 });
+
+document.addEventListener('contextmenu', function(e) {
+  if (e.target.closest('input, textarea, [contenteditable="true"]')) return;
+  e.preventDefault();
+});

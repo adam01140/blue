@@ -24,13 +24,14 @@ html, body {
 
 /* GRAPH AREA */
 #graphContainer {
-  position: absolute;
+  position: fixed;
   left: 220px;
   right: 0;
   top: 0;
   bottom: 0;
   cursor: default;
-  overflow: hidden; /* This container is where we do the wheel zoom */
+  overflow: hidden;
+  z-index: 0;
 }
 
 /* SHAPES IN THE TOOLBAR */
