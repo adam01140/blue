@@ -1,0 +1,151 @@
+﻿Flowchart System Documentation: How to Convert Legal Paperwork into Structured Flowcharts 
+Overview 
+This document explains the custom flowchart JSON system used to convert legal paperwork into structured, interactive online forms. It includes an in-depth look at the architecture, logic rules, node types, layout guidelines, and conditional branching. It is designed to allow any AI or developer to understand and replicate the system from scratch. 
+1. Purpose of the System 
+The system is designed to: - Take complex legal paperwork and simplify it into a user-guided flow. - Create a visual flowchart that represents the logical and conditional journey of a form. - Export that structure into JSON which is read by a custom form-rendering engine. 
+2. Core Concepts 
+2.1 Nodes 
+Each part of a form is a node. Types include: - Question nodes: Textbox, dropdown, date, etc. - Option nodes: Yes/No choices for dropdowns and checkboxes - Edges: Connect two nodes to define flow logic 
+2.2 Sections 
+•  
+Group related questions into visually distinct zones. 
+•  
+Identified using sectionPrefs , which assigns each node a section name and style. 2.3 Geometry 
+•  
+Each node has geometry.x , geometry.y , width , and height values. •  
+This ensures the chart remains readable and organized. 
+3. JSON Structure 
+Each flowchart is represented in a JSON object:  
+{ 
+"cells": [ ...nodes and edges... ], 
+1
+"sectionPrefs": { ...section metadata... } 
+} 
+3.1 Question Node Format 
+{ 
+"id": "2", 
+"vertex": true, 
+"edge": false, 
+"value": "<div style=...>Question Text</div>", 
+"style": "shape=roundRect;...;fontSize=16;...", 
+"geometry": { "x": ..., "y": ..., "width": ..., "height": ... }, "_questionText": "What is your name?", 
+"_nameId": "answer1", 
+"_questionId": 1, 
+"nodeId": "unique_node_name" 
+} 
+- Note: Set fontSize=16 or higher for better legibility. 
+3.2 Option Node Format 
+Used by dropdowns/checkboxes:  
+{ 
+"id": "3", 
+"vertex": true, 
+"edge": false, 
+"value": "<div style=...>Yes</div>", 
+"style": "...", 
+"geometry": { ... } 
+} 
+3.3 Edge Format 
+{ 
+"id": "4", 
+"vertex": false, 
+"edge": true, 
+"source": "2", 
+"target": "3", 
+"style": "", 
+2
+"geometry": {} 
+} 
+3.4 SectionPrefs Format 
+"sectionPrefs": { 
+"1": { 
+"borderColor": "hsl(0, 100%, 80%)", 
+"name": "Applicant Information" 
+} 
+} 
+4. Supported Question Types 
+questionType Description
+	text Single-line input
+	text2 Dropdown with options
+	checkbox Yes/No or multi-select checkbox
+	number Numeric input only
+	date Date picker
+	dateRange Two date inputs (start and end)
+	bigParagraph Long textarea
+	email Email input
+	phone Phone number
+	multipleTextboxes Several labeled textboxes in one question
+	multipleDropdownType Repeating group based on number selection
+	
+
+
+
+Extra Fields: - multipleTextboxes : Uses _textboxes array with placeholder names. - multipleDropdownType : Uses _twoNumbers and _textboxes with isAmountOption flag. 
+5. Logic Rules 
+5.1 Node Linking 
+•  
+Dropdown/Checkbox nodes → link to option nodes → link to next question •  
+Text, date, email, number → link directly to next question node 3
+•  
+Always connect question nodes with edge elements to define flow. 5.2 Conditional Logic 
+•  
+Branches are created by linking each option node to a different follow-up node. •  
+Linear flows skip option nodes entirely and link directly. 
+6. Visual Guidelines 
+•  
+Use geometry.x/y to lay out nodes in a clean vertical (linear) stack. •  
+Question text must be legible—use fontSize=16 or higher. 
+•  
+Keep node dimensions consistent (160×80, or wider for multi-input nodes). •  
+Use fillColor , fontColor , and strokeColor for visual grouping. 
+7. Sample Form: Hunger Example 
+•  
+Section 1: Hunger Assessment 
+•  
+Dropdown: Are you hungry? → Yes/No •  
+Section 2: Hunger Response 
+•  
+Yes → Textbox: What would you like to eat? 
+•  
+No → Dropdown: Are you thirsty? → Yes/No 
+8. Real-World Example: Rental Application 
+•  
+MultiTextbox: What's your full name? → First, Middle Initial, Last •  
+Phone: What's your contact number? 
+•  
+MultiTextbox: What is your ID info? → ID Type, Number, Issuer, Expiry •  
+Textbox: What is your SSN or ITIN? 
+•  
+Date: When were you born? •  
+Textbox: Do you have another ID? 
+•  
+Email: What's your email address? 
+All nodes are linked top-to-bottom with edge objects, and laid out vertically in a clear flow. 9. Best Practices 
+•  
+Use multipleTextboxes to group related fields. •  
+Phrase fields as human-friendly questions. •  
+Always link nodes explicitly. •  
+Assign readable fontSize . 
+•  
+Maintain linear top-down layout with consistent spacing. •  
+Assign unique IDs to every node and edge. 
+•  
+Use sectionPrefs to title and style grouped areas. 4
+10. Next Steps for New Forms 
+1.  2.  
+Break form into logical sections. 
+Write each field as a question. 3.  
+Select the best questionType . 
+4.  
+Use multi-input nodes for related fields. 
+5.  
+Position nodes vertically with consistent geometry.y . 6.  
+Create edges between each node. 
+7.  
+Export to JSON and test in the form tool. 
+End of Updated Guide 
+5
+11. Linking and Branching Best Practices
+- Always ensure all nodes are linked exactly as in the user's provided correct output.json, including all conditional branches and direct flows.
+- The flowchart logic must match the intended paperwork flow, with no missing or duplicate links.
+- When a user provides a corrected or improved JSON, update this documentation to reflect the new linking and logic standards.
+- This ensures future versions always follow the most up-to-date linking and branching logic, and never have to relearn these best practices. 
