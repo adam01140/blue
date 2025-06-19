@@ -14,6 +14,7 @@
             font-family: 'Montserrat', sans-serif;
             color: #333;
             background-color: #eaf1f8;
+            zoom: 0.90;
         }
         header {
             background-color: #2c3e50;
@@ -128,7 +129,7 @@
         footer {
             text-align: center;
             padding: 20px;
-            background-color: #2c3e50;
+            background-color: #374656;
             color: white;
         }
         /* Media query for smaller screens */
@@ -1214,6 +1215,9 @@
                     <a href="Other.html">Other</a>
                 </div>
             </div>
+            <a href="FAQ.html">FAQ
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
             <a href="about.html">About Us
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
@@ -1407,6 +1411,7 @@
             <div class="pro-footer-title">Navigation</div>
             <a href="index.html">Home</a>
             <a href="FreeForm.html">Forms</a>
+            <a href="FAQ.html">FAQ</a>
             <a href="about.html">About Us</a>
             <a href="contact.html">Contact Us</a>
         </div>
@@ -1418,61 +1423,45 @@
     <footer>
         &copy; 2024 FormWiz. All rights reserved.
     </footer>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script>
-        // Dynamic How It Works image switching
         document.addEventListener('DOMContentLoaded', function() {
-            const steps = document.querySelectorAll('.hiw-step');
-            const images = document.querySelectorAll('.hiw-image');
-            let activeStep = 0;
+            // Firebase Configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+                authDomain: "formwiz-3f4fd.firebaseapp.com",
+                projectId: "formwiz-3f4fd",
+                storageBucket: "formwiz-3f4fd.appspot.com",
+                messagingSenderId: "404259212529",
+                appId: "1:404259212529:web:15a33bce82383b21cfed50",
+                measurementId: "G-P07YEN0HPD"
+            };
 
-            function setActiveStep(idx) {
-                steps.forEach((step, i) => {
-                    if (i === idx) {
-                        step.classList.add('active');
-                        images[i].classList.add('active');
-                    } else {
-                        step.classList.remove('active');
-                        images[i].classList.remove('active');
-                    }
-                });
-                activeStep = idx;
+            // Initialize Firebase
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
             }
+            const auth = firebase.auth();
+            const signInButton = document.querySelector('.sign-in-btn');
 
-            // Click to activate step
-            steps.forEach((step, idx) => {
-                step.addEventListener('click', () => setActiveStep(idx));
+            auth.onAuthStateChanged(function(user) {
+                console.log('Auth state changed on FAQ.html. User:', user);
+                if (user) {
+                    // User is signed in.
+                    if (signInButton) {
+                        signInButton.style.display = 'none';
+                    }
+                } else {
+                    // No user is signed in.
+                    if (signInButton) {
+                        signInButton.style.display = 'block';
+                    }
+                }
             });
 
-            // Scroll-based activation
-            function onScroll() {
-                let found = false;
-                steps.forEach((step, idx) => {
-                    const rect = step.getBoundingClientRect();
-                    if (!found && rect.top < window.innerHeight/2 && rect.bottom > window.innerHeight/2) {
-                        setActiveStep(idx);
-                        found = true;
-                    }
-                });
-            }
-            window.addEventListener('scroll', onScroll);
-        });
-
-        // Hero animation on load
-        document.addEventListener('DOMContentLoaded', function() {
-            const heroH1 = document.querySelector('.hero-content h1');
-            const heroP = document.querySelector('.hero-content p');
-            if (heroH1 && heroP) {
-                setTimeout(() => {
-                    heroH1.classList.add('hero-animate');
-                }, 100);
-                setTimeout(() => {
-                    heroP.classList.add('hero-animate');
-                }, 450);
-            }
-        });
-
-        // Dropdown for Forms nav
-        document.addEventListener('DOMContentLoaded', function() {
+            // Dropdown for Forms nav
             const formsWrapper = document.getElementById('forms-dropdown-wrapper');
             const formsLink = document.getElementById('forms-nav-link');
             const dropdownMenu = document.getElementById('forms-dropdown-menu');
@@ -1502,9 +1491,7 @@
                     dropdownOpen ? closeDropdown() : openDropdown();
                 }
             });
-        });
 
-        document.addEventListener('DOMContentLoaded', function() {
             // FAQ item click handling
             document.querySelectorAll('.faq-item h3').forEach(header => {
                 header.addEventListener('click', () => {
