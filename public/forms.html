@@ -22,37 +22,33 @@
             font-family: 'Montserrat', sans-serif;
             color: #333;
             background-color: #eaf1f8;
+            zoom: 0.90;
+            min-height: 100vh;
         }
-
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
         header {
             background-color: #2c3e50;
-            padding: 20px 0 20px 0;
+            padding: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: relative;
-            width: 100vw;
-            left: 0;
-            top: 0;
-            box-sizing: border-box;
         }
-
         header img {
             cursor: pointer;
-            margin-left: 24px;
-            width: 130px;
-            height: 80px;
         }
-
         nav {
             position: absolute;
-            left: calc(50% - 20px);
+            left: 50%;
             transform: translateX(-50%);
             display: flex;
             gap: 38px;
             z-index: 2;
         }
-
         nav a {
             color: #fff;
             text-decoration: none;
@@ -65,13 +61,11 @@
             display: flex;
             align-items: center;
         }
-
         nav a:hover {
             color: #ff7043;
             background: rgba(255,255,255,0.08);
             box-shadow: 0 2px 8px rgba(44,62,80,0.10);
         }
-
         .nav-chevron {
             display: inline-block;
             margin-left: 6px;
@@ -79,17 +73,87 @@
             height: 14px;
             vertical-align: middle;
         }
-
         .nav-chevron svg {
             display: block;
             width: 100%;
             height: 100%;
         }
-
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-left: auto;
+        }
+        .sign-in-btn {
+            background: #fff;
+            color: #222;
+            font-weight: 700;
+            font-size: 1.08em;
+            border: none;
+            border-radius: 22px;
+            padding: 8px 28px;
+            margin-left: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            outline: none;
+        }
+        .sign-in-btn:hover {
+            background: #f4f4f4;
+            color: #2980b9;
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+        }
+        .nav-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 38px;
+            background: #fff;
+            min-width: 210px;
+            box-shadow: 0 4px 24px rgba(44,62,80,0.13);
+            border-radius: 10px;
+            z-index: 10;
+            padding: 12px 0;
+            flex-direction: column;
+            gap: 0;
+        }
+        .dropdown-menu a {
+            color: #222;
+            padding: 12px 28px;
+            text-decoration: none;
+            display: block;
+            font-weight: 600;
+            font-size: 1.08em;
+            border-radius: 0;
+            transition: background 0.18s, color 0.18s;
+        }
+        .dropdown-menu a:hover {
+            background: #eaf1f8;
+            color: #2980b9;
+        }
+        .nav-dropdown-wrapper.open .dropdown-menu {
+            display: flex;
+            animation: dropdownFadeIn 0.22s cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .forms-chevron {
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+        }
+        .nav-dropdown-wrapper.open .forms-chevron {
+            transform: rotate(-90deg);
+        }
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
-                padding: 10px 0 10px 0;
+                padding: 10px;
             }
             nav {
                 position: static;
@@ -97,7 +161,12 @@
                 margin-top: 10px;
             }
         }
-
+        main {
+            flex: 1 0 auto;
+        }
+        .pro-footer, footer {
+            flex-shrink: 0;
+        }
         .user-info {
             position: absolute;
             right: 70px;
@@ -229,14 +298,6 @@
             color: #7f8c8d;
             font-size: 18px;
             margin-top: 20px;
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            background-color: var(--header-color);
-            color: #EBE7D9;
-            margin-top: auto;
         }
 
         /* Modal Styles */
@@ -527,26 +588,125 @@
             display: none;
         }
 
-        .sign-in-btn {
-            background: #fff;
-            color: #222;
-            font-weight: 700;
-            font-size: 1.08em;
-            border: none;
-            border-radius: 22px;
-            padding: 8px 28px;
-            margin-left: 18px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
-            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-            text-decoration: none;
-            outline: none;
-            display: none;
+        .pro-footer {
+            background: #2c3e50;
+            color: #f3f7f8;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 60px;
+            padding: 48px 10vw 32px 10vw;
+            border-top: 2px solid #2c3e50;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.18em;
+            margin-top: 0;
         }
-        .sign-in-btn:hover {
-            background: #f4f4f4;
-            color: #2980b9;
-            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+        .pro-footer-col {
+            flex: 1 1 320px;
+            min-width: 220px;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .address-col {
+            border-right: 1.5px solid #2c7a7d;
+            padding-right: 48px;
+            align-items: flex-start;
+        }
+        .nav-col {
+            align-items: flex-start;
+            padding-left: 32px;
+            padding-right: 32px;
+            border-right: 1.5px solid #2c7a7d;
+        }
+        .company-col {
+            align-items: flex-start;
+            padding-left: 48px;
+        }
+        .pro-footer-title {
+            font-weight: 700;
+            font-size: 1.25em;
+            margin-bottom: 6px;
+            color: #fff;
+            letter-spacing: 0.02em;
+        }
+        .company-title {
+            margin-top: 8px;
+            margin-bottom: 0;
+        }
+        .pro-footer-contact a {
+            color: #b6e2e6;
+            text-decoration: underline;
+            font-weight: 500;
+            margin-right: 18px;
+            transition: color 0.2s;
+        }
+        .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
+            color: #ff7043;
+        }
+        .pro-footer-logo {
+            margin-bottom: 8px;
+        }
+        .pro-footer-desc {
+            color: #e0e6ea;
+            font-size: 1em;
+            margin-top: 0;
+            line-height: 1.5;
+        }
+        .pro-footer-col.nav-col a {
+            color: #b6e2e6;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 6px;
+            transition: color 0.2s;
+            font-size: 1em;
+        }
+        .pro-footer-col.nav-col a:not(:last-child) {
+            margin-bottom: 8px;
+        }
+        @media (max-width: 900px) {
+            .pro-footer {
+                flex-direction: column;
+                gap: 32px;
+                padding: 32px 4vw 18px 4vw;
+            }
+            .address-col, .company-col, .nav-col {
+                border: none;
+                padding: 0;
+                min-width: unset;
+                max-width: unset;
+            }
+            .company-col, .nav-col {
+                align-items: flex-start;
+            }
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #374656;
+            color: white;
+        }
+        .user-actions-row {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 18px;
+            width: 100%;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .settings-button, .logout-button {
+            height: 44px !important;
+            min-width: 120px;
+            max-width: 320px;
+            width: 100%;
+            margin: 0;
+            font-size: 1em;
+            border-radius: 7px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.08);
         }
     </style>
 </head>
@@ -557,17 +717,33 @@
             <a href="index.html">Home
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
-            <a href="forms.html">Forms
+            <div class="nav-dropdown-wrapper" id="forms-dropdown-wrapper">
+                <a href="#" id="forms-nav-link">Forms
+                    <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </a>
+                <div class="dropdown-menu" id="forms-dropdown-menu">
+                    <a href="forms.html">My Forms</a>
+                    <a href="FreeForm.html">Free Form</a>
+                    <a href="Family.html">Family</a>
+                    <a href="Probate.html">Probate</a>
+                    <a href="Property.html">Property</a>
+                    <a href="Immigration.html">Immigration</a>
+                    <a href="SmallClaims.html">Small Claims</a>
+                    <a href="Other.html">Other</a>
+                </div>
+            </div>
+            <a href="about.html">About Us
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
             <a href="contact.html">Contact Us
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
+            <a href="FAQ.html">FAQ
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
         </nav>
-        <div class="user-info">
-            <span class="welcome-message" id="welcome-message"></span>
-            <button class="settings-button" id="settings-button">👤</button>
-            <a href="account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
+        <div class="header-actions">
+            <a href="account.html" class="sign-in-btn">Sign In</a>
         </div>
     </header>
 
@@ -684,7 +860,7 @@
 
 <div class="main-forms-wrapper">
     <div id="portfolio-section" class="forms-card">
-        <h1>My Form Portfolio</h1><br>
+       <center> <h1>My Form Portfolio</h1><br></center>
         <div class="subtitle">All your saved forms in one place. Open, manage, or remove forms below.</div><br>
         <ul id="my-forms-list" class="forms-list">
             <!-- User's forms will be dynamically inserted here -->
@@ -705,9 +881,37 @@
             <li><a href="#" data-form-id="smallclaims" data-form-url="smallclaims.html?formId=example3">Small Claims</a></li>
         </ul><br>
     </div>
-    <button class="logout-button" id="logout-button">Logout</button>
+    <div class="user-actions-row" style="display: flex; flex-direction: column; justify-content: center; gap: 14px; margin-bottom: 18px; width: 100%; max-width: 320px; margin-left: auto; margin-right: auto;">
+        <button class="settings-button" id="user-settings-btn" style="width: 100%; height: 44px; display: none;">User Settings</button>
+        <button class="logout-button" id="logout-button" style="width: 100%; height: 44px;">Logout</button>
+    </div>
 </div>
 
+    <div class="pro-footer">
+        <div class="pro-footer-col address-col">
+            <div class="pro-footer-logo">
+                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
+            </div>
+            <div class="pro-footer-title">FormWiz</div>
+            <div>1043 Garland Ave Unit C #1235<br>San Jose, CA 95126, US</div>
+            <div class="pro-footer-contact">
+                <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
+                <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
+            </div>
+        </div>
+        <div class="pro-footer-col nav-col">
+            <div class="pro-footer-title">Navigation</div>
+            <a href="index.html">Home</a>
+            <a href="FreeForm.html">Forms</a>
+            <a href="FAQ.html">FAQ</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+        </div>
+        <div class="pro-footer-col company-col">
+            <div class="pro-footer-title company-title">About FormWiz</div>
+            <div class="pro-footer-desc">FormWiz consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
+        </div>
+    </div>
     <footer>
         &copy; 2024 FormWiz. All rights reserved.
     </footer>
@@ -859,6 +1063,7 @@
                         ...doc.data()
                     });
                 });
+                console.log('Fetched forms:', forms.length, forms);
                 renderMyForms(forms);
                 selectedForms.clear();
                 updateRemoveSelectedButton();
@@ -910,6 +1115,7 @@
             const formDoc = await db.collection('users').doc(userId).collection('forms').doc(formId).get();
             if (formDoc.exists) {
                 alert('You already have this form in your portfolio.');
+                fetchMyForms(userId); // Always refresh UI
             } else {
                 // Add new form to user's collection
                 await db.collection('users').doc(userId).collection('forms').doc(formId).set({
@@ -941,7 +1147,6 @@
     userSettingsForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         settingsError.textContent = '';
-        
         const userId = auth.currentUser.uid;
         const updatedData = {
             firstName: document.getElementById('settings-first-name').value.trim(),
@@ -956,19 +1161,22 @@
             },
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
-
         try {
             // Update user document (create if doesn't exist)
             await db.collection('users').doc(userId).set(updatedData, { merge: true });
-            
-            // Update welcome message
-            welcomeMessage.textContent = `Welcome ${updatedData.firstName} ${updatedData.lastName}`;
-            
+            // Update welcome message if it exists
+            if (welcomeMessage) {
+                welcomeMessage.textContent = `Welcome ${updatedData.firstName} ${updatedData.lastName}`;
+            }
+            // Update portfolio welcome message if it exists
+            const portfolioWelcome = document.getElementById('portfolio-welcome-message');
+            if (portfolioWelcome) {
+                portfolioWelcome.textContent = `Welcome, ${updatedData.firstName} ${updatedData.lastName}`;
+            }
             // Update auth email if changed
             if (auth.currentUser.email !== updatedData.email) {
                 await auth.currentUser.updateEmail(updatedData.email);
             }
-            
             closeSettings();
         } catch (error) {
             settingsError.textContent = error.message;
@@ -979,21 +1187,20 @@
     // Update the auth state listener in forms.html
     auth.onAuthStateChanged(async (user) => {
         if (user) {
-            document.getElementById('portfolio-section').style.display = 'block';
-            settingsButton.style.display = 'inline-block';
-            logoutButton.style.display = 'block';
-            signInBtn.style.display = 'none';
+            const portfolioSection = document.getElementById('portfolio-section');
+            if (portfolioSection) portfolioSection.style.display = 'block';
+            if (settingsButton) settingsButton.style.display = 'inline-block';
+            if (logoutButton) logoutButton.style.display = 'block';
+            if (signInBtn) signInBtn.style.display = 'none';
             try {
                 // Get user document from Firestore
                 const userDoc = await db.collection('users').doc(user.uid).get();
-                
                 if (userDoc.exists) {
                     const userData = userDoc.data();
-                    
                     // Update welcome message with actual name
-                    welcomeMessage.textContent = `${userData.firstName} ${userData.lastName}`;
-                    document.getElementById('portfolio-welcome-message').textContent = `Welcome, ${userData.firstName} ${userData.lastName}`;
-
+                    if (welcomeMessage) welcomeMessage.textContent = `${userData.firstName} ${userData.lastName}`;
+                    const portfolioWelcome = document.getElementById('portfolio-welcome-message');
+                    if (portfolioWelcome) portfolioWelcome.textContent = `Welcome, ${userData.firstName} ${userData.lastName}`;
                     // Pre-populate settings form
                     document.getElementById('settings-first-name').value = userData.firstName || '';
                     document.getElementById('settings-last-name').value = userData.lastName || '';
@@ -1003,10 +1210,8 @@
                     document.getElementById('settings-city').value = userData.address?.city || '';
                     document.getElementById('settings-state').value = userData.address?.state || '';
                     document.getElementById('settings-zip').value = userData.address?.zip || '';
-                    
                     // Load user's forms
                     fetchMyForms(user.uid);
-                    
                     // Render available forms with buttons
                     renderAvailableForms();
                 } else {
@@ -1024,26 +1229,105 @@
                         },
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
-                    
                     await db.collection('users').doc(user.uid).set(newUserData);
-                    welcomeMessage.textContent = `Welcome User`;
-                    
+                    if (welcomeMessage) welcomeMessage.textContent = `Welcome User`;
                     // Render available forms with buttons
                     renderAvailableForms();
+                    fetchMyForms(user.uid);
                 }
             } catch (error) {
                 console.error('Error loading user data:', error);
-                welcomeMessage.textContent = 'Welcome User';
+                if (welcomeMessage) welcomeMessage.textContent = 'Welcome User';
+                fetchMyForms(user.uid);
             }
-            
-            settingsButton.addEventListener('click', openSettings);
+            if (settingsButton) settingsButton.addEventListener('click', openSettings);
         } else {
-            document.getElementById('portfolio-section').style.display = 'none';
-            settingsButton.style.display = 'none';
-            logoutButton.style.display = 'none';
-            signInBtn.style.display = 'inline-block';
+            const portfolioSection = document.getElementById('portfolio-section');
+            if (portfolioSection) portfolioSection.style.display = 'none';
+            if (settingsButton) settingsButton.style.display = 'none';
+            if (logoutButton) logoutButton.style.display = 'none';
+            if (signInBtn) signInBtn.style.display = 'inline-block';
         }
     });
+
+    // Dropdown for Forms nav (copied from index.html)
+    document.addEventListener('DOMContentLoaded', function() {
+        const formsWrapper = document.getElementById('forms-dropdown-wrapper');
+        const formsLink = document.getElementById('forms-nav-link');
+        const dropdownMenu = document.getElementById('forms-dropdown-menu');
+        let dropdownOpen = false;
+        function openDropdown() {
+            formsWrapper.classList.add('open');
+            dropdownOpen = true;
+        }
+        function closeDropdown() {
+            formsWrapper.classList.remove('open');
+            dropdownOpen = false;
+        }
+        formsLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            dropdownOpen ? closeDropdown() : openDropdown();
+        });
+        document.addEventListener('mousedown', function(e) {
+            if (!formsWrapper.contains(e.target)) {
+                closeDropdown();
+            }
+        });
+        formsLink.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                dropdownOpen ? closeDropdown() : openDropdown();
+            }
+        });
+    });
+
+    // Ensure sign-in button only shows when not logged in
+    document.addEventListener('DOMContentLoaded', function() {
+        const signInBtn = document.querySelector('.sign-in-btn');
+        const auth = firebase.auth();
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                if (signInBtn) signInBtn.style.display = 'none';
+            } else {
+                if (signInBtn) signInBtn.style.display = 'block';
+            }
+        });
+    });
+
+    // Show/hide User Settings button based on auth state
+    const userSettingsBtn = document.getElementById('user-settings-btn');
+    auth.onAuthStateChanged(function(user) {
+        if (user) {
+            if (userSettingsBtn) userSettingsBtn.style.display = 'block';
+        } else {
+            if (userSettingsBtn) userSettingsBtn.style.display = 'none';
+        }
+    });
+    // Open settings modal on click, always autofill with latest user data
+    if (userSettingsBtn) {
+        userSettingsBtn.addEventListener('click', async function() {
+            const user = auth.currentUser;
+            if (user) {
+                try {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        document.getElementById('settings-first-name').value = userData.firstName || '';
+                        document.getElementById('settings-last-name').value = userData.lastName || '';
+                        document.getElementById('settings-email').value = userData.email || user.email || '';
+                        document.getElementById('settings-phone').value = userData.phone || '';
+                        document.getElementById('settings-street').value = userData.address?.street || '';
+                        document.getElementById('settings-city').value = userData.address?.city || '';
+                        document.getElementById('settings-state').value = userData.address?.state || '';
+                        document.getElementById('settings-zip').value = userData.address?.zip || '';
+                    }
+                } catch (error) {
+                    // fallback: do nothing
+                }
+            }
+            openSettings();
+        });
+    }
 </script>
 </body>
 </html>

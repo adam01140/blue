@@ -15,6 +15,12 @@
             color: #333;
             background-color: #eaf1f8;
             zoom: 0.90;
+            min-height: 100vh;
+        }
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         header {
             background-color: #2c3e50;
@@ -150,7 +156,7 @@
         }
         /* Make main content flexible */
         main {
-            flex: 1;
+            flex: 1 0 auto;
         }
         /* How It Works Section */
         .how-it-works {
@@ -1115,9 +1121,9 @@
                 align-items: flex-start;
             }
         }
-
-        
-   
+        .pro-footer, footer {
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
@@ -1132,6 +1138,7 @@
                     <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </a>
                 <div class="dropdown-menu" id="forms-dropdown-menu">
+                    <a href="forms.html">My Forms</a>
                     <a href="FreeForm.html">Free Form</a>
                     <a href="Family.html">Family</a>
                     <a href="Probate.html">Probate</a>
@@ -1141,13 +1148,13 @@
                     <a href="Other.html">Other</a>
                 </div>
             </div>
-            <a href="FAQ.html">FAQ
-                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            </a>
             <a href="about.html">About Us
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
             <a href="contact.html">Contact Us
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <a href="FAQ.html">FAQ
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
         </nav>

@@ -1,6 +1,8 @@
 // server.js
 const express       = require('express');
 const dotenv        = require('dotenv');
+// WARNING: Using LIVE keys for local development is not recommended and will likely fail.
+const stripe        = require('stripe')('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');
 const admin         = require('firebase-admin');
 const bodyParser    = require('body-parser');
 const fileUpload    = require('express-fileupload');
@@ -41,7 +43,7 @@ app.get('/', (_, res) => {
 
 /* ————— helper ————— */
 function shouldCheck(v) {
-  // treat ANY present, non‑false value as “checked”
+  // treat ANY present, non‑false value as "checked"
   if (v === undefined)               return false;
   if (Array.isArray(v))              return v.length > 0;
   const s = String(v).trim().toLowerCase();
@@ -50,7 +52,7 @@ function shouldCheck(v) {
 
 /**
  * POST /edit_pdf
- * Accepts ▸ a file upload named “pdf”, **or** ▸ a query string ?pdf=fileName
+ * Accepts ▸ a file upload named "pdf", **or** ▸ a query string ?pdf=fileName
  * and returns the edited PDF with filled‑in fields.
  */
 app.post('/edit_pdf', async (req, res) => {
@@ -113,6 +115,33 @@ app.post('/edit_pdf', async (req, res) => {
       'Content-Disposition': `attachment; filename="${outputName}"`,
     })
     .send(Buffer.from(edited));
+});
+
+// Add a new route for creating a Stripe Checkout Session
+app.post('/create-checkout-session', async (req, res) => {
+    const { priceId, formId } = req.body;
+    const YOUR_DOMAIN = 'http://localhost:3000'; // Replace with your domain
+
+    if (!priceId || !formId) {
+        return res.status(400).send({ error: 'Price ID and Form ID are required.' });
+    }
+
+    try {
+        const session = await stripe.checkout.sessions.create({
+            line_items: [{
+                price: priceId,
+                quantity: 1,
+            }],
+            mode: 'payment',
+            success_url: `${YOUR_DOMAIN}/example.html?payment=success&formId=${formId}&session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${YOUR_DOMAIN}/example.html?payment=cancelled`,
+        });
+
+        res.send({ sessionId: session.id });
+    } catch (e) {
+        console.error("Stripe Error:", e);
+        res.status(500).send({ error: e.message });
+    }
 });
 
 // ────────────────────────────────────────────────────────────
