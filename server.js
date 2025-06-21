@@ -1,6 +1,8 @@
 // server.js
 const express       = require('express');
 const dotenv        = require('dotenv');
+dotenv.config();
+
 // WARNING: Using LIVE keys for local development is not recommended and will likely fail.
 const stripe        = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const admin         = require('firebase-admin');
