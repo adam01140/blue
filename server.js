@@ -2,7 +2,7 @@
 const express       = require('express');
 const dotenv        = require('dotenv');
 // WARNING: Using LIVE keys for local development is not recommended and will likely fail.
-const stripe        = require('stripe')('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');
+const stripe        = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const admin         = require('firebase-admin');
 const bodyParser    = require('body-parser');
 const fileUpload    = require('express-fileupload');

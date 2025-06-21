@@ -425,7 +425,7 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
 </div></form>
-<div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey<br><br><button onclick="processAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><button onclick="window.location.href='forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
+<div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
 </div>
 </section>
 </div>
@@ -510,7 +510,6 @@ var linkedDropdowns = [];
 var sectionStack = [];
 var currentSectionNumber = 1;
 var pdfFileName = "form.pdf";
-var pdfOutputFileName = "adam.html";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["form.pdf", ];
 var hiddenCheckboxCalculations = [];
@@ -1469,7 +1468,7 @@ if (typeof handleNext === 'function') {
             modal.style.justifyContent = 'center';
             modal.style.zIndex = '99999';
             modal.innerHTML =
-    '<div style="background:#fff; border-radius:12px; box-shadow:0 8px 32px rgba(44,62,80,0.18); padding:32px 28px 24px 28px; max-width:470px; width:90%; text-align:center; position:relative;">' +
+    '<div style="background:#fff; border-radius:12px; box-shadow:0 8px 32px rgba(44,62,80,0.18); padding:32px 28px 24px 28px; max-width:370px; width:90%; text-align:center; position:relative;">' +
       '<h2>Payment Required</h2>' +
       '<p>To download your completed PDF, please complete payment.</p>' +
       '<button id="stripeCheckoutBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%); color:#fff; border:none; border-radius:6px; padding:10px 28px; font-size:1.1em; font-weight:600; cursor:pointer;">Pay & Download</button>' +
@@ -1523,8 +1522,9 @@ if (typeof handleNext === 'function') {
                     loadAnswers().then(() => {
                         processAllPdfs().then(() => {
                             wipeAnswers();
-                            window.history.replaceState({}, document.title, "/" + pdfOutputFileName);
-                            navigateSection('end');
+                            // NOTE: You may want to change this to redirect to example2.html
+                            window.history.replaceState({}, document.title, "/example2.html");
+                            navigateSection('end'); // <-- ADD THIS LINE
                         });
                     });
                 } else {
