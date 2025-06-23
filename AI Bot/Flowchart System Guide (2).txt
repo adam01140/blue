@@ -166,3 +166,59 @@ End of Updated Guide
     - Yes: x = (X + W/2) - (w/2) - s/2
     - No:  x = (X + W/2) + (w/2) + s/2
 - This ensures option nodes are perfectly centered and spaced for a visually balanced flowchart. 
+16. Vertical Spacing and Layout Rule
+
+-   **Intra-Section Spacing:** Nodes within the same section should have a good amount of vertical spacing between them, enough for some "wiggle room." Maintain an ample gap of at least 100px-150px between nodes to prevent a "squished" or crowded appearance.
+-   **Inter-Section Spacing:** Nodes that start new sections should have a lot of vertical distance from the previous section. Create a clear visual break by using a much larger vertical gap, typically 400px or more. This helps users mentally group related parts of the flowchart.
+
+17. Optional Information Rule
+- When a form section asks for information that an applicant may not have (e.g., vehicle information, a previous address), always precede the section with a yes/no dropdown question to ask if they have that information. For example, "Do you have a vehicle?" should come before asking for vehicle details.
+
+18. Advanced Guide to Flowchart JSON: Engine Insights
+
+This section provides a developer-level view of how the flowchart tool processes the JSON. Understanding these mechanics is crucial for creating valid and robust flowcharts that load correctly every time.
+
+18.1 The Two-Pass Loading System
+
+The rendering engine uses a two-pass system (`loadFlowchartData` function) to build the visual flowchart from your JSON:
+
+1.  **First Pass (Vertices):** The engine iterates through the `cells` array and creates all the *vertices* (i.e., any object where `"vertex": true`). It creates the nodes, positions them using their `geometry`, and assigns all their custom properties (like `_questionText`, `_textboxes`, etc.). At this stage, no connections are made.
+
+2.  **Second Pass (Edges):** The engine iterates through the `cells` array a second time, but now it only looks for *edges* (i.e., any object where `"edge": true`). For each edge, it finds the `source` and `target` nodes that were created in the first pass (using their matching `id`s) and draws the visual connection between them.
+
+**Implication:** This is why correct linking is paramount. If an edge object's `source` or `target` ID does not correspond to a vertex object's `id`, the link will fail to render, creating a broken flow. Every single node that should be connected *must* have a corresponding edge object defining that link.
+
+18.2 Anatomy of a Valid Node (Vertex)
+
+For a node to be valid, it must contain the following properties, as extracted by the `exportFlowchartJson` function:
+
+-   `"id"`: A **unique string** that identifies the node. This is the reference used by edge objects.
+-   `"vertex": true`: Identifies this object as a shape/node.
+-   `"edge": false`: Explicitly marks this as not an edge.
+-   `"value"`: The HTML content that is displayed inside the node. For simple nodes, this can be a `<div>` with centered text. For complex types like `"multipleTextboxes"`, this **must be the full HTML structure** for the interactive element, including input fields, buttons, and `onblur`/`onclick` JavaScript handlers. The rendering engine uses this HTML directly.
+-   `"style"`: A string of key-value pairs separated by semicolons that defines the node's appearance and, crucially, its type (`nodeType=question`, `questionType=text2`, etc.).
+-   `"geometry"`: An object with `"x"`, `"y"`, `"width"`, and `"height"` properties that define the node's position and size on the canvas.
+
+**Essential Custom Properties (`_` prefix):**
+
+These properties are not part of the core `mxGraph` library but are critical for the form-rendering engine. They must be included for the node to function correctly.
+
+-   `"_questionText"`: The actual question text, stripped of HTML.
+-   `"_nameId"`: A machine-readable identifier for the answer given to this question.
+-   `"_questionId"`: A sequential integer ID. This can be re-calculated by the tool, but it's good practice to set it.
+-   `"_textboxes"`: An array of objects for `"multipleTextboxes"` questions, e.g., `[{"nameId": "first_name", "placeholder": "First Name"}]`.
+-   Other properties like `_twoNumbers`, `_placeholder`, `_image`, and various `_calc` fields are required for their respective node types.
+
+18.3 Anatomy of a Valid Link (Edge)
+
+An edge is simpler but just as critical:
+
+-   `"id"`: A unique string for the edge itself.
+-   `"vertex": false`: Explicitly marks this as not a node.
+-   `"edge": true`: Identifies this object as a connector.
+-   `"source"`: The `id` of the starting node for the connection.
+-   `"target"`: The `id` of the ending node for the connection.
+-   `"style"`: Can be used to style the edge (e.g., arrows), but is often an empty string `""`.
+-   `"geometry": {}`: Usually an empty object, as the renderer calculates the path.
+
+By ensuring every flowchart JSON adheres to this structure—with every vertex fully defined, every connection explicitly created with a corresponding edge object, and proper vertical spacing—we can guarantee that the flowchart will render correctly and function as intended within the tool. 
