@@ -410,12 +410,7 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1"><label><h3>Do you have a lawyer</h3></label><input type="text" id="answer1" name="answer1" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-2"><label><h3>Hungry?</h3></label><select id="answer2" name="answer2"
-                      onchange="dropdownMirror(this, 'answer2')">
-                       <option value="" disabled selected>Select an option</option></select><br>
-              <div id="dropdowntext_answer2"></div>
-              <input type="text" id="answer2_dropdown" name="answer2_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
+        <form id="customForm"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1"><label><h3>How many cars do you have</h3></label><input type="text" id="answer1" name="answer1" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-2"><label><h3>What is your location</h3></label><input type="text" id="answer2" name="answer2" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
@@ -499,7 +494,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
             // Do NOT redirect. Just let the user fill the form.
         }
     });
-  var questionSlugMap       = {"1":"do_you_have_a_lawyer","2":"hungry"};
+  var questionSlugMap       = {"1":"how_many_cars_do_you_have","2":"what_is_your_location"};
 var questionNameIds = {"1":"answer1","2":"answer2"};
 var jumpLogics = [];
 var conditionalPDFs = [];
@@ -510,7 +505,8 @@ var linkedDropdowns = [];
 var sectionStack = [];
 var currentSectionNumber = 1;
 var pdfFileName = "form.pdf";
-var pdfOutputFileName = "adam.html";
+var pdfOutputFileName = "example.html";
+var stripePriceId = "price_1RdZOEFJeSRMFQ8XNEfCjdmw";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["form.pdf", ];
 var hiddenCheckboxCalculations = [];
@@ -1361,7 +1357,7 @@ if (typeof handleNext === 'function') {
         // WARNING: Using LIVE keys for local development is not recommended and will likely fail.
         const STRIPE_PUBLIC_KEY = 'pk_live_51RcD0sFJeSRMFQ8X5rliD5AD1etCL6QwozQjkmUoCG5iULUAqPLFjm4aejihXCZNjsQF1cfSVug5lXe0NKns1TEY00SWDPlDAz';
         // IMPORTANT: Replace this with the actual TEST Price ID for your product.
-        const STRIPE_PRICE_ID = 'price_1RcDedFJeSRMFQ8XmelYMbkc';
+        const STRIPE_PRICE_ID = stripePriceId || 'price_1RcDedFJeSRMFQ8XmelYMbkc';
 
         // Helper: get all form fields to save
         function getFormFields() {

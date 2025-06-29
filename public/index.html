@@ -770,10 +770,11 @@
         }
         @media (max-width: 1200px) {
             .hero-services-row {
-                gap: 12px;
+                gap: 10px;
             }
             .hero-service-card {
                 width: 140px;
+                flex: 0 0 140px;
                 padding: 16px 6px 12px 6px;
             }
         }
@@ -784,6 +785,7 @@
             .hero-service-card {
                 width: 40vw;
                 min-width: 120px;
+                flex: 0 0 40vw;
                 padding: 12px 2vw 10px 2vw;
             }
         }
@@ -927,8 +929,8 @@
             }
         }
         .hero-container.hero-gridfit {
-            
-            width: 95%;
+            width: 100%;
+            max-width: 1600px;
             margin: 0 auto;
             padding-left: 60px;
             padding-right: 60px;
@@ -944,13 +946,14 @@
             padding-right: 0;
         }
         .hero-services-row.hero-services-row-gridfit {
-            display: grid;
-            grid-template-columns: repeat(7, minmax(140px, 1fr));
-            gap: 50px;
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: center;
+            align-items: stretch;
+            gap: 12px;
             margin: 38px 0 0 0;
             width: 100%;
             box-sizing: border-box;
-            justify-items: center;
         }
         .hero-service-card {
             background: #22313f;
@@ -1001,8 +1004,8 @@
         }
         @media (max-width: 1200px) {
             .hero-services-row.hero-services-row-gridfit {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 32px;
+                flex-wrap: wrap;
+                gap: 8px;
             }
             .hero-service-card {
                 max-width: 90vw;
@@ -1019,7 +1022,6 @@
                 text-align: center;
             }
             .hero-services-row.hero-services-row-gridfit {
-                grid-template-columns: 1fr;
                 gap: 8px;
             }
             .hero-service-card {
@@ -1141,7 +1143,6 @@
                     <a href="forms.html">My Forms</a>
                     <a href="FreeForm.html">Free Form</a>
                     <a href="Family.html">Family</a>
-                    <a href="Probate.html">Probate</a>
                     <a href="Property.html">Property</a>
                     <a href="Immigration.html">Immigration</a>
                     <a href="SmallClaims.html">Small Claims</a>
@@ -1186,11 +1187,6 @@
                             <div class="hero-service-icon">👨‍👩‍👧‍👦</div>
                             <div class="hero-service-title">Family</div>
                             <div class="hero-service-desc">Forms for divorce, custody, and other family law matters.</div>
-                        </div>
-                        <div class="hero-service-card" onclick="location.href='Probate.html'">
-                            <div class="hero-service-icon">🏛️</div>
-                            <div class="hero-service-title">Probate</div>
-                            <div class="hero-service-desc">Wills, estate, and probate court forms.</div>
                         </div>
                         <div class="hero-service-card" onclick="location.href='Property.html'">
                             <div class="hero-service-icon">🏠</div>
@@ -1299,7 +1295,6 @@
                 <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
             </div>
             <div class="pro-footer-title">FormWiz</div>
-            <div>1043 Garland Ave Unit C #1235<br>San Jose, CA 95126, US</div>
             <div class="pro-footer-contact">
                 <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
                 <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
@@ -1366,6 +1361,14 @@
             const images = document.querySelectorAll('.hiw-image');
             let activeStep = 0;
 
+            // Dynamic How It Works description text
+            const hiwDesc = document.querySelector('.hiw-image-header p');
+            const hiwStepDescriptions = [
+                'Browse our library or search for a specific form that you need',
+                'Follow our plain language prompts so we can populate the form with the correct and required information',
+                'Use our filing checklist to make sure you are filing with everything required'
+            ];
+
             function setActiveStep(idx) {
                 steps.forEach((step, i) => {
                     if (i === idx) {
@@ -1377,6 +1380,9 @@
                     }
                 });
                 activeStep = idx;
+                if (hiwDesc && hiwStepDescriptions[idx]) {
+                    hiwDesc.textContent = hiwStepDescriptions[idx];
+                }
             }
 
             // Click or hover to activate step

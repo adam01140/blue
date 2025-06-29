@@ -1,0 +1,62 @@
+Rental Application Flowchart Outline
+
+Section 1: Applicant Identity
+1. What's your full name? [multipleTextboxes] (First Name, Middle Initial, Last Name)
+2. What is your Social Security Number or ITIN? [text]
+3. When were you born? [date]
+4. What is your contact phone number? [phone]
+5. Enter your ID info [multipleTextboxes] (Photo ID Type, ID Number, Issuing Government, Expiration Date)
+6. Do you have another form of ID? [dropdown: yes/no]
+    - If Yes: What is it? [text]
+7. What is your email address? [email]
+
+Section 2: Address History
+8. What is your current address? [multipleTextboxes] (Street Address, City, State, Zip Code)
+9. Who is your current landlord or manager? [text]
+10. What is their phone number? [phone]
+11. How much is your current rent? [number]
+12. What dates have you lived at your current address? [dateRange]
+13. Why are you leaving this address? [bigParagraph]
+14. Do you have a previous address? [dropdown: yes/no]
+    - If Yes: What is your previous address? [multipleTextboxes] (Street Address, City, State, Zip Code)
+      - Who is your current landlord or manager? [text]
+      - What is their phone number? [phone]
+      - How much is your current rent? [number]
+      - What dates have you lived at your current address? [dateRange]
+      - Why are you leaving this address? [bigParagraph]
+
+Section 3: Campus Address (if applicable)
+15. Do you have a campus address? [dropdown: yes/no]
+    - If Yes: What is your campus address? [multipleTextboxes] (Street Address, City, State, Zip Code)
+      - What dates have you lived at your campus address? [dateRange]
+      - Why are you leaving this campus address? [bigParagraph]
+      - Who is your campus landlord or manager? [text]
+      - What is their phone number? [phone]
+      - How much is your campus rent? [number]
+
+Section 4: Personal Info
+16. What is your age? [number]
+17. Do you have any pets? [dropdown: yes/no]
+18. Are you a smoker? [dropdown: yes/no]
+
+Section 5: Employment
+19. Do you currently have a job? [dropdown: yes/no]
+    - If Yes: Work Info [multipleTextboxes] (Present Occupation, Employer, From/To, Name of Supervisor, Phone, City)
+20. Have you had a job before? [dropdown: yes/no]
+    - If Yes: Previous Occupation [multipleTextboxes] (Previous Occupation, Employer, From/To, Name of Supervisor, Phone, City)
+
+Section 6: Financial Information
+21. Current Gross Income [multipleTextboxes] (Amount, Per, Savings)
+22. Financial Aid Award [multipleTextboxes] (Amount, Per)
+
+Section 7: Contacts
+23. Personal Reference [multipleTextboxes] (Name, Phone)
+24. Emergency Contact [multipleTextboxes] (Name, Phone, Relation, E-mail)
+
+Section 8: Vehicle Information
+25. Do you have a car? [dropdown: yes/no]
+    - If Yes: Vehicles: Make/Year/License # [multipleTextboxes] (Vehicle 1, Vehicle 2, ...)
+
+Section 9: Rental Details
+26. Address of Proposed Rental [text]
+27. Proposed Move-in Date [date] 

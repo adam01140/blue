@@ -222,3 +222,192 @@ An edge is simpler but just as critical:
 -   `"geometry": {}`: Usually an empty object, as the renderer calculates the path.
 
 By ensuring every flowchart JSON adheres to this structure—with every vertex fully defined, every connection explicitly created with a corresponding edge object, and proper vertical spacing—we can guarantee that the flowchart will render correctly and function as intended within the tool. 
+
+19. Flowchart Outline Best Practices
+
+- **Always start with an outline:** Before building the flowchart JSON, create a flowchart outline that lists every question, its type, and any conditional logic or branching. This outline acts as a blueprint for the flowchart and ensures completeness and clarity.
+- **What to include:**
+  - The exact text of each question as it will appear to the user.
+  - The question type (e.g., text, number, date, dropdown, multipleTextboxes, etc.).
+  - Any options for dropdowns or checkboxes (e.g., Yes/No).
+  - Conditional logic (e.g., "If Yes, ask... If No, skip to...").
+  - Group questions into logical sections that match the form's structure.
+- **Why this matters:**
+  - Prevents missing or duplicating questions.
+  - Makes it easy to spot and plan for conditional branches.
+  - Ensures the flowchart matches the intent and logic of the original form.
+  - Allows for easier review and feedback before implementation.
+- **How to create a good outline:**
+  1. Read through the entire form and break it into logical sections.
+  2. For each field, write the question as it should appear to the user.
+  3. Assign the correct question type for each field.
+  4. Note any options or special input requirements.
+  5. Clearly indicate any conditional logic or branching.
+  6. Review the outline for completeness and logical flow before building the JSON.
+- **Example:**
+  See `outline.txt` for a sample outline based on the rental application form. 
+
+20. Visual Style Requirements for All Nodes
+
+To ensure a visually pleasing and consistent flowchart, all nodes (questions, options, etc.) must use the following style properties:
+
+- shape=roundRect
+- rounded=1
+- arcSize=20
+- whiteSpace=wrap
+- html=1
+- spacing=12
+- fontSize=16 (or higher for legibility)
+- align=center
+- verticalAlign=middle
+- pointerEvents=1
+- overflow=fill
+- section=<section number>
+- nodeType=question or nodeType=option (as appropriate)
+- questionType=<type> (for questions)
+- nodeId=<unique_node_id>
+- fillColor, fontColor, strokeColor: Use a harmonious color scheme (e.g., fillColor=#cce6ff, fontColor=#070665, strokeColor=hsl(0, 100%, 80%))
+
+**Option nodes** should use a visually distinct but harmonious color palette (e.g., fillColor=#fffde7, fontColor=#b26a00).
+
+**Example style string:**
+
+shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;spacing=12;fontSize=16;align=center;verticalAlign=middle;section=1;questionType=text;pointerEvents=1;overflow=fill;nodeId=what_is_your_name;fillColor=#cce6ff;fontColor=#070665;strokeColor=hsl(0, 100%, 80%)
+
+**Rationale:**
+- This ensures all flowcharts are visually consistent, modern, and easy to read.
+- Rounded corners and spacing prevent a "boxy" or crowded appearance.
+- The color scheme provides clear section grouping and visual hierarchy.
+
+**Enforcement:**
+- All new nodes must use this style. If a user provides a new preferred style, update this section and use it for all future work. 
+
+21. Advanced Flowchart Layout and Readability Rules
+
+To maximize readability and maintain a professional, user-friendly appearance, all flowcharts must follow these layout rules:
+
+- **Option Node Alignment:** All option nodes for a question must be placed in a single, evenly spaced horizontal row directly beneath the parent question node.
+- **Branching Question Placement:** Any follow-up question node (e.g., conditional questions like 'If LLC, specify tax classification...') must be placed directly beneath its relevant option node, with clear vertical alignment.
+- **Downstream Node Centering:** Nodes that are the next step for multiple branches (e.g., 'Exemptions...') must be centered horizontally under their logical parent(s) to avoid edge crossings and tangling.
+- **Edge Clarity:** All edges should be straight, direct, and never cross unnecessarily. Avoid diagonal or tangled lines.
+- **Spacing:** Maintain generous, consistent horizontal and vertical spacing between all nodes and rows. Never allow nodes or edges to appear crowded or overlapping.
+- **Visual Grouping:** Always visually group related branches and keep conditional logic clear and easy to follow.
+
+**Rationale:**
+- These rules ensure the flowchart is easy to read, visually appealing, and that the logic is immediately clear to users and reviewers.
+- They prevent the "spaghetti diagram" effect and make it easy to spot errors or missing logic.
+
+**Enforcement:**
+- All new flowcharts must follow these layout rules. If a user provides a new preferred layout, update this section and use it for all future work. 
+
+**Additional Visual Clarity Rules:**
+- All option nodes for a question must be the same width, and all question nodes must be the same (wider) width for visual consistency.
+- Option nodes must be spaced so their edges do not touch or overlap, even for long labels.
+- For long labels, increase node width or use line breaks to prevent overflow or horizontal scrolling.
+- Always center the row of option nodes under the parent question node.
+- Increase vertical spacing between rows to prevent edge overlap and crowding.
+
+**Rationale:**
+- These rules ensure the flowchart is visually clear and easy to read, even for complex or long labels.
+- They prevent overflow and horizontal scrolling, and maintain a professional appearance.
+
+**Enforcement:**
+- All new flowcharts must follow these layout rules. If a user provides a new preferred layout, update this section and use it for all future work. 
+
+**Option Node Order and Centering:**
+- Option nodes must be ordered left-to-right to match the logical flow of the form (not just alphabetical or random order).
+- Branching nodes (e.g., conditional follow-ups) must be centered directly beneath their relevant option(s), with no overlap.
+- The entire flowchart should be visually centered and balanced, with all rows and branches aligned for maximum clarity.
+
+**Rationale:**
+- These rules ensure the flowchart is visually clear and easy to read, even for complex or long labels.
+- They prevent overflow and horizontal scrolling, and maintain a professional appearance.
+
+**Enforcement:**
+- All new flowcharts must follow these layout rules. If a user provides a new preferred layout, update this section and use it for all future work. 
+
+22. How to Prevent Overlapping Branching Nodes
+
+1. **Dynamic Vertical Stacking for Branching Nodes**
+   - If two (or more) branching nodes would overlap horizontally, stack them vertically instead of placing them on the same row.
+   - For example, place "Do you have any foreign partners…" on a row below "If LLC, specify tax classification…", with enough vertical space between them.
+
+2. **Automatic Node Width Adjustment**
+   - Set a maximum width for branching nodes. If the label is too long, use line breaks or increase the node's height, not its width, to avoid encroaching on neighboring nodes.
+
+3. **Smart Branching Node Placement**
+   - Calculate the x/y positions of all branching nodes after laying out the option nodes.
+   - If a branching node would overlap with another, move it down to the next available row.
+   - Always check for overlap before finalizing node positions.
+
+4. **Minimum Vertical Spacing**
+   - Enforce a minimum vertical gap between all rows, and increase it if a wide node is present.
+
+5. **System Guide Rule**
+   - If two or more branching nodes would overlap horizontally, always stack them vertically with sufficient vertical spacing to ensure all text is readable and no nodes overlap. 
+
+23. Universal Overlap Prevention Rule
+
+- After laying out all nodes, check for and resolve any vertical or horizontal overlaps between any nodes, not just branching nodes.
+- Always enforce at least the minimum vertical and horizontal spacing between all nodes (e.g., 100–150px vertically, 100px horizontally).
+- If any nodes would overlap, automatically move the lower or rightmost node(s) to maintain the required gap.
+- This rule applies to all nodes, including questions, options, and branching nodes, throughout the entire flowchart.
+
+24. Advanced Vertical Spacing and Multi-Input Node Rule
+
+- **Vertical spacing and node geometry must be set to allow for very tall multi-input nodes (e.g., multipleTextboxes, multipleDropdownType) and generous vertical spacing above and below.**
+- Node heights and y-coordinates should be set to match the gold standard provided in the latest correct output.json (see example in user message). For example, a multi-input node may have a height of 430px or 480px, and y-coordinates should be set so that there is ample space above and below such nodes.
+- All node values (HTML), styles, and geometry must match the gold standard for maximum readability and visual clarity.
+- This approach is mandatory for all node types and sections, and must be enforced in all future flowcharts.
+
+**Rationale:**
+- This ensures that even the tallest nodes are never crowded, and the flowchart remains visually clear, readable, and professional.
+- It is robust and future-proof, scaling to any form complexity.
+
+**Enforcement:**
+- All new flowcharts must use this vertical spacing and geometry rule. If a user provides a new preferred spacing or geometry, update this section and use it for all future work.
+
+25. Downstream Node Stacking and Linking Rule
+
+- When a node has multiple downstream questions (not just options), always stack them vertically with sufficient spacing.
+- Ensure all downstream nodes are linked in the correct sequential order (e.g., Node A -> Node B -> Node C).
+- Never skip or omit downstream nodes in the flowchart or in the JSON.
+- Always verify that all nodes are visible and connected in the rendered flowchart. 
+
+26. Dropdown for Limited Answers Rule
+
+- Whenever a question has a limited set of possible answers, always implement it as a dropdown with explicit option nodes for each answer.
+- Example: For 'If LLC, specify tax classification (C, S, or P)', use a dropdown with options labelled C, S, and P.
+
+27. Qualifying Question Precedence Rule
+
+- Always precede a question with a qualifying yes/no dropdown if not all users will have an answer to that question.
+- Example: Before asking 'Exempt payee code (if any)', first ask 'Do you have a payee code?' as a dropdown with Yes/No options. If Yes, show the follow-up question; if No, skip to the next relevant question. 
+
+28. Vertical Spacing and Option Row Rules
+
+- All question nodes (except for option rows) must have a large vertical gap (at least 150–200px) from the nodes above and below them.
+- Only option nodes belonging to the same question should share similar y-values (i.e., be in a single horizontal row directly beneath their parent question node).
+- In all other cases, nodes should never have similar y-values; maintain generous vertical spacing for maximum readability.
+
+29. Explicit Option Node Linking Rule
+
+- Every option node (e.g., Yes/No, C/S/P, etc.) must be explicitly linked from its parent question node with a dedicated edge.
+- Never omit these links, even for simple Yes/No dropdowns or other limited-answer questions.
+
+30. Pre-Submission Validation Rule
+
+- Before providing a new output.json, always check that all nodes (except option rows) have large vertical spacing, and that all option nodes are properly linked from their parent question.
+- If any node violates these rules, fix the layout and links before submitting. 
+
+31. Explicit Option Node and Linking Rules for Qualifying Questions
+
+- Explicitly create Yes/No option nodes for every qualifying question (not just Yes/No values in the question node).
+- Link the parent question node to its option nodes (never directly to the next question).
+- Link each option node to the correct next node (e.g., Yes → follow-up, No → skip or next branch).
+- Ensure all geometry (x/y) values are set so that the flow is visually continuous and vertically stacked, with each follow-up node directly below its logical parent.
+- Remove all duplicate/conflicting edges and floating nodes.
+- Validate the entire flow for a single, unbroken chain, matching the working example exactly.
+- No floating or disconnected nodes: every option node is only linked from its parent question and only points to the correct next node.
+- The flow must be a single, unbroken chain, with no cycles, duplicates, or floating nodes.
+- The y-values for each node are set so that the flow is visually continuous, with each follow-up node directly below its logical parent. 

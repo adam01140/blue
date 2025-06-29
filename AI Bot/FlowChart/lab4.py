@@ -4,6 +4,7 @@ import torch.nn as nn
 import argparse
 import PIL
 import random
+import PyPDF2
 
 # TODO 1: Choose a digit
 digit = 3  # Change this to your chosen digit (0-9)
@@ -219,3 +220,13 @@ def main(rungan):
         gan(x_train[labels_train == digit_int])
     else:
         classify(x_train, y_train, x_validation, labels_validation) 
+
+# Extract all text from the PDF and save to a .txt file
+with open('tax-document.pdf', 'rb') as pdf_file:
+    reader = PyPDF2.PdfReader(pdf_file)
+    all_text = ''
+    for page in reader.pages:
+        all_text += page.extract_text() + '\n'
+
+with open('tax-document.txt', 'w', encoding='utf-8') as out_file:
+    out_file.write(all_text) 

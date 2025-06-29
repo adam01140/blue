@@ -1,0 +1,33 @@
+# Tax Form W-9 Flowchart Outline
+
+## Section 1: Identification
+- What is your name? (text)
+- What is your business name/disregarded entity name, if different from above? (text, optional)
+- What is your federal tax classification? (dropdown: Individual/sole proprietor, C corporation, S corporation, Partnership, Trust/estate, LLC [C/S/P], Other)
+  - If LLC, specify tax classification (text: C, S, or P)
+- If you checked "Partnership" or "Trust/estate" or "LLC" with "P" as tax classification, and you are providing this form to a partnership, trust, or estate in which you have an ownership interest: Do you have any foreign partners, owners, or beneficiaries? (checkbox)
+- Exemptions (codes apply only to certain entities, not individuals)
+  - Exempt payee code (text, optional)
+  - Exemption from FATCA reporting code (text, optional)
+
+## Section 2: Address
+- What is your address? (text)
+- What is your city, state, and ZIP code? (text)
+- Requester's name and address (optional, text)
+- List account number(s) here (optional, text)
+
+## Section 3: Taxpayer Identification Number (TIN)
+- What is your Social Security Number (SSN)? (number, 3 fields)
+- OR What is your Employer Identification Number (EIN)? (number, 2 fields)
+
+## Section 4: Certification
+- Certification statement (display only, paragraph)
+- Signature of U.S. person (signature)
+- Date (date)
+
+## Logic/Branching Notes
+- If the entity is an LLC, user must specify the tax classification (C, S, or P).
+- If "Partnership", "Trust/estate", or "LLC" with "P" is selected, and the form is being provided to a partnership, trust, or estate in which the user has an ownership interest, ask about foreign partners/owners/beneficiaries.
+- Exemptions fields are only for certain entities, not individuals.
+- Only one of SSN or EIN is required, not both.
+- Certification statement must be acknowledged (signed and dated) to complete the form. 
