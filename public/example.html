@@ -275,11 +275,11 @@
 <input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">
 
 <!-- Firebase includes -->
-    <script src="https://js.stripe.com/v3/"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="cart.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="cart.js"></script>
 
 <script>
 /*──────── mirror a dropdown → textbox and checkbox ────────*/
@@ -508,7 +508,7 @@ var sectionStack = [];
 var currentSectionNumber = 1;
 var pdfFileName = "form.pdf";
 var pdfOutputFileName = "example.html";
-var stripePriceId = "price_1RdZOEFJeSRMFQ8XNEfCjdmw";
+var stripePriceId = "price_1RczdKFJeSRMFQ8XRsUby35v";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["form.pdf", ];
 var hiddenCheckboxCalculations = [];
@@ -1355,11 +1355,7 @@ if (typeof handleNext === 'function') {
         let userId = null;
         let isUserLoggedIn = false;
 
-        // Stripe Keys - Placed within scope
-        // WARNING: Using LIVE keys for local development is not recommended and will likely fail.
-        const STRIPE_PUBLIC_KEY = 'pk_live_51RcD0sFJeSRMFQ8X5rliD5AD1etCL6QwozQjkmUoCG5iULUAqPLFjm4aejihXCZNjsQF1cfSVug5lXe0NKns1TEY00SWDPlDAz';
-        // IMPORTANT: Replace this with the actual TEST Price ID for your product.
-        const STRIPE_PRICE_ID = stripePriceId || 'price_1RcDedFJeSRMFQ8XmelYMbkc';
+
 
         // Helper: get all form fields to save
         function getFormFields() {
@@ -1454,7 +1450,7 @@ if (typeof handleNext === 'function') {
         
         // Cart Modal Logic
         function showCartModal() {
-            const EXAMPLE_FORM_PRICE_ID = "price_1RdZOEFJeSRMFQ8XNEfCjdmw";
+            const EXAMPLE_FORM_PRICE_ID = stripePriceId;
             let exampleFormPrice = null;
 
             async function fetchExampleFormPrice() {
