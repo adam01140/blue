@@ -112,11 +112,13 @@ class CartManager {
             }
             cartHTML += `
                 <div class="cart-item">
-                    <div class="cart-item-info">
-                        <div class="cart-item-title">${item.title}</div>
-                        <div class="cart-item-price">${priceDisplay}</div>
+                    <div class="cart-item-content">
+                        <div style="flex:1; display:flex; flex-direction:column;">
+                            <div class="cart-item-title">${item.title}</div>
+                            <div class="cart-item-price">${priceDisplay}</div>
+                        </div>
+                        <button class="remove-item" onclick="cartManager.removeFromCart('${item.formId}')">Remove</button>
                     </div>
-                    <button class="remove-item" onclick="cartManager.removeFromCart('${item.formId}')">Remove</button>
                 </div>
             `;
         }
@@ -158,7 +160,7 @@ class CartManager {
             const data = await response.json();
             
             if (data.sessionId) {
-                const stripe = Stripe('pk_live_51RcD0sFJeSRMFQ8X5rliD5AD1etCL6QwozQjkmUoCG5iULUAqPLFjm4aejihXCZNjsQF1cfSVug5lXe0NKns1TEY00SWDPlDAz');
+                const stripe = Stripe('pk_test_51RcD0sFJeSRMFQ8XHBsZjqggnburcGm45kJWz7WAxZSjRklIxv9n8z6vNd3yofGwUbKn6C05GLhJ2QmD9fnQrc2R00wYqO0Dwq');
                 stripe.redirectToCheckout({ sessionId: data.sessionId });
             } else {
                 alert('Error: Could not create payment session. Please try again.');
@@ -300,6 +302,38 @@ class CartManager {
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
+                // ───── Email the PDF to the user ─────
+                let userEmail = null;
+                if (typeof firebase !== 'undefined' && firebase.auth) {
+                    const user = firebase.auth().currentUser;
+                    if (user && user.email) {
+                        userEmail = user.email;
+                    }
+                }
+                if (!userEmail) {
+                    userEmail = prompt('Enter your email to receive a copy of your PDF:');
+                }
+                if (userEmail) {
+                    const emailFormData = new FormData();
+                    emailFormData.append('to', userEmail);
+                    emailFormData.append('filename', `Edited_${cartItem.formId}`);
+                    emailFormData.append('subject', 'Your Completed Form from FormWiz');
+                    emailFormData.append('text', 'Attached is your completed PDF form from FormWiz.');
+                    emailFormData.append('pdf', blob, `Edited_${cartItem.formId}`);
+                    try {
+                        const emailRes = await fetch('/email-pdf', {
+                            method: 'POST',
+                            body: emailFormData
+                        });
+                        if (emailRes.ok) {
+                            console.log('PDF emailed to', userEmail);
+                        } else {
+                            alert('Failed to email PDF to ' + userEmail);
+                        }
+                    } catch (err) {
+                        alert('Error emailing PDF: ' + err.message);
+                    }
+                }
             }
         } catch (error) {
             console.error(`Error processing PDF for ${cartItem.formId}:`, error);

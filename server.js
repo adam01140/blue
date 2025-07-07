@@ -4,7 +4,7 @@ const dotenv        = require('dotenv');
 dotenv.config();
 
 // WARNING: Using LIVE keys for local development is not recommended and will likely fail.
-const stripe        = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe        = require('stripe')('REMOVED');
 const admin         = require('firebase-admin');
 const bodyParser    = require('body-parser');
 const fileUpload    = require('express-fileupload');
@@ -12,6 +12,7 @@ const path          = require('path');
 const { PDFDocument, StandardFonts } = require('pdf-lib');
 const cors          = require('cors');
 const fs            = require('fs');
+const nodemailer    = require('nodemailer');
 
 dotenv.config();
 
@@ -200,6 +201,61 @@ app.get('/stripe-price/:priceId', async (req, res) => {
         res.status(404).json({ error: 'Price not found' });
     }
 });
+
+// Endpoint to email a PDF to the user
+app.post('/email-pdf', async (req, res) => {
+    try {
+        const { to, subject, text, filename } = req.body;
+        if (!to || !filename) {
+            return res.status(400).json({ error: 'Missing required fields (to, filename)' });
+        }
+        // PDF should be sent as raw binary in req.files.pdf
+        if (!req.files || !req.files.pdf) {
+            return res.status(400).json({ error: 'Missing PDF file' });
+        }
+        const pdfBuffer = req.files.pdf.data;
+        await sendPdfEmail(to, subject || 'Your Completed Form', text || 'Attached is your completed PDF form from FormWiz.', pdfBuffer, filename);
+        res.json({ success: true });
+    } catch (e) {
+        console.error('Error sending PDF email:', e);
+        res.status(500).json({ error: 'Failed to send email' });
+    }
+});
+
+// ────────────────────────────────────────────────────────────
+// Nodemailer setup (using Gmail SMTP for example)
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER, // set in .env
+        pass: process.env.EMAIL_PASS  // set in .env
+    }
+});
+
+/**
+ * Send an email with a PDF attachment
+ * @param {string} to - recipient email
+ * @param {string} subject - email subject
+ * @param {string} text - email body
+ * @param {Buffer} pdfBuffer - PDF file buffer
+ * @param {string} filename - PDF file name
+ */
+async function sendPdfEmail(to, subject, text, pdfBuffer, filename) {
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to,
+        subject,
+        text,
+        attachments: [
+            {
+                filename,
+                content: pdfBuffer,
+                contentType: 'application/pdf'
+            }
+        ]
+    };
+    await transporter.sendMail(mailOptions);
+}
 
 // ────────────────────────────────────────────────────────────
 // Start server
