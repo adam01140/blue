@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart - FormWiz</title>
+    <link rel="stylesheet" href="generate.css">
+    <style>
+        .cart-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .cart-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4f8cff;
+        }
+        
+        .cart-item-info {
+            flex: 1;
+        }
+        
+        .cart-item-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .cart-item-price {
+            color: #4f8cff;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .remove-item {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .remove-item:hover {
+            background: #c0392b;
+        }
+        
+        .cart-total {
+            text-align: right;
+            padding: 20px;
+            background: #4f8cff;
+            color: white;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .total-amount {
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+        
+        .checkout-btn {
+            background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+        
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .empty-cart {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .continue-shopping {
+            background: #e0e7ef;
+            color: #2c3e50;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        .continue-shopping:hover {
+            background: #cfd8e3;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #4f8cff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
+            <nav>
+        <a href="index.html">Home</a>
+        <a href="forms.html">Forms</a>
+        <a href="cart.html" id="cart-link">Cart <span id="cart-count" style="background: #ff7043; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.8em; margin-left: 5px;">0</span></a>
+        <a href="contact.html">Contact Us</a>
+    </nav>
+    </header>
+
+    <div class="cart-container">
+        <div class="cart-header">
+            <h1>Your Cart</h1>
+        </div>
+        
+        <div id="cart-items">
+            <div class="loading">Loading cart...</div>
+        </div>
+        
+        <div id="cart-total" style="display: none;">
+            <div class="cart-total">
+                <div>Total: <span class="total-amount" id="total-amount">$0.00</span></div>
+                <button class="checkout-btn" id="checkout-btn">Pay Total</button>
+            </div>
+        </div>
+        
+        <div id="empty-cart" style="display: none;">
+            <div class="empty-cart">
+                <h3>Your cart is empty</h3>
+                <p>Add some forms to get started!</p>
+                <button class="continue-shopping" onclick="location.href='forms.html'">Browse Forms</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2024 FormWiz. All rights reserved.
+    </footer>
+
+    <!-- Firebase includes -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <script src="cart.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+            authDomain: "formwiz-3f4fd.firebaseapp.com",
+            projectId: "formwiz-3f4fd",
+            storageBucket: "formwiz-3f4fd.appspot.com",
+            messagingSenderId: "404259212529",
+            appId: "1:404259212529:web:15a33bce82383b21cfed50",
+            measurementId: "G-P07YEN0HPD"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Update cart count
+        function updateCartCount() {
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement && typeof getCartCount === 'function') {
+                const count = getCartCount();
+                cartCountElement.textContent = count;
+                cartCountElement.style.display = count > 0 ? 'inline' : 'none';
+            }
+        }
+
+        // Update cart count on page load and periodically
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+            // Update cart count every 5 seconds
+            setInterval(updateCartCount, 5000);
+        });
+    </script>
+</body>
+</html> 

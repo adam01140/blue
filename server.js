@@ -146,6 +146,61 @@ app.post('/create-checkout-session', async (req, res) => {
     }
 });
 
+// Add a new route for creating a Cart Checkout Session
+app.post('/create-cart-checkout-session', async (req, res) => {
+    console.log('Cart checkout session requested');
+    console.log('Request body:', req.body);
+    
+    const { cartItems, totalAmount } = req.body;
+    const YOUR_DOMAIN = 'http://localhost:3000'; // Replace with your domain
+
+    if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
+        console.log('Error: No cart items provided');
+        return res.status(400).send({ error: 'Cart items are required.' });
+    }
+
+    try {
+        // Create line items from cart items
+        const lineItems = cartItems.map(item => ({
+            price: item.priceId, // Use the Stripe Price ID directly
+            quantity: 1,
+        }));
+
+        const session = await stripe.checkout.sessions.create({
+            line_items: lineItems,
+            mode: 'payment',
+            success_url: `${YOUR_DOMAIN}/cart.html?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${YOUR_DOMAIN}/cart.html?payment=cancelled`,
+            metadata: {
+                cartItems: JSON.stringify(cartItems.map(item => item.formId)),
+                totalAmount: totalAmount ? totalAmount.toString() : '',
+            },
+        });
+
+        console.log('Stripe session created successfully:', session.id);
+        res.send({ sessionId: session.id });
+    } catch (e) {
+        console.error("Stripe Cart Error:", e);
+        res.status(500).send({ error: e.message });
+    }
+});
+
+// Fetch Stripe price info by Price ID
+app.get('/stripe-price/:priceId', async (req, res) => {
+    try {
+        const price = await stripe.prices.retrieve(req.params.priceId, { expand: ['product'] });
+        res.json({
+            priceId: price.id,
+            unit_amount: price.unit_amount,
+            currency: price.currency,
+            product: price.product && price.product.name ? price.product.name : price.product.id,
+            nickname: price.nickname,
+        });
+    } catch (e) {
+        res.status(404).json({ error: 'Price not found' });
+    }
+});
+
 // ────────────────────────────────────────────────────────────
 // Start server
 // ────────────────────────────────────────────────────────────
