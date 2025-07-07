@@ -264,6 +264,7 @@
     <nav>
         <a href="index.html">Home</a>
         <a href="forms.html">Forms</a>
+        <a href="cart.html" id="cart-link">Cart <span id="cart-count" style="background: #ff7043; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.8em; margin-left: 5px;">0</span></a>
         <a href="contact.html">Contact Us</a>
     </nav>
 </header>
@@ -278,6 +279,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="cart.js"></script>
 
 <script>
 /*──────── mirror a dropdown → textbox and checkbox ────────*/
@@ -410,12 +412,7 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1"><label><h3>Do you have a lawyer</h3></label><input type="text" id="answer1" name="answer1" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-2"><label><h3>Hungry?</h3></label><select id="answer2" name="answer2"
-                      onchange="dropdownMirror(this, 'answer2')">
-                       <option value="" disabled selected>Select an option</option></select><br>
-              <div id="dropdowntext_answer2"></div>
-              <input type="text" id="answer2_dropdown" name="answer2_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
+        <form id="customForm"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1"><label><h3>bruh</h3></label><input type="text" id="answer1" name="answer1" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-2"><label><h3>What is your location</h3></label><input type="text" id="answer2" name="answer2" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
@@ -425,7 +422,7 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
 </div></form>
-<div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey</div>
+<div id="thankYouMessage" class="thank-you-message">Thank you for completing the survey<br><br><button onclick="processAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><button onclick="window.location.href='forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
 </div>
 </section>
 </div>
@@ -499,7 +496,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
             // Do NOT redirect. Just let the user fill the form.
         }
     });
-  var questionSlugMap       = {"1":"do_you_have_a_lawyer","2":"hungry"};
+  var questionSlugMap       = {"1":"bruh","2":"what_is_your_location"};
 var questionNameIds = {"1":"answer1","2":"answer2"};
 var jumpLogics = [];
 var conditionalPDFs = [];
@@ -509,9 +506,11 @@ var amountMap = {"length":0};
 var linkedDropdowns = [];
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "form.pdf";
+var pdfFileName = "form2.pdf";
+var pdfOutputFileName = "example2.html";
+var stripePriceId = "price_1RczdKFJeSRMFQ8XRsUby35v";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["form.pdf", ];
+var allPdfFileNames = ["form2.pdf", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
@@ -1356,11 +1355,7 @@ if (typeof handleNext === 'function') {
         let userId = null;
         let isUserLoggedIn = false;
 
-        // Stripe Keys - Placed within scope
-        // WARNING: Using LIVE keys for local development is not recommended and will likely fail.
-        const STRIPE_PUBLIC_KEY = 'pk_live_51RcD0sFJeSRMFQ8X5rliD5AD1etCL6QwozQjkmUoCG5iULUAqPLFjm4aejihXCZNjsQF1cfSVug5lXe0NKns1TEY00SWDPlDAz';
-        // IMPORTANT: Replace this with the actual TEST Price ID for your product.
-        const STRIPE_PRICE_ID = 'price_1RcDedFJeSRMFQ8XmelYMbkc';
+
 
         // Helper: get all form fields to save
         function getFormFields() {
@@ -1453,61 +1448,109 @@ if (typeof handleNext === 'function') {
 
 
         
-        // Payment Modal Logic
-        function showPaymentModal() {
-            const modal = document.createElement('div');
-            modal.id = 'stripe-payment-modal';
-            modal.style.position = 'fixed';
-            modal.style.top = '0';
-            modal.style.left = '0';
-            modal.style.width = '100vw';
-            modal.style.height = '100vh';
-            modal.style.background = 'rgba(44,62,80,0.45)';
-            modal.style.display = 'flex';
-            modal.style.alignItems = 'center';
-            modal.style.justifyContent = 'center';
-            modal.style.zIndex = '99999';
-            modal.innerHTML =
-    '<div style="background:#fff; border-radius:12px; box-shadow:0 8px 32px rgba(44,62,80,0.18); padding:32px 28px 24px 28px; max-width:370px; width:90%; text-align:center; position:relative;">' +
-      '<h2>Payment Required</h2>' +
-      '<p>To download your completed PDF, please complete payment.</p>' +
-      '<button id="stripeCheckoutBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%); color:#fff; border:none; border-radius:6px; padding:10px 28px; font-size:1.1em; font-weight:600; cursor:pointer;">Pay & Download</button>' +
-      '<br><br>' +
-      '<button id="cancelPaymentBtn" style="background:#e0e7ef; color:#2c3e50; border:none; border-radius:6px; padding:8px 22px; font-size:1em; font-weight:600; cursor:pointer;">Cancel</button>' +
-    '</div>';
+        // Cart Modal Logic
+        function showCartModal() {
+            const EXAMPLE_FORM_PRICE_ID = stripePriceId;
+            let exampleFormPrice = null;
 
-  document.body.appendChild(modal);
-
-  document.getElementById('cancelPaymentBtn').onclick = () => {
-    document.body.removeChild(modal);
-  };
-  document.getElementById('stripeCheckoutBtn').onclick = () => {
-    startStripeCheckout();
-  };
-}
-
-
-        async function startStripeCheckout() {
-            await saveAnswers();
-            const stripe = Stripe(STRIPE_PUBLIC_KEY);
-            try {
-                const response = await fetch('/create-checkout-session', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        priceId: STRIPE_PRICE_ID,
-                        formId: formId
-                    })
-                });
-                const data = await response.json();
-                if (data.sessionId) {
-                    stripe.redirectToCheckout({ sessionId: data.sessionId });
-                } else {
-                    alert('Error: Could not create payment session.');
+            async function fetchExampleFormPrice() {
+                try {
+                    const res = await fetch(`/stripe-price/${EXAMPLE_FORM_PRICE_ID}`);
+                    if (!res.ok) return null;
+                    const data = await res.json();
+                    exampleFormPrice = data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : null;
+                    return exampleFormPrice;
+                } catch (e) {
+                    return null;
                 }
-            } catch (error) {
-                console.error('Payment Error:', error);
-                alert('A payment error occurred. Please try again.');
+            }
+
+            fetchExampleFormPrice().then(price => {
+                const priceDisplay = price ? `$${price}` : '...';
+                const modal = document.createElement('div');
+                modal.id = 'cart-modal';
+                modal.style.position = 'fixed';
+                modal.style.top = '0';
+                modal.style.left = '0';
+                modal.style.width = '100vw';
+                modal.style.height = '100vh';
+                modal.style.background = 'rgba(44,62,80,0.45)';
+                modal.style.display = 'flex';
+                modal.style.alignItems = 'center';
+                modal.style.justifyContent = 'center';
+                modal.style.zIndex = '99999';
+                modal.innerHTML =
+                    '<div style="background:#fff; border-radius:12px; box-shadow:0 8px 32px rgba(44,62,80,0.18); padding:32px 28px 24px 28px; max-width:470px; width:90%; text-align:center; position:relative;">' +
+                    '<h2>Add to Cart</h2>' +
+                    `<p>Your form has been completed! Add it to your cart to download later.</p>` +
+                    `<button id="addToCartBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%); color:#fff; border:none; border-radius:6px; padding:10px 28px; font-size:1.1em; font-weight:600; cursor:pointer;">Add to Cart - ${priceDisplay}</button>` +
+                    '<br><br>' +
+                    '<button id="viewCartBtn" style="background:#e0e7ef; color:#2c3e50; border:none; border-radius:6px; padding:8px 22px; font-size:1em; font-weight:600; cursor:pointer;">View Cart</button>' +
+                    '<br><br>' +
+                    '<button id="cancelCartBtn" style="background:#e74c3c; color:#fff; border:none; border-radius:6px; padding:8px 22px; font-size:1em; font-weight:600; cursor:pointer;">Cancel</button>' +
+                    '</div>';
+
+                document.body.appendChild(modal);
+
+                document.getElementById('cancelCartBtn').onclick = () => {
+                    document.body.removeChild(modal);
+                };
+                document.getElementById('viewCartBtn').onclick = () => {
+                    document.body.removeChild(modal);
+                    window.location.href = 'cart.html';
+                };
+                document.getElementById('addToCartBtn').onclick = () => {
+                    addFormToCart(EXAMPLE_FORM_PRICE_ID);
+                    document.body.removeChild(modal);
+                };
+            });
+        }
+
+
+        // Cart functionality
+        function addFormToCart(priceId) {
+            // Get all form data
+            const form = document.getElementById('customForm');
+            const formData = {};
+            
+            if (form) {
+                const formElements = form.elements;
+                for (let i = 0; i < formElements.length; i++) {
+                    const element = formElements[i];
+                    if (element.name && !element.disabled && 
+                        ['INPUT', 'TEXTAREA', 'SELECT'].includes(element.tagName) &&
+                        !['hidden', 'button', 'submit', 'reset'].includes(element.type)) {
+                        
+                        if (element.type === 'checkbox' || element.type === 'radio') {
+                            formData[element.name] = element.checked;
+                        } else {
+                            formData[element.name] = element.value;
+                        }
+                    }
+                }
+            }
+
+            // Add to cart using the global cart manager
+            const formTitle = "Custom Form"; // You can make this dynamic based on form type
+            
+            if (typeof addToCart === 'function') {
+                addToCart(formId || 'custom-form', formTitle, priceId, formData);
+                alert('Form added to cart! You can view your cart and checkout when ready.');
+            } else {
+                // Fallback: save to localStorage if cart manager not available
+                const cartItem = {
+                    formId: formId || 'custom-form',
+                    title: formTitle,
+                    priceId: priceId,
+                    formData: formData,
+                    timestamp: Date.now()
+                };
+                
+                let cart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
+                cart.push(cartItem);
+                localStorage.setItem('formwiz_cart', JSON.stringify(cart));
+                
+                alert('Form added to cart! You can view your cart and checkout when ready.');
             }
         }
 
@@ -1522,9 +1565,8 @@ if (typeof handleNext === 'function') {
                     loadAnswers().then(() => {
                         processAllPdfs().then(() => {
                             wipeAnswers();
-                            // NOTE: You may want to change this to redirect to example2.html
-                            window.history.replaceState({}, document.title, "/example2.html");
-                            navigateSection('end'); // <-- ADD THIS LINE
+                            window.history.replaceState({}, document.title, "/" + pdfOutputFileName);
+                            navigateSection('end');
                         });
                     });
                 } else {
@@ -1538,10 +1580,27 @@ if (typeof handleNext === 'function') {
         if (form) {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                showPaymentModal();
+                showCartModal();
                 return false;
             });
         }
+
+        // Update cart count
+        function updateCartCount() {
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement && typeof getCartCount === 'function') {
+                const count = getCartCount();
+                cartCountElement.textContent = count;
+                cartCountElement.style.display = count > 0 ? 'inline' : 'none';
+            }
+        }
+
+        // Update cart count on page load and periodically
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+            // Update cart count every 5 seconds
+            setInterval(updateCartCount, 5000);
+        });
     });
 })();
 
