@@ -2296,7 +2296,7 @@ if (typeof handleNext === 'function') {
                     window.location.href = 'cart.html';
                 };
                 document.getElementById('addToCartBtn').onclick = () => {
-                    addFormToCart();
+                    addFormToCart(EXAMPLE_FORM_PRICE_ID);
                     document.body.removeChild(modal);
                 };
             });
@@ -2304,7 +2304,7 @@ if (typeof handleNext === 'function') {
 
 
         // Cart functionality
-        function addFormToCart() {
+        function addFormToCart(priceId) {
             // Get all form data
             const form = document.getElementById('customForm');
             const formData = {};
@@ -2328,7 +2328,6 @@ if (typeof handleNext === 'function') {
 
             // Add to cart using the global cart manager
             const formTitle = "Custom Form"; // You can make this dynamic based on form type
-            const priceId = EXAMPLE_FORM_PRICE_ID; // Stripe Price ID for this form
             
             if (typeof addToCart === 'function') {
                 addToCart(formId || 'custom-form', formTitle, priceId, formData);
