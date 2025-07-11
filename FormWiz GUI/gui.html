@@ -42,8 +42,8 @@
             position: fixed; 
             top: 0; 
             left: 0; 
-            width: 100%; 
-            height: 100%;
+            width: 100vw; 
+            height: 100vh;
             background-color: rgba(0, 0, 0, 0.5); 
             z-index: 1000; 
             display: flex;
@@ -54,15 +54,31 @@
             background-color: #fff; 
             border-radius: 8px; 
             padding: 20px;
-            width: 90%;
-            max-width: 1200px;
+            width: 98vw;
+            max-width: 1600px;
+            max-height: 98vh;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .modal-content iframe {
-            width: 100%; 
-            height: 800px;
+            width: 96vw;
+            max-width: 1560px;
+            height: 92vh;
+            max-height: 92vh;
             border: none;
+        }
+        .modal-content .close {
+            position: absolute;
+            top: 10px;
+            right: 18px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            z-index: 10;
         }
         .question-header {
             display: flex;
@@ -70,6 +86,31 @@
             gap: 10px;
             justify-content: center;
             width: 100%;
+        }
+        #pasteJsonTextarea {
+            width: 100%;
+            min-height: 120px;
+            max-height: 40vh;
+            resize: vertical;
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+        #confirmPasteJsonBtn {
+            width: 100%;
+            padding: 12px 0;
+            font-size: 1.1rem;
+            background: #0056b3;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        #confirmPasteJsonBtn:hover {
+            background: #003d80;
         }
     </style>
 </head>
@@ -95,7 +136,9 @@
                     <input type="text" id="stripePriceId" placeholder="Enter Stripe Price ID (e.g., price_12345)">
                 </div>
             </div>
-            <button type="button" onclick="addPdfInput()">Add PDF</button><br><br>
+            <button type="button" id="pasteJsonBtn">Paste Json</button><br><br>
+            
+            <button type="button" onclick="addPdfInput()">Add PDF</button>
             <button onclick="generateAndDownloadForm()">Export HTML</button>
             <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importForm(event)">
             <button onclick="document.getElementById('importFileInput').click();">Import JSON</button>
@@ -105,6 +148,15 @@
                 <div class="modal-content">
                     <span class="close" onclick="closePreview()">&times;</span>
                     <iframe id="previewFrame"></iframe>
+                </div>
+            </div>
+            <!-- Modal for pasting JSON -->
+            <div id="pasteJsonModal" class="modal" style="display:none;">
+                <div class="modal-content" style="max-width:500px;">
+                    <span class="close" onclick="document.getElementById('pasteJsonModal').style.display='none'">&times;</span>
+                    <h3>Paste GUI JSON</h3>
+                    <textarea id="pasteJsonTextarea" style="width:100%;height:200px;"></textarea><br>
+                    <button id="confirmPasteJsonBtn">Import</button>
                 </div>
             </div>
         </div>
@@ -128,6 +180,58 @@
         function closePreview() {
             document.getElementById('previewModal').style.display = 'none';
         }
+
+        // Paste Json modal logic
+        document.addEventListener('DOMContentLoaded', function() {
+            var pasteBtn = document.getElementById('pasteJsonBtn');
+            var modal = document.getElementById('pasteJsonModal');
+            var textarea = document.getElementById('pasteJsonTextarea');
+            var confirmBtn = document.getElementById('confirmPasteJsonBtn');
+            if (pasteBtn && modal && textarea && confirmBtn) {
+                pasteBtn.addEventListener('click', function() {
+                    // Try to read from clipboard and import instantly
+                    if (navigator.clipboard && navigator.clipboard.readText) {
+                        navigator.clipboard.readText().then(function(clipText) {
+                            try {
+                                var jsonData = JSON.parse(clipText);
+                                loadFormData(jsonData);
+                                setTimeout(updateFormAfterImport, 300);
+                                // Auto-preview after import
+                                setTimeout(function() {
+                                    if (typeof showPreview === 'function') showPreview();
+                                }, 350);
+                            } catch (e) {
+                                // If not valid JSON, show modal for manual paste
+                                textarea.value = '';
+                                modal.style.display = 'flex';
+                            }
+                        }).catch(function() {
+                            // If clipboard read fails, show modal
+                            textarea.value = '';
+                            modal.style.display = 'flex';
+                        });
+                    } else {
+                        // Clipboard API not supported, show modal
+                        textarea.value = '';
+                        modal.style.display = 'flex';
+                    }
+                });
+                confirmBtn.addEventListener('click', function() {
+                    try {
+                        var jsonData = JSON.parse(textarea.value);
+                        loadFormData(jsonData);
+                        setTimeout(updateFormAfterImport, 300);
+                        modal.style.display = 'none';
+                        // Auto-preview after import
+                        setTimeout(function() {
+                            if (typeof showPreview === 'function') showPreview();
+                        }, 350);
+                    } catch (e) {
+                        alert('Invalid JSON: ' + e.message);
+                    }
+                });
+            }
+        });
 
         // Functions for adding/removing PDF inputs
         function addPdfInput() {

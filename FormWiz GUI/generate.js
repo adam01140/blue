@@ -2277,8 +2277,8 @@ if (typeof handleNext === 'function') {
                 modal.style.zIndex = '99999';
                 modal.innerHTML =
                     '<div style="background:#fff; border-radius:12px; box-shadow:0 8px 32px rgba(44,62,80,0.18); padding:32px 28px 24px 28px; max-width:470px; width:90%; text-align:center; position:relative;">' +
-                    '<h2>Add to Cart</h2>' +
-                    \`<p>Your form has been completed! Add it to your cart to download later.</p>\` +
+                    '<h2>Checkout</h2>' +
+                    \`<p>Your form has been completed! Add it to your cart to download .</p>\` +
                     \`<button id="addToCartBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%); color:#fff; border:none; border-radius:6px; padding:10px 28px; font-size:1.1em; font-weight:600; cursor:pointer;">Add to Cart - \${priceDisplay}</button>\` +
                     '<br><br>' +
                     '<button id="viewCartBtn" style="background:#e0e7ef; color:#2c3e50; border:none; border-radius:6px; padding:8px 22px; font-size:1em; font-weight:600; cursor:pointer;">View Cart</button>' +
@@ -2327,11 +2327,11 @@ if (typeof handleNext === 'function') {
             }
 
             // Add to cart using the global cart manager
-            const formTitle = "Custom Form"; // You can make this dynamic based on form type
+           const formTitle = pdfOutputFileName; // You can make this dynamic based on form type
             
-            if (typeof addToCart === 'function') {
+           if (typeof addToCart === 'function') {
                 addToCart(formId || 'custom-form', formTitle, priceId, formData);
-                alert('Form added to cart! You can view your cart and checkout when ready.');
+                window.location.href = 'cart.html';
             } else {
                 // Fallback: save to localStorage if cart manager not available
                 const cartItem = {
@@ -2345,8 +2345,7 @@ if (typeof handleNext === 'function') {
                 let cart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
                 cart.push(cartItem);
                 localStorage.setItem('formwiz_cart', JSON.stringify(cart));
-                
-                alert('Form added to cart! You can view your cart and checkout when ready.');
+                window.location.href = 'cart.html';
             }
         }
 

@@ -205,16 +205,46 @@ app.get('/stripe-price/:priceId', async (req, res) => {
 // Endpoint to email a PDF to the user
 app.post('/email-pdf', async (req, res) => {
     try {
-        const { to, subject, text, filename } = req.body;
-        if (!to || !filename) {
-            return res.status(400).json({ error: 'Missing required fields (to, filename)' });
+        let { to, extraEmails, subject, text, filename } = req.body;
+        if (!to && !extraEmails) {
+            return res.status(400).json({ error: 'Missing recipient email(s)' });
+        }
+        if (!filename) {
+            return res.status(400).json({ error: 'Missing required field: filename' });
         }
         // PDF should be sent as raw binary in req.files.pdf
         if (!req.files || !req.files.pdf) {
             return res.status(400).json({ error: 'Missing PDF file' });
         }
         const pdfBuffer = req.files.pdf.data;
-        await sendPdfEmail(to, subject || 'Your Completed Form', text || 'Attached is your completed PDF form from FormWiz.', pdfBuffer, filename);
+        // Build recipients array
+        let recipients = [];
+        if (to) recipients.push(to);
+        if (extraEmails) {
+            if (typeof extraEmails === 'string') {
+                // Accept comma-separated or single email
+                if (extraEmails.includes(',')) {
+                    recipients = recipients.concat(extraEmails.split(',').map(e => e.trim()).filter(Boolean));
+                } else {
+                    recipients.push(extraEmails.trim());
+                }
+            } else if (Array.isArray(extraEmails)) {
+                recipients = recipients.concat(extraEmails.filter(Boolean));
+            }
+        }
+        recipients = recipients.filter(Boolean);
+        // Extract form name from filename
+        let formName = filename.replace(/^Edited_/, '').replace(/\.pdf$/i, '').replace(/_/g, ' ');
+        // Send to all recipients
+        for (const email of recipients) {
+            await sendPdfEmail(
+                email,
+                subject || `Your Completed ${formName} from FormWiz`,
+                text || `Attached is your completed ${formName} PDF form from FormWiz.`,
+                pdfBuffer,
+                filename
+            );
+        }
         res.json({ success: true });
     } catch (e) {
         console.error('Error sending PDF email:', e);

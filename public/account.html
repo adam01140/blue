@@ -487,7 +487,6 @@
             </a>
         </nav>
         <div class="header-actions">
-            <a href="account.html" class="sign-in-btn">Sign In</a>
         </div>
     </header>
     <div class="main-wrapper">
@@ -618,7 +617,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     <script>
+      let signingUp = false; // flag to suppress redirect during signup
       // Firebase config
       const firebaseConfig = {
         apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
@@ -632,9 +633,9 @@
       firebase.initializeApp(firebaseConfig);
       const auth = firebase.auth();
       const db = firebase.firestore();
-      // Redirect if already logged in
+      // Redirect if already logged in, but not during signup
       auth.onAuthStateChanged(function(user) {
-        if (user) {
+        if (user && !signingUp) {
           window.location.href = 'forms.html';
         }
       });
@@ -661,6 +662,7 @@
       // Signup logic
       signupForm.addEventListener('submit', async function(e) {
         e.preventDefault();
+        signingUp = true; // tell the listener to wait
         const signupError = document.getElementById('signup-error');
         signupError.textContent = '';
         // Collect all fields
@@ -680,14 +682,17 @@
         // Validation
         if (!firstName || !lastName || !email || !phone || !street || !city || !state || !zip || !password || !confirmPassword || !signature || !date) {
           signupError.textContent = 'Please fill out all fields.';
+          signingUp = false;
           return;
         }
         if (!termsChecked) {
           signupError.textContent = 'You must agree to the terms and conditions.';
+          signingUp = false;
           return;
         }
         if (password !== confirmPassword) {
           signupError.textContent = 'Passwords do not match';
+          signingUp = false;
           return;
         }
         try {
@@ -703,18 +708,19 @@
             signature,
             agreementDate: date
           };
-          await Promise.all([
-            userCredential.user.updateProfile({
-              displayName: `${firstName} ${lastName}`
-            }),
-            db.collection('users').doc(userCredential.user.uid).set(userData)
-          ]);
+          await userCredential.user.updateProfile({
+            displayName: `${firstName} ${lastName}`
+          });
+          await db.collection('users').doc(userCredential.user.uid).set(userData);
+          alert('your account has been added to firebase');
           window.location.href = 'forms.html';
         } catch (error) {
           signupError.textContent = error.message;
           if (auth.currentUser) {
             try { await auth.currentUser.delete(); } catch (e) {}
           }
+        } finally {
+          signingUp = false;
         }
       });
       // Login logic (unchanged)
@@ -771,6 +777,19 @@
                     signInButton.style.display = user ? 'none' : 'block';
                 }
             });
+        }
+      });
+    </script>
+    <script>
+      // Set signup date to today
+      document.addEventListener('DOMContentLoaded', function() {
+        var dateInput = document.getElementById('signup-date');
+        if (dateInput) {
+          var today = new Date();
+          var yyyy = today.getFullYear();
+          var mm = String(today.getMonth() + 1).padStart(2, '0');
+          var dd = String(today.getDate()).padStart(2, '0');
+          dateInput.value = yyyy + '-' + mm + '-' + dd;
         }
       });
     </script>

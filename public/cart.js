@@ -88,17 +88,20 @@ class CartManager {
         const cartItemsContainer = document.getElementById('cart-items');
         const cartTotalContainer = document.getElementById('cart-total');
         const emptyCartContainer = document.getElementById('empty-cart');
+        const clearCartBtn = document.getElementById('clear-cart-btn');
         if (!cartItemsContainer) return;
 
         if (this.cart.length === 0) {
             cartItemsContainer.innerHTML = '';
             cartTotalContainer.style.display = 'none';
             emptyCartContainer.style.display = 'block';
+            if (clearCartBtn) clearCartBtn.style.display = 'none';
             return;
         }
 
         emptyCartContainer.style.display = 'none';
         cartTotalContainer.style.display = 'block';
+        if (clearCartBtn) clearCartBtn.style.display = 'block';
 
         let cartHTML = '';
         let total = 0;
@@ -334,6 +337,33 @@ class CartManager {
                         alert('Error emailing PDF: ' + err.message);
                     }
                 }
+                // ───── Upload PDF to Firebase Storage and save permanent download URL ─────
+                if (typeof firebase !== 'undefined' && firebase.auth && firebase.firestore && firebase.storage) {
+                    const user = firebase.auth().currentUser;
+                    if (user) {
+                        const db = firebase.firestore();
+                        const storage = firebase.storage();
+                        const docId = `${cartItem.formId}_${Date.now()}`;
+                        const storageRef = storage.ref().child(`users/${user.uid}/documents/${docId}.pdf`);
+                        try {
+                            // Upload the PDF blob
+                            await storageRef.put(blob);
+                            // Get the permanent download URL
+                            const downloadUrl = await storageRef.getDownloadURL();
+                            // Save a record with the permanent downloadUrl
+                            await db.collection('users').doc(user.uid)
+                                .collection('documents').doc(docId).set({
+                                    name: cartItem.title || cartItem.formId,
+                                    formId: cartItem.formId,
+                                    countyName: cartItem.countyName || '',
+                                    purchaseDate: firebase.firestore.FieldValue.serverTimestamp(),
+                                    downloadUrl: downloadUrl
+                                });
+                        } catch (err) {
+                            console.error('Error uploading PDF to Firebase Storage or saving document:', err);
+                        }
+                    }
+                }
             }
         } catch (error) {
             console.error(`Error processing PDF for ${cartItem.formId}:`, error);
@@ -360,4 +390,11 @@ function addToCart(formId, formTitle, priceId, formData) {
 // Global function to get cart count (for navigation display)
 function getCartCount() {
     return cartManager ? cartManager.getCartCount() : 0;
+} 
+
+// Global function to clear the cart and update display
+function clearCart() {
+    if (cartManager) {
+        cartManager.clearCart();
+    }
 } 

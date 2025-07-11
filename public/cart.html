@@ -465,12 +465,13 @@
         <div id="cart-items" class="cart-list">
             <div class="loading">Loading cart...</div>
         </div>
-        
+        <button class="clear-cart-btn" id="clear-cart-btn" style="background: #ff5a5f; color: #fff; border: none; border-radius: 10px; padding: 12px 0; width: 100%; font-size: 1.1em; font-weight: 700; margin-top: 15px; cursor: pointer;">Clear Cart</button>
         <div id="cart-total" style="display: none;">
             <div class="cart-summary">
                 <div class="summary-label">Total:</div>
                 <div class="total-amount" id="total-amount">$0.00</div>
                 <button class="checkout-btn" id="checkout-btn">Pay Total</button>
+                <button class="exit-btn" id="exit-btn" style="background: #e0e7ef; color: #2c3e50; border: none; border-radius: 8px; padding: 12px 0; width: 100%; font-size: 1.08em; font-weight: 600; margin-top: 18px; cursor: pointer;">Exit</button>
             </div>
         </div>
         
@@ -516,7 +517,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     <script src="cart.js"></script>
     <script>
         // Firebase configuration
@@ -601,6 +603,28 @@
                     window.location.href = 'home.html';
                 }
             });
+        });
+
+        // Add event listeners for Clear Cart and Exit buttons
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const clearCartBtn = document.getElementById('clear-cart-btn');
+            const exitBtn = document.getElementById('exit-btn');
+            if (clearCartBtn) {
+                clearCartBtn.addEventListener('click', function() {
+                    if (typeof clearCart === 'function') {
+                        clearCart();
+                    } else if (typeof localStorage !== 'undefined') {
+                        localStorage.removeItem('cart');
+                        location.reload();
+                    }
+                });
+            }
+            if (exitBtn) {
+                exitBtn.addEventListener('click', function() {
+                    window.location.href = 'forms.html';
+                });
+            }
         });
     </script>
 </body>

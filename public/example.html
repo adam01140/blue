@@ -279,6 +279,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="updateLastOpened.js"></script>
 <script src="cart.js"></script>
 
 <script>
@@ -412,7 +413,7 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1"><label><h3>bruh</h3></label><input type="text" id="answer1" name="answer1" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-2"><label><h3>What is your location</h3></label><input type="text" id="answer2" name="answer2" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
+        <form id="customForm"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1"><label><h3>example</h3></label><input type="text" id="answer1" name="answer1" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-2"><label><h3>What is your location</h3></label><input type="text" id="answer2" name="answer2" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
@@ -496,7 +497,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
             // Do NOT redirect. Just let the user fill the form.
         }
     });
-  var questionSlugMap       = {"1":"bruh","2":"what_is_your_location"};
+  var questionSlugMap       = {"1":"example","2":"what_is_your_location"};
 var questionNameIds = {"1":"answer1","2":"answer2"};
 var jumpLogics = [];
 var conditionalPDFs = [];
@@ -506,11 +507,11 @@ var amountMap = {"length":0};
 var linkedDropdowns = [];
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "form.pdf";
-var pdfOutputFileName = "example.html";
-var stripePriceId = "price_1Ri8ASFJeSRMFQ8XDhtdSkFr";
+var pdfFileName = "form2.pdf";
+var pdfOutputFileName = "Fee Waiver";
+var stripePriceId = "price_1RiOURFJeSRMFQ8XLlOmQGrj";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["form.pdf", ];
+var allPdfFileNames = ["form2.pdf", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
@@ -1481,8 +1482,8 @@ if (typeof handleNext === 'function') {
                 modal.style.zIndex = '99999';
                 modal.innerHTML =
                     '<div style="background:#fff; border-radius:12px; box-shadow:0 8px 32px rgba(44,62,80,0.18); padding:32px 28px 24px 28px; max-width:470px; width:90%; text-align:center; position:relative;">' +
-                    '<h2>Add to Cart</h2>' +
-                    `<p>Your form has been completed! Add it to your cart to download later.</p>` +
+                    '<h2>Checkout</h2>' +
+                    `<p>Your form has been completed! Add it to your cart to download .</p>` +
                     `<button id="addToCartBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%); color:#fff; border:none; border-radius:6px; padding:10px 28px; font-size:1.1em; font-weight:600; cursor:pointer;">Add to Cart - ${priceDisplay}</button>` +
                     '<br><br>' +
                     '<button id="viewCartBtn" style="background:#e0e7ef; color:#2c3e50; border:none; border-radius:6px; padding:8px 22px; font-size:1em; font-weight:600; cursor:pointer;">View Cart</button>' +
@@ -1531,11 +1532,11 @@ if (typeof handleNext === 'function') {
             }
 
             // Add to cart using the global cart manager
-            const formTitle = "Custom Form"; // You can make this dynamic based on form type
+           const formTitle = pdfOutputFileName; // You can make this dynamic based on form type
             
-            if (typeof addToCart === 'function') {
+           if (typeof addToCart === 'function') {
                 addToCart(formId || 'custom-form', formTitle, priceId, formData);
-                alert('Form added to cart! You can view your cart and checkout when ready.');
+                window.location.href = 'cart.html';
             } else {
                 // Fallback: save to localStorage if cart manager not available
                 const cartItem = {
@@ -1549,8 +1550,7 @@ if (typeof handleNext === 'function') {
                 let cart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
                 cart.push(cartItem);
                 localStorage.setItem('formwiz_cart', JSON.stringify(cart));
-                
-                alert('Form added to cart! You can view your cart and checkout when ready.');
+                window.location.href = 'cart.html';
             }
         }
 

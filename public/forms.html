@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forms - FormWiz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #2980b9;
@@ -456,6 +457,10 @@
             display: none;
             width:100%;
             height:40px;
+            max-width: 180px !important;
+            width: 100% !important;
+            margin: 20px auto 0 auto !important;
+            display: block;
         }
 
         #remove-selected-button:hover {
@@ -464,7 +469,7 @@
 
         .main-forms-wrapper {
             max-width: 1200px;
-            margin: 48px auto 48px auto;
+            margin: 8px auto 48px auto;
             display: flex;
             flex-direction: column;
             gap: 48px;
@@ -565,6 +570,12 @@
             font-size: 1.1em;
             margin-top: 18px;
             text-align: center;
+            background: #eaf6ff;
+            border: 2px solid #b3e0ff;
+            border-radius: 16px;
+            padding: 18px 24px;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.04);
         }
 
         @media (max-width: 1100px) {
@@ -708,18 +719,342 @@
             border-radius: 7px;
             box-shadow: 0 2px 8px rgba(44,62,80,0.08);
         }
+        .forms-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 32px;
+            margin-top: 38px;
+        }
+        .circle-arrow-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #2980b9;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
+            outline: none;
+            position: relative;
+        }
+        .circle-arrow-btn:disabled {
+            background: #b3cbe6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .circle-arrow-btn svg {
+            width: 28px;
+            height: 28px;
+            display: block;
+        }
+        .forms-list {
+            transition: opacity 0.35s cubic-bezier(0.4,0,0.2,1), transform 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+        .forms-list.fade-out {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        .forms-list.fade-in {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        #portfolio-section .forms-list {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center;
+            gap: 32px;
+            width: 100%;
+        }
+        #portfolio-section .forms-list li {
+            width: 90% !important;
+            max-width: 600px !important;
+            min-width: 320px !important;
+            padding: 18px 32px 14px 32px !important;
+            border-radius: 18px !important;
+            box-shadow: 0 2px 16px rgba(44,62,80,0.10) !important;
+            margin: 0 auto !important;
+            height: auto !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #portfolio-section .last-opened {
+            position: absolute;
+            top: 10px;
+            right: 18px;
+            font-size: 0.95em;
+            color: #7f8c8d;
+            background: rgba(255,255,255,0.85);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+            pointer-events: none;
+            z-index: 2;
+        }
+        @media (max-width: 700px) {
+            #portfolio-section .forms-list li {
+                width: 98% !important;
+                max-width: 98vw !important;
+                min-width: unset !important;
+                padding: 12px 6vw 10px 6vw !important;
+            }
+        }
+        #portfolio-section .form-action-button {
+            max-width: 220px;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+        .welcome-header {
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.06);
+            border-radius: 0 0 24px 24px;
+            margin: 0 auto 32px auto;
+            padding: 36px 0 32px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+        }
+        .welcome-header-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--header-color);
+            margin-bottom: 18px;
+            letter-spacing: 0.01em;
+        }
+        .welcome-header-options {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 8px;
+            flex-wrap: nowrap;
+        }
+        .welcome-header-option {
+            background: #f8fafc;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+            padding: 22px 18px 16px 18px;
+            min-width: 120px;
+            max-width: 180px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: box-shadow 0.18s, background 0.18s, transform 0.18s;
+            border: none;
+            outline: none;
+            position: relative;
+        }
+        .welcome-header-option:hover {
+            background: #eaf1f8;
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .welcome-header-option-icon {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            color: #2980b9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .welcome-header-option-label {
+            font-size: 1.18em;
+            font-weight: 700;
+            color: #2c3e50;
+            text-align: center;
+        }
+        @media (max-width: 900px) {
+            .welcome-header-options {
+                flex-direction: column;
+                gap: 18px;
+            }
+            .welcome-header {
+                padding: 24px 0 18px 0;
+            }
+        }
+        #portfolio-section .form-county {
+            font-size: 0.98em;
+            color: #153a5b;
+            font-weight: 600;
+            margin-top: 2px;
+            margin-bottom: 6px;
+            text-align: center;
+            letter-spacing: 0.01em;
+        }
+        #cart-icon-link .cart-circle {
+            width: 54px !important;
+            height: 54px !important;
+            background: #2980b9;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        #cart-icon {
+            width: 32px !important;
+            height: 32px !important;
+            display: block;
+        }
+        #settings-logout-btn {
+            display: block;
+            margin: 18px auto 0 auto !important;
+            width: 100%;
+            max-width: 320px;
+            min-width: 120px;
+            text-align: center;
+        }
+        #user-settings-form .btn {
+            width: 100%;
+            max-width: 320px;
+            min-width: 120px;
+            display: block;
+            margin: 0 auto 0 auto;
+            text-align: center;
+        }
+        #saving-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(44, 62, 80, 0.45);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+        }
+        #saving-overlay .saving-modal {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(44,62,80,0.18);
+            padding: 32px 28px 24px 28px;
+            max-width: 320px;
+            width: 90%;
+            text-align: center;
+            font-size: 1.25em;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+        #saving-overlay .saving-modal.error {
+            color: #e74c3c;
+        }
+        .delete-account-button {
+            background: #e74c3c !important;
+            color: #fff !important;
+            border: none;
+            border-radius: 7px;
+            padding: 10px 0;
+            width: 100%;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 14px auto 0 auto !important;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+            transition: background 0.2s;
+            display: block;
+            max-width: 320px;
+            min-width: 120px;
+            text-align: center;
+        }
+        .delete-account-button:hover {
+            background: #c0392b !important;
+        }
+
+        /* ───────── My Documents timestamp (matches My Form Portfolio) ───────── */
+#documents-section .forms-list li {         /* make the card a positioning context   */
+    position: relative;                     /* so the timestamp can sit top-right    */
+}
+
+#documents-section .last-opened {           /* copy of #portfolio-section rule       */
+    position: absolute;
+    top: 10px;
+    right: 18px;
+    font-size: 0.95em;
+    color: #7f8c8d;
+    background: rgba(255,255,255,0.85);
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+    pointer-events: none;
+    z-index: 2;
+}
+
     </style>
 </head>
 <body>
     <header>
         <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
         <nav>
-            <a href="index.html">Home</a>
-            <a href="forms.html">Forms</a>
-            <a href="cart.html" id="cart-link">Cart <span id="cart-count" style="background: #ff7043; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.8em; margin-left: 5px;">0</span></a>
-            <a href="contact.html">Contact Us</a>
+            <a href="index.html">Home
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <div class="nav-dropdown-wrapper" id="forms-dropdown-wrapper">
+                <a href="#" id="forms-nav-link">Forms
+                    <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </a>
+                <div class="dropdown-menu" id="forms-dropdown-menu">
+                    <a href="forms.html">My Forms</a>
+                    <a href="FreeForm.html">Free Form</a>
+                    <a href="Family.html">Family</a>
+                    <a href="Property.html">Property</a>
+                    <a href="Immigration.html">Immigration</a>
+                    <a href="SmallClaims.html">Small Claims</a>
+                    <a href="Other.html">Other</a>
+                </div>
+            </div>
+            <a href="about.html">About Us
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <a href="contact.html">Contact Us
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <a href="FAQ.html">FAQ
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
         </nav>
+        <div class="header-actions">
+            <a href="account.html" class="sign-in-btn">Sign In</a>
+            <a href="cart.html" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
+                <span class="cart-circle">
+                    <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="10" cy="21" r="1.5"/>
+                        <circle cx="18" cy="21" r="1.5"/>
+                        <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
+                    </svg>
+                    <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
+                </span>
+            </a>
+        </div>
     </header>
+    <div class="welcome-header">
+        <div class="welcome-header-title">Welcome To FormWiz!</div>
+        <div class="welcome-header-options">
+            <div class="welcome-header-option" id="new-form-btn" tabindex="0">
+                <span class="welcome-header-option-icon">📄</span>
+                <span class="welcome-header-option-label">New Form</span>
+            </div>
+            <div class="welcome-header-option" id="my-forms-btn" tabindex="0">
+                <span class="welcome-header-option-icon">📁</span>
+                <span class="welcome-header-option-label">My Forms</span>
+            </div>
+            <div class="welcome-header-option" id="documents-btn" tabindex="0">
+                <span class="welcome-header-option-icon">📑</span>
+                <span class="welcome-header-option-label"> My Documents</span>
+            </div>
+            <div class="welcome-header-option" id="settings-btn" tabindex="0">
+                <span class="welcome-header-option-icon">⚙️</span>
+                <span class="welcome-header-option-label">Settings</span>
+            </div>
+        </div>
+    </div>
 
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal">
@@ -820,16 +1155,13 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="btn">Save Changes</button>
+                <button type="submit" class="btn" id="settings-save-btn">Back</button>
+                <button type="button" id="settings-logout-btn" class="logout-button">Logout</button>
+                <button type="button" id="settings-delete-btn" class="delete-account-button" style="background:#e74c3c; color:#fff; margin: 14px auto 0 auto; width:100%; max-width:320px; min-width:120px; display:block; font-weight:700;">Delete Account</button>
                 <div class="error-message" id="settings-error"></div>
             </form>
         </div>
     </div>
-	
-	<br>
-	<center>
-	<h2 id="portfolio-welcome-message" style="color: var(--text-color); margin-bottom: 10px;"></h2>
-	</center>
 	
 
 <div class="main-forms-wrapper">
@@ -842,22 +1174,47 @@
         <div id="no-forms-message" class="no-forms-message" style="display: none;">
             You currently have no forms in your portfolio.
         </div><br>
-        <button id="remove-selected-button" class="remove-button">Remove Forms</button>
+        <button id="remove-selected-button" class="remove-button">Remove Forms</button><br><br><br></b>
+        <div class="user-actions-row" style="display: none; flex-direction: column; justify-content: center; gap: 14px; margin-bottom: 18px; width: 100%; max-width: 320px; margin-left: auto; margin-right: auto;">
+            <button class="settings-button" id="user-settings-btn" style="width: 100%; height: 44px; display: none;">User Settings</button>
+            <button class="logout-button" id="logout-button" style="width: 100%; height: 44px;">Logout</button>
+        </div>
+    </div>
+    <!-- My Documents Section -->
+    <div id="documents-section" class="forms-card">
+        <center><h1>My Documents</h1><br></center>
+        <div class="subtitle">All your completed and purchased forms. Download or view your documents below.</div><br>
+        <ul id="my-documents-list" class="forms-list">
+            <!-- User's purchased documents will be dynamically inserted here -->
+        </ul>
+        <div id="no-documents-message" class="no-forms-message" style="display: none;">
+            You have not purchased any documents yet.
+        </div><br>
     </div>
     <div class="forms-card">
         <h1>Available Forms</h1><br>
-        <div class="subtitle">Browse and add new forms to your portfolio. Click a form to add it below.</div><br>
+        <div class="subtitle">Browse and add new forms to your portfolio. Click a form to add it below.</div>
+        <!-- Search Bar for Available Forms -->
+        <input type="text" id="available-forms-search" placeholder="Search By Form Name " style="width: 100%; max-width: 400px; margin-bottom: 18px; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0;">
+        
+        <input type="text" id="available-forms-zip" placeholder="Search By ZIP Code" maxlength="5" style="width: 100%; max-width: 220px; margin: 0 auto 18px auto; display: block; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #b3e0ff; background: #f8fbff; text-align: center; box-shadow: 0 1px 4px rgba(44,62,80,0.06);">
+        <br><br>
         <ul id="available-forms-list" class="forms-list">
-            <li><a href="#" data-form-id="fee-waiver" data-form-url="fee-waiver.html?formId=fee-waiver">Court Fees Waiver</a></li>
-            <li><a href="#" data-form-id="example" data-form-url="example.html?formId=example">Example</a></li>
-            <li><a href="#" data-form-id="example2" data-form-url="example2.html?formId=example2">Example2</a></li>
-            <li><a href="#" data-form-id="example3" data-form-url="example3.html?formId=example3">Example3</a></li>
-            <li><a href="#" data-form-id="smallclaims" data-form-url="smallclaims.html?formId=example3">Small Claims</a></li>
-        </ul><br>
-    </div>
-    <div class="user-actions-row" style="display: flex; flex-direction: column; justify-content: center; gap: 14px; margin-bottom: 18px; width: 100%; max-width: 320px; margin-left: auto; margin-right: auto;">
-        <button class="settings-button" id="user-settings-btn" style="width: 100%; height: 44px; display: none;">User Settings</button>
-        <button class="logout-button" id="logout-button" style="width: 100%; height: 44px;">Logout</button>
+            <!-- Available forms will be dynamically loaded here -->
+        </ul>
+        <div class="forms-pagination">
+            <button id="forms-prev-btn" class="circle-arrow-btn" aria-label="Previous" disabled>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15.5 19L8.5 12L15.5 5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <button id="forms-next-btn" class="circle-arrow-btn" aria-label="Next">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8.5 5L15.5 12L8.5 19" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+        <br>
     </div>
 </div>
 
@@ -867,7 +1224,6 @@
                 <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
             </div>
             <div class="pro-footer-title">FormWiz</div>
-            <div>1043 Garland Ave Unit C #1235<br>San Jose, CA 95126, US</div>
             <div class="pro-footer-contact">
                 <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
                 <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
@@ -887,22 +1243,7 @@
         </div>
     </div>
     <footer>
-        <div
-            class="shape"
-            data-type="options"
-            data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;nodeId=Option_node;section=1;spacing=12;fontSize=16;"
-        >
-            Options Node
-        </div>
-        <div
-            class="shape"
-            data-type="imageOption"
-            data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=imageOption;questionType=dropdown;nodeId=Image_Option_node;section=1;spacing=12;fontSize=16;"
-        >
-            Image Option Node
-        </div>
-        <div class="button-bar"> 
-        </div>
+        &copy; 2024 FormWiz. All rights reserved.
     </footer>
 
     <!-- Firebase SDKs -->
@@ -910,7 +1251,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="cart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
  <script>
     // Firebase Configuration
     const firebaseConfig = {
@@ -969,6 +1310,42 @@
     });
 
     // Form Management Functions
+    function timeAgo(date) {
+        const now = new Date();
+        const seconds = Math.floor((now - date) / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        const weeks = Math.floor(days / 7);
+        const months = Math.floor(days / 30);
+        const years = Math.floor(days / 365);
+        if (years > 0) return years + (years === 1 ? ' year ago' : ' years ago');
+        if (months > 0) return months + (months === 1 ? ' month ago' : ' months ago');
+        if (weeks > 0) return weeks + (weeks === 1 ? ' week ago' : ' weeks ago');
+        if (days > 0) return days + (days === 1 ? ' day ago' : ' days ago');
+        if (hours > 0) return hours + (hours === 1 ? ' hour ago' : ' hours ago');
+        if (minutes > 0) return minutes + (minutes === 1 ? ' minute ago' : ' minutes ago');
+        return 'Just now';
+    }
+
+    function showSavingOverlay(msg, isError) {
+        const overlay = document.getElementById('saving-overlay');
+        const modal = document.getElementById('saving-modal-text');
+        if (modal) {
+            modal.textContent = msg || 'Saving...';
+            if (isError) {
+                modal.classList.add('error');
+            } else {
+                modal.classList.remove('error');
+            }
+        }
+        if (overlay) overlay.style.display = 'flex';
+    }
+    function hideSavingOverlay() {
+        const overlay = document.getElementById('saving-overlay');
+        if (overlay) overlay.style.display = 'none';
+    }
+
     function renderMyForms(forms) {
         myFormsList.innerHTML = '';
         if (forms.length === 0) {
@@ -976,38 +1353,95 @@
             removeSelectedButton.style.display = 'none';
         } else {
             noFormsMessage.style.display = 'none';
+            // Sort forms: newest lastOpened first, never opened at the bottom
+            forms.sort((a, b) => {
+                if (!a.lastOpened && !b.lastOpened) return 0;
+                if (!a.lastOpened) return 1;
+                if (!b.lastOpened) return -1;
+                const aDate = a.lastOpened?.toDate ? a.lastOpened.toDate() : new Date(a.lastOpened);
+                const bDate = b.lastOpened?.toDate ? b.lastOpened.toDate() : new Date(b.lastOpened);
+                return bDate - aDate;
+            });
             forms.forEach((form) => {
                 const li = document.createElement('li');
-                
+                li.style.cursor = 'pointer';
+                // Add last opened timestamp (top right)
+                const lastOpenedDiv = document.createElement('div');
+                lastOpenedDiv.className = 'last-opened';
+                if (form.lastOpened) {
+                    const date = form.lastOpened.toDate ? form.lastOpened.toDate() : new Date(form.lastOpened);
+                    lastOpenedDiv.textContent = timeAgo(date);
+                } else {
+                    lastOpenedDiv.textContent = 'Never opened';
+                }
+                li.appendChild(lastOpenedDiv);
                 // Add checkbox for selection
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.classList.add('form-checkbox');
                 checkbox.dataset.formId = form.id;
-                checkbox.addEventListener('change', function() {
+                checkbox.addEventListener('change', function(e) {
                     if (this.checked) {
                         selectedForms.add(form.id);
                     } else {
                         selectedForms.delete(form.id);
                     }
                     updateRemoveSelectedButton();
+                    e.stopPropagation(); // Prevent li click
                 });
-                
+                checkbox.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent li click
+                });
                 const a = document.createElement('a');
-                a.href = form.url;
+                a.href = '#';
                 a.textContent = form.name;
-                
-                // Create Open button
+                a.style.display = 'block';
+                a.style.textAlign = 'center';
+                a.addEventListener('click', function(e) { e.preventDefault(); });
+                // Add county name under form name if present
+                let countyDiv = null;
+                if (form.countyName) {
+                    countyDiv = document.createElement('div');
+                    countyDiv.className = 'form-county';
+                    let countyText = form.countyName.trim();
+                    if (!countyText.toLowerCase().endsWith('county')) {
+                        countyText += ' County';
+                    }
+                    countyDiv.textContent = countyText;
+                }
+                // Create Open button (visual only, no click handler)
                 const openButton = document.createElement('button');
                 openButton.textContent = 'Open';
                 openButton.classList.add('form-action-button');
-                openButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    window.location.href = form.url;
+                openButton.style.maxWidth = '220px';
+                openButton.style.width = '100%';
+                openButton.style.margin = '12px auto 0 auto';
+                openButton.style.display = 'block';
+                openButton.tabIndex = -1;
+                openButton.addEventListener('click', function(e) { e.preventDefault(); });
+                // Make the whole li clickable except for the checkbox
+                li.addEventListener('click', async function(e) {
+                    if (e.target === checkbox) return;
+                    showSavingOverlay('Saving...', false);
+                    console.log('[FormWiz] Attempting to update lastOpened for', form.id);
+                    // Update lastOpened in Firestore, then navigate
+                    const userId = auth.currentUser.uid;
+                    const formRef = db.collection('users').doc(userId).collection('forms').doc(form.id);
+                    try {
+                        await formRef.set({ lastOpened: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                        console.log('[FormWiz] lastOpened updated for', form.id);
+                        hideSavingOverlay();
+                        //alert('Saved! Navigating to form...');
+                        window.location.href = form.url;
+                    } catch (err) {
+                        console.error('[FormWiz] Failed to update lastOpened:', err);
+                        hideSavingOverlay();
+                        alert('Failed to save last opened timestamp. Please try again.');
+                    }
                 });
-
                 li.appendChild(checkbox);
                 li.appendChild(a);
+                if (countyDiv) li.appendChild(countyDiv);
                 li.appendChild(openButton);
                 myFormsList.appendChild(li);
             });
@@ -1043,9 +1477,11 @@
         }
     });
 
-    function fetchMyForms(userId) {
-        db.collection('users').doc(userId).collection('forms').get()
-            .then((querySnapshot) => {
+    let formsUnsubscribe = null;
+    function listenToMyForms(userId) {
+        if (formsUnsubscribe) formsUnsubscribe();
+        formsUnsubscribe = db.collection('users').doc(userId).collection('forms')
+            .onSnapshot((querySnapshot) => {
                 const forms = [];
                 querySnapshot.forEach((doc) => {
                     forms.push({
@@ -1053,68 +1489,187 @@
                         ...doc.data()
                     });
                 });
-                console.log('Fetched forms:', forms.length, forms);
                 renderMyForms(forms);
                 selectedForms.clear();
                 updateRemoveSelectedButton();
-            })
-            .catch((error) => {
-                console.error('Error fetching user forms:', error);
+            }, (error) => {
+                console.error('Error listening to user forms:', error);
             });
     }
 
-    // Update Available Forms rendering
-    function renderAvailableForms() {
-        const formItems = availableFormsList.querySelectorAll('li');
-        
-        formItems.forEach(li => {
-            const anchor = li.querySelector('a');
-            if (anchor) {
-                const formId = anchor.getAttribute('data-form-id');
-                const formUrl = anchor.getAttribute('data-form-url');
-                const formName = anchor.textContent;
-                
-                // Create Click Here button
-                const addButton = document.createElement('button');
-                addButton.textContent = 'Click Here';
-                addButton.classList.add('form-action-button');
-                addButton.dataset.formId = formId;
-                addButton.dataset.formUrl = formUrl;
-                addButton.dataset.formName = formName;
-                
-                addButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    addFormToPortfolio(formId, formUrl, formName);
-                });
-                
-                li.appendChild(addButton);
+    // Load available forms from JSON file
+    async function loadAvailableForms() {
+        try {
+            const response = await fetch('available-forms.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        });
+            const data = await response.json();
+            return data.forms || [];
+        } catch (error) {
+            console.error('Error loading available forms:', error);
+            return [];
+        }
+    }
+
+    let countyZipMap = null;
+    async function loadCountyZipMap() {
+        if (countyZipMap) return countyZipMap;
+        try {
+            const response = await fetch('county-zips.json');
+            if (!response.ok) throw new Error('Failed to load county-zips.json');
+            countyZipMap = await response.json();
+            return countyZipMap;
+        } catch (e) {
+            console.error('Error loading county-zips.json:', e);
+            return {};
+        }
+    }
+
+    // Pagination logic for available forms
+    let availableFormsData = [];
+    let currentFormsPage = 0;
+    const FORMS_PER_PAGE = 5;
+
+    // Update renderAvailableForms to use county-based zip search
+    async function renderAvailableForms(page = 0, searchFilter = '', zipFilter = '') {
+        try {
+            if (!availableFormsData.length) {
+                availableFormsData = await loadAvailableForms();
+            }
+            let forms = availableFormsData;
+            if (searchFilter) {
+                forms = forms.filter(form => form.name.toLowerCase().includes(searchFilter.toLowerCase()));
+            }
+            if (zipFilter) {
+                const countyZipMap = await loadCountyZipMap();
+                // Find counties that contain this zip
+                const matchingCounties = Object.entries(countyZipMap)
+                    .filter(([county, zips]) => zips.includes(zipFilter))
+                    .map(([county]) => county);
+                // Show forms that have any of those counties
+                forms = forms.filter(form => Array.isArray(form.counties) && form.counties.some(c => matchingCounties.includes(c)));
+            }
+            const totalPages = Math.ceil(forms.length / FORMS_PER_PAGE);
+            if (page < 0) page = 0;
+            if (page >= totalPages) page = totalPages - 1;
+            currentFormsPage = page;
+            const start = page * FORMS_PER_PAGE;
+            const end = start + FORMS_PER_PAGE;
+            const formsToShow = forms.slice(start, end);
+            // Animate out
+            availableFormsList.classList.remove('fade-in');
+            availableFormsList.classList.add('fade-out');
+            setTimeout(() => {
+                availableFormsList.innerHTML = '';
+                formsToShow.forEach(form => {
+                    const li = document.createElement('li');
+                    const anchor = document.createElement('a');
+                    anchor.href = '#';
+                    anchor.setAttribute('data-form-id', form.id);
+                    anchor.setAttribute('data-form-url', form.url);
+                    anchor.textContent = form.name;
+                    // Create Click Here button
+                    const addButton = document.createElement('button');
+                    addButton.textContent = 'Click Here';
+                    addButton.classList.add('form-action-button');
+                    addButton.dataset.formId = form.id;
+                    addButton.dataset.formUrl = form.url;
+                    addButton.dataset.formName = form.name;
+                    addButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        addFormToPortfolio(form.id, form.url, form.name);
+                    });
+                    li.appendChild(anchor);
+                    li.appendChild(addButton);
+                    availableFormsList.appendChild(li);
+                });
+                // Animate in
+                availableFormsList.classList.remove('fade-out');
+                availableFormsList.classList.add('fade-in');
+            }, 180);
+            // Update pagination buttons
+            const prevBtn = document.getElementById('forms-prev-btn');
+            const nextBtn = document.getElementById('forms-next-btn');
+            prevBtn.disabled = (page === 0);
+            nextBtn.disabled = (page >= totalPages - 1);
+        } catch (error) {
+            console.error('Error rendering available forms:', error);
+        }
     }
     
     async function addFormToPortfolio(formId, formUrl, formName) {
         const user = auth.currentUser;
         if (!user) {
-            // Not signed in, just go to the form
             window.location.href = formUrl;
+            return;
+        }
+        // Require zip code to be entered, or use user settings zip
+        const zipInput = document.getElementById('available-forms-zip');
+        let zipValue = zipInput ? zipInput.value.trim() : '';
+        let userZip = '';
+        let userCounty = '';
+        let userData = null;
+        if (!zipValue) {
+            // Try to get zip from user settings
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    userData = userDoc.data();
+                    userZip = userData.address && userData.address.zip ? userData.address.zip.trim() : '';
+                    zipValue = userZip;
+                }
+            } catch (e) {
+                // fallback: do nothing
+            }
+            if (!zipValue) {
+                alert('Please enter a zip code above or add your zip code in your user settings.');
+                return;
+            }
+        }
+        // Find county for this zip
+        const countyZipMap = await loadCountyZipMap();
+        let foundCounty = null;
+        for (const [county, zips] of Object.entries(countyZipMap)) {
+            if (zips.includes(zipValue)) {
+                foundCounty = county;
+                break;
+            }
+        }
+        if (!foundCounty) {
+            alert('No county found for this zip code.');
+            return;
+        }
+        // Check if form supports this county
+        let formObj = null;
+        if (!availableFormsData.length) {
+            availableFormsData = await loadAvailableForms();
+        }
+        formObj = availableFormsData.find(f => f.id === formId);
+        if (formObj && (!Array.isArray(formObj.counties) || !formObj.counties.includes(foundCounty))) {
+            alert(`This form is not offered in ${foundCounty} please select another form or try a different zip code.`);
             return;
         }
         const userId = user.uid;
         try {
-            // Check if form exists in user's collection
             const formDoc = await db.collection('users').doc(userId).collection('forms').doc(formId).get();
             if (formDoc.exists) {
-                alert('You already have this form in your portfolio.');
-                fetchMyForms(userId); // Always refresh UI
+                // Update lastOpened in Firestore
+                await db.collection('users').doc(userId).collection('forms').doc(formId).update({
+                    lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
+                    countyName: foundCounty
+                });
+                window.location.href = formUrl;
             } else {
-                // Add new form to user's collection
                 await db.collection('users').doc(userId).collection('forms').doc(formId).set({
                     name: formName,
                     url: formUrl,
-                    addedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    addedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
+                    countyName: foundCounty
                 });
-                // Refresh the forms list
-                fetchMyForms(userId);
+                // No need to call fetchMyForms, real-time listener will update
+                window.location.href = formUrl;
             }
         } catch (error) {
             console.error('Error handling form:', error);
@@ -1136,6 +1691,10 @@
     // User Settings Form Handler
     userSettingsForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (!isSettingsChanged()) {
+            closeSettings();
+            return;
+        }
         settingsError.textContent = '';
         const userId = auth.currentUser.uid;
         const updatedData = {
@@ -1174,6 +1733,20 @@
         }
     });
 
+    // Phone number auto-formatting for xxx-xxx-xxxx
+    const phoneInput = document.getElementById('settings-phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let value = phoneInput.value.replace(/\D/g, '');
+            if (value.length > 3 && value.length <= 6) {
+                value = value.replace(/(\d{3})(\d+)/, '$1-$2');
+            } else if (value.length > 6) {
+                value = value.replace(/(\d{3})(\d{3})(\d+)/, '$1-$2-$3');
+            }
+            phoneInput.value = value;
+        });
+    }
+
     // Update the auth state listener in forms.html
     auth.onAuthStateChanged(async (user) => {
         if (user) {
@@ -1201,9 +1774,9 @@
                     document.getElementById('settings-state').value = userData.address?.state || '';
                     document.getElementById('settings-zip').value = userData.address?.zip || '';
                     // Load user's forms
-                    fetchMyForms(user.uid);
+                    listenToMyForms(user.uid);
                     // Render available forms with buttons
-                    renderAvailableForms();
+                    await renderAvailableForms();
                 } else {
                     // Create user document if it doesn't exist
                     const newUserData = {
@@ -1222,21 +1795,25 @@
                     await db.collection('users').doc(user.uid).set(newUserData);
                     if (welcomeMessage) welcomeMessage.textContent = `Welcome User`;
                     // Render available forms with buttons
-                    renderAvailableForms();
-                    fetchMyForms(user.uid);
+                    await renderAvailableForms();
+                    listenToMyForms(user.uid);
                 }
             } catch (error) {
                 console.error('Error loading user data:', error);
                 if (welcomeMessage) welcomeMessage.textContent = 'Welcome User';
-                fetchMyForms(user.uid);
+                listenToMyForms(user.uid);
             }
             if (settingsButton) settingsButton.addEventListener('click', openSettings);
+            // Listen to My Documents
+            listenToMyDocuments(user.uid);
         } else {
             const portfolioSection = document.getElementById('portfolio-section');
             if (portfolioSection) portfolioSection.style.display = 'none';
             if (settingsButton) settingsButton.style.display = 'none';
             if (logoutButton) logoutButton.style.display = 'none';
             if (signInBtn) signInBtn.style.display = 'inline-block';
+            if (formsUnsubscribe) formsUnsubscribe();
+            if (documentsUnsubscribe) documentsUnsubscribe();
         }
     });
 
@@ -1335,6 +1912,461 @@
             openSettings();
         });
     }
+
+    // Add search functionality for available forms
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('available-forms-search');
+        const availableFormsList = document.getElementById('available-forms-list');
+        if (searchInput && availableFormsList) {
+            searchInput.addEventListener('input', function() {
+                const filter = searchInput.value.trim().toLowerCase();
+                const formItems = availableFormsList.querySelectorAll('li');
+                formItems.forEach(li => {
+                    const anchor = li.querySelector('a');
+                    if (anchor) {
+                        const formName = anchor.textContent.toLowerCase();
+                        if (formName.includes(filter)) {
+                            li.style.display = '';
+                        } else {
+                            li.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        }
+        
+        // Load available forms for all users
+        renderAvailableForms(0);
+    });
+
+    // Update cart count badge in header
+    function updateCartCountBadge() {
+        const cartCountElement = document.getElementById('cart-count-badge');
+        if (cartCountElement && typeof getCartCount === 'function') {
+            const count = getCartCount();
+            if (count > 0) {
+                cartCountElement.textContent = count;
+                cartCountElement.style.display = 'flex';
+            } else {
+                cartCountElement.style.display = 'none';
+            }
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartCountBadge();
+        setInterval(updateCartCountBadge, 5000);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const prevBtn = document.getElementById('forms-prev-btn');
+        const nextBtn = document.getElementById('forms-next-btn');
+        const searchInput = document.getElementById('available-forms-search');
+        const zipInput = document.getElementById('available-forms-zip');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function() {
+                renderAvailableForms(currentFormsPage - 1, searchInput.value.trim(), zipInput.value.trim());
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function() {
+                renderAvailableForms(currentFormsPage + 1, searchInput.value.trim(), zipInput.value.trim());
+            });
+        }
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                renderAvailableForms(0, searchInput.value.trim(), zipInput.value.trim());
+            });
+        }
+        if (zipInput) {
+            zipInput.addEventListener('input', function(e) {
+                // Only allow numbers, max 5 digits
+                let val = zipInput.value.replace(/\D/g, '');
+                if (val.length > 5) val = val.slice(0, 5);
+                zipInput.value = val;
+                renderAvailableForms(0, searchInput.value.trim(), zipInput.value.trim());
+            });
+        }
+        // Initial render
+        renderAvailableForms(0);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Scroll to Available Forms
+        const newFormBtn = document.getElementById('new-form-btn');
+        if (newFormBtn) {
+            newFormBtn.addEventListener('click', function() {
+                const availableSection = document.querySelector('.main-forms-wrapper .forms-card:nth-of-type(2)');
+                if (availableSection) {
+                    const rect = availableSection.getBoundingClientRect();
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    const sectionMiddle = rect.top + scrollTop + rect.height / 2;
+                    const viewportMiddle = window.innerHeight / 2;
+                    window.scrollTo({
+                        top: sectionMiddle - viewportMiddle,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        }
+        // Scroll to My Forms
+        const myFormsBtn = document.getElementById('my-forms-btn');
+        if (myFormsBtn) {
+            myFormsBtn.addEventListener('click', function() {
+                const portfolioSection = document.getElementById('portfolio-section');
+                if (portfolioSection) {
+                    portfolioSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        }
+        // Scroll to My Documents
+        const documentsBtn = document.getElementById('documents-btn');
+        if (documentsBtn) {
+            documentsBtn.addEventListener('click', function() {
+                const documentsSection = document.getElementById('documents-section');
+                if (documentsSection) {
+                    documentsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        }
+        // Open Settings Modal
+        const settingsBtn = document.getElementById('settings-btn');
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', function() {
+                openSettings();
+            });
+        }
+    });
+
+    // Settings modal logout button
+    const settingsLogoutBtn = document.getElementById('settings-logout-btn');
+    if (settingsLogoutBtn) {
+        settingsLogoutBtn.addEventListener('click', function() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                alert('Sign Out Error: ' + error.message);
+            });
+        });
+    }
+
+    // New logic for settings modal buttons
+    const settingsSaveBtn = document.getElementById('settings-save-btn');
+    let originalSettings = {};
+    function getSettingsFormData() {
+        return {
+            firstName: document.getElementById('settings-first-name').value.trim(),
+            lastName: document.getElementById('settings-last-name').value.trim(),
+            email: document.getElementById('settings-email').value.trim(),
+            phone: document.getElementById('settings-phone').value.trim(),
+            street: document.getElementById('settings-street').value.trim(),
+            city: document.getElementById('settings-city').value.trim(),
+            state: document.getElementById('settings-state').value,
+            zip: document.getElementById('settings-zip').value.trim()
+        };
+    }
+    function isSettingsChanged() {
+        const data = getSettingsFormData();
+        return (
+            data.firstName !== (originalSettings.firstName || '') ||
+            data.lastName !== (originalSettings.lastName || '') ||
+            data.email !== (originalSettings.email || '') ||
+            data.phone !== (originalSettings.phone || '') ||
+            data.street !== (originalSettings.street || '') ||
+            data.city !== (originalSettings.city || '') ||
+            data.state !== (originalSettings.state || '') ||
+            data.zip !== (originalSettings.zip || '')
+        );
+    }
+    function updateSettingsSaveBtn() {
+        if (isSettingsChanged()) {
+            settingsSaveBtn.textContent = 'Save Changes';
+            settingsSaveBtn.disabled = false;
+        } else {
+            settingsSaveBtn.textContent = 'Back';
+            settingsSaveBtn.disabled = false;
+        }
+    }
+    // On modal open, store original values
+    function storeOriginalSettings() {
+        originalSettings = getSettingsFormData();
+        updateSettingsSaveBtn();
+    }
+    // Attach to modal open logic
+    if (userSettingsBtn) {
+        userSettingsBtn.addEventListener('click', async function() {
+            storeOriginalSettings();
+        });
+    }
+    // Also attach to openSettings()
+    function openSettings() {
+        settingsModal.style.display = 'block';
+        storeOriginalSettings();
+    }
+    // Listen for changes
+    ['settings-first-name','settings-last-name','settings-email','settings-phone','settings-street','settings-city','settings-state','settings-zip'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', updateSettingsSaveBtn);
+            el.addEventListener('change', updateSettingsSaveBtn);
+        }
+    });
+
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible' && auth.currentUser) {
+            listenToMyForms(auth.currentUser.uid);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // ... existing code ...
+        // Delete Account button logic
+        const deleteBtn = document.getElementById('settings-delete-btn');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', async function() {
+                if (!confirm('Are you sure you want to delete your account? This cannot be undone.')) return;
+                const user = auth.currentUser;
+                if (!user) return;
+                try {
+                    // Delete user Firestore data
+                    await db.collection('users').doc(user.uid).delete();
+                    // Delete all forms subcollection
+                    const formsSnap = await db.collection('users').doc(user.uid).collection('forms').get();
+                    const batch = db.batch();
+                    formsSnap.forEach(doc => batch.delete(doc.ref));
+                    await batch.commit();
+                    // Delete all formAnswers subcollection
+                    const answersSnap = await db.collection('users').doc(user.uid).collection('formAnswers').get();
+                    const batch2 = db.batch();
+                    answersSnap.forEach(doc => batch2.delete(doc.ref));
+                    await batch2.commit();
+                    // Delete the auth user
+                    await user.delete();
+                    window.location.href = 'index.html';
+                } catch (err) {
+                    alert('Failed to delete account: ' + (err && err.message ? err.message : err));
+                }
+            });
+        }
+    });
+
+    // --- My Documents Section Logic ---
+    const myDocumentsList = document.getElementById('my-documents-list');
+    const noDocumentsMessage = document.getElementById('no-documents-message');
+    // Track selected documents
+    const selectedDocuments = new Set();
+    // Add Delete Documents button
+    let deleteDocumentsBtn = document.getElementById('delete-documents-button');
+    if (!deleteDocumentsBtn) {
+        deleteDocumentsBtn = document.createElement('button');
+        deleteDocumentsBtn.id = 'delete-documents-button';
+        deleteDocumentsBtn.className = 'remove-button';
+        deleteDocumentsBtn.textContent = 'Delete Documents';
+        deleteDocumentsBtn.style.display = 'none';
+        deleteDocumentsBtn.style.background = '#e74c3c';
+        deleteDocumentsBtn.style.color = '#fff';
+        deleteDocumentsBtn.style.maxWidth = '180px';
+        deleteDocumentsBtn.style.width = '100%';
+        deleteDocumentsBtn.style.margin = '32px auto 0 auto';
+        deleteDocumentsBtn.style.display = 'block';
+        myDocumentsList.parentNode.insertBefore(deleteDocumentsBtn, myDocumentsList.nextSibling);
+    }
+
+    function renderMyDocuments(docs) {
+        myDocumentsList.innerHTML = '';
+        if (docs.length === 0) {
+            noDocumentsMessage.style.display = 'block';
+            deleteDocumentsBtn.style.display = 'none';
+        } else {
+            noDocumentsMessage.style.display = 'none';
+            // Sort by purchaseDate descending
+            docs.sort((a, b) => {
+                if (!a.purchaseDate && !b.purchaseDate) return 0;
+                if (!a.purchaseDate) return 1;
+                if (!b.purchaseDate) return -1;
+                const aDate = a.purchaseDate?.toDate ? a.purchaseDate.toDate() : new Date(a.purchaseDate);
+                const bDate = b.purchaseDate?.toDate ? b.purchaseDate.toDate() : new Date(b.purchaseDate);
+                return bDate - aDate;
+            });
+            docs.forEach((doc) => {
+                const li = document.createElement('li');
+                li.style.cursor = 'pointer';
+                // Match My Form Portfolio card width and style
+                li.style.width = '90%';
+                li.style.maxWidth = '600px';
+                li.style.minWidth = '600px';
+                li.style.padding = '18px 32px 14px 32px';
+                li.style.borderRadius = '18px';
+                li.style.boxShadow = '0 2px 16px rgba(44,62,80,0.10)';
+                li.style.margin = '0 auto';
+                li.style.height = 'auto';
+                li.style.display = 'flex';
+                li.style.flexDirection = 'column';
+                li.style.alignItems = 'center';
+                // Add checkbox for selection (top left)
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.classList.add('form-checkbox');
+                checkbox.dataset.docId = doc.id;
+                checkbox.style.position = 'absolute';
+                checkbox.style.top = '5px';
+                checkbox.style.left = '3px';
+                checkbox.style.width = '15px';
+                checkbox.style.height = '15px';
+                checkbox.style.cursor = 'pointer';
+                checkbox.style.zIndex = '1';
+                checkbox.addEventListener('change', function(e) {
+                    if (this.checked) {
+                        selectedDocuments.add(doc.id);
+                    } else {
+                        selectedDocuments.delete(doc.id);
+                    }
+                    updateDeleteDocumentsButton();
+                    e.stopPropagation();
+                });
+                checkbox.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+                // Add purchase date timestamp (top right) using same class as portfolio
+                const purchaseDateDiv = document.createElement('div');
+                purchaseDateDiv.className = 'last-opened';
+                // No inline style overrides here, let CSS handle it
+                if (doc.purchaseDate) {
+                    const date = doc.purchaseDate.toDate ? doc.purchaseDate.toDate() : new Date(doc.purchaseDate);
+                    purchaseDateDiv.textContent = timeAgo(date);
+                } else {
+                    purchaseDateDiv.textContent = 'Unknown date';
+                }
+                li.style.position = 'relative';
+                li.appendChild(checkbox);
+                li.appendChild(purchaseDateDiv);
+                // Add document name as a link (styled like portfolio)
+                const a = document.createElement('a');
+                a.href = '#';
+                a.textContent = doc.name || doc.title || 'Document';
+                a.style.display = 'block';
+                a.style.textAlign = 'center';
+                a.addEventListener('click', function(e) { e.preventDefault(); });
+                // Add county name under document name if present
+                let countyDiv = null;
+                if (doc.countyName) {
+                    countyDiv = document.createElement('div');
+                    countyDiv.className = 'form-county';
+                    let countyText = doc.countyName.trim();
+                    if (!countyText.toLowerCase().endsWith('county')) {
+                        countyText += ' County';
+                    }
+                    countyDiv.textContent = countyText;
+                }
+                // Download button (styled like Open button)
+                const downloadBtn = document.createElement('button');
+                downloadBtn.textContent = 'Download';
+                downloadBtn.classList.add('form-action-button');
+                downloadBtn.style.maxWidth = '220px';
+                downloadBtn.style.width = '100%';
+                downloadBtn.style.margin = '12px auto 0 auto';
+                downloadBtn.style.display = 'block';
+                downloadBtn.tabIndex = -1;
+                downloadBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (doc.downloadUrl) {
+                        window.open(doc.downloadUrl, '_blank');
+                    } else {
+                        alert('No download available for this document.');
+                    }
+                });
+                // Make the whole li clickable except for the button
+                li.addEventListener('click', function(e) {
+                    if (e.target === downloadBtn || e.target === checkbox) return;
+                    if (doc.downloadUrl) {
+                        window.open(doc.downloadUrl, '_blank');
+                    }
+                });
+                li.appendChild(a);
+                if (countyDiv) li.appendChild(countyDiv);
+                li.appendChild(downloadBtn);
+                myDocumentsList.appendChild(li);
+            });
+            updateDeleteDocumentsButton();
+        }
+    }
+    function updateDeleteDocumentsButton() {
+        if (selectedDocuments.size > 0) {
+            deleteDocumentsBtn.style.display = 'block';
+        } else {
+            deleteDocumentsBtn.style.display = 'none';
+        }
+    }
+    // Delete selected documents
+    deleteDocumentsBtn.addEventListener('click', async () => {
+        if (selectedDocuments.size === 0) return;
+        if (!confirm('Are you sure you want to delete the selected documents? This cannot be undone.')) return;
+        const userId = auth.currentUser.uid;
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        for (const docId of selectedDocuments) {
+            // Delete from Firestore
+            await db.collection('users').doc(userId).collection('documents').doc(docId).delete();
+            // Delete from Storage
+            try {
+                const storageRef = storage.ref().child(`users/${userId}/documents/${docId}.pdf`);
+                await storageRef.delete();
+            } catch (e) {
+                // Ignore if not found
+            }
+        }
+        selectedDocuments.clear();
+        updateDeleteDocumentsButton();
+    });
+
+    let documentsUnsubscribe = null;
+    function listenToMyDocuments(userId) {
+        if (documentsUnsubscribe) documentsUnsubscribe();
+        documentsUnsubscribe = db.collection('users').doc(userId).collection('documents')
+            .onSnapshot((querySnapshot) => {
+                const docs = [];
+                querySnapshot.forEach((doc) => {
+                    docs.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                renderMyDocuments(docs);
+            }, (error) => {
+                console.error('Error listening to user documents:', error);
+            });
+    }
+
+    /* ---------- smooth scroll helper ---------- */
+    function scrollToSection(sectionEl, offset = 50) {
+        const y = sectionEl.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        /* NEW FORM → Available Forms card */
+        const newFormBtn      = document.getElementById('new-form-btn');
+        const availableCard   = document.querySelector('.main-forms-wrapper .forms-card:nth-of-type(3)'); // the "Available Forms" card
+        if (newFormBtn && availableCard) {
+            newFormBtn.addEventListener('click', () => scrollToSection(availableCard));
+        }
+
+        /* MY FORMS → My Form Portfolio card */
+        const myFormsBtn      = document.getElementById('my-forms-btn');
+        const portfolioCard   = document.getElementById('portfolio-section');
+        if (myFormsBtn && portfolioCard) {
+            myFormsBtn.addEventListener('click', () => scrollToSection(portfolioCard));
+        }
+
+        /* MY DOCUMENTS → My Documents card */
+        const documentsBtn    = document.getElementById('documents-btn');
+        const documentsCard   = document.getElementById('documents-section');
+        if (documentsBtn && documentsCard) {
+            documentsBtn.addEventListener('click', () => scrollToSection(documentsCard));
+        }
+    });
 </script>
+<div id="saving-overlay">
+    <div class="saving-modal" id="saving-modal-text">Saving...</div>
+</div>
 </body>
 </html>
