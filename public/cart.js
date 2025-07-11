@@ -263,10 +263,26 @@ class CartManager {
                     const ref = storage.ref().child(`users/${user.uid}/documents/${docId}.pdf`);
                     await ref.put(file, meta);
                     const downloadUrl = await ref.getDownloadURL();
+
+                    // Fetch correct name and countyName from user's forms collection
+                    let docName = cartItem.title || cartItem.formId;
+                    let docCounty = null;
+                    try {
+                        const formDoc = await db.collection('users').doc(user.uid).collection('forms').doc(cartItem.formId).get();
+                        if (formDoc.exists) {
+                            const formData = formDoc.data();
+                            if (formData && formData.name) docName = formData.name;
+                            if (formData && formData.countyName) docCounty = formData.countyName;
+                        }
+                    } catch (e) {
+                        // fallback: use cartItem.title
+                    }
+
                     await db.collection('users').doc(user.uid)
                         .collection('documents').doc(docId).set({
-                            name: cartItem.title || cartItem.formId,
+                            name: docName,
                             formId: cartItem.formId,
+                            countyName: docCounty || null,
                             purchaseDate: firebase.firestore.FieldValue.serverTimestamp(),
                             downloadUrl
                         });
