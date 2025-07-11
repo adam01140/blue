@@ -200,10 +200,15 @@ class CartManager {
 
     async handlePaymentSuccess() {
         for (const item of this.cart) {
-            if (item.formData) await this.processFormPDF(item);
+            try {
+                await this.processFormPDF(item); // run unconditionally
+            } catch (err) {
+                console.error(`Failed to save ${item.formId}:`, err);
+                alert(`Could not save ${item.title || item.formId} to your account.`);
+            }
         }
         await this.clearCart();
-        alert('Payment successful. Forms processed.');
+        alert('Payment successful. Your documents were saved to My Documents.');
         window.location.href = 'forms.html';
     }
 
@@ -225,6 +230,8 @@ class CartManager {
 
             const a = document.createElement('a');
             a.href = url;
+            const safeFormId = cartItem.formId.replace(/\W+/g, '_');
+            const docId = `${Date.now()}_${safeFormId}`;
             a.download = `Edited_${cartItem.formId}`;
             document.body.appendChild(a);
             a.click();
@@ -251,10 +258,9 @@ class CartManager {
                 if (user) {
                     const storage = firebase.storage();
                     const db = firebase.firestore();
-                    const docId = `${cartItem.formId}_${Date.now()}`;
-                    const ref = storage.ref().child(`users/${user.uid}/documents/${docId}.pdf`);
                     const meta = { contentType: 'application/pdf', customMetadata: { uploadedBy: user.uid } };
-                    const file = new File([blob], docId + '.pdf', { type: 'application/pdf' });
+                    const file = new File([blob], `${docId}.pdf`, { type: 'application/pdf' });
+                    const ref = storage.ref().child(`users/${user.uid}/documents/${docId}.pdf`);
                     await ref.put(file, meta);
                     const downloadUrl = await ref.getDownloadURL();
                     await db.collection('users').doc(user.uid)
