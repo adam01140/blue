@@ -4,7 +4,11 @@ const dotenv        = require('dotenv');
 dotenv.config();
 
 // WARNING: Using LIVE keys for local development is not recommended and will likely fail.
-const stripe        = require('stripe')('REMOVED');
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeSecretKey) {
+  throw new Error('STRIPE_SECRET_KEY is not set in the environment. Please add it to your .env file.');
+}
+const stripe = require('stripe')(stripeSecretKey);
 const admin         = require('firebase-admin');
 const bodyParser    = require('body-parser');
 const fileUpload    = require('express-fileupload');
