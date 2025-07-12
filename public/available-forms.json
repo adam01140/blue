@@ -3,7 +3,7 @@
     {
       "id": "fee-waiver",
       "url": "fee-waiver.html?formId=fee-waiver",
-      "name": "Court Fees Waiver Form",
+      "name": "Fee Waiver",
       "counties": ["Monterey"]
     },
     {
@@ -21,18 +21,18 @@
     {
       "id": "example3",
       "url": "example3.html?formId=example3",
-      "name": "Example3",
+      "name": "PCOR",
       "counties": ["Monterey"]
     },
     {
       "id": "smallclaims",
       "url": "smallclaims.html?formId=example3",
-      "name": "Small Claims",
+      "name": "SC-100 Plaintiff’s Claim",
       "counties": ["Monterey"]
     },
     {
       "id": "small-claims2",
-      "name": "Small Claims 2",
+      "name": "SC-100A",
       "url": "small-claims2.html?formId=small-claims2",
       "counties": ["Monterey"]
     }
