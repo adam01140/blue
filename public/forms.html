@@ -1159,7 +1159,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <input type="text" id="settings-zip" placeholder="ZIP" pattern="[0-9]{5}" required>
+                                <input type="text" id="settings-zip" placeholder="ZIP" pattern="[0-9]{5}" required inputmode="numeric" pattern="[0-9]*" maxlength="5">
                             </div>
                         </div>
                     </div>
@@ -1766,8 +1766,19 @@
             if (logoutButton) logoutButton.style.display = 'block';
             if (signInBtn) signInBtn.style.display = 'none';
             try {
-                // Get user document from Firestore
-                const userDoc = await db.collection('users').doc(user.uid).get();
+                // Get user document from Firestore with retry logic for new users
+                let userDoc = await db.collection('users').doc(user.uid).get();
+                let retryCount = 0;
+                const maxRetries = 3;
+                
+                // If user document doesn't exist, wait a bit and retry (for new users)
+                while (!userDoc.exists && retryCount < maxRetries) {
+                    console.log(`User document not found, retrying... (${retryCount + 1}/${maxRetries})`);
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+                    userDoc = await db.collection('users').doc(user.uid).get();
+                    retryCount++;
+                }
+                
                 if (userDoc.exists) {
                     const userData = userDoc.data();
                     // Update welcome message with actual name
@@ -1788,7 +1799,7 @@
                     // Render available forms with buttons
                     await renderAvailableForms();
                 } else {
-                    // Create user document if it doesn't exist
+                    // Create user document if it doesn't exist (fallback for users who somehow don't have data)
                     const newUserData = {
                         firstName: '',
                         lastName: '',
@@ -2373,6 +2384,19 @@
         if (documentsBtn && documentsCard) {
             documentsBtn.addEventListener('click', () => scrollToSection(documentsCard));
         }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // ... existing code ...
+      // Enforce numeric-only input for ZIP code in settings
+      var settingsZipInput = document.getElementById('settings-zip');
+      if (settingsZipInput) {
+        settingsZipInput.addEventListener('input', function() {
+          let val = settingsZipInput.value.replace(/\D/g, '');
+          if (val.length > 5) val = val.slice(0, 5);
+          settingsZipInput.value = val;
+        });
+      }
     });
 </script>
 <div id="saving-overlay">
