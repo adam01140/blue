@@ -279,7 +279,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="updateLastOpened.js"></script>
 <script src="cart.js"></script>
 
 <script>
@@ -507,11 +506,11 @@ var amountMap = {"length":0};
 var linkedDropdowns = [];
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "form2.pdf";
-var pdfOutputFileName = "Fee Waiver";
-var stripePriceId = "price_1RiOURFJeSRMFQ8XLlOmQGrj";
+var pdfFileName = "form.pdf";
+var pdfOutputFileName = "bro what";
+var stripePriceId = "price_1Ri8ASFJeSRMFQ8XDhtdSkFr";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["form2.pdf", ];
+var allPdfFileNames = ["form.pdf", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
@@ -1355,7 +1354,7 @@ if (typeof handleNext === 'function') {
         const baseFormId = urlParams.get('formId') || window.formId || 'default';
         const county = urlParams.get('county') || '';
         // Create a unique form ID that includes county information for autosave separation
-        const formId = county ? `${baseFormId}_${county.replace(/\s+/g, '_')}` : baseFormId;
+        const formId = county ? baseFormId + '_' + county.replace(/s+/g, '_') : baseFormId;
         let userId = null;
         let isUserLoggedIn = false;
 
