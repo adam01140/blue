@@ -1126,6 +1126,142 @@
         .pro-footer, footer {
             flex-shrink: 0;
         }
+        /* Cart Icon Styles */
+        #cart-icon-link .cart-circle {
+            width: 54px !important;
+            height: 54px !important;
+            background: #2980b9;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        #cart-icon {
+            width: 32px !important;
+            height: 32px !important;
+            display: block;
+        }
+        /* Sliding Cart Menu Styles */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .cart-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .cart-side-menu {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+            z-index: 10000;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-side-menu.active {
+            right: 0;
+        }
+        .cart-header {
+            background: #2c3e50;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cart-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+        .cart-close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        .cart-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .cart-content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .cart-icon-large {
+            font-size: 4em;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+        .cart-message {
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        .cart-description {
+            font-size: 1em;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .cart-signup-btn {
+            background: #2980b9;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .cart-signup-btn:hover {
+            background: #1c598a;
+        }
+        @media (max-width: 480px) {
+            .cart-side-menu {
+                width: 100%;
+                right: -100%;
+            }
+            .cart-content {
+                padding: 20px;
+            }
+            .cart-message {
+                font-size: 1.1em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1161,8 +1297,37 @@
         </nav>
         <div class="header-actions">
             <a href="account.html" class="sign-in-btn">Sign In</a>
+            <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
+                <span class="cart-circle">
+                    <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="10" cy="21" r="1.5"/>
+                        <circle cx="18" cy="21" r="1.5"/>
+                        <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
+                    </svg>
+                    <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
+                </span>
+            </a>
         </div>
     </header>
+
+    <!-- Sliding Cart Menu -->
+    <div class="cart-overlay" id="cart-overlay">
+        <div class="cart-side-menu" id="cart-side-menu">
+            <div class="cart-header">
+                <h2>🛒 Cart</h2>
+                <button class="cart-close-btn" id="cart-close-btn">&times;</button>
+            </div>
+            <div class="cart-content">
+                <div class="cart-icon-large">🛒</div>
+                <div class="cart-message">Create an account to start shopping!</div>
+                <div class="cart-description">
+                    To add forms to your cart and make purchases, you'll need to create a FormWiz account. 
+                    Sign up now to access our complete library of legal forms and start simplifying your paperwork.
+                </div>
+                <a href="account.html" class="cart-signup-btn">Sign Up</a>
+            </div>
+        </div>
+    </div>
 
     <main>
         <!-- HERO SECTION -->
@@ -1325,6 +1490,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="cart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Firebase Configuration
@@ -1349,20 +1515,31 @@
                 console.log('Auth state changed. User:', user);
                 if (user) {
                     // User is signed in.
-                    // Redirect to forms.html if on index.html
-                    if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '/public/' || window.location.pathname === '/public/index.html') {
-                        window.location.href = 'forms.html';
-                        return;
-                    }
-                    console.log('User is signed in. Hiding sign-in button.');
+                    console.log('User is signed in. Changing to logout button.');
                     if (signInButton) {
-                        signInButton.style.display = 'none';
+                        signInButton.textContent = 'Log Out';
+                        signInButton.href = '#';
+                        signInButton.onclick = function(e) {
+                            e.preventDefault();
+                            auth.signOut().then(() => {
+                                window.location.reload();
+                            }).catch((error) => {
+                                console.error('Error signing out:', error);
+                            });
+                        };
+                    }
+                    // Redirect to forms.html if on index.html (commented out for now)
+                    if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '/public/' || window.location.pathname === '/public/index.html') {
+                        //window.location.href = 'forms.html';
+                        // return; // Removed this return to allow button update
                     }
                 } else {
                     // No user is signed in.
                     console.log('User is not signed in. Showing sign-in button.');
                     if (signInButton) {
-                        signInButton.style.display = 'block';
+                        signInButton.textContent = 'Sign In';
+                        signInButton.href = 'account.html';
+                        signInButton.onclick = null;
                     }
                 }
             });
@@ -1455,6 +1632,67 @@
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     dropdownOpen ? closeDropdown() : openDropdown();
+                }
+            });
+
+            // Update cart count badge in header
+            function updateCartCountBadge() {
+                const cartCountElement = document.getElementById('cart-count-badge');
+                if (cartCountElement && typeof getCartCount === 'function') {
+                    const count = getCartCount();
+                    if (count > 0) {
+                        cartCountElement.textContent = count;
+                        cartCountElement.style.display = 'flex';
+                    } else {
+                        cartCountElement.style.display = 'none';
+                    }
+                }
+            }
+
+            // Initialize cart count badge
+            updateCartCountBadge();
+            setInterval(updateCartCountBadge, 5000);
+
+            // Sliding Cart Menu
+            const cartIconLink = document.getElementById('cart-icon-link');
+            const cartOverlay = document.getElementById('cart-overlay');
+            const cartSideMenu = document.getElementById('cart-side-menu');
+            const cartCloseBtn = document.getElementById('cart-close-btn');
+
+            function openCart() {
+                cartOverlay.classList.add('active');
+                cartSideMenu.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+            }
+
+            function closeCart() {
+                cartOverlay.classList.remove('active');
+                cartSideMenu.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+
+            cartIconLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (auth.currentUser) {
+                    // User is signed in, redirect to cart.html
+                    window.location.href = 'cart.html';
+                } else {
+                    // User is not signed in, open the cart menu
+                    openCart();
+                }
+            });
+
+            cartCloseBtn.addEventListener('click', closeCart);
+            cartOverlay.addEventListener('click', function(e) {
+                if (e.target === cartOverlay) {
+                    closeCart();
+                }
+            });
+
+            // Keyboard accessibility for cart menu
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeCart();
                 }
             });
         });

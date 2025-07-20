@@ -1,0 +1,27 @@
+"""
+make_ca_zip_json.py
+Creates a { "County": [ "ZIP", ... ], … } JSON for every county in California
+using the public table at https://californiavolunteers.ca.gov/look-up-your-county-by-zip-code/
+"""
+import json, re, requests
+from collections import defaultdict
+from bs4 import BeautifulSoup          # pip install beautifulsoup4
+
+URL = "https://californiavolunteers.ca.gov/look-up-your-county-by-zip-code/"
+html = requests.get(URL, timeout=30).text
+
+# each table row looks like “90001 LosAngeles LosAngeles”
+row_re = re.compile(r'\b(\d{5})\s+[A-Za-z]+\s+([A-Z][a-z]+(?:\s[A-Z][a-z]+)*)')
+
+counties = defaultdict(list)
+for zip_code, county in row_re.findall(html):
+    counties[county].append(zip_code)
+
+# sort the ZIP codes inside each county and sort counties alphabetically
+expanded_json = {c: sorted(zips) for c, zips in sorted(counties.items())}
+
+# write to disk (or print)
+with open("ca_county_zip_map.json", "w", encoding="utf‑8") as f:
+    json.dump(expanded_json, f, indent=2)
+
+print("Done! JSON saved to ca_county_zip_map.json")

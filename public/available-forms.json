@@ -4,37 +4,37 @@
       "id": "fee-waiver",
       "url": "fee-waiver.html?formId=fee-waiver",
       "name": "Fee Waiver",
-      "counties": ["Monterey"]
+      "counties": ["Monterey", "Santa Cruz"]
     },
     {
       "id": "example",
       "url": "example.html?formId=example",
       "name": "Example",
-      "counties": ["Monterey"]
+      "counties": ["Monterey", "Santa Cruz"]
     },
     {
       "id": "example2",
       "url": "example2.html?formId=example2",
       "name": "Example2",
-      "counties": ["Monterey"]
+      "counties": ["Monterey", "Santa Cruz"]
     },
     {
       "id": "example3",
       "url": "example3.html?formId=example3",
       "name": "PCOR",
-      "counties": ["Monterey"]
+      "counties": ["Monterey", "Santa Cruz"]
     },
     {
       "id": "smallclaims",
       "url": "smallclaims.html?formId=example3",
-      "name": "SC-100 Plaintiff’s Claim",
-      "counties": ["Monterey"]
+      "name": "SC-100 Plaintiff's Claim",
+      "counties": ["Monterey", "Santa Cruz"]
     },
     {
       "id": "small-claims2",
       "name": "SC-100A",
       "url": "small-claims2.html?formId=small-claims2",
-      "counties": ["Monterey"]
+      "counties": ["Monterey", "Santa Cruz"]
     }
   ]
 }
