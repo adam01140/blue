@@ -1352,7 +1352,10 @@ if (typeof handleNext === 'function') {
         if (typeof firebase === 'undefined' || !firebase.auth || !firebase.firestore) return;
         const db = firebase.firestore();
         const urlParams = new URLSearchParams(window.location.search);
-        const formId = urlParams.get('formId') || window.formId || 'default';
+        const baseFormId = urlParams.get('formId') || window.formId || 'default';
+        const county = urlParams.get('county') || '';
+        // Create a unique form ID that includes county information for autosave separation
+        const formId = county ? `${baseFormId}_${county.replace(/\s+/g, '_')}` : baseFormId;
         let userId = null;
         let isUserLoggedIn = false;
 

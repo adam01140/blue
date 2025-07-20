@@ -1502,7 +1502,9 @@
                         console.log('[FormWiz] lastOpened updated for', form.id);
                         hideSavingOverlay();
                         //alert('Saved! Navigating to form...');
-                        window.location.href = form.url;
+                        // Append county information to the URL for autosave separation
+                        const separator = form.url.includes('?') ? '&' : '?';
+                        window.location.href = form.url + separator + 'county=' + encodeURIComponent(form.countyName || '');
                     } catch (err) {
                         console.error('[FormWiz] Failed to update lastOpened:', err);
                         hideSavingOverlay();
@@ -1727,15 +1729,22 @@
         
         // Check if user already has this form for this county
         try {
-            const formDoc = await db.collection('users').doc(userId).collection('forms').doc(formId).get();
-            if (formDoc.exists) {
-                const formData = formDoc.data();
-                // Check if the existing form is for the same county
-                if (formData.countyName === foundCounty) {
-                    // Show duplicate confirmation modal
-                    showDuplicateFormModal(formName, foundCounty, formId, formUrl, foundCounty);
-                    return;
+            // Query all forms to check for duplicates of the same form type in the same county
+            const formsSnapshot = await db.collection('users').doc(userId).collection('forms').get();
+            let duplicateFound = false;
+            
+            formsSnapshot.forEach(doc => {
+                const formData = doc.data();
+                // Check if this is the same form type (by formId or originalFormId) and same county
+                if ((formData.originalFormId === formId || doc.id === formId) && formData.countyName === foundCounty) {
+                    duplicateFound = true;
                 }
+            });
+            
+            if (duplicateFound) {
+                // Show duplicate confirmation modal
+                showDuplicateFormModal(formName, foundCounty, formId, formUrl, foundCounty);
+                return;
             }
             
             // No duplicate found, proceed with adding the form
@@ -1767,19 +1776,36 @@
                     isDuplicate: true
                 });
                 // No need to call fetchMyForms, real-time listener will update
-                window.location.href = formUrl;
+                // Append county information to the URL for autosave separation
+                const separator = formUrl.includes('?') ? '&' : '?';
+                window.location.href = formUrl + separator + 'county=' + encodeURIComponent(countyName);
             } else {
-                // For new forms, check if it already exists
-                const formDoc = await db.collection('users').doc(userId).collection('forms').doc(formId).get();
-                if (formDoc.exists) {
-                    // Update lastOpened in Firestore
-                    await db.collection('users').doc(userId).collection('forms').doc(formId).update({
+                // For new forms, check if it already exists for the same county
+                const formsSnapshot = await db.collection('users').doc(userId).collection('forms').get();
+                let existingFormDoc = null;
+                
+                formsSnapshot.forEach(doc => {
+                    const formData = doc.data();
+                    // Check if this is the same form type and same county
+                    if ((formData.originalFormId === formId || doc.id === formId) && formData.countyName === countyName) {
+                        existingFormDoc = doc;
+                    }
+                });
+                
+                if (existingFormDoc) {
+                    // Update lastOpened in Firestore for the existing form
+                    await existingFormDoc.ref.update({
                         lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
                         countyName: countyName
                     });
-                    window.location.href = formUrl;
+                    // Append county information to the URL for autosave separation
+                    const separator = formUrl.includes('?') ? '&' : '?';
+                    window.location.href = formUrl + separator + 'county=' + encodeURIComponent(countyName);
                 } else {
-                    await db.collection('users').doc(userId).collection('forms').doc(formId).set({
+                    // Create a new form document with auto-generated ID
+                    const newFormRef = db.collection('users').doc(userId).collection('forms').doc();
+                    await newFormRef.set({
+                        originalFormId: formId, // Keep reference to original form ID
                         name: formName,
                         url: formUrl,
                         addedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1787,7 +1813,9 @@
                         countyName: countyName
                     });
                     // No need to call fetchMyForms, real-time listener will update
-                    window.location.href = formUrl;
+                    // Append county information to the URL for autosave separation
+                    const separator = formUrl.includes('?') ? '&' : '?';
+                    window.location.href = formUrl + separator + 'county=' + encodeURIComponent(countyName);
                 }
             }
         } catch (error) {
