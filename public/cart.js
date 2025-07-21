@@ -36,7 +36,7 @@ class CartManager {
         this.setCookie(this.cartCookieName, JSON.stringify(this.cart), 30);
     }
 
-    async addToCart(formId, formTitle, priceId, formData = null, countyName = '') {
+    async addToCart(formId, formTitle, priceId, formData = null, countyName = '', defendantName = '') {
         // Always add a new cart item with a unique cartItemId
         const cartItemId = `${formId}_${Date.now()}_${Math.floor(Math.random()*100000)}`;
         this.cart.push({
@@ -46,6 +46,7 @@ class CartManager {
             priceId,
             formData,
             countyName,
+            defendantName, // Store defendantName
             timestamp: Date.now()
         });
         this.saveCart();
@@ -80,7 +81,18 @@ class CartManager {
         const clearBtn = document.getElementById('clear-cart-btn');
         if (!itemsEl) return;
 
-        if (this.cart.length === 0) {
+        // Filter out duplicates by portfolioId (if present)
+        const seenPortfolioIds = new Set();
+        const filteredCart = [];
+        for (const item of this.cart) {
+            if (item.portfolioId) {
+                if (seenPortfolioIds.has(item.portfolioId)) continue;
+                seenPortfolioIds.add(item.portfolioId);
+            }
+            filteredCart.push(item);
+        }
+
+        if (filteredCart.length === 0) {
             itemsEl.innerHTML = '';
             totalEl.style.display = 'none';
             emptyEl.style.display = 'block';
@@ -95,18 +107,28 @@ class CartManager {
         let html = '';
         let total = 0;
 
-        for (const item of this.cart) {
+        for (const item of filteredCart) {
             const priceInfo = await fetchStripePrice(item.priceId);
             let display = '...';
             if (priceInfo && priceInfo.unit_amount != null) {
                 display = `$${(priceInfo.unit_amount / 100).toFixed(2)}`;
                 total += priceInfo.unit_amount / 100;
             }
+            // Capitalize defendant's name if present
+            let defendantDisplay = '';
+            if (item.defendantName) {
+                const capName = String(item.defendantName)
+                  .split(/\s+/)
+                  .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+                  .join(' ');
+                defendantDisplay = `<div style='font-weight:bold;color:#e74c3c;'>Defendant: ${capName}</div>`;
+            }
             html += `
                 <div class="cart-item">
                     <div class="cart-item-content">
                         <div style="flex:1;display:flex;flex-direction:column;">
                             <div class="cart-item-title">${item.title}</div>
+                            ${defendantDisplay}
                             ${item.countyName ? `<div class='cart-item-county' style='font-size:0.98em;color:#153a5b;margin-bottom:2px;'>${item.countyName}</div>` : ''}
                             <div class="cart-item-price">${display}</div>
                         </div>
@@ -300,8 +322,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await cartManager.updateCartDisplay();
 });
 
-function addToCart(formId, formTitle, priceId, formData, countyName) {
-    if (cartManager) cartManager.addToCart(formId, formTitle, priceId, formData, countyName);
+function addToCart(formId, formTitle, priceId, formData, countyName, defendantName) {
+    if (cartManager) cartManager.addToCart(formId, formTitle, priceId, formData, countyName, defendantName);
 }
 
 function getCartCount() {

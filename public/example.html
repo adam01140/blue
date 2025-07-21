@@ -468,7 +468,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const urlParams = new URLSearchParams(window.location.search);
-    const formId = urlParams.get("formId");
+    const portfolioId = urlParams.get('portfolioId');
+    const formId = portfolioId ? portfolioId : (urlParams.get("formId") || window.formId || 'default');
     let userId = null;
     firebase.auth().onAuthStateChanged(async function(user){
         if(user){ 
@@ -1351,10 +1352,11 @@ if (typeof handleNext === 'function') {
         if (typeof firebase === 'undefined' || !firebase.auth || !firebase.firestore) return;
         const db = firebase.firestore();
         const urlParams = new URLSearchParams(window.location.search);
+        const portfolioId = urlParams.get('portfolioId');
         const baseFormId = urlParams.get('formId') || window.formId || 'default';
         const county = urlParams.get('county') || '';
-        // Create a unique form ID that includes county information for autosave separation
-        const formId = county ? baseFormId + '_' + county.replace(/s+/g, '_') : baseFormId;
+        // Use portfolioId if present, else fallback to old logic
+        const formId = portfolioId ? portfolioId : (county ? baseFormId + '_' + county.replace(/s+/g, '_') : baseFormId);
         let userId = null;
         let isUserLoggedIn = false;
 
@@ -1503,7 +1505,8 @@ if (typeof handleNext === 'function') {
                     window.location.href = 'cart.html';
                 };
                 document.getElementById('addToCartBtn').onclick = () => {
-                    addFormToCart(EXAMPLE_FORM_PRICE_ID);
+                    const defendantName = urlParams.get('defendantName');
+                    addFormToCart(EXAMPLE_FORM_PRICE_ID, defendantName);
                     document.body.removeChild(modal);
                 };
             });
@@ -1511,7 +1514,7 @@ if (typeof handleNext === 'function') {
 
 
         // Cart functionality
-        function addFormToCart(priceId) {
+        function addFormToCart(priceId, defendantName = '') {
             // Get all form data
             const form = document.getElementById('customForm');
             const formData = {};
@@ -1537,7 +1540,7 @@ if (typeof handleNext === 'function') {
            const formTitle = pdfOutputFileName; // You can make this dynamic based on form type
            const county = urlParams.get('county') || '';
            if (typeof addToCart === 'function') {
-                addToCart(formId || 'custom-form', formTitle, priceId, formData, county);
+                addToCart(formId || 'custom-form', formTitle, priceId, formData, county, defendantName);
                 window.location.href = 'cart.html';
             } else {
                 // Fallback: save to localStorage if cart manager not available
@@ -1547,6 +1550,7 @@ if (typeof handleNext === 'function') {
                     priceId: priceId,
                     formData: formData,
                     countyName: county,
+                    defendantName: defendantName,
                     timestamp: Date.now()
                 };
                 
