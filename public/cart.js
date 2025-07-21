@@ -36,26 +36,24 @@ class CartManager {
         this.setCookie(this.cartCookieName, JSON.stringify(this.cart), 30);
     }
 
-    async addToCart(formId, formTitle, priceId, formData = null) {
-        const index = this.cart.findIndex(i => i.formId === formId);
-        if (index !== -1) {
-            this.cart[index].formData = formData;
-            this.cart[index].timestamp = Date.now();
-        } else {
-            this.cart.push({
-                formId,
-                title: formTitle,
-                priceId,
-                formData,
-                timestamp: Date.now()
-            });
-        }
+    async addToCart(formId, formTitle, priceId, formData = null, countyName = '') {
+        // Always add a new cart item with a unique cartItemId
+        const cartItemId = `${formId}_${Date.now()}_${Math.floor(Math.random()*100000)}`;
+        this.cart.push({
+            cartItemId,
+            formId,
+            title: formTitle,
+            priceId,
+            formData,
+            countyName,
+            timestamp: Date.now()
+        });
         this.saveCart();
         await this.updateCartDisplay();
     }
 
-    async removeFromCart(formId) {
-        this.cart = this.cart.filter(i => i.formId !== formId);
+    async removeFromCart(cartItemId) {
+        this.cart = this.cart.filter(i => i.cartItemId !== cartItemId);
         this.saveCart();
         await this.updateCartDisplay();
     }
@@ -109,9 +107,10 @@ class CartManager {
                     <div class="cart-item-content">
                         <div style="flex:1;display:flex;flex-direction:column;">
                             <div class="cart-item-title">${item.title}</div>
+                            ${item.countyName ? `<div class='cart-item-county' style='font-size:0.98em;color:#153a5b;margin-bottom:2px;'>${item.countyName}</div>` : ''}
                             <div class="cart-item-price">${display}</div>
                         </div>
-                        <button class="remove-item" onclick="cartManager.removeFromCart('${item.formId}')">Remove</button>
+                        <button class="remove-item" onclick="cartManager.removeFromCart('${item.cartItemId}')">Remove</button>
                     </div>
                 </div>
             `;
@@ -301,8 +300,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await cartManager.updateCartDisplay();
 });
 
-function addToCart(formId, formTitle, priceId, formData) {
-    if (cartManager) cartManager.addToCart(formId, formTitle, priceId, formData);
+function addToCart(formId, formTitle, priceId, formData, countyName) {
+    if (cartManager) cartManager.addToCart(formId, formTitle, priceId, formData, countyName);
 }
 
 function getCartCount() {

@@ -507,7 +507,7 @@ var linkedDropdowns = [];
 var sectionStack = [];
 var currentSectionNumber = 1;
 var pdfFileName = "form.pdf";
-var pdfOutputFileName = "bro what";
+var pdfOutputFileName = "Small Claims";
 var stripePriceId = "price_1Ri8ASFJeSRMFQ8XDhtdSkFr";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["form.pdf", ];
@@ -1535,9 +1535,9 @@ if (typeof handleNext === 'function') {
 
             // Add to cart using the global cart manager
            const formTitle = pdfOutputFileName; // You can make this dynamic based on form type
-            
+           const county = urlParams.get('county') || '';
            if (typeof addToCart === 'function') {
-                addToCart(formId || 'custom-form', formTitle, priceId, formData);
+                addToCart(formId || 'custom-form', formTitle, priceId, formData, county);
                 window.location.href = 'cart.html';
             } else {
                 // Fallback: save to localStorage if cart manager not available
@@ -1546,6 +1546,7 @@ if (typeof handleNext === 'function') {
                     title: formTitle,
                     priceId: priceId,
                     formData: formData,
+                    countyName: county,
                     timestamp: Date.now()
                 };
                 

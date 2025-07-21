@@ -1307,7 +1307,8 @@
             </a>
         </nav>
         <div class="header-actions">
-            <a href="account.html" class="sign-in-btn">Sign In</a>
+            <a href="account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
+            <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
             <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
                 <span class="cart-circle">
                     <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -2900,6 +2901,7 @@
                             <div class="cart-item">
                                 <div class="cart-item-info">
                                     <div class="cart-item-title">${item.title || 'Form'}</div>
+                                    ${item.countyName ? `<div class='cart-item-county' style='font-size:0.98em;color:#153a5b;margin-bottom:2px;'>${item.countyName}</div>` : ''}
                                     <div class="cart-item-price">${display}</div>
                                 </div>
                                 <button class="remove-item" title="Remove" onclick="(function(){const cart=JSON.parse(decodeURIComponent(document.cookie.split('; ').find(row=>row.startsWith('formwiz_cart='))?.split('=')[1]||'[]'));cart.splice(${itemCount},1);document.cookie='formwiz_cart='+encodeURIComponent(JSON.stringify(cart))+';path=/;max-age=2592000';window.location.reload();})()">
@@ -2966,5 +2968,32 @@
         </div>
     </div>
 </div>
+
+    <!-- Add logic to show/hide Log Out button and handle logout -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const signInBtn = document.getElementById('sign-in-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            auth.onAuthStateChanged(function(user) {
+                if (user) {
+                    if (signInBtn) signInBtn.style.display = 'none';
+                    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+                } else {
+                    if (signInBtn) signInBtn.style.display = 'inline-block';
+                    if (logoutBtn) logoutBtn.style.display = 'none';
+                }
+            });
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    auth.signOut().then(() => {
+                        window.location.href = 'index.html';
+                    }).catch((error) => {
+                        alert('Sign Out Error: ' + error.message);
+                    });
+                });
+            }
+        });
+    </script>
 </body>
 </html>
