@@ -200,11 +200,15 @@ window.exportGuiJson = function(download = true) {
       };
     }
     
-    const questionType = getQuestionType(cell);
+    let questionType = getQuestionType(cell);
+    let exportType = questionType;
+    // --- PATCH: treat text2 as dropdown ---
+    if (questionType === "text2") exportType = "dropdown";
+    
     const question = {
       questionId: cell._questionId || questionCounter++,
       text: cell._questionText || cell.value || "",
-      type: questionType,
+      type: exportType,
       logic: {
         enabled: false,
         conditions: []
@@ -260,18 +264,15 @@ window.exportGuiJson = function(download = true) {
         const targetCell = edge.target;
         if (targetCell && isOptions(targetCell)) {
           let optionText = targetCell.value || "";
-          
           // Clean HTML from option text
           if (optionText.includes("<")) {
             const temp = document.createElement("div");
             temp.innerHTML = optionText;
             optionText = temp.textContent || temp.innerText || optionText;
           }
-          
           const option = {
             text: optionText
           };
-          
           // Handle amount options
           if (getQuestionType(targetCell) === "amountOption") {
             option.amount = {
@@ -279,15 +280,33 @@ window.exportGuiJson = function(download = true) {
               placeholder: targetCell._amountPlaceholder || "Enter amount"
             };
           }
-          
           // Handle image options
           if (getQuestionType(targetCell) === "imageOption" && targetCell._image) {
             option.image = targetCell._image;
           }
-          
           question.options.push(option);
         }
       }
+    }
+    
+    // --- PATCH: For dropdowns, convert options to array of strings and add linking/image fields ---
+    if (exportType === "dropdown") {
+      let imageData = null;
+      // Convert options to array of strings, and extract image node if present
+      question.options = question.options.map(opt => {
+        if (typeof opt.text === 'string') {
+          // If this option is an image node, extract its image data
+          if (opt.image && typeof opt.image === 'object') {
+            imageData = opt.image;
+          }
+          return opt.text;
+        }
+        return "";
+      });
+      // Add linking field
+      question.linking = { enabled: false, targetId: "" };
+      // Add image field: use imageData if found, else default
+      question.image = imageData || { url: "", width: 0, height: 0 };
     }
     
     sectionMap[section].questions.push(question);

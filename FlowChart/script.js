@@ -3768,6 +3768,20 @@ function updateImageOptionCell(cell) {
   let imgWidth = cell._image.width || "100";
   let imgHeight = cell._image.height || "100";
 
+  // --- FOCUS PRESERVATION PATCH ---
+  // Find the currently focused input (if any) and its cursor position
+  let focusField = null, cursorPos = null, selectionEnd = null;
+  const active = document.activeElement;
+  if (active && active.tagName === 'INPUT' && active.type === 'text' || active.type === 'number') {
+    if (active.parentElement && active.parentElement.textContent.startsWith('URL')) focusField = 'url';
+    else if (active.parentElement && active.parentElement.textContent.startsWith('Width')) focusField = 'width';
+    else if (active.parentElement && active.parentElement.textContent.startsWith('Height')) focusField = 'height';
+    if (focusField) {
+      cursorPos = active.selectionStart;
+      selectionEnd = active.selectionEnd;
+    }
+  }
+
   // Render image preview and three textboxes
   const html = `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:8px 0;">
@@ -3786,6 +3800,30 @@ function updateImageOptionCell(cell) {
     graph.getModel().endUpdate();
   }
   graph.updateCellSize(cell);
+
+  // --- RESTORE FOCUS AND CURSOR POSITION ---
+  if (focusField) {
+    setTimeout(() => {
+      // Find the correct input in the newly rendered node
+      const state = graph.view.getState(cell);
+      if (state && state.text && state.text.node) {
+        let input = null;
+        if (focusField === 'url') {
+          input = state.text.node.querySelector('input[type="text"]');
+        } else if (focusField === 'width') {
+          input = state.text.node.querySelectorAll('input[type="number"]')[0];
+        } else if (focusField === 'height') {
+          input = state.text.node.querySelectorAll('input[type="number"]')[1];
+        }
+        if (input) {
+          input.focus();
+          if (cursorPos !== null && selectionEnd !== null) {
+            input.setSelectionRange(cursorPos, selectionEnd);
+          }
+        }
+      }
+    }, 0);
+  }
 }
 
 // Handler for updating image node fields
