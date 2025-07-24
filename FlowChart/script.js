@@ -3760,23 +3760,43 @@ function pasteNodeFromJson(x, y) {
 // --- UPDATE IMAGE OPTION NODE ---
 function updateImageOptionCell(cell) {
   if (!cell || !isOptions(cell) || getQuestionType(cell) !== "imageOption") return;
-  // Use _image property for rendering
-  let imgUrl = cell._image?.url || "";
-  let imgWidth = cell._image?.width || 100;
-  let imgHeight = cell._image?.height || 100;
-  let labelText = cell.value || "Image Option";
-  // If it's an HTML string, extract the text
-  if (typeof labelText === 'string' && labelText.includes('<')) {
-    const tmp = document.createElement('div');
-    tmp.innerHTML = labelText;
-    labelText = (tmp.textContent || tmp.innerText || "Image Option").trim();
+  // Ensure _image property exists
+  if (!cell._image) {
+    cell._image = { url: "", width: "100", height: "100" };
   }
-  // Render image and label
-  const html = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;"><img src="${imgUrl}" alt="Option Image" style="max-width:${imgWidth}px;max-height:${imgHeight}px;object-fit:contain;margin-bottom:6px;" /><div style="text-align:center;">${escapeHtml(labelText)}</div></div>`;
+  let imgUrl = cell._image.url || "";
+  let imgWidth = cell._image.width || "100";
+  let imgHeight = cell._image.height || "100";
+
+  // Render image preview and three textboxes
+  const html = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:8px 0;">
+      <img src="${imgUrl}" alt="Image Preview" style="max-width:${imgWidth}px;max-height:${imgHeight}px;object-fit:contain;margin-bottom:8px;border:1px solid #ccc;background:#fff;" onerror="this.style.opacity=0.2" />
+      <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:4px;">
+        <label style="font-size:12px;width:100%;text-align:left;">URL:<input type="text" value="${escapeAttr(imgUrl)}" style="width:120px;margin-left:4px;" oninput="window.updateImageNodeField('${cell.id}','url',this.value)" /></label>
+        <label style="font-size:12px;width:100%;text-align:left;">Width:<input type="number" min="1" value="${escapeAttr(imgWidth)}" style="width:60px;margin-left:4px;" oninput="window.updateImageNodeField('${cell.id}','width',this.value)" /></label>
+        <label style="font-size:12px;width:100%;text-align:left;">Height:<input type="number" min="1" value="${escapeAttr(imgHeight)}" style="width:60px;margin-left:4px;" oninput="window.updateImageNodeField('${cell.id}','height',this.value)" /></label>
+      </div>
+    </div>
+  `;
   graph.getModel().beginUpdate();
   try {
     graph.getModel().setValue(cell, html);
   } finally {
     graph.getModel().endUpdate();
   }
+  graph.updateCellSize(cell);
 }
+
+// Handler for updating image node fields
+window.updateImageNodeField = function(cellId, field, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || getQuestionType(cell) !== "imageOption") return;
+  if (!cell._image) cell._image = { url: "", width: "100", height: "100" };
+  if (field === "width" || field === "height") {
+    // Only allow positive integers
+    value = String(Math.max(1, parseInt(value) || 1));
+  }
+  cell._image[field] = value;
+  updateImageOptionCell(cell);
+};
