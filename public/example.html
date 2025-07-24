@@ -412,7 +412,27 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1"><label><h3>example</h3></label><input type="text" id="answer1" name="answer1" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-2"><label><h3>What is your location</h3></label><input type="text" id="answer2" name="answer2" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
+        <form id="customForm"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Demographics</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Employment Info</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">Legal Info</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="4"><div class="stepper-circle">4</div><div class="stepper-label">Qualified Assistance</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="5"><div class="stepper-circle">5</div><div class="stepper-label">Section 5</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="6"><div class="stepper-circle">6</div><div class="stepper-label">Section 6</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="7"><div class="stepper-circle">7</div><div class="stepper-label">Section 7</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="8"><div class="stepper-circle">8</div><div class="stepper-label">Section 8</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="9"><div class="stepper-circle">9</div><div class="stepper-label">Section 9</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="10"><div class="stepper-circle">10</div><div class="stepper-label">Section 10</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="11"><div class="stepper-circle">11</div><div class="stepper-label">Section 11</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="12"><div class="stepper-circle">12</div><div class="stepper-label">Section 12</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="13"><div class="stepper-circle">13</div><div class="stepper-label">Section 13</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="14"><div class="stepper-circle">14</div><div class="stepper-label">Section 14</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="15"><div class="stepper-circle">15</div><div class="stepper-label">Section 15</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="16"><div class="stepper-circle">16</div><div class="stepper-label">Section 16</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Demographics</h1><div id="question-container-1"><label><h3>What is your name</h3></label><input type="text" id="what_is_your_name" name="what_is_your_name" placeholder=""><br></div><div id="question-container-2"><label><h3>What is your location?</h3></label><input type="text" id="State" name="State" placeholder="State" style="text-align:center;"><br><input type="text" id="City" name="City" placeholder="City" style="text-align:center;"><br><input type="text" id="Street" name="Street" placeholder="Street" style="text-align:center;"><br><input type="text" id="Zip" name="Zip" placeholder="Zip" style="text-align:center;"><br><input type="text" id="County" name="County" placeholder="County" style="text-align:center;"><br></div><div id="question-container-3"><label><h3>What is your phone number</h3></label><input type="text" id="what_is_your_phone_number" name="what_is_your_phone_number" placeholder=""><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="handleNext(1)">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Employment Info</h1><div id="question-container-4"><label><h3>Are you currently employed</h3></label><select id="are_you_currently_employed" name="are_you_currently_employed"
+                      onchange="dropdownMirror(this, 'are_you_currently_employed')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_currently_employed"></div>
+              <input type="text" id="are_you_currently_employed_dropdown" name="are_you_currently_employed_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-5"><label><h3>Please enter your work info</h3></label><input type="text" id="Job Title" name="Job Title" placeholder="Job Title" style="text-align:center;"><br><input type="text" id="Job Address" name="Job Address" placeholder="Job Address" style="text-align:center;"><br><input type="text" id="Employer Name" name="Employer Name" placeholder="Employer Name" style="text-align:center;"><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" onclick="handleNext(2)">Next</button></div></div><div id="section3" class="section"><center><h1 class="section-title">Legal Info</h1><div id="question-container-6"><label><h3>Do you have a lawyer</h3></label><select id="do_you_have_a_lawyer" name="do_you_have_a_lawyer"
+                      onchange="dropdownMirror(this, 'do_you_have_a_lawyer')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_have_a_lawyer"></div>
+              <input type="text" id="do_you_have_a_lawyer_dropdown" name="do_you_have_a_lawyer_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-7"><label><h3>Please enter lawyer info</h3></label><input type="text" id="Laywer Name" name="Laywer Name" placeholder="Laywer name" style="text-align:center;"><br><input type="text" id="Lawyer Firm" name="Lawyer Firm" placeholder="Lawyer Firm" style="text-align:center;"><br><input type="text" id="Laywer Address" name="Laywer Address" placeholder="Laywer Address" style="text-align:center;"><br><input type="text" id="Lawyer Phone Number" name="Lawyer Phone Number" placeholder="Lawyer Phone Number" style="text-align:center;"><br><input type="text" id="State Bar Number" name="State Bar Number" placeholder="State Bar Number" style="text-align:center;"><br></div><div id="question-container-8"><label><h3>Has your lawyer agreed to cover a portion of your fees?</h3></label><select id="has_your_lawyer_agreed_to_cover_a_portion_of_your_fees" name="has_your_lawyer_agreed_to_cover_a_portion_of_your_fees"
+                      onchange="dropdownMirror(this, 'has_your_lawyer_agreed_to_cover_a_portion_of_your_fees')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_has_your_lawyer_agreed_to_cover_a_portion_of_your_fees"></div>
+              <input type="text" id="has_your_lawyer_agreed_to_cover_a_portion_of_your_fees_dropdown" name="has_your_lawyer_agreed_to_cover_a_portion_of_your_fees_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-9"><label><h3>Have you filed a claim before</h3></label><select id="have_you_filed_a_claim_before" name="have_you_filed_a_claim_before"
+                      onchange="dropdownMirror(this, 'have_you_filed_a_claim_before')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_have_you_filed_a_claim_before"></div>
+              <input type="text" id="have_you_filed_a_claim_before_dropdown" name="have_you_filed_a_claim_before_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" onclick="handleNext(3)">Next</button></div></div><div id="section4" class="section"><center><h1 class="section-title">Qualified Assistance</h1><div id="question-container-10"><label><h3>Do you receive any of the following?</h3></label><div><center><div id="checkmark" class="checkbox-group-10"></div><br></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" onclick="handleNext(4)">Next</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
@@ -468,8 +488,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const urlParams = new URLSearchParams(window.location.search);
-    const portfolioId = urlParams.get('portfolioId');
-    const formId = portfolioId ? portfolioId : (urlParams.get("formId") || window.formId || 'default');
+    const formId = urlParams.get("formId");
     let userId = null;
     firebase.auth().onAuthStateChanged(async function(user){
         if(user){ 
@@ -497,8 +516,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
             // Do NOT redirect. Just let the user fill the form.
         }
     });
-  var questionSlugMap       = {"1":"example","2":"what_is_your_location"};
-var questionNameIds = {"1":"answer1","2":"answer2"};
+  var questionSlugMap       = {"1":"what_is_your_name","2":"what_is_your_location","3":"what_is_your_phone_number","4":"are_you_currently_employed","5":"please_enter_your_work_info","6":"do_you_have_a_lawyer","7":"please_enter_lawyer_info","8":"has_your_lawyer_agreed_to_cover_a_portion_of_your_fees","9":"have_you_filed_a_claim_before","10":"do_you_receive_any_of_the_following"};
+var questionNameIds = {"1":"what_is_your_name","3":"what_is_your_phone_number","4":"are_you_currently_employed","6":"do_you_have_a_lawyer","8":"has_your_lawyer_agreed_to_cover_a_portion_of_your_fees","9":"have_you_filed_a_claim_before","10":"do_you_receive_any_of_the_following"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var conditionalAlerts = [];
@@ -507,11 +526,11 @@ var amountMap = {"length":0};
 var linkedDropdowns = [];
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "form.pdf";
-var pdfOutputFileName = "Small Claims";
-var stripePriceId = "price_1Ri8ASFJeSRMFQ8XDhtdSkFr";
+var pdfFileName = "";
+var pdfOutputFileName = "example.html";
+var stripePriceId = "";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["form.pdf", ];
+var allPdfFileNames = ["", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
@@ -1352,11 +1371,10 @@ if (typeof handleNext === 'function') {
         if (typeof firebase === 'undefined' || !firebase.auth || !firebase.firestore) return;
         const db = firebase.firestore();
         const urlParams = new URLSearchParams(window.location.search);
-        const portfolioId = urlParams.get('portfolioId');
         const baseFormId = urlParams.get('formId') || window.formId || 'default';
         const county = urlParams.get('county') || '';
-        // Use portfolioId if present, else fallback to old logic
-        const formId = portfolioId ? portfolioId : (county ? baseFormId + '_' + county.replace(/s+/g, '_') : baseFormId);
+        // Create a unique form ID that includes county information for autosave separation
+        const formId = county ? baseFormId + '_' + county.replace(/s+/g, '_') : baseFormId;
         let userId = null;
         let isUserLoggedIn = false;
 
@@ -1505,8 +1523,7 @@ if (typeof handleNext === 'function') {
                     window.location.href = 'cart.html';
                 };
                 document.getElementById('addToCartBtn').onclick = () => {
-                    const defendantName = urlParams.get('defendantName');
-                    addFormToCart(EXAMPLE_FORM_PRICE_ID, defendantName);
+                    addFormToCart(EXAMPLE_FORM_PRICE_ID);
                     document.body.removeChild(modal);
                 };
             });
@@ -1514,7 +1531,7 @@ if (typeof handleNext === 'function') {
 
 
         // Cart functionality
-        function addFormToCart(priceId, defendantName = '') {
+        function addFormToCart(priceId) {
             // Get all form data
             const form = document.getElementById('customForm');
             const formData = {};
@@ -1538,9 +1555,9 @@ if (typeof handleNext === 'function') {
 
             // Add to cart using the global cart manager
            const formTitle = pdfOutputFileName; // You can make this dynamic based on form type
-           const county = urlParams.get('county') || '';
+            
            if (typeof addToCart === 'function') {
-                addToCart(formId || 'custom-form', formTitle, priceId, formData, county, defendantName);
+                addToCart(formId || 'custom-form', formTitle, priceId, formData);
                 window.location.href = 'cart.html';
             } else {
                 // Fallback: save to localStorage if cart manager not available
@@ -1549,8 +1566,6 @@ if (typeof handleNext === 'function') {
                     title: formTitle,
                     priceId: priceId,
                     formData: formData,
-                    countyName: county,
-                    defendantName: defendantName,
                     timestamp: Date.now()
                 };
                 
