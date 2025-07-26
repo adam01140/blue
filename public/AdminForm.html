@@ -238,7 +238,7 @@
             // Sort forms alphabetically by name before rendering
             formsData.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
             let table = `<table class="forms-table"><thead><tr>
-                <th>ID</th><th>Name</th><th>URL</th><th>Counties</th><th>Actions</th>
+                <th>ID</th><th>Name</th><th>URL</th><th>Counties</th><th>Defendant</th><th>Actions</th>
             </tr></thead><tbody>`;
             formsData.forEach((form, idx) => {
                 // Only show the base for URL input, not the full URL
@@ -248,6 +248,7 @@
                     <td><input value="${form.name || ''}" onchange="updateFormField(${idx}, 'name', this.value)"></td>
                     <td><input value="${urlBase}" onchange="updateFormField(${idx}, 'url', this.value)"></td>
                     <td>${renderCountySelect(idx, form.counties || [])}</td>
+                    <td>${renderDefendantSelect(idx, form.defendant || form.defendent || 'N/A')}</td>
                     <td>
                         <button class="action-btn delete" onclick="deleteForm(${idx})">Delete</button>
                     </td>
@@ -265,6 +266,15 @@
                     });
                 }
             });
+            // Attach change listeners for defendant selects
+            formsData.forEach((form, idx) => {
+                const defendantSelect = document.getElementById(`defendant-select-${idx}`);
+                if (defendantSelect) {
+                    defendantSelect.addEventListener('change', function() {
+                        updateFormField(idx, 'defendant', this.value);
+                    });
+                }
+            });
         }
 
         function renderCountySelect(idx, selectedCounties) {
@@ -272,6 +282,14 @@
             COUNTY_LIST.forEach(county => {
                 html += `<option value="${county}"${selectedCounties.includes(county) ? ' selected' : ''}>${county}</option>`;
             });
+            html += '</select>';
+            return html;
+        }
+
+        function renderDefendantSelect(idx, selectedDefendant) {
+            let html = `<select class="county-select" id="defendant-select-${idx}">`;
+            html += `<option value="N/A"${selectedDefendant === 'N/A' ? ' selected' : ''}>N/A</option>`;
+            html += `<option value="Yes"${selectedDefendant === 'Yes' || selectedDefendant === 'YES' ? ' selected' : ''}>Yes</option>`;
             html += '</select>';
             return html;
         }
@@ -284,6 +302,10 @@
                 // Auto-generate full URL from base
                 const base = value.trim();
                 formsData[idx][field] = base ? `${base}.html?formId=${base}` : '';
+            } else if (field === 'defendant') {
+                // Normalize defendant field and remove old spelling
+                formsData[idx]['defendant'] = value;
+                delete formsData[idx]['defendent'];
             } else {
                 formsData[idx][field] = value;
             }
@@ -308,7 +330,7 @@
 
         // Add a new form
         document.getElementById('add-form-btn').onclick = function() {
-            formsData.push({ id: '', name: '', url: '', counties: [] });
+            formsData.push({ id: '', name: '', url: '', counties: [], defendant: 'N/A' });
             renderFormsTable();
         };
 
@@ -323,6 +345,18 @@
                     try {
                         const json = JSON.parse(e.target.result);
                         formsData = Array.isArray(json.forms) ? json.forms : json;
+                        
+                        // Normalize defendant field names and values
+                        formsData.forEach(form => {
+                            if (form.defendent && !form.defendant) {
+                                form.defendant = form.defendent;
+                                delete form.defendent;
+                            }
+                            if (form.defendant === 'YES') {
+                                form.defendant = 'Yes';
+                            }
+                        });
+                        
                         // Sort alphabetically by name after import
                         formsData.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
                         renderFormsTable();
