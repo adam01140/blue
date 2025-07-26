@@ -2431,26 +2431,55 @@ if (typeof handleNext === 'function') {
                     // Render cart items
                     let total = 0;
                     let itemsHtml = '';
-                    
+                    let itemIndex = 0;
                     for (const item of cart) {
                         const price = await fetchStripePrice(item.priceId);
                         const itemPrice = price ? parseFloat(price) : 0;
                         total += itemPrice;
-                        
-                        itemsHtml += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #e0e0e0;">' +
-                            '<div style="flex:1;">' +
-                                '<div style="font-weight:600;color:#2c3e50;">' + (item.title || 'Form') + '</div>' +
-                                '<div style="font-size:0.9em;color:#7f8c8d;">' + (item.formId || '') + '</div>' +
-                            '</div>' +
-                            '<div style="text-align:right;">' +
-                                '<div style="font-weight:600;color:#2c3e50;">$' + itemPrice.toFixed(2) + '</div>' +
-                            '</div>' +
-                        '</div>';
+                        // Defendant and county fields
+                        let defendantHtml = '';
+                        let countyHtml = '';
+                        if (item.formData && item.formData.defendantName) {
+                            const capName = String(item.formData.defendantName)
+                              .split(/s+/)
+                              .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+                              .join(' ');
+                            defendantHtml = '<div style=\"color:#e74c3c;font-weight:600;\">Defendant: ' + capName + '</div>';
+                        }
+                        if (item.formData && item.formData.county) {
+                            countyHtml = '<div style="color:#7f8c8d;">' + item.formData.county + '</div>';
+                        }
+                        itemsHtml +=
+     '<div class="cart-item">' +
+       '<div class="cart-item-info">' +
+         '<div class="cart-item-title">' + (item.title || 'Form') + '</div>' +
+         defendantHtml +
+         countyHtml +
+       '</div>' +
+       '<div class="cart-item-price">$' + itemPrice.toFixed(2) + '</div>' +
+       '<button class="remove-item" title="Remove" data-cart-index="' + itemIndex + '">' +
+         '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-2 14H7L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"></path></svg>' +
+       '</button>' +
+     '</div>';
+                        itemIndex++;
                     }
-                    
                     cartItemsList.innerHTML = itemsHtml;
                     cartItemsList.style.display = 'block';
-                    
+                    // Remove item event listeners
+                    const removeButtons = cartItemsList.querySelectorAll('.remove-item');
+                    removeButtons.forEach(btn => {
+                      btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const idx = parseInt(btn.getAttribute('data-cart-index'));
+                        if (!isNaN(idx)) {
+                          cart.splice(idx, 1);
+                          // Save updated cart
+                          document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
+                          localStorage.setItem('formwiz_cart', JSON.stringify(cart));
+                          loadCartItems();
+                        }
+                      });
+                    });
                     if (cartCheckoutBtn) {
                         cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
                         cartCheckoutBtn.style.display = 'block';
@@ -2458,7 +2487,6 @@ if (typeof handleNext === 'function') {
                             window.location.href = 'cart.html';
                         };
                     }
-                    
                 } catch (error) {
                     console.error('Error loading cart items:', error);
                     cartItemsList.innerHTML = '<p style="color:#e74c3c;">Error loading cart items</p>';
