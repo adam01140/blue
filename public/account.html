@@ -474,7 +474,7 @@
                     <a href="Probate.html">Probate</a>
                     <a href="Property.html">Property</a>
                     <a href="Immigration.html">Immigration</a>
-                    <a href="SmallClaims.html">Small Claims</a>
+                    <a href="smallclaims.html">Small Claims</a>
                     <a href="Other.html">Other</a>
                 </div>
             </div>
@@ -576,7 +576,16 @@
                         <label for="login-password">Password</label>
                         <div class="password-wrapper">
                             <input type="password" id="login-password" required autocomplete="current-password">
-                            <button type="button" class="toggle-password" data-target="login-password" aria-label="Show password">👁️</button>
+                            <button type="button" class="toggle-password" data-target="login-password" aria-label="Show password">
+                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                <svg class="eye-off-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                                    <line x1="1" y1="1" x2="23" y2="23"/>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                     <div class="form-group" style="visibility:hidden;height:0;padding:0;margin:0;"></div>
@@ -603,7 +612,7 @@
           </div>
           <div class="pro-footer-title">FormWiz</div>
           <div class="pro-footer-contact">
-              <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
+              <a href="tel:18008508370">1-800-850-8370</a> &nbsp; 
               <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
           </div>
       </div>
@@ -617,7 +626,7 @@
       </div>
       <div class="pro-footer-col company-col">
           <div class="pro-footer-title company-title">About FormWiz</div>
-          <div class="pro-footer-desc">FormWiz consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
+          <div class="pro-footer-desc">FormWiz consists of a group of proven professionals with over 70 years of combined <strong>legal</strong>, technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
       </div>
     </div>
     <footer>
@@ -799,6 +808,26 @@
                 }
             });
         }
+        
+        // Update cart count badge - only show when logged in
+        function updateCartCountBadge() {
+            const cartCountElement = document.getElementById('cart-count-badge');
+            if (cartCountElement && auth.currentUser && typeof getCartCount === 'function') {
+                const count = getCartCount();
+                if (count > 0) {
+                    cartCountElement.textContent = count;
+                    cartCountElement.style.display = 'flex';
+                } else {
+                    cartCountElement.style.display = 'none';
+                }
+            } else if (cartCountElement) {
+                cartCountElement.style.display = 'none';
+            }
+        }
+
+        // Initialize cart count badge
+        updateCartCountBadge();
+        setInterval(updateCartCountBadge, 5000);
       });
     </script>
     <script>
@@ -812,6 +841,29 @@
           var dd = String(today.getDate()).padStart(2, '0');
           dateInput.value = yyyy + '-' + mm + '-' + dd;
         }
+        
+        // Add password toggle functionality
+        const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+        togglePasswordButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const passwordInput = document.getElementById(targetId);
+            const eyeIcon = this.querySelector('.eye-icon');
+            const eyeOffIcon = this.querySelector('.eye-off-icon');
+            
+            if (passwordInput) {
+              if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                if (eyeIcon) eyeIcon.style.display = 'none';
+                if (eyeOffIcon) eyeOffIcon.style.display = 'block';
+              } else {
+                passwordInput.type = 'password';
+                if (eyeIcon) eyeIcon.style.display = 'block';
+                if (eyeOffIcon) eyeOffIcon.style.display = 'none';
+              }
+            }
+          });
+        });
       });
     </script>
     <script>
