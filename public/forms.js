@@ -603,11 +603,37 @@ addFormToPortfolio = async function(formId, formUrl, formName) {
         alert(`This form is not offered in ${foundCounty} please select another form or try a different zip code.`);
         return;
     }
+    
+    const userId = user.uid;
+    
+    // Check if user already has this form for this county (duplicate check)
+    try {
+        const formsSnapshot = await db.collection('users').doc(userId).collection('forms').get();
+        let duplicateFound = false;
+        
+        formsSnapshot.forEach(doc => {
+            const formData = doc.data();
+            // Check if this is the same form type (by formId or originalFormId) and same county
+            if ((formData.originalFormId === formId || doc.id === formId) && formData.countyName === foundCounty) {
+                duplicateFound = true;
+            }
+        });
+        
+        if (duplicateFound) {
+            // Show duplicate confirmation modal
+            showDuplicateFormModal(formName, foundCounty, formId, formUrl, foundCounty);
+            return;
+        }
+    } catch (error) {
+        console.error('Error checking for duplicate form:', error);
+    }
+    
     // If form requires defendant, show modal
-    if (formObj && formObj.defendent && formObj.defendent.toUpperCase() === 'YES') {
+    if (formObj && formObj.defendant && formObj.defendant.toUpperCase() === 'YES') {
         showDefendantModal(formObj, formId, formUrl, formName, foundCounty);
         return;
     }
+    
     // Otherwise, continue as normal
     await originalAddFormToPortfolio(formId, formUrl, formName);
 };
@@ -815,7 +841,20 @@ function showDuplicateFormModal(formName, countyName, formId, formUrl, newCounty
     yesBtn.onclick = async function() {
         closeDuplicateFormModal();
         if (pendingFormData) {
-            await addFormToPortfolioInternal(pendingFormData.formId, pendingFormData.formUrl, pendingFormData.formName, pendingFormData.countyName, true);
+            // Check if the form requires a defendant
+            let formObj = null;
+            if (!availableFormsData.length) {
+                availableFormsData = await loadAvailableForms();
+            }
+            formObj = availableFormsData.find(f => f.id === pendingFormData.formId);
+            
+            if (formObj && formObj.defendant && formObj.defendant.toUpperCase() === 'YES') {
+                // Show defendant modal for duplicate
+                showDefendantModal(formObj, pendingFormData.formId, pendingFormData.formUrl, pendingFormData.formName, pendingFormData.countyName, true);
+            } else {
+                // No defendant required, add directly
+                await addFormToPortfolioInternal(pendingFormData.formId, pendingFormData.formUrl, pendingFormData.formName, pendingFormData.countyName, true);
+            }
             pendingFormData = null;
         }
     };
@@ -1694,7 +1733,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Defendant Name Modal
 let pendingDefendantData = null;
 
-function showDefendantModal(formObj, formId, formUrl, formName, countyName) {
+function showDefendantModal(formObj, formId, formUrl, formName, countyName, isDuplicate = false) {
     const modal = document.getElementById('defendant-modal');
     const closeBtn = document.getElementById('defendant-modal-close');
     const submitBtn = document.getElementById('defendant-modal-submit');
@@ -1705,7 +1744,7 @@ function showDefendantModal(formObj, formId, formUrl, formName, countyName) {
     errorDiv.style.display = 'none';
     errorDiv.textContent = '';
     modal.style.display = 'block';
-    pendingDefendantData = { formObj, formId, formUrl, formName, countyName };
+    pendingDefendantData = { formObj, formId, formUrl, formName, countyName, isDuplicate };
     function closeModal() {
         modal.style.display = 'none';
         pendingDefendantData = null;
@@ -1729,7 +1768,7 @@ function showDefendantModal(formObj, formId, formUrl, formName, countyName) {
                 pendingDefendantData.formUrl,
                 pendingDefendantData.formName,
                 pendingDefendantData.countyName,
-                false,
+                pendingDefendantData.isDuplicate,
                 defendantName
             );
             pendingDefendantData = null;

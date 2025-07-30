@@ -1,46 +1,63 @@
 {
   "forms": [
     {
-      "id": "fee-waiver",
-      "url": "fee-waiver.html?formId=fee-waiver",
-      "name": "Fee Waiver",
-      "counties": ["Monterey", "Santa Cruz"],
-      "defendent": "YES"
-    },
-    {
       "id": "example",
       "url": "example.html?formId=example",
       "name": "Example",
-      "counties": ["Monterey", "Santa Cruz"],
-      "defendent": "YES"
+      "counties": [
+        "Monterey"
+      ],
+      "defendant": "YES"
     },
     {
       "id": "example2",
       "url": "example2.html?formId=example2",
       "name": "Example2",
-      "counties": ["Monterey", "Santa Cruz"],
-      "defendent": "N/A"
+      "counties": [
+        "Monterey",
+        "Santa Cruz"
+      ],
+      "defendant": "Yes"
+    },
+    {
+      "id": "fee-waiver",
+      "url": "fee-waiver.html?formId=fee-waiver",
+      "name": "Fee Waiver",
+      "counties": [
+        "Monterey",
+        "Santa Cruz"
+      ],
+      "defendant": "Yes"
     },
     {
       "id": "example3",
       "url": "example3.html?formId=example3",
       "name": "PCOR",
-      "counties": ["Monterey", "Santa Cruz"],
-      "defendent": "N/A"
+      "counties": [
+        "Monterey",
+        "Santa Cruz"
+      ],
+      "defendant": "N/A"
     },
     {
       "id": "smallclaims",
       "url": "smallclaims.html?formId=example3",
       "name": "SC-100 Plaintiff's Claim",
-      "counties": ["Monterey", "Santa Cruz"],
-      "defendent": "N/A"
+      "counties": [
+        "Monterey",
+        "Santa Cruz"
+      ],
+      "defendant": "N/A"
     },
     {
       "id": "small-claims2",
       "name": "SC-100A",
       "url": "small-claims2.html?formId=small-claims2",
-      "counties": ["Monterey", "Santa Cruz"],
-      "defendent": "N/A"
+      "counties": [
+        "Monterey",
+        "Santa Cruz"
+      ],
+      "defendant": "N/A"
     }
   ]
 }

@@ -190,10 +190,32 @@ app.post('/create-cart-checkout-session', async (req, res) => {
     }
 });
 
+// List all Stripe prices (for debugging)
+app.get('/stripe-prices', async (req, res) => {
+    try {
+        console.log('Listing all Stripe prices...');
+        const prices = await stripe.prices.list({ limit: 10, active: true });
+        const priceList = prices.data.map(price => ({
+            id: price.id,
+            unit_amount: price.unit_amount,
+            currency: price.currency,
+            nickname: price.nickname,
+            active: price.active
+        }));
+        console.log(`Found ${priceList.length} prices`);
+        res.json({ prices: priceList });
+    } catch (e) {
+        console.error('Error listing Stripe prices:', e.message);
+        res.status(500).json({ error: 'Failed to list prices', details: e.message });
+    }
+});
+
 // Fetch Stripe price info by Price ID
 app.get('/stripe-price/:priceId', async (req, res) => {
     try {
+        console.log(`Fetching Stripe price: ${req.params.priceId}`);
         const price = await stripe.prices.retrieve(req.params.priceId, { expand: ['product'] });
+        console.log(`Price found: ${price.id}, amount: ${price.unit_amount}`);
         res.json({
             priceId: price.id,
             unit_amount: price.unit_amount,
@@ -202,7 +224,12 @@ app.get('/stripe-price/:priceId', async (req, res) => {
             nickname: price.nickname,
         });
     } catch (e) {
-        res.status(404).json({ error: 'Price not found' });
+        console.error(`Stripe price error for ${req.params.priceId}:`, e.message);
+        res.status(404).json({ 
+            error: 'Price not found', 
+            priceId: req.params.priceId,
+            details: e.message 
+        });
     }
 });
 

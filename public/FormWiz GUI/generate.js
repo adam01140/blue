@@ -2907,11 +2907,16 @@ if (typeof handleNext === 'function') {
                 }
             }
 
+            // Extract county and defendant information from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const countyName = urlParams.get('county') || '';
+            const defendantName = urlParams.get('defendantName') || '';
+
             // Add to cart using the global cart manager
            const formTitle = pdfOutputFileName; // You can make this dynamic based on form type
             
            if (typeof addToCart === 'function') {
-                addToCart(formId || 'custom-form', formTitle, priceId, formData);
+                addToCart(formId || 'custom-form', formTitle, priceId, formData, countyName, defendantName);
                 window.location.href = 'cart.html';
             } else {
                 // Fallback: save to localStorage if cart manager not available
@@ -2920,6 +2925,8 @@ if (typeof handleNext === 'function') {
                     title: formTitle,
                     priceId: priceId,
                     formData: formData,
+                    countyName: countyName,
+                    defendantName: defendantName,
                     timestamp: Date.now()
                 };
                 
@@ -3235,15 +3242,15 @@ if (typeof handleNext === 'function') {
                         // Defendant and county fields
                         let defendantHtml = '';
                         let countyHtml = '';
-                        if (item.formData && item.formData.defendantName) {
-                            const capName = String(item.formData.defendantName)
+                        if (item.defendantName) {
+                            const capName = String(item.defendantName)
                               .split(/\s+/)
                               .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
                               .join(' ');
                             defendantHtml = '<div style=\\"color:#e74c3c;font-weight:600;\\">Defendant: ' + capName + '</div>';
                         }
-                        if (item.formData && item.formData.county) {
-                            countyHtml = '<div style="color:#7f8c8d;">' + item.formData.county + '</div>';
+                        if (item.countyName) {
+                            countyHtml = '<div style="color:#7f8c8d;">' + item.countyName + '</div>';
                         }
                         itemsHtml +=
      '<div class="cart-item">' +
