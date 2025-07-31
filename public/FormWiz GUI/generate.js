@@ -3250,7 +3250,8 @@ if (typeof handleNext === 'function') {
                             defendantHtml = '<div style=\\"color:#e74c3c;font-weight:600;\\">Defendant: ' + capName + '</div>';
                         }
                         if (item.countyName) {
-                            countyHtml = '<div style="color:#7f8c8d;">' + item.countyName + '</div>';
+                            const countyDisplay = item.countyName.toLowerCase().includes('county') ? item.countyName : item.countyName + ' County';
+                            countyHtml = '<div style="color:#7f8c8d;">' + countyDisplay + '</div>';
                         }
                         itemsHtml +=
      '<div class="cart-item">' +

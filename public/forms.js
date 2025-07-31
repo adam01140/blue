@@ -1685,7 +1685,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="cart-item-info">
                                 <div class="cart-item-title">${item.title || 'Form'}</div>
                                 ${defendantDisplay}
-                                ${item.countyName ? `<div class='cart-item-county' style='font-size:0.98em;color:#153a5b;margin-bottom:2px;'>${item.countyName}</div>` : ''}
+                                ${item.countyName ? `<div class='cart-item-county' style='font-size:0.98em;color:#153a5b;margin-bottom:2px;'>${item.countyName}${item.countyName.toLowerCase().includes('county') ? '' : ' County'}</div>` : ''}
                                 <div class="cart-item-price">${display}</div>
                             </div>
                             <button class="remove-item" title="Remove" onclick="(function(){const cart=JSON.parse(decodeURIComponent(document.cookie.split('; ').find(row=>row.startsWith('formwiz_cart='))?.split('=')[1]||'[]'));cart.splice(${itemCount},1);document.cookie='formwiz_cart='+encodeURIComponent(JSON.stringify(cart))+';path=/;max-age=2592000';window.location.reload();})()">

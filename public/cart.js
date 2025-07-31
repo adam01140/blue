@@ -129,7 +129,7 @@ class CartManager {
                         <div style="flex:1;display:flex;flex-direction:column;">
                             <div class="cart-item-title">${item.title}</div>
                             ${defendantDisplay}
-                            ${item.countyName ? `<div class='cart-item-county' style='font-size:0.98em;color:#153a5b;margin-bottom:2px;'>${item.countyName}</div>` : ''}
+                            ${item.countyName ? `<div class='cart-item-county' style='font-size:0.98em;color:#153a5b;margin-bottom:2px;'>${item.countyName}${item.countyName.toLowerCase().includes('county') ? '' : ' County'}</div>` : ''}
                             <div class="cart-item-price">${display}</div>
                         </div>
                         <button class="remove-item" onclick="cartManager.removeFromCart('${item.cartItemId}')">Remove</button>

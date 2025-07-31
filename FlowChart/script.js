@@ -47,6 +47,7 @@ function hideContextMenu() {
   document.getElementById('contextMenu').style.display = 'none';
   document.getElementById('typeSubmenu').style.display = 'none';
   document.getElementById('calcSubmenu').style.display = 'none';
+  document.getElementById('optionTypeSubmenu').style.display = 'none';
   document.getElementById('emptySpaceMenu').style.display = 'none';
   document.getElementById('propertiesMenu').style.display = 'none';
 }
@@ -497,6 +498,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   const typeSubmenu = document.getElementById("typeSubmenu");
   const calcSubmenu = document.getElementById("calcSubmenu");
+  const optionTypeSubmenu = document.getElementById("optionTypeSubmenu");
   const calcTypeBtn = document.getElementById("calcType");
   const subtitleTypeBtn = document.getElementById("subtitleType");
   const infoTypeBtn = document.getElementById("infoType");
@@ -510,6 +512,10 @@ const phoneTypeBtn = document.getElementById("phoneType");
   const bigParagraphTypeBtn = document.getElementById("bigParagraphType");
   const multipleTextboxesTypeBtn = document.getElementById("multipleTextboxesTypeBtn");
   const multipleDropdownTypeBtn = document.getElementById("multipleDropdownTypeBtn");
+  const imageOptionTypeBtn = document.getElementById("imageOptionType");
+  const amountOptionTypeBtn = document.getElementById("amountOptionType");
+  const endNodeTypeBtn = document.getElementById("endNodeType");
+  const regularOptionTypeBtn = document.getElementById("regularOptionType");
 
   const propertiesMenu = document.getElementById("propertiesMenu");
   const propNodeText = document.getElementById("propNodeText");
@@ -766,6 +772,9 @@ graph.isCellEditable = function (cell) {
           if (getNodeType(cell) === 'question') {
             document.getElementById('yesNoNode').style.display = 'block';
             document.getElementById('changeType').style.display = 'block';
+          } else if (isOptions(cell)) {
+            document.getElementById('yesNoNode').style.display = 'none';
+            document.getElementById('changeType').style.display = 'block';
           } else {
             document.getElementById('yesNoNode').style.display = 'none';
             document.getElementById('changeType').style.display = 'none';
@@ -799,6 +808,8 @@ graph.isCellEditable = function (cell) {
     if (
       !contextMenu.contains(e.target) &&
       !typeSubmenu.contains(e.target) &&
+      !calcSubmenu.contains(e.target) &&
+      !optionTypeSubmenu.contains(e.target) &&
       !propertiesMenu.contains(e.target)
     ) {
       hideContextMenu();
@@ -997,16 +1008,41 @@ graph.isCellEditable = function (cell) {
   // 'Change Type' -> Show submenu
   changeTypeButton.addEventListener("click", () => {
     const rect = contextMenu.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    // Calculate submenu position, ensuring it doesn't go off-screen
+    let submenuLeft = rect.right + 5;
+    let submenuTop = rect.top;
+    
+    // If submenu would go off the right edge, position it to the left of the context menu
+    if (submenuLeft + 200 > windowWidth) {
+      submenuLeft = rect.left - 205;
+    }
+    
+    // If submenu would go off the bottom edge, adjust the top position
+    if (submenuTop + 200 > windowHeight) {
+      submenuTop = windowHeight - 210;
+    }
+    
     if (selectedCell && isQuestion(selectedCell)) {
       typeSubmenu.style.display = "block";
-      typeSubmenu.style.left = rect.right + "px";
-      typeSubmenu.style.top = rect.top + "px";
+      typeSubmenu.style.left = submenuLeft + "px";
+      typeSubmenu.style.top = submenuTop + "px";
+      calcSubmenu.style.display = "none";
+      optionTypeSubmenu.style.display = "none";
+    } else if (selectedCell && isOptions(selectedCell)) {
+      optionTypeSubmenu.style.display = "block";
+      optionTypeSubmenu.style.left = submenuLeft + "px";
+      optionTypeSubmenu.style.top = submenuTop + "px";
+      typeSubmenu.style.display = "none";
       calcSubmenu.style.display = "none";
     } else if (selectedCell && (isCalculationNode(selectedCell) || isSubtitleNode(selectedCell) || isInfoNode(selectedCell))) {
       calcSubmenu.style.display = "block";
-      calcSubmenu.style.left = rect.right + "px";
-      calcSubmenu.style.top = rect.top + "px";
+      calcSubmenu.style.left = submenuLeft + "px";
+      calcSubmenu.style.top = submenuTop + "px";
       typeSubmenu.style.display = "none";
+      optionTypeSubmenu.style.display = "none";
     }
   });
 
@@ -1178,6 +1214,83 @@ graph.isCellEditable = function (cell) {
       }
       graph.getModel().setStyle(selectedCell, st);
       updatemultipleDropdownTypeCell(selectedCell);
+    }
+    hideContextMenu();
+  });
+
+  // Option Type Submenu Event Handlers
+  imageOptionTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      // Convert to image option node
+      graph.getModel().beginUpdate();
+      try {
+        // Update the style to include imageOption type
+        selectedCell.style = selectedCell.style.replace(/questionType=[^;]+/, "questionType=imageOption");
+        // Initialize image properties
+        selectedCell._image = { url: "", width: "100", height: "100" };
+        updateImageOptionCell(selectedCell);
+      } finally {
+        graph.getModel().endUpdate();
+      }
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  amountOptionTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      // Convert to amount option node
+      graph.getModel().beginUpdate();
+      try {
+        // Update the style to include amountOption type
+        selectedCell.style = selectedCell.style.replace(/questionType=[^;]+/, "questionType=amountOption");
+        // Initialize amount properties
+        selectedCell._amountName = "Amount Name";
+        selectedCell._amountPlaceholder = "Enter amount";
+        // Use the proper update function
+        updateAmountOptionCell(selectedCell);
+      } finally {
+        graph.getModel().endUpdate();
+      }
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  endNodeTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      // Convert to end node
+      graph.getModel().beginUpdate();
+      try {
+        // Update the style to end node type
+        selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=end");
+        selectedCell.style = selectedCell.style.replace(/questionType=[^;]+/, "");
+        selectedCell.style += ";fillColor=#CCCCCC;fontColor=#000000;";
+        updateEndNodeCell(selectedCell);
+      } finally {
+        graph.getModel().endUpdate();
+      }
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
+  regularOptionTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      // Convert to regular option node
+      graph.getModel().beginUpdate();
+      try {
+        // Update the style to regular option type (remove any questionType)
+        selectedCell.style = selectedCell.style.replace(/questionType=[^;]+/, "");
+        // Set a default value
+        selectedCell.value = "Option";
+        // Use the proper update function
+        updateOptionNodeCell(selectedCell);
+        refreshOptionNodeId(selectedCell);
+      } finally {
+        graph.getModel().endUpdate();
+      }
+      refreshAllCells();
     }
     hideContextMenu();
   });
@@ -1634,6 +1747,10 @@ keyHandler.bindControlKey(86, () => {
           height: "100"
         };
         updateImageOptionCell(cell);
+      } else if (nodeType === 'amountOption') {
+        cell._amountName = "Amount Name";
+        cell._amountPlaceholder = "Enter amount";
+        updateAmountOptionCell(cell);
       } else if (nodeType === 'end') {
         updateEndNodeCell(cell);
       }
@@ -2451,7 +2568,7 @@ function refreshAllCells() {
       if (getQuestionType(cell) === "imageOption") {
         updateImageOptionCell(cell);
       } else if (getQuestionType(cell) === "amountOption") {
-        // Amount option has its own handling
+        updateAmountOptionCell(cell);
       } else {
         // Regular option nodes
         updateOptionNodeCell(cell);
@@ -3745,6 +3862,8 @@ function pasteNodeFromJson(x, y) {
       // If image option, update rendering
       if (getQuestionType(newCell) === "imageOption") {
         updateImageOptionCell(newCell);
+      } else if (getQuestionType(newCell) === "amountOption") {
+        updateAmountOptionCell(newCell);
       } else if (isOptions(newCell)) {
         refreshOptionNodeId(newCell);
       } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
@@ -3837,4 +3956,47 @@ window.updateImageNodeField = function(cellId, field, value) {
   }
   cell._image[field] = value;
   updateImageOptionCell(cell);
+};
+
+// --- UPDATE AMOUNT OPTION NODE ---
+function updateAmountOptionCell(cell) {
+  if (!cell || !isOptions(cell) || getQuestionType(cell) !== "amountOption") return;
+  
+  // Ensure amount properties exist
+  if (!cell._amountName) {
+    cell._amountName = "Amount Name";
+  }
+  if (!cell._amountPlaceholder) {
+    cell._amountPlaceholder = "Enter amount";
+  }
+
+  // Create the HTML display for amount option node
+  const html = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:8px 0;">
+      <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:4px;">
+        <label style="font-size:12px;width:100%;text-align:left;">Name:<input type="text" value="${escapeAttr(cell._amountName)}" style="width:120px;margin-left:4px;" oninput="window.updateAmountNodeField('${cell.id}','name',this.value)" /></label>
+        <label style="font-size:12px;width:100%;text-align:left;">Placeholder:<input type="text" value="${escapeAttr(cell._amountPlaceholder)}" style="width:120px;margin-left:4px;" oninput="window.updateAmountNodeField('${cell.id}','placeholder',this.value)" /></label>
+      </div>
+    </div>
+  `;
+  
+  graph.getModel().beginUpdate();
+  try {
+    graph.getModel().setValue(cell, html);
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  graph.updateCellSize(cell);
+}
+
+// Handler for updating amount node fields
+window.updateAmountNodeField = function(cellId, field, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || getQuestionType(cell) !== "amountOption") return;
+  if (field === "name") {
+    cell._amountName = value;
+  } else if (field === "placeholder") {
+    cell._amountPlaceholder = value;
+  }
+  updateAmountOptionCell(cell);
 };
