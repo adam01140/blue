@@ -981,6 +981,13 @@ graph.isCellEditable = function (cell) {
       
       graph.removeCells(cells);
       refreshAllCells();
+      
+      // Check and cleanup empty sections after deletion
+      if (typeof checkAndCleanupEmptySections === 'function') {
+        setTimeout(() => {
+          checkAndCleanupEmptySections();
+        }, 0);
+      }
     }
     hideContextMenu();
   });
@@ -1791,6 +1798,13 @@ keyHandler.bindControlKey(86, () => {
           
           // Delete the cell
           graph.removeCells([selectedCell]);
+          
+          // Check and cleanup empty sections after deletion
+          if (typeof checkAndCleanupEmptySections === 'function') {
+            setTimeout(() => {
+              checkAndCleanupEmptySections();
+            }, 0);
+          }
           
           // Prevent default behavior (like going back in browser history)
           event.preventDefault();
@@ -3789,8 +3803,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// --- COPY/PASTE NODE AS JSON ---
+// --- COPY/PASTE NODE AS JSON (Cross-tab functionality) ---
 let flowchartClipboard = null;
+const FLOWCHART_CLIPBOARD_KEY = 'flowchart_clipboard_data';
+const FLOWCHART_CLIPBOARD_TIMESTAMP_KEY = 'flowchart_clipboard_timestamp';
 
 function copySelectedNodeAsJson() {
   const cells = graph.getSelectionCells();
@@ -3819,20 +3835,67 @@ function copySelectedNodeAsJson() {
     }
     return cellData;
   });
-  flowchartClipboard = JSON.stringify(data);
-  // Optionally, copy to system clipboard
-  if (navigator.clipboard) navigator.clipboard.writeText(flowchartClipboard);
+  
+  const clipboardData = JSON.stringify(data);
+  const timestamp = Date.now();
+  
+  // Store in localStorage for cross-tab functionality
+  localStorage.setItem(FLOWCHART_CLIPBOARD_KEY, clipboardData);
+  localStorage.setItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY, timestamp.toString());
+  
+  // Also keep in memory for same-tab functionality
+  flowchartClipboard = clipboardData;
+  
+  // Copy to system clipboard as well
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(clipboardData).then(() => {
+      console.log('Node copied to clipboard and localStorage');
+    }).catch(err => {
+      console.log('Failed to copy to system clipboard:', err);
+    });
+  }
+  
+  // Show feedback to user
+  showCopyFeedback();
 }
 
 function pasteNodeFromJson(x, y) {
-  if (!flowchartClipboard) return;
+  // Try to get data from localStorage first (for cross-tab functionality)
+  let clipboardData = localStorage.getItem(FLOWCHART_CLIPBOARD_KEY);
+  let timestamp = localStorage.getItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY);
+  
+  // If no localStorage data, fall back to memory clipboard
+  if (!clipboardData && flowchartClipboard) {
+    clipboardData = flowchartClipboard;
+  }
+  
+  if (!clipboardData) {
+    // Try to get from system clipboard as last resort
+    navigator.clipboard.readText().then(text => {
+      try {
+        JSON.parse(text); // Validate it's JSON
+        pasteNodeFromJsonData(text, x, y);
+      } catch (e) {
+        alert("No valid node data found in clipboard");
+      }
+    }).catch(err => {
+      alert("No node data found to paste");
+    });
+    return;
+  }
+  
+  pasteNodeFromJsonData(clipboardData, x, y);
+}
+
+function pasteNodeFromJsonData(clipboardData, x, y) {
   let data;
   try {
-    data = JSON.parse(flowchartClipboard);
+    data = JSON.parse(clipboardData);
   } catch (e) {
     alert("Clipboard data is invalid");
     return;
   }
+  
   if (!Array.isArray(data)) data = [data];
   const parent = graph.getDefaultParent();
   graph.getModel().beginUpdate();
@@ -3869,6 +3932,122 @@ function pasteNodeFromJson(x, y) {
     graph.getModel().endUpdate();
   }
   refreshAllCells();
+  
+  // Show feedback to user
+  showPasteFeedback();
+}
+
+// Add visual feedback for copy/paste operations
+function showCopyFeedback() {
+  const feedback = document.createElement('div');
+  feedback.textContent = 'Node copied! Available in other tabs.';
+  feedback.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease-out;
+  `;
+  
+  document.body.appendChild(feedback);
+  
+  setTimeout(() => {
+    feedback.style.animation = 'slideOut 0.3s ease-in';
+    setTimeout(() => feedback.remove(), 300);
+  }, 2000);
+}
+
+function showPasteFeedback() {
+  const feedback = document.createElement('div');
+  feedback.textContent = 'Node pasted successfully!';
+  feedback.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #2196F3;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease-out;
+  `;
+  
+  document.body.appendChild(feedback);
+  
+  setTimeout(() => {
+    feedback.style.animation = 'slideOut 0.3s ease-in';
+    setTimeout(() => feedback.remove(), 300);
+  }, 2000);
+}
+
+// Add CSS animations for feedback
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+  }
+`;
+document.head.appendChild(style);
+
+// Listen for storage events to detect when data is copied in other tabs
+window.addEventListener('storage', function(e) {
+  if (e.key === FLOWCHART_CLIPBOARD_KEY && e.newValue) {
+    // Update the memory clipboard when data is copied in another tab
+    flowchartClipboard = e.newValue;
+    console.log('Node data updated from another tab');
+  }
+});
+
+// Check for clipboard data on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if there's clipboard data available from other tabs
+  const clipboardData = localStorage.getItem(FLOWCHART_CLIPBOARD_KEY);
+  const timestamp = localStorage.getItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY);
+  
+  if (clipboardData && timestamp) {
+    const age = Date.now() - parseInt(timestamp);
+    // Show indicator if clipboard data is less than 1 hour old
+    if (age < 3600000) {
+      showClipboardIndicator();
+    }
+  }
+});
+
+function showClipboardIndicator() {
+  const indicator = document.createElement('div');
+  indicator.innerHTML = `
+    <div style="position: fixed; bottom: 20px; right: 20px; background: #FF9800; color: white; 
+                padding: 12px 20px; border-radius: 6px; font-size: 14px; z-index: 10000; 
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer;">
+      📋 Node data available from another tab (Ctrl+V to paste)
+    </div>
+  `;
+  
+  indicator.addEventListener('click', () => {
+    indicator.remove();
+  });
+  
+  document.body.appendChild(indicator);
+  
+  // Auto-remove after 10 seconds
+  setTimeout(() => {
+    if (indicator.parentNode) {
+      indicator.remove();
+    }
+  }, 10000);
 }
 
 // --- UPDATE IMAGE OPTION NODE ---
