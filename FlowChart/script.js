@@ -512,10 +512,6 @@ const phoneTypeBtn = document.getElementById("phoneType");
   const bigParagraphTypeBtn = document.getElementById("bigParagraphType");
   const multipleTextboxesTypeBtn = document.getElementById("multipleTextboxesTypeBtn");
   const multipleDropdownTypeBtn = document.getElementById("multipleDropdownTypeBtn");
-  const imageOptionTypeBtn = document.getElementById("imageOptionType");
-  const amountOptionTypeBtn = document.getElementById("amountOptionType");
-  const endNodeTypeBtn = document.getElementById("endNodeType");
-  const regularOptionTypeBtn = document.getElementById("regularOptionType");
 
   const propertiesMenu = document.getElementById("propertiesMenu");
   const propNodeText = document.getElementById("propNodeText");
@@ -550,7 +546,7 @@ function isSimpleHtmlQuestion(cell) {
 const origGetEditingValue = graph.getEditingValue.bind(graph);
 graph.getEditingValue = function (cell, evt) {
   if (isSimpleHtmlQuestion(cell) || 
-      (isOptions(cell) && !getQuestionType(cell).includes('image')) ||
+      (isOptions(cell) && !getQuestionType(cell).includes('image') && !getQuestionType(cell).includes('amount')) ||
       isSubtitleNode(cell) ||
       isInfoNode(cell)) {
     const tmp = document.createElement("div");
@@ -578,8 +574,8 @@ graph.addListener(mxEvent.LABEL_CHANGED, (sender, evt) => {
     }
     
     evt.consume();   // stop mxGraph from writing the raw text
-  } else if (isOptions(cell) && !getQuestionType(cell).includes('image')) {
-    // For regular option nodes and amount option nodes, update the label and node ID
+  } else if (isOptions(cell) && !getQuestionType(cell).includes('image') && !getQuestionType(cell).includes('amount')) {
+    // For regular option nodes, update the label and node ID
     graph.getModel().beginUpdate();
     try {
       // Set the clean value
@@ -772,9 +768,12 @@ graph.isCellEditable = function (cell) {
           if (getNodeType(cell) === 'question') {
             document.getElementById('yesNoNode').style.display = 'block';
             document.getElementById('changeType').style.display = 'block';
-          } else if (isOptions(cell)) {
+            document.getElementById('changeType').textContent = 'Change Type &raquo;';
+          } else if (getNodeType(cell) === 'options') {
             document.getElementById('yesNoNode').style.display = 'none';
             document.getElementById('changeType').style.display = 'block';
+            // Change the text to indicate it's for option types
+            document.getElementById('changeType').textContent = 'Change Option Type &raquo;';
           } else {
             document.getElementById('yesNoNode').style.display = 'none';
             document.getElementById('changeType').style.display = 'none';
@@ -808,7 +807,6 @@ graph.isCellEditable = function (cell) {
     if (
       !contextMenu.contains(e.target) &&
       !typeSubmenu.contains(e.target) &&
-      !calcSubmenu.contains(e.target) &&
       !optionTypeSubmenu.contains(e.target) &&
       !propertiesMenu.contains(e.target)
     ) {
@@ -831,6 +829,26 @@ graph.isCellEditable = function (cell) {
       mxEvent.consume(evt);
     }
   }, container);
+
+  // Keyboard shortcuts for copy/paste
+  document.addEventListener('keydown', function(evt) {
+    // Only handle shortcuts when not typing in input fields
+    if (isUserTyping(evt)) return;
+    
+    if (evt.ctrlKey || evt.metaKey) {
+      if (evt.key === 'c') {
+        evt.preventDefault();
+        copySelectedNodeAsJson();
+      } else if (evt.key === 'v') {
+        evt.preventDefault();
+        // Get the center of the viewport for pasting
+        const viewport = graph.view.getGraphBounds();
+        const centerX = viewport.x + viewport.width / 2;
+        const centerY = viewport.y + viewport.height / 2;
+        pasteNodeFromJson(centerX, centerY);
+      }
+    }
+  });
 
   // Track selection
   graph.getSelectionModel().addListener(mxEvent.CHANGE, () => {
@@ -981,13 +999,6 @@ graph.isCellEditable = function (cell) {
       
       graph.removeCells(cells);
       refreshAllCells();
-      
-      // Check and cleanup empty sections after deletion
-      if (typeof checkAndCleanupEmptySections === 'function') {
-        setTimeout(() => {
-          checkAndCleanupEmptySections();
-        }, 0);
-      }
     }
     hideContextMenu();
   });
@@ -1015,39 +1026,22 @@ graph.isCellEditable = function (cell) {
   // 'Change Type' -> Show submenu
   changeTypeButton.addEventListener("click", () => {
     const rect = contextMenu.getBoundingClientRect();
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-    
-    // Calculate submenu position, ensuring it doesn't go off-screen
-    let submenuLeft = rect.right + 5;
-    let submenuTop = rect.top;
-    
-    // If submenu would go off the right edge, position it to the left of the context menu
-    if (submenuLeft + 200 > windowWidth) {
-      submenuLeft = rect.left - 205;
-    }
-    
-    // If submenu would go off the bottom edge, adjust the top position
-    if (submenuTop + 200 > windowHeight) {
-      submenuTop = windowHeight - 210;
-    }
-    
     if (selectedCell && isQuestion(selectedCell)) {
       typeSubmenu.style.display = "block";
-      typeSubmenu.style.left = submenuLeft + "px";
-      typeSubmenu.style.top = submenuTop + "px";
+      typeSubmenu.style.left = rect.right + "px";
+      typeSubmenu.style.top = rect.top + "px";
       calcSubmenu.style.display = "none";
       optionTypeSubmenu.style.display = "none";
     } else if (selectedCell && isOptions(selectedCell)) {
       optionTypeSubmenu.style.display = "block";
-      optionTypeSubmenu.style.left = submenuLeft + "px";
-      optionTypeSubmenu.style.top = submenuTop + "px";
+      optionTypeSubmenu.style.left = rect.right + "px";
+      optionTypeSubmenu.style.top = rect.top + "px";
       typeSubmenu.style.display = "none";
       calcSubmenu.style.display = "none";
     } else if (selectedCell && (isCalculationNode(selectedCell) || isSubtitleNode(selectedCell) || isInfoNode(selectedCell))) {
       calcSubmenu.style.display = "block";
-      calcSubmenu.style.left = submenuLeft + "px";
-      calcSubmenu.style.top = submenuTop + "px";
+      calcSubmenu.style.left = rect.right + "px";
+      calcSubmenu.style.top = rect.top + "px";
       typeSubmenu.style.display = "none";
       optionTypeSubmenu.style.display = "none";
     }
@@ -1225,20 +1219,22 @@ graph.isCellEditable = function (cell) {
     hideContextMenu();
   });
 
-  // Option Type Submenu Event Handlers
+  // Option type submenu event handlers
+  const regularOptionTypeBtn = document.getElementById("regularOptionType");
+  const imageOptionTypeBtn = document.getElementById("imageOptionType");
+  const amountOptionTypeBtn = document.getElementById("amountOptionType");
+
+  regularOptionTypeBtn.addEventListener("click", () => {
+    if (selectedCell && isOptions(selectedCell)) {
+      setOptionType(selectedCell, "dropdown");
+      refreshAllCells();
+    }
+    hideContextMenu();
+  });
+
   imageOptionTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
-      // Convert to image option node
-      graph.getModel().beginUpdate();
-      try {
-        // Update the style to include imageOption type
-        selectedCell.style = selectedCell.style.replace(/questionType=[^;]+/, "questionType=imageOption");
-        // Initialize image properties
-        selectedCell._image = { url: "", width: "100", height: "100" };
-        updateImageOptionCell(selectedCell);
-      } finally {
-        graph.getModel().endUpdate();
-      }
+      setOptionType(selectedCell, "imageOption");
       refreshAllCells();
     }
     hideContextMenu();
@@ -1246,57 +1242,7 @@ graph.isCellEditable = function (cell) {
 
   amountOptionTypeBtn.addEventListener("click", () => {
     if (selectedCell && isOptions(selectedCell)) {
-      // Convert to amount option node
-      graph.getModel().beginUpdate();
-      try {
-        // Update the style to include amountOption type
-        selectedCell.style = selectedCell.style.replace(/questionType=[^;]+/, "questionType=amountOption");
-        // Set simple text like a regular amount option node
-        selectedCell.value = "Amount Option";
-        // Remove any complex properties that might have been set
-        delete selectedCell._amountName;
-        delete selectedCell._amountPlaceholder;
-      } finally {
-        graph.getModel().endUpdate();
-      }
-      refreshAllCells();
-    }
-    hideContextMenu();
-  });
-
-  endNodeTypeBtn.addEventListener("click", () => {
-    if (selectedCell && isOptions(selectedCell)) {
-      // Convert to end node
-      graph.getModel().beginUpdate();
-      try {
-        // Update the style to end node type
-        selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=end");
-        selectedCell.style = selectedCell.style.replace(/questionType=[^;]+/, "");
-        selectedCell.style += ";fillColor=#CCCCCC;fontColor=#000000;";
-        updateEndNodeCell(selectedCell);
-      } finally {
-        graph.getModel().endUpdate();
-      }
-      refreshAllCells();
-    }
-    hideContextMenu();
-  });
-
-  regularOptionTypeBtn.addEventListener("click", () => {
-    if (selectedCell && isOptions(selectedCell)) {
-      // Convert to regular option node
-      graph.getModel().beginUpdate();
-      try {
-        // Update the style to regular option type (remove any questionType)
-        selectedCell.style = selectedCell.style.replace(/questionType=[^;]+/, "");
-        // Set a default value
-        selectedCell.value = "Option";
-        // Use the proper update function
-        updateOptionNodeCell(selectedCell);
-        refreshOptionNodeId(selectedCell);
-      } finally {
-        graph.getModel().endUpdate();
-      }
+      setOptionType(selectedCell, "amountOption");
       refreshAllCells();
     }
     hideContextMenu();
@@ -1499,13 +1445,7 @@ const keyHandler = new mxKeyHandler(graph);
 /* Ctrl + C  – copy node (ONLY when not typing) */
 keyHandler.bindControlKey(67, () => {
   if (isUserTyping()) return;                  // NEW / CHANGED
-  console.log('Ctrl+C pressed');
-  try {
-    copySelectedNodeAsJson();
-    console.log('Ctrl+C copy completed');
-  } catch (error) {
-    console.error('Error in Ctrl+C copy:', error);
-  }
+  copySelectedNodeAsJson();
 });
 
 /* Ctrl + V  – paste node (ONLY when not typing) */
@@ -1519,14 +1459,7 @@ keyHandler.bindControlKey(86, () => {
   
   // Add listener for copy button
   document.getElementById('copyNodeButton').addEventListener('click', function() {
-    console.log('Copy button clicked');
-    try {
-      copySelectedNodeAsJson();
-      console.log('Copy function completed');
-    } catch (error) {
-      console.error('Error in copy function:', error);
-      alert('Error copying: ' + error.message);
-    }
+    copySelectedNodeAsJson();
     hideContextMenu();
   });
   
@@ -1616,28 +1549,6 @@ keyHandler.bindControlKey(86, () => {
 
             if (optionSection !== null && optionSection > (questionSection || 0)) {
                 setSection(source, optionSection);
-            }
-        }
-        // NEW: When connecting a multi-textbox or multi-dropdown question to another question,
-        // the target question should adopt the source's section if it's higher
-        else if (isQuestion(source) && isQuestion(target)) {
-            const sourceSection = getSection(source);
-            const targetSection = getSection(target);
-            const sourceQuestionType = getQuestionType(source);
-            
-            // Check if source is a multi-textbox or multi-dropdown question
-            if ((sourceQuestionType === "multipleTextboxes" || sourceQuestionType === "multipleDropdownType") && 
-                sourceSection !== null && sourceSection > (targetSection || 0)) {
-                setSection(target, sourceSection);
-                
-                // Also apply to all downstream cells from the target
-                const downstreamCells = getConnectedDescendants(target);
-                downstreamCells.forEach(cell => {
-                    const cellSection = getSection(cell);
-                    if ((isOptions(cell) || isQuestion(cell)) && (sourceSection > (cellSection || 0))) {
-                        setSection(cell, sourceSection);
-                    }
-                });
             }
         }
     }
@@ -1833,13 +1744,6 @@ keyHandler.bindControlKey(86, () => {
           
           // Delete the cell
           graph.removeCells([selectedCell]);
-          
-          // Check and cleanup empty sections after deletion
-          if (typeof checkAndCleanupEmptySections === 'function') {
-            setTimeout(() => {
-              checkAndCleanupEmptySections();
-            }, 0);
-          }
           
           // Prevent default behavior (like going back in browser history)
           event.preventDefault();
@@ -2532,6 +2436,50 @@ function setQuestionType (cell, newType) {
   }
   refreshAllCells();
 }
+
+// Function to set option type for option nodes
+function setOptionType(cell, newType) {
+  if (!cell || !isOptions(cell)) return;
+  
+  /* —— 1. update style —— */
+  let st = (cell.style || '').replace(/questionType=[^;]+/, '');
+  st += `;questionType=${newType};align=center;verticalAlign=middle;spacing=12;`;
+  
+  graph.getModel().setStyle(cell, st);
+
+  /* —— 2. update internals —— */
+  graph.getModel().beginUpdate();
+  try {
+    switch (newType) {
+      case 'dropdown':
+        // Regular option - simple text
+        updateOptionNodeCell(cell);
+        break;
+      case 'imageOption':
+        // Image option - needs image URL and alt text
+        if (!cell._imageUrl) {
+          cell._imageUrl = '';
+          cell._imageAltText = 'Image description';
+        }
+        updateImageOptionCell(cell);
+        break;
+      case 'amountOption':
+        // Amount option - needs amount name and placeholder
+        if (!cell._amountName) {
+          cell._amountName = 'Amount';
+          cell._amountPlaceholder = 'Enter amount';
+        }
+        // updateAmountOptionCell is handled in the existing code
+        break;
+      default:
+        updateOptionNodeCell(cell);
+    }
+    refreshOptionNodeId(cell);
+  } finally {
+    graph.getModel().endUpdate();
+  }
+  refreshAllCells();
+}
 /* ----------  END OF REPLACEMENT  #2 ------------- */
 
 
@@ -2613,8 +2561,7 @@ function refreshAllCells() {
       if (getQuestionType(cell) === "imageOption") {
         updateImageOptionCell(cell);
       } else if (getQuestionType(cell) === "amountOption") {
-        // Amount option nodes should be handled like regular option nodes
-        updateOptionNodeCell(cell);
+        // Amount option has its own handling
       } else {
         // Regular option nodes
         updateOptionNodeCell(cell);
@@ -2681,10 +2628,12 @@ function isJumpNode(cell) {
 }
 
 /**
- * Find only the DIRECT upstream options that lead to this question (no BFS climbing).
+ * BFS helper: climb from question Q up to all option nodes feeding into Q (even if via multiple question→question).
  */
 function findAllUpstreamOptions(questionCell) {
   const results = [];
+  const visited = new Set();
+  const queue = [];
 
   const incomings = graph.getIncomingEdges(questionCell) || [];
   incomings.forEach(edge => {
@@ -2701,8 +2650,36 @@ function findAllUpstreamOptions(questionCell) {
           });
         }
       }
+    } else if (src && isQuestion(src)) {
+      queue.push(src);
     }
   });
+
+  while (queue.length > 0) {
+    const currentQ = queue.shift();
+    if (!currentQ || visited.has(currentQ.id)) continue;
+    visited.add(currentQ.id);
+
+    const qIncomings = graph.getIncomingEdges(currentQ) || [];
+    qIncomings.forEach(edge => {
+      const src = edge.source;
+      if (src && isOptions(src)) {
+        const optLabel = (src.value || "Option").replace(/<[^>]+>/g, "").trim();
+        const parentEdges = graph.getIncomingEdges(src) || [];
+        if (parentEdges.length > 0) {
+          const parentQ = parentEdges[0].source;
+          if (parentQ && isQuestion(parentQ)) {
+            results.push({
+              questionId: parentQ._questionId,
+              answerLabel: optLabel
+            });
+          }
+        }
+      } else if (src && isQuestion(src)) {
+        queue.push(src);
+      }
+    });
+  }
 
   return results;
 }
@@ -3808,7 +3785,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// --- COPY/PASTE NODE AS JSON (Cross-tab functionality) ---
+// --- COPY/PASTE NODE AS JSON ---
 let flowchartClipboard = null;
 const FLOWCHART_CLIPBOARD_KEY = 'flowchart_clipboard_data';
 const FLOWCHART_CLIPBOARD_TIMESTAMP_KEY = 'flowchart_clipboard_timestamp';
@@ -3821,171 +3798,171 @@ function copySelectedNodeAsJson() {
       return;
     }
   
-  // Separate vertices (nodes) and edges
-  const nodes = cells.filter(cell => cell.vertex);
-  let edges = cells.filter(cell => cell.edge);
-  
-  console.log('Total selected cells:', cells.length);
-  console.log('Selected nodes (vertex):', nodes.length);
-  console.log('Selected edges (edge):', edges.length);
-  console.log('All selected cells:', cells.map(c => ({ id: c.id, vertex: c.vertex, edge: c.edge })));
-  
-  // If no nodes are selected, we can't copy anything meaningful
-  if (nodes.length === 0) {
-    console.log('No nodes selected for copying');
-    return;
-  }
-  
-  // Get all node IDs for edge detection
-  const selectedNodeIds = new Set(nodes.map(node => node.id));
-  
-  // Find all edges that connect selected nodes (even if not explicitly selected)
-  const allEdges = graph.getModel().getEdges();
-  console.log('All edges in graph:', allEdges.length);
-  console.log('Sample edges:', allEdges.slice(0, 3).map(e => ({ 
-    id: e.id, 
-    source: e.source ? e.source.id : null, 
-    target: e.target ? e.target.id : null,
-    vertex: e.vertex,
-    edge: e.edge
-  })));
-  
-  const connectingEdges = allEdges.filter(edge => {
-    const sourceId = edge.source ? edge.source.id : null;
-    const targetId = edge.target ? edge.target.id : null;
-    const connectsSelected = selectedNodeIds.has(sourceId) && selectedNodeIds.has(targetId);
-    if (connectsSelected) {
-      console.log('Found connecting edge:', edge.id, 'from', sourceId, 'to', targetId);
-    }
-    return connectsSelected;
-  });
-  
-  // Debug logging for edge detection
-  console.log('Selected nodes:', Array.from(selectedNodeIds));
-  console.log('All edges in graph:', allEdges.length);
-  console.log('Connecting edges found:', connectingEdges.length);
-  console.log('Explicitly selected edges:', edges.length);
-  
-  // Combine explicitly selected edges with connecting edges
-  const allSelectedEdges = new Set([...edges, ...connectingEdges]);
-  edges = Array.from(allSelectedEdges);
-  
-  // Calculate the bounding box of all selected nodes to determine the center
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  nodes.forEach(cell => {
-    if (cell.geometry) {
-      minX = Math.min(minX, cell.geometry.x);
-      minY = Math.min(minY, cell.geometry.y);
-      maxX = Math.max(maxX, cell.geometry.x + cell.geometry.width);
-      maxY = Math.max(maxY, cell.geometry.y + cell.geometry.height);
-    }
-  });
-  
-  const centerX = (minX + maxX) / 2;
-  const centerY = (minY + maxY) / 2;
-  
-  // Create a map of old IDs to new IDs for edge reconstruction
-  const idMap = {};
-  const newIds = [];
-  
-  // Prepare node data with relative positioning
-  const nodeData = nodes.map(cell => {
-    const cellData = {};
+    // Separate vertices (nodes) and edges
+    const nodes = cells.filter(cell => cell.vertex);
+    let edges = cells.filter(cell => cell.edge);
     
-    // Only copy specific properties we need, avoiding circular references
-    const safeProperties = [
-      'id', 'value', 'style', 'section', '_questionText', '_textboxes', '_twoNumbers', 
-      '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
-      '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
-      '_infoText', '_amountName', '_amountPlaceholder'
-    ];
+    console.log('Total selected cells:', cells.length);
+    console.log('Selected nodes (vertex):', nodes.length);
+    console.log('Selected edges (edge):', edges.length);
+    console.log('All selected cells:', cells.map(c => ({ id: c.id, vertex: c.vertex, edge: c.edge })));
     
-    safeProperties.forEach(prop => {
-      if (cell.hasOwnProperty(prop) && cell[prop] !== undefined) {
-        cellData[prop] = cell[prop];
+    // If no nodes are selected, we can't copy anything meaningful
+    if (nodes.length === 0) {
+      console.log('No nodes selected for copying');
+      return;
+    }
+    
+    // Get all node IDs for edge detection
+    const selectedNodeIds = new Set(nodes.map(node => node.id));
+    
+    // Find all edges that connect selected nodes (even if not explicitly selected)
+    const allEdges = graph.getModel().getEdges();
+    console.log('All edges in graph:', allEdges.length);
+    console.log('Sample edges:', allEdges.slice(0, 3).map(e => ({ 
+      id: e.id, 
+      source: e.source ? e.source.id : null, 
+      target: e.target ? e.target.id : null,
+      vertex: e.vertex,
+      edge: e.edge
+    })));
+    
+    const connectingEdges = allEdges.filter(edge => {
+      const sourceId = edge.source ? edge.source.id : null;
+      const targetId = edge.target ? edge.target.id : null;
+      const connectsSelected = selectedNodeIds.has(sourceId) && selectedNodeIds.has(targetId);
+      if (connectsSelected) {
+        console.log('Found connecting edge:', edge.id, 'from', sourceId, 'to', targetId);
+      }
+      return connectsSelected;
+    });
+    
+    // Debug logging for edge detection
+    console.log('Selected nodes:', Array.from(selectedNodeIds));
+    console.log('All edges in graph:', allEdges.length);
+    console.log('Connecting edges found:', connectingEdges.length);
+    console.log('Explicitly selected edges:', edges.length);
+    
+    // Combine explicitly selected edges with connecting edges
+    const allSelectedEdges = new Set([...edges, ...connectingEdges]);
+    edges = Array.from(allSelectedEdges);
+    
+    // Calculate the bounding box of all selected nodes to determine the center
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    nodes.forEach(cell => {
+      if (cell.geometry) {
+        minX = Math.min(minX, cell.geometry.x);
+        minY = Math.min(minY, cell.geometry.y);
+        maxX = Math.max(maxX, cell.geometry.x + cell.geometry.width);
+        maxY = Math.max(maxY, cell.geometry.y + cell.geometry.height);
       }
     });
     
-    // Store the original ID for edge mapping
-    const originalId = cell.id;
-    const newId = "node_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + "_" + newIds.length;
-    idMap[originalId] = newId;
-    newIds.push(newId);
-    cellData.originalId = originalId;
-    cellData.newId = newId;
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
     
-    // Calculate relative position from center
-    if (cell.geometry) {
-      cellData.geometry = {
-        x: cell.geometry.x - centerX,
-        y: cell.geometry.y - centerY,
-        width: cell.geometry.width,
-        height: cell.geometry.height
-      };
-    }
-    return cellData;
-  });
-  
-  // Prepare edge data with updated source/target IDs
-  const edgeData = edges.map(cell => {
-    const cellData = {};
+    // Create a map of old IDs to new IDs for edge reconstruction
+    const idMap = {};
+    const newIds = [];
     
-    // Only copy specific edge properties we need, avoiding circular references
-    const safeEdgeProperties = [
-      'id', 'value', 'style', 'geometry'
-    ];
-    
-    safeEdgeProperties.forEach(prop => {
-      if (cell.hasOwnProperty(prop) && cell[prop] !== undefined) {
-        cellData[prop] = cell[prop];
+    // Prepare node data with relative positioning
+    const nodeData = nodes.map(cell => {
+      const cellData = {};
+      
+      // Only copy specific properties we need, avoiding circular references
+      const safeProperties = [
+        'id', 'value', 'style', 'section', '_questionText', '_textboxes', '_twoNumbers', 
+        '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
+        '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
+        '_infoText', '_amountName', '_amountPlaceholder'
+      ];
+      
+      safeProperties.forEach(prop => {
+        if (cell.hasOwnProperty(prop) && cell[prop] !== undefined) {
+          cellData[prop] = cell[prop];
+        }
+      });
+      
+      // Store the original ID for edge mapping
+      const originalId = cell.id;
+      const newId = "node_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + "_" + newIds.length;
+      idMap[originalId] = newId;
+      newIds.push(newId);
+      cellData.originalId = originalId;
+      cellData.newId = newId;
+      
+      // Calculate relative position from center
+      if (cell.geometry) {
+        cellData.geometry = {
+          x: cell.geometry.x - centerX,
+          y: cell.geometry.y - centerY,
+          width: cell.geometry.width,
+          height: cell.geometry.height
+        };
       }
+      return cellData;
     });
     
-    // Update source and target IDs to use the new node IDs
-    if (cell.source && idMap[cell.source.id]) {
-      cellData.sourceId = idMap[cell.source.id];
-    }
-    if (cell.target && idMap[cell.target.id]) {
-      cellData.targetId = idMap[cell.target.id];
+    // Prepare edge data with updated source/target IDs
+    const edgeData = edges.map(cell => {
+      const cellData = {};
+      
+      // Only copy specific edge properties we need, avoiding circular references
+      const safeEdgeProperties = [
+        'id', 'value', 'style', 'geometry'
+      ];
+      
+      safeEdgeProperties.forEach(prop => {
+        if (cell.hasOwnProperty(prop) && cell[prop] !== undefined) {
+          cellData[prop] = cell[prop];
+        }
+      });
+      
+      // Update source and target IDs to use the new node IDs
+      if (cell.source && idMap[cell.source.id]) {
+        cellData.sourceId = idMap[cell.source.id];
+      }
+      if (cell.target && idMap[cell.target.id]) {
+        cellData.targetId = idMap[cell.target.id];
+      }
+      
+      return cellData;
+    });
+    
+    console.log('Copy operation - Nodes:', nodes.length, 'Edges found:', edges.length, 'Edge data:', edgeData.length);
+    
+    // Create the complete clipboard data
+    const clipboardData = {
+      nodes: nodeData,
+      edges: edgeData,
+      centerX: centerX,
+      centerY: centerY,
+      isMultiCopy: true
+    };
+    
+    const jsonData = JSON.stringify(clipboardData);
+    const timestamp = Date.now();
+    
+    // Store in localStorage for cross-tab functionality
+    localStorage.setItem(FLOWCHART_CLIPBOARD_KEY, jsonData);
+    localStorage.setItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY, timestamp.toString());
+    
+    // Also keep in memory for same-tab functionality
+    flowchartClipboard = jsonData;
+    
+    // Copy to system clipboard as well
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(jsonData).then(() => {
+        console.log('Nodes copied to clipboard and localStorage');
+      }).catch(err => {
+        console.log('Failed to copy to system clipboard:', err);
+      });
     }
     
-    return cellData;
-  });
-  
-  console.log('Copy operation - Nodes:', nodes.length, 'Edges found:', edges.length, 'Edge data:', edgeData.length);
-  
-  // Create the complete clipboard data
-  const clipboardData = {
-    nodes: nodeData,
-    edges: edgeData,
-    centerX: centerX,
-    centerY: centerY,
-    isMultiCopy: true
-  };
-  
-  const jsonData = JSON.stringify(clipboardData);
-  const timestamp = Date.now();
-  
-  // Store in localStorage for cross-tab functionality
-  localStorage.setItem(FLOWCHART_CLIPBOARD_KEY, jsonData);
-  localStorage.setItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY, timestamp.toString());
-  
-  // Also keep in memory for same-tab functionality
-  flowchartClipboard = jsonData;
-  
-  // Copy to system clipboard as well
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(jsonData).then(() => {
-      console.log('Nodes copied to clipboard and localStorage');
-    }).catch(err => {
-      console.log('Failed to copy to system clipboard:', err);
-    });
-  }
-  
-  // Show feedback to user
-  const nodeCount = nodes.length;
-  const edgeCount = edges.length;
-  showCopyFeedback(nodeCount, edgeCount);
+    // Show feedback to user
+    const nodeCount = nodes.length;
+    const edgeCount = edges.length;
+    showCopyFeedback(nodeCount, edgeCount);
   } catch (error) {
     console.error('Error in copySelectedNodeAsJson:', error);
     throw error;
@@ -4232,19 +4209,7 @@ function showPasteFeedback(nodeCount = 1, edgeCount = 0) {
   }, 2000);
 }
 
-// Add CSS animations for feedback
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-  @keyframes slideOut {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(100%); opacity: 0; }
-  }
-`;
-document.head.appendChild(style);
+// CSS animations are now in style.css
 
 // Listen for storage events to detect when data is copied in other tabs
 window.addEventListener('storage', function(e) {

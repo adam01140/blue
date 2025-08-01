@@ -550,13 +550,6 @@ function updateAllCalcNodesOnQuestionChange(questionCell, isDeleted, oldNodeId =
       } finally {
         graph.getModel().endUpdate();
       }
-      
-      // Check and cleanup empty sections after deletion
-      if (typeof checkAndCleanupEmptySections === 'function') {
-        setTimeout(() => {
-          checkAndCleanupEmptySections();
-        }, 0);
-      }
     }
   }
   // If the question was modified, update all dependent calculation nodes

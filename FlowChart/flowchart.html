@@ -36,11 +36,11 @@
 </div>
 
 <div class="toolbar">
-  <h3>Drag And Drop Elements Below</h3>
+  <h3>Shapes</h3>
   <div
     class="shape"
     data-type="question"
-    data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;nodeId=Question_node;section=1;spacing=12;fontSize=16;"
+    data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=question;questionType=dropdown;nodeId=Question_node;section=1;spacing=12;fontSize=16;"
   >
     Question Node
   </div>
@@ -50,13 +50,13 @@
     data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=dropdown;nodeId=Option_node;section=1;spacing=12;fontSize=16;"
   >
     Options Node
-  </div><br>
+  </div>
   <div
     class="shape"
     data-type="imageOption"
     data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=imageOption;nodeId=Image_node;section=1;spacing=12;fontSize=16;"
   >
-    Image Node
+    Image Option Node
   </div>
   <div 
     class="shape"
@@ -64,13 +64,13 @@
     data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=end;fillColor=#CCCCCC;fontColor=#000000;spacing=12;fontSize=16;"
   >
     End Node
-  </div><br>
+  </div>
   <div 
     class="shape"
     data-type="amountOption"
     data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=amountOption;spacing=12;fontSize=16;"
   >
-    Amount Node
+    Amount Option Node
   </div>
 
   <!-- New: Calculation Node -->
@@ -83,7 +83,6 @@
   </div>
 
   <div class="button-bar">
-    <button onclick="previewForm()">Preview Form</button><br>
     <button onclick="exportFlowchartJson()">Export Flowchart JSON</button>
     <button onclick="document.getElementById('importFlowchartFile').click()">Import Flowchart</button>
     <input
@@ -92,7 +91,7 @@
       accept=".json"
       onchange="importFlowchartJson(event)"
     />
-    <button onclick="exportGuiJson(true)">Export GUI JSON</button>
+    <button onclick="exportGuiJson()">Export GUI JSON</button>
   </div>
 
   <div class="legend">
@@ -160,7 +159,7 @@
 <div id="contextMenu" class="context-menu">
   <button id="copyNodeButton">Copy</button>
   <button id="deleteNode">Delete Node</button>
-  <button id="jumpNode" style="display:none;">Jump</button>
+  <button id="jumpNode">Jump</button>
   <button id="yesNoNode">Yes/No</button>
   <button id="changeType">Change Type &raquo;</button>
   <button id="newSectionNode">New Section</button>
@@ -199,13 +198,6 @@
   <button id="bigParagraphType">Big Paragraph</button>
   <button id="multipleTextboxesTypeBtn">Multiple Textboxes</button>
   <button id="multipleDropdownTypeBtn">Multiple Dropdown</button>
-</div>
-
-<!-- Option Type Submenu -->
-<div id="optionTypeSubmenu" class="submenu">
-  <button id="regularOptionType">Regular Option</button>
-  <button id="imageOptionType">Image Option</button>
-  <button id="amountOptionType">Amount Option</button>
 </div>
 
 <div id="propertiesMenu">
