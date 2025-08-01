@@ -329,25 +329,21 @@ window.exportGuiJson = function(download = true) {
                 temp.innerHTML = optionLabel;
                 optionLabel = temp.textContent || temp.innerText || optionLabel;
               }
-              // Recursively collect parent logic paths
-              const parentPaths = collectAllLogicPaths(parentQ, pathSoFar.concat([{ prevQuestion: String(prevQuestionId), prevAnswer: optionLabel.trim() }]));
-              if (parentPaths.length > 0) {
-                found = true;
-                allPaths.push(...parentPaths);
-              } else {
-                found = true;
-                allPaths.push(pathSoFar.concat([{ prevQuestion: String(prevQuestionId), prevAnswer: optionLabel.trim() }]));
-              }
+              // Only add the direct parent logic, don't recurse further
+              found = true;
+              allPaths.push(pathSoFar.concat([{ prevQuestion: String(prevQuestionId), prevAnswer: optionLabel.trim() }]));
             }
           }
-        } else if (sourceCell && isQuestion(sourceCell)) {
-          // Recursively walk up question-to-question edges
-          const parentPaths = collectAllLogicPaths(sourceCell, pathSoFar);
-          if (parentPaths.length > 0) {
-            found = true;
-            allPaths.push(...parentPaths);
-          }
         }
+        // Remove the recursive question-to-question logic collection
+        // else if (sourceCell && isQuestion(sourceCell)) {
+        //   // Recursively walk up question-to-question edges
+        //   const parentPaths = collectAllLogicPaths(sourceCell, pathSoFar);
+        //   if (parentPaths.length > 0) {
+        //     found = true;
+        //     allPaths.push(...parentPaths);
+        //   }
+        // }
       }
       if (!found && pathSoFar.length > 0) {
         return [pathSoFar];

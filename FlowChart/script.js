@@ -1618,6 +1618,28 @@ keyHandler.bindControlKey(86, () => {
                 setSection(source, optionSection);
             }
         }
+        // NEW: When connecting a multi-textbox or multi-dropdown question to another question,
+        // the target question should adopt the source's section if it's higher
+        else if (isQuestion(source) && isQuestion(target)) {
+            const sourceSection = getSection(source);
+            const targetSection = getSection(target);
+            const sourceQuestionType = getQuestionType(source);
+            
+            // Check if source is a multi-textbox or multi-dropdown question
+            if ((sourceQuestionType === "multipleTextboxes" || sourceQuestionType === "multipleDropdownType") && 
+                sourceSection !== null && sourceSection > (targetSection || 0)) {
+                setSection(target, sourceSection);
+                
+                // Also apply to all downstream cells from the target
+                const downstreamCells = getConnectedDescendants(target);
+                downstreamCells.forEach(cell => {
+                    const cellSection = getSection(cell);
+                    if ((isOptions(cell) || isQuestion(cell)) && (sourceSection > (cellSection || 0))) {
+                        setSection(cell, sourceSection);
+                    }
+                });
+            }
+        }
     }
 
     refreshAllCells();
@@ -2659,12 +2681,10 @@ function isJumpNode(cell) {
 }
 
 /**
- * BFS helper: climb from question Q up to all option nodes feeding into Q (even if via multiple question→question).
+ * Find only the DIRECT upstream options that lead to this question (no BFS climbing).
  */
 function findAllUpstreamOptions(questionCell) {
   const results = [];
-  const visited = new Set();
-  const queue = [];
 
   const incomings = graph.getIncomingEdges(questionCell) || [];
   incomings.forEach(edge => {
@@ -2681,36 +2701,8 @@ function findAllUpstreamOptions(questionCell) {
           });
         }
       }
-    } else if (src && isQuestion(src)) {
-      queue.push(src);
     }
   });
-
-  while (queue.length > 0) {
-    const currentQ = queue.shift();
-    if (!currentQ || visited.has(currentQ.id)) continue;
-    visited.add(currentQ.id);
-
-    const qIncomings = graph.getIncomingEdges(currentQ) || [];
-    qIncomings.forEach(edge => {
-      const src = edge.source;
-      if (src && isOptions(src)) {
-        const optLabel = (src.value || "Option").replace(/<[^>]+>/g, "").trim();
-        const parentEdges = graph.getIncomingEdges(src) || [];
-        if (parentEdges.length > 0) {
-          const parentQ = parentEdges[0].source;
-          if (parentQ && isQuestion(parentQ)) {
-            results.push({
-              questionId: parentQ._questionId,
-              answerLabel: optLabel
-            });
-          }
-        }
-      } else if (src && isQuestion(src)) {
-        queue.push(src);
-      }
-    });
-  }
 
   return results;
 }
