@@ -1499,7 +1499,13 @@ const keyHandler = new mxKeyHandler(graph);
 /* Ctrl + C  – copy node (ONLY when not typing) */
 keyHandler.bindControlKey(67, () => {
   if (isUserTyping()) return;                  // NEW / CHANGED
-  copySelectedNodeAsJson();
+  console.log('Ctrl+C pressed');
+  try {
+    copySelectedNodeAsJson();
+    console.log('Ctrl+C copy completed');
+  } catch (error) {
+    console.error('Error in Ctrl+C copy:', error);
+  }
 });
 
 /* Ctrl + V  – paste node (ONLY when not typing) */
@@ -1513,7 +1519,14 @@ keyHandler.bindControlKey(86, () => {
   
   // Add listener for copy button
   document.getElementById('copyNodeButton').addEventListener('click', function() {
-    copySelectedNodeAsJson();
+    console.log('Copy button clicked');
+    try {
+      copySelectedNodeAsJson();
+      console.log('Copy function completed');
+    } catch (error) {
+      console.error('Error in copy function:', error);
+      alert('Error copying: ' + error.message);
+    }
     hideContextMenu();
   });
   
@@ -3809,26 +3822,111 @@ const FLOWCHART_CLIPBOARD_KEY = 'flowchart_clipboard_data';
 const FLOWCHART_CLIPBOARD_TIMESTAMP_KEY = 'flowchart_clipboard_timestamp';
 
 function copySelectedNodeAsJson() {
-  const cells = graph.getSelectionCells();
-  if (!cells || cells.length === 0) return;
-  // Only copy vertices (nodes), not edges
-  const nodes = cells.filter(cell => cell.vertex);
-  if (nodes.length === 0) return;
-  // Deep clone node data (excluding graph/model references)
-  const data = nodes.map(cell => {
-    const cellData = {};
-    for (let key in cell) {
-      if (Object.prototype.hasOwnProperty.call(cell, key)) {
-        // Exclude parent/children/graph/model references
-        if (["parent", "children", "edges", "mxTransient", "mxObjectId", "mxCellId", "mxCellEditor", "mxCellRenderer"].includes(key)) continue;
-        cellData[key] = cell[key];
-      }
+  try {
+    const cells = graph.getSelectionCells();
+    if (!cells || cells.length === 0) {
+      console.log('No cells selected');
+      return;
     }
-    // Also copy geometry
+  
+  // Separate vertices (nodes) and edges
+  const nodes = cells.filter(cell => cell.vertex);
+  let edges = cells.filter(cell => cell.edge);
+  
+  console.log('Total selected cells:', cells.length);
+  console.log('Selected nodes (vertex):', nodes.length);
+  console.log('Selected edges (edge):', edges.length);
+  console.log('All selected cells:', cells.map(c => ({ id: c.id, vertex: c.vertex, edge: c.edge })));
+  
+  // If no nodes are selected, we can't copy anything meaningful
+  if (nodes.length === 0) {
+    console.log('No nodes selected for copying');
+    return;
+  }
+  
+  // Get all node IDs for edge detection
+  const selectedNodeIds = new Set(nodes.map(node => node.id));
+  
+  // Find all edges that connect selected nodes (even if not explicitly selected)
+  const allEdges = graph.getModel().getEdges();
+  console.log('All edges in graph:', allEdges.length);
+  console.log('Sample edges:', allEdges.slice(0, 3).map(e => ({ 
+    id: e.id, 
+    source: e.source ? e.source.id : null, 
+    target: e.target ? e.target.id : null,
+    vertex: e.vertex,
+    edge: e.edge
+  })));
+  
+  const connectingEdges = allEdges.filter(edge => {
+    const sourceId = edge.source ? edge.source.id : null;
+    const targetId = edge.target ? edge.target.id : null;
+    const connectsSelected = selectedNodeIds.has(sourceId) && selectedNodeIds.has(targetId);
+    if (connectsSelected) {
+      console.log('Found connecting edge:', edge.id, 'from', sourceId, 'to', targetId);
+    }
+    return connectsSelected;
+  });
+  
+  // Debug logging for edge detection
+  console.log('Selected nodes:', Array.from(selectedNodeIds));
+  console.log('All edges in graph:', allEdges.length);
+  console.log('Connecting edges found:', connectingEdges.length);
+  console.log('Explicitly selected edges:', edges.length);
+  
+  // Combine explicitly selected edges with connecting edges
+  const allSelectedEdges = new Set([...edges, ...connectingEdges]);
+  edges = Array.from(allSelectedEdges);
+  
+  // Calculate the bounding box of all selected nodes to determine the center
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  nodes.forEach(cell => {
+    if (cell.geometry) {
+      minX = Math.min(minX, cell.geometry.x);
+      minY = Math.min(minY, cell.geometry.y);
+      maxX = Math.max(maxX, cell.geometry.x + cell.geometry.width);
+      maxY = Math.max(maxY, cell.geometry.y + cell.geometry.height);
+    }
+  });
+  
+  const centerX = (minX + maxX) / 2;
+  const centerY = (minY + maxY) / 2;
+  
+  // Create a map of old IDs to new IDs for edge reconstruction
+  const idMap = {};
+  const newIds = [];
+  
+  // Prepare node data with relative positioning
+  const nodeData = nodes.map(cell => {
+    const cellData = {};
+    
+    // Only copy specific properties we need, avoiding circular references
+    const safeProperties = [
+      'id', 'value', 'style', 'section', '_questionText', '_textboxes', '_twoNumbers', 
+      '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
+      '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
+      '_infoText', '_amountName', '_amountPlaceholder'
+    ];
+    
+    safeProperties.forEach(prop => {
+      if (cell.hasOwnProperty(prop) && cell[prop] !== undefined) {
+        cellData[prop] = cell[prop];
+      }
+    });
+    
+    // Store the original ID for edge mapping
+    const originalId = cell.id;
+    const newId = "node_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + "_" + newIds.length;
+    idMap[originalId] = newId;
+    newIds.push(newId);
+    cellData.originalId = originalId;
+    cellData.newId = newId;
+    
+    // Calculate relative position from center
     if (cell.geometry) {
       cellData.geometry = {
-        x: cell.geometry.x,
-        y: cell.geometry.y,
+        x: cell.geometry.x - centerX,
+        y: cell.geometry.y - centerY,
         width: cell.geometry.width,
         height: cell.geometry.height
       };
@@ -3836,27 +3934,70 @@ function copySelectedNodeAsJson() {
     return cellData;
   });
   
-  const clipboardData = JSON.stringify(data);
+  // Prepare edge data with updated source/target IDs
+  const edgeData = edges.map(cell => {
+    const cellData = {};
+    
+    // Only copy specific edge properties we need, avoiding circular references
+    const safeEdgeProperties = [
+      'id', 'value', 'style', 'geometry'
+    ];
+    
+    safeEdgeProperties.forEach(prop => {
+      if (cell.hasOwnProperty(prop) && cell[prop] !== undefined) {
+        cellData[prop] = cell[prop];
+      }
+    });
+    
+    // Update source and target IDs to use the new node IDs
+    if (cell.source && idMap[cell.source.id]) {
+      cellData.sourceId = idMap[cell.source.id];
+    }
+    if (cell.target && idMap[cell.target.id]) {
+      cellData.targetId = idMap[cell.target.id];
+    }
+    
+    return cellData;
+  });
+  
+  console.log('Copy operation - Nodes:', nodes.length, 'Edges found:', edges.length, 'Edge data:', edgeData.length);
+  
+  // Create the complete clipboard data
+  const clipboardData = {
+    nodes: nodeData,
+    edges: edgeData,
+    centerX: centerX,
+    centerY: centerY,
+    isMultiCopy: true
+  };
+  
+  const jsonData = JSON.stringify(clipboardData);
   const timestamp = Date.now();
   
   // Store in localStorage for cross-tab functionality
-  localStorage.setItem(FLOWCHART_CLIPBOARD_KEY, clipboardData);
+  localStorage.setItem(FLOWCHART_CLIPBOARD_KEY, jsonData);
   localStorage.setItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY, timestamp.toString());
   
   // Also keep in memory for same-tab functionality
-  flowchartClipboard = clipboardData;
+  flowchartClipboard = jsonData;
   
   // Copy to system clipboard as well
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(clipboardData).then(() => {
-      console.log('Node copied to clipboard and localStorage');
+    navigator.clipboard.writeText(jsonData).then(() => {
+      console.log('Nodes copied to clipboard and localStorage');
     }).catch(err => {
       console.log('Failed to copy to system clipboard:', err);
     });
   }
   
   // Show feedback to user
-  showCopyFeedback();
+  const nodeCount = nodes.length;
+  const edgeCount = edges.length;
+  showCopyFeedback(nodeCount, edgeCount);
+  } catch (error) {
+    console.error('Error in copySelectedNodeAsJson:', error);
+    throw error;
+  }
 }
 
 function pasteNodeFromJson(x, y) {
@@ -3896,51 +4037,151 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
     return;
   }
   
-  if (!Array.isArray(data)) data = [data];
   const parent = graph.getDefaultParent();
   graph.getModel().beginUpdate();
+  
   try {
-    data.forEach((cellData, idx) => {
-      // Assign a new ID
-      cellData.id = "node_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + "_" + idx;
-      // Offset geometry for each pasted node
-      let dx = 40 * idx;
-      let dy = 40 * idx;
-      let px = (typeof x === "number" ? x : (cellData.geometry?.x || 100)) + dx;
-      let py = (typeof y === "number" ? y : (cellData.geometry?.y || 100)) + dy;
-      const geo = new mxGeometry(px, py, cellData.geometry?.width || 160, cellData.geometry?.height || 80);
-      const newCell = new mxCell(cellData.value, geo, cellData.style);
-      newCell.vertex = true;
-      // Copy custom fields
-      ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
-        if (cellData[k] !== undefined) newCell[k] = cellData[k];
+    // Handle new multi-copy format
+    if (data.isMultiCopy && data.nodes) {
+      // Use provided position or default to center of viewport
+      const pasteX = typeof x === "number" ? x : (data.centerX || 100);
+      const pasteY = typeof y === "number" ? y : (data.centerY || 100);
+      
+      // Create a map to store new cell instances
+      const newCells = {};
+      
+      // First, create all nodes
+      data.nodes.forEach((nodeData) => {
+        // Calculate absolute position based on relative position and paste location
+        const absX = pasteX + (nodeData.geometry?.x || 0);
+        const absY = pasteY + (nodeData.geometry?.y || 0);
+        
+        const geo = new mxGeometry(
+          absX, 
+          absY, 
+          nodeData.geometry?.width || 160, 
+          nodeData.geometry?.height || 80
+        );
+        
+        const newCell = new mxCell(nodeData.value, geo, nodeData.style);
+        newCell.vertex = true;
+        newCell.id = nodeData.newId;
+        
+        // Copy custom fields
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+          if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
+        });
+        
+        // Section
+        if (nodeData.section !== undefined) newCell.section = nodeData.section;
+        
+        // Insert into graph
+        graph.addCell(newCell, parent);
+        newCells[nodeData.newId] = newCell;
+        
+        // Update rendering for special node types
+        if (getQuestionType(newCell) === "imageOption") {
+          updateImageOptionCell(newCell);
+        } else if (isOptions(newCell)) {
+          refreshOptionNodeId(newCell);
+        } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
+          if (typeof updateCalculationNodeCell === "function") updateCalculationNodeCell(newCell);
+        }
       });
-      // Section
-      if (cellData.section !== undefined) newCell.section = cellData.section;
-      // Insert into graph
-      graph.addCell(newCell, parent);
-      // If image option, update rendering
-      if (getQuestionType(newCell) === "imageOption") {
-        updateImageOptionCell(newCell);
-      } else if (isOptions(newCell)) {
-        refreshOptionNodeId(newCell);
-      } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
-        if (typeof updateCalculationNodeCell === "function") updateCalculationNodeCell(newCell);
+      
+      // Then, create all edges
+      if (data.edges) {
+        console.log('Paste operation - Creating', data.edges.length, 'edges');
+        data.edges.forEach((edgeData, index) => {
+          const sourceCell = newCells[edgeData.sourceId];
+          const targetCell = newCells[edgeData.targetId];
+          
+          if (sourceCell && targetCell) {
+            // Use the proper insertEdge method instead of manual creation
+            const newEdge = graph.insertEdge(parent, null, edgeData.value || "", sourceCell, targetCell, edgeData.style);
+            
+            // Copy edge properties if they exist
+            if (edgeData.geometry) {
+              newEdge.geometry = new mxGeometry(
+                edgeData.geometry.x || 0,
+                edgeData.geometry.y || 0,
+                edgeData.geometry.width || 0,
+                edgeData.geometry.height || 0
+              );
+            }
+            
+            console.log('Edge created successfully:', newEdge.id);
+          } else {
+            console.log('Failed to create edge - missing source or target');
+          }
+        });
+      } else {
+        console.log('No edges data found in clipboard');
       }
-    });
+      
+      // Show feedback with counts
+      const nodeCount = data.nodes.length;
+      const edgeCount = data.edges ? data.edges.length : 0;
+      showPasteFeedback(nodeCount, edgeCount);
+      
+    } else {
+      // Handle legacy single-node format (backward compatibility)
+      let legacyData = Array.isArray(data) ? data : [data];
+      
+      legacyData.forEach((cellData, idx) => {
+        // Assign a new ID
+        cellData.id = "node_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + "_" + idx;
+        // Offset geometry for each pasted node
+        let dx = 40 * idx;
+        let dy = 40 * idx;
+        let px = (typeof x === "number" ? x : (cellData.geometry?.x || 100)) + dx;
+        let py = (typeof y === "number" ? y : (cellData.geometry?.y || 100)) + dy;
+        const geo = new mxGeometry(px, py, cellData.geometry?.width || 160, cellData.geometry?.height || 80);
+        const newCell = new mxCell(cellData.value, geo, cellData.style);
+        newCell.vertex = true;
+        // Copy custom fields
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+          if (cellData[k] !== undefined) newCell[k] = cellData[k];
+        });
+        // Section
+        if (cellData.section !== undefined) newCell.section = cellData.section;
+        // Insert into graph
+        graph.addCell(newCell, parent);
+        // If image option, update rendering
+        if (getQuestionType(newCell) === "imageOption") {
+          updateImageOptionCell(newCell);
+        } else if (isOptions(newCell)) {
+          refreshOptionNodeId(newCell);
+        } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
+          if (typeof updateCalculationNodeCell === "function") updateCalculationNodeCell(newCell);
+        }
+      });
+      
+      showPasteFeedback(legacyData.length, 0);
+    }
+    
   } finally {
     graph.getModel().endUpdate();
   }
-  refreshAllCells();
   
-  // Show feedback to user
-  showPasteFeedback();
+  refreshAllCells();
 }
 
 // Add visual feedback for copy/paste operations
-function showCopyFeedback() {
+function showCopyFeedback(nodeCount = 1, edgeCount = 0) {
   const feedback = document.createElement('div');
-  feedback.textContent = 'Node copied! Available in other tabs.';
+  let message = '';
+  if (nodeCount === 1 && edgeCount === 0) {
+    message = 'Node copied! Available in other tabs.';
+  } else if (nodeCount > 1 && edgeCount === 0) {
+    message = `${nodeCount} nodes copied! Available in other tabs.`;
+  } else if (nodeCount > 1 && edgeCount > 0) {
+    message = `${nodeCount} nodes and ${edgeCount} connections copied! Available in other tabs.`;
+  } else {
+    message = 'Selection copied! Available in other tabs.';
+  }
+  
+  feedback.textContent = message;
   feedback.style.cssText = `
     position: fixed;
     top: 20px;
@@ -3963,9 +4204,20 @@ function showCopyFeedback() {
   }, 2000);
 }
 
-function showPasteFeedback() {
+function showPasteFeedback(nodeCount = 1, edgeCount = 0) {
   const feedback = document.createElement('div');
-  feedback.textContent = 'Node pasted successfully!';
+  let message = '';
+  if (nodeCount === 1 && edgeCount === 0) {
+    message = 'Node pasted successfully!';
+  } else if (nodeCount > 1 && edgeCount === 0) {
+    message = `${nodeCount} nodes pasted successfully!`;
+  } else if (nodeCount > 1 && edgeCount > 0) {
+    message = `${nodeCount} nodes and ${edgeCount} connections pasted successfully!`;
+  } else {
+    message = 'Selection pasted successfully!';
+  }
+  
+  feedback.textContent = message;
   feedback.style.cssText = `
     position: fixed;
     top: 20px;
@@ -4021,18 +4273,44 @@ document.addEventListener('DOMContentLoaded', function() {
     const age = Date.now() - parseInt(timestamp);
     // Show indicator if clipboard data is less than 1 hour old
     if (age < 3600000) {
-      showClipboardIndicator();
+      try {
+        const data = JSON.parse(clipboardData);
+        let nodeCount = 1;
+        let edgeCount = 0;
+        
+        if (data.isMultiCopy && data.nodes) {
+          nodeCount = data.nodes.length;
+          edgeCount = data.edges ? data.edges.length : 0;
+        } else if (Array.isArray(data)) {
+          nodeCount = data.length;
+        }
+        
+        showClipboardIndicator(nodeCount, edgeCount);
+      } catch (e) {
+        showClipboardIndicator(1, 0);
+      }
     }
   }
 });
 
-function showClipboardIndicator() {
+function showClipboardIndicator(nodeCount = 1, edgeCount = 0) {
   const indicator = document.createElement('div');
+  let message = '';
+  if (nodeCount === 1 && edgeCount === 0) {
+    message = '📋 Node data available from another tab (Ctrl+V to paste)';
+  } else if (nodeCount > 1 && edgeCount === 0) {
+    message = `📋 ${nodeCount} nodes available from another tab (Ctrl+V to paste)`;
+  } else if (nodeCount > 1 && edgeCount > 0) {
+    message = `📋 ${nodeCount} nodes and ${edgeCount} connections available from another tab (Ctrl+V to paste)`;
+  } else {
+    message = '📋 Selection data available from another tab (Ctrl+V to paste)';
+  }
+  
   indicator.innerHTML = `
     <div style="position: fixed; bottom: 20px; right: 20px; background: #FF9800; color: white; 
                 padding: 12px 20px; border-radius: 6px; font-size: 14px; z-index: 10000; 
                 box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer;">
-      📋 Node data available from another tab (Ctrl+V to paste)
+      ${message}
     </div>
   `;
   
