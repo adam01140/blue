@@ -275,6 +275,9 @@ window.exportGuiJson = function(download = true) {
     
     // Handle outgoing edges to option nodes
     const outgoingEdges = graph.getOutgoingEdges(cell);
+    const jumpConditions = [];
+    let endOption = null;
+    
     if (outgoingEdges) {
       for (const edge of outgoingEdges) {
         const targetCell = edge.target;
@@ -289,6 +292,24 @@ window.exportGuiJson = function(download = true) {
           const option = {
             text: optionText
           };
+          
+          // Check if this option leads to an end node
+          const optionOutgoingEdges = graph.getOutgoingEdges(targetCell);
+          if (optionOutgoingEdges) {
+            for (const optionEdge of optionOutgoingEdges) {
+              const optionTarget = optionEdge.target;
+              if (optionTarget && isEndNode(optionTarget)) {
+                // This option leads to an end node
+                jumpConditions.push({
+                  option: optionText.trim(),
+                  to: "end"
+                });
+                endOption = optionText.trim();
+                break;
+              }
+            }
+          }
+          
           // Handle amount options
           if (getQuestionType(targetCell) === "amountOption") {
             option.amount = {
@@ -303,6 +324,17 @@ window.exportGuiJson = function(download = true) {
           question.options.push(option);
         }
       }
+    }
+    
+    // Set jump logic if any options lead to end nodes
+    if (jumpConditions.length > 0) {
+      question.jump.enabled = true;
+      question.jump.conditions = jumpConditions;
+    }
+    
+    // Set conditionalPDF answer to the option that leads to end (if any)
+    if (endOption) {
+      question.conditionalPDF.answer = endOption;
     }
     
     // --- PATCH: For dropdowns, convert options to array of strings and add linking/image fields ---
