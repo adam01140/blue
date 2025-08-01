@@ -1244,11 +1244,11 @@ graph.isCellEditable = function (cell) {
       try {
         // Update the style to include amountOption type
         selectedCell.style = selectedCell.style.replace(/questionType=[^;]+/, "questionType=amountOption");
-        // Initialize amount properties
-        selectedCell._amountName = "Amount Name";
-        selectedCell._amountPlaceholder = "Enter amount";
-        // Use the proper update function
-        updateAmountOptionCell(selectedCell);
+        // Set simple value like regular amount option nodes
+        selectedCell.value = "Amount Option";
+        // Remove any special properties that might have been set
+        delete selectedCell._amountName;
+        delete selectedCell._amountPlaceholder;
       } finally {
         graph.getModel().endUpdate();
       }
@@ -1747,10 +1747,6 @@ keyHandler.bindControlKey(86, () => {
           height: "100"
         };
         updateImageOptionCell(cell);
-      } else if (nodeType === 'amountOption') {
-        cell._amountName = "Amount Name";
-        cell._amountPlaceholder = "Enter amount";
-        updateAmountOptionCell(cell);
       } else if (nodeType === 'end') {
         updateEndNodeCell(cell);
       }
@@ -2568,7 +2564,7 @@ function refreshAllCells() {
       if (getQuestionType(cell) === "imageOption") {
         updateImageOptionCell(cell);
       } else if (getQuestionType(cell) === "amountOption") {
-        updateAmountOptionCell(cell);
+        // Amount option has its own handling
       } else {
         // Regular option nodes
         updateOptionNodeCell(cell);
@@ -3862,8 +3858,6 @@ function pasteNodeFromJson(x, y) {
       // If image option, update rendering
       if (getQuestionType(newCell) === "imageOption") {
         updateImageOptionCell(newCell);
-      } else if (getQuestionType(newCell) === "amountOption") {
-        updateAmountOptionCell(newCell);
       } else if (isOptions(newCell)) {
         refreshOptionNodeId(newCell);
       } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
@@ -3956,47 +3950,4 @@ window.updateImageNodeField = function(cellId, field, value) {
   }
   cell._image[field] = value;
   updateImageOptionCell(cell);
-};
-
-// --- UPDATE AMOUNT OPTION NODE ---
-function updateAmountOptionCell(cell) {
-  if (!cell || !isOptions(cell) || getQuestionType(cell) !== "amountOption") return;
-  
-  // Ensure amount properties exist
-  if (!cell._amountName) {
-    cell._amountName = "Amount Name";
-  }
-  if (!cell._amountPlaceholder) {
-    cell._amountPlaceholder = "Enter amount";
-  }
-
-  // Create the HTML display for amount option node
-  const html = `
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:8px 0;">
-      <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:4px;">
-        <label style="font-size:12px;width:100%;text-align:left;">Name:<input type="text" value="${escapeAttr(cell._amountName)}" style="width:120px;margin-left:4px;" oninput="window.updateAmountNodeField('${cell.id}','name',this.value)" /></label>
-        <label style="font-size:12px;width:100%;text-align:left;">Placeholder:<input type="text" value="${escapeAttr(cell._amountPlaceholder)}" style="width:120px;margin-left:4px;" oninput="window.updateAmountNodeField('${cell.id}','placeholder',this.value)" /></label>
-      </div>
-    </div>
-  `;
-  
-  graph.getModel().beginUpdate();
-  try {
-    graph.getModel().setValue(cell, html);
-  } finally {
-    graph.getModel().endUpdate();
-  }
-  graph.updateCellSize(cell);
-}
-
-// Handler for updating amount node fields
-window.updateAmountNodeField = function(cellId, field, value) {
-  const cell = graph.getModel().getCell(cellId);
-  if (!cell || getQuestionType(cell) !== "amountOption") return;
-  if (field === "name") {
-    cell._amountName = value;
-  } else if (field === "placeholder") {
-    cell._amountPlaceholder = value;
-  }
-  updateAmountOptionCell(cell);
 };
