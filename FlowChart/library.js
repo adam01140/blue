@@ -325,6 +325,45 @@ window.exportGuiJson = function(download = true) {
       question.image = imageData || { url: "", width: 0, height: 0 };
     }
     
+    // --- PATCH: For checkboxes, convert options to proper checkbox format ---
+    if (exportType === "checkbox") {
+      // Clean the question text from HTML
+      if (question.text && question.text.includes("<")) {
+        const temp = document.createElement("div");
+        temp.innerHTML = question.text;
+        question.text = temp.textContent || temp.innerText || question.text;
+      }
+      
+      // Get the proper base nameId from the question's nodeId
+      const baseNameId = getNodeId(cell) || question.nameId || "unnamed";
+      
+      // Convert options to checkbox format
+      question.options = question.options.map(opt => {
+        if (typeof opt.text === 'string') {
+          const optionText = opt.text.trim();
+          return {
+            label: optionText,
+            nameId: `${baseNameId}_${optionText.toLowerCase().replace(/\s+/g, '_')}`,
+            value: "",
+            hasAmount: false,
+            amountName: "",
+            amountPlaceholder: ""
+          };
+        }
+        return {
+          label: "",
+          nameId: "",
+          value: "",
+          hasAmount: false,
+          amountName: "",
+          amountPlaceholder: ""
+        };
+      });
+      
+      // Set conditionalPDF answer to empty string for checkboxes
+      question.conditionalPDF.answer = "";
+    }
+    
     // --- PATCH: Add direct parent conditional logic with special handling for mult textbox/dropdown ---
     function findDirectParentCondition(cell) {
       const incomingEdges = graph.getIncomingEdges(cell) || [];
