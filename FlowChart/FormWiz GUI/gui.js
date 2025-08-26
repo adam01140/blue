@@ -889,6 +889,17 @@ function toggleOptions(questionId) {
     if (pdfLogicBlock) {
         pdfLogicBlock.style.display = 'none'; // Reset visibility
         // The actual visibility will be controlled by the checkbox toggle
+        
+        // If PDF Logic is currently enabled and we're switching to Big Paragraph, update the conditions
+        const pdfLogicCheckbox = document.getElementById(`pdfLogic${questionId}`);
+        if (pdfLogicCheckbox && pdfLogicCheckbox.checked && questionType === 'bigParagraph') {
+            const pdfLogicConditionsDiv = document.getElementById(`pdfLogicConditions${questionId}`);
+            if (pdfLogicConditionsDiv) {
+                pdfLogicConditionsDiv.innerHTML = '';
+                // Add a default character limit condition for Big Paragraph
+                addPdfLogicCondition(questionId);
+            }
+        }
     }
     
     // Update linking targets in case dropdown questions were added/changed
@@ -1046,21 +1057,78 @@ function updateAlertLogicAnswersForRow(questionId, conditionIndex) {
 function addPdfLogicCondition(questionId) {
     const pdfLogicConditionsDiv = document.getElementById(`pdfLogicConditions${questionId}`);
     const numConditions = pdfLogicConditionsDiv.children.length + 1;
-
-    const conditionRow = document.createElement('div');
-    conditionRow.className = 'pdf-logic-condition-row';
-    conditionRow.id = `pdfLogicConditionRow${questionId}_${numConditions}`;
-    conditionRow.innerHTML = `
-        <span>Condition ${numConditions}:</span><br>
-        <input type="number" placeholder="Previous question number"
-               id="pdfPrevQuestion${questionId}_${numConditions}"
-               onchange="updatePdfLogicAnswersForRow(${questionId}, ${numConditions})"><br>
-        <select id="pdfPrevAnswer${questionId}_${numConditions}" style="display: block;">
-            <option value="">-- Select an answer --</option>
-        </select><br>
-        <button type="button" onclick="removePdfLogicCondition(${questionId}, ${numConditions})">Remove</button>
-        <hr>
-    `;
+    
+    // Check if this is a Big Paragraph question
+    const questionBlock = document.getElementById(`questionBlock${questionId}`);
+    const questionTypeSelect = questionBlock.querySelector(`#questionType${questionId}`);
+    const questionType = questionTypeSelect ? questionTypeSelect.value : '';
+    
+    let conditionRow;
+    
+    if (questionType === 'bigParagraph') {
+        // For Big Paragraph, show character limit selector
+        conditionRow = document.createElement('div');
+        conditionRow.className = 'pdf-logic-condition-row';
+        conditionRow.id = `pdfLogicConditionRow${questionId}_${numConditions}`;
+        conditionRow.innerHTML = `
+            <span>Condition ${numConditions}:</span><br>
+            <label>Character Limit:</label><br>
+            <select id="pdfCharacterLimit${questionId}_${numConditions}" style="display: block;">
+                <option value="">-- Choose a character limit --</option>
+                <option value="50">50 characters</option>
+                <option value="100">100 characters</option>
+                <option value="200">200 characters</option>
+                <option value="300">300 characters</option>
+                <option value="500">500 characters</option>
+                <option value="750">750 characters</option>
+                <option value="1000">1000 characters</option>
+                <option value="1500">1500 characters</option>
+                <option value="2000">2000 characters</option>
+                <option value="custom">Custom limit</option>
+            </select><br>
+            <input type="number" id="pdfCustomCharacterLimit${questionId}_${numConditions}" 
+                   placeholder="Enter custom character limit" 
+                   style="display: none; margin-top: 5px;"
+                   min="1" max="10000"><br>
+            <button type="button" onclick="removePdfLogicCondition(${questionId}, ${numConditions})">Remove</button>
+            <hr>
+        `;
+        
+        // Add event listener for custom character limit
+        setTimeout(() => {
+            const limitSelect = document.getElementById(`pdfCharacterLimit${questionId}_${numConditions}`);
+            const customInput = document.getElementById(`pdfCustomCharacterLimit${questionId}_${numConditions}`);
+            
+            if (limitSelect && customInput) {
+                limitSelect.addEventListener('change', function() {
+                    if (this.value === 'custom') {
+                        customInput.style.display = 'block';
+                        customInput.focus();
+                    } else {
+                        customInput.style.display = 'none';
+                        customInput.value = '';
+                    }
+                });
+            }
+        }, 100);
+    } else {
+        // For other question types, show the original previous question logic
+        conditionRow = document.createElement('div');
+        conditionRow.className = 'pdf-logic-condition-row';
+        conditionRow.id = `pdfLogicConditionRow${questionId}_${numConditions}`;
+        conditionRow.innerHTML = `
+            <span>Condition ${numConditions}:</span><br>
+            <input type="number" placeholder="Previous question number"
+                   id="pdfPrevQuestion${questionId}_${numConditions}"
+                   onchange="updatePdfLogicAnswersForRow(${questionId}, ${numConditions})"><br>
+            <select id="pdfPrevAnswer${questionId}_${numConditions}" style="display: block;">
+                <option value="">-- Select an answer --</option>
+            </select><br>
+            <button type="button" onclick="removePdfLogicCondition(${questionId}, ${numConditions})">Remove</button>
+            <hr>
+        `;
+    }
+    
     pdfLogicConditionsDiv.appendChild(conditionRow);
 }
 
@@ -1283,6 +1351,22 @@ function togglePdfLogic(questionId) {
     const pdfLogicEnabled = document.getElementById(`pdfLogic${questionId}`).checked;
     const pdfLogicBlock = document.getElementById(`pdfLogicBlock${questionId}`);
     pdfLogicBlock.style.display = pdfLogicEnabled ? 'block' : 'none';
+    
+    // If enabling PDF logic for a Big Paragraph question, clear any existing conditions
+    if (pdfLogicEnabled) {
+        const questionBlock = document.getElementById(`questionBlock${questionId}`);
+        const questionTypeSelect = questionBlock.querySelector(`#questionType${questionId}`);
+        const questionType = questionTypeSelect ? questionTypeSelect.value : '';
+        
+        if (questionType === 'bigParagraph') {
+            const pdfLogicConditionsDiv = document.getElementById(`pdfLogicConditions${questionId}`);
+            if (pdfLogicConditionsDiv) {
+                pdfLogicConditionsDiv.innerHTML = '';
+                // Add a default character limit condition for Big Paragraph
+                addPdfLogicCondition(questionId);
+            }
+        }
+    }
 }
 
 // Alert Logic toggling

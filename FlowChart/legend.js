@@ -13,7 +13,7 @@ function getDefaultSectionColor(sectionNum) {
 
 /**
  * Sets the section number for a cell and updates its style.
- * Also handles propagating section changes to connected cells.
+ * Also handles propagating section changes to connected cells recursively down the entire chain.
  */
 function setSection(cell, sectionNum) {
   let style = cell.style || "";
@@ -28,19 +28,9 @@ function setSection(cell, sectionNum) {
     updateSectionLegend();
   }
 
-  // If this is a question node, update all connected option nodes
+  // If this is a question node, cascade the section change down the entire chain
   if (isQuestion(cell)) {
-    const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-    outgoingEdges.forEach(edge => {
-      const targetCell = edge.target;
-      if (targetCell && isOptions(targetCell)) {
-        // Recursively set section without triggering infinite loop
-        let targetStyle = targetCell.style || "";
-        targetStyle = targetStyle.replace(/section=[^;]+/, "");
-        targetStyle += `;section=${sectionNum};`;
-        graph.getModel().setStyle(targetCell, targetStyle);
-      }
-    });
+    cascadeSectionChange(cell, sectionNum, new Set());
   }
   // If this is an option node, check if it's connected to a question and match its section
   else if (isOptions(cell)) {
@@ -59,6 +49,40 @@ function setSection(cell, sectionNum) {
       }
     }
   }
+}
+
+/**
+ * Recursively cascades section changes down the entire chain of connected nodes.
+ * This function traverses all connected descendants and updates their sections.
+ */
+function cascadeSectionChange(startCell, newSectionNum, visitedCells) {
+  // Prevent infinite loops by tracking visited cells
+  if (visitedCells.has(startCell.id)) {
+    return;
+  }
+  visitedCells.add(startCell.id);
+
+  // Get all outgoing edges from the current cell
+  const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
+  
+  outgoingEdges.forEach(edge => {
+    const targetCell = edge.target;
+    if (!targetCell || visitedCells.has(targetCell.id)) {
+      return;
+    }
+
+    // Only update cells that are part of the flowchart (have styles)
+    if (targetCell.style) {
+      // Update the target cell's section
+      let targetStyle = targetCell.style || "";
+      targetStyle = targetStyle.replace(/section=[^;]+/, "");
+      targetStyle += `;section=${newSectionNum};`;
+      graph.getModel().setStyle(targetCell, targetStyle);
+    }
+
+    // Recursively cascade to all descendants of this target cell
+    cascadeSectionChange(targetCell, newSectionNum, visitedCells);
+  });
 }
 
 /**

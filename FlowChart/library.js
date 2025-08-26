@@ -2,6 +2,21 @@
 // ******** Import/Export & Library *************
 // **********************************************
 
+// Helper function to check if a cell is a PDF node
+function isPdfNode(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=pdfNode");
+}
+
+// Helper function to check if a cell is an options node
+function isOptions(cell) {
+  return cell && cell.style && cell.style.includes("nodeType=options");
+}
+
+// Helper function to check if a cell is an alert node
+function isAlertNode(cell) {
+  return cell && cell.style && cell.style.includes("questionType=alertNode");
+}
+
 // Utility to download JSON
 function downloadJson(str, filename) {
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(str);
@@ -74,6 +89,7 @@ window.exportFlowchartJson = function () {
     // PDF node properties
     if (cell._pdfUrl !== undefined) cellData._pdfUrl = cell._pdfUrl;
     if (cell._priceId !== undefined) cellData._priceId = cell._priceId;
+    if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
     
     // Notes node properties
             if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
@@ -264,6 +280,21 @@ window.exportGuiJson = function(download = true) {
         pdfName: "",
         answer: "Yes"
       },
+      pdfLogic: {
+        enabled: false,
+        pdfName: "",
+        stripePriceId: "",
+        conditions: []
+      },
+      alertLogic: {
+        enabled: false,
+        message: "",
+        conditions: []
+      },
+      checklistLogic: {
+        enabled: false,
+        conditions: []
+      },
       conditionalAlert: {
         enabled: false,
         prevQuestion: "",
@@ -291,6 +322,24 @@ window.exportGuiJson = function(download = true) {
       question.text = temp.textContent || temp.innerText || question.text;
     }
     
+    // Clean HTML entities and tags from all question text
+    if (question.text) {
+      // First decode HTML entities
+      const textarea = document.createElement('textarea');
+      textarea.innerHTML = question.text;
+      let cleanedText = textarea.value;
+      
+      // Then remove HTML tags
+      const temp = document.createElement("div");
+      temp.innerHTML = cleanedText;
+      cleanedText = temp.textContent || temp.innerText || cleanedText;
+      
+      // Clean up extra whitespace
+      cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
+      
+      question.text = cleanedText;
+    }
+    
     // For multiple textboxes, add the textboxes array
     if (questionType === "multipleTextboxes" && cell._textboxes) {
       question.textboxes = cell._textboxes.map(tb => ({
@@ -309,11 +358,22 @@ window.exportGuiJson = function(download = true) {
         const targetCell = edge.target;
         if (targetCell && isOptions(targetCell)) {
           let optionText = targetCell.value || "";
-          // Clean HTML from option text
-          if (optionText.includes("<")) {
+          // Clean HTML entities and tags from option text
+          if (optionText) {
+            // First decode HTML entities
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = optionText;
+            let cleanedText = textarea.value;
+            
+            // Then remove HTML tags
             const temp = document.createElement("div");
-            temp.innerHTML = optionText;
-            optionText = temp.textContent || temp.innerText || optionText;
+            temp.innerHTML = cleanedText;
+            cleanedText = temp.textContent || temp.innerText || cleanedText;
+            
+            // Clean up extra whitespace
+            cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
+            
+            optionText = cleanedText;
           }
           const option = {
             text: optionText
@@ -514,10 +574,22 @@ window.exportGuiJson = function(download = true) {
             if (parentQ && isQuestion(parentQ)) {
               const prevQuestionId = parentQ._questionId || "";
               let optionLabel = sourceCell.value || "";
-              if (optionLabel.includes("<")) {
+              // Clean HTML entities and tags from option text
+              if (optionLabel) {
+                // First decode HTML entities
+                const textarea = document.createElement('textarea');
+                textarea.innerHTML = optionLabel;
+                let cleanedLabel = textarea.value;
+                
+                // Then remove HTML tags
                 const temp = document.createElement("div");
-                temp.innerHTML = optionLabel;
-                optionLabel = temp.textContent || temp.innerText || optionLabel;
+                temp.innerHTML = cleanedLabel;
+                cleanedLabel = temp.textContent || temp.innerText || cleanedLabel;
+                
+                // Clean up extra whitespace
+                cleanedLabel = cleanedLabel.replace(/\s+/g, ' ').trim();
+                
+                optionLabel = cleanedLabel;
               }
               conditions.push({
                 prevQuestion: String(prevQuestionId),
@@ -575,6 +647,78 @@ window.exportGuiJson = function(download = true) {
     }
     // --- END PATCH ---
     
+    // --- PATCH: Add PDF Logic detection ---
+    // Check if this question is connected to a PDF node
+    if (outgoingEdges) {
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        if (targetCell && isPdfNode(targetCell)) {
+          // This question is connected to a PDF node
+          question.pdfLogic.enabled = true;
+          question.pdfLogic.pdfName = targetCell._pdfUrl || "";
+          question.pdfLogic.stripePriceId = targetCell._priceId || "";
+          
+          // If this is a Big Paragraph question and the PDF node has a character limit
+          if (questionType === "bigParagraph" && targetCell._characterLimit) {
+            question.pdfLogic.conditions = [{
+              characterLimit: parseInt(targetCell._characterLimit) || 0
+            }];
+          }
+          break; // Only process the first PDF connection
+        }
+      }
+    }
+    // --- END PDF Logic PATCH ---
+    
+    // --- PATCH: Add Alert Logic detection ---
+    // Check if this question is connected to an alert node
+    if (outgoingEdges) {
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        if (targetCell && isAlertNode(targetCell)) {
+          // This question is connected to an alert node
+          question.alertLogic.enabled = true;
+          question.alertLogic.message = targetCell._alertText || "";
+          
+          // Find the condition that leads to this alert
+          // We need to find which option of this question leads to the alert node
+          const questionOutgoingEdges = graph.getOutgoingEdges(cell);
+          if (questionOutgoingEdges) {
+            for (const questionEdge of questionOutgoingEdges) {
+              const optionCell = questionEdge.target;
+              if (optionCell && isOptions(optionCell)) {
+                // Check if this option leads to the alert node
+                const optionOutgoingEdges = graph.getOutgoingEdges(optionCell);
+                if (optionOutgoingEdges) {
+                  for (const optionEdge of optionOutgoingEdges) {
+                    if (optionEdge.target === targetCell) {
+                      // This option leads to the alert node
+                      let optionText = optionCell.value || "";
+                      // Clean HTML from option text
+                      if (optionText) {
+                        const temp = document.createElement("div");
+                        temp.innerHTML = optionText;
+                        optionText = temp.textContent || temp.innerText || optionText;
+                        optionText = optionText.trim();
+                      }
+                      
+                      question.alertLogic.conditions = [{
+                        prevQuestion: String(cell._questionId || ""),
+                        prevAnswer: optionText
+                      }];
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+          }
+          break; // Only process the first alert connection
+        }
+      }
+    }
+    // --- END Alert Logic PATCH ---
+    
     sectionMap[section].questions.push(question);
   }
   
@@ -596,13 +740,17 @@ window.exportGuiJson = function(download = true) {
   // Create final output object
   const output = {
     sections: sections,
+    groups: getGroupsData(),
     hiddenFields: hiddenFields,
     sectionCounter: sectionCounter,
     questionCounter: questionCounter,
     hiddenFieldCounter: hiddenFieldCounter,
+    groupCounter: 1,
     defaultPDFName: defaultPDFName,
+    pdfOutputName: "",
+    stripePriceId: "",
     additionalPDFs: [],
-    groups: getGroupsData()
+    checklistItems: []
   };
   
   // Convert to string and download
@@ -1228,6 +1376,7 @@ function loadFlowchartData(data) {
         // PDF node properties
         if (item._pdfUrl !== undefined) newCell._pdfUrl = item._pdfUrl;
         if (item._priceId !== undefined) newCell._priceId = item._priceId;
+        if (item._characterLimit !== undefined) newCell._characterLimit = item._characterLimit;
         
         // Notes node properties
         if (item._notesText !== undefined) newCell._notesText = item._notesText;

@@ -599,14 +599,40 @@ function loadFormData(formData) {
                         question.pdfLogic.conditions.forEach((condition, index) => {
                             addPdfLogicCondition(question.questionId);
                             const conditionIndex = index + 1;
-                            const prevQuestionInput = questionBlock.querySelector(`#pdfPrevQuestion${question.questionId}_${conditionIndex}`);
-                            const prevAnswerSelect = questionBlock.querySelector(`#pdfPrevAnswer${question.questionId}_${conditionIndex}`);
-                            if (prevQuestionInput) {
-                                prevQuestionInput.value = condition.prevQuestion;
-                                updatePdfLogicAnswersForRow(question.questionId, conditionIndex);
-                            }
-                            if (prevAnswerSelect) {
-                                prevAnswerSelect.value = condition.prevAnswer;
+                            
+                            // Check if this is a Big Paragraph question with character limit logic
+                            if (question.type === 'bigParagraph' && condition.characterLimit) {
+                                const charLimitSelect = questionBlock.querySelector(`#pdfCharacterLimit${question.questionId}_${conditionIndex}`);
+                                const customCharLimitInput = questionBlock.querySelector(`#pdfCustomCharacterLimit${question.questionId}_${conditionIndex}`);
+                                
+                                if (charLimitSelect) {
+                                    // Check if the character limit matches a preset option
+                                    const presetLimits = ['50', '100', '200', '300', '500', '750', '1000', '1500', '2000'];
+                                    if (presetLimits.includes(condition.characterLimit.toString())) {
+                                        charLimitSelect.value = condition.characterLimit.toString();
+                                        if (customCharLimitInput) {
+                                            customCharLimitInput.style.display = 'none';
+                                        }
+                                    } else {
+                                        // Set to custom and show the custom input
+                                        charLimitSelect.value = 'custom';
+                                        if (customCharLimitInput) {
+                                            customCharLimitInput.style.display = 'block';
+                                            customCharLimitInput.value = condition.characterLimit.toString();
+                                        }
+                                    }
+                                }
+                            } else if (condition.prevQuestion && condition.prevAnswer) {
+                                // For other question types, use previous question logic
+                                const prevQuestionInput = questionBlock.querySelector(`#pdfPrevQuestion${question.questionId}_${conditionIndex}`);
+                                const prevAnswerSelect = questionBlock.querySelector(`#pdfPrevAnswer${question.questionId}_${conditionIndex}`);
+                                if (prevQuestionInput) {
+                                    prevQuestionInput.value = condition.prevQuestion;
+                                    updatePdfLogicAnswersForRow(question.questionId, conditionIndex);
+                                }
+                                if (prevAnswerSelect) {
+                                    prevAnswerSelect.value = condition.prevAnswer;
+                                }
                             }
                         });
                     }
@@ -883,13 +909,34 @@ function exportForm() {
                     const pdfLogicConditionRows = pdfLogicConditionsDiv.querySelectorAll('.pdf-logic-condition-row');
                     pdfLogicConditionRows.forEach((row, index) => {
                         const conditionIndex = index + 1;
-                        const prevQuestion = row.querySelector(`#pdfPrevQuestion${questionId}_${conditionIndex}`)?.value || "";
-                        const prevAnswer = row.querySelector(`#pdfPrevAnswer${questionId}_${conditionIndex}`)?.value || "";
-                        if (prevQuestion && prevAnswer) {
-                            pdfLogicConditionsArray.push({
-                                prevQuestion: prevQuestion,
-                                prevAnswer: prevAnswer
-                            });
+                        
+                        // Check if this is a Big Paragraph question with character limit logic
+                        if (questionType === 'bigParagraph') {
+                            const charLimitSelect = row.querySelector(`#pdfCharacterLimit${questionId}_${conditionIndex}`);
+                            const customCharLimitInput = row.querySelector(`#pdfCustomCharacterLimit${questionId}_${conditionIndex}`);
+                            
+                            if (charLimitSelect) {
+                                let charLimit = charLimitSelect.value;
+                                if (charLimit === 'custom' && customCharLimitInput) {
+                                    charLimit = customCharLimitInput.value;
+                                }
+                                
+                                if (charLimit && charLimit !== '') {
+                                    pdfLogicConditionsArray.push({
+                                        characterLimit: parseInt(charLimit)
+                                    });
+                                }
+                            }
+                        } else {
+                            // For other question types, use previous question logic
+                            const prevQuestion = row.querySelector(`#pdfPrevQuestion${questionId}_${conditionIndex}`)?.value || "";
+                            const prevAnswer = row.querySelector(`#pdfPrevAnswer${questionId}_${conditionIndex}`)?.value || "";
+                            if (prevQuestion && prevAnswer) {
+                                pdfLogicConditionsArray.push({
+                                    prevQuestion: prevQuestion,
+                                    prevAnswer: prevAnswer
+                                });
+                            }
                         }
                     });
                 }
@@ -1405,6 +1452,25 @@ function exportForm() {
 
     const jsonString = JSON.stringify(formData, null, 2);
     downloadJSON(jsonString, "form_data.json");
+    
+    // Also copy to clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(jsonString).then(() => {
+            // Show a brief notification that it was copied
+            const exportButton = document.querySelector('button[onclick="exportForm()"]');
+            if (exportButton) {
+                const originalText = exportButton.textContent;
+                exportButton.textContent = 'Copied to clipboard!';
+                exportButton.style.backgroundColor = '#28a745';
+                setTimeout(() => {
+                    exportButton.textContent = originalText;
+                    exportButton.style.backgroundColor = '';
+                }, 2000);
+            }
+        }).catch(err => {
+            console.error('Failed to copy to clipboard:', err);
+        });
+    }
 }
 
 

@@ -1214,7 +1214,55 @@ questionSlugMap[questionId] = slug;
           nmEl2 && nmEl2.value ? nmEl2.value : "answer" + questionId;
         const ph2 = phEl2 && phEl2.value ? phEl2.value : "";
         questionNameIds[questionId] = nameId2;
-        formHTML += `<textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}"></textarea><br>`;
+        
+        // Check if this Big Paragraph has PDF logic with character limits
+        let hasPdfLogic = false;
+        let characterLimits = [];
+        if (pdfLogicPDFs && pdfLogicPDFs.length > 0) {
+          const pdfLogic = pdfLogicPDFs.find(pdf => pdf.questionId === questionId && pdf.isBigParagraph);
+          if (pdfLogic && pdfLogic.conditions.length > 0) {
+            hasPdfLogic = true;
+            characterLimits = pdfLogic.conditions.map(condition => condition.characterLimit).filter(limit => limit);
+          }
+        }
+        
+        if (hasPdfLogic && characterLimits.length > 0) {
+          const maxLimit = Math.max(...characterLimits);
+          formHTML += `
+            <div class="big-paragraph-container">
+              <textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}" 
+                        maxlength="${maxLimit * 2}" oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)})"></textarea>
+              <div class="character-count" id="charCount_${nameId2}">
+                <span class="current-count">0</span> / <span class="limit-display">${maxLimit}</span> characters
+              </div>
+            </div><br>
+            <script>
+              function updateCharacterCount(textareaId, limits) {
+                const textarea = document.getElementById(textareaId);
+                const countDisplay = document.getElementById('charCount_' + textareaId);
+                const currentCount = textarea.value.length;
+                const maxLimit = Math.max(...limits);
+                
+                if (countDisplay) {
+                  countDisplay.querySelector('.current-count').textContent = currentCount;
+                  countDisplay.querySelector('.limit-display').textContent = maxLimit;
+                  
+                  // Change color based on character count
+                  if (currentCount > maxLimit) {
+                    countDisplay.style.color = '#ff6b6b';
+                    countDisplay.style.fontWeight = 'bold';
+                  } else if (currentCount > maxLimit * 0.8) {
+                    countDisplay.style.color = '#ffa726';
+                  } else {
+                    countDisplay.style.color = '#666';
+                  }
+                }
+              }
+            </script>
+          `;
+        } else {
+          formHTML += `<textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}"></textarea><br>`;
+        }
       } else if (questionType === "money") {
         const mnNmEl = qBlock.querySelector("#textboxName" + questionId);
         const mnPhEl = qBlock.querySelector("#textboxPlaceholder" + questionId);
@@ -1467,11 +1515,11 @@ for (let co = 0; co < cOptsDivs.length; co++){
 
     /* actual input */
     formHTML += `
-      <span class="checkbox-inline">
+      <span class="checkbox-inline" id="checkbox-container-${optionNameId}">
         <label class="checkbox-label">
           <input type="checkbox" id="${optionNameId}" name="${optionNameId}" value="${optionValue}" 
-                 ${hasAmount ? `onchange="toggleAmountField('${optionNameId}_amount', this.checked); toggleNoneOption(this, ${questionId});"` : 
-                               `onchange="toggleNoneOption(this, ${questionId});"`}>
+                 ${hasAmount ? `onchange="toggleAmountField('${optionNameId}_amount', this.checked); toggleNoneOption(this, ${questionId}); updateCheckboxStyle(this);"` : 
+                               `onchange="toggleNoneOption(this, ${questionId}); updateCheckboxStyle(this);"`}>
           ${labelText}
         </label>
       </span>`;
@@ -1500,10 +1548,10 @@ if (noneEl?.checked){
     });
 
     formHTML += `
-      <span class="checkbox-inline">
+      <span class="checkbox-inline" id="checkbox-container-${noneNameId}">
         <label class="checkbox-label">
           <input type="checkbox" id="${noneNameId}" name="${noneNameId}" value="${noneStr}" 
-                 onchange="handleNoneOfTheAboveToggle(this, ${questionId});">
+                 onchange="handleNoneOfTheAboveToggle(this, ${questionId}); updateCheckboxStyle(this);">
           ${noneStr}
         </label>
       </span>`;
@@ -1739,31 +1787,59 @@ formHTML += `</div><br></div>`;
             questionId: questionId,
             pdfName: pdfLogicPdfName,
             stripePriceId: pdfLogicStripePriceId,
-            conditions: []
+            conditions: [],
+            isBigParagraph: questionType === "bigParagraph"
           });
           
           // Process conditions
           for (let lr = 0; lr < pdfLogicRows.length; lr++) {
             const row = pdfLogicRows[lr];
             const rowIndex = lr + 1;
-            const pqEl = row.querySelector(
-              "#pdfPrevQuestion" + questionId + "_" + rowIndex
-            );
-            const paEl = row.querySelector(
-              "#pdfPrevAnswer" + questionId + "_" + rowIndex
-            );
+            
+            if (questionType === "bigParagraph") {
+              // For Big Paragraph, process character limit
+              const charLimitEl = row.querySelector(
+                "#pdfCharacterLimit" + questionId + "_" + rowIndex
+              );
+              const customCharLimitEl = row.querySelector(
+                "#pdfCustomCharacterLimit" + questionId + "_" + rowIndex
+              );
+              
+              if (!charLimitEl) continue;
+              
+              let charLimit = charLimitEl.value.trim();
+              if (charLimit === 'custom') {
+                charLimit = customCharLimitEl ? customCharLimitEl.value.trim() : '';
+              }
+              
+              if (!charLimit) continue;
+              
+              // Add character limit condition to the PDF Logic array
+              const pdfLogicIndex = pdfLogicPDFs.length - 1;
+              pdfLogicPDFs[pdfLogicIndex].conditions.push({
+                characterLimit: parseInt(charLimit)
+              });
+            } else {
+              // For other question types, process previous question logic
+              const pqEl = row.querySelector(
+                "#pdfPrevQuestion" + questionId + "_" + rowIndex
+              );
+              const paEl = row.querySelector(
+                "#pdfPrevAnswer" + questionId + "_" + rowIndex
+              );
 
-            if (!pqEl || !paEl) continue;
-            const pqVal = pqEl.value.trim();
-            const paVal = paEl.value.trim();
-            if (!pqVal || !paVal) continue;
+              if (!pqEl || !paEl) continue;
+              const pqVal = pqEl.value.trim();
+              const paVal = paEl.value.trim();
+              if (!pqVal || !paVal) continue;
 
-            // Add condition to the PDF Logic array
-            const pdfLogicIndex = pdfLogicPDFs.length - 1;
-            pdfLogicPDFs[pdfLogicIndex].conditions.push({
-              prevQuestion: pqVal,
-              prevAnswer: paVal
-            });
+              // Add condition to the PDF Logic array
+              const pdfLogicIndex = pdfLogicPDFs.length - 1;
+              pdfLogicPDFs[pdfLogicIndex].conditions.push({
+                prevQuestion: pqVal,
+                prevAnswer: paVal
+              });
+            }
           }
         }
       }
@@ -2274,6 +2350,12 @@ document.addEventListener('DOMContentLoaded', function() {
         element.addEventListener('change', function() { checkAlertLogic(this); });
         element.addEventListener('input', function() { checkAlertLogic(this); });
     });
+    
+    // Initialize checkbox styling for beautiful blue borders
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        updateCheckboxStyle(checkbox);
+    });
 });
 `;
   }
@@ -2732,6 +2814,25 @@ function handleNoneOfTheAboveToggle(noneCheckbox, questionId) {
             toggleAmountField(amountId, false);
         }
     });
+    
+    // Update styling for all checkboxes
+    allCheckboxes.forEach(checkbox => {
+        updateCheckboxStyle(checkbox);
+    });
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Update checkbox styling for beautiful blue border
+ *──────────────────────────────────────────────────────────────*/
+function updateCheckboxStyle(checkbox) {
+    const container = document.getElementById('checkbox-container-' + checkbox.id);
+    if (container) {
+        if (checkbox.checked) {
+            container.classList.add('checked');
+        } else {
+            container.classList.remove('checked');
+        }
+    }
 }
 
 
@@ -3104,29 +3205,50 @@ async function processAllPdfs() {
                 // Check if conditions are met
                 let shouldDownload = false;
                 
-                pdfLogic.conditions.forEach(condition => {
-                    const prevQuestionId = condition.prevQuestion;
-                    const prevAnswer = condition.prevAnswer;
-                    
-                    // Get the previous question's value
-                    const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
-                                              document.getElementById('answer' + prevQuestionId);
-                    
-                    if (prevQuestionElement) {
-                        let prevValue = '';
-                        
-                        if (prevQuestionElement.type === 'checkbox') {
-                            prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
-                        } else {
-                            prevValue = prevQuestionElement.value;
+                if (pdfLogic.isBigParagraph) {
+                    // For Big Paragraph questions, check character limit
+                    pdfLogic.conditions.forEach(condition => {
+                        if (condition.characterLimit) {
+                            // Get the Big Paragraph question's value
+                            const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                                  document.getElementById('answer' + pdfLogic.questionId);
+                            
+                            if (questionElement) {
+                                const questionValue = questionElement.value || '';
+                                
+                                // Check if the text length exceeds the character limit
+                                if (questionValue.length > condition.characterLimit) {
+                                    shouldDownload = true;
+                                }
+                            }
                         }
+                    });
+                } else {
+                    // For other question types, check previous question conditions
+                    pdfLogic.conditions.forEach(condition => {
+                        const prevQuestionId = condition.prevQuestion;
+                        const prevAnswer = condition.prevAnswer;
                         
-                        // Check if the condition matches
-                        if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
-                            shouldDownload = true;
+                        // Get the previous question's value
+                        const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                                                  document.getElementById('answer' + prevQuestionId);
+                        
+                        if (prevQuestionElement) {
+                            let prevValue = '';
+                            
+                            if (prevQuestionElement.type === 'checkbox') {
+                                prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
+                            } else {
+                                prevValue = prevQuestionElement.value;
+                            }
+                            
+                            // Check if the condition matches
+                            if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                                shouldDownload = true;
+                            }
                         }
-                    }
-                });
+                    });
+                }
                 
                 // Download PDF if conditions are met
                 if (shouldDownload) {
