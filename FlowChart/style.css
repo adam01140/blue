@@ -146,6 +146,53 @@ input[type="file"] {
   outline: 1px dashed #888;
 }
 
+/* SEARCH BOX */
+.search-container {
+  margin-top: 15px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 8px 30px 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.search-container input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+#clearSearchBtn {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  display: none;
+}
+
+#clearSearchBtn:hover {
+  background: #f0f0f0;
+  color: #666;
+}
+
+#clearSearchBtn.show {
+  display: block;
+}
+
 /* LEGENDS */
 .legend {
   margin-top: 10px;
@@ -441,15 +488,36 @@ input[type="file"] {
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 10px; /* Increased padding for better appearance */
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9f9f9;
 }
 .flowchart-item strong {
-  display: block;
-  margin-bottom: 6px;
   cursor: pointer;
+  color: #333;
 }
 .flowchart-item button {
   margin-right: 6px;
+}
+
+/* MULTI-SELECTION VISUAL INDICATOR */
+body.ctrl-pressed {
+  cursor: crosshair !important;
+}
+
+body.ctrl-pressed::after {
+  content: "Multi-Selection Mode";
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: #007bff;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 10000;
+  pointer-events: none;
 }
 
 /* MULTIPLE TEXTBOXES CUSTOM STYLES */
