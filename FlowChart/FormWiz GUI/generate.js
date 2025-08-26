@@ -119,6 +119,68 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     '    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">',
     '    <link rel="stylesheet" href="generate.css">',
     "    <style>",
+    "      /* Checkbox option styling with beautiful blue border */",
+    "      .checkbox-inline {",
+    "        display: block;",
+    "        margin: 8px auto;",
+    "        padding: 12px 16px;",
+    "        border: 1px solid #d1d1d6;",
+    "        border-radius: 8px;",
+    "        background-color: #ffffff;",
+    "        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);",
+    "        transition: all 0.3s ease;",
+    "        width: 80%;",
+    "        max-width: 400px;",
+    "        text-align: center;",
+    "      }",
+    "      ",
+    "      .checkbox-inline:hover {",
+    "        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);",
+    "        transform: translateY(-1px);",
+    "      }",
+    "      ",
+    "      .checkbox-inline.checked {",
+    "        border-color: #0051a6;",
+    "        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);",
+    "        background-color: #f8fbff;",
+    "      }",
+    "      ",
+    "      .checkbox-label {",
+    "        display: flex;",
+    "        align-items: center;",
+    "        justify-content: flex-start;",
+    "        gap: 8px;",
+    "        cursor: pointer;",
+    "        font-size: 16px;",
+    "        color: #333;",
+    "        margin: 0;",
+    "        padding: 0 12px;",
+    "        width: 100%;",
+    "      }",
+    "      ",
+    "      .checkbox-label input[type=\"checkbox\"] {",
+    "        margin: 0;",
+    "        flex-shrink: 0;",
+    "      }",
+    "      ",
+    "      /* Form validation styles */",
+    "      .form-field-required {",
+    "        border-color: #e74c3c !important;",
+    "        box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.3) !important;",
+    "      }",
+    "      ",
+    "      .validation-error {",
+    "        color: #e74c3c;",
+    "        font-size: 14px;",
+    "        margin-top: 5px;",
+    "        display: none;",
+    "      }",
+    "      ",
+    "      .next-button:disabled {",
+    "        background: #bdc3c7 !important;",
+    "        cursor: not-allowed !important;",
+    "        opacity: 0.6;",
+    "      }",
     "      /* Test Mode Visual Indicators */",
     "      .test-mode-active .question-container {",
     "        position: relative;",
@@ -1949,9 +2011,9 @@ if (s > 1){
 }
 
     if (s === sectionCounter - 1) {
-      formHTML += `<button type="submit">Submit</button>`;
+      formHTML += `<button type="submit" class="next-button">Submit</button>`;
     } else {
-      formHTML += `<button type="button" onclick="handleNext(${s})">Next</button>`;
+      formHTML += `<button type="button" class="next-button" onclick="validateAndProceed(${s})" id="next-button-${s}">Next</button>`;
     }
     formHTML += "</div>";
 
@@ -2834,6 +2896,176 @@ function updateCheckboxStyle(checkbox) {
         }
     }
 }
+
+/*──────────────────────────────────────────────────────────────*
+ * Form validation functions
+ *──────────────────────────────────────────────────────────────*/
+function validateAndProceed(sectionNumber) {
+    if (validateCurrentSection(sectionNumber)) {
+        handleNext(sectionNumber);
+    }
+}
+
+function validateCurrentSection(sectionNumber) {
+    const section = document.getElementById('section' + sectionNumber);
+    if (!section) return true;
+    
+    const questions = section.querySelectorAll('.question-container');
+    let isValid = true;
+    
+    questions.forEach(question => {
+        const questionId = question.id.replace('question-container-', '');
+        const questionType = getQuestionTypeFromContainer(question);
+        
+        if (!validateQuestion(question, questionType, questionId)) {
+            isValid = false;
+        }
+    });
+    
+    // Update next button state
+    const nextButton = document.getElementById('next-button-' + sectionNumber);
+    if (nextButton) {
+        nextButton.disabled = !isValid;
+    }
+    
+    return isValid;
+}
+
+function getQuestionTypeFromContainer(questionContainer) {
+    // Check for different input types to determine question type
+    if (questionContainer.querySelector('input[type="checkbox"]')) {
+        return 'checkbox';
+    } else if (questionContainer.querySelector('select')) {
+        return 'dropdown';
+    } else if (questionContainer.querySelector('input[type="text"]')) {
+        return 'text';
+    } else if (questionContainer.querySelector('input[type="email"]')) {
+        return 'email';
+    } else if (questionContainer.querySelector('input[type="tel"]')) {
+        return 'phone';
+    } else if (questionContainer.querySelector('input[type="number"]')) {
+        return 'number';
+    } else if (questionContainer.querySelector('input[type="date"]')) {
+        return 'date';
+    } else if (questionContainer.querySelector('textarea')) {
+        return 'bigParagraph';
+    }
+    return 'text'; // default
+}
+
+function validateQuestion(questionContainer, questionType, questionId) {
+    let isValid = true;
+    
+    switch (questionType) {
+        case 'checkbox':
+            isValid = validateCheckboxQuestion(questionContainer);
+            break;
+        case 'dropdown':
+            isValid = validateDropdownQuestion(questionContainer);
+            break;
+        case 'text':
+        case 'email':
+        case 'phone':
+        case 'number':
+        case 'date':
+        case 'bigParagraph':
+            isValid = validateTextQuestion(questionContainer);
+            break;
+        default:
+            isValid = true;
+    }
+    
+    // Add visual feedback
+    if (!isValid) {
+        questionContainer.classList.add('form-field-required');
+        showValidationError(questionContainer, 'This field is required');
+    } else {
+        questionContainer.classList.remove('form-field-required');
+        hideValidationError(questionContainer);
+    }
+    
+    return isValid;
+}
+
+function validateCheckboxQuestion(questionContainer) {
+    const checkboxes = questionContainer.querySelectorAll('input[type="checkbox"]');
+    const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+    return checkedBoxes.length > 0;
+}
+
+function validateDropdownQuestion(questionContainer) {
+    const select = questionContainer.querySelector('select');
+    if (!select) return true;
+    return select.value && select.value.trim() !== '';
+}
+
+function validateTextQuestion(questionContainer) {
+    const inputs = questionContainer.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
+    if (inputs.length === 0) return true;
+    
+    for (let input of inputs) {
+        if (!input.value || input.value.trim() === '') {
+            return false;
+        }
+    }
+    return true;
+}
+
+function showValidationError(container, message) {
+    let errorDiv = container.querySelector('.validation-error');
+    if (!errorDiv) {
+        errorDiv = document.createElement('div');
+        errorDiv.className = 'validation-error';
+        container.appendChild(errorDiv);
+    }
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+}
+
+function hideValidationError(container) {
+    const errorDiv = container.querySelector('.validation-error');
+    if (errorDiv) {
+        errorDiv.style.display = 'none';
+    }
+}
+
+// Add validation listeners to all form fields
+function addValidationListeners() {
+    const currentSection = document.querySelector('.section.active');
+    if (!currentSection) return;
+    
+    const sectionNumber = currentSection.id.replace('section', '');
+    const formFields = currentSection.querySelectorAll('input, select, textarea');
+    
+    formFields.forEach(field => {
+        field.addEventListener('change', () => validateCurrentSection(sectionNumber));
+        field.addEventListener('input', () => validateCurrentSection(sectionNumber));
+    });
+    
+    // Initial validation
+    validateCurrentSection(sectionNumber);
+}
+
+// Initialize validation when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    addValidationListeners();
+    
+    // Re-add listeners when sections change
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                if (mutation.target.classList.contains('section')) {
+                    setTimeout(addValidationListeners, 100);
+                }
+            }
+        });
+    });
+    
+    observer.observe(document.body, {
+        attributes: true,
+        subtree: true
+    });
+});
 
 
 function showTextboxLabels(questionId, count){

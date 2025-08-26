@@ -194,6 +194,42 @@
             var modal = document.getElementById('pasteJsonModal');
             var textarea = document.getElementById('pasteJsonTextarea');
             var confirmBtn = document.getElementById('confirmPasteJsonBtn');
+            
+            // Check for preview JSON in URL parameters
+            function checkForPreviewJson() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const previewJson = urlParams.get('preview');
+                
+                if (previewJson) {
+                    try {
+                        const decodedJson = decodeURIComponent(previewJson);
+                        const jsonData = JSON.parse(decodedJson);
+                        
+                        // Load the form data automatically
+                        loadFormData(jsonData);
+                        setTimeout(updateFormAfterImport, 300);
+                        
+                        // Auto-preview after import
+                        setTimeout(function() {
+                            if (typeof showPreview === 'function') showPreview();
+                        }, 350);
+                        
+                        // Clear the URL parameter to prevent reloading on refresh
+                        const newUrl = window.location.pathname;
+                        window.history.replaceState({}, document.title, newUrl);
+                        
+                        return true; // Successfully loaded from URL
+                    } catch (e) {
+                        console.error('Error loading preview JSON from URL:', e);
+                        return false; // Failed to load from URL
+                    }
+                }
+                return false; // No preview parameter found
+            }
+            
+            // Try to load from URL first
+            const loadedFromUrl = checkForPreviewJson();
+            
             if (pasteBtn && modal && textarea && confirmBtn) {
                 pasteBtn.addEventListener('click', function() {
                     // Try to read from clipboard and import instantly

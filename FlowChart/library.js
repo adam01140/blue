@@ -413,6 +413,22 @@ window.exportGuiJson = function(download = true) {
                     }
                   }
                 }
+                
+                // Check for section jumps - if target question is in a section more than 1 away (forward or backward)
+                const sourceSection = parseInt(getSection(cell) || "1", 10);
+                const targetSection = parseInt(getSection(optionTarget) || "1", 10);
+                
+                // If target section is more than 1 section away from source section (in either direction)
+                if (Math.abs(targetSection - sourceSection) > 1) {
+                  // Check if this jump already exists
+                  const exists = jumpConditions.some(j => j.option === optionText.trim() && j.to === targetSection.toString());
+                  if (!exists) {
+                    jumpConditions.push({
+                      option: optionText.trim(),
+                      to: targetSection.toString()
+                    });
+                  }
+                }
               }
             }
           }
@@ -433,7 +449,7 @@ window.exportGuiJson = function(download = true) {
       }
     }
     
-    // Set jump logic if any options lead to end nodes
+    // Set jump logic if any options lead to end nodes or section jumps
     if (jumpConditions.length > 0) {
       question.jump.enabled = true;
       question.jump.conditions = jumpConditions;
@@ -563,6 +579,7 @@ window.exportGuiJson = function(download = true) {
     function findDirectParentCondition(cell) {
       const incomingEdges = graph.getIncomingEdges(cell) || [];
       const conditions = [];
+      const currentSection = parseInt(getSection(cell) || "1", 10);
       
       for (const edge of incomingEdges) {
         const sourceCell = edge.source;
@@ -572,33 +589,43 @@ window.exportGuiJson = function(download = true) {
           for (const optEdge of optionIncoming) {
             const parentQ = optEdge.source;
             if (parentQ && isQuestion(parentQ)) {
-              const prevQuestionId = parentQ._questionId || "";
-              let optionLabel = sourceCell.value || "";
-              // Clean HTML entities and tags from option text
-              if (optionLabel) {
-                // First decode HTML entities
-                const textarea = document.createElement('textarea');
-                textarea.innerHTML = optionLabel;
-                let cleanedLabel = textarea.value;
-                
-                // Then remove HTML tags
-                const temp = document.createElement("div");
-                temp.innerHTML = cleanedLabel;
-                cleanedLabel = temp.textContent || temp.innerText || cleanedLabel;
-                
-                // Clean up extra whitespace
-                cleanedLabel = cleanedLabel.replace(/\s+/g, ' ').trim();
-                
-                optionLabel = cleanedLabel;
+              const sourceSection = parseInt(getSection(parentQ) || "1", 10);
+              
+              // Only add conditional logic if the source section is adjacent (within 1 section)
+              // Connections from sections more than 1 away should be handled by jump logic
+              if (Math.abs(sourceSection - currentSection) <= 1) {
+                const prevQuestionId = parentQ._questionId || "";
+                let optionLabel = sourceCell.value || "";
+                // Clean HTML entities and tags from option text
+                if (optionLabel) {
+                  // First decode HTML entities
+                  const textarea = document.createElement('textarea');
+                  textarea.innerHTML = optionLabel;
+                  let cleanedLabel = textarea.value;
+                  
+                  // Then remove HTML tags
+                  const temp = document.createElement("div");
+                  temp.innerHTML = cleanedLabel;
+                  cleanedLabel = temp.textContent || temp.innerText || cleanedLabel;
+                  
+                  // Clean up extra whitespace
+                  cleanedLabel = cleanedLabel.replace(/\s+/g, ' ').trim();
+                  
+                  optionLabel = cleanedLabel;
+                }
+                conditions.push({
+                  prevQuestion: String(prevQuestionId),
+                  prevAnswer: optionLabel.trim()
+                });
               }
-              conditions.push({
-                prevQuestion: String(prevQuestionId),
-                prevAnswer: optionLabel.trim()
-              });
             }
           }
-                  } else if (sourceCell && isQuestion(sourceCell)) {
-            // This is a direct question-to-question connection
+        } else if (sourceCell && isQuestion(sourceCell)) {
+          // This is a direct question-to-question connection
+          const sourceSection = parseInt(getSection(sourceCell) || "1", 10);
+          
+          // Only add conditional logic if the source section is adjacent (within 1 section)
+          if (Math.abs(sourceSection - currentSection) <= 1) {
             // Check if the source is a multiple textbox/dropdown question or number question
             const sourceQuestionType = getQuestionType(sourceCell);
             if (sourceQuestionType === "multipleTextboxes" || sourceQuestionType === "multipleDropdownType" || sourceQuestionType === "number") {
@@ -613,6 +640,7 @@ window.exportGuiJson = function(download = true) {
               }
             }
           }
+        }
       }
       
       // Remove duplicates based on prevQuestion and prevAnswer combination
@@ -671,49 +699,39 @@ window.exportGuiJson = function(download = true) {
     // --- END PDF Logic PATCH ---
     
     // --- PATCH: Add Alert Logic detection ---
-    // Check if this question is connected to an alert node
+    // Check if this question is connected to an alert node through its options
     if (outgoingEdges) {
       for (const edge of outgoingEdges) {
-        const targetCell = edge.target;
-        if (targetCell && isAlertNode(targetCell)) {
-          // This question is connected to an alert node
-          question.alertLogic.enabled = true;
-          question.alertLogic.message = targetCell._alertText || "";
-          
-          // Find the condition that leads to this alert
-          // We need to find which option of this question leads to the alert node
-          const questionOutgoingEdges = graph.getOutgoingEdges(cell);
-          if (questionOutgoingEdges) {
-            for (const questionEdge of questionOutgoingEdges) {
-              const optionCell = questionEdge.target;
-              if (optionCell && isOptions(optionCell)) {
-                // Check if this option leads to the alert node
-                const optionOutgoingEdges = graph.getOutgoingEdges(optionCell);
-                if (optionOutgoingEdges) {
-                  for (const optionEdge of optionOutgoingEdges) {
-                    if (optionEdge.target === targetCell) {
-                      // This option leads to the alert node
-                      let optionText = optionCell.value || "";
-                      // Clean HTML from option text
-                      if (optionText) {
-                        const temp = document.createElement("div");
-                        temp.innerHTML = optionText;
-                        optionText = temp.textContent || temp.innerText || optionText;
-                        optionText = optionText.trim();
-                      }
-                      
-                      question.alertLogic.conditions = [{
-                        prevQuestion: String(cell._questionId || ""),
-                        prevAnswer: optionText
-                      }];
-                      break;
-                    }
-                  }
+        const optionCell = edge.target;
+        if (optionCell && isOptions(optionCell)) {
+          // Check if this option leads to an alert node
+          const optionOutgoingEdges = graph.getOutgoingEdges(optionCell);
+          if (optionOutgoingEdges) {
+            for (const optionEdge of optionOutgoingEdges) {
+              const targetCell = optionEdge.target;
+              if (targetCell && isAlertNode(targetCell)) {
+                // This question's option leads to an alert node
+                question.alertLogic.enabled = true;
+                question.alertLogic.message = targetCell._alertText || "";
+                
+                // Extract the option text
+                let optionText = optionCell.value || "";
+                // Clean HTML from option text
+                if (optionText) {
+                  const temp = document.createElement("div");
+                  temp.innerHTML = optionText;
+                  optionText = temp.textContent || temp.innerText || optionText;
+                  optionText = optionText.trim();
                 }
+                
+                question.alertLogic.conditions = [{
+                  prevQuestion: String(cell._questionId || ""),
+                  prevAnswer: optionText
+                }];
+                break; // Only process the first alert connection
               }
             }
           }
-          break; // Only process the first alert connection
         }
       }
     }

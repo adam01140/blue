@@ -7,6 +7,68 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="generate.css">
     <style>
+      /* Checkbox option styling with beautiful blue border */
+      .checkbox-inline {
+        display: block;
+        margin: 8px auto;
+        padding: 12px 16px;
+        border: 1px solid #d1d1d6;
+        border-radius: 8px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+      }
+      
+      .checkbox-inline:hover {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+      }
+      
+      .checkbox-inline.checked {
+        border-color: #0051a6;
+        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
+        background-color: #f8fbff;
+      }
+      
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        color: #333;
+        margin: 0;
+        padding: 0 12px;
+        width: 100%;
+      }
+      
+      .checkbox-label input[type="checkbox"] {
+        margin: 0;
+        flex-shrink: 0;
+      }
+      
+      /* Form validation styles */
+      .form-field-required {
+        border-color: #e74c3c !important;
+        box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.3) !important;
+      }
+      
+      .validation-error {
+        color: #e74c3c;
+        font-size: 14px;
+        margin-top: 5px;
+        display: none;
+      }
+      
+      .next-button:disabled {
+        background: #bdc3c7 !important;
+        cursor: not-allowed !important;
+        opacity: 0.6;
+      }
       /* Test Mode Visual Indicators */
       .test-mode-active .question-container {
         position: relative;
@@ -889,7 +951,343 @@
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1"><label><h3></h3></label><textarea id="answer1" name="answer1" rows="5" cols="50" placeholder=""></textarea><br></div><br><br><div class="navigation-buttons"><button type="submit">Submit</button></div></div><div id="hidden_pdf_fields">
+        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">SC-500</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">SC-103</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="4"><div class="stepper-circle">4</div><div class="stepper-label">SC-120</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="5"><div class="stepper-circle">5</div><div class="stepper-label">SC-100</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1"><label><h3>Where are you suing?</h3></label><input type="text" id="where_are_you_suing" name="where_are_you_suing" placeholder=""><br></div><div id="question-container-2"><label><h3>Please explain why you are suing at this location</h3></label><div><center><div id="checkmark" class="checkbox-group-2">
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured.">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured." name="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured." value="Where the plaintiff was injured." 
+                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+          Where the plaintiff was injured.
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives" name="please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives" value="Where the defendant lives" 
+                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+          Where the defendant lives
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged.">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged." name="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged." value="Where the plaintiff’s property was damaged." 
+                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+          Where the plaintiff’s property was damaged.
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_a_contract_(written_or_spoken)_was_made,_signed,_performed,_or_broken_by_the_defendant_or_where_the_defendant_lived_or_did_business_when_the_defendant_made_the_contract.">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_a_contract_(written_or_spoken)_was_made,_signed,_performed,_or_broken_by_the_defendant_or_where_the_defendant_lived_or_did_business_when_the_defendant_made_the_contract." name="please_explain_why_you_are_suing_at_this_location_where_a_contract_(written_or_spoken)_was_made,_signed,_performed,_or_broken_by_the_defendant_or_where_the_defendant_lived_or_did_business_when_the_defendant_made_the_contract." value="Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract." 
+                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+          Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_other">
+        <label class="checkbox-label">
+          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_other" name="please_explain_why_you_are_suing_at_this_location_other" value="Other" 
+                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+          Other
+        </label>
+      </span></div><br></div></div><div id="question-container-3" class="hidden"><label><h3>Is it where the buyer or lessee signed the contract, lives now, or lived when the contract was made</h3></label><select id="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_1" name="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_1"
+                      onchange="dropdownMirror(this, 'is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_1')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_1"></div>
+              <input type="text" id="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_1_dropdown" name="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_1_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-4" class="hidden"><label><h3>What is your claim about?</h3></label><select id="what_is_your_claim_about_1" name="what_is_your_claim_about_1"
+                      onchange="dropdownMirror(this, 'what_is_your_claim_about_1')">
+                       <option value="" disabled selected>Select an option</option><option value="None of the above">None of the above</option><option value="an offer or contract for personal, family, or household goods, services, or loans">an offer or contract for personal, family, or household goods, services, or loans</option><option value="a vehicle finance sale">a vehicle finance sale</option><option value="a retail installment contract (like a credit card)">a retail installment contract (like a credit card)</option></select><br>
+              <div id="dropdowntext_what_is_your_claim_about_1"></div>
+              <input type="text" id="what_is_your_claim_about_1_dropdown" name="what_is_your_claim_about_1_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-5" class="hidden"><label><h3>Please explain why you're filing at this courthouse?</h3></label><textarea id="please_explain_why_youre_filing_at_this_courthouse_1_1" name="please_explain_why_youre_filing_at_this_courthouse_1_1" rows="5" cols="50" placeholder=""></textarea><br></div><div id="question-container-6" class="hidden"><label><h3>Have you filed more than twelve other small claims w/in the last twelve months</h3></label><select id="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months" name="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months"
+                      onchange="dropdownMirror(this, 'have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months"></div>
+              <input type="text" id="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months_dropdown" name="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-7" class="hidden"><label><h3>Were 2 or more of those small claims cases more than $2,500?</h3></label><select id="were_2_or_more_of_those_small_claims_cases_more_than_2500" name="were_2_or_more_of_those_small_claims_cases_more_than_2500"
+                      onchange="dropdownMirror(this, 'were_2_or_more_of_those_small_claims_cases_more_than_2500')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_were_2_or_more_of_those_small_claims_cases_more_than_2500"></div>
+              <input type="text" id="were_2_or_more_of_those_small_claims_cases_more_than_2500_dropdown" name="were_2_or_more_of_those_small_claims_cases_more_than_2500_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-8" class="hidden"><label><h3>Is this a covid 19 rental debt claim?</h3></label><select id="is_this_a_covid_19_rental_debt_claim" name="is_this_a_covid_19_rental_debt_claim"
+                      onchange="dropdownMirror(this, 'is_this_a_covid_19_rental_debt_claim')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_is_this_a_covid_19_rental_debt_claim"></div>
+              <input type="text" id="is_this_a_covid_19_rental_debt_claim_dropdown" name="is_this_a_covid_19_rental_debt_claim_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-10" class="hidden"><label><h3>Have you read form SC-101-INFO?</h3></label><select id="have_you_read_form_sc101info" name="have_you_read_form_sc101info"
+                      onchange="dropdownMirror(this, 'have_you_read_form_sc101info')">
+                       <option value="" disabled selected>Select an option</option></select><br>
+              <div id="dropdowntext_have_you_read_form_sc101info"></div>
+              <input type="text" id="have_you_read_form_sc101info_dropdown" name="have_you_read_form_sc101info_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-11" class="hidden"><label><h3>Are you suing an attorney?</h3></label><select id="are_you_suing_an_attorney_2" name="are_you_suing_an_attorney_2"
+                      onchange="dropdownMirror(this, 'are_you_suing_an_attorney_2')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_suing_an_attorney_2"></div>
+              <input type="text" id="are_you_suing_an_attorney_2_dropdown" name="are_you_suing_an_attorney_2_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-14" class="hidden"><label><h3>Are you doing business under a fictious business name</h3></label><select id="are_you_doing_business_under_a_fictious_business_name_1" name="are_you_doing_business_under_a_fictious_business_name_1"
+                      onchange="dropdownMirror(this, 'are_you_doing_business_under_a_fictious_business_name_1')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_doing_business_under_a_fictious_business_name_1"></div>
+              <input type="text" id="are_you_doing_business_under_a_fictious_business_name_1_dropdown" name="are_you_doing_business_under_a_fictious_business_name_1_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-16" class="hidden"><label><h3>Are you the P or D?</h3></label><select id="are_you_the_p_or_d" name="are_you_the_p_or_d"
+                      onchange="dropdownMirror(this, 'are_you_the_p_or_d')">
+                       <option value="" disabled selected>Select an option</option><option value="D">D</option><option value="P">P</option></select><br>
+              <div id="dropdowntext_are_you_the_p_or_d"></div>
+              <input type="text" id="are_you_the_p_or_d_dropdown" name="are_you_the_p_or_d_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">SC-500</h1><div id="question-container-9" class="hidden"><label><h3>Are you the only one suing?</h3></label><select id="are_you_the_only_one_suing" name="are_you_the_only_one_suing"
+                      onchange="dropdownMirror(this, 'are_you_the_only_one_suing')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_the_only_one_suing"></div>
+              <input type="text" id="are_you_the_only_one_suing_dropdown" name="are_you_the_only_one_suing_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-12" class="hidden"><label><h3>How many other people are suing?</h3></label><select id="answer12" onchange="showTextboxLabels(12, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer12"></div></div><div id="question-container-15" class="hidden"><label><h3>Are you suing more than one person?</h3></label><select id="are_you_suing_more_than_one_person" name="are_you_suing_more_than_one_person"
+                      onchange="dropdownMirror(this, 'are_you_suing_more_than_one_person')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_suing_more_than_one_person"></div>
+              <input type="text" id="are_you_suing_more_than_one_person_dropdown" name="are_you_suing_more_than_one_person_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-17" class="hidden"><label><h3>How many other people are you suing?</h3></label><select id="answer17" onchange="showTextboxLabels(17, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer17"></div></div><div id="question-container-19" class="hidden"><label><h3>Is the defendant on active military duty?</h3></label><select id="is_the_defendant_on_active_military_duty" name="is_the_defendant_on_active_military_duty"
+                      onchange="dropdownMirror(this, 'is_the_defendant_on_active_military_duty')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_is_the_defendant_on_active_military_duty"></div>
+              <input type="text" id="is_the_defendant_on_active_military_duty_dropdown" name="is_the_defendant_on_active_military_duty_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-20" class="hidden"><label><h3>What is the defendants name?</h3></label><input type="text" id="what_is_the_defendants_name" name="what_is_the_defendants_name" placeholder=""><br></div><div id="question-container-26" class="hidden"><label><h3>Are you doing business under a fictious business name</h3></label><select id="are_you_doing_business_under_a_fictious_business_name" name="are_you_doing_business_under_a_fictious_business_name"
+                      onchange="dropdownMirror(this, 'are_you_doing_business_under_a_fictious_business_name')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_doing_business_under_a_fictious_business_name"></div>
+              <input type="text" id="are_you_doing_business_under_a_fictious_business_name_dropdown" name="are_you_doing_business_under_a_fictious_business_name_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-29" class="hidden"><label><h3>How much are you suing for?</h3></label><input type="number" id="how_much_are_you_suing_for" name="how_much_are_you_suing_for" min="0" step="0.01" placeholder="Enter amount"><br></div><div id="question-container-31" class="hidden"><label><h3>List all rent you claim defendant owes that came due in the period from March 1, 2020, to September 30, 2021. For each month you claim rent is due, include each amount due and the date it came due.</h3></label><textarea id="list_all_rent_you_claim_defendant_owes_that_came_due_in_the_period_from_march_1_2020_to_september_30_2021_for_each_month_you_claim_rent_is_due_include_each_amount_due_and_the_date_it_came_due" name="list_all_rent_you_claim_defendant_owes_that_came_due_in_the_period_from_march_1_2020_to_september_30_2021_for_each_month_you_claim_rent_is_due_include_each_amount_due_and_the_date_it_came_due" rows="5" cols="50" placeholder=""></textarea><br></div><div id="question-container-34"><label><h3>List all unpaid financial obligations under the lease or rental agreement (other than rent) that you claim defendant owes and that came due during the period in (a) above. For each month you claim other financial obligations are due, include each amount, the date it came due, and what it was for (for example, parking fees or utilities included as part of the rental agreement).</h3></label><textarea id="list_all_unpaid_financial_obligations_under_the_lease_or_rental_agreement_other_than_rent_that_you_claim_defendant_owes_and_that_came_due_during_the_period_in_a_above_for_each_month_you_claim_other_financial_obligations_are_due_include_each_amount_the_date_it_came_due_and_what_it_was_for_for_example_parking_fees_or_utilities_included_as_part_of_the_rental_agreement" name="list_all_unpaid_financial_obligations_under_the_lease_or_rental_agreement_other_than_rent_that_you_claim_defendant_owes_and_that_came_due_during_the_period_in_a_above_for_each_month_you_claim_other_financial_obligations_are_due_include_each_amount_the_date_it_came_due_and_what_it_was_for_for_example_parking_fees_or_utilities_included_as_part_of_the_rental_agreement" rows="5" cols="50" placeholder=""></textarea><br></div><div id="question-container-37"><label><h3>List any amounts you received from defendant, rental assistance programs, and other third parties that you have already credited, and any other amounts you have offset or credited, for rent or other financial obligations due between March 1, 2020, and September 30, 2021, that you are not claiming in item 3 above. Include each amount, when it was paid or credited, and what it was for.</h3></label><textarea id="list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_for_rent_or_other_financial_obligations_due_between_march_1_2020_and_september_30_2021_that_you_are_not_claiming_in_item_3_above_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for" name="list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_for_rent_or_other_financial_obligations_due_between_march_1_2020_and_september_30_2021_that_you_are_not_claiming_in_item_3_above_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for" rows="5" cols="50" placeholder=""></textarea><br></div><div id="question-container-40"><label><h3>Have you sent a demand letter to D?</h3></label><select id="have_you_sent_a_demand_letter_to_d_1" name="have_you_sent_a_demand_letter_to_d_1"
+                      onchange="dropdownMirror(this, 'have_you_sent_a_demand_letter_to_d_1')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_have_you_sent_a_demand_letter_to_d_1"></div>
+              <input type="text" id="have_you_sent_a_demand_letter_to_d_1_dropdown" name="have_you_sent_a_demand_letter_to_d_1_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-43" class="hidden"><label><h3>Please explain why not</h3></label><textarea id="please_explain_why_not" name="please_explain_why_not" rows="5" cols="50" placeholder=""></textarea><br></div><div id="question-container-46" class="hidden"><label><h3>Did you make a good faith effort to help the plaintiff obtain rental assistance through any of the following means:</h3></label><div><center><div id="checkmark" class="checkbox-group-46">
+      <span class="checkbox-inline" id="checkbox-container-did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_investigating_if_governmental_rental_assistance_is_available_to_the_tenant">
+        <label class="checkbox-label">
+          <input type="checkbox" id="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_investigating_if_governmental_rental_assistance_is_available_to_the_tenant" name="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_investigating_if_governmental_rental_assistance_is_available_to_the_tenant" value="Investigating if governmental rental assistance is available to the tenant" 
+                 onchange="toggleNoneOption(this, 46); updateCheckboxStyle(this);">
+          Investigating if governmental rental assistance is available to the tenant
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_seeking_governmental_rental_assistance_for_the_tenant">
+        <label class="checkbox-label">
+          <input type="checkbox" id="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_seeking_governmental_rental_assistance_for_the_tenant" name="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_seeking_governmental_rental_assistance_for_the_tenant" value="Seeking governmental rental assistance for the tenant" 
+                 onchange="toggleNoneOption(this, 46); updateCheckboxStyle(this);">
+          Seeking governmental rental assistance for the tenant
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_cooperating_with_the_tenants_efforts_to_obtain_rental_assistance_from_any_governmental_entity_or_third_party">
+        <label class="checkbox-label">
+          <input type="checkbox" id="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_cooperating_with_the_tenants_efforts_to_obtain_rental_assistance_from_any_governmental_entity_or_third_party" name="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_cooperating_with_the_tenants_efforts_to_obtain_rental_assistance_from_any_governmental_entity_or_third_party" value="Cooperating with the tenants efforts to obtain rental assistance from any governmental entity or third party" 
+                 onchange="toggleNoneOption(this, 46); updateCheckboxStyle(this);">
+          Cooperating with the tenants efforts to obtain rental assistance from any governmental entity or third party
+        </label>
+      </span></div><br></div></div><div id="question-container-50" class="hidden"><label><h3>Describe your efforts in detail</h3></label><textarea id="describe_your_efforts_in_detail" name="describe_your_efforts_in_detail" rows="5" cols="50" placeholder=""></textarea><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(2)" id="next-button-2">Next</button></div></div><div id="section3" class="section"><center><h1 class="section-title">SC-103</h1><div id="question-container-13" class="hidden"><label><h3>Please enter your business details</h3></label><input type="text" id="Name" name="Name" placeholder="Name" style="text-align:center;"><br><input type="text" id="Business Address" name="Business Address" placeholder="Address" style="text-align:center;"><br><input type="text" id="Mailing Address" name="Mailing Address" placeholder="Mailing Address" style="text-align:center;"><br></div><div id="question-container-18" class="hidden"><label><h3>What do you do business as?</h3></label><div><center><div id="checkmark" class="checkbox-group-18">
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_1_an_individual">
+        <label class="checkbox-label">
+          <input type="checkbox" id="what_do_you_do_business_as_1_an_individual" name="what_do_you_do_business_as_1_an_individual" value="An Individual" 
+                 onchange="toggleNoneOption(this, 18); updateCheckboxStyle(this);">
+          An Individual
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_1_an_association">
+        <label class="checkbox-label">
+          <input type="checkbox" id="what_do_you_do_business_as_1_an_association" name="what_do_you_do_business_as_1_an_association" value="An Association" 
+                 onchange="toggleNoneOption(this, 18); updateCheckboxStyle(this);">
+          An Association
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_1_a_partnership">
+        <label class="checkbox-label">
+          <input type="checkbox" id="what_do_you_do_business_as_1_a_partnership" name="what_do_you_do_business_as_1_a_partnership" value="A Partnership" 
+                 onchange="toggleNoneOption(this, 18); updateCheckboxStyle(this);">
+          A Partnership
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_1_a_limited_liability">
+        <label class="checkbox-label">
+          <input type="checkbox" id="what_do_you_do_business_as_1_a_limited_liability" name="what_do_you_do_business_as_1_a_limited_liability" value="A Limited Liability" 
+                 onchange="toggleNoneOption(this, 18); updateCheckboxStyle(this);">
+          A Limited Liability
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_1_a_corporation">
+        <label class="checkbox-label">
+          <input type="checkbox" id="what_do_you_do_business_as_1_a_corporation" name="what_do_you_do_business_as_1_a_corporation" value="A Corporation" 
+                 onchange="toggleNoneOption(this, 18); updateCheckboxStyle(this);">
+          A Corporation
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_1_other">
+        <label class="checkbox-label">
+          <input type="checkbox" id="what_do_you_do_business_as_1_other" name="what_do_you_do_business_as_1_other" value="Other" 
+                 onchange="toggleNoneOption(this, 18); updateCheckboxStyle(this);">
+          Other
+        </label>
+      </span></div><br></div></div><div id="question-container-21" class="hidden"><label><h3>What country did you file your Fictious Business Name Statement</h3></label><input type="text" id="what_country_did_you_file_your_fictious_business_name_statement_1" name="what_country_did_you_file_your_fictious_business_name_statement_1" placeholder=""><br></div><div id="question-container-22"><label><h3>What is your fictious business name statement number</h3></label><input type="number" id="what_is_your_fictious_business_name_statement_number" name="what_is_your_fictious_business_name_statement_number" min="0" step="0.01" placeholder="Enter amount"><br></div><div id="question-container-23"><label><h3>What is the date that your fictious nusiness name statement expires</h3></label>
+          <div class="date-container">
+            <input type="date" id="what_is_the_date_that_your_fictious_nusiness_name_statement_expires" name="what_is_the_date_that_your_fictious_nusiness_name_statement_expires" class="date-input">
+          </div><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(3)" id="next-button-3">Next</button></div></div><div id="section4" class="section"><center><h1 class="section-title">SC-120</h1><div id="question-container-25" class="hidden"><label><h3>Are you being sued by yourself?</h3></label><select id="are_you_being_sued_by_yourself" name="are_you_being_sued_by_yourself"
+                      onchange="dropdownMirror(this, 'are_you_being_sued_by_yourself')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_being_sued_by_yourself"></div>
+              <input type="text" id="are_you_being_sued_by_yourself_dropdown" name="are_you_being_sued_by_yourself_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-28" class="hidden"><label><h3>How many other people are being sued?</h3></label><select id="answer28" onchange="showTextboxLabels(28, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer28"></div></div><div id="question-container-33" class="hidden"><label><h3>Are any of the people suing you on active military duty?</h3></label><select id="are_any_of_the_people_suing_you_on_active_military_duty" name="are_any_of_the_people_suing_you_on_active_military_duty"
+                      onchange="dropdownMirror(this, 'are_any_of_the_people_suing_you_on_active_military_duty')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_are_any_of_the_people_suing_you_on_active_military_duty"></div>
+              <input type="text" id="are_any_of_the_people_suing_you_on_active_military_duty_dropdown" name="are_any_of_the_people_suing_you_on_active_military_duty_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-36" class="hidden"><label><h3>What is the defendants name?</h3></label><input type="text" id="what_is_the_defendants_name_3" name="what_is_the_defendants_name_3" placeholder=""><br></div><div id="question-container-38" class="hidden"><label><h3>Are you being sued with another person/entity</h3></label><select id="are_you_suing_more_than_one_person_2" name="are_you_suing_more_than_one_person_2"
+                      onchange="dropdownMirror(this, 'are_you_suing_more_than_one_person_2')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_are_you_suing_more_than_one_person_2"></div>
+              <input type="text" id="are_you_suing_more_than_one_person_2_dropdown" name="are_you_suing_more_than_one_person_2_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-41" class="hidden"><label><h3>How many other people are you suing?</h3></label><select id="answer41" onchange="showTextboxLabels(41, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer41"></div></div><div id="question-container-44" class="hidden"><label><h3>How much are they you suing for?</h3></label><input type="number" id="how_much_are_they_you_suing_for" name="how_much_are_they_you_suing_for" min="0" step="0.01" placeholder="Enter amount"><br></div><div id="question-container-47" class="hidden"><label><h3>Explain why they owe you that money</h3></label><textarea id="explain_why_they_owe_you_that_money_1_1" name="explain_why_they_owe_you_that_money_1_1" rows="5" cols="50" placeholder=""></textarea><br></div><div id="question-container-49"><label><h3>Do you know the date of the incident?</h3></label><select id="do_you_know_the_date_of_the_incident_1" name="do_you_know_the_date_of_the_incident_1"
+                      onchange="dropdownMirror(this, 'do_you_know_the_date_of_the_incident_1')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_know_the_date_of_the_incident_1"></div>
+              <input type="text" id="do_you_know_the_date_of_the_incident_1_dropdown" name="do_you_know_the_date_of_the_incident_1_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-53" class="hidden"><label><h3>when did this happen?</h3></label>
+          <div class="date-container">
+            <input type="date" id="when_did_this_happen" name="when_did_this_happen" class="date-input">
+          </div><br></div><div id="question-container-54" class="hidden"><label><h3>Do you know the date range that it occured?</h3></label><select id="do_you_know_the_date_range_that_it_occured" name="do_you_know_the_date_range_that_it_occured"
+                      onchange="dropdownMirror(this, 'do_you_know_the_date_range_that_it_occured')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_know_the_date_range_that_it_occured"></div>
+              <input type="text" id="do_you_know_the_date_range_that_it_occured_dropdown" name="do_you_know_the_date_range_that_it_occured_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-56" class="hidden"><label><h3>How did you calculate the money owed to you?</h3></label><textarea id="how_did_you_calculate_the_money_owed_to_you" name="how_did_you_calculate_the_money_owed_to_you" rows="5" cols="50" placeholder=""></textarea><br></div><div id="question-container-58"><label><h3>Have you sent a demand letter to D?</h3></label><select id="have_you_sent_a_demand_letter_to_d_1_1" name="have_you_sent_a_demand_letter_to_d_1_1"
+                      onchange="dropdownMirror(this, 'have_you_sent_a_demand_letter_to_d_1_1')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_have_you_sent_a_demand_letter_to_d_1_1"></div>
+              <input type="text" id="have_you_sent_a_demand_letter_to_d_1_1_dropdown" name="have_you_sent_a_demand_letter_to_d_1_1_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-60" class="hidden"><label><h3>Are you suing a public entity?</h3></label><select id="are_you_suing_a_public_entity_3" name="are_you_suing_a_public_entity_3"
+                      onchange="dropdownMirror(this, 'are_you_suing_a_public_entity_3')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_suing_a_public_entity_3"></div>
+              <input type="text" id="are_you_suing_a_public_entity_3_dropdown" name="are_you_suing_a_public_entity_3_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-62" class="hidden"><label><h3>Have you filed a written claim against the entity?</h3></label><select id="have_you_filed_a_written_claim_against_the_entity_1" name="have_you_filed_a_written_claim_against_the_entity_1"
+                      onchange="dropdownMirror(this, 'have_you_filed_a_written_claim_against_the_entity_1')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_have_you_filed_a_written_claim_against_the_entity_1"></div>
+              <input type="text" id="have_you_filed_a_written_claim_against_the_entity_1_dropdown" name="have_you_filed_a_written_claim_against_the_entity_1_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-64" class="hidden"><label><h3>When was the claim filed?</h3></label>
+          <div class="date-container">
+            <input type="date" id="when_was_the_claim_filed_1" name="when_was_the_claim_filed_1" class="date-input">
+          </div><br></div><div id="question-container-66" class="hidden"><label><h3>Are you suing there because of any of the following reasons</h3></label><select id="are_you_suing_there_because_of_any_of_the_following_reasons_1" name="are_you_suing_there_because_of_any_of_the_following_reasons_1"
+                      onchange="dropdownMirror(this, 'are_you_suing_there_because_of_any_of_the_following_reasons_1')">
+                       <option value="" disabled selected>Select an option</option><option value="Participants completed a structured online survey consisting of 28 items divided into two subsections: rumination and academic efficacy. The rumination subsection (10 items) was adapted from the Ruminative Responses Scale and included Q3, Q47, and Q5–Q12. These items measured repetitive and self-focused thought with example questions such as “How often do you think about how sad you feel?” or “I think about the reasons for my feelings,” answered using scales ranging from four-point frequency options (Almost never, Sometimes, Often, Almost always) to five-point Likert scales (Exactly true to Exactly false). Following this block, participants responded to the academic efficacy subsection (18 items), which included Q48, Q49, and Q15.1–Q29. These questions assessed confidence in academic competence and ability to handle coursework, with example items such as “I can always manage to solve difficult academic problems if I try hard enough” and “I feel confident that I can succeed in my coursework,” rated on scales from Strongly disagree to Strongly agree. All items were presented in a fixed order, with the rumination block (Q3, Q47, Q5–Q12) first, followed by the academic efficacy block (Q48–Q49, Q15.1–Q29), ensuring that participants completed the rumination measures before evaluating their academic beliefs. The entire survey took approximately 5–10 minutes to complete, after which participants received a debriefing statement and were thanked for their participation.">Participants completed a structured online survey consisting of 28 items divided into two subsections: rumination and academic efficacy. The rumination subsection (10 items) was adapted from the Ruminative Responses Scale and included Q3, Q47, and Q5–Q12. These items measured repetitive and self-focused thought with example questions such as “How often do you think about how sad you feel?” or “I think about the reasons for my feelings,” answered using scales ranging from four-point frequency options (Almost never, Sometimes, Often, Almost always) to five-point Likert scales (Exactly true to Exactly false). Following this block, participants responded to the academic efficacy subsection (18 items), which included Q48, Q49, and Q15.1–Q29. These questions assessed confidence in academic competence and ability to handle coursework, with example items such as “I can always manage to solve difficult academic problems if I try hard enough” and “I feel confident that I can succeed in my coursework,” rated on scales from Strongly disagree to Strongly agree. All items were presented in a fixed order, with the rumination block (Q3, Q47, Q5–Q12) first, followed by the academic efficacy block (Q48–Q49, Q15.1–Q29), ensuring that participants completed the rumination measures before evaluating their academic beliefs. The entire survey took approximately 5–10 minutes to complete, after which participants received a debriefing statement and were thanked for their participation.</option><option value="Where the plaintiff’s property was damaged.">Where the plaintiff’s property was damaged.</option><option value="Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.">Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.</option><option value="None of the above">None of the above</option><option value="Where the plaintiff was injured.">Where the plaintiff was injured.</option></select><br>
+              <div id="dropdowntext_are_you_suing_there_because_of_any_of_the_following_reasons_1"></div>
+              <input type="text" id="are_you_suing_there_because_of_any_of_the_following_reasons_1_dropdown" name="are_you_suing_there_because_of_any_of_the_following_reasons_1_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-69" class="hidden"><label><h3>Is it where the buyer or lessee signed the contract, lives now, or lived when the contract was made</h3></label><select id="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_2" name="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_2"
+                      onchange="dropdownMirror(this, 'is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_2')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_2"></div>
+              <input type="text" id="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_2_dropdown" name="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_2_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-72" class="hidden"><label><h3>What is your claim about?</h3></label><select id="what_is_your_claim_about_1_1" name="what_is_your_claim_about_1_1"
+                      onchange="dropdownMirror(this, 'what_is_your_claim_about_1_1')">
+                       <option value="" disabled selected>Select an option</option><option value="a vehicle finance sale">a vehicle finance sale</option><option value="an offer or contract for personal, family, or household goods, services, or loans">an offer or contract for personal, family, or household goods, services, or loans</option><option value="a retail installment contract (like a credit card)">a retail installment contract (like a credit card)</option><option value="None of the above">None of the above</option></select><br>
+              <div id="dropdowntext_what_is_your_claim_about_1_1"></div>
+              <input type="text" id="what_is_your_claim_about_1_1_dropdown" name="what_is_your_claim_about_1_1_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-73" class="hidden"><label><h3>Please explain why you're filing at this courthouse?</h3></label><textarea id="please_explain_why_youre_filing_at_this_courthouse_1" name="please_explain_why_youre_filing_at_this_courthouse_1" rows="5" cols="50" placeholder=""></textarea><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(4)" id="next-button-4">Next</button></div></div><div id="section5" class="section"><center><h1 class="section-title">SC-100</h1><div id="question-container-24" class="hidden"><label><h3>Are you suing by yourself?</h3></label><select id="are_you_suing_by_yourself" name="are_you_suing_by_yourself"
+                      onchange="dropdownMirror(this, 'are_you_suing_by_yourself')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_suing_by_yourself"></div>
+              <input type="text" id="are_you_suing_by_yourself_dropdown" name="are_you_suing_by_yourself_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-27" class="hidden"><label><h3>How many people are suing you?</h3></label><select id="answer27" onchange="showTextboxLabels(27, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer27"></div></div><div id="question-container-30" class="hidden"><label><h3>Are you suing more than one person?</h3></label><select id="are_you_suing_more_than_one_person_1" name="are_you_suing_more_than_one_person_1"
+                      onchange="dropdownMirror(this, 'are_you_suing_more_than_one_person_1')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_suing_more_than_one_person_1"></div>
+              <input type="text" id="are_you_suing_more_than_one_person_1_dropdown" name="are_you_suing_more_than_one_person_1_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-32" class="hidden"><label><h3>Who else is being sued with you?</h3></label><select id="answer32" onchange="showTextboxLabels(32, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer32"></div></div><div id="question-container-35" class="hidden"><label><h3>Are any of them on active military duty?</h3></label><select id="are_any_of_them_on_active_military_duty_1" name="are_any_of_them_on_active_military_duty_1"
+                      onchange="dropdownMirror(this, 'are_any_of_them_on_active_military_duty_1')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_are_any_of_them_on_active_military_duty_1"></div>
+              <input type="text" id="are_any_of_them_on_active_military_duty_1_dropdown" name="are_any_of_them_on_active_military_duty_1_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-39" class="hidden"><label><h3>What is the defendants name?</h3></label><input type="text" id="what_is_the_defendants_name_1" name="what_is_the_defendants_name_1" placeholder=""><br></div><div id="question-container-42" class="hidden"><label><h3>How much are you suing for?</h3></label><input type="number" id="how_much_are_you_suing_for_1" name="how_much_are_you_suing_for_1" min="0" step="0.01" placeholder="Enter amount"><br></div><div id="question-container-45" class="hidden"><label><h3>Explain why they owe you that money</h3></label><textarea id="explain_why_they_owe_you_that_money_1" name="explain_why_they_owe_you_that_money_1" rows="5" cols="50" placeholder=""></textarea><br></div><div id="question-container-48"><label><h3>Do you know the date of the incident?</h3></label><select id="do_you_know_the_date_of_the_incident" name="do_you_know_the_date_of_the_incident"
+                      onchange="dropdownMirror(this, 'do_you_know_the_date_of_the_incident')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_know_the_date_of_the_incident"></div>
+              <input type="text" id="do_you_know_the_date_of_the_incident_dropdown" name="do_you_know_the_date_of_the_incident_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-51" class="hidden"><label><h3>when did this happen?</h3></label>
+          <div class="date-container">
+            <input type="date" id="when_did_this_happen_1_1" name="when_did_this_happen_1_1" class="date-input">
+          </div><br></div><div id="question-container-52" class="hidden"><label><h3>Do you know the date range that it occured?</h3></label><select id="do_you_know_the_date_range_that_it_occured_1" name="do_you_know_the_date_range_that_it_occured_1"
+                      onchange="dropdownMirror(this, 'do_you_know_the_date_range_that_it_occured_1')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_know_the_date_range_that_it_occured_1"></div>
+              <input type="text" id="do_you_know_the_date_range_that_it_occured_1_dropdown" name="do_you_know_the_date_range_that_it_occured_1_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-55" class="hidden"><label><h3>When did this happen?</h3></label>
+          <div class="date-range-container">
+            <div class="date-input-group">
+              <label for="when_did_this_happen_2_1">Start Date</label>
+              <input type="date" id="when_did_this_happen_2_1" name="when_did_this_happen_2_1" class="date-input start-date">
+            </div>
+            <div class="date-range-separator">to</div>
+            <div class="date-input-group">
+              <label for="when_did_this_happen_2_2">End Date</label>
+              <input type="date" id="when_did_this_happen_2_2" name="when_did_this_happen_2_2" class="date-input end-date">
+            </div>
+          </div><br>
+          <script>
+            // Add validation for date range (end date >= start date)
+            document.addEventListener('DOMContentLoaded', function() {
+              const startDate = document.getElementById('when_did_this_happen_2_1');
+              const endDate = document.getElementById('when_did_this_happen_2_2');
+              
+              if (startDate && endDate) {
+                // Update min date for end date when start date changes
+                startDate.addEventListener('change', function() {
+                  if (startDate.value) {
+                    endDate.min = startDate.value;
+                    
+                    // If end date is before start date, reset it
+                    if (endDate.value && endDate.value < startDate.value) {
+                      endDate.value = '';
+                    }
+                  }
+                });
+                
+                // Set initial min value if start date has a value
+                if (startDate.value) {
+                  endDate.min = startDate.value;
+                }
+              }
+            });
+          </script></div><div id="question-container-57" class="hidden"><label><h3>How did you calculate the money owed to you?</h3></label><textarea id="how_did_you_calculate_the_money_owed_to_you_1" name="how_did_you_calculate_the_money_owed_to_you_1" rows="5" cols="50" placeholder=""></textarea><br></div><div id="question-container-59"><label><h3>Have you sent a demand letter to D?</h3></label><select id="have_you_sent_a_demand_letter_to_d" name="have_you_sent_a_demand_letter_to_d"
+                      onchange="dropdownMirror(this, 'have_you_sent_a_demand_letter_to_d')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_have_you_sent_a_demand_letter_to_d"></div>
+              <input type="text" id="have_you_sent_a_demand_letter_to_d_dropdown" name="have_you_sent_a_demand_letter_to_d_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-61" class="hidden"><label><h3>Are you suing a public entity?</h3></label><select id="are_you_suing_a_public_entity" name="are_you_suing_a_public_entity"
+                      onchange="dropdownMirror(this, 'are_you_suing_a_public_entity')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_are_you_suing_a_public_entity"></div>
+              <input type="text" id="are_you_suing_a_public_entity_dropdown" name="are_you_suing_a_public_entity_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-63" class="hidden"><label><h3>Have you filed a written claim against the entity?</h3></label><select id="have_you_filed_a_written_claim_against_the_entity" name="have_you_filed_a_written_claim_against_the_entity"
+                      onchange="dropdownMirror(this, 'have_you_filed_a_written_claim_against_the_entity')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_have_you_filed_a_written_claim_against_the_entity"></div>
+              <input type="text" id="have_you_filed_a_written_claim_against_the_entity_dropdown" name="have_you_filed_a_written_claim_against_the_entity_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-65" class="hidden"><label><h3>When was the claim filed?</h3></label>
+          <div class="date-container">
+            <input type="date" id="when_was_the_claim_filed" name="when_was_the_claim_filed" class="date-input">
+          </div><br></div><div id="question-container-67" class="hidden"><label><h3>Are you suing there because of any of the following reasons</h3></label><select id="are_you_suing_there_because_of_any_of_the_following_reasons" name="are_you_suing_there_because_of_any_of_the_following_reasons"
+                      onchange="dropdownMirror(this, 'are_you_suing_there_because_of_any_of_the_following_reasons')">
+                       <option value="" disabled selected>Select an option</option><option value="Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.">Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.</option><option value="Where the plaintiff was injured.">Where the plaintiff was injured.</option><option value="Participants completed a structured online survey consisting of 28 items divided into two subsections: rumination and academic efficacy. The rumination subsection (10 items) was adapted from the Ruminative Responses Scale and included Q3, Q47, and Q5–Q12. These items measured repetitive and self-focused thought with example questions such as “How often do you think about how sad you feel?” or “I think about the reasons for my feelings,” answered using scales ranging from four-point frequency options (Almost never, Sometimes, Often, Almost always) to five-point Likert scales (Exactly true to Exactly false). Following this block, participants responded to the academic efficacy subsection (18 items), which included Q48, Q49, and Q15.1–Q29. These questions assessed confidence in academic competence and ability to handle coursework, with example items such as “I can always manage to solve difficult academic problems if I try hard enough” and “I feel confident that I can succeed in my coursework,” rated on scales from Strongly disagree to Strongly agree. All items were presented in a fixed order, with the rumination block (Q3, Q47, Q5–Q12) first, followed by the academic efficacy block (Q48–Q49, Q15.1–Q29), ensuring that participants completed the rumination measures before evaluating their academic beliefs. The entire survey took approximately 5–10 minutes to complete, after which participants received a debriefing statement and were thanked for their participation.">Participants completed a structured online survey consisting of 28 items divided into two subsections: rumination and academic efficacy. The rumination subsection (10 items) was adapted from the Ruminative Responses Scale and included Q3, Q47, and Q5–Q12. These items measured repetitive and self-focused thought with example questions such as “How often do you think about how sad you feel?” or “I think about the reasons for my feelings,” answered using scales ranging from four-point frequency options (Almost never, Sometimes, Often, Almost always) to five-point Likert scales (Exactly true to Exactly false). Following this block, participants responded to the academic efficacy subsection (18 items), which included Q48, Q49, and Q15.1–Q29. These questions assessed confidence in academic competence and ability to handle coursework, with example items such as “I can always manage to solve difficult academic problems if I try hard enough” and “I feel confident that I can succeed in my coursework,” rated on scales from Strongly disagree to Strongly agree. All items were presented in a fixed order, with the rumination block (Q3, Q47, Q5–Q12) first, followed by the academic efficacy block (Q48–Q49, Q15.1–Q29), ensuring that participants completed the rumination measures before evaluating their academic beliefs. The entire survey took approximately 5–10 minutes to complete, after which participants received a debriefing statement and were thanked for their participation.</option><option value="Where the plaintiff’s property was damaged.">Where the plaintiff’s property was damaged.</option><option value="None of the above">None of the above</option></select><br>
+              <div id="dropdowntext_are_you_suing_there_because_of_any_of_the_following_reasons"></div>
+              <input type="text" id="are_you_suing_there_because_of_any_of_the_following_reasons_dropdown" name="are_you_suing_there_because_of_any_of_the_following_reasons_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-68" class="hidden"><label><h3>Is it where the buyer or lessee signed the contract, lives now, or lived when the contract was made</h3></label><select id="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made" name="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made"
+                      onchange="dropdownMirror(this, 'is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made"></div>
+              <input type="text" id="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_dropdown" name="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-70" class="hidden"><label><h3>What is your claim about?</h3></label><select id="what_is_your_claim_about" name="what_is_your_claim_about"
+                      onchange="dropdownMirror(this, 'what_is_your_claim_about')">
+                       <option value="" disabled selected>Select an option</option><option value="an offer or contract for personal, family, or household goods, services, or loans">an offer or contract for personal, family, or household goods, services, or loans</option><option value="a vehicle finance sale">a vehicle finance sale</option><option value="a retail installment contract (like a credit card)">a retail installment contract (like a credit card)</option><option value="None of the above">None of the above</option></select><br>
+              <div id="dropdowntext_what_is_your_claim_about"></div>
+              <input type="text" id="what_is_your_claim_about_dropdown" name="what_is_your_claim_about_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-71" class="hidden"><label><h3>Please explain why you're filing at this courthouse?</h3></label><textarea id="please_explain_why_youre_filing_at_this_courthouse" name="please_explain_why_youre_filing_at_this_courthouse" rows="5" cols="50" placeholder=""></textarea><br></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
@@ -1076,30 +1474,2522 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = 'test-user';
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId");
-    var questionSlugMap       = {"1":""};
-var questionNameIds = {"1":"answer1"};
-var jumpLogics = [];
+    var questionSlugMap       = {"1":"where_are_you_suing","2":"please_explain_why_you_are_suing_at_this_location","3":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","4":"what_is_your_claim_about","5":"please_explain_why_you_re_filing_at_this_courthouse","6":"have_you_filed_more_than_twelve_other_small_claims_w_in_the_last_twelve_months","7":"were_2_or_more_of_those_small_claims_cases_more_than_2_500","8":"is_this_a_covid_19_rental_debt_claim","9":"are_you_the_only_one_suing","10":"have_you_read_form_sc_101_info","11":"are_you_suing_an_attorney","12":"how_many_other_people_are_suing","13":"please_enter_your_business_details","14":"are_you_doing_business_under_a_fictious_business_name","15":"are_you_suing_more_than_one_person","16":"are_you_the_p_or_d","17":"how_many_other_people_are_you_suing","18":"what_do_you_do_business_as","19":"is_the_defendant_on_active_military_duty","20":"what_is_the_defendants_name","21":"what_country_did_you_file_your_fictious_business_name_statement","22":"what_is_your_fictious_business_name_statement_number","23":"what_is_the_date_that_your_fictious_nusiness_name_statement_expires","24":"are_you_suing_by_yourself","25":"are_you_being_sued_by_yourself","26":"are_you_doing_business_under_a_fictious_business_name","27":"how_many_people_are_suing_you","28":"how_many_other_people_are_being_sued","29":"how_much_are_you_suing_for","30":"are_you_suing_more_than_one_person","31":"list_all_rent_you_claim_defendant_owes_that_came_due_in_the_period_from_march_1_2020_to_september_30_2021_for_each_month_you_claim_rent_is_due_include_each_amount_due_and_the_date_it_came_due","32":"who_else_is_being_sued_with_you","33":"are_any_of_the_people_suing_you_on_active_military_duty","34":"list_all_unpaid_financial_obligations_under_the_lease_or_rental_agreement_other_than_rent_that_you_claim_defendant_owes_and_that_came_due_during_the_period_in_a_above_for_each_month_you_claim_other_financial_obligations_are_due_include_each_amount_the_date_it_came_due_and_what_it_was_for_for_example_parking_fees_or_utilities_included_as_part_of_the_rental_agreement","35":"are_any_of_them_on_active_military_duty","36":"what_is_the_defendants_name","37":"list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_for_rent_or_other_financial_obligations_due_between_march_1_2020_and_september_30_2021_that_you_are_not_claiming_in_item_3_above_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for","38":"are_you_being_sued_with_another_person_entity","39":"what_is_the_defendants_name","40":"have_you_sent_a_demand_letter_to_d","41":"how_many_other_people_are_you_suing","42":"how_much_are_you_suing_for","43":"please_explain_why_not","44":"how_much_are_they_you_suing_for","45":"explain_why_they_owe_you_that_money","46":"did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means","47":"explain_why_they_owe_you_that_money","48":"do_you_know_the_date_of_the_incident","49":"do_you_know_the_date_of_the_incident","50":"describe_your_efforts_in_detail","51":"when_did_this_happen","52":"do_you_know_the_date_range_that_it_occured","53":"when_did_this_happen","54":"do_you_know_the_date_range_that_it_occured","55":"when_did_this_happen","56":"how_did_you_calculate_the_money_owed_to_you","57":"how_did_you_calculate_the_money_owed_to_you","58":"have_you_sent_a_demand_letter_to_d","59":"have_you_sent_a_demand_letter_to_d","60":"are_you_suing_a_public_entity","61":"are_you_suing_a_public_entity","62":"have_you_filed_a_written_claim_against_the_entity","63":"have_you_filed_a_written_claim_against_the_entity","64":"when_was_the_claim_filed","65":"when_was_the_claim_filed","66":"are_you_suing_there_because_of_any_of_the_following_reasons","67":"are_you_suing_there_because_of_any_of_the_following_reasons","68":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","69":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","70":"what_is_your_claim_about","71":"please_explain_why_you_re_filing_at_this_courthouse","72":"what_is_your_claim_about","73":"please_explain_why_you_re_filing_at_this_courthouse"};
+var questionNameIds = {"1":"where_are_you_suing","2":"please_explain_why_you_are_suing_at_this_location","3":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_1","4":"what_is_your_claim_about_1","5":"please_explain_why_youre_filing_at_this_courthouse_1_1","6":"have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months","7":"were_2_or_more_of_those_small_claims_cases_more_than_2500","8":"is_this_a_covid_19_rental_debt_claim","9":"are_you_the_only_one_suing","10":"have_you_read_form_sc101info","11":"are_you_suing_an_attorney_2","12":"answer12","14":"are_you_doing_business_under_a_fictious_business_name_1","15":"are_you_suing_more_than_one_person","16":"are_you_the_p_or_d","17":"answer17","18":"what_do_you_do_business_as","19":"is_the_defendant_on_active_military_duty","20":"what_is_the_defendants_name","21":"what_country_did_you_file_your_fictious_business_name_statement_1","22":"what_is_your_fictious_business_name_statement_number","23":"what_is_the_date_that_your_fictious_nusiness_name_statement_expires","24":"are_you_suing_by_yourself","25":"are_you_being_sued_by_yourself","26":"are_you_doing_business_under_a_fictious_business_name","27":"answer27","28":"answer28","29":"how_much_are_you_suing_for","30":"are_you_suing_more_than_one_person_1","31":"list_all_rent_you_claim_defendant_owes_that_came_due_in_the_period_from_march_1_2020_to_september_30_2021_for_each_month_you_claim_rent_is_due_include_each_amount_due_and_the_date_it_came_due","32":"answer32","33":"are_any_of_the_people_suing_you_on_active_military_duty","34":"list_all_unpaid_financial_obligations_under_the_lease_or_rental_agreement_other_than_rent_that_you_claim_defendant_owes_and_that_came_due_during_the_period_in_a_above_for_each_month_you_claim_other_financial_obligations_are_due_include_each_amount_the_date_it_came_due_and_what_it_was_for_for_example_parking_fees_or_utilities_included_as_part_of_the_rental_agreement","35":"are_any_of_them_on_active_military_duty_1","36":"what_is_the_defendants_name_3","37":"list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_for_rent_or_other_financial_obligations_due_between_march_1_2020_and_september_30_2021_that_you_are_not_claiming_in_item_3_above_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for","38":"are_you_suing_more_than_one_person_2","39":"what_is_the_defendants_name_1","40":"have_you_sent_a_demand_letter_to_d_1","41":"answer41","42":"how_much_are_you_suing_for_1","43":"please_explain_why_not","44":"how_much_are_they_you_suing_for","45":"explain_why_they_owe_you_that_money_1","46":"did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means","47":"explain_why_they_owe_you_that_money_1_1","48":"do_you_know_the_date_of_the_incident","49":"do_you_know_the_date_of_the_incident_1","50":"describe_your_efforts_in_detail","51":"when_did_this_happen_1_1","52":"do_you_know_the_date_range_that_it_occured_1","53":"when_did_this_happen","54":"do_you_know_the_date_range_that_it_occured","55":"when_did_this_happen_2","56":"how_did_you_calculate_the_money_owed_to_you","57":"how_did_you_calculate_the_money_owed_to_you_1","58":"have_you_sent_a_demand_letter_to_d_1_1","59":"have_you_sent_a_demand_letter_to_d","60":"are_you_suing_a_public_entity_3","61":"are_you_suing_a_public_entity","62":"have_you_filed_a_written_claim_against_the_entity_1","63":"have_you_filed_a_written_claim_against_the_entity","64":"when_was_the_claim_filed_1","65":"when_was_the_claim_filed","66":"are_you_suing_there_because_of_any_of_the_following_reasons_1","67":"are_you_suing_there_because_of_any_of_the_following_reasons","68":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","69":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_2","70":"what_is_your_claim_about","71":"please_explain_why_youre_filing_at_this_courthouse","72":"what_is_your_claim_about_1_1","73":"please_explain_why_youre_filing_at_this_courthouse_1"};
+var jumpLogics = [{"questionId":"7","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"11","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"14","questionType":"dropdown","jumpOption":"Yes","jumpTo":"3","section":1},{"questionId":"16","questionType":"dropdown","jumpOption":"D","jumpTo":"4","section":1},{"questionId":"16","questionType":"dropdown","jumpOption":"P","jumpTo":"5","section":1},{"questionId":"66","questionType":"dropdown","jumpOption":"Participants completed a structured online survey consisting of 28 items divided into two subsections: rumination and academic efficacy. The rumination subsection (10 items) was adapted from the Ruminative Responses Scale and included Q3, Q47, and Q5–Q12. These items measured repetitive and self-focused thought with example questions such as “How often do you think about how sad you feel?” or “I think about the reasons for my feelings,” answered using scales ranging from four-point frequency options (Almost never, Sometimes, Often, Almost always) to five-point Likert scales (Exactly true to Exactly false). Following this block, participants responded to the academic efficacy subsection (18 items), which included Q48, Q49, and Q15.1–Q29. These questions assessed confidence in academic competence and ability to handle coursework, with example items such as “I can always manage to solve difficult academic problems if I try hard enough” and “I feel confident that I can succeed in my coursework,” rated on scales from Strongly disagree to Strongly agree. All items were presented in a fixed order, with the rumination block (Q3, Q47, Q5–Q12) first, followed by the academic efficacy block (Q48–Q49, Q15.1–Q29), ensuring that participants completed the rumination measures before evaluating their academic beliefs. The entire survey took approximately 5–10 minutes to complete, after which participants received a debriefing statement and were thanked for their participation.","jumpTo":"end","section":4},{"questionId":"66","questionType":"dropdown","jumpOption":"Where the plaintiff’s property was damaged.","jumpTo":"end","section":4},{"questionId":"66","questionType":"dropdown","jumpOption":"Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.","jumpTo":"end","section":4},{"questionId":"66","questionType":"dropdown","jumpOption":"None of the above","jumpTo":"end","section":4},{"questionId":"66","questionType":"dropdown","jumpOption":"Where the plaintiff was injured.","jumpTo":"end","section":4},{"questionId":"69","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":4},{"questionId":"72","questionType":"dropdown","jumpOption":"a vehicle finance sale","jumpTo":"end","section":4},{"questionId":"72","questionType":"dropdown","jumpOption":"an offer or contract for personal, family, or household goods, services, or loans","jumpTo":"end","section":4},{"questionId":"72","questionType":"dropdown","jumpOption":"a retail installment contract (like a credit card)","jumpTo":"end","section":4},{"questionId":"67","questionType":"dropdown","jumpOption":"Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.","jumpTo":"end","section":5},{"questionId":"67","questionType":"dropdown","jumpOption":"Where the plaintiff was injured.","jumpTo":"end","section":5},{"questionId":"67","questionType":"dropdown","jumpOption":"Participants completed a structured online survey consisting of 28 items divided into two subsections: rumination and academic efficacy. The rumination subsection (10 items) was adapted from the Ruminative Responses Scale and included Q3, Q47, and Q5–Q12. These items measured repetitive and self-focused thought with example questions such as “How often do you think about how sad you feel?” or “I think about the reasons for my feelings,” answered using scales ranging from four-point frequency options (Almost never, Sometimes, Often, Almost always) to five-point Likert scales (Exactly true to Exactly false). Following this block, participants responded to the academic efficacy subsection (18 items), which included Q48, Q49, and Q15.1–Q29. These questions assessed confidence in academic competence and ability to handle coursework, with example items such as “I can always manage to solve difficult academic problems if I try hard enough” and “I feel confident that I can succeed in my coursework,” rated on scales from Strongly disagree to Strongly agree. All items were presented in a fixed order, with the rumination block (Q3, Q47, Q5–Q12) first, followed by the academic efficacy block (Q48–Q49, Q15.1–Q29), ensuring that participants completed the rumination measures before evaluating their academic beliefs. The entire survey took approximately 5–10 minutes to complete, after which participants received a debriefing statement and were thanked for their participation.","jumpTo":"end","section":5},{"questionId":"67","questionType":"dropdown","jumpOption":"Where the plaintiff’s property was damaged.","jumpTo":"end","section":5},{"questionId":"67","questionType":"dropdown","jumpOption":"None of the above","jumpTo":"end","section":5},{"questionId":"68","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":5},{"questionId":"70","questionType":"dropdown","jumpOption":"an offer or contract for personal, family, or household goods, services, or loans","jumpTo":"end","section":5},{"questionId":"70","questionType":"dropdown","jumpOption":"a vehicle finance sale","jumpTo":"end","section":5},{"questionId":"70","questionType":"dropdown","jumpOption":"a retail installment contract (like a credit card)","jumpTo":"end","section":5}];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"1","pdfName":"form2.pdf","stripePriceId":"123","conditions":[{"characterLimit":50}],"isBigParagraph":true}];
-var alertLogics = [];
+var pdfLogicPDFs = [];
+var alertLogics = [{"questionId":"7","message":"Sorry youre just not eligible","conditions":[{"prevQuestion":"7","prevAnswer":"Yes"}]},{"questionId":"11","message":"We cant take you on sorry","conditions":[{"prevQuestion":"11","prevAnswer":"Yes"}]}];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"length":0};
-var amountMap = {"length":0};
+var labelMap = {"12":["Name","Phone Number","Mailing Address","Email Address"],"17":["Phone Number","Mailing Address","Email Address"],"27":["Name","Phone Number","Mailing Address","Email Address"],"28":["Name","Phone Number","Mailing Address","Email Address"],"32":["Name","Phone Number","Mailing Address","Email Address"],"41":["Name","Phone Number","Mailing Address","Email Address"],"length":0};
+var amountMap = {"12":[],"17":["Name"],"27":[],"28":[],"32":[],"41":[],"length":0};
 var linkedDropdowns = [];
 var isHandlingLink = false;
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "form1.pdf";
+var pdfFileName = "";
 var pdfOutputFileName = "example.html";
 var stripePriceId = "";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["form1.pdf", ];
+var allPdfFileNames = ["", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
 
+(function(){
+ var thisQ=document.getElementById("question-container-3");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="other";
+    var cPrevQNum="2";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var checkQuestion = "2";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-4");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="3";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "3";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-5");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="none of the above";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "4";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-6");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="an offer or contract for personal, family, or household goods, services, or loans";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="a vehicle finance sale";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="a retail installment contract (like a credit card)";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="3";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.";
+    var cPrevQNum="2";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where the plaintiff was injured.";
+    var cPrevQNum="2";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where the defendant lives";
+    var cPrevQNum="2";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where the plaintiff’s property was damaged.";
+    var cPrevQNum="2";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="none of the above";
+    var cPrevQNum="4";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "4";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "4";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "4";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "3";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "2";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "2";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "2";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "2";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "4";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-7");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="6";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "6";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-8");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="7";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="6";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "7";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "6";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-10");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="8";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "8";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-11");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="8";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "8";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-14");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="11";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "11";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-16");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="14";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "14";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-9");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="8";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "8";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-12");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="9";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-15");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="9";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="9";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-17");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="15";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "15";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-19");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="15";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "15";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-20");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="19";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "19";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-26");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="19";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="15";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "19";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "15";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-29");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="26";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="26";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "26";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "26";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-31");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="26";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="26";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "26";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "26";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-43");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="40";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "40";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-46");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="40";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "40";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-50");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="investigating if governmental rental assistance is available to the tenant";
+    var cPrevQNum="46";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="seeking governmental rental assistance for the tenant";
+    var cPrevQNum="46";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="cooperating with the tenants efforts to obtain rental assistance from any governmental entity or third party";
+    var cPrevQNum="46";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var checkQuestion = "46";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "46";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "46";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-13");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="14";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "14";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-18");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="14";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "14";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-21");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="an association";
+    var cPrevQNum="18";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="other";
+    var cPrevQNum="18";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="an individual";
+    var cPrevQNum="18";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="a partnership";
+    var cPrevQNum="18";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="a limited liability";
+    var cPrevQNum="18";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="a corporation";
+    var cPrevQNum="18";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var checkQuestion = "18";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "18";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "18";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "18";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "18";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "18";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-25");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="d";
+    var cPrevQNum="16";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "16";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-28");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="25";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "25";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-33");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="25";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="25";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "25";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "25";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-36");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "33";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-38");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "33";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-41");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="38";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "38";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-44");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="38";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="38";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "38";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "38";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-47");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="38";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="38";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "38";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "38";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-53");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="49";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "49";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-54");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="49";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "49";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-56");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="54";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "54";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-60");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="58";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="58";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "58";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "58";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-62");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="60";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "60";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-64");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="62";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "62";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-66");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="62";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="60";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "62";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "60";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-69");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="none of the above";
+    var cPrevQNum="66";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "66";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-72");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="69";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "69";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-73");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="none of the above";
+    var cPrevQNum="72";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "72";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-24");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="p";
+    var cPrevQNum="16";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "16";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-27");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="24";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "24";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-30");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="24";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="24";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "24";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "24";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-32");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="30";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "30";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-35");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="30";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="30";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "30";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "30";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-39");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="35";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "35";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "32";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-42");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="35";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "35";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-45");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="35";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "35";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-51");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="48";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "48";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-52");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="48";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "48";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-55");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="52";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "52";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-57");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="52";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "52";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-61");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="59";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="59";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "59";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "59";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-63");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="61";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "61";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-65");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="63";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "63";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-67");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="63";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="61";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "63";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "61";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-68");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="none of the above";
+    var cPrevQNum="67";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "67";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-70");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="68";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "68";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-71");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="none of the above";
+    var cPrevQNum="70";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "70";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+
+// Alert Logic Functions
+function showAlert(message) {
+    const alertOverlay = document.getElementById('alertOverlay');
+    const alertMessage = document.getElementById('alertMessage');
+    
+    if (alertOverlay && alertMessage) {
+        alertMessage.textContent = message;
+        alertOverlay.style.display = 'flex';
+    }
+}
+
+function closeAlert() {
+    const alertOverlay = document.getElementById('alertOverlay');
+    if (alertOverlay) {
+        alertOverlay.style.display = 'none';
+    }
+}
+
+function exitForm() {
+    window.location.reload();
+}
+
+function checkAlertLogic(changedElement) {
+    if (!alertLogics || alertLogics.length === 0) return;
+    
+    // Get the question ID from the changed element
+    let changedQuestionId = null;
+    if (changedElement) {
+        const elementId = changedElement.id;
+        // Try to extract question ID from element ID
+        for (const [qId, nameId] of Object.entries(questionNameIds)) {
+            if (elementId === nameId || elementId === 'answer' + qId) {
+                changedQuestionId = qId;
+                break;
+            }
+        }
+    }
+    
+    for (const alertLogic of alertLogics) {
+        if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
+        
+        // Only check this alert logic if it's related to the changed element
+        let shouldCheckThisAlert = false;
+        if (changedQuestionId) {
+            // Check if any condition in this alert logic references the changed question
+            for (const condition of alertLogic.conditions) {
+                if (condition.prevQuestion === changedQuestionId) {
+                    shouldCheckThisAlert = true;
+                    break;
+                }
+            }
+        } else {
+            // If we can't determine which question changed, check all alerts (fallback)
+            shouldCheckThisAlert = true;
+        }
+        
+        if (!shouldCheckThisAlert) continue;
+        
+        let shouldShowAlert = false;
+        
+        // Check if ANY of the conditions match (OR logic)
+        for (const condition of alertLogic.conditions) {
+            const prevQuestionId = condition.prevQuestion;
+            const prevAnswer = condition.prevAnswer;
+            
+            // Get the previous question's value
+            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                                      document.getElementById('answer' + prevQuestionId);
+            
+            if (prevQuestionElement) {
+                let prevValue = '';
+                
+                if (prevQuestionElement.type === 'checkbox') {
+                    prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
+                } else {
+                    prevValue = prevQuestionElement.value;
+                }
+                
+                // Check if the condition matches
+                if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                    shouldShowAlert = true;
+                    break; // Found a match, no need to check other conditions
+                }
+            }
+        }
+        
+        // Show alert if conditions are met
+        if (shouldShowAlert && alertLogic.message) {
+            showAlert(alertLogic.message);
+            return; // Show only the first matching alert
+        }
+    }
+}
+
+// Add event listeners for alert logic
+document.addEventListener('DOMContentLoaded', function() {
+    const formElements = document.querySelectorAll('input, select, textarea');
+    formElements.forEach(element => {
+        element.addEventListener('change', function() { checkAlertLogic(this); });
+        element.addEventListener('input', function() { checkAlertLogic(this); });
+    });
+    
+    // Initialize checkbox styling for beautiful blue borders
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        updateCheckboxStyle(checkbox);
+    });
+});
 
 // Always-available Cart Modal (global)
 window.showCartModal = function () {
@@ -1453,7 +4343,196 @@ function handleNoneOfTheAboveToggle(noneCheckbox, questionId) {
             toggleAmountField(amountId, false);
         }
     });
+    
+    // Update styling for all checkboxes
+    allCheckboxes.forEach(checkbox => {
+        updateCheckboxStyle(checkbox);
+    });
 }
+
+/*──────────────────────────────────────────────────────────────*
+ * Update checkbox styling for beautiful blue border
+ *──────────────────────────────────────────────────────────────*/
+function updateCheckboxStyle(checkbox) {
+    const container = document.getElementById('checkbox-container-' + checkbox.id);
+    if (container) {
+        if (checkbox.checked) {
+            container.classList.add('checked');
+        } else {
+            container.classList.remove('checked');
+        }
+    }
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Form validation functions
+ *──────────────────────────────────────────────────────────────*/
+function validateAndProceed(sectionNumber) {
+    if (validateCurrentSection(sectionNumber)) {
+        handleNext(sectionNumber);
+    }
+}
+
+function validateCurrentSection(sectionNumber) {
+    const section = document.getElementById('section' + sectionNumber);
+    if (!section) return true;
+    
+    const questions = section.querySelectorAll('.question-container');
+    let isValid = true;
+    
+    questions.forEach(question => {
+        const questionId = question.id.replace('question-container-', '');
+        const questionType = getQuestionTypeFromContainer(question);
+        
+        if (!validateQuestion(question, questionType, questionId)) {
+            isValid = false;
+        }
+    });
+    
+    // Update next button state
+    const nextButton = document.getElementById('next-button-' + sectionNumber);
+    if (nextButton) {
+        nextButton.disabled = !isValid;
+    }
+    
+    return isValid;
+}
+
+function getQuestionTypeFromContainer(questionContainer) {
+    // Check for different input types to determine question type
+    if (questionContainer.querySelector('input[type="checkbox"]')) {
+        return 'checkbox';
+    } else if (questionContainer.querySelector('select')) {
+        return 'dropdown';
+    } else if (questionContainer.querySelector('input[type="text"]')) {
+        return 'text';
+    } else if (questionContainer.querySelector('input[type="email"]')) {
+        return 'email';
+    } else if (questionContainer.querySelector('input[type="tel"]')) {
+        return 'phone';
+    } else if (questionContainer.querySelector('input[type="number"]')) {
+        return 'number';
+    } else if (questionContainer.querySelector('input[type="date"]')) {
+        return 'date';
+    } else if (questionContainer.querySelector('textarea')) {
+        return 'bigParagraph';
+    }
+    return 'text'; // default
+}
+
+function validateQuestion(questionContainer, questionType, questionId) {
+    let isValid = true;
+    
+    switch (questionType) {
+        case 'checkbox':
+            isValid = validateCheckboxQuestion(questionContainer);
+            break;
+        case 'dropdown':
+            isValid = validateDropdownQuestion(questionContainer);
+            break;
+        case 'text':
+        case 'email':
+        case 'phone':
+        case 'number':
+        case 'date':
+        case 'bigParagraph':
+            isValid = validateTextQuestion(questionContainer);
+            break;
+        default:
+            isValid = true;
+    }
+    
+    // Add visual feedback
+    if (!isValid) {
+        questionContainer.classList.add('form-field-required');
+        showValidationError(questionContainer, 'This field is required');
+    } else {
+        questionContainer.classList.remove('form-field-required');
+        hideValidationError(questionContainer);
+    }
+    
+    return isValid;
+}
+
+function validateCheckboxQuestion(questionContainer) {
+    const checkboxes = questionContainer.querySelectorAll('input[type="checkbox"]');
+    const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+    return checkedBoxes.length > 0;
+}
+
+function validateDropdownQuestion(questionContainer) {
+    const select = questionContainer.querySelector('select');
+    if (!select) return true;
+    return select.value && select.value.trim() !== '';
+}
+
+function validateTextQuestion(questionContainer) {
+    const inputs = questionContainer.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
+    if (inputs.length === 0) return true;
+    
+    for (let input of inputs) {
+        if (!input.value || input.value.trim() === '') {
+            return false;
+        }
+    }
+    return true;
+}
+
+function showValidationError(container, message) {
+    let errorDiv = container.querySelector('.validation-error');
+    if (!errorDiv) {
+        errorDiv = document.createElement('div');
+        errorDiv.className = 'validation-error';
+        container.appendChild(errorDiv);
+    }
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+}
+
+function hideValidationError(container) {
+    const errorDiv = container.querySelector('.validation-error');
+    if (errorDiv) {
+        errorDiv.style.display = 'none';
+    }
+}
+
+// Add validation listeners to all form fields
+function addValidationListeners() {
+    const currentSection = document.querySelector('.section.active');
+    if (!currentSection) return;
+    
+    const sectionNumber = currentSection.id.replace('section', '');
+    const formFields = currentSection.querySelectorAll('input, select, textarea');
+    
+    formFields.forEach(field => {
+        field.addEventListener('change', () => validateCurrentSection(sectionNumber));
+        field.addEventListener('input', () => validateCurrentSection(sectionNumber));
+    });
+    
+    // Initial validation
+    validateCurrentSection(sectionNumber);
+}
+
+// Initialize validation when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    addValidationListeners();
+    
+    // Re-add listeners when sections change
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                if (mutation.target.classList.contains('section')) {
+                    setTimeout(addValidationListeners, 100);
+                }
+            }
+        });
+    });
+    
+    observer.observe(document.body, {
+        attributes: true,
+        subtree: true
+    });
+});
 
 
 function showTextboxLabels(questionId, count){

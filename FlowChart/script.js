@@ -4262,13 +4262,23 @@ function previewForm() {
       guiJsonStr = JSON.stringify(guiJsonStr, null, 2);
     }
   }
+  
   if (guiJsonStr) {
+    // Encode the JSON for URL transmission
+    const encodedJson = encodeURIComponent(guiJsonStr);
+    const guiUrl = `FormWiz%20GUI/gui.html?preview=${encodedJson}`;
+    
+    // Still copy to clipboard for manual use if needed
     navigator.clipboard.writeText(guiJsonStr).then(() => {
       // Optionally, show a message: copied!
     });
+    
+    // Open the GUI preview in a new tab with the JSON in the URL
+    window.open(guiUrl, '_blank');
+  } else {
+    // Fallback to regular GUI if no JSON generated
+    window.open('FormWiz%20GUI/gui.html', '_blank');
   }
-  // Open the GUI preview in a new tab
-  window.open('FormWiz%20GUI/gui.html', '_blank');
 }
 
 // AUTOSAVE FLOWCHART TO COOKIES FEATURE

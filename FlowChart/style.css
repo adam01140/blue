@@ -233,7 +233,43 @@ input[type="file"] {
   border: 1px solid #ddd;
   border-radius: 4px;
   cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
 }
+
+.section-item.dragging {
+  opacity: 0.5;
+  transform: rotate(2deg);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+
+.section-item.drag-over {
+  border: 2px dashed #007bff;
+  background-color: rgba(0, 123, 255, 0.1);
+  transform: translateY(2px);
+}
+
+.section-item .drag-handle {
+  cursor: grab;
+  padding: 2px 6px;
+  margin-right: 6px;
+  color: #666;
+  font-size: 12px;
+  border-radius: 3px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  transition: background-color 0.2s;
+}
+
+.section-item .drag-handle:hover {
+  background-color: #e0e0e0;
+}
+
+.section-item .drag-handle:active {
+  cursor: grabbing;
+}
+
 .section-item.highlighted {
   border: 2px solid #007bff;
   background-color: rgba(0, 123, 255, 0.1);
