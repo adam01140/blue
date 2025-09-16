@@ -1,12 +1,19 @@
 // server.js
 const express       = require('express');
 const dotenv        = require('dotenv');
+const fetch         = require('node-fetch');
 dotenv.config();
 
 // WARNING: Using LIVE keys for local development is not recommended and will likely fail.
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 if (!stripeSecretKey) {
   throw new Error('STRIPE_SECRET_KEY is not set in the environment. Please add it to your .env file.');
+}
+
+// AI Configuration
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+if (!OPENAI_API_KEY) {
+  throw new Error('OPENAI_API_KEY is not set in the environment. Please add it to your .env file.');
 }
 const stripe = require('stripe')(stripeSecretKey);
 const admin         = require('firebase-admin');
@@ -46,6 +53,95 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ────────────────────────────────────────────────────────────
 app.get('/', (_, res) => {
   res.send('Welcome to the PDF Editing Server');
+});
+
+// ────────────────────────────────────────────────────────────
+// AI Chat Endpoint (Secure)
+// ────────────────────────────────────────────────────────────
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message, conversationHistory = [] } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    // Prepare messages for OpenAI API
+    const messages = [
+      {
+        role: 'system',
+        content: `You are an AI Legal Assistant designed to help users with general legal questions and guidance. 
+
+IMPORTANT DISCLAIMERS:
+- You provide general information only and cannot replace professional legal advice
+- You cannot provide specific legal advice for individual cases
+- Always recommend consulting with a qualified attorney for specific legal matters
+- You cannot represent users in court or provide legal representation
+- Information provided is for educational purposes only
+
+Your role is to:
+- Explain legal concepts in simple terms
+- Provide general guidance on legal processes
+- Help users understand their rights and options
+- Suggest when professional legal help is needed
+- Be helpful, accurate, and responsible
+- ASSESS if the user's situation matches any available forms and recommend them
+
+AVAILABLE FORMS:
+- SC-100: Plaintiff's Claim form for suing a defendant
+- SC-120: Defendant's Claim form for counter-suing a plaintiff  
+- SC-500: Small claims form for cases related to COVID-19
+- Fee Waiver: Application for waiver of court filing fees
+
+FORM ASSESSMENT GUIDELINES:
+- Listen carefully to the user's situation and needs
+- If their situation matches one of the available forms, recommend it
+- Provide a helpful explanation of the form and why it's appropriate
+- Use the format: "If you need assistance with [situation], we recommend filling out a [Form Name] form. [Explanation of what the form does and why it's useful]."
+- If multiple forms might apply, explain the differences
+- If no forms match, provide general guidance and suggest consulting an attorney
+
+Always end responses with a reminder to consult with a qualified attorney for specific legal matters.`
+      },
+      ...conversationHistory.slice(-10), // Keep last 10 messages for context
+      { role: 'user', content: message }
+    ];
+
+    // Call OpenAI API
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: messages,
+        max_tokens: 2000,
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || 'OpenAI API request failed');
+    }
+
+    const data = await response.json();
+    const aiResponse = data.choices[0].message.content;
+
+    res.json({ 
+      response: aiResponse,
+      success: true 
+    });
+
+  } catch (error) {
+    console.error('AI Chat Error:', error);
+    res.status(500).json({ 
+      error: 'Failed to process chat message',
+      details: error.message 
+    });
+  }
 });
 
 /* ————— helper ————— */

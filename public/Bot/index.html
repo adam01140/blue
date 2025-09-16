@@ -8,8 +8,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <!-- AI Configuration -->
-    <script src="ai-config.js"></script>
+    <!-- AI Configuration removed - now handled server-side -->
     <style>
         html, body {
             height: 100%;
@@ -1711,7 +1710,7 @@
         // Forms data from Firebase
         let availableForms = [];
 
-        // AI_CONFIG is now loaded from ai-config.js
+        // AI configuration is now handled server-side
 
         // Chat state management
         let conversationHistory = [];
@@ -1753,57 +1752,12 @@
                 });
                 
                 console.log('Loaded forms from Firebase:', availableForms);
-                updateSystemPromptWithForms();
             } catch (error) {
                 console.error('Error loading forms from Firebase:', error);
             }
         }
 
-        // Update system prompt to include forms assessment
-        function updateSystemPromptWithForms() {
-            const formsInfo = availableForms.map(form => 
-                `- ${form.name}: ${form.description} (ID: ${form.id}, URL: ${form.url})`
-            ).join('\n');
-
-            AI_CONFIG.systemPrompt = `You are an AI Legal Assistant designed to help users with general legal questions and guidance. 
-
-IMPORTANT DISCLAIMERS:
-- You provide general information only and cannot replace professional legal advice
-- You cannot provide specific legal advice for individual cases
-- Always recommend consulting with a qualified attorney for specific legal matters
-- You cannot represent users in court or provide legal representation
-- Information provided is for educational purposes only
-
-Your role is to:
-- Explain legal concepts in simple terms
-- Provide general guidance on legal processes
-- Help users understand their rights and options
-- Suggest when professional legal help is needed
-- Be helpful, accurate, and responsible
-- ASSESS if the user's situation matches any available forms and recommend them
-
-AVAILABLE FORMS:
-${formsInfo}
-
-FORM ASSESSMENT GUIDELINES:
-- Listen carefully to the user's situation and needs
-- If their situation matches one of the available forms, recommend it
-- Provide a helpful explanation of the form and why it's appropriate
-- Use the format: "If you need assistance with [situation], we recommend filling out a [Form Name] form. [Explanation of what the form does and why it's useful]."
-- Do NOT include direct links in your response - a form recommendation module will appear automatically
-- If multiple forms might apply, explain the differences
-- If no forms match, provide general guidance and suggest consulting an attorney
-
-EXAMPLES:
-- If user mentions "waiving court fees" or "can't afford filing fees" → Say "If you need assistance in waiving a court fee, we recommend filling out a Fee Waiver form. This form is used to apply for a waiver of court filing fees if you cannot afford to pay them."
-- If user mentions "suing someone" or "small claims" → Say "If you need to file a lawsuit for money owed, we recommend filling out an SC-100 form. This is the Plaintiff's Claim form for suing a defendant in small claims court."
-- If user mentions "counter-suing" or "defendant" → Say "If someone is suing you and you want to counter-sue, we recommend filling out an SC-120 form. This is the Defendant's Claim form for counter-suing a plaintiff."
-- If user mentions "COVID-19" legal issues → Say "If you have a legal issue related to COVID-19, we recommend filling out an SC-500 form. This is specifically designed for small claims cases related to COVID-19."
-
-Always end responses with a reminder to consult with a qualified attorney for specific legal matters.`;
-
-            console.log('Updated system prompt with forms:', AI_CONFIG.systemPrompt);
-        }
+        // System prompt is now handled server-side
 
         // Initialize chat functionality
         document.addEventListener('DOMContentLoaded', function() {
@@ -1879,7 +1833,6 @@ Always end responses with a reminder to consult with a qualified attorney for sp
 
             // Debug: Check if forms are loaded
             console.log('Available forms when sending message:', availableForms);
-            console.log('Current system prompt:', AI_CONFIG.systemPrompt);
 
             // If in fallback mode, use built-in responses
             if (fallbackMode) {
@@ -1936,7 +1889,7 @@ Always end responses with a reminder to consult with a qualified attorney for sp
                 return;
             }
 
-            // API key is loaded from ai-config.js
+            // API calls are now handled server-side
 
             try {
                 // Add to conversation history
@@ -2036,32 +1989,24 @@ Always end responses with a reminder to consult with a qualified attorney for sp
         }
 
         async function callOpenAI() {
-            const messages = [
-                { role: 'system', content: AI_CONFIG.systemPrompt },
-                ...conversationHistory.slice(-10) // Keep last 10 messages for context
-            ];
-
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${AI_CONFIG.apiKey}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    model: AI_CONFIG.model,
-                    messages: messages,
-                    max_tokens: AI_CONFIG.maxTokens,
-                    temperature: AI_CONFIG.temperature
+                    message: conversationHistory[conversationHistory.length - 1].content,
+                    conversationHistory: conversationHistory.slice(0, -1) // Exclude the current message
                 })
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error?.message || 'API request failed');
+                throw new Error(errorData.error || 'Server request failed');
             }
 
             const data = await response.json();
-            return data.choices[0].message.content;
+            return data.response;
         }
 
         function addMessage(sender, content, autoScroll = true) {
