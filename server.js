@@ -58,6 +58,71 @@ function shouldCheck(v) {
 }
 
 /**
+ * Map HTML form values to PDF radio group options
+ * @param {PDFRadioGroup} field - The PDF radio group field
+ * @param {string} value - The value from the HTML form
+ * @returns {string|null} - The mapped option name or null if no match
+ */
+function mapRadioValue(field, value) {
+  try {
+    const options = field.getOptions();
+    const valueStr = String(value).trim();
+    
+    // If the value is already a valid option, use it
+    if (options.includes(valueStr)) {
+      return valueStr;
+    }
+    
+    // Handle common HTML form values
+    if (valueStr === 'on' || valueStr === 'true' || valueStr === '1') {
+      // For 'on' values, try to find a "Yes" option or the first available option
+      const yesOption = options.find(opt => 
+        opt.toLowerCase().includes('yes') || 
+        opt.toLowerCase().includes('true') ||
+        opt.toLowerCase().includes('1')
+      );
+      if (yesOption) return yesOption;
+      
+      // If no "Yes" option, use the first option
+      if (options.length > 0) return options[0];
+    }
+    
+    if (valueStr === 'off' || valueStr === 'false' || valueStr === '0') {
+      // For 'off' values, try to find a "No" option
+      const noOption = options.find(opt => 
+        opt.toLowerCase().includes('no') || 
+        opt.toLowerCase().includes('false') ||
+        opt.toLowerCase().includes('0')
+      );
+      if (noOption) return noOption;
+    }
+    
+    // Handle comma-separated values (like "on,on")
+    if (valueStr.includes(',')) {
+      const parts = valueStr.split(',').map(p => p.trim()).filter(Boolean);
+      if (parts.length > 0) {
+        // Use the first non-empty part and try to map it
+        return mapRadioValue(field, parts[0]);
+      }
+    }
+    
+    // Try partial matching
+    const partialMatch = options.find(opt => 
+      opt.toLowerCase().includes(valueStr.toLowerCase()) ||
+      valueStr.toLowerCase().includes(opt.toLowerCase())
+    );
+    if (partialMatch) return partialMatch;
+    
+    console.log(`Could not map radio value "${valueStr}" to any option in field ${field.getName()}. Available options: ${options.join(', ')}`);
+    return null;
+    
+  } catch (error) {
+    console.error(`Error mapping radio value for field ${field.getName()}:`, error.message);
+    return null;
+  }
+}
+
+/**
  * POST /edit_pdf
  * Accepts ▸ a file upload named "pdf", **or** ▸ a query string ?pdf=fileName
  * and returns the edited PDF with filled‑in fields.
@@ -98,20 +163,49 @@ app.post('/edit_pdf', async (req, res) => {
 
     if (value === undefined) return;            // nothing sent for this field
 
-    switch (field.constructor.name) {
-      case 'PDFCheckBox':
-        shouldCheck(value) ? field.check() : field.uncheck();
-        break;
+    try {
+      switch (field.constructor.name) {
+        case 'PDFCheckBox':
+          shouldCheck(value) ? field.check() : field.uncheck();
+          break;
 
-      case 'PDFRadioGroup':
-      case 'PDFDropdown':
-        field.select(String(value));
-        break;
+        case 'PDFRadioGroup':
+          // Handle radio groups with proper option mapping
+          const radioValue = mapRadioValue(field, value);
+          if (radioValue) {
+            field.select(radioValue);
+          }
+          break;
 
-      case 'PDFTextField':
-      default:
-        field.setText(String(value));
-        field.updateAppearances(helv);
+        case 'PDFDropdown':
+          field.select(String(value));
+          break;
+
+        case 'PDFTextField':
+          field.setText(String(value));
+          field.updateAppearances(helv);
+          break;
+
+        case 'PDFSignature':
+          // Skip signature fields - they can't be filled programmatically
+          console.log(`Skipping signature field: ${key}`);
+          break;
+
+        default:
+          // For unknown field types, try to set text if the method exists
+          if (typeof field.setText === 'function') {
+            field.setText(String(value));
+            if (typeof field.updateAppearances === 'function') {
+              field.updateAppearances(helv);
+            }
+          } else {
+            console.log(`Skipping field ${key} of type ${field.constructor.name} - no setText method available`);
+          }
+          break;
+      }
+    } catch (error) {
+      console.error(`Error processing field ${key} of type ${field.constructor.name}:`, error.message);
+      // Continue processing other fields even if one fails
     }
   });
 
