@@ -328,7 +328,16 @@ async function renderAvailableForms(page = 0, searchFilter = '', zipFilter = '')
         }
         let forms = availableFormsData;
         if (searchFilter) {
-            forms = forms.filter(form => form.name.toLowerCase().includes(searchFilter.toLowerCase()));
+            const searchTerm = searchFilter.toLowerCase();
+            // Create a prioritized list: title matches first, then description matches
+            const titleMatches = forms.filter(form => form.name.toLowerCase().includes(searchTerm));
+            const descriptionMatches = forms.filter(form => 
+                form.description && 
+                form.description.toLowerCase().includes(searchTerm) && 
+                !form.name.toLowerCase().includes(searchTerm) // Exclude already matched titles
+            );
+            // Combine with title matches first, then description matches
+            forms = [...titleMatches, ...descriptionMatches];
         }
         if (zipFilter) {
             const countyZipMap = await loadCountyZipMap();
@@ -353,16 +362,43 @@ async function renderAvailableForms(page = 0, searchFilter = '', zipFilter = '')
             availableFormsList.innerHTML = '';
             formsToShow.forEach(form => {
                 const li = document.createElement('li');
+                
+                // Create form info container
+                const formInfo = document.createElement('div');
+                formInfo.style.display = 'flex';
+                formInfo.style.flexDirection = 'column';
+                formInfo.style.gap = '4px';
+                formInfo.style.flex = '1';
+                
+                // Create form name anchor
                 const anchor = document.createElement('a');
                 anchor.href = '#';
                 anchor.setAttribute('data-form-id', form.id);
                 anchor.setAttribute('data-form-url', form.url);
                 anchor.textContent = form.name;
+                anchor.style.fontWeight = 'bold';
+                anchor.style.fontSize = '1.1em';
+                anchor.style.color = '#2c3e50';
+                anchor.style.textDecoration = 'none';
                 // Fix: Make anchor trigger addFormToPortfolio
                 anchor.addEventListener('click', (e) => {
                     e.preventDefault();
                     addFormToPortfolio(form.id, form.url, form.name);
                 });
+                
+                // Create form description
+                const description = document.createElement('div');
+                description.textContent = form.description || 'No description available';
+                description.style.fontSize = '0.9em';
+                description.style.color = '#7f8c8d';
+                description.style.lineHeight = '1.4';
+                description.style.marginTop = '0px';
+                description.style.marginBottom = '10px';
+                
+                // Add description to form info
+                formInfo.appendChild(anchor);
+                formInfo.appendChild(description);
+                
                 // Create Click Here button
                 const addButton = document.createElement('button');
                 addButton.textContent = 'Click Here';
@@ -374,7 +410,9 @@ async function renderAvailableForms(page = 0, searchFilter = '', zipFilter = '')
                     e.preventDefault();
                     addFormToPortfolio(form.id, form.url, form.name);
                 });
-                li.appendChild(anchor);
+                
+                // Add elements to list item
+                li.appendChild(formInfo);
                 li.appendChild(addButton);
                 availableFormsList.appendChild(li);
             });
