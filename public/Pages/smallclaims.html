@@ -99,8 +99,8 @@
         .btn {
             background-color: #2980b9;
             color: #ffffff;
-            padding: 12px 24px;
-            font-size: 1.1em;
+            padding: 15px 50px;
+            font-size: 1.2em;
             text-decoration: none;
             font-weight: bold;
             border-radius: 5px;
@@ -110,8 +110,6 @@
             justify-content: center;
             margin: 20px auto;
             flex-direction: column;
-            width: auto;
-            max-width: 200px;
         }
         .tiny-click-here {
             font-size: 0.8em;
@@ -1357,7 +1355,7 @@
             setCookie('formwiz_cart', encodeURIComponent(JSON.stringify(cart)), 30);
             
             // Redirect to form
-            window.location.href = `Forms/${formId}.html?formId=${formId}&defendant=${encodeURIComponent(defendantName)}&county=${encodeURIComponent(county)}`;
+            window.location.href = `Pages/${formId}.html?formId=${formId}&defendant=${encodeURIComponent(defendantName)}&county=${encodeURIComponent(county)}`;
         }
 
         // Cookie helper functions
