@@ -1287,6 +1287,8 @@
         <!-- Search Bar for Available Forms -->
         <input type="text" id="available-forms-search" placeholder="Search By Form Name " style="width: 100%; max-width: 400px; margin-bottom: 18px; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0;">
         
+        <br><br>
+        <div class="subtitle">Which County Are You Filing In</div>
         <input type="text" id="available-forms-zip" placeholder="Search By ZIP Code" maxlength="5" style="width: 100%; max-width: 220px; margin: 0 auto 18px auto; display: block; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #b3e0ff; background: #f8fbff; text-align: center; box-shadow: 0 1px 4px rgba(44,62,80,0.06);">
         <br><br>
         <ul id="available-forms-list" class="forms-list">
@@ -1394,6 +1396,21 @@
         });
     </script>
 
+    <!-- County Selection Modal -->
+    <div id="county-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <span class="close-modal" id="county-modal-close">&times;</span>
+            <h2 id="county-modal-title">Which county are you filing in?</h2>
+            <p id="county-modal-message" style="font-size: 1.1em; margin: 20px 0; line-height: 1.5;">Enter your zip code below to determine your county.</p>
+            <input type="text" id="county-zip-input" placeholder="Enter zip code" maxlength="5" style="width: 90%; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0; margin-bottom: 18px; text-align: center;">
+            <div id="county-modal-error" style="color: #e74c3c; font-size: 1em; margin-bottom: 10px; display: none;"></div>
+              <div id="county-modal-buttons" style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
+                  <button type="button" id="county-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">Cancel</button>
+                  <button type="button" id="county-modal-submit" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9;">Submit</button>
+              </div>
+        </div>
+    </div>
+
     <!-- Defendant Name Modal -->
     <div id="defendant-modal" class="modal">
         <div class="modal-content" style="max-width: 500px; text-align: center;">
@@ -1402,10 +1419,10 @@
             <p style="font-size: 1.1em; margin: 20px 0; line-height: 1.5;">Hey, this form is eligible for a defendant. Who are you suing?</p>
             <input type="text" id="defendant-name-input" placeholder="Enter defendant's name" style="width: 90%; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0; margin-bottom: 18px;">
             <div id="defendant-modal-error" style="color: #e74c3c; font-size: 1em; margin-bottom: 10px; display: none;"></div>
-            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
-                <button type="button" id="defendant-modal-submit" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9;">Submit</button>
-                <button type="button" id="defendant-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">Cancel</button>
-            </div>
+              <div style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
+                  <button type="button" id="defendant-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">Cancel</button>
+                  <button type="button" id="defendant-modal-submit" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9;">Submit</button>
+              </div>
         </div>
     </div>
 </body>

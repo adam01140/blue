@@ -16,6 +16,12 @@ if (!OPENAI_API_KEY) {
   throw new Error('OPENAI_API_KEY is not set in the environment. Please add it to your .env file.');
 }
 
+// Admin Configuration
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+if (!ADMIN_PASSWORD) {
+  throw new Error('ADMIN_PASSWORD is not set in the environment. Please add it to your .env file.');
+}
+
 // Firebase Configuration
 const requiredFirebaseEnvVars = [
   'FIREBASE_PROJECT_ID',
@@ -81,6 +87,336 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ────────────────────────────────────────────────────────────
 app.get('/', (_, res) => {
   res.send('Welcome to the PDF Editing Server');
+});
+
+// Admin authentication endpoint
+app.post('/api/admin-login', (req, res) => {
+  try {
+    const { password } = req.body;
+    
+    if (!password) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Password is required' 
+      });
+    }
+
+    if (password === ADMIN_PASSWORD) {
+      res.json({ 
+        success: true, 
+        message: 'Authentication successful' 
+      });
+    } else {
+      res.status(401).json({ 
+        success: false, 
+        error: 'Invalid password' 
+      });
+    }
+
+  } catch (error) {
+    console.error('Admin login error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Server error during authentication' 
+    });
+  }
+});
+
+// Admin forms data endpoint
+app.get('/api/admin-forms', async (req, res) => {
+  try {
+    console.log('Loading forms for admin console...');
+    
+    const formsRef = db.collection('forms');
+    const snapshot = await formsRef.get();
+    
+    const formsData = [];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      formsData.push({
+        id: doc.id,
+        ...data
+      });
+    });
+    
+    console.log(`Found ${formsData.length} forms for admin console`);
+    res.json({ 
+      success: true, 
+      forms: formsData 
+    });
+
+  } catch (error) {
+    console.error('Error loading admin forms:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to load forms data' 
+    });
+  }
+});
+
+// Admin save forms endpoint
+app.post('/api/admin-save-forms', async (req, res) => {
+  try {
+    const { forms } = req.body;
+    
+    if (!forms || !Array.isArray(forms)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Forms data is required' 
+      });
+    }
+
+    console.log(`Saving ${forms.length} forms to Firebase...`);
+    
+    const batch = db.batch();
+    const formsRef = db.collection('forms');
+    
+    // Clear existing forms
+    const snapshot = await formsRef.get();
+    snapshot.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    
+    // Add new forms
+    forms.forEach(form => {
+      const docRef = formsRef.doc(form.id || form.name);
+      batch.set(docRef, form);
+    });
+    
+    await batch.commit();
+    
+    console.log(`Successfully saved ${forms.length} forms to Firebase`);
+    res.json({ 
+      success: true, 
+      message: `Successfully saved ${forms.length} forms` 
+    });
+
+  } catch (error) {
+    console.error('Error saving admin forms:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to save forms data' 
+    });
+  }
+});
+
+// Admin delete form endpoint
+app.delete('/api/admin-delete-form/:formId', async (req, res) => {
+  try {
+    const { formId } = req.params;
+    
+    if (!formId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Form ID is required' 
+      });
+    }
+
+    console.log(`Deleting form ${formId} from Firebase...`);
+    
+    await db.collection('forms').doc(formId).delete();
+    
+    console.log(`Successfully deleted form ${formId} from Firebase`);
+    res.json({ 
+      success: true, 
+      message: 'Form deleted successfully' 
+    });
+
+  } catch (error) {
+    console.error('Error deleting admin form:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to delete form' 
+    });
+  }
+});
+
+// Debug endpoint to check forms in source database
+app.get('/api/debug-forms', async (req, res) => {
+  try {
+    const sourceProjectId = 'invoice-4f2b4';
+    
+    // Initialize source Firebase app
+    const sourceApp = admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL: `https://${sourceProjectId}.firebaseio.com`
+    }, 'debugSourceApp');
+    
+    const sourceDb = sourceApp.firestore();
+
+    // Get all forms from source
+    const snapshot = await sourceDb.collection('forms').get();
+    const forms = [];
+    
+    snapshot.forEach(doc => {
+      const formData = doc.data();
+      forms.push({
+        id: doc.id,
+        name: formData.name || 'Unnamed',
+        description: formData.description || 'No description',
+        counties: formData.counties || []
+      });
+    });
+
+    // Clean up
+    await sourceApp.delete();
+
+    res.json({
+      success: true,
+      projectId: sourceProjectId,
+      totalForms: forms.length,
+      forms: forms
+    });
+
+  } catch (error) {
+    console.error('Debug error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// ────────────────────────────────────────────────────────────
+// Form Transfer Endpoint (Accepts Forms Data)
+// ────────────────────────────────────────────────────────────
+app.post('/api/transfer-forms-data', async (req, res) => {
+  try {
+    const { forms, targetProjectId } = req.body;
+    
+    if (!forms || !Array.isArray(forms) || forms.length === 0) {
+      return res.status(400).json({ error: 'Forms data is required' });
+    }
+
+    if (!targetProjectId) {
+      return res.status(400).json({ error: 'Target project ID is required' });
+    }
+
+    // Initialize target Firebase app (FormWiz)
+    const targetApp = admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL: `https://${targetProjectId}.firebaseio.com`
+    }, 'targetApp');
+    
+    const targetDb = targetApp.firestore();
+
+    // Transfer forms to target database
+    const batch = targetDb.batch();
+    let transferredCount = 0;
+
+    for (const form of forms) {
+      const formRef = targetDb.collection('forms').doc(form.id);
+      const { id, ...formData } = form; // Remove id from data since it's the document ID
+      batch.set(formRef, formData);
+      transferredCount++;
+      console.log(`Transferring form: ${form.id} - ${form.name || 'Unnamed'}`);
+    }
+
+    await batch.commit();
+
+    // Clean up
+    await targetApp.delete();
+
+    res.json({ 
+      success: true, 
+      message: `Successfully transferred ${transferredCount} forms`,
+      transferredCount 
+    });
+
+  } catch (error) {
+    console.error('Error transferring forms data:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// ────────────────────────────────────────────────────────────
+// Form Transfer Endpoint (Secure)
+// ────────────────────────────────────────────────────────────
+app.post('/api/transfer-forms', async (req, res) => {
+  try {
+    const { sourceProjectId, targetProjectId } = req.body;
+    
+    if (!sourceProjectId || !targetProjectId) {
+      return res.status(400).json({ error: 'Source and target project IDs are required' });
+    }
+
+    // Initialize source Firebase app
+    const sourceApp = admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL: `https://${sourceProjectId}.firebaseio.com`
+    }, 'sourceApp');
+    
+    const sourceDb = sourceApp.firestore();
+
+    // Initialize target Firebase app (FormWiz)
+    const targetApp = admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL: `https://${targetProjectId}.firebaseio.com`
+    }, 'targetApp');
+    
+    const targetDb = targetApp.firestore();
+
+    // Get all forms from source
+    console.log(`Attempting to read from source project: ${sourceProjectId}`);
+    const snapshot = await sourceDb.collection('forms').get();
+    const formsToTransfer = [];
+    
+    console.log(`Found ${snapshot.size} documents in source forms collection`);
+    
+    snapshot.forEach(doc => {
+      const formData = doc.data();
+      formData.id = doc.id;
+      formsToTransfer.push(formData);
+      console.log(`Form found: ${doc.id} - ${formData.name || 'Unnamed'}`);
+    });
+
+    if (formsToTransfer.length === 0) {
+      console.log('No forms found to transfer');
+      return res.json({ 
+        success: true, 
+        message: 'No forms found in source database',
+        transferredCount: 0,
+        debug: {
+          sourceProjectId,
+          targetProjectId,
+          documentsFound: snapshot.size
+        }
+      });
+    }
+
+    // Transfer forms to target database
+    const batch = targetDb.batch();
+    let transferredCount = 0;
+
+    for (const form of formsToTransfer) {
+      const formRef = targetDb.collection('forms').doc(form.id);
+      const { id, ...formData } = form;
+      batch.set(formRef, formData);
+      transferredCount++;
+    }
+
+    await batch.commit();
+
+    // Clean up apps
+    await sourceApp.delete();
+    await targetApp.delete();
+
+    res.json({ 
+      success: true, 
+      message: `Successfully transferred ${transferredCount} forms`,
+      transferredCount 
+    });
+
+  } catch (error) {
+    console.error('Error transferring forms:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
 });
 
 // ────────────────────────────────────────────────────────────

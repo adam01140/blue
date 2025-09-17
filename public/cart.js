@@ -25,9 +25,13 @@ class CartManager {
         const cartData = this.getCookie(this.cartCookieName);
         if (!cartData) return [];
         try {
-            return JSON.parse(cartData);
+            // Decode URL-encoded data if needed
+            const decodedData = cartData.startsWith('%') ? decodeURIComponent(cartData) : cartData;
+            return JSON.parse(decodedData);
         } catch (e) {
             console.error('Error parsing cart data', e);
+            // Clear the corrupted cookie
+            this.setCookie(this.cartCookieName, '', -1);
             return [];
         }
     }

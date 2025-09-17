@@ -46,6 +46,15 @@ window.onclick = function(event) {
     if (event.target == document.getElementById('duplicate-form-modal')) {
         closeDuplicateFormModal();
     }
+    if (event.target == document.getElementById('county-modal')) {
+        document.getElementById('county-modal').style.display = 'none';
+        pendingCountyData = null;
+        currentCounty = null;
+    }
+    if (event.target == document.getElementById('defendant-modal')) {
+        document.getElementById('defendant-modal').style.display = 'none';
+        pendingDefendantData = null;
+    }
 };
 
 // Logout Function
@@ -258,17 +267,36 @@ function listenToMyForms(userId) {
         });
 }
 
-// Load available forms from JSON file
+// Load available forms from Firebase
 async function loadAvailableForms() {
     try {
-        const response = await fetch('available-forms.json');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        return data.forms || [];
+        const snapshot = await db.collection('forms').get();
+        const forms = [];
+        
+        snapshot.forEach(doc => {
+            const formData = doc.data();
+            formData.id = doc.id;
+            
+            // Transform URLs to use the correct format with Forms/ prefix
+            if (formData.url) {
+                if (formData.id === 'sc100') {
+                    formData.url = 'Forms/sc-100.html?formId=sc100';
+                } else if (formData.id === 'sc120') {
+                    formData.url = 'Forms/sc-120.html?formId=sc120';
+                } else if (formData.id === 'sc500') {
+                    formData.url = 'Forms/sc-500.html?formId=sc500';
+                } else if (formData.id === 'fee-waiver') {
+                    formData.url = 'Forms/fee-waiver.html?formId=fee-waiver';
+                }
+            }
+            
+            forms.push(formData);
+        });
+        
+        console.log('Loaded available forms from Firebase:', forms);
+        return forms;
     } catch (error) {
-        console.error('Error loading available forms:', error);
+        console.error('Error loading available forms from Firebase:', error);
         return [];
     }
 }
@@ -551,7 +579,7 @@ async function addFormToPortfolioInternal(formId, formUrl, formName, countyName,
 
 
 
-   // Patch addFormToPortfolio to show defendant modal if needed
+   // Patch addFormToPortfolio to show county modal first
    const originalAddFormToPortfolio = addFormToPortfolio;
 addFormToPortfolio = async function(formId, formUrl, formName) {
     const user = auth.currentUser;
@@ -559,83 +587,9 @@ addFormToPortfolio = async function(formId, formUrl, formName) {
         window.location.href = formUrl;
         return;
     }
-    // Require zip code to be entered, or use user settings zip
-    const zipInput = document.getElementById('available-forms-zip');
-    let zipValue = zipInput ? zipInput.value.trim() : '';
-    let userZip = '';
-    let userCounty = '';
-    let userData = null;
-    if (!zipValue) {
-        // Try to get zip from user settings
-        try {
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            if (userDoc.exists) {
-                userData = userDoc.data();
-                userZip = userData.address && userData.address.zip ? userData.address.zip.trim() : '';
-                zipValue = userZip;
-            }
-        } catch (e) {}
-        if (!zipValue) {
-            alert('Please enter a zip code above or add your zip code in your user settings.');
-            return;
-        }
-    }
-    // Find county for this zip
-    const countyZipMap = await loadCountyZipMap();
-    let foundCounty = null;
-    for (const [county, zips] of Object.entries(countyZipMap)) {
-        if (zips.includes(zipValue)) {
-            foundCounty = county;
-            break;
-        }
-    }
-    if (!foundCounty) {
-        alert('No county found for this zip code.');
-        return;
-    }
-    // Check if form supports this county
-    let formObj = null;
-    if (!availableFormsData.length) {
-        availableFormsData = await loadAvailableForms();
-    }
-    formObj = availableFormsData.find(f => f.id === formId);
-    if (formObj && (!Array.isArray(formObj.counties) || !formObj.counties.includes(foundCounty))) {
-        alert(`This form is not offered in ${foundCounty} please select another form or try a different zip code.`);
-        return;
-    }
     
-    const userId = user.uid;
-    
-    // Check if user already has this form for this county (duplicate check)
-    try {
-        const formsSnapshot = await db.collection('users').doc(userId).collection('forms').get();
-        let duplicateFound = false;
-        
-        formsSnapshot.forEach(doc => {
-            const formData = doc.data();
-            // Check if this is the same form type (by formId or originalFormId) and same county
-            if ((formData.originalFormId === formId || doc.id === formId) && formData.countyName === foundCounty) {
-                duplicateFound = true;
-            }
-        });
-        
-        if (duplicateFound) {
-            // Show duplicate confirmation modal
-            showDuplicateFormModal(formName, foundCounty, formId, formUrl, foundCounty);
-            return;
-        }
-    } catch (error) {
-        console.error('Error checking for duplicate form:', error);
-    }
-    
-    // If form requires defendant, show modal
-    if (formObj && formObj.defendant && formObj.defendant.toUpperCase() === 'YES') {
-        showDefendantModal(formObj, formId, formUrl, formName, foundCounty);
-        return;
-    }
-    
-    // Otherwise, continue as normal
-    await originalAddFormToPortfolio(formId, formUrl, formName);
+    // Show county selection modal
+    showCountyModal(formId, formUrl, formName);
 };
 
 // Patch addFormToPortfolioInternal to accept defendantName
@@ -1729,6 +1683,166 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// County Selection Modal
+let pendingCountyData = null;
+let currentCounty = null;
+
+function showCountyModal(formId, formUrl, formName) {
+    const modal = document.getElementById('county-modal');
+    const closeBtn = document.getElementById('county-modal-close');
+    const submitBtn = document.getElementById('county-modal-submit');
+    const cancelBtn = document.getElementById('county-modal-cancel');
+    const zipInput = document.getElementById('county-zip-input');
+    const errorDiv = document.getElementById('county-modal-error');
+    const title = document.getElementById('county-modal-title');
+    const message = document.getElementById('county-modal-message');
+    const buttons = document.getElementById('county-modal-buttons');
+    
+    // Reset modal to initial state
+    title.textContent = 'Which county are you filing in?';
+    message.textContent = 'Enter your zip code below to determine your county.';
+    zipInput.style.display = 'block';
+    zipInput.value = '';
+    errorDiv.style.display = 'none';
+    errorDiv.textContent = '';
+    submitBtn.textContent = 'Submit';
+    submitBtn.style.display = 'block';
+    cancelBtn.style.display = 'block';
+    modal.style.display = 'block';
+    
+    pendingCountyData = { formId, formUrl, formName };
+    currentCounty = null;
+    
+    function closeModal() {
+        modal.style.display = 'none';
+        pendingCountyData = null;
+        currentCounty = null;
+    }
+    
+    closeBtn.onclick = closeModal;
+    cancelBtn.onclick = closeModal;
+    
+    window.onclick = function(event) {
+        if (event.target == modal) closeModal();
+    };
+    
+    // Handle zip code input - only allow numbers
+    zipInput.addEventListener('input', function() {
+        let val = zipInput.value.replace(/\D/g, '');
+        if (val.length > 5) val = val.slice(0, 5);
+        zipInput.value = val;
+    });
+    
+    submitBtn.onclick = async function() {
+        if (!currentCounty) {
+            // First step: validate zip code and find county
+            const zipValue = zipInput.value.trim();
+            if (!zipValue || zipValue.length !== 5) {
+                errorDiv.textContent = 'Please enter a valid 5-digit zip code.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Find county for this zip
+            const countyZipMap = await loadCountyZipMap();
+            let foundCounty = null;
+            for (const [county, zips] of Object.entries(countyZipMap)) {
+                if (zips.includes(zipValue)) {
+                    foundCounty = county;
+                    break;
+                }
+            }
+            
+            if (!foundCounty) {
+                errorDiv.textContent = 'No county found for this zip code.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Check if form supports this county
+            let formObj = null;
+            if (!availableFormsData.length) {
+                availableFormsData = await loadAvailableForms();
+            }
+            formObj = availableFormsData.find(f => f.id === formId);
+            if (formObj && (!Array.isArray(formObj.counties) || !formObj.counties.includes(foundCounty))) {
+                errorDiv.textContent = `This form is not offered in ${foundCounty} County. Please try a different zip code.`;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Show confirmation step
+            currentCounty = foundCounty;
+            title.textContent = 'Confirm County';
+            message.textContent = `Great, you're filing in ${foundCounty} County right?`;
+            zipInput.style.display = 'none';
+            errorDiv.style.display = 'none';
+            submitBtn.textContent = 'Yes';
+            cancelBtn.textContent = 'No';
+            
+        } else {
+            // Second step: user confirmed county, proceed with form addition
+            modal.style.display = 'none';
+            
+            if (pendingCountyData) {
+                // Check for duplicates
+                const userId = auth.currentUser.uid;
+                try {
+                    const formsSnapshot = await db.collection('users').doc(userId).collection('forms').get();
+                    let duplicateFound = false;
+                    
+                    formsSnapshot.forEach(doc => {
+                        const formData = doc.data();
+                        if ((formData.originalFormId === formId || doc.id === formId) && formData.countyName === currentCounty) {
+                            duplicateFound = true;
+                        }
+                    });
+                    
+                    if (duplicateFound) {
+                        showDuplicateFormModal(pendingCountyData.formName, currentCounty, pendingCountyData.formId, pendingCountyData.formUrl, currentCounty);
+                    } else {
+                        // Check if form requires defendant
+                        let formObj = null;
+                        if (!availableFormsData.length) {
+                            availableFormsData = await loadAvailableForms();
+                        }
+                        formObj = availableFormsData.find(f => f.id === pendingCountyData.formId);
+                        
+                        if (formObj && formObj.defendant && formObj.defendant.toUpperCase() === 'YES') {
+                            showDefendantModal(formObj, pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty);
+                        } else {
+                            await addFormToPortfolioInternal(pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error checking for duplicate form:', error);
+                }
+                
+                pendingCountyData = null;
+                currentCounty = null;
+            }
+        }
+    };
+    
+    // Handle "No" button - go back to zip code input
+    cancelBtn.onclick = function() {
+        if (currentCounty) {
+            // Go back to zip code input
+            title.textContent = 'Which county are you filing in?';
+            message.textContent = 'Enter your zip code below to determine your county.';
+            zipInput.style.display = 'block';
+            zipInput.value = '';
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+            submitBtn.textContent = 'Submit';
+            cancelBtn.textContent = 'Cancel';
+            currentCounty = null;
+        } else {
+            closeModal();
+        }
+    };
+}
 
 // Defendant Name Modal
 let pendingDefendantData = null;

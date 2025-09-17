@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Form Manager</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Firebase is now handled server-side -->
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
@@ -436,12 +434,65 @@
             .forms-table th, .forms-table td { font-size: 0.98em; }
             .forms-table-wrapper { padding: 6px 2px 2px 2px; }
             .modal-content { width: 95%; margin: 10% auto; }
-            .modal-header, .modal-body, .modal-footer { padding: 20px; }
-        }
+        .modal-header, .modal-body, .modal-footer { padding: 20px; }
+    }
+
+    /* Enhanced login modal styles */
+    #admin-password:focus {
+        outline: none;
+        border-color: rgba(255,255,255,0.6) !important;
+        background: rgba(255,255,255,0.2) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    #admin-password::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+
+    #login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255,107,107,0.6);
+    }
+
+    #login-btn:active {
+        transform: translateY(0);
+    }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal" style="display: block;">
+        <div class="modal-content" style="max-width: 450px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: none;">
+            <div style="padding: 40px;">
+                <div style="margin-bottom: 30px;">
+                    <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="white">
+                            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                        </svg>
+                    </div>
+                    <h2 style="margin: 0; font-size: 2.2em; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Admin Access</h2>
+                    <p style="margin: 15px 0 0; font-size: 1.1em; opacity: 0.9;">Enter your credentials to continue</p>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <input type="password" id="admin-password" placeholder="Enter admin password" style="width: 100%; padding: 16px 20px; font-size: 1.1em; border-radius: 12px; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; backdrop-filter: blur(10px); transition: all 0.3s ease; box-sizing: border-box;">
+                    <div id="login-error" style="color: #ff6b6b; font-size: 0.95em; margin-top: 12px; display: none; font-weight: 500;"></div>
+                </div>
+                
+                <button id="login-btn" class="btn" style="width: 100%; padding: 16px 30px; background: linear-gradient(45deg, #ff6b6b, #ee5a24); border: none; border-radius: 12px; color: white; font-size: 1.1em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(255,107,107,0.4);">
+                    <span style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                            <path d="M10 17l5-5-5-5v10z"/>
+                        </svg>
+                        Access Admin Panel
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="admin-content" style="display: none;">
         <h1>Admin Form Manager</h1>
         <div class="import-section">
             <span class="custom-file-input">
@@ -506,24 +557,25 @@
         </div>
     </div>
     <script>
-        // Firebase configuration
+        // Firebase configuration (FormWiz)
         const firebaseConfig = {
-            apiKey: "AIzaSyACh8hp2kL4P0xBPkwkvpLA0zNAqtw5IQc",
-            authDomain: "invoice-4f2b4.firebaseapp.com",
-            projectId: "invoice-4f2b4",
-            storageBucket: "invoice-4f2b4.firebasestorage.app",
-            messagingSenderId: "1028270499799",
-            appId: "1:1028270499799:web:31401d335232bb21bc4d92",
-            measurementId: "G-Z1HX6QN3DG"
+            apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+            authDomain: "formwiz-3f4fd.firebaseapp.com",
+            projectId: "formwiz-3f4fd",
+            storageBucket: "formwiz-3f4fd.firebasestorage.app",
+            messagingSenderId: "404259212529",
+            appId: "1:404259212529:web:15a33bce82383b21cfed50",
+            measurementId: "G-P07YEN0HPD"
         };
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // Firebase is now handled server-side
 
+        // Admin authentication - password is now server-side
+        
         let formsData = [];
         let fileName = 'available-forms.json';
         let currentEditIndex = -1;
+        let isAuthenticated = false;
 
         // California counties list
         const COUNTY_LIST = [
@@ -533,39 +585,39 @@
         // Load forms data from Firebase Firestore
         async function loadFormsData() {
             try {
-                document.getElementById('file-name').textContent = 'Loading forms from Firebase...';
+                document.getElementById('file-name').textContent = 'Loading forms from server...';
                 
-                const snapshot = await db.collection('forms').get();
-                formsData = [];
+                const response = await fetch('/api/admin-forms');
+                const result = await response.json();
                 
-                snapshot.forEach(doc => {
-                    const formData = doc.data();
-                    formData.id = doc.id; // Use document ID as form ID
-                    formsData.push(formData);
-                });
-                
-                // Normalize defendant field names and values, and ensure description field exists
-                formsData.forEach(form => {
-                    if (form.defendent && !form.defendant) {
-                        form.defendant = form.defendent;
-                        delete form.defendent;
-                    }
-                    if (form.defendant === 'YES') {
-                        form.defendant = 'Yes';
-                    }
-                    // Ensure description field exists for backward compatibility
-                    if (!form.description) {
-                        form.description = '';
-                    }
-                });
-                
-                // Sort alphabetically by name after loading
-                formsData.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                renderFormsTable();
-                document.getElementById('file-name').textContent = `Loaded ${formsData.length} forms from Firebase`;
+                if (result.success) {
+                    formsData = result.forms;
+                    
+                    // Normalize defendant field names and values, and ensure description field exists
+                    formsData.forEach(form => {
+                        if (form.defendent && !form.defendant) {
+                            form.defendant = form.defendent;
+                            delete form.defendent;
+                        }
+                        if (form.defendant === 'YES') {
+                            form.defendant = 'Yes';
+                        }
+                        // Ensure description field exists for backward compatibility
+                        if (!form.description) {
+                            form.description = '';
+                        }
+                    });
+                    
+                    // Sort alphabetically by name after loading
+                    formsData.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                    renderFormsTable();
+                    document.getElementById('file-name').textContent = `Loaded ${formsData.length} forms from server`;
+                } else {
+                    throw new Error(result.error || 'Failed to load forms');
+                }
             } catch (error) {
-                console.error('Error loading forms from Firebase:', error);
-                document.getElementById('file-name').textContent = 'Error loading forms from Firebase - ' + error.message;
+                console.error('Error loading forms from server:', error);
+                document.getElementById('file-name').textContent = 'Error loading forms from server - ' + error.message;
                 renderFormsTable();
             }
         }
@@ -647,18 +699,30 @@
                 try {
                     const form = formsData[idx];
                     if (form.id) {
-                        // Delete from Firebase
-                        await db.collection('forms').doc(form.id).delete();
+                        // Delete from server
+                        const response = await fetch(`/api/admin-delete-form/${form.id}`, {
+                            method: 'DELETE'
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            // Remove from local data
+                            formsData.splice(idx, 1);
+                            renderFormsTable();
+                            document.getElementById('file-name').textContent = 'Form deleted from server successfully';
+                        } else {
+                            throw new Error(result.error || 'Failed to delete form');
+                        }
+                    } else {
+                        // Remove from local data only if no ID
+                        formsData.splice(idx, 1);
+                        renderFormsTable();
+                        document.getElementById('file-name').textContent = 'Form removed from local data';
                     }
-                    
-                    // Remove from local data
-                formsData.splice(idx, 1);
-                renderFormsTable();
-                    
-                    document.getElementById('file-name').textContent = 'Form deleted from Firebase successfully';
                 } catch (error) {
-                    console.error('Error deleting form from Firebase:', error);
-                    alert('Error deleting form from Firebase: ' + error.message);
+                    console.error('Error deleting form from server:', error);
+                    alert('Error deleting form from server: ' + error.message);
                 }
             }
         };
@@ -703,27 +767,29 @@
         // Save forms data to Firebase Firestore
         async function saveFormsData() {
             try {
-                document.getElementById('file-name').textContent = 'Saving changes to Firebase...';
+                document.getElementById('file-name').textContent = 'Saving changes to server...';
                 
                 // Sort alphabetically by name before saving
                 formsData.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
                 
-                // Save each form to Firebase
-                const batch = db.batch();
-                
-                for (const form of formsData) {
-                    const formRef = db.collection('forms').doc(form.id);
-                    const { id, ...formData } = form; // Remove id from data since it's the document ID
-                    batch.set(formRef, formData);
+                const response = await fetch('/api/admin-save-forms', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ forms: formsData })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('file-name').textContent = result.message;
+                } else {
+                    throw new Error(result.error || 'Failed to save forms');
                 }
-                
-                await batch.commit();
-                
-                // Update status message
-                document.getElementById('file-name').textContent = `Successfully saved ${formsData.length} forms to Firebase`;
             } catch (error) {
-                console.error('Error saving to Firebase:', error);
-                document.getElementById('file-name').textContent = 'Error saving to Firebase - ' + error.message;
+                console.error('Error saving to server:', error);
+                document.getElementById('file-name').textContent = 'Error saving to server - ' + error.message;
             }
         }
 
@@ -898,8 +964,101 @@
             }
         }
 
-        // Load forms data on page load
-        loadFormsData();
+
+        // Authentication functions
+        function showLoginError(message) {
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideLoginError() {
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.style.display = 'none';
+        }
+
+        async function authenticate() {
+            const password = document.getElementById('admin-password').value;
+            
+            if (!password) {
+                showLoginError('Please enter a password.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin-login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ password: password })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    isAuthenticated = true;
+                    document.getElementById('login-modal').style.display = 'none';
+                    document.getElementById('admin-content').style.display = 'block';
+                    loadFormsData();
+                } else {
+                    showLoginError(result.error || 'Incorrect password. Please try again.');
+                    document.getElementById('admin-password').value = '';
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showLoginError('Server error. Please try again.');
+                document.getElementById('admin-password').value = '';
+            }
+        }
+
+        // Login button event listener
+        document.getElementById('login-btn').addEventListener('click', authenticate);
+        
+        // Enter key on password field
+        document.getElementById('admin-password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                authenticate();
+            }
+        });
+
+        // Protect all admin functions
+        function requireAuth() {
+            if (!isAuthenticated) {
+                alert('Authentication required. Please refresh the page and log in.');
+                return false;
+            }
+            return true;
+        }
+
+        // Override all admin functions to require authentication
+        const originalLoadFormsData = loadFormsData;
+        loadFormsData = function() {
+            if (requireAuth()) {
+                return originalLoadFormsData();
+            }
+        };
+
+        const originalSaveFormsData = saveFormsData;
+        saveFormsData = function() {
+            if (requireAuth()) {
+                return originalSaveFormsData();
+            }
+        };
+
+        const originalDeleteForm = deleteForm;
+        deleteForm = function(idx) {
+            if (requireAuth()) {
+                return originalDeleteForm(idx);
+            }
+        };
+
+        const originalSaveFormChanges = saveFormChanges;
+        saveFormChanges = function() {
+            if (requireAuth()) {
+                return originalSaveFormChanges();
+            }
+        };
     </script>
 </body>
 </html> 
