@@ -1,4 +1,4 @@
-/**************************************************
+﻿/**************************************************
  ************ Firebase Config & Basic Auth ********
  **************************************************/
  const firebaseConfig = {
@@ -1630,6 +1630,16 @@ graph.isCellEditable = function (cell) {
       document.getElementById("amountProps").style.display = "none";
     }
 
+    // If it's a PDF node
+    if (cell.style && cell.style.includes("nodeType=pdfNode")) {
+      document.getElementById("propPdfDisplayName").textContent = cell._pdfDisplayName || "";
+      document.getElementById("propPdfFilename").textContent = cell._pdfFilename || cell._pdfUrl || "";
+      document.getElementById("propPdfPriceId").textContent = cell._priceId || "";
+      document.getElementById("pdfProps").style.display = "block";
+    } else {
+      document.getElementById("pdfProps").style.display = "none";
+    }
+
     propNodeId.textContent = getNodeId(cell) || "";
     propNodeSection.textContent = getSection(cell) || "1";
     const sec = getSection(cell);
@@ -1786,6 +1796,146 @@ graph.isCellEditable = function (cell) {
       refreshAllCells();
     }
   });
+
+  // For PDF fields
+  makeEditableField(document.getElementById("propPdfDisplayName"), (newName) => {
+    if (selectedCell && selectedCell.style && selectedCell.style.includes("nodeType=pdfNode")) {
+      selectedCell._pdfDisplayName = newName.trim();
+      refreshAllCells();
+    }
+  });
+  makeEditableField(document.getElementById("propPdfFilename"), (newFilename) => {
+    if (selectedCell && selectedCell.style && selectedCell.style.includes("nodeType=pdfNode")) {
+      selectedCell._pdfFilename = newFilename.trim();
+      refreshAllCells();
+    }
+  });
+  makeEditableField(document.getElementById("propPdfPriceId"), (newPriceId) => {
+    if (selectedCell && selectedCell.style && selectedCell.style.includes("nodeType=pdfNode")) {
+      selectedCell._priceId = newPriceId.trim();
+      refreshAllCells();
+    }
+  });
+
+  // PDF Properties Modal Functions
+  window.closePdfPropertiesModal = function() {
+    document.getElementById('pdfPropertiesModal').style.display = 'none';
+  };
+
+  window.savePdfProperties = function() {
+    if (!selectedCell || !selectedCell.style || !selectedCell.style.includes("nodeType=pdfNode")) {
+      return;
+    }
+
+    const displayName = document.getElementById('pdfDisplayNameInput').value.trim();
+    const filename = document.getElementById('pdfFilenameInput').value.trim();
+    const priceId = document.getElementById('pdfPriceIdInput').value.trim();
+
+    // Update the cell properties
+    selectedCell._pdfDisplayName = displayName;
+    selectedCell._pdfFilename = filename;
+    selectedCell._priceId = priceId;
+
+    // Update the cell value to show the display name
+    if (displayName) {
+      selectedCell.value = displayName;
+    } else if (filename) {
+      selectedCell.value = filename.replace(/\.pdf$/i, '');
+    }
+
+    // Refresh the display
+    refreshAllCells();
+    
+    // Trigger autosave
+    requestAutosave();
+    
+    // Close the modal
+    closePdfPropertiesModal();
+  };
+
+  // Handle double-click on PDF nodes
+  graph.addListener(mxEvent.DOUBLE_CLICK, function(sender, evt) {
+    const cell = evt.getProperty('cell');
+    if (cell && cell.style && cell.style.includes("nodeType=pdfNode")) {
+      evt.consume();
+      
+      // Set the selected cell
+      selectedCell = cell;
+      
+      // Populate the modal with current values
+      console.log('PDF Node properties:', {
+        _pdfDisplayName: cell._pdfDisplayName,
+        _pdfFilename: cell._pdfFilename,
+        _pdfUrl: cell._pdfUrl,
+        _priceId: cell._priceId
+      });
+      document.getElementById('pdfDisplayNameInput').value = cell._pdfDisplayName || '';
+      document.getElementById('pdfFilenameInput').value = cell._pdfFilename || cell._pdfUrl || '';
+      document.getElementById('pdfPriceIdInput').value = cell._priceId || '';
+      
+      // Sync the inline fields with modal values
+      syncModalToInlineFields(cell);
+      
+      // Add event listeners for real-time synchronization
+      setupPdfFieldSync();
+      
+      // Show the modal
+      document.getElementById('pdfPropertiesModal').style.display = 'flex';
+    }
+  });
+
+  // Function to sync modal values to inline fields
+  function syncModalToInlineFields(cell) {
+    // Update the inline fields in the PDF node
+    const pdfNodeHtml = cell.value;
+    if (pdfNodeHtml && pdfNodeHtml.includes('updatePdfDisplayNameField')) {
+      // Update the display name field
+      const displayNameMatch = pdfNodeHtml.match(/updatePdfDisplayNameField\('${cell.id}',this\.value\)" \/>/);
+      if (displayNameMatch) {
+        const newHtml = pdfNodeHtml.replace(
+          /value="[^"]*" style="width:120px;margin-left:4px;" onblur="window\.updatePdfDisplayNameField\('${cell.id}',this\.value\)" \/>/,
+          `value="${cell._pdfDisplayName || ''}" style="width:120px;margin-left:4px;" onblur="window.updatePdfDisplayNameField('${cell.id}',this.value)" />`
+        );
+        cell.value = newHtml;
+      }
+    }
+  }
+
+  // Function to set up real-time synchronization between PDF fields
+  function setupPdfFieldSync() {
+    const displayNameInput = document.getElementById('pdfDisplayNameInput');
+    const filenameInput = document.getElementById('pdfFilenameInput');
+    
+    // Clear any existing event listeners by cloning the elements
+    const newDisplayNameInput = displayNameInput.cloneNode(true);
+    const newFilenameInput = filenameInput.cloneNode(true);
+    displayNameInput.parentNode.replaceChild(newDisplayNameInput, displayNameInput);
+    filenameInput.parentNode.replaceChild(newFilenameInput, filenameInput);
+    
+    // Sync from display name to filename
+    function syncDisplayNameToFilename() {
+      const displayName = newDisplayNameInput.value.trim();
+      if (displayName && !newFilenameInput.value.trim()) {
+        // Only auto-fill if filename is empty
+        newFilenameInput.value = displayName.toLowerCase().replace(/\s+/g, '_') + '.pdf';
+      }
+    }
+    
+    // Sync from filename to display name
+    function syncFilenameToDisplayName() {
+      const filename = newFilenameInput.value.trim();
+      if (filename && !newDisplayNameInput.value.trim()) {
+        // Only auto-fill if display name is empty
+        const displayName = filename.replace(/\.pdf$/i, '').replace(/_/g, ' ');
+        // Capitalize first letter of each word
+        newDisplayNameInput.value = displayName.replace(/\b\w/g, l => l.toUpperCase());
+      }
+    }
+    
+    // Add event listeners
+    newDisplayNameInput.addEventListener('input', syncDisplayNameToFilename);
+    newFilenameInput.addEventListener('input', syncFilenameToDisplayName);
+  }
 /**************************************************
  *              KEYBOARD  SHORTCUTS               *
  **************************************************/
@@ -4364,7 +4514,24 @@ function autosaveFlowchartToLocalStorage() {
       
       // PDF node properties
       if (cell._pdfUrl !== undefined) cellData._pdfUrl = cell._pdfUrl;
+      if (cell._pdfFilename !== undefined) cellData._pdfFilename = cell._pdfFilename;
+      if (cell._pdfDisplayName !== undefined) cellData._pdfDisplayName = cell._pdfDisplayName;
       if (cell._priceId !== undefined) cellData._priceId = cell._priceId;
+      if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
+      
+      // Debug PDF properties in autosave
+      if (cell.style && cell.style.includes("nodeType=pdfNode")) {
+        console.log('💾 AUTOSAVE: PDF Node properties for cell', cell.id, ':', {
+          _pdfUrl: cell._pdfUrl,
+          _pdfFilename: cell._pdfFilename,
+          _pdfDisplayName: cell._pdfDisplayName,
+          _priceId: cell._priceId
+        });
+        console.log('💾 AUTOSAVE: Cell data being saved:', cellData);
+      }
+      
+      
+      
       
       // Notes node properties
       if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
@@ -5223,20 +5390,44 @@ function isPdfNode(cell) {
 function updatePdfNodeCell(cell) {
   if (!cell || !isPdfNode(cell)) return;
   
+  console.log('🔄 UPDATE PDF NODE CELL: Called for cell', cell.id, 'with properties:', {
+    _pdfUrl: cell._pdfUrl,
+    _pdfFilename: cell._pdfFilename,
+    _pdfDisplayName: cell._pdfDisplayName,
+    _priceId: cell._priceId
+  });
+  
   // Ensure _pdfUrl property exists
-  if (!cell._pdfUrl) {
+  if (cell._pdfUrl === undefined) {
     cell._pdfUrl = "";
   }
   
+  // Ensure _pdfFilename property exists
+  if (cell._pdfFilename === undefined) {
+    cell._pdfFilename = "";
+  }
+  
+  // Ensure _pdfDisplayName property exists
+  if (cell._pdfDisplayName === undefined) {
+    cell._pdfDisplayName = "";
+  }
+  
   // Ensure _priceId property exists
-  if (!cell._priceId) {
+  if (cell._priceId === undefined) {
     cell._priceId = "";
   }
   
   // Ensure _characterLimit property exists
-  if (!cell._characterLimit) {
+  if (cell._characterLimit === undefined) {
     cell._characterLimit = "";
   }
+  
+  console.log('🔄 UPDATE PDF NODE CELL: Properties after ensuring they exist:', {
+    _pdfUrl: cell._pdfUrl,
+    _pdfFilename: cell._pdfFilename,
+    _pdfDisplayName: cell._pdfDisplayName,
+    _priceId: cell._priceId
+  });
 
   // Check if this PDF node is connected to a Big Paragraph node
   const isConnectedToBigParagraph = checkIfPdfConnectedToBigParagraph(cell);
@@ -5245,8 +5436,9 @@ function updatePdfNodeCell(cell) {
   let html = `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:4px 0;">
       <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:2px;">
-        <label style="font-size:11px;width:100%;text-align:left;">PDF:<input type="text" value="${escapeAttr(cell._pdfUrl)}" style="width:120px;margin-left:4px;" onblur="window.updatePdfNodeField('${cell.id}',this.value)" /></label>
-        <label style="font-size:11px;width:100%;text-align:left;">Price ID:<input type="text" value="${escapeAttr(cell._priceId)}" style="width:120px;margin-left:4px;" onblur="window.updatePdfPriceIdField('${cell.id}',this.value)" /></label>
+        <label style="font-size:11px;width:100%;text-align:left;">PDF Name:<input type="text" value="${escapeAttr(cell._pdfDisplayName || '')}" style="width:120px;margin-left:4px;" onblur="window.updatePdfDisplayNameField('${cell.id}',this.value)" /></label>
+        <label style="font-size:11px;width:100%;text-align:left;">PDF File:<input type="text" value="${escapeAttr(cell._pdfFilename || cell._pdfUrl || '')}" style="width:120px;margin-left:4px;" onblur="window.updatePdfFilenameField('${cell.id}',this.value)" /></label>
+        <label style="font-size:11px;width:100%;text-align:left;">Price ID:<input type="text" value="${escapeAttr(cell._priceId || '')}" style="width:120px;margin-left:4px;" onblur="window.updatePdfPriceIdField('${cell.id}',this.value)" /></label>
   `;
   
   // Add Character Limit field if connected to Big Paragraph
@@ -5268,13 +5460,57 @@ function updatePdfNodeCell(cell) {
     graph.getModel().endUpdate();
   }
   graph.updateCellSize(cell);
+  
+  console.log('🔄 UPDATE PDF NODE CELL: Final properties after update:', {
+    _pdfUrl: cell._pdfUrl,
+    _pdfFilename: cell._pdfFilename,
+    _pdfDisplayName: cell._pdfDisplayName,
+    _priceId: cell._priceId
+  });
+  
+  // Trigger autosave after updating the cell
+  requestAutosave();
 }
 
-// Handler for updating PDF node field
-window.updatePdfNodeField = function(cellId, value) {
+// Handler for updating PDF display name field
+window.updatePdfDisplayNameField = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isPdfNode(cell)) return;
-  cell._pdfUrl = value;
+  cell._pdfDisplayName = value;
+  console.log('🔧 PDF FIELD UPDATE: Set _pdfDisplayName to:', value, 'for cell:', cellId);
+  console.log('🔧 PDF FIELD UPDATE: Cell properties after update:', {
+    _pdfDisplayName: cell._pdfDisplayName,
+    _pdfFilename: cell._pdfFilename,
+    _priceId: cell._priceId
+  });
+  // Update cell value to show display name
+  if (value) {
+    cell.value = value;
+  } else if (cell._pdfFilename) {
+    cell.value = cell._pdfFilename.replace(/\.pdf$/i, '');
+  }
+  // Trigger autosave
+  requestAutosave();
+  // Don't call updatePdfNodeCell here to avoid re-rendering while typing
+};
+
+// Handler for updating PDF filename field
+window.updatePdfFilenameField = function(cellId, value) {
+  const cell = graph.getModel().getCell(cellId);
+  if (!cell || !isPdfNode(cell)) return;
+  cell._pdfFilename = value;
+  console.log('🔧 PDF FIELD UPDATE: Set _pdfFilename to:', value, 'for cell:', cellId);
+  console.log('🔧 PDF FIELD UPDATE: Cell properties after update:', {
+    _pdfDisplayName: cell._pdfDisplayName,
+    _pdfFilename: cell._pdfFilename,
+    _priceId: cell._priceId
+  });
+  // Update cell value if no display name is set
+  if (!cell._pdfDisplayName && value) {
+    cell.value = value.replace(/\.pdf$/i, '');
+  }
+  // Trigger autosave
+  requestAutosave();
   // Don't call updatePdfNodeCell here to avoid re-rendering while typing
 };
 
@@ -5283,6 +5519,14 @@ window.updatePdfPriceIdField = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isPdfNode(cell)) return;
   cell._priceId = value;
+  console.log('🔧 PDF FIELD UPDATE: Set _priceId to:', value, 'for cell:', cellId);
+  console.log('🔧 PDF FIELD UPDATE: Cell properties after update:', {
+    _pdfDisplayName: cell._pdfDisplayName,
+    _pdfFilename: cell._pdfFilename,
+    _priceId: cell._priceId
+  });
+  // Trigger autosave
+  requestAutosave();
   // Don't call updatePdfNodeCell here to avoid re-rendering while typing
 };
 

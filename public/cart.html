@@ -595,6 +595,45 @@
             appId: "1:404259212529:web:15a33bce82383b21cfed50",
             measurementId: "G-P07YEN0HPD"
         };
+
+        // Debug: Show what would be downloaded when cart.html loads
+        function debugCartContents() {
+            console.log('🛒 CART.HTML LOADED - Debugging cart contents');
+            
+            // Get cart from localStorage
+            const cartData = localStorage.getItem('formwiz_cart');
+            let cart = [];
+            
+            if (cartData) {
+                try {
+                    cart = JSON.parse(cartData);
+                } catch (e) {
+                    console.error('Error parsing cart data:', e);
+                }
+            }
+            
+            console.log('📦 Current cart contents:', cart);
+            
+            if (cart.length === 0) {
+                console.log('🛒 Cart is empty');
+                return;
+            }
+            
+            console.log('📋 PDFs that would be downloaded if user pays:');
+            cart.forEach((item, index) => {
+                const pdfName = item.pdfName || item.formId;
+                const base = pdfName.replace(/\.pdf$/i, '');
+                console.log(`${index + 1}. ${item.title || 'Untitled'}`);
+                console.log(`   - Form ID: ${item.formId}`);
+                console.log(`   - PDF Name: ${item.pdfName || 'undefined'}`);
+                console.log(`   - Final PDF: ${base}`);
+                console.log(`   - Request URL: /edit_pdf?pdf=${encodeURIComponent(base)}`);
+                console.log('---');
+            });
+        }
+
+        // Run debug when page loads
+        document.addEventListener('DOMContentLoaded', debugCartContents);
         
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);

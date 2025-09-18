@@ -1418,7 +1418,62 @@ function renderMyDocuments(docs) {
             const bDate = b.purchaseDate?.toDate ? b.purchaseDate.toDate() : new Date(b.purchaseDate);
             return bDate - aDate;
         });
-        docs.forEach((doc) => {
+        
+        // Group documents by their base form ID and purchase date (within 1 minute)
+        const documentGroups = groupDocumentsByFormAndTime(docs);
+        
+        // Render each group
+        documentGroups.forEach((group, groupIndex) => {
+            if (group.length === 1) {
+                // Single document - render normally
+                renderSingleDocument(group[0]);
+            } else {
+                // Multiple documents - render as a group
+                renderDocumentGroup(group, groupIndex);
+            }
+        });
+        
+        updateDeleteDocumentsButton();
+    }
+}
+
+function groupDocumentsByFormAndTime(docs) {
+    const groups = [];
+    const processed = new Set();
+    
+    docs.forEach((doc, index) => {
+        if (processed.has(index)) return;
+        
+        const group = [doc];
+        processed.add(index);
+        
+        // Find related documents (same base form ID and similar purchase time)
+        const baseFormId = doc.formId ? doc.formId.replace(/_\d+$/, '') : '';
+        const docTime = doc.purchaseDate?.toDate ? doc.purchaseDate.toDate() : new Date(doc.purchaseDate || 0);
+        
+        docs.forEach((otherDoc, otherIndex) => {
+            if (processed.has(otherIndex) || otherIndex === index) return;
+            
+            const otherBaseFormId = otherDoc.formId ? otherDoc.formId.replace(/_\d+$/, '') : '';
+            const otherTime = otherDoc.purchaseDate?.toDate ? otherDoc.purchaseDate.toDate() : new Date(otherDoc.purchaseDate || 0);
+            
+            // Check if same base form and within 1 minute
+            if (baseFormId && otherBaseFormId && baseFormId === otherBaseFormId) {
+                const timeDiff = Math.abs(docTime - otherTime);
+                if (timeDiff < 60000) { // 1 minute in milliseconds
+                    group.push(otherDoc);
+                    processed.add(otherIndex);
+                }
+            }
+        });
+        
+        groups.push(group);
+    });
+    
+    return groups;
+}
+
+function renderSingleDocument(doc) {
             const li = document.createElement('li');
             li.style.cursor = 'pointer';
             // Match My Form Portfolio card width and style
@@ -1477,16 +1532,16 @@ function renderMyDocuments(docs) {
             a.style.display = 'block';
             a.style.textAlign = 'center';
             a.addEventListener('click', function(e) { e.preventDefault(); });
-            // Add defendant name under document name if present (styled like portfolio)
-            let defendantDiv = null;
-            if (doc.defendantName) {
-                let capName = doc.defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-                defendantDiv = document.createElement('div');
-                defendantDiv.className = 'form-county';
-                defendantDiv.style.fontWeight = 'bold';
-                defendantDiv.style.color = '#e74c3c';
-                defendantDiv.textContent = 'Defendant: ' + capName;
-            }
+    // Add defendant name under document name if present (styled like portfolio)
+    let defendantDiv = null;
+    if (doc.defendantName) {
+        let capName = doc.defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        defendantDiv = document.createElement('div');
+        defendantDiv.className = 'form-county';
+        defendantDiv.style.fontWeight = 'bold';
+        defendantDiv.style.color = '#e74c3c';
+        defendantDiv.textContent = 'Defendant: ' + capName;
+    }
             // Add county name under document name if present
             let countyDiv = null;
             if (doc.countyName) {
@@ -1523,13 +1578,195 @@ function renderMyDocuments(docs) {
                 }
             });
             li.appendChild(a);
-            if (defendantDiv) li.appendChild(defendantDiv);
+    if (defendantDiv) li.appendChild(defendantDiv);
             if (countyDiv) li.appendChild(countyDiv);
             li.appendChild(downloadBtn);
             myDocumentsList.appendChild(li);
+}
+
+function renderDocumentGroup(docs, groupIndex) {
+    // Create a container for the group
+    const groupContainer = document.createElement('div');
+    groupContainer.style.margin = '0 auto 20px auto';
+    groupContainer.style.width = '90%';
+    groupContainer.style.maxWidth = '600px';
+    
+    // Group header
+    const groupHeader = document.createElement('div');
+    groupHeader.style.background = 'linear-gradient(90deg, #4f8cff 0%, #38d39f 100%)';
+    groupHeader.style.color = 'white';
+    groupHeader.style.padding = '12px 20px';
+    groupHeader.style.borderRadius = '12px 12px 0 0';
+    groupHeader.style.fontWeight = 'bold';
+    groupHeader.style.textAlign = 'center';
+    groupHeader.style.fontSize = '16px';
+    groupHeader.textContent = `Form Group (${docs.length} documents)`;
+    
+    // Group checkbox (select all)
+    const groupCheckbox = document.createElement('input');
+    groupCheckbox.type = 'checkbox';
+    groupCheckbox.style.position = 'absolute';
+    groupCheckbox.style.top = '8px';
+    groupCheckbox.style.left = '8px';
+    groupCheckbox.style.width = '15px';
+    groupCheckbox.style.height = '15px';
+    groupCheckbox.style.cursor = 'pointer';
+    groupCheckbox.style.zIndex = '1';
+    groupCheckbox.addEventListener('change', function(e) {
+        const isChecked = this.checked;
+        docs.forEach(doc => {
+            if (isChecked) {
+                selectedDocuments.add(doc.id);
+            } else {
+                selectedDocuments.delete(doc.id);
+            }
         });
         updateDeleteDocumentsButton();
-    }
+        e.stopPropagation();
+    });
+    groupHeader.style.position = 'relative';
+    groupHeader.appendChild(groupCheckbox);
+    
+    // Download all button
+    const downloadAllBtn = document.createElement('button');
+    downloadAllBtn.textContent = 'Download All';
+    downloadAllBtn.style.background = 'white';
+    downloadAllBtn.style.color = '#4f8cff';
+    downloadAllBtn.style.border = 'none';
+    downloadAllBtn.style.padding = '8px 16px';
+    downloadAllBtn.style.borderRadius = '6px';
+    downloadAllBtn.style.fontWeight = 'bold';
+    downloadAllBtn.style.cursor = 'pointer';
+    downloadAllBtn.style.marginLeft = '10px';
+    downloadAllBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // Download all documents in the group
+        docs.forEach((doc, index) => {
+            setTimeout(() => {
+                if (doc.downloadUrl) {
+                    window.open(doc.downloadUrl, '_blank');
+                }
+            }, index * 500); // Stagger downloads by 500ms
+        });
+    });
+    groupHeader.appendChild(downloadAllBtn);
+    
+    groupContainer.appendChild(groupHeader);
+    
+    // Render each document in the group
+    docs.forEach((doc, index) => {
+        const li = document.createElement('li');
+        li.style.cursor = 'pointer';
+        li.style.width = '100%';
+        li.style.padding = '12px 20px';
+        li.style.borderRadius = index === docs.length - 1 ? '0 0 12px 12px' : '0';
+        li.style.boxShadow = '0 1px 8px rgba(44,62,80,0.05)';
+        li.style.margin = '0';
+        li.style.height = 'auto';
+        li.style.display = 'flex';
+        li.style.flexDirection = 'column';
+        li.style.alignItems = 'center';
+        li.style.borderBottom = index < docs.length - 1 ? '1px solid #e0e7ef' : 'none';
+        
+        // Individual checkbox
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.classList.add('form-checkbox');
+        checkbox.dataset.docId = doc.id;
+        checkbox.style.position = 'absolute';
+        checkbox.style.top = '8px';
+        checkbox.style.left = '8px';
+        checkbox.style.width = '15px';
+        checkbox.style.height = '15px';
+        checkbox.style.cursor = 'pointer';
+        checkbox.style.zIndex = '1';
+        checkbox.addEventListener('change', function(e) {
+            if (this.checked) {
+                selectedDocuments.add(doc.id);
+            } else {
+                selectedDocuments.delete(doc.id);
+            }
+            updateDeleteDocumentsButton();
+            e.stopPropagation();
+        });
+        checkbox.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        
+        // Document name
+        const a = document.createElement('a');
+        a.href = '#';
+        a.textContent = doc.name || doc.title || 'Document';
+        a.style.display = 'block';
+        a.style.textAlign = 'center';
+        a.style.fontWeight = 'bold';
+        a.addEventListener('click', function(e) { e.preventDefault(); });
+        
+        // Defendant and county info
+        let defendantDiv = null;
+        if (doc.defendantName) {
+            let capName = doc.defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+            defendantDiv = document.createElement('div');
+            defendantDiv.className = 'form-county';
+            defendantDiv.style.fontWeight = 'bold';
+            defendantDiv.style.color = '#e74c3c';
+            defendantDiv.style.fontSize = '14px';
+            defendantDiv.textContent = 'Defendant: ' + capName;
+        }
+        
+        let countyDiv = null;
+        if (doc.countyName) {
+            countyDiv = document.createElement('div');
+            countyDiv.className = 'form-county';
+            countyDiv.style.fontSize = '14px';
+            let countyText = doc.countyName.trim();
+            if (!countyText.toLowerCase().endsWith('county')) {
+                countyText += ' County';
+            }
+            countyDiv.textContent = countyText;
+        }
+        
+        // Individual download button
+        const downloadBtn = document.createElement('button');
+        downloadBtn.textContent = 'Download';
+        downloadBtn.classList.add('form-action-button');
+        downloadBtn.style.maxWidth = '150px';
+        downloadBtn.style.width = '100%';
+        downloadBtn.style.margin = '8px auto 0 auto';
+        downloadBtn.style.display = 'block';
+        downloadBtn.style.fontSize = '14px';
+        downloadBtn.style.padding = '6px 12px';
+        downloadBtn.tabIndex = -1;
+        downloadBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (doc.downloadUrl) {
+                window.open(doc.downloadUrl, '_blank');
+            } else {
+                alert('No download available for this document.');
+            }
+        });
+        
+        li.style.position = 'relative';
+        li.appendChild(checkbox);
+        li.appendChild(a);
+        if (defendantDiv) li.appendChild(defendantDiv);
+        if (countyDiv) li.appendChild(countyDiv);
+        li.appendChild(downloadBtn);
+        
+        // Make the whole li clickable except for buttons
+        li.addEventListener('click', function(e) {
+            if (e.target === downloadBtn || e.target === checkbox) return;
+            if (doc.downloadUrl) {
+                window.open(doc.downloadUrl, '_blank');
+            }
+        });
+        
+        groupContainer.appendChild(li);
+    });
+    
+    myDocumentsList.appendChild(groupContainer);
 }
 function updateDeleteDocumentsButton() {
     if (selectedDocuments.size > 0) {

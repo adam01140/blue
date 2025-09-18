@@ -1112,14 +1112,14 @@ document.addEventListener("DOMContentLoaded", function() {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Intro 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Intro 1</h1><div id="question-container-1" class="question-container"><label><h3>Hungry?</h3></label><select id="hungry" name="hungry"
+        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Intro 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Enter section name</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Intro 1</h1><div id="question-container-1" class="question-container"><label><h3>Hungry?</h3></label><select id="hungry" name="hungry"
                       onchange="dropdownMirror(this, 'hungry')">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_hungry"></div>
               <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Section 2</h1><div id="question-container-2" class="question-container"><label><h3>Thirsty?</h3></label><select id="thirsty" name="thirsty"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Enter section name</h1><div id="question-container-2" class="question-container hidden"><label><h3>Thirsty?</h3></label><select id="thirsty" name="thirsty"
                       onchange="dropdownMirror(this, 'thirsty')">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_thirsty"></div>
               <input type="text" id="thirsty_dropdown" name="thirsty_dropdown"
                    readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
@@ -1314,7 +1314,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 var questionNameIds = {"1":"hungry","2":"thirsty"};
 var jumpLogics = [];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc500.pdf","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","conditions":[{"prevQuestion":"1","prevAnswer":"Yes"}],"isBigParagraph":false}];
+var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc500.pdf","pdfDisplayName":"Small Claims 500 Form","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","conditions":[{"prevQuestion":"1","prevAnswer":"Yes"}],"isBigParagraph":false}];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
@@ -1326,13 +1326,62 @@ var isHandlingLink = false;
 var sectionStack = [];
 var currentSectionNumber = 1;
 var pdfFileName = "sc100.pdf";
-var pdfOutputFileName = "sc-100.html";
-var stripePriceId = "price_1Ri8ASFJeSRMFQ8XDhtdSkFr";
+var pdfOutputFileName = "Small Claims 100 Form";
+var stripePriceId = "price_1S8afyFJeSRMFQ8XkAJHVYSv";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["sc100.pdf", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
+
+(function(){
+ var thisQ=document.getElementById("question-container-2");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
 
 
 // Alert Logic Functions
@@ -1424,7 +1473,7 @@ window.showCartModal = function () {
     document.body.appendChild(modal);
 
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
-    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = 'Pages/cart.html'; };
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); };
     document.getElementById('addToCartBtn').onclick   = () => {
       window.addFormToCart(EXAMPLE_FORM_PRICE_ID);
       modal.remove();
@@ -1452,8 +1501,12 @@ window.addFormToCart = function (priceId) {
 
   // Check for PDF Logic PDFs that should be added to cart
   const pdfLogicItems = [];
+  console.log('🔍 Checking PDF Logic PDFs:', pdfLogicPDFs);
+  
   if (typeof pdfLogicPDFs !== 'undefined' && pdfLogicPDFs.length > 0) {
     for (const pdfLogic of pdfLogicPDFs) {
+      console.log('📋 Processing PDF Logic item:', pdfLogic);
+      
       if (pdfLogic.pdfName && pdfLogic.stripePriceId) {
         // Check if conditions are met
         let shouldAddToCart = false;
@@ -1461,6 +1514,8 @@ window.addFormToCart = function (priceId) {
         pdfLogic.conditions.forEach(condition => {
           const prevQuestionId = condition.prevQuestion;
           const prevAnswer = condition.prevAnswer;
+          
+          console.log('🔍 Checking condition:', { prevQuestionId, prevAnswer });
           
           // Get the previous question's value
           const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
@@ -1475,6 +1530,13 @@ window.addFormToCart = function (priceId) {
               prevValue = prevQuestionElement.value;
             }
             
+            console.log('📝 Question value:', { 
+              questionId: prevQuestionId, 
+              value: prevValue, 
+              expected: prevAnswer,
+              matches: prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()
+            });
+            
             // Check if the condition matches
             if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
               shouldAddToCart = true;
@@ -1482,37 +1544,68 @@ window.addFormToCart = function (priceId) {
           }
         });
         
+        console.log('✅ Should add to cart:', shouldAddToCart);
+        
         // Add to cart if conditions are met
         if (shouldAddToCart) {
-          pdfLogicItems.push({
-            formId: (window.formId || 'custom-form') + '_' + pdfLogic.questionId,
-            title: pdfLogic.pdfName.replace(/\.pdf$/i, ''),
+          const pdfLogicItem = {
+            formId: pdfLogic.pdfName.replace(/\.pdf$/i, ''), // Use the PDF name without extension as formId
+            pdfName: pdfLogic.pdfName, // Store the actual PDF name for generation
+            title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/\.pdf$/i, ''),
             priceId: pdfLogic.stripePriceId,
             formData: formData,
             countyName: countyName,
             defendantName: defendantName,
             timestamp: Date.now()
-          });
+          };
+          
+          console.log('📦 Adding PDF Logic item to cart:', pdfLogicItem);
+          pdfLogicItems.push(pdfLogicItem);
         }
       }
     }
   }
+  
+  console.log('📋 Final PDF Logic items:', pdfLogicItems);
 
   // Prefer existing cart manager if present
+  // Check if addToCart function exists
   if (typeof window.addToCart === 'function') {
     const fid = (window.formId || 'custom-form');
+    console.log('🛒 Adding main form to cart:', { fid, formTitle, priceId });
     window.addToCart(fid, formTitle, priceId, formData, countyName, defendantName);
     
     // Add PDF Logic items to cart
-    pdfLogicItems.forEach(item => {
-      window.addToCart(item.formId, item.title, item.priceId, item.formData, item.countyName, item.defendantName);
+    console.log('🛒 Adding PDF Logic items to cart:', pdfLogicItems.length, 'items');
+    pdfLogicItems.forEach((item, index) => {
+      console.log(`🛒 Adding PDF Logic item ${index + 1}:`, {
+        formId: item.formId,
+        title: item.title,
+        priceId: item.priceId,
+        pdfName: item.pdfName
+      });
+      
+      console.log('🛒 Calling addToCart with parameters:', {
+        formId: item.formId,
+        formTitle: item.title,
+        priceId: item.priceId,
+        formData: item.formData,
+        countyName: item.countyName,
+        defendantName: item.defendantName,
+        pdfName: item.pdfName
+      });
+      
+      window.addToCart(item.formId, item.title, item.priceId, item.formData, item.countyName, item.defendantName, item.pdfName);
     });
     
-    window.location.href = 'cart.html';
+
     return;
+  } else {
+    // Fallback to localStorage method
   }
 
   // Fallback: localStorage/cookie
+  console.log('🔄 Using fallback localStorage method');
   const cart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
   
   // Add main form
@@ -1526,15 +1619,18 @@ window.addFormToCart = function (priceId) {
     timestamp: Date.now()
   };
   cart.push(mainItem);
+  console.log('📦 Added main form to fallback cart:', mainItem);
   
   // Add PDF Logic items
   pdfLogicItems.forEach(item => {
+    console.log('📦 Adding PDF Logic item to fallback cart:', item);
     cart.push(item);
   });
   
+  console.log('💾 Saving fallback cart to localStorage:', cart);
   localStorage.setItem('formwiz_cart', JSON.stringify(cart));
   document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
-  window.location.href = 'cart.html';
+
 };
 
 // Fallback cart count function (global, no Firebase required)
@@ -3353,7 +3449,7 @@ if (typeof handleNext === 'function') {
                         cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
                         cartCheckoutBtn.style.display = 'block';
                         cartCheckoutBtn.onclick = function() {
-                            window.location.href = 'cart.html';
+                            
                         };
                     }
                 } catch (error) {

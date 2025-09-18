@@ -1956,6 +1956,8 @@ formHTML += `</div><br></div>`;
         const pdfLogicRows = qBlock.querySelectorAll(".pdf-logic-condition-row");
         const pdfLogicPdfNameEl = qBlock.querySelector("#pdfLogicPdfName" + questionId);
         const pdfLogicPdfName = pdfLogicPdfNameEl ? pdfLogicPdfNameEl.value.trim() : "";
+        const pdfLogicPdfDisplayNameEl = qBlock.querySelector("#pdfLogicPdfDisplayName" + questionId);
+        const pdfLogicPdfDisplayName = pdfLogicPdfDisplayNameEl ? pdfLogicPdfDisplayNameEl.value.trim() : "";
         const pdfLogicStripePriceIdEl = qBlock.querySelector("#pdfLogicStripePriceId" + questionId);
         const pdfLogicStripePriceId = pdfLogicStripePriceIdEl ? pdfLogicStripePriceIdEl.value.trim() : "";
         
@@ -1964,6 +1966,7 @@ formHTML += `</div><br></div>`;
           pdfLogicPDFs.push({
             questionId: questionId,
             pdfName: pdfLogicPdfName,
+            pdfDisplayName: pdfLogicPdfDisplayName || pdfLogicPdfName.replace(/\.pdf$/i, ''),
             stripePriceId: pdfLogicStripePriceId,
             conditions: [],
             isBigParagraph: questionType === "bigParagraph"
@@ -2675,7 +2678,7 @@ window.addFormToCart = function (priceId) {
         if (shouldAddToCart) {
           pdfLogicItems.push({
             formId: (window.formId || 'custom-form') + '_' + pdfLogic.questionId,
-            title: pdfLogic.pdfName.replace(/\\.pdf$/i, ''),
+            title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/\\.pdf$/i, ''),
             priceId: pdfLogic.stripePriceId,
             formData: formData,
             countyName: countyName,

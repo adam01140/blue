@@ -326,8 +326,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     await cartManager.updateCartDisplay();
 });
 
-function addToCart(formId, formTitle, priceId, formData, countyName, defendantName) {
-    if (cartManager) cartManager.addToCart(formId, formTitle, priceId, formData, countyName, defendantName);
+function addToCart(formId, formTitle, priceId, formData, countyName, defendantName, pdfName) {
+    console.log('🌐 Forms addToCart called with:', {
+        formId, formTitle, priceId, countyName, defendantName, pdfName
+    });
+    
+    if (cartManager) {
+        console.log('🛒 Calling CartManager.addToCart from Forms...');
+        cartManager.addToCart(formId, formTitle, priceId, formData, countyName, defendantName, pdfName);
+    } else {
+        console.error('❌ CartManager not available in Forms!');
+    }
 }
 
 function getCartCount() {

@@ -2,7 +2,219 @@
  * download.js - MULTIPLE OR CONDITIONS
  *   WITH multi-term hidden-field calculations
  *   export/import logic (for both checkbox and text)
+ *   AND GUI autosave functionality
  ********************************************/
+
+// GUI Autosave functionality
+let guiAutosaveTimeout = null;
+const GUI_AUTOSAVE_DELAY = 2000; // 2 seconds delay
+const GUI_STORAGE_KEY = 'gui_autosave_data';
+const GUI_LAST_IMPORT_KEY = 'gui_last_import';
+
+/**
+ * Initialize GUI autosave functionality
+ */
+function initializeGuiAutosave() {
+    console.log('🔄 GUI AUTOSAVE: Initializing autosave functionality');
+    
+    // Load last saved data on page load
+    loadLastGuiData();
+    
+    // Set up autosave on form changes
+    setupGuiAutosaveListeners();
+    
+    console.log('🔄 GUI AUTOSAVE: Autosave initialized');
+}
+
+/**
+ * Set up event listeners for GUI autosave
+ */
+function setupGuiAutosaveListeners() {
+    // Listen for changes in the form builder
+    const formBuilder = document.getElementById('formBuilder');
+    if (formBuilder) {
+        formBuilder.addEventListener('input', debounceGuiAutosave);
+        formBuilder.addEventListener('change', debounceGuiAutosave);
+    }
+    
+    // Listen for section changes
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('button[onclick*="addSection"], button[onclick*="removeSection"], button[onclick*="addQuestion"]')) {
+            debounceGuiAutosave();
+        }
+    });
+    
+    // Listen for PDF input changes
+    const pdfInputs = document.querySelectorAll('#pdfContainer input');
+    pdfInputs.forEach(input => {
+        input.addEventListener('input', debounceGuiAutosave);
+    });
+}
+
+/**
+ * Debounced autosave function
+ */
+function debounceGuiAutosave() {
+    if (guiAutosaveTimeout) {
+        clearTimeout(guiAutosaveTimeout);
+    }
+    
+    guiAutosaveTimeout = setTimeout(() => {
+        saveGuiData();
+    }, GUI_AUTOSAVE_DELAY);
+}
+
+/**
+ * Save current GUI data to localStorage
+ */
+function saveGuiData() {
+    try {
+        const formData = exportForm(false); // false = don't download, just return data
+        if (formData) {
+            localStorage.setItem(GUI_STORAGE_KEY, JSON.stringify(formData));
+            console.log('💾 GUI AUTOSAVE: Data saved to localStorage');
+        }
+    } catch (error) {
+        console.error('💾 GUI AUTOSAVE: Error saving data:', error);
+    }
+}
+
+/**
+ * Load last saved GUI data from localStorage
+ */
+function loadLastGuiData() {
+    try {
+        const savedData = localStorage.getItem(GUI_STORAGE_KEY);
+        if (savedData) {
+            const formData = JSON.parse(savedData);
+            console.log('📥 GUI AUTOSAVE: Found saved data, loading...');
+            
+            // Show a notification to the user
+            showGuiAutosaveNotification('Found saved data. Loading...', 'info');
+            
+            // Load the data
+            loadFormData(formData);
+            
+            // Show success notification
+            setTimeout(() => {
+                showGuiAutosaveNotification('Previous work restored!', 'success');
+            }, 500);
+        }
+    } catch (error) {
+        console.error('📥 GUI AUTOSAVE: Error loading saved data:', error);
+    }
+}
+
+/**
+ * Clear saved GUI data
+ */
+function clearGuiData() {
+    if (confirm('Are you sure you want to clear all saved GUI data? This cannot be undone.')) {
+        localStorage.removeItem(GUI_STORAGE_KEY);
+        localStorage.removeItem(GUI_LAST_IMPORT_KEY);
+        showGuiAutosaveNotification('Saved data cleared!', 'warning');
+        console.log('🗑️ GUI AUTOSAVE: Data cleared');
+    }
+}
+
+/**
+ * Show autosave notification
+ */
+function showGuiAutosaveNotification(message, type = 'info') {
+    // Remove existing notification
+    const existingNotification = document.getElementById('guiAutosaveNotification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.id = 'guiAutosaveNotification';
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 6px;
+        color: white;
+        font-weight: 500;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        max-width: 300px;
+        word-wrap: break-word;
+    `;
+    
+    // Set color based on type
+    switch (type) {
+        case 'success':
+            notification.style.backgroundColor = '#28a745';
+            break;
+        case 'warning':
+            notification.style.backgroundColor = '#ffc107';
+            notification.style.color = '#000';
+            break;
+        case 'error':
+            notification.style.backgroundColor = '#dc3545';
+            break;
+        default:
+            notification.style.backgroundColor = '#007bff';
+    }
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }
+    }, 3000);
+}
+
+/**
+ * Save last imported file data
+ */
+function saveLastImportData(formData) {
+    try {
+        localStorage.setItem(GUI_LAST_IMPORT_KEY, JSON.stringify(formData));
+        console.log('💾 GUI AUTOSAVE: Last import data saved');
+    } catch (error) {
+        console.error('💾 GUI AUTOSAVE: Error saving last import data:', error);
+    }
+}
+
+/**
+ * Load last imported file data
+ */
+function loadLastImportData() {
+    try {
+        const savedData = localStorage.getItem(GUI_LAST_IMPORT_KEY);
+        if (savedData) {
+            const formData = JSON.parse(savedData);
+            console.log('📥 GUI AUTOSAVE: Loading last import data...');
+            loadFormData(formData);
+            showGuiAutosaveNotification('Last imported file restored!', 'success');
+            return true;
+        }
+    } catch (error) {
+        console.error('📥 GUI AUTOSAVE: Error loading last import data:', error);
+    }
+    return false;
+}
+
+// Initialize autosave when DOM is loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeGuiAutosave);
+} else {
+    initializeGuiAutosave();
+}
 
 /**
  * Helper function to find checkbox options for a given question ID
@@ -128,6 +340,23 @@ function loadFormData(formData) {
         const stripePriceIdInput = document.getElementById('stripePriceId');
         if (stripePriceIdInput) {
             stripePriceIdInput.value = formData.stripePriceId;
+        }
+    }
+    
+    // Set form properties in flowchart if available
+    if (formData.formProperties && typeof setFormProperties === 'function') {
+        setFormProperties(formData.formProperties);
+    }
+    
+    // Also set form properties from individual fields if formProperties not available
+    if (!formData.formProperties && (formData.defaultPDFName || formData.pdfOutputName || formData.stripePriceId)) {
+        const properties = {
+            pdfFormName: formData.defaultPDFName || '',
+            outputFileName: formData.pdfOutputName || '',
+            stripePriceId: formData.stripePriceId || ''
+        };
+        if (typeof setFormProperties === 'function') {
+            setFormProperties(properties);
         }
     }
 
@@ -589,6 +818,10 @@ function loadFormData(formData) {
                     if (pdfLogicPdfNameInput) {
                         pdfLogicPdfNameInput.value = question.pdfLogic.pdfName;
                     }
+                    const pdfLogicPdfDisplayNameInput = questionBlock.querySelector(`#pdfLogicPdfDisplayName${question.questionId}`);
+                    if (pdfLogicPdfDisplayNameInput) {
+                        pdfLogicPdfDisplayNameInput.value = question.pdfLogic.pdfDisplayName || "";
+                    }
                     const pdfLogicStripePriceIdInput = questionBlock.querySelector(`#pdfLogicStripePriceId${question.questionId}`);
                     if (pdfLogicStripePriceIdInput) {
                         pdfLogicStripePriceIdInput.value = question.pdfLogic.stripePriceId || "";
@@ -785,9 +1018,18 @@ function loadFormData(formData) {
 
     // 9) Finally, re-run references (e.g. auto-fill dropdowns in hidden fields)
     updateFormAfterImport();
+    
+    // 10) Save the imported data for autosave
+    saveLastImportData(formData);
 }
 
 function exportForm() {
+    // Get form properties from flowchart if available
+    let formProperties = {};
+    if (typeof getFormProperties === 'function') {
+        formProperties = getFormProperties();
+    }
+    
     const formData = {
         sections: [],
         groups: [],
@@ -798,15 +1040,16 @@ function exportForm() {
         groupCounter: groupCounter,
         defaultPDFName: document.getElementById('formPDFName')
             ? document.getElementById('formPDFName').value.trim()
-            : '',
+            : formProperties.pdfFormName || '',
         pdfOutputName: document.getElementById('pdfOutputName')
             ? document.getElementById('pdfOutputName').value.trim()
-            : '',
+            : formProperties.outputFileName || '',
         stripePriceId: document.getElementById('stripePriceId')
             ? document.getElementById('stripePriceId').value.trim()
-            : '',
+            : formProperties.stripePriceId || '',
         additionalPDFs: [], // New field for additional PDFs
-        checklistItems: [] // New field for checklist items
+        checklistItems: [], // New field for checklist items
+        formProperties: formProperties // Include form properties in export
     };
 
     // Collect all additional PDF names
@@ -899,6 +1142,7 @@ function exportForm() {
             // ---------- PDF Logic ----------
             const pdfLogicEnabled = questionBlock.querySelector(`#pdfLogic${questionId}`)?.checked || false;
             const pdfLogicPdfName = questionBlock.querySelector(`#pdfLogicPdfName${questionId}`)?.value || "";
+            const pdfLogicPdfDisplayName = questionBlock.querySelector(`#pdfLogicPdfDisplayName${questionId}`)?.value || "";
             const pdfLogicStripePriceId = questionBlock.querySelector(`#pdfLogicStripePriceId${questionId}`)?.value || "";
             
             // Collect PDF Logic conditions
@@ -1024,6 +1268,7 @@ function exportForm() {
                 pdfLogic: {
                     enabled: pdfLogicEnabled,
                     pdfName: pdfLogicPdfName,
+                    pdfDisplayName: pdfLogicPdfDisplayName,
                     stripePriceId: pdfLogicStripePriceId,
                     conditions: pdfLogicConditionsArray
                 },

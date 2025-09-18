@@ -30,9 +30,14 @@ function downloadJson(str, filename) {
 
 // Export the flowchart structure as JSON
 window.exportFlowchartJson = function () {
+  alert('Hello world');
+  console.log('📤 EXPORT: Starting window.exportFlowchartJson function');
+  console.log('📤 EXPORT: Function called from:', new Error().stack);
+  alert('Export function called!');
   const parent = graph.getDefaultParent();
   const encoder = new mxCodec();
   const cells = graph.getChildCells(parent, true, true);
+  console.log('📤 EXPORT: Found', cells.length, 'cells to export');
 
   // Map cells, keeping only needed properties
   const simplifiedCells = cells.map(cell => {
@@ -88,8 +93,21 @@ window.exportFlowchartJson = function () {
     
     // PDF node properties
     if (cell._pdfUrl !== undefined) cellData._pdfUrl = cell._pdfUrl;
+    if (cell._pdfFilename !== undefined) cellData._pdfFilename = cell._pdfFilename;
+    if (cell._pdfDisplayName !== undefined) cellData._pdfDisplayName = cell._pdfDisplayName;
     if (cell._priceId !== undefined) cellData._priceId = cell._priceId;
     if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
+    
+    // Debug PDF properties in export
+    if (cell.style && cell.style.includes("nodeType=pdfNode")) {
+      console.log('📤 EXPORT: PDF Node properties for cell', cell.id, ':', {
+        _pdfUrl: cell._pdfUrl,
+        _pdfFilename: cell._pdfFilename,
+        _pdfDisplayName: cell._pdfDisplayName,
+        _priceId: cell._priceId
+      });
+      console.log('📤 EXPORT: Cell data being exported:', cellData);
+    }
     
     // Notes node properties
             if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
@@ -117,10 +135,17 @@ window.exportFlowchartJson = function () {
     return cellData;
   });
 
+  // Get form properties if available
+  let formProperties = {};
+  if (typeof getFormProperties === 'function') {
+    formProperties = getFormProperties();
+  }
+  
   const exportObj = {
     cells: simplifiedCells,
     sectionPrefs: sectionPrefs,
-    groups: getGroupsData()
+    groups: getGroupsData(),
+    formProperties: formProperties
   };
 
   const jsonStr = JSON.stringify(exportObj, null, 2);
@@ -283,6 +308,7 @@ window.exportGuiJson = function(download = true) {
       pdfLogic: {
         enabled: false,
         pdfName: "",
+        pdfDisplayName: "",
         stripePriceId: "",
         conditions: []
       },
@@ -685,7 +711,8 @@ window.exportGuiJson = function(download = true) {
         if (targetCell && isPdfNode(targetCell)) {
           // This question is directly connected to a PDF node
           question.pdfLogic.enabled = true;
-          question.pdfLogic.pdfName = targetCell._pdfUrl || "";
+          question.pdfLogic.pdfName = targetCell._pdfUrl || targetCell._pdfFilename || "";
+          question.pdfLogic.pdfDisplayName = targetCell._pdfDisplayName || "";
           question.pdfLogic.stripePriceId = targetCell._priceId || "";
           
           // If this is a Big Paragraph question and the PDF node has a character limit
@@ -716,7 +743,8 @@ window.exportGuiJson = function(download = true) {
               if (pdfCell && isPdfNode(pdfCell)) {
                 // This question's option leads to a PDF node
                 question.pdfLogic.enabled = true;
-                question.pdfLogic.pdfName = pdfCell._pdfUrl || "";
+                question.pdfLogic.pdfName = pdfCell._pdfUrl || pdfCell._pdfFilename || "";
+                question.pdfLogic.pdfDisplayName = pdfCell._pdfDisplayName || "";
                 question.pdfLogic.stripePriceId = pdfCell._priceId || "";
                 
                 // Extract the option text
@@ -801,6 +829,12 @@ window.exportGuiJson = function(download = true) {
   sections.sort((a, b) => a.sectionId - b.sectionId);
   
   // Create final output object
+  // Get form properties if available
+  let formProperties = {};
+  if (typeof getFormProperties === 'function') {
+    formProperties = getFormProperties();
+  }
+  
   const output = {
     sections: sections,
     groups: getGroupsData(),
@@ -809,11 +843,12 @@ window.exportGuiJson = function(download = true) {
     questionCounter: questionCounter,
     hiddenFieldCounter: hiddenFieldCounter,
     groupCounter: 1,
-    defaultPDFName: defaultPDFName,
-    pdfOutputName: "",
-    stripePriceId: "",
+    defaultPDFName: formProperties.pdfFormName || defaultPDFName,
+    pdfOutputName: formProperties.outputFileName || "",
+    stripePriceId: formProperties.stripePriceId || "",
     additionalPDFs: [],
-    checklistItems: []
+    checklistItems: [],
+    formProperties: formProperties
   };
   
   // Convert to string and download
@@ -1130,92 +1165,6 @@ function downloadJson(str, filename) {
   document.body.removeChild(dlAnchorElem);
 }
 
-/**
- * Exports the flowchart to a JSON file.
- */
-function exportFlowchartJson() {
-  const parent = graph.getDefaultParent();
-  const encoder = new mxCodec();
-  const cells = graph.getChildCells(parent, true, true);
-
-  // Map cells, keeping only needed properties
-  const simplifiedCells = cells.map(cell => {
-    // Basic info about the cell
-    const cellData = {
-      id: cell.id,
-      vertex: cell.vertex,
-      edge: cell.edge,
-      value: cell.value,
-      style: cell.style,
-    };
-
-    // Handle geometry 
-    if (cell.geometry) {
-      cellData.geometry = {
-        x: cell.geometry.x,
-        y: cell.geometry.y,
-        width: cell.geometry.width,
-        height: cell.geometry.height,
-      };
-    }
-
-    // Add source and target for edges
-    if (cell.edge && cell.source && cell.target) {
-      cellData.source = cell.source.id;
-      cellData.target = cell.target.id;
-      
-      // Save edge geometry (articulation points) if it exists
-      if (cell.geometry && cell.geometry.points && cell.geometry.points.length > 0) {
-        cellData.edgeGeometry = {
-          points: cell.geometry.points.map(point => ({
-            x: point.x,
-            y: point.y
-          }))
-        };
-      }
-    }
-
-    // Custom fields for specific nodes
-    if (cell._textboxes) cellData._textboxes = JSON.parse(JSON.stringify(cell._textboxes));
-    if (cell._questionText) cellData._questionText = cell._questionText;
-    if (cell._twoNumbers) cellData._twoNumbers = cell._twoNumbers;
-    if (cell._nameId) cellData._nameId = cell._nameId;
-    if (cell._placeholder) cellData._placeholder = cell._placeholder;
-    if (cell._questionId) cellData._questionId = cell._questionId;
-    
-    // textbox properties
-    if (cell._amountName) cellData._amountName = cell._amountName;
-    if (cell._amountPlaceholder) cellData._amountPlaceholder = cell._amountPlaceholder;
-    
-    // image option
-    if (cell._image) cellData._image = cell._image;
-    
-    // calculation node properties
-    if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
-    if (cell._calcAmountLabel !== undefined) cellData._calcAmountLabel = cell._calcAmountLabel;
-    if (cell._calcOperator !== undefined) cellData._calcOperator = cell._calcOperator;
-    if (cell._calcThreshold !== undefined) cellData._calcThreshold = cell._calcThreshold;
-    if (cell._calcFinalText !== undefined) cellData._calcFinalText = cell._calcFinalText;
-    if (cell._calcTerms !== undefined) cellData._calcTerms = JSON.parse(JSON.stringify(cell._calcTerms));
-    
-    // subtitle & info nodes
-    if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
-    if (cell._infoText !== undefined) cellData._infoText = cell._infoText;
-
-    return cellData;
-  });
-
-  const groupsData = getGroupsData();
-  
-  const exportObj = {
-    cells: simplifiedCells,
-    sectionPrefs: sectionPrefs,
-    groups: groupsData
-  };
-
-  const jsonStr = JSON.stringify(exportObj, null, 2);
-  downloadJson(jsonStr, "flowchart.json");
-}
 
 /**
  * Exports the flowchart to a GUI-usable JSON format.
@@ -1438,8 +1387,11 @@ function loadFlowchartData(data) {
         
         // PDF node properties
         if (item._pdfUrl !== undefined) newCell._pdfUrl = item._pdfUrl;
+        if (item._pdfFilename !== undefined) newCell._pdfFilename = item._pdfFilename;
+        if (item._pdfDisplayName !== undefined) newCell._pdfDisplayName = item._pdfDisplayName;
         if (item._priceId !== undefined) newCell._priceId = item._priceId;
         if (item._characterLimit !== undefined) newCell._characterLimit = item._characterLimit;
+        
         
         // Notes node properties
         if (item._notesText !== undefined) newCell._notesText = item._notesText;
@@ -1553,6 +1505,12 @@ function loadFlowchartData(data) {
     });
   } finally {
     graph.getModel().endUpdate();
+  }
+
+  // Load form properties if available
+  if (data.formProperties && typeof setFormProperties === 'function') {
+    setFormProperties(data.formProperties);
+    console.log('📥 IMPORT: Loaded form properties from flowchart JSON');
   }
 
   refreshAllCells();
