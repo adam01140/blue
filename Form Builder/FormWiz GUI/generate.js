@@ -1193,6 +1193,9 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
   const pdfOutputName = pdfOutputNameInputEl && pdfOutputNameInputEl.value.trim() ? pdfOutputNameInputEl.value.trim() : "example.html";
   const escapedPdfOutputName = pdfOutputName.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, '\\"');
 
+  // Set window.formId to use the PDF name (without .pdf extension) for cart and form identification
+  window.formId = pdfFormName.replace(/\.pdf$/i, '');
+
   // Get the Stripe Price ID
   const stripePriceIdInputEl = document.getElementById("stripePriceId");
   const stripePriceId = stripePriceIdInputEl && stripePriceIdInputEl.value.trim() ? stripePriceIdInputEl.value.trim() : "";
@@ -2295,6 +2298,9 @@ if (s > 1){
   // Now we place ONE <script> block for everything:
   formHTML += "\n<script>\n";
   
+  // Set window.formId to the PDF name (without .pdf extension) for cart and form identification
+  formHTML += `window.formId = '${escapedPdfFormName.replace(/\.pdf$/i, '')}';\n`;
+  
  formHTML += `
 /*───────────────────────────────*
  * return the true checkbox prefix
@@ -2339,7 +2345,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
       const urlParams = new URLSearchParams(window.location.search);
-      const formId = urlParams.get("formId");
+      const formId = urlParams.get("formId") || window.formId || 'default';
       let userId = null;
       firebase.auth().onAuthStateChanged(async function(user){
           if(user){ 
@@ -2374,7 +2380,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let isUserLoggedIn = false;
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
-      const formId = urlParams.get("formId");
+      const formId = urlParams.get("formId") || window.formId || 'default';
     `;
   }
 

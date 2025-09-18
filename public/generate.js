@@ -1193,6 +1193,9 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
   const pdfOutputName = pdfOutputNameInputEl && pdfOutputNameInputEl.value.trim() ? pdfOutputNameInputEl.value.trim() : "example.html";
   const escapedPdfOutputName = pdfOutputName.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, '\\"');
 
+  // Set window.formId to use the PDF name (without .pdf extension) for cart and form identification
+  window.formId = pdfFormName.replace(/\.pdf$/i, '');
+
   // Get the Stripe Price ID
   const stripePriceIdInputEl = document.getElementById("stripePriceId");
   const stripePriceId = stripePriceIdInputEl && stripePriceIdInputEl.value.trim() ? stripePriceIdInputEl.value.trim() : "";

@@ -1139,10 +1139,44 @@ document.addEventListener('DOMContentLoaded', function() {
 // Update cart count badge in header
 function updateCartCountBadge() {
     const cartCountElement = document.getElementById('cart-count-badge');
-    if (cartCountElement && typeof getCartCount === 'function') {
-        const count = getCartCount();
+    if (cartCountElement) {
+        let count = 0;
+        
+        // Try getCartCount function first
+        if (typeof getCartCount === 'function') {
+            count = getCartCount();
+        } else {
+            // Fallback to checking both cookie and localStorage
+            try {
+                // Check cookie first
+                function getCookie(name) {
+                    const eq = name + '=';
+                    const parts = document.cookie.split(';');
+                    for (let c of parts) {
+                        while (c.charAt(0) === ' ') c = c.slice(1);
+                        if (c.indexOf(eq) === 0) return c.slice(eq.length);
+                    }
+                    return null;
+                }
+                
+                let cartData = getCookie('formwiz_cart');
+                if (!cartData) {
+                    cartData = localStorage.getItem('formwiz_cart');
+                }
+                
+                if (cartData) {
+                    const decodedData = cartData.startsWith('%') ? decodeURIComponent(cartData) : cartData;
+                    const cart = JSON.parse(decodedData);
+                    count = Array.isArray(cart) ? cart.length : 0;
+                }
+            } catch (e) {
+                console.error('Error getting cart count:', e);
+                count = 0;
+            }
+        }
+        
+        cartCountElement.textContent = count;
         if (count > 0) {
-            cartCountElement.textContent = count;
             cartCountElement.style.display = 'flex';
         } else {
             cartCountElement.style.display = 'none';
@@ -1629,9 +1663,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 let cart = [];
                 try {
-                    const cartData = getCookie('formwiz_cart');
-                    if (cartData) cart = JSON.parse(cartData);
-                } catch (e) { cart = []; }
+                    // Try cookie first, then localStorage as fallback
+                    let cartData = getCookie('formwiz_cart');
+                    if (!cartData) {
+                        cartData = localStorage.getItem('formwiz_cart');
+                    }
+                    if (cartData) {
+                        // Decode URL-encoded data if needed
+                        const decodedData = cartData.startsWith('%') ? decodeURIComponent(cartData) : cartData;
+                        cart = JSON.parse(decodedData);
+                    }
+                } catch (e) { 
+                    console.error('Error parsing cart data:', e);
+                    cart = []; 
+                }
                 if (!Array.isArray(cart) || cart.length === 0) {
                     cartItemsList.innerHTML = '<div style="color:#7f8c8d;font-size:1.1em;margin-top:18px;">Your cart is empty.</div>';
                     cartCheckoutBtn.style.display = 'none';
