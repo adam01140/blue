@@ -1679,7 +1679,7 @@ function renderDocumentGroup(docs, groupIndex) {
     // Add document name as a link (styled like portfolio)
     const a = document.createElement('a');
     a.href = '#';
-    a.textContent = `${originalFormName} (${docs.length} documents)`;
+            a.textContent = originalFormName;
     a.style.display = 'block';
     a.style.textAlign = 'center';
     a.style.fontWeight = 'bold';
