@@ -905,7 +905,7 @@
 </head>
 <body>
 <header>
-    <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
+    <img src="../logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='../index.html';">
     <nav>
         <a href="index.html">Home
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -981,7 +981,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="cart.js"></script>
+<script src="../Pages/cart.js"></script>
 
 <script>
 // Firebase Configuration
@@ -1139,7 +1139,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <div class="pro-footer">
         <div class="pro-footer-col address-col">
             <div class="pro-footer-logo">
-                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
+                <img src="../logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
             </div>
             <div class="pro-footer-title">FormWiz</div>
             <div class="pro-footer-contact">
@@ -1314,21 +1314,6 @@ function buildCheckboxName (questionId, rawNameId, labelText){
 var questionNameIds = {"1":"hungry","2":"thirsty"};
 var jumpLogics = [];
 var conditionalPDFs = [];
-console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', [
-  {
-    "questionId": "1",
-    "pdfName": "sc500.pdf",
-    "pdfDisplayName": "Small Claims 500 Form",
-    "stripePriceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2",
-    "conditions": [
-      {
-        "prevQuestion": "1",
-        "prevAnswer": "Yes"
-      }
-    ],
-    "isBigParagraph": false
-  }
-]);
 var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc500.pdf","pdfDisplayName":"Small Claims 500 Form","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","conditions":[{"prevQuestion":"1","prevAnswer":"Yes"}],"isBigParagraph":false}];
 var alertLogics = [];
 var checklistLogics = [];
@@ -1341,7 +1326,7 @@ var isHandlingLink = false;
 var sectionStack = [];
 var currentSectionNumber = 1;
 var pdfFileName = "sc100.pdf";
-var pdfOutputFileName = "example.html";
+var pdfOutputFileName = "Small Claims 100 Form";
 var stripePriceId = "price_1S8afyFJeSRMFQ8XkAJHVYSv";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["sc100.pdf", ];
@@ -1488,7 +1473,7 @@ window.showCartModal = function () {
     document.body.appendChild(modal);
 
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
-    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = 'cart.html'; };
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); };
     document.getElementById('addToCartBtn').onclick   = () => {
       window.addFormToCart(EXAMPLE_FORM_PRICE_ID);
       modal.remove();
@@ -1496,28 +1481,8 @@ window.showCartModal = function () {
   });
 };
 
-// --- Cart helpers (new) ---
-function clearCartState() {
-  try { localStorage.removeItem('formwiz_cart'); } catch {}
-  // expire cookie immediately
-  document.cookie = 'formwiz_cart=;path=/;max-age=0';
-}
-
-function writeCartCookie(cart) {
-  try { document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000'; } catch {}
-}
-
-function getUrlParam(name) {
-  const u = new URLSearchParams(window.location.search);
-  return u.get(name) || '';
-}
-
 // Add to cart helper (global, no Firebase required)
 window.addFormToCart = function (priceId) {
-  // 1) Fresh start each submission (prevents dupes/stale items across re-submits)
-  clearCartState();
-
-  // 2) Collect form data
   const form = document.getElementById('customForm');
   const formData = {};
   if (form) {
@@ -1529,98 +1494,171 @@ window.addFormToCart = function (priceId) {
     }
   }
 
-  // 3) Uniform metadata for every cart line
-  const originalFormId = (window.formId || 'custom-form');
-  const formTitle      = window.pdfOutputFileName || (typeof pdfOutputFileName !== 'undefined' ? pdfOutputFileName : 'Form');
-  const countyName     = getUrlParam('county');
-  const defendantName  = getUrlParam('defendantName');
-  const portfolioId    = getUrlParam('portfolioId');
-  const nowTs          = Date.now();
+  const urlParams = new URLSearchParams(window.location.search);
+  const countyName    = urlParams.get('county') || '';
+  const defendantName = urlParams.get('defendantName') || '';
+  const portfolioId   = urlParams.get('portfolioId') || '';
+  const formTitle     = window.pdfOutputFileName || pdfOutputFileName || 'Form';
 
-  // 4) Compute all PDF-logic matches (OR logic across conditions)
+  // Check for PDF Logic PDFs that should be added to cart
   const pdfLogicItems = [];
-  try {
-    if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
-      for (const pdfLogic of window.pdfLogicPDFs) {
-        if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
-
-        let matched = false;
-        const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
-        for (const c of conds) {
-          const prevId = c?.prevQuestion;
-          const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
-          if (!prevId) continue;
-
-          const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
-                     document.getElementById('answer' + prevId);
-          if (!el) continue;
-
-          let val = '';
-          if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
-          else                        { val = el.value || ''; }
-
-          if (val.toString().toLowerCase() === expect) {
-            matched = true; // any condition match includes the PDF
+  console.log('🔍 Checking PDF Logic PDFs:', pdfLogicPDFs);
+  
+  if (typeof pdfLogicPDFs !== 'undefined' && pdfLogicPDFs.length > 0) {
+    for (const pdfLogic of pdfLogicPDFs) {
+      console.log('📋 Processing PDF Logic item:', pdfLogic);
+      
+      if (pdfLogic.pdfName && pdfLogic.stripePriceId) {
+        // Check if conditions are met
+        let shouldAddToCart = false;
+        
+        pdfLogic.conditions.forEach(condition => {
+          const prevQuestionId = condition.prevQuestion;
+          const prevAnswer = condition.prevAnswer;
+          
+          console.log('🔍 Checking condition:', { prevQuestionId, prevAnswer });
+          
+          // Get the previous question's value
+          const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                                    document.getElementById('answer' + prevQuestionId);
+          
+          if (prevQuestionElement) {
+            let prevValue = '';
+            
+            if (prevQuestionElement.type === 'checkbox') {
+              prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
+            } else {
+              prevValue = prevQuestionElement.value;
+            }
+            
+            console.log('📝 Question value:', { 
+              questionId: prevQuestionId, 
+              value: prevValue, 
+              expected: prevAnswer,
+              matches: prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()
+            });
+            
+            // Check if the condition matches
+            if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+              shouldAddToCart = true;
+            }
           }
-        }
-
-        if (matched) {
-          pdfLogicItems.push({
-            formId: pdfLogic.pdfName.replace(/.pdf$/i, ''),
-            title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/.pdf$/i, ''),
+        });
+        
+        console.log('✅ Should add to cart:', shouldAddToCart);
+        
+        // Add to cart if conditions are met
+        if (shouldAddToCart) {
+          const pdfLogicItem = {
+            formId: pdfLogic.pdfName.replace(/\.pdf$/i, ''), // Use the PDF name without extension as formId
+            originalFormId: window.formId || 'custom-form', // Track the original form that generated this document
+            portfolioId: portfolioId, // Track the portfolio ID for grouping
+            pdfName: pdfLogic.pdfName, // Store the actual PDF name for generation
+            title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/\.pdf$/i, ''),
             priceId: pdfLogic.stripePriceId,
-            pdfName: pdfLogic.pdfName,
-            originalFormId: originalFormId,
-            portfolioId: portfolioId,
-            formData: formData,
+            formData: { ...formData, originalFormId: window.formId || 'custom-form', portfolioId: portfolioId }, // Include portfolioId in formData
             countyName: countyName,
             defendantName: defendantName,
-            timestamp: nowTs
-          });
+            timestamp: Date.now()
+          };
+          
+          console.log('📦 Adding PDF Logic item to cart:', pdfLogicItem);
+          pdfLogicItems.push(pdfLogicItem);
         }
       }
     }
-  } catch (e) {
-    console.warn('[PDF LOGIC] error computing matches:', e);
   }
+  
+  console.log('📋 Final PDF Logic items:', pdfLogicItems);
 
-  // 5) Preferred path: site cart manager
+  // Clear old cart items first
+  console.log('🧹 Clearing old cart items...');
+  console.log('🔍 Cart before clearing - localStorage:', localStorage.getItem('formwiz_cart'));
+  console.log('🔍 Cart before clearing - cookies:', document.cookie);
+  localStorage.removeItem('formwiz_cart');
+  document.cookie = 'formwiz_cart=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  console.log('✅ Cart cleared from both localStorage and cookies');
+
+  // Prefer existing cart manager if present
+  // Check if addToCart function exists
   if (typeof window.addToCart === 'function') {
-    // main item
-    window.addToCart(
-      originalFormId, formTitle, priceId, { ...formData }, countyName, defendantName,
-      { originalFormId, portfolioId, pdfName: (window.pdfFileName || '') }
-    );
-
-    // every matched PDF logic item
-    for (const item of pdfLogicItems) {
-      window.addToCart(
-        item.formId, item.title, item.priceId, { ...item.formData },
-        item.countyName, item.defendantName,
-        { originalFormId: item.originalFormId, portfolioId: item.portfolioId, pdfName: item.pdfName }
-      );
+    const fid = (window.formId || 'custom-form');
+    console.log('🛒 Adding main form to cart:', { fid, formTitle, priceId });
+    // Add originalFormId and portfolioId to the main form data
+    const mainFormData = { ...formData, originalFormId: fid, portfolioId: portfolioId };
+    console.log('🛒 Main form data with portfolioId:', { mainFormData, portfolioId });
+    window.addToCart(fid, formTitle, priceId, mainFormData, countyName, defendantName);
+    
+    // Add PDF Logic items to cart
+    console.log('🛒 Adding PDF Logic items to cart:', pdfLogicItems.length, 'items');
+    pdfLogicItems.forEach((item, index) => {
+      console.log(`🛒 Adding PDF Logic item ${index + 1}:`, {
+        formId: item.formId,
+        title: item.title,
+        priceId: item.priceId,
+        pdfName: item.pdfName
+      });
+      
+      console.log('🛒 Calling addToCart with parameters:', {
+        formId: item.formId,
+        formTitle: item.title,
+        priceId: item.priceId,
+        formData: item.formData,
+        countyName: item.countyName,
+        defendantName: item.defendantName,
+        pdfName: item.pdfName
+      });
+      
+      window.addToCart(item.formId, item.title, item.priceId, item.formData, item.countyName, item.defendantName, item.pdfName);
+    });
+    
+    // Debug: Show final cart state after adding items
+    console.log('🔍 Final cart state after adding items:');
+    console.log('📦 localStorage cart:', localStorage.getItem('formwiz_cart'));
+    console.log('🍪 Cookie cart:', document.cookie);
+    
+    // Try to parse and show the cart contents
+    try {
+      const finalCart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
+      console.log('📋 Final parsed cart contents:', finalCart);
+      console.log('📊 Final cart length:', finalCart.length);
+    } catch (e) {
+      console.error('❌ Error parsing final cart:', e);
     }
 
-    // redirect after everything is queued
-    setTimeout(() => { window.location.href = 'cart.html'; }, 0);
     return;
+  } else {
+    // Fallback to localStorage method
   }
 
-  // 6) Fallback: localStorage + cookie (fresh array due to clearCartState)
-  const cart = [];
-  cart.push({
-    formId: originalFormId, title: formTitle, priceId,
-    pdfName: (window.pdfFileName || ''),
-    originalFormId, portfolioId, formData, countyName, defendantName, timestamp: nowTs
+  // Fallback: localStorage/cookie
+  console.log('🔄 Using fallback localStorage method');
+  const cart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
+  
+  // Add main form
+  const mainItem = {
+    formId: (window.formId || 'custom-form'),
+    title: formTitle,
+    priceId,
+    formData,
+    countyName,
+    defendantName,
+    timestamp: Date.now()
+  };
+  cart.push(mainItem);
+  console.log('📦 Added main form to fallback cart:', mainItem);
+  
+  // Add PDF Logic items
+  pdfLogicItems.forEach(item => {
+    console.log('📦 Adding PDF Logic item to fallback cart:', item);
+    cart.push(item);
   });
-  for (const item of pdfLogicItems) cart.push(item);
+  
+  console.log('💾 Saving fallback cart to localStorage:', cart);
+  localStorage.setItem('formwiz_cart', JSON.stringify(cart));
+  document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
 
-  try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch {}
-  writeCartCookie(cart);
-
-  setTimeout(() => { window.location.href = 'cart.html'; }, 0);
 };
-
 
 // Fallback cart count function (global, no Firebase required)
 window.getCartCount = function() {
@@ -3438,7 +3476,7 @@ if (typeof handleNext === 'function') {
                         cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
                         cartCheckoutBtn.style.display = 'block';
                         cartCheckoutBtn.onclick = function() {
-                            window.location.href = 'cart.html';
+                            
                         };
                     }
                 } catch (error) {
