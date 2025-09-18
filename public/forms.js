@@ -1477,6 +1477,16 @@ function renderMyDocuments(docs) {
             a.style.display = 'block';
             a.style.textAlign = 'center';
             a.addEventListener('click', function(e) { e.preventDefault(); });
+            // Add defendant name under document name if present (styled like portfolio)
+            let defendantDiv = null;
+            if (doc.defendantName) {
+                let capName = doc.defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+                defendantDiv = document.createElement('div');
+                defendantDiv.className = 'form-county';
+                defendantDiv.style.fontWeight = 'bold';
+                defendantDiv.style.color = '#e74c3c';
+                defendantDiv.textContent = 'Defendant: ' + capName;
+            }
             // Add county name under document name if present
             let countyDiv = null;
             if (doc.countyName) {
@@ -1513,6 +1523,7 @@ function renderMyDocuments(docs) {
                 }
             });
             li.appendChild(a);
+            if (defendantDiv) li.appendChild(defendantDiv);
             if (countyDiv) li.appendChild(countyDiv);
             li.appendChild(downloadBtn);
             myDocumentsList.appendChild(li);

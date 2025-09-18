@@ -289,28 +289,64 @@ class CartManager {
                     await ref.put(file, meta);
                     const downloadUrl = await ref.getDownloadURL();
 
-                    // Fetch correct name and countyName from user's forms collection
+                    // Fetch correct name, countyName, and defendantName from user's forms collection
                     let docName = cartItem.title || cartItem.formId;
                     let docCounty = null;
+                    let docDefendant = null;
+                    let formDocId = null; // Store the form document ID for removal
+                    
                     try {
-                        const formDoc = await db.collection('users').doc(user.uid).collection('forms').doc(cartItem.formId).get();
+                        // First try to find by formId
+                        let formDoc = await db.collection('users').doc(user.uid).collection('forms').doc(cartItem.formId).get();
                         if (formDoc.exists) {
+                            formDocId = cartItem.formId;
+                        } else {
+                            // If not found by formId, search by originalFormId and countyName
+                            const formsSnapshot = await db.collection('users').doc(user.uid).collection('forms')
+                                .where('originalFormId', '==', cartItem.formId)
+                                .where('countyName', '==', cartItem.countyName)
+                                .get();
+                            
+                            if (!formsSnapshot.empty) {
+                                formDoc = formsSnapshot.docs[0];
+                                formDocId = formDoc.id;
+                            }
+                        }
+                        
+                        if (formDoc && formDoc.exists) {
                             const formData = formDoc.data();
                             if (formData && formData.name) docName = formData.name;
                             if (formData && formData.countyName) docCounty = formData.countyName;
+                            if (formData && formData.defendantName) docDefendant = formData.defendantName;
                         }
                     } catch (e) {
-                        // fallback: use cartItem.title
+                        console.error('Error fetching form data:', e);
+                        // fallback: use cartItem data
+                        docCounty = cartItem.countyName;
+                        docDefendant = cartItem.defendantName;
                     }
 
+                    // Save document with proper title format
                     await db.collection('users').doc(user.uid)
                         .collection('documents').doc(docId).set({
                             name: docName,
                             formId: cartItem.formId,
                             countyName: docCounty || null,
+                            defendantName: docDefendant || null,
                             purchaseDate: firebase.firestore.FieldValue.serverTimestamp(),
                             downloadUrl
                         });
+
+                    // Remove the form from portfolio after successful document creation
+                    if (formDocId) {
+                        try {
+                            await db.collection('users').doc(user.uid)
+                                .collection('forms').doc(formDocId).delete();
+                            console.log(`Removed form ${formDocId} from portfolio after payment`);
+                        } catch (e) {
+                            console.error('Error removing form from portfolio:', e);
+                        }
+                    }
                 }
             }
         } catch (e) {
