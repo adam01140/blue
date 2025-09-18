@@ -279,7 +279,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="cart.js"></script>
+<script src="Pages/cart.js"></script>
 
 <script>
 /*──────── mirror a dropdown → textbox and checkbox ────────*/
@@ -1497,7 +1497,7 @@ if (typeof handleNext === 'function') {
                 };
                 document.getElementById('viewCartBtn').onclick = () => {
                     document.body.removeChild(modal);
-                    window.location.href = 'cart.html';
+                    window.location.href = 'Pages/cart.html';
                 };
                 document.getElementById('addToCartBtn').onclick = () => {
                     addFormToCart(EXAMPLE_FORM_PRICE_ID);
@@ -1535,7 +1535,7 @@ if (typeof handleNext === 'function') {
             
            if (typeof addToCart === 'function') {
                 addToCart(formId || 'custom-form', formTitle, priceId, formData);
-                window.location.href = 'cart.html';
+                window.location.href = 'Pages/cart.html';
             } else {
                 // Fallback: save to localStorage if cart manager not available
                 const cartItem = {
@@ -1549,7 +1549,7 @@ if (typeof handleNext === 'function') {
                 let cart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
                 cart.push(cartItem);
                 localStorage.setItem('formwiz_cart', JSON.stringify(cart));
-                window.location.href = 'cart.html';
+                window.location.href = 'Pages/cart.html';
             }
         }
 

@@ -1044,7 +1044,7 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>',
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>',
     '<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>',
-    '<script src="cart.js"></script>',
+    '<script src="Pages/cart.js"></script>',
     "",
     '<script>',
     '// Firebase Configuration',

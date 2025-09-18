@@ -981,7 +981,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="cart.js"></script>
+<script src="Pages/cart.js"></script>
 
 <script>
 // Firebase Configuration
@@ -3316,7 +3316,7 @@ window.showCartModal = function () {
     document.body.appendChild(modal);
 
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
-    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = 'cart.html'; };
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = 'Pages/cart.html'; };
     document.getElementById('addToCartBtn').onclick   = () => {
       window.addFormToCart(EXAMPLE_FORM_PRICE_ID);
       modal.remove();
@@ -3400,7 +3400,7 @@ window.addFormToCart = function (priceId) {
       window.addToCart(item.formId, item.title, item.priceId, item.formData, item.countyName, item.defendantName);
     });
     
-    window.location.href = 'cart.html';
+    window.location.href = 'Pages/cart.html';
     return;
   }
 
@@ -3426,7 +3426,7 @@ window.addFormToCart = function (priceId) {
   
   localStorage.setItem('formwiz_cart', JSON.stringify(cart));
   document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
-  window.location.href = 'cart.html';
+  window.location.href = 'Pages/cart.html';
 };
 
 // Fallback cart count function (global, no Firebase required)
@@ -5613,7 +5613,7 @@ if (typeof handleNext === 'function') {
                         cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
                         cartCheckoutBtn.style.display = 'block';
                         cartCheckoutBtn.onclick = function() {
-                            window.location.href = 'cart.html';
+                            window.location.href = 'Pages/cart.html';
                         };
                     }
                 } catch (error) {

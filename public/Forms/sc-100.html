@@ -905,7 +905,7 @@
 </head>
 <body>
 <header>
-    <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
+    <img src="../logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='../index.html';">
     <nav>
         <a href="index.html">Home
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -981,7 +981,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="cart.js"></script>
+<script src="../Pages/cart.js"></script>
 
 <script>
 // Firebase Configuration
@@ -1139,7 +1139,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <div class="pro-footer">
         <div class="pro-footer-col address-col">
             <div class="pro-footer-logo">
-                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
+                <img src="../logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
             </div>
             <div class="pro-footer-title">FormWiz</div>
             <div class="pro-footer-contact">
@@ -1497,6 +1497,7 @@ window.addFormToCart = function (priceId) {
   const urlParams = new URLSearchParams(window.location.search);
   const countyName    = urlParams.get('county') || '';
   const defendantName = urlParams.get('defendantName') || '';
+  const portfolioId   = urlParams.get('portfolioId') || '';
   const formTitle     = window.pdfOutputFileName || pdfOutputFileName || 'Form';
 
   // Check for PDF Logic PDFs that should be added to cart
@@ -1550,10 +1551,12 @@ window.addFormToCart = function (priceId) {
         if (shouldAddToCart) {
           const pdfLogicItem = {
             formId: pdfLogic.pdfName.replace(/\.pdf$/i, ''), // Use the PDF name without extension as formId
+            originalFormId: window.formId || 'custom-form', // Track the original form that generated this document
+            portfolioId: portfolioId, // Track the portfolio ID for grouping
             pdfName: pdfLogic.pdfName, // Store the actual PDF name for generation
             title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/\.pdf$/i, ''),
             priceId: pdfLogic.stripePriceId,
-            formData: formData,
+            formData: { ...formData, originalFormId: window.formId || 'custom-form', portfolioId: portfolioId }, // Include portfolioId in formData
             countyName: countyName,
             defendantName: defendantName,
             timestamp: Date.now()
@@ -1568,12 +1571,23 @@ window.addFormToCart = function (priceId) {
   
   console.log('📋 Final PDF Logic items:', pdfLogicItems);
 
+  // Clear old cart items first
+  console.log('🧹 Clearing old cart items...');
+  console.log('🔍 Cart before clearing - localStorage:', localStorage.getItem('formwiz_cart'));
+  console.log('🔍 Cart before clearing - cookies:', document.cookie);
+  localStorage.removeItem('formwiz_cart');
+  document.cookie = 'formwiz_cart=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  console.log('✅ Cart cleared from both localStorage and cookies');
+
   // Prefer existing cart manager if present
   // Check if addToCart function exists
   if (typeof window.addToCart === 'function') {
     const fid = (window.formId || 'custom-form');
     console.log('🛒 Adding main form to cart:', { fid, formTitle, priceId });
-    window.addToCart(fid, formTitle, priceId, formData, countyName, defendantName);
+    // Add originalFormId and portfolioId to the main form data
+    const mainFormData = { ...formData, originalFormId: fid, portfolioId: portfolioId };
+    console.log('🛒 Main form data with portfolioId:', { mainFormData, portfolioId });
+    window.addToCart(fid, formTitle, priceId, mainFormData, countyName, defendantName);
     
     // Add PDF Logic items to cart
     console.log('🛒 Adding PDF Logic items to cart:', pdfLogicItems.length, 'items');
@@ -1598,6 +1612,19 @@ window.addFormToCart = function (priceId) {
       window.addToCart(item.formId, item.title, item.priceId, item.formData, item.countyName, item.defendantName, item.pdfName);
     });
     
+    // Debug: Show final cart state after adding items
+    console.log('🔍 Final cart state after adding items:');
+    console.log('📦 localStorage cart:', localStorage.getItem('formwiz_cart'));
+    console.log('🍪 Cookie cart:', document.cookie);
+    
+    // Try to parse and show the cart contents
+    try {
+      const finalCart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
+      console.log('📋 Final parsed cart contents:', finalCart);
+      console.log('📊 Final cart length:', finalCart.length);
+    } catch (e) {
+      console.error('❌ Error parsing final cart:', e);
+    }
 
     return;
   } else {

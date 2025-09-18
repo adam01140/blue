@@ -728,8 +728,8 @@ app.post('/create-cart-checkout-session', async (req, res) => {
         const session = await stripe.checkout.sessions.create({
             line_items: lineItems,
             mode: 'payment',
-            success_url: `${YOUR_DOMAIN}/cart.html?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${YOUR_DOMAIN}/cart.html?payment=cancelled`,
+            success_url: `${YOUR_DOMAIN}/Pages/cart.html?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${YOUR_DOMAIN}/Pages/cart.html?payment=cancelled`,
             metadata: {
                 cartItems: JSON.stringify(cartItems.map(item => item.formId)),
                 totalAmount: totalAmount ? totalAmount.toString() : '',

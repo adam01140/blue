@@ -137,6 +137,13 @@ function renderMyForms(forms) {
             checkbox.type = 'checkbox';
             checkbox.classList.add('form-checkbox');
             checkbox.dataset.formId = form.id;
+            checkbox.style.position = 'absolute';
+            checkbox.style.top = '20px';
+            checkbox.style.left = '20px';
+            checkbox.style.width = '24px';
+            checkbox.style.height = '24px';
+            checkbox.style.cursor = 'pointer';
+            checkbox.style.zIndex = '1';
             checkbox.addEventListener('change', function(e) {
                 if (this.checked) {
                     selectedForms.add(form.id);
@@ -730,6 +737,13 @@ renderMyForms = function(forms) {
             checkbox.type = 'checkbox';
             checkbox.classList.add('form-checkbox');
             checkbox.dataset.formId = form.id;
+            checkbox.style.position = 'absolute';
+            checkbox.style.top = '20px';
+            checkbox.style.left = '20px';
+            checkbox.style.width = '24px';
+            checkbox.style.height = '24px';
+            checkbox.style.cursor = 'pointer';
+            checkbox.style.zIndex = '1';
             checkbox.addEventListener('change', function(e) {
                 if (this.checked) {
                     selectedForms.add(form.id);
@@ -1447,23 +1461,27 @@ function groupDocumentsByFormAndTime(docs) {
         const group = [doc];
         processed.add(index);
         
-        // Find related documents (same base form ID and similar purchase time)
-        const baseFormId = doc.formId ? doc.formId.replace(/_\d+$/, '') : '';
+        // Find related documents (same portfolio ID, or same original form ID and similar purchase time)
+        const portfolioId = doc.portfolioId;
+        const originalFormId = doc.originalFormId || doc.formId;
         const docTime = doc.purchaseDate?.toDate ? doc.purchaseDate.toDate() : new Date(doc.purchaseDate || 0);
         
         docs.forEach((otherDoc, otherIndex) => {
             if (processed.has(otherIndex) || otherIndex === index) return;
             
-            const otherBaseFormId = otherDoc.formId ? otherDoc.formId.replace(/_\d+$/, '') : '';
+            const otherPortfolioId = otherDoc.portfolioId;
+            const otherOriginalFormId = otherDoc.originalFormId || otherDoc.formId;
             const otherTime = otherDoc.purchaseDate?.toDate ? otherDoc.purchaseDate.toDate() : new Date(otherDoc.purchaseDate || 0);
             
-            // Check if same base form and within 1 minute
-            if (baseFormId && otherBaseFormId && baseFormId === otherBaseFormId) {
-                const timeDiff = Math.abs(docTime - otherTime);
-                if (timeDiff < 60000) { // 1 minute in milliseconds
-                    group.push(otherDoc);
-                    processed.add(otherIndex);
-                }
+            // Primary grouping: same portfolio ID
+            // Secondary grouping: same original form and within 1 minute
+            const samePortfolio = portfolioId && otherPortfolioId && portfolioId === otherPortfolioId;
+            const sameFormAndTime = originalFormId && otherOriginalFormId && originalFormId === otherOriginalFormId && 
+                                  Math.abs(docTime - otherTime) < 60000; // 1 minute in milliseconds
+            
+            if (samePortfolio || sameFormAndTime) {
+                group.push(otherDoc);
+                processed.add(otherIndex);
             }
         });
         
@@ -1494,10 +1512,10 @@ function renderSingleDocument(doc) {
             checkbox.classList.add('form-checkbox');
             checkbox.dataset.docId = doc.id;
             checkbox.style.position = 'absolute';
-            checkbox.style.top = '5px';
-            checkbox.style.left = '3px';
-            checkbox.style.width = '15px';
-            checkbox.style.height = '15px';
+            checkbox.style.top = '20px';
+            checkbox.style.left = '20px';
+            checkbox.style.width = '24px';
+            checkbox.style.height = '24px';
             checkbox.style.cursor = 'pointer';
             checkbox.style.zIndex = '1';
             checkbox.addEventListener('change', function(e) {
@@ -1584,35 +1602,51 @@ function renderSingleDocument(doc) {
             myDocumentsList.appendChild(li);
 }
 
+function getFormDisplayName(formId) {
+    // Convert form ID to display name
+    const formNameMap = {
+        'sc100': 'SC-100',
+        'sc500': 'SC-500',
+        'sc120': 'SC-120',
+        'custom-form': 'Custom Form'
+    };
+    return formNameMap[formId] || formId.toUpperCase();
+}
+
 function renderDocumentGroup(docs, groupIndex) {
-    // Create a container for the group
-    const groupContainer = document.createElement('div');
-    groupContainer.style.margin = '0 auto 20px auto';
-    groupContainer.style.width = '90%';
-    groupContainer.style.maxWidth = '600px';
+    // Create a single portfolio-style entry for the group
+    const li = document.createElement('li');
+    li.style.cursor = 'pointer';
+    // Match My Form Portfolio card width and style exactly
+    li.style.width = '90%';
+    li.style.maxWidth = '600px';
+    li.style.minWidth = '600px';
+    li.style.padding = '18px 32px 14px 32px';
+    li.style.borderRadius = '18px';
+    li.style.boxShadow = '0 2px 16px rgba(44,62,80,0.10)';
+    li.style.margin = '0 auto';
+    li.style.height = 'auto';
+    li.style.display = 'flex';
+    li.style.flexDirection = 'column';
+    li.style.alignItems = 'center';
+    li.style.position = 'relative';
     
-    // Group header
-    const groupHeader = document.createElement('div');
-    groupHeader.style.background = 'linear-gradient(90deg, #4f8cff 0%, #38d39f 100%)';
-    groupHeader.style.color = 'white';
-    groupHeader.style.padding = '12px 20px';
-    groupHeader.style.borderRadius = '12px 12px 0 0';
-    groupHeader.style.fontWeight = 'bold';
-    groupHeader.style.textAlign = 'center';
-    groupHeader.style.fontSize = '16px';
-    groupHeader.textContent = `Form Group (${docs.length} documents)`;
-    
-    // Group checkbox (select all)
-    const groupCheckbox = document.createElement('input');
-    groupCheckbox.type = 'checkbox';
-    groupCheckbox.style.position = 'absolute';
-    groupCheckbox.style.top = '8px';
-    groupCheckbox.style.left = '8px';
-    groupCheckbox.style.width = '15px';
-    groupCheckbox.style.height = '15px';
-    groupCheckbox.style.cursor = 'pointer';
-    groupCheckbox.style.zIndex = '1';
-    groupCheckbox.addEventListener('change', function(e) {
+    // Add checkbox for selection (top left) - same as portfolio
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.classList.add('form-checkbox');
+    // Store all document IDs for this group
+    docs.forEach(doc => {
+        checkbox.dataset.docId = doc.id;
+    });
+    checkbox.style.position = 'absolute';
+    checkbox.style.top = '20px';
+    checkbox.style.left = '20px';
+    checkbox.style.width = '24px';
+    checkbox.style.height = '24px';
+    checkbox.style.cursor = 'pointer';
+    checkbox.style.zIndex = '1';
+    checkbox.addEventListener('change', function(e) {
         const isChecked = this.checked;
         docs.forEach(doc => {
             if (isChecked) {
@@ -1624,20 +1658,59 @@ function renderDocumentGroup(docs, groupIndex) {
         updateDeleteDocumentsButton();
         e.stopPropagation();
     });
-    groupHeader.style.position = 'relative';
-    groupHeader.appendChild(groupCheckbox);
+    checkbox.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
     
-    // Download all button
+    // Add purchase date timestamp (top right) - same as portfolio
+    const purchaseDateDiv = document.createElement('div');
+    purchaseDateDiv.className = 'last-opened';
+    // Use the most recent purchase date from the group
+    const mostRecentDate = docs.reduce((latest, doc) => {
+        const docDate = doc.purchaseDate?.toDate ? doc.purchaseDate.toDate() : new Date(doc.purchaseDate || 0);
+        return docDate > latest ? docDate : latest;
+    }, new Date(0));
+    purchaseDateDiv.textContent = timeAgo(mostRecentDate);
+    
+    // Get the original form name from the first document
+    const originalFormId = docs[0].originalFormId || docs[0].formId;
+    const originalFormName = getFormDisplayName(originalFormId);
+    
+    // Add document name as a link (styled like portfolio)
+    const a = document.createElement('a');
+    a.href = '#';
+    a.textContent = `${originalFormName} (${docs.length} documents)`;
+    a.style.display = 'block';
+    a.style.textAlign = 'center';
+    a.style.fontWeight = 'bold';
+    a.style.fontSize = '18px';
+    a.style.color = '#2980b9';
+    a.addEventListener('click', function(e) { e.preventDefault(); });
+    
+    // Add county info if available (from first document)
+    let countyDiv = null;
+    if (docs[0].countyName) {
+        countyDiv = document.createElement('div');
+        countyDiv.className = 'form-county';
+        countyDiv.style.fontSize = '14px';
+        countyDiv.style.color = '#153a5b';
+        countyDiv.style.marginTop = '4px';
+        let countyText = docs[0].countyName.trim();
+        if (!countyText.toLowerCase().endsWith('county')) {
+            countyText += ' County';
+        }
+        countyDiv.textContent = countyText;
+    }
+    
+    // Download All button (styled like portfolio Open button)
     const downloadAllBtn = document.createElement('button');
     downloadAllBtn.textContent = 'Download All';
-    downloadAllBtn.style.background = 'white';
-    downloadAllBtn.style.color = '#4f8cff';
-    downloadAllBtn.style.border = 'none';
-    downloadAllBtn.style.padding = '8px 16px';
-    downloadAllBtn.style.borderRadius = '6px';
-    downloadAllBtn.style.fontWeight = 'bold';
-    downloadAllBtn.style.cursor = 'pointer';
-    downloadAllBtn.style.marginLeft = '10px';
+    downloadAllBtn.classList.add('form-action-button');
+    downloadAllBtn.style.maxWidth = '220px';
+    downloadAllBtn.style.width = '100%';
+    downloadAllBtn.style.margin = '12px auto 0 auto';
+    downloadAllBtn.style.display = 'block';
+    downloadAllBtn.tabIndex = -1;
     downloadAllBtn.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -1650,123 +1723,27 @@ function renderDocumentGroup(docs, groupIndex) {
             }, index * 500); // Stagger downloads by 500ms
         });
     });
-    groupHeader.appendChild(downloadAllBtn);
     
-    groupContainer.appendChild(groupHeader);
-    
-    // Render each document in the group
-    docs.forEach((doc, index) => {
-        const li = document.createElement('li');
-        li.style.cursor = 'pointer';
-        li.style.width = '100%';
-        li.style.padding = '12px 20px';
-        li.style.borderRadius = index === docs.length - 1 ? '0 0 12px 12px' : '0';
-        li.style.boxShadow = '0 1px 8px rgba(44,62,80,0.05)';
-        li.style.margin = '0';
-        li.style.height = 'auto';
-        li.style.display = 'flex';
-        li.style.flexDirection = 'column';
-        li.style.alignItems = 'center';
-        li.style.borderBottom = index < docs.length - 1 ? '1px solid #e0e7ef' : 'none';
-        
-        // Individual checkbox
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.classList.add('form-checkbox');
-        checkbox.dataset.docId = doc.id;
-        checkbox.style.position = 'absolute';
-        checkbox.style.top = '8px';
-        checkbox.style.left = '8px';
-        checkbox.style.width = '15px';
-        checkbox.style.height = '15px';
-        checkbox.style.cursor = 'pointer';
-        checkbox.style.zIndex = '1';
-        checkbox.addEventListener('change', function(e) {
-            if (this.checked) {
-                selectedDocuments.add(doc.id);
-            } else {
-                selectedDocuments.delete(doc.id);
-            }
-            updateDeleteDocumentsButton();
-            e.stopPropagation();
+    // Make the whole li clickable except for the button
+    li.addEventListener('click', function(e) {
+        if (e.target === downloadAllBtn || e.target === checkbox) return;
+        // Download all documents when clicking the card
+        docs.forEach((doc, index) => {
+            setTimeout(() => {
+                if (doc.downloadUrl) {
+                    window.open(doc.downloadUrl, '_blank');
+                }
+            }, index * 500);
         });
-        checkbox.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-        
-        // Document name
-        const a = document.createElement('a');
-        a.href = '#';
-        a.textContent = doc.name || doc.title || 'Document';
-        a.style.display = 'block';
-        a.style.textAlign = 'center';
-        a.style.fontWeight = 'bold';
-        a.addEventListener('click', function(e) { e.preventDefault(); });
-        
-        // Defendant and county info
-        let defendantDiv = null;
-        if (doc.defendantName) {
-            let capName = doc.defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-            defendantDiv = document.createElement('div');
-            defendantDiv.className = 'form-county';
-            defendantDiv.style.fontWeight = 'bold';
-            defendantDiv.style.color = '#e74c3c';
-            defendantDiv.style.fontSize = '14px';
-            defendantDiv.textContent = 'Defendant: ' + capName;
-        }
-        
-        let countyDiv = null;
-        if (doc.countyName) {
-            countyDiv = document.createElement('div');
-            countyDiv.className = 'form-county';
-            countyDiv.style.fontSize = '14px';
-            let countyText = doc.countyName.trim();
-            if (!countyText.toLowerCase().endsWith('county')) {
-                countyText += ' County';
-            }
-            countyDiv.textContent = countyText;
-        }
-        
-        // Individual download button
-        const downloadBtn = document.createElement('button');
-        downloadBtn.textContent = 'Download';
-        downloadBtn.classList.add('form-action-button');
-        downloadBtn.style.maxWidth = '150px';
-        downloadBtn.style.width = '100%';
-        downloadBtn.style.margin = '8px auto 0 auto';
-        downloadBtn.style.display = 'block';
-        downloadBtn.style.fontSize = '14px';
-        downloadBtn.style.padding = '6px 12px';
-        downloadBtn.tabIndex = -1;
-        downloadBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (doc.downloadUrl) {
-                window.open(doc.downloadUrl, '_blank');
-            } else {
-                alert('No download available for this document.');
-            }
-        });
-        
-        li.style.position = 'relative';
-        li.appendChild(checkbox);
-        li.appendChild(a);
-        if (defendantDiv) li.appendChild(defendantDiv);
-        if (countyDiv) li.appendChild(countyDiv);
-        li.appendChild(downloadBtn);
-        
-        // Make the whole li clickable except for buttons
-        li.addEventListener('click', function(e) {
-            if (e.target === downloadBtn || e.target === checkbox) return;
-            if (doc.downloadUrl) {
-                window.open(doc.downloadUrl, '_blank');
-            }
-        });
-        
-        groupContainer.appendChild(li);
     });
     
-    myDocumentsList.appendChild(groupContainer);
+    li.appendChild(checkbox);
+    li.appendChild(purchaseDateDiv);
+    li.appendChild(a);
+    if (countyDiv) li.appendChild(countyDiv);
+    li.appendChild(downloadAllBtn);
+    
+    myDocumentsList.appendChild(li);
 }
 function updateDeleteDocumentsButton() {
     if (selectedDocuments.size > 0) {
