@@ -493,7 +493,7 @@ graph.addListener(mxEvent.LABEL_CHANGED, (sender, evt) => {
     evt.consume();
   } else if (isSubtitleNode(cell)) {
     // Update subtitle node
-    graph.getModel().beginUpdate();
+        graph.getModel().beginUpdate();
     try {
       // Save the plain text in the _subtitleText property
       value = value.trim() || "Subtitle text";
@@ -1379,9 +1379,9 @@ graph.isCellEditable = function (cell) {
   // Calc submenu buttons
   calcTypeBtn.addEventListener("click", () => {
     if (selectedCell) {
-      // Extract and preserve the current text content
-      const preservedText = extractTextFromCell(selectedCell);
-      
+        // Extract and preserve the current text content
+        const preservedText = extractTextFromCell(selectedCell);
+        
       // Convert to calculation node
       graph.getModel().beginUpdate();
       try {
@@ -1403,14 +1403,14 @@ graph.isCellEditable = function (cell) {
 
   subtitleTypeBtn.addEventListener("click", () => {
     if (selectedCell) {
-      // Extract and preserve the current text content
-      const preservedText = extractTextFromCell(selectedCell);
-      
+        // Extract and preserve the current text content
+        const preservedText = extractTextFromCell(selectedCell);
+        
       // Convert to subtitle node
       graph.getModel().beginUpdate();
       try {
         selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=subtitle");
-        selectedCell._subtitleText = preservedText || "Subtitle text";
+          selectedCell._subtitleText = preservedText || "Subtitle text";
         updateSubtitleNodeCell(selectedCell);
       } finally {
         graph.getModel().endUpdate();
@@ -1422,14 +1422,14 @@ graph.isCellEditable = function (cell) {
 
   infoTypeBtn.addEventListener("click", () => {
     if (selectedCell) {
-      // Extract and preserve the current text content
-      const preservedText = extractTextFromCell(selectedCell);
-      
+        // Extract and preserve the current text content
+        const preservedText = extractTextFromCell(selectedCell);
+        
       // Convert to info node
       graph.getModel().beginUpdate();
       try {
         selectedCell.style = selectedCell.style.replace(/nodeType=[^;]+/, "nodeType=info");
-        selectedCell._infoText = preservedText || "Information text";
+          selectedCell._infoText = preservedText || "Information text";
         updateInfoNodeCell(selectedCell);
       } finally {
         graph.getModel().endUpdate();
@@ -2135,17 +2135,17 @@ keyHandler.bindControlKey(86, () => {
                 setSection(source, optionSection);
             }
         }
+      }
+  
+      // Update PDF nodes when connections change (to show/hide character limit field)
+      const allCells = graph.getModel().cells;
+      for (const cellId in allCells) {
+        const cell = allCells[cellId];
+        if (cell && isPdfNode(cell)) {
+          updatePdfNodeCell(cell);
+        }
     }
 
-    // Update PDF nodes when connections change (to show/hide character limit field)
-    const allCells = graph.getModel().cells;
-    for (const cellId in allCells) {
-      const cell = allCells[cellId];
-      if (cell && isPdfNode(cell)) {
-        updatePdfNodeCell(cell);
-      }
-    }
-    
     refreshAllCells();
 });
 
@@ -2784,7 +2784,7 @@ function setNodeId(cell, nodeId) {
   style = style.replace(/nodeId=[^;]+/, "");
   style += `;nodeId=${encodeURIComponent(nodeId)};`;
   graph.getModel().setStyle(cell, style);
-}
+  }
 function getNodeId(cell) {
   const style = cell.style || "";
   const m = style.match(/nodeId=([^;]+)/);
@@ -3191,9 +3191,9 @@ function extractTextFromCell(cell) {
 // Function to set option type for option nodes
 function setOptionType(cell, newType) {
   if (!cell || !isOptions(cell)) return;
-  
-  // Extract and preserve the current text content
-  const preservedText = extractTextFromCell(cell);
+    
+    // Extract and preserve the current text content
+    const preservedText = extractTextFromCell(cell);
   
   /* —— 1. update style —— */
   let st = (cell.style || '').replace(/questionType=[^;]+/, '');
@@ -3206,31 +3206,31 @@ function setOptionType(cell, newType) {
   try {
     switch (newType) {
       case 'dropdown':
-        // Regular option - preserve text content
-        if (preservedText) {
-          cell.value = `<div style="text-align:center;">${mxUtils.htmlEntities(preservedText)}</div>`;
-        }
+          // Regular option - preserve text content
+          if (preservedText) {
+            cell.value = `<div style="text-align:center;">${mxUtils.htmlEntities(preservedText)}</div>`;
+          }
         updateOptionNodeCell(cell);
         break;
       case 'imageOption':
         // Image option - needs image URL and alt text
         if (!cell._imageUrl) {
           cell._imageUrl = '';
-          cell._imageAltText = preservedText || 'Image description';
+            cell._imageAltText = preservedText || 'Image description';
         }
         updateImageOptionCell(cell);
         break;
       case 'amountOption':
         // Amount option - needs amount name and placeholder
         if (!cell._amountName) {
-          cell._amountName = preservedText || 'Amount';
+            cell._amountName = preservedText || 'Amount';
           cell._amountPlaceholder = 'Enter amount';
         }
         // updateAmountOptionCell is handled in the existing code
         break;
       case 'notesNode':
-        // Notes node - preserve text content
-        cell._notesText = preservedText || 'Notes text';
+          // Notes node - preserve text content
+          cell._notesText = preservedText || 'Notes text';
         // Add bold border style
         st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
         st = st.replace(/strokeColor=[^;]+/, '');
@@ -3239,8 +3239,8 @@ function setOptionType(cell, newType) {
         updateNotesNodeCell(cell);
         break;
       case 'checklistNode':
-        // Checklist node - preserve text content
-        cell._checklistText = preservedText || 'Checklist text';
+          // Checklist node - preserve text content
+          cell._checklistText = preservedText || 'Checklist text';
         // Add striped red border style
         st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
         st = (cell.style || '').replace(/strokeColor=[^;]+/, '');
@@ -3250,8 +3250,8 @@ function setOptionType(cell, newType) {
         updateChecklistNodeCell(cell);
         break;
       case 'alertNode':
-        // Alert node - preserve text content
-        cell._alertText = preservedText || 'Alert message';
+          // Alert node - preserve text content
+          cell._alertText = preservedText || 'Alert message';
         // Add bold black and red checkered border style
         st = (cell.style || '').replace(/strokeWidth=[^;]+/, '');
         st = (cell.style || '').replace(/strokeColor=[^;]+/, '');
@@ -4071,14 +4071,14 @@ function sanitizeNameId(str) {
  */
 function updateText2Cell(cell) {
   if (!cell) return;
-  // Ensure we have question text - only set default if it's completely undefined or null
-  if (cell._questionText === undefined || cell._questionText === null) {
+    // Ensure we have question text - only set default if it's completely undefined or null
+    if (cell._questionText === undefined || cell._questionText === null) {
     cell._questionText = "Enter dropdown question";
   }
   // Create the HTML content as a single line
   const html = `
     <div class="multiple-textboxes-node" style="display:flex; flex-direction:column; align-items:center; width:100%;">
-      <div class="question-text" style="text-align:center; padding:8px; width:100%; user-select:text;"contenteditable onkeydown="window.handleTitleInputKeydown(event)"onmousedown="event.stopPropagation();"onclick="window.handleMultipleTextboxClick(event, '${cell.id}')"onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')"onblur="window.updateText2Handler('${cell.id}', this.innerText)">${escapeHtml(cell._questionText || "")}</div>
+        <div class="question-text" style="text-align:center; padding:8px; width:100%; user-select:text;"contenteditable onkeydown="window.handleTitleInputKeydown(event)"onmousedown="event.stopPropagation();"onclick="window.handleMultipleTextboxClick(event, '${cell.id}')"onfocus="window.handleMultipleTextboxFocus(event, '${cell.id}')"onblur="window.updateText2Handler('${cell.id}', this.innerText)">${escapeHtml(cell._questionText || "")}</div>
     </div>`;
   graph.getModel().setValue(cell, html);
 }
@@ -4225,7 +4225,7 @@ function updateSimpleQuestionCell(cell) {
   graph.getModel().setValue(cell, html);
 }
 
-
+  
 
 // Patch updateMultipleTextboxesCell to use <input> for title
 function updateMultipleTextboxesCell(cell) {
@@ -4412,23 +4412,23 @@ function previewForm() {
       guiJsonStr = JSON.stringify(guiJsonStr, null, 2);
     }
   }
-  
-  if (guiJsonStr) {
-    // Encode the JSON for URL transmission
-    const encodedJson = encodeURIComponent(guiJsonStr);
-    const guiUrl = `FormWiz%20GUI/gui.html?preview=${encodedJson}`;
     
-    // Still copy to clipboard for manual use if needed
+  if (guiJsonStr) {
+      // Encode the JSON for URL transmission
+      const encodedJson = encodeURIComponent(guiJsonStr);
+      const guiUrl = `FormWiz%20GUI/gui.html?preview=${encodedJson}`;
+      
+      // Still copy to clipboard for manual use if needed
     navigator.clipboard.writeText(guiJsonStr).then(() => {
       // Optionally, show a message: copied!
     });
-    
-    // Open the GUI preview in a new tab with the JSON in the URL
-    window.open(guiUrl, '_blank');
-  } else {
-    // Fallback to regular GUI if no JSON generated
-    window.open('FormWiz%20GUI/gui.html', '_blank');
-  }
+      
+      // Open the GUI preview in a new tab with the JSON in the URL
+      window.open(guiUrl, '_blank');
+    } else {
+      // Fallback to regular GUI if no JSON generated
+  window.open('FormWiz%20GUI/gui.html', '_blank');
+    }
 }
 
 // AUTOSAVE FLOWCHART TO COOKIES FEATURE
@@ -5416,11 +5416,11 @@ function updatePdfNodeCell(cell) {
   if (cell._priceId === undefined) {
     cell._priceId = "";
   }
-  
-  // Ensure _characterLimit property exists
+
+    // Ensure _characterLimit property exists
   if (cell._characterLimit === undefined) {
-    cell._characterLimit = "";
-  }
+      cell._characterLimit = "";
+    }
   
   console.log('🔄 UPDATE PDF NODE CELL: Properties after ensuring they exist:', {
     _pdfUrl: cell._pdfUrl,
@@ -5428,27 +5428,27 @@ function updatePdfNodeCell(cell) {
     _pdfDisplayName: cell._pdfDisplayName,
     _priceId: cell._priceId
   });
-
-  // Check if this PDF node is connected to a Big Paragraph node
-  const isConnectedToBigParagraph = checkIfPdfConnectedToBigParagraph(cell);
   
-  // Render PDF input field with Price ID field and optional Character Limit field
-  let html = `
+    // Check if this PDF node is connected to a Big Paragraph node
+    const isConnectedToBigParagraph = checkIfPdfConnectedToBigParagraph(cell);
+    
+    // Render PDF input field with Price ID field and optional Character Limit field
+    let html = `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:4px 0;">
       <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:2px;">
         <label style="font-size:11px;width:100%;text-align:left;">PDF Name:<input type="text" value="${escapeAttr(cell._pdfDisplayName || '')}" style="width:120px;margin-left:4px;" onblur="window.updatePdfDisplayNameField('${cell.id}',this.value)" /></label>
         <label style="font-size:11px;width:100%;text-align:left;">PDF File:<input type="text" value="${escapeAttr(cell._pdfFilename || cell._pdfUrl || '')}" style="width:120px;margin-left:4px;" onblur="window.updatePdfFilenameField('${cell.id}',this.value)" /></label>
         <label style="font-size:11px;width:100%;text-align:left;">Price ID:<input type="text" value="${escapeAttr(cell._priceId || '')}" style="width:120px;margin-left:4px;" onblur="window.updatePdfPriceIdField('${cell.id}',this.value)" /></label>
-  `;
-  
-  // Add Character Limit field if connected to Big Paragraph
-  if (isConnectedToBigParagraph) {
-    html += `
-        <label style="font-size:11px;width:100%;text-align:left;">Character limit:<input type="number" value="${escapeAttr(cell._characterLimit)}" style="width:120px;margin-left:4px;" min="1" max="10000" onblur="window.updatePdfCharacterLimitField('${cell.id}',this.value)" /></label>
     `;
-  }
-  
-  html += `
+    
+    // Add Character Limit field if connected to Big Paragraph
+    if (isConnectedToBigParagraph) {
+      html += `
+          <label style="font-size:11px;width:100%;text-align:left;">Character limit:<input type="number" value="${escapeAttr(cell._characterLimit)}" style="width:120px;margin-left:4px;" min="1" max="10000" onblur="window.updatePdfCharacterLimitField('${cell.id}',this.value)" /></label>
+      `;
+    }
+    
+    html += `
       </div>
     </div>
   `;
@@ -5529,35 +5529,35 @@ window.updatePdfPriceIdField = function(cellId, value) {
   requestAutosave();
   // Don't call updatePdfNodeCell here to avoid re-rendering while typing
 };
-
-// Handler for updating PDF Character Limit field
-window.updatePdfCharacterLimitField = function(cellId, value) {
-  const cell = graph.getModel().getCell(cellId);
-  if (!cell || !isPdfNode(cell)) return;
-  cell._characterLimit = value;
-  // Don't call updatePdfNodeCell here to avoid re-rendering while typing
-};
-
-// Function to check if a PDF node is connected to a Big Paragraph node
-function checkIfPdfConnectedToBigParagraph(pdfCell) {
-  if (!pdfCell || !isPdfNode(pdfCell)) return false;
   
-  // Get all incoming edges to this PDF node
-  const incomingEdges = graph.getIncomingEdges(pdfCell) || [];
+  // Handler for updating PDF Character Limit field
+  window.updatePdfCharacterLimitField = function(cellId, value) {
+    const cell = graph.getModel().getCell(cellId);
+    if (!cell || !isPdfNode(cell)) return;
+    cell._characterLimit = value;
+    // Don't call updatePdfNodeCell here to avoid re-rendering while typing
+  };
   
-  for (const edge of incomingEdges) {
-    const sourceCell = edge.source;
-    if (sourceCell && isQuestion(sourceCell)) {
-      // Check if the source question is a Big Paragraph
-      const questionType = getQuestionType(sourceCell);
-      if (questionType === "bigParagraph") {
-        return true;
+  // Function to check if a PDF node is connected to a Big Paragraph node
+  function checkIfPdfConnectedToBigParagraph(pdfCell) {
+    if (!pdfCell || !isPdfNode(pdfCell)) return false;
+    
+    // Get all incoming edges to this PDF node
+    const incomingEdges = graph.getIncomingEdges(pdfCell) || [];
+    
+    for (const edge of incomingEdges) {
+      const sourceCell = edge.source;
+      if (sourceCell && isQuestion(sourceCell)) {
+        // Check if the source question is a Big Paragraph
+        const questionType = getQuestionType(sourceCell);
+        if (questionType === "bigParagraph") {
+          return true;
+        }
       }
     }
+    
+    return false;
   }
-  
-  return false;
-}
 
 // Notes Node functions
 function isNotesNode(cell) {

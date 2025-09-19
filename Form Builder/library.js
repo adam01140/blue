@@ -1350,9 +1350,26 @@ function loadFlowchartData(data) {
     const createdCells = {};
 
     if (data.sectionPrefs) {
+      console.log('🔍 [SECTION LOAD DEBUG] Loading section preferences:', JSON.stringify(data.sectionPrefs, null, 2));
       sectionPrefs = data.sectionPrefs;
+      console.log('🔍 [SECTION LOAD DEBUG] Set sectionPrefs to:', JSON.stringify(sectionPrefs, null, 2));
+      
+      // Test the getSectionPrefs function immediately after setting
+      if (typeof getSectionPrefs === 'function') {
+        const testResult = getSectionPrefs();
+        console.log('🔍 [SECTION LOAD DEBUG] getSectionPrefs() returns:', JSON.stringify(testResult, null, 2));
+      }
+      
       // updateSectionLegend is defined in legend.js
-      updateSectionLegend();
+      setTimeout(() => {
+        if (typeof updateSectionLegend === 'function') {
+          console.log('🔍 [SECTION LOAD DEBUG] Calling updateSectionLegend()');
+          updateSectionLegend();
+          console.log('🔍 [SECTION LOAD DEBUG] After updateSectionLegend(), sectionPrefs:', JSON.stringify(sectionPrefs, null, 2));
+        } else {
+          console.error('❌ [SECTION IMPORT DEBUG] updateSectionLegend function not available!');
+        }
+      }, 50);
     }
 
 
@@ -1449,8 +1466,8 @@ function loadFlowchartData(data) {
     });
 
     // Third pass: Update cell displays based on types
-  graph.getModel().beginUpdate();
-  try {
+    graph.getModel().beginUpdate();
+    try {
       Object.values(createdCells).forEach(cell => {
         if (getQuestionType(cell) === 'multipleTextboxes') {
           updateMultipleTextboxesCell(cell);
@@ -1461,33 +1478,33 @@ function loadFlowchartData(data) {
         } else if (getQuestionType(cell) === 'amountOption') {
           // Amount options are handled in refreshAllCells
         } else if (getQuestionType(cell) === 'imageOption') {
-        updateImageOptionCell(cell);
-              } else if (getQuestionType(cell) === 'notesNode') {
-        updateNotesNodeCell(cell);
+          updateImageOptionCell(cell);
+        } else if (getQuestionType(cell) === 'notesNode') {
+          updateNotesNodeCell(cell);
         } else if (getQuestionType(cell) === 'checklistNode') {
-        updateChecklistNodeCell(cell);
+          updateChecklistNodeCell(cell);
         } else if (getQuestionType(cell) === 'alertNode') {
-        updateAlertNodeCell(cell);
-      } else if (isPdfNode(cell)) {
-        updatePdfNodeCell(cell);
-      } else if (isCalculationNode(cell)) {
-        updateCalculationNodeCell(cell);
-      } else if (isSubtitleNode(cell)) {
+          updateAlertNodeCell(cell);
+        } else if (isPdfNode(cell)) {
+          updatePdfNodeCell(cell);
+        } else if (isCalculationNode(cell)) {
+          updateCalculationNodeCell(cell);
+        } else if (isSubtitleNode(cell)) {
           // Use the _subtitleText property if available, otherwise extract from value
-        if (!cell._subtitleText && cell.value) {
-          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
-          cell._subtitleText = cleanValue || "Subtitle text";
-        }
-        updateSubtitleNodeCell(cell);
-      } else if (isInfoNode(cell)) {
+          if (!cell._subtitleText && cell.value) {
+            const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+            cell._subtitleText = cleanValue || "Subtitle text";
+          }
+          updateSubtitleNodeCell(cell);
+        } else if (isInfoNode(cell)) {
           // Use the _infoText property if available, otherwise extract from value
-        if (!cell._infoText && cell.value) {
-          const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
-          cell._infoText = cleanValue || "Information text";
+          if (!cell._infoText && cell.value) {
+            const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
+            cell._infoText = cleanValue || "Information text";
+          }
+          updateInfoNodeCell(cell);
         }
-        updateInfoNodeCell(cell);
-      }
-    });
+      });
     } finally {
       graph.getModel().endUpdate();
     }
@@ -1515,15 +1532,15 @@ function loadFlowchartData(data) {
 
   refreshAllCells();
   
-      // Load groups data if present (after sections are fully processed)
-    console.log('loadFlowchartData: checking for groups data');
-    console.log('loadFlowchartData: data.groups =', data.groups);
-    if (data.groups) {
-      console.log('loadFlowchartData: calling loadGroupsFromData with:', data.groups);
-      loadGroupsFromData(data.groups);
-    } else {
-      console.log('loadFlowchartData: no groups data found');
-    }
+  // Load groups data if present (after sections are fully processed)
+  console.log('loadFlowchartData: checking for groups data');
+  console.log('loadFlowchartData: data.groups =', data.groups);
+  if (data.groups) {
+    console.log('loadFlowchartData: calling loadGroupsFromData with:', data.groups);
+    loadGroupsFromData(data.groups);
+  } else {
+    console.log('loadFlowchartData: no groups data found');
+  }
   
   // Find node with smallest y-position (topmost on screen) and center on it
   setTimeout(() => {
