@@ -821,7 +821,7 @@
                     <div style="font-size:1.25em;font-weight:700;color:#2c3e50;margin-bottom:8px;">SC-100 Plaintiff's Claim and ORDER to Go to Small Claims Court</div>
                     <div style="font-size:1.05em;color:#555;margin-bottom:16px;">Start your small claims case as a plaintiff and notify the defendant of your claim.</div>
                     <div style="font-size:1.1em;color:#2980b9;font-weight:700;margin-bottom:10px;">Free</div>
-                    <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;" onclick="showCountyModal('sc-100', 'SC-100 Plaintiff\'s Claim and ORDER to Go to Small Claims Court'); return false;">Get Started</a>
+                    <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;" onclick="showCountyModal('sc100', 'SC-100 Plaintiff\'s Claim and ORDER to Go to Small Claims Court'); return false;">Get Started</a>
                 </div>
                 <!-- SC-120 Card -->
                 <div class="freeform-card">
@@ -832,7 +832,7 @@
                     <div style="font-size:1.25em;font-weight:700;color:#2c3e50;margin-bottom:8px;">SC-120 Defendant's Claim and ORDER to Go to Small Claims Court</div>
                     <div style="font-size:1.05em;color:#555;margin-bottom:16px;">File a counterclaim as a defendant in response to a small claims case.</div>
                     <div style="font-size:1.1em;color:#2980b9;font-weight:700;margin-bottom:10px;">Free</div>
-                    <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;" onclick="showCountyModal('sc-120', 'SC-120 Defendant\'s Claim and ORDER to Go to Small Claims Court'); return false;">Get Started</a>
+                    <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;" onclick="showCountyModal('sc120', 'SC-120 Defendant\'s Claim and ORDER to Go to Small Claims Court'); return false;">Get Started</a>
                 </div>
                 <!-- SC-500 Card -->
                 <div class="freeform-card">
@@ -843,7 +843,7 @@
                     <div style="font-size:1.25em;font-weight:700;color:#2c3e50;margin-bottom:8px;">SC-500 COVID-19 Small Claims Dispute Resolution</div>
                     <div style="font-size:1.05em;color:#555;margin-bottom:16px;">Resolve disputes related to COVID-19 through small claims court procedures.</div>
                     <div style="font-size:1.1em;color:#2980b9;font-weight:700;margin-bottom:10px;">Free</div>
-                    <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;" onclick="showCountyModal('sc-500', 'SC-500 COVID-19 Small Claims Dispute Resolution'); return false;">Get Started</a>
+                    <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;" onclick="showCountyModal('sc500', 'SC-500 COVID-19 Small Claims Dispute Resolution'); return false;">Get Started</a>
                 </div>
             </div>
         </section>
@@ -1198,11 +1198,30 @@
 
     <!-- Popup System JavaScript -->
     <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+            authDomain: "formwiz-3f4fd.firebaseapp.com",
+            projectId: "formwiz-3f4fd",
+            storageBucket: "formwiz-3f4fd.firebasestorage.app",
+            messagingSenderId: "404259212529",
+            appId: "1:404259212529:web:15a33bce82383b21cfed50",
+            measurementId: "G-P07YEN0HPD"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
         // Global variables for popup system
         let currentFormId = null;
         let currentFormName = null;
         let currentCounty = null;
         let countyZips = null;
+        let availableFormsData = [];
 
         // Load county-zips.json data
         async function loadCountyZips() {
@@ -1215,14 +1234,37 @@
             }
         }
 
+        // Load available forms from Firebase
+        async function loadAvailableForms() {
+            try {
+                const snapshot = await db.collection('forms').get();
+                const forms = [];
+                
+                snapshot.forEach(doc => {
+                    const formData = doc.data();
+                    formData.id = doc.id;
+                    forms.push(formData);
+                });
+                
+                console.log('Loaded available forms from Firebase:', forms);
+                return forms;
+            } catch (error) {
+                console.error('Error loading available forms from Firebase:', error);
+                return [];
+            }
+        }
+
         // Show county modal
         function showCountyModal(formId, formName) {
+            console.log('showCountyModal called with:', { formId, formName });
             currentFormId = formId;
             currentFormName = formName;
             currentCounty = null;
+            console.log('Variables set:', { currentFormId, currentFormName, currentCounty });
             
             // Reset modal state
             document.getElementById('county-zip-input').value = '';
+            document.getElementById('county-zip-input').style.display = 'block';
             document.getElementById('county-modal-error').style.display = 'none';
             document.getElementById('county-modal-title').textContent = 'Which county are you filing in?';
             document.getElementById('county-modal-message').textContent = 'Enter your zip code below to determine your county.';
@@ -1246,13 +1288,18 @@
             currentCounty = null;
         }
 
+        // Hide county modal without resetting variables
+        function hideCountyModal() {
+            document.getElementById('county-modal').style.display = 'none';
+        }
+
         // Close defendant modal
         function closeDefendantModal() {
             document.getElementById('defendant-modal').style.display = 'none';
         }
 
         // Handle county zip input submission
-        function handleCountySubmit() {
+        async function handleCountySubmit() {
             const zipCode = document.getElementById('county-zip-input').value.trim();
             const errorDiv = document.getElementById('county-modal-error');
             
@@ -1268,19 +1315,40 @@
                 return;
             }
             
-            // Look up county
-            const county = countyZips[zipCode];
+            // Look up county - iterate through all counties to find the one containing this zip code
+            let county = null;
+            for (const [countyName, zipCodes] of Object.entries(countyZips)) {
+                if (zipCodes.includes(zipCode)) {
+                    county = countyName;
+                    break;
+                }
+            }
+            
             if (!county) {
                 errorDiv.textContent = 'Zip code not found. Please check your zip code and try again.';
                 errorDiv.style.display = 'block';
                 return;
             }
             
+            // Check if form supports this county
+            if (!availableFormsData.length) {
+                availableFormsData = await loadAvailableForms();
+            }
+            const formObj = availableFormsData.find(f => f.id === currentFormId);
+            
+            if (formObj && (!Array.isArray(formObj.counties) || !formObj.counties.includes(county))) {
+                errorDiv.textContent = `This form is not offered in ${county} County. Please try a different zip code.`;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
             currentCounty = county;
+            console.log('County set:', { currentFormId, currentFormName, currentCounty });
             
             // Update modal for confirmation
             document.getElementById('county-modal-title').textContent = 'Confirm Your County';
             document.getElementById('county-modal-message').textContent = `Great! You're filing in ${county} County, right?`;
+            document.getElementById('county-zip-input').style.display = 'none';
             document.getElementById('county-modal-buttons').style.display = 'none';
             document.getElementById('county-modal-error').style.display = 'none';
             
@@ -1298,6 +1366,7 @@
                 document.getElementById('county-modal-title').textContent = 'Which county are you filing in?';
                 document.getElementById('county-modal-message').textContent = 'Enter your zip code below to determine your county.';
                 document.getElementById('county-zip-input').value = '';
+                document.getElementById('county-zip-input').style.display = 'block';
                 document.getElementById('county-modal-error').style.display = 'none';
                 buttonsDiv.innerHTML = `
                     <button type="button" id="county-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">Cancel</button>
@@ -1307,13 +1376,16 @@
             });
             
             document.getElementById('county-confirm-yes').addEventListener('click', function() {
-                closeCountyModal();
+                console.log('County confirmed, variables before transition:', { currentFormId, currentFormName, currentCounty });
+                // Hide county modal but don't reset variables yet
+                hideCountyModal();
                 showDefendantModal();
             });
         }
 
         // Handle defendant name submission
         function handleDefendantSubmit() {
+            console.log('Defendant submit called, variables:', { currentFormId, currentFormName, currentCounty });
             const defendantName = document.getElementById('defendant-name-input').value.trim();
             const errorDiv = document.getElementById('defendant-modal-error');
             
@@ -1326,38 +1398,72 @@
             // Add form to cart and redirect
             addFormToCart(currentFormId, currentFormName, defendantName, currentCounty);
             closeDefendantModal();
+            
+            // Reset variables after successful form addition
+            currentFormId = null;
+            currentFormName = null;
+            currentCounty = null;
         }
 
-        // Add form to cart
-        function addFormToCart(formId, formName, defendantName, county) {
-            // Get existing cart
-            let cart = [];
-            try {
-                const cartData = getCookie('formwiz_cart');
-                if (cartData) {
-                    cart = JSON.parse(decodeURIComponent(cartData));
-                }
-            } catch (e) {
-                cart = [];
+        // Add form to portfolio (using the same system as forms.html)
+        async function addFormToCart(formId, formName, defendantName, county) {
+            console.log('Adding form to portfolio:', { formId, formName, defendantName, county });
+            
+            const user = auth.currentUser;
+            if (!user) {
+                // If not logged in, redirect to form without portfolio
+                const formUrl = getFormUrl(formId);
+                window.location.href = `${formUrl}&defendant=${encodeURIComponent(defendantName)}&county=${encodeURIComponent(county)}`;
+                return;
             }
             
-            // Add new form to cart
-            const formData = {
-                id: formId,
-                title: formName,
-                defendantName: defendantName,
-                countyName: county,
-                priceId: 'price_' + formId, // This would be the actual Stripe price ID
-                timestamp: new Date().toISOString()
-            };
-            
-            cart.push(formData);
-            
-            // Save cart to cookie
-            setCookie('formwiz_cart', encodeURIComponent(JSON.stringify(cart)), 30);
-            
-            // Redirect to form
-            window.location.href = `Forms/${formId}.html?formId=${formId}&defendant=${encodeURIComponent(defendantName)}&county=${encodeURIComponent(county)}`;
+            const userId = user.uid;
+            try {
+                // Add form to user's portfolio in Firebase
+                const formRef = db.collection('users').doc(userId).collection('forms').doc();
+                const portfolioId = formRef.id;
+                
+                const formUrl = getFormUrl(formId);
+                
+                await formRef.set({
+                    formId: formId,
+                    formUrl: formUrl,
+                    formName: formName,
+                    countyName: county,
+                    defendantName: defendantName,
+                    purchaseDate: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active'
+                });
+                
+                console.log('Form added to portfolio with ID:', portfolioId);
+                
+                // Redirect to form with portfolio ID
+                const separator = formUrl.includes('?') ? '&' : '?';
+                let url = formUrl + separator + 'county=' + encodeURIComponent(county) + '&portfolioId=' + encodeURIComponent(portfolioId);
+                if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                
+                window.location.href = url;
+                
+            } catch (error) {
+                console.error('Error adding form to portfolio:', error);
+                // Fallback: redirect to form without portfolio
+                const formUrl = getFormUrl(formId);
+                window.location.href = `${formUrl}&defendant=${encodeURIComponent(defendantName)}&county=${encodeURIComponent(county)}`;
+            }
+        }
+        
+        // Helper function to get form URL
+        function getFormUrl(formId) {
+            if (formId === 'sc100') {
+                return 'Forms/sc-100.html?formId=sc100';
+            } else if (formId === 'sc120') {
+                return 'Forms/sc-120.html?formId=sc120';
+            } else if (formId === 'sc500') {
+                return 'Forms/sc-500.html?formId=sc500';
+            } else {
+                return `Forms/${formId}.html?formId=${formId}`;
+            }
         }
 
         // Cookie helper functions
@@ -1396,8 +1502,9 @@
         }
 
         // Initialize popup system
-        document.addEventListener('DOMContentLoaded', function() {
-            loadCountyZips();
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadCountyZips();
+            await loadAvailableForms();
             addCountyModalEventListeners();
             addDefendantModalEventListeners();
             
