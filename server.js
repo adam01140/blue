@@ -617,21 +617,41 @@ app.post('/edit_pdf', async (req, res) => {
   const form   = pdfDoc.getForm();
   const helv   = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
+  // Debug: Log all available PDF fields
+  console.log('Available PDF fields:');
+  form.getFields().forEach(field => {
+    console.log(`- ${field.getName()} (${field.constructor.name})`);
+  });
+
+  // Debug: Log all form data received
+  console.log('Form data received:');
+  Object.keys(req.body).forEach(key => {
+    console.log(`- ${key}: ${req.body[key]}`);
+  });
+
   form.getFields().forEach(field => {
     const key   = field.getName();
     const value = req.body[key];
 
-    if (value === undefined) return;            // nothing sent for this field
+    if (value === undefined) {
+      console.log(`No data for field: ${key}`);
+      return;            // nothing sent for this field
+    }
+
+    console.log(`Processing field: ${key} = ${value} (${field.constructor.name})`);
 
     try {
       switch (field.constructor.name) {
         case 'PDFCheckBox':
-          shouldCheck(value) ? field.check() : field.uncheck();
+          const shouldBeChecked = shouldCheck(value);
+          console.log(`Checkbox ${key}: shouldCheck(${value}) = ${shouldBeChecked}`);
+          shouldBeChecked ? field.check() : field.uncheck();
           break;
 
         case 'PDFRadioGroup':
           // Handle radio groups with proper option mapping
           const radioValue = mapRadioValue(field, value);
+          console.log(`Radio ${key}: mapped "${value}" to "${radioValue}"`);
           if (radioValue) {
             field.select(radioValue);
           }
