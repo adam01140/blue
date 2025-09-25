@@ -2875,7 +2875,7 @@ window.showCartModal = function () {
     document.body.appendChild(modal);
 
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
-    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = 'cart.html'; };
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = '../Pages/cart.html'; };
     document.getElementById('addToCartBtn').onclick   = () => {
       window.addFormToCart(EXAMPLE_FORM_PRICE_ID);
       modal.remove();
@@ -2989,7 +2989,7 @@ window.addFormToCart = function (priceId) {
     }
 
     // redirect after everything is queued
-    setTimeout(() => { window.location.href = 'cart.html'; }, 0);
+    setTimeout(() => { window.location.href = '../Pages/cart.html'; }, 0);
     return;
   }
 
@@ -3005,7 +3005,7 @@ window.addFormToCart = function (priceId) {
   try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch {}
   writeCartCookie(cart);
 
-  setTimeout(() => { window.location.href = 'cart.html'; }, 0);
+  setTimeout(() => { window.location.href = '../Pages/cart.html'; }, 0);
 };
 
 
@@ -4820,7 +4820,7 @@ if (typeof handleNext === 'function') {
                         cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
                         cartCheckoutBtn.style.display = 'block';
                         cartCheckoutBtn.onclick = function() {
-                            window.location.href = 'cart.html';
+                            window.location.href = '../Pages/cart.html';
                         };
                     }
                 } catch (error) {

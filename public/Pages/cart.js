@@ -85,6 +85,7 @@ class CartManager {
         console.log('🔍 FormData originalFormId:', formData?.originalFormId);
         console.log('📦 Adding cart item:', cartItem);
         console.log('📦 Cart item portfolioId field:', cartItem.portfolioId);
+        console.log('🆔 Generated cartItemId:', cartItemId);
         
         this.cart.push(cartItem);
         this.saveCart();
@@ -92,7 +93,22 @@ class CartManager {
     }
 
     async removeFromCart(cartItemId) {
+        console.log('🗑️ [CART DEBUG] Attempting to remove cartItemId:', cartItemId);
+        console.log('🗑️ [CART DEBUG] Current cart items:', this.cart.map(item => ({ cartItemId: item.cartItemId, title: item.title })));
+        
+        const beforeCount = this.cart.length;
         this.cart = this.cart.filter(i => i.cartItemId !== cartItemId);
+        const afterCount = this.cart.length;
+        
+        console.log('🗑️ [CART DEBUG] Cart items before removal:', beforeCount);
+        console.log('🗑️ [CART DEBUG] Cart items after removal:', afterCount);
+        
+        if (beforeCount === afterCount) {
+            console.error('❌ [CART DEBUG] No item was removed! cartItemId not found:', cartItemId);
+        } else {
+            console.log('✅ [CART DEBUG] Item successfully removed');
+        }
+        
         this.saveCart();
         await this.updateCartDisplay();
     }
@@ -119,16 +135,8 @@ class CartManager {
         const clearBtn = document.getElementById('clear-cart-btn');
         if (!itemsEl) return;
 
-        // Filter out duplicates by portfolioId (if present)
-        const seenPortfolioIds = new Set();
-        const filteredCart = [];
-        for (const item of this.cart) {
-            if (item.portfolioId) {
-                if (seenPortfolioIds.has(item.portfolioId)) continue;
-                seenPortfolioIds.add(item.portfolioId);
-            }
-            filteredCart.push(item);
-        }
+        // Show all cart items (no filtering)
+        const filteredCart = this.cart;
 
         if (filteredCart.length === 0) {
             itemsEl.innerHTML = '';
@@ -258,21 +266,49 @@ class CartManager {
     }
 
     async handlePaymentSuccess() {
+        console.log('🎉 [PAYMENT DEBUG] Payment successful! Starting PDF processing...');
+        console.log('🎉 [PAYMENT DEBUG] Cart items to process:', this.cart.length, this.cart);
+        
+        const processedItems = [];
+        const failedItems = [];
+        
         for (const item of this.cart) {
             try {
+                console.log('🎉 [PAYMENT DEBUG] Processing item:', item.title, 'formId:', item.formId, 'portfolioId:', item.portfolioId);
                 await this.processFormPDF(item); // run unconditionally
+                processedItems.push(item);
+                console.log('✅ [PAYMENT DEBUG] Successfully processed:', item.title);
             } catch (err) {
-                console.error(`Failed to save ${item.formId}:`, err);
+                console.error(`❌ [PAYMENT DEBUG] Failed to save ${item.formId}:`, err);
+                failedItems.push(item);
                 alert(`Could not save ${item.title || item.formId} to your account.`);
             }
         }
+        
+        console.log('🎉 [PAYMENT DEBUG] PDF processing complete!');
+        console.log('✅ [PAYMENT DEBUG] Successfully processed items:', processedItems.length, processedItems.map(item => item.title));
+        console.log('❌ [PAYMENT DEBUG] Failed items:', failedItems.length, failedItems.map(item => item.title));
         
         // Remove portfolio entries after successful payment
         await this.removePortfolioEntries();
         
         await this.clearCart();
-        alert('Payment successful. Your documents were saved to My Documents.');
-        window.location.href = 'forms.html';
+        
+        // Show debug alert with processing results
+        const debugInfo = `🎉 Payment Debug Results:
+        
+✅ Successfully processed ${processedItems.length} PDF(s):
+${processedItems.map(item => `- ${item.title} (${item.formId}) - Portfolio: ${item.portfolioId || 'N/A'}`).join('\n')}
+
+${failedItems.length > 0 ? `❌ Failed to process ${failedItems.length} PDF(s):
+${failedItems.map(item => `- ${item.title} (${item.formId})`).join('\n')}` : '✅ All PDFs processed successfully!'}
+
+📁 PDFs with the same portfolio ID will be grouped together in My Documents.
+📥 Clicking download will open all PDFs associated with that form.
+
+Forms page requested.`;
+        
+        alert(debugInfo);
     }
 
     async removePortfolioEntries() {
@@ -376,10 +412,19 @@ class CartManager {
                     let docCounty = null;
                     let docDefendant = null;
                     try {
-                        const formDoc = await db.collection('users').doc(user.uid).collection('forms').doc(cartItem.formId).get();
+                        // For conditional PDFs, try to get data from the original form first
+                        const formIdToCheck = cartItem.originalFormId || cartItem.formId;
+                        const formDoc = await db.collection('users').doc(user.uid).collection('forms').doc(formIdToCheck).get();
                         if (formDoc.exists) {
                             const formData = formDoc.data();
-                            if (formData && formData.name) docName = formData.name;
+                            if (formData && formData.name) {
+                                // For conditional PDFs, use the conditional PDF name but keep the main form context
+                                if (cartItem.originalFormId && cartItem.originalFormId !== cartItem.formId) {
+                                    docName = cartItem.title || cartItem.formId; // Use the conditional PDF name
+                                } else {
+                                    docName = formData.name; // Use the main form name
+                                }
+                            }
                             if (formData && formData.countyName) docCounty = formData.countyName;
                             if (formData && formData.defendantName) docDefendant = formData.defendantName;
                         }
@@ -403,12 +448,18 @@ class CartManager {
                         downloadUrl
                     };
                     
-                    console.log('💾 Saving document to Firebase:', documentData);
+                    console.log('💾 [PAYMENT DEBUG] Saving document to Firebase:', documentData);
                     
                     await db.collection('users').doc(user.uid)
                         .collection('documents').doc(docId).set(documentData);
                     
-                    console.log('✅ Document saved successfully with portfolioId:', cartItem.portfolioId);
+                    console.log('✅ [PAYMENT DEBUG] Document saved successfully:', {
+                        formId: cartItem.formId,
+                        title: cartItem.title,
+                        portfolioId: cartItem.portfolioId,
+                        originalFormId: cartItem.originalFormId,
+                        docId: docId
+                    });
                 }
             }
         } catch (e) {

@@ -1111,172 +1111,17 @@ document.addEventListener("DOMContentLoaded", function() {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">SC-103</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">SC-500</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" class="question-container"><label><h3>Please explain why you are suing at this location</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
-      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured.">
-        <label class="checkbox-label">
-          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured." name="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured." value="Where the plaintiff was injured." 
-                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
-          Where the plaintiff was injured.
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives">
-        <label class="checkbox-label">
-          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives" name="please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives" value="Where the defendant lives" 
-                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
-          Where the defendant lives
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged.">
-        <label class="checkbox-label">
-          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged." name="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged." value="Where the plaintiff’s property was damaged." 
-                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
-          Where the plaintiff’s property was damaged.
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_a_contract_(written_or_spoken)_was_made,_signed,_performed,_or_broken_by_the_defendant_or_where_the_defendant_lived_or_did_business_when_the_defendant_made_the_contract.">
-        <label class="checkbox-label">
-          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_a_contract_(written_or_spoken)_was_made,_signed,_performed,_or_broken_by_the_defendant_or_where_the_defendant_lived_or_did_business_when_the_defendant_made_the_contract." name="please_explain_why_you_are_suing_at_this_location_where_a_contract_(written_or_spoken)_was_made,_signed,_performed,_or_broken_by_the_defendant_or_where_the_defendant_lived_or_did_business_when_the_defendant_made_the_contract." value="Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract." 
-                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
-          Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_other">
-        <label class="checkbox-label">
-          <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_other" name="please_explain_why_you_are_suing_at_this_location_other" value="Other" 
-                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
-          Other
-        </label>
-      </span></div><br></div></div><div id="question-container-2" class="question-container hidden"><label><h3>Is it where the buyer or lessee signed the contract, lives now, or lived when the contract was made</h3></label><select id="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made" name="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made"
-                      onchange="dropdownMirror(this, 'is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made')">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made"></div>
-              <input type="text" id="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_dropdown" name="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-3" class="question-container hidden"><label><h3>What is your claim about?</h3></label><select id="what_is_your_claim_about" name="what_is_your_claim_about"
-                      onchange="dropdownMirror(this, 'what_is_your_claim_about')">
-                       <option value="" disabled selected>Select an option</option><option value="None of the above">None of the above</option><option value="an offer or contract for personal, family, or household goods, services, or loans">an offer or contract for personal, family, or household goods, services, or loans</option><option value="a vehicle finance sale">a vehicle finance sale</option><option value="a retail installment contract (like a credit card)">a retail installment contract (like a credit card)</option></select><br>
-              <div id="dropdowntext_what_is_your_claim_about"></div>
-              <input type="text" id="what_is_your_claim_about_dropdown" name="what_is_your_claim_about_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-4" class="question-container hidden"><label><h3>Please explain why you're filing at this courthouse?</h3></label><div class="text-input-container"><textarea id="please_explain_why_youre_filing_at_this_courthouse" name="please_explain_why_youre_filing_at_this_courthouse" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-5" class="question-container hidden"><label><h3>Have you filed more than twelve other small claims w/in the last twelve months</h3></label><select id="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months" name="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months"
-                      onchange="dropdownMirror(this, 'have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months')">
+        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Intro 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Enter section name</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Intro 1</h1><div id="question-container-1" class="question-container"><label><h3>Hungry?</h3></label><select id="hungry" name="hungry"
+                      onchange="dropdownMirror(this, 'hungry')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months"></div>
-              <input type="text" id="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months_dropdown" name="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-6" class="question-container hidden"><label><h3>Were 2 or more of those small claims cases more than $2,500?</h3></label><select id="were_2_or_more_of_those_small_claims_cases_more_than_2500" name="were_2_or_more_of_those_small_claims_cases_more_than_2500"
-                      onchange="dropdownMirror(this, 'were_2_or_more_of_those_small_claims_cases_more_than_2500')">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_were_2_or_more_of_those_small_claims_cases_more_than_2500"></div>
-              <input type="text" id="were_2_or_more_of_those_small_claims_cases_more_than_2500_dropdown" name="were_2_or_more_of_those_small_claims_cases_more_than_2500_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-8" class="question-container hidden"><label><h3>Are you suing an attorney?</h3></label><select id="are_you_suing_an_attorney" name="are_you_suing_an_attorney"
-                      onchange="dropdownMirror(this, 'are_you_suing_an_attorney')">
+              <div id="dropdowntext_hungry"></div>
+              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Enter section name</h1><div id="question-container-2" class="question-container hidden"><label><h3>Thirsty?</h3></label><select id="thirsty" name="thirsty"
+                      onchange="dropdownMirror(this, 'thirsty')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_are_you_suing_an_attorney"></div>
-              <input type="text" id="are_you_suing_an_attorney_dropdown" name="are_you_suing_an_attorney_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-9" class="question-container hidden"><label><h3>Are you doing business under a fictious business name</h3></label><select id="are_you_doing_business_under_a_fictious_business_name" name="are_you_doing_business_under_a_fictious_business_name"
-                      onchange="dropdownMirror(this, 'are_you_doing_business_under_a_fictious_business_name')">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_are_you_doing_business_under_a_fictious_business_name"></div>
-              <input type="text" id="are_you_doing_business_under_a_fictious_business_name_dropdown" name="are_you_doing_business_under_a_fictious_business_name_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-11" class="question-container hidden"><label><h3>Are you suing for more than $10,000?</h3></label><select id="are_you_suing_for_more_than_10000" name="are_you_suing_for_more_than_10000"
-                      onchange="dropdownMirror(this, 'are_you_suing_for_more_than_10000')">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_are_you_suing_for_more_than_10000"></div>
-              <input type="text" id="are_you_suing_for_more_than_10000_dropdown" name="are_you_suing_for_more_than_10000_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">SC-103</h1><div id="question-container-7" class="question-container hidden"><label><h3>Please enter your business details</h3></label><div class="text-input-container"><input type="text" id="Name" name="Name" placeholder="Name"></div><div class="text-input-container"><input type="text" id="Business Address" name="Business Address" placeholder="Address"></div><div class="text-input-container"><input type="text" id="Mailing Address" name="Mailing Address" placeholder="Mailing Address"></div></div><div id="question-container-10" class="question-container hidden"><label><h3>What do you do business as?</h3></label><div><center><div id="checkmark" class="checkbox-group-10">
-      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_an_individual">
-        <label class="checkbox-label">
-          <input type="checkbox" id="what_do_you_do_business_as_an_individual" name="what_do_you_do_business_as_an_individual" value="An Individual" 
-                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
-          An Individual
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_an_association">
-        <label class="checkbox-label">
-          <input type="checkbox" id="what_do_you_do_business_as_an_association" name="what_do_you_do_business_as_an_association" value="An Association" 
-                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
-          An Association
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_a_partnership">
-        <label class="checkbox-label">
-          <input type="checkbox" id="what_do_you_do_business_as_a_partnership" name="what_do_you_do_business_as_a_partnership" value="A Partnership" 
-                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
-          A Partnership
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_a_limited_liability">
-        <label class="checkbox-label">
-          <input type="checkbox" id="what_do_you_do_business_as_a_limited_liability" name="what_do_you_do_business_as_a_limited_liability" value="A Limited Liability" 
-                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
-          A Limited Liability
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_a_corporation">
-        <label class="checkbox-label">
-          <input type="checkbox" id="what_do_you_do_business_as_a_corporation" name="what_do_you_do_business_as_a_corporation" value="A Corporation" 
-                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
-          A Corporation
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_other">
-        <label class="checkbox-label">
-          <input type="checkbox" id="what_do_you_do_business_as_other" name="what_do_you_do_business_as_other" value="Other" 
-                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
-          Other
-        </label>
-      </span></div><br></div></div><div id="question-container-12" class="question-container hidden"><label><h3>Please explain what you do business as</h3></label><div class="text-input-container"><textarea id="sc103_please_explain_what_you_do_business_as" name="sc103_please_explain_what_you_do_business_as" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-13" class="question-container hidden"><label><h3>What county did you file your Fictious Business Name Statement</h3></label><div class="text-input-container"><input type="text" id="sc103_what_county_did_you_file_your_fictious_business_name_statement" name="sc103_what_county_did_you_file_your_fictious_business_name_statement" placeholder=""></div></div><div id="question-container-15" class="question-container"><label><h3>What is your fictious business name statement number</h3></label><div class="text-input-container"><input type="number" id="sc103_what_is_your_fictious_business_name_statement_number" name="sc103_what_is_your_fictious_business_name_statement_number" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-16" class="question-container"><label><h3>What is the date that your fictious businesses name statement expires</h3></label><div class="date-input-container"><input type="date" id="what_is_the_date_that_your_fictious_businesses_name_statement_expires" name="what_is_the_date_that_your_fictious_businesses_name_statement_expires"></div></div><div id="question-container-18" class="question-container"><label><h3>Are you suing for more than $12,500?</h3></label><select id="are_you_suing_for_more_than_12500" name="are_you_suing_for_more_than_12500"
-                      onchange="dropdownMirror(this, 'are_you_suing_for_more_than_12500')">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_are_you_suing_for_more_than_12500"></div>
-              <input type="text" id="are_you_suing_for_more_than_12500_dropdown" name="are_you_suing_for_more_than_12500_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(2)" id="next-button-2">Next</button></div></div><div id="section3" class="section"><center><h1 class="section-title">SC-500</h1><div id="question-container-14" class="question-container hidden"><label><h3>Are you the only one suing?</h3></label><select id="are_you_the_only_one_suing" name="are_you_the_only_one_suing"
-                      onchange="dropdownMirror(this, 'are_you_the_only_one_suing')">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_are_you_the_only_one_suing"></div>
-              <input type="text" id="are_you_the_only_one_suing_dropdown" name="are_you_the_only_one_suing_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-17" class="question-container hidden"><label><h3>How many other people are suing?</h3></label><select id="answer17" onchange="showTextboxLabels(17, this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer17"></div></div><div id="question-container-19" class="question-container hidden"><label><h3>Are you suing more than one person?</h3></label><select id="are_you_suing_more_than_one_person" name="are_you_suing_more_than_one_person"
-                      onchange="dropdownMirror(this, 'are_you_suing_more_than_one_person')">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_are_you_suing_more_than_one_person"></div>
-              <input type="text" id="are_you_suing_more_than_one_person_dropdown" name="are_you_suing_more_than_one_person_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-20" class="question-container hidden"><label><h3>How many other people are you suing?</h3></label><select id="answer20" onchange="showTextboxLabels(20, this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer20"></div></div><div id="question-container-21" class="question-container hidden"><label><h3>Is the defendant on active military duty?</h3></label><select id="is_the_defendant_on_active_military_duty" name="is_the_defendant_on_active_military_duty"
-                      onchange="dropdownMirror(this, 'is_the_defendant_on_active_military_duty')">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_is_the_defendant_on_active_military_duty"></div>
-              <input type="text" id="is_the_defendant_on_active_military_duty_dropdown" name="is_the_defendant_on_active_military_duty_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-22" class="question-container hidden"><label><h3>Who are you suing?</h3></label><div class="text-input-container"><input type="text" id="Name" name="Name" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Phone" name="Phone" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Mailing Address" name="Mailing Address" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Email Address" name="Email Address" placeholder="Enter value"></div></div><div id="question-container-23" class="question-container hidden"><label><h3>Who are you suing?</h3></label><div class="text-input-container"><input type="text" id="Name" name="Name" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Phone" name="Phone" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Mailing Address" name="Mailing Address" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Email Address" name="Email Address" placeholder="Enter value"></div></div><div id="question-container-24" class="question-container hidden"><label><h3>Are any of the people being sued on active military duty?</h3></label><select id="are_any_of_the_people_being_sued_on_active_military_duty" name="are_any_of_the_people_being_sued_on_active_military_duty"
-                      onchange="dropdownMirror(this, 'are_any_of_the_people_being_sued_on_active_military_duty')">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_are_any_of_the_people_being_sued_on_active_military_duty"></div>
-              <input type="text" id="are_any_of_the_people_being_sued_on_active_military_duty_dropdown" name="are_any_of_the_people_being_sued_on_active_military_duty_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-25" class="question-container hidden"><label><h3>Whats the name of the person on active military duty?</h3></label><div class="text-input-container"><input type="text" id="whats_the_name_of_the_person_on_active_military_duty" name="whats_the_name_of_the_person_on_active_military_duty" placeholder=""></div></div><div id="question-container-26" class="question-container hidden"><label><h3>How much are you suing for?</h3></label><div class="text-input-container"><input type="number" id="sc500_how_much_are_you_suing_for" name="sc500_how_much_are_you_suing_for" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-27" class="question-container hidden"><label><h3>List all the months that you claim the defendant owes you rent money. For each month, include each amount due and the date it came due.</h3></label><div class="text-input-container"><textarea id="sc500_list_all_the_months_that_you_claim_the_defendant_owes_you_rent_money_for_each_month_include_each_amount_due_and_the_date_it_came_due" name="sc500_list_all_the_months_that_you_claim_the_defendant_owes_you_rent_money_for_each_month_include_each_amount_due_and_the_date_it_came_due" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-28" class="question-container"><label><h3>List all unpaid financial obligations (other than rent) that you claim defendant owes. For each month, include each amount, the date it came due, and what it was for</h3></label><div class="text-input-container"><textarea id="sc500_list_all_unpaid_financial_obligations_other_than_rent_that_you_claim_defendant_owes_for_each_month_include_each_amount_the_date_it_came_due_and_what_it_was_for" name="sc500_list_all_unpaid_financial_obligations_other_than_rent_that_you_claim_defendant_owes_for_each_month_include_each_amount_the_date_it_came_due_and_what_it_was_for" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-29" class="question-container"><label><h3>List any amounts you received from defendant, rental assistance programs, and other third parties that you have already credited, and any other amounts you have offset or credited. Include each amount, when it was paid or credited, and what it was for.</h3></label><div class="text-input-container"><textarea id="sc500_list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for" name="sc500_list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-30" class="question-container"><label><h3>Have you sent a demand letter to D?</h3></label><select id="have_you_sent_a_demand_letter_to_d_1" name="have_you_sent_a_demand_letter_to_d_1"
-                      onchange="dropdownMirror(this, 'have_you_sent_a_demand_letter_to_d_1')">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_have_you_sent_a_demand_letter_to_d_1"></div>
-              <input type="text" id="have_you_sent_a_demand_letter_to_d_1_dropdown" name="have_you_sent_a_demand_letter_to_d_1_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-31" class="question-container hidden"><label><h3>Please explain why not</h3></label><div class="text-input-container"><textarea id="sc500_please_explain_why_not" name="sc500_please_explain_why_not" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-32" class="question-container hidden"><label><h3>Did you make a good faith effort to help the plaintiff obtain rental assistance through any of the following means:</h3></label><div><center><div id="checkmark" class="checkbox-group-32">
-      <span class="checkbox-inline" id="checkbox-container-did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_investigating_if_governmental_rental_assistance_is_available_to_the_tenant">
-        <label class="checkbox-label">
-          <input type="checkbox" id="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_investigating_if_governmental_rental_assistance_is_available_to_the_tenant" name="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_investigating_if_governmental_rental_assistance_is_available_to_the_tenant" value="Investigating if governmental rental assistance is available to the tenant" 
-                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
-          Investigating if governmental rental assistance is available to the tenant
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_seeking_governmental_rental_assistance_for_the_tenant">
-        <label class="checkbox-label">
-          <input type="checkbox" id="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_seeking_governmental_rental_assistance_for_the_tenant" name="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_seeking_governmental_rental_assistance_for_the_tenant" value="Seeking governmental rental assistance for the tenant" 
-                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
-          Seeking governmental rental assistance for the tenant
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_cooperating_with_the_tenants_efforts_to_obtain_rental_assistance_from_any_governmental_entity_or_third_party">
-        <label class="checkbox-label">
-          <input type="checkbox" id="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_cooperating_with_the_tenants_efforts_to_obtain_rental_assistance_from_any_governmental_entity_or_third_party" name="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_cooperating_with_the_tenants_efforts_to_obtain_rental_assistance_from_any_governmental_entity_or_third_party" value="Cooperating with the tenants efforts to obtain rental assistance from any governmental entity or third party" 
-                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
-          Cooperating with the tenants efforts to obtain rental assistance from any governmental entity or third party
-        </label>
-      </span></div><br></div></div><div id="question-container-33" class="question-container hidden"><label><h3>Describe your efforts in detail</h3></label><div class="text-input-container"><textarea id="sc500_describe_your_efforts_in_detail" name="sc500_describe_your_efforts_in_detail" rows="5" cols="50" placeholder=""></textarea></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+              <div id="dropdowntext_thirsty"></div>
+              <input type="text" id="thirsty_dropdown" name="thirsty_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
@@ -1430,58 +1275,32 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"please_explain_why_you_are_suing_at_this_location","2":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","3":"what_is_your_claim_about","4":"please_explain_why_you_re_filing_at_this_courthouse","5":"have_you_filed_more_than_twelve_other_small_claims_w_in_the_last_twelve_months","6":"were_2_or_more_of_those_small_claims_cases_more_than_2_500","7":"please_enter_your_business_details","8":"are_you_suing_an_attorney","9":"are_you_doing_business_under_a_fictious_business_name","10":"what_do_you_do_business_as","11":"are_you_suing_for_more_than_10_000","12":"please_explain_what_you_do_business_as","13":"what_county_did_you_file_your_fictious_business_name_statement","14":"are_you_the_only_one_suing","15":"what_is_your_fictious_business_name_statement_number","16":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","17":"how_many_other_people_are_suing","18":"are_you_suing_for_more_than_12_500","19":"are_you_suing_more_than_one_person","20":"how_many_other_people_are_you_suing","21":"is_the_defendant_on_active_military_duty","22":"who_are_you_suing","23":"who_are_you_suing","24":"are_any_of_the_people_being_sued_on_active_military_duty","25":"whats_the_name_of_the_person_on_active_military_duty","26":"how_much_are_you_suing_for","27":"list_all_the_months_that_you_claim_the_defendant_owes_you_rent_money_for_each_month_include_each_amount_due_and_the_date_it_came_due","28":"list_all_unpaid_financial_obligations_other_than_rent_that_you_claim_defendant_owes_for_each_month_include_each_amount_the_date_it_came_due_and_what_it_was_for","29":"list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for","30":"have_you_sent_a_demand_letter_to_d","31":"please_explain_why_not","32":"did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means","33":"describe_your_efforts_in_detail"};
-var questionNameIds = {"1":"please_explain_why_you_are_suing_at_this_location","2":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","3":"what_is_your_claim_about","4":"please_explain_why_youre_filing_at_this_courthouse","5":"have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months","6":"were_2_or_more_of_those_small_claims_cases_more_than_2500","8":"are_you_suing_an_attorney","9":"are_you_doing_business_under_a_fictious_business_name","10":"what_do_you_do_business_as","11":"are_you_suing_for_more_than_10000","12":"sc103_please_explain_what_you_do_business_as","13":"sc103_what_county_did_you_file_your_fictious_business_name_statement","14":"are_you_the_only_one_suing","15":"sc103_what_is_your_fictious_business_name_statement_number","16":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","17":"answer17","18":"are_you_suing_for_more_than_12500","19":"are_you_suing_more_than_one_person","20":"answer20","21":"is_the_defendant_on_active_military_duty","24":"are_any_of_the_people_being_sued_on_active_military_duty","25":"whats_the_name_of_the_person_on_active_military_duty","26":"sc500_how_much_are_you_suing_for","27":"sc500_list_all_the_months_that_you_claim_the_defendant_owes_you_rent_money_for_each_month_include_each_amount_due_and_the_date_it_came_due","28":"sc500_list_all_unpaid_financial_obligations_other_than_rent_that_you_claim_defendant_owes_for_each_month_include_each_amount_the_date_it_came_due_and_what_it_was_for","29":"sc500_list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for","30":"have_you_sent_a_demand_letter_to_d_1","31":"sc500_please_explain_why_not","32":"did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means","33":"sc500_describe_your_efforts_in_detail"};
-var jumpLogics = [{"questionId":"6","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"8","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"11","questionType":"dropdown","jumpOption":"No","jumpTo":"3","section":1}];
+    var questionSlugMap       = {"1":"hungry","2":"thirsty"};
+var questionNameIds = {"1":"hungry","2":"thirsty"};
+var jumpLogics = [];
 var conditionalPDFs = [];
 console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', [
   {
-    "questionId": "9",
-    "pdfName": "sc103.pdf",
-    "pdfDisplayName": "SC-103",
+    "questionId": "1",
+    "pdfName": "sc120.pdf",
+    "pdfDisplayName": "SC-120",
     "stripePriceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2",
     "conditions": [
       {
-        "prevQuestion": "9",
-        "prevAnswer": "Yes"
-      }
-    ],
-    "isBigParagraph": false
-  },
-  {
-    "questionId": "14",
-    "pdfName": "sc500a.pdf",
-    "pdfDisplayName": "SC-500A",
-    "stripePriceId": "price_1SB7DUFJeSRMFQ8X5tzen50D",
-    "conditions": [
-      {
-        "prevQuestion": "14",
-        "prevAnswer": "No"
-      }
-    ],
-    "isBigParagraph": false
-  },
-  {
-    "questionId": "19",
-    "pdfName": "sc500a.pdf",
-    "pdfDisplayName": "SC-500A",
-    "stripePriceId": "price_1SB7DUFJeSRMFQ8X5tzen50D",
-    "conditions": [
-      {
-        "prevQuestion": "19",
+        "prevQuestion": "1",
         "prevAnswer": "Yes"
       }
     ],
     "isBigParagraph": false
   }
 ]);
-var pdfLogicPDFs = [{"questionId":"9","pdfName":"sc103.pdf","pdfDisplayName":"SC-103","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","conditions":[{"prevQuestion":"9","prevAnswer":"Yes"}],"isBigParagraph":false},{"questionId":"14","pdfName":"sc500a.pdf","pdfDisplayName":"SC-500A","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","conditions":[{"prevQuestion":"14","prevAnswer":"No"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc500a.pdf","pdfDisplayName":"SC-500A","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","conditions":[{"prevQuestion":"19","prevAnswer":"Yes"}],"isBigParagraph":false}];
-var alertLogics = [{"questionId":"6","message":"Sorry youre just not eligible","conditions":[{"prevQuestion":"6","prevAnswer":"Yes"}]},{"questionId":"8","message":"We cant take you on sorry","conditions":[{"prevQuestion":"8","prevAnswer":"Yes"}]},{"questionId":"11","message":"Sorry you cant sue for that much","conditions":[{"prevQuestion":"11","prevAnswer":"Yes"}]},{"questionId":"18","message":"Sorry you cant sue for that much","conditions":[{"prevQuestion":"18","prevAnswer":"Yes"}]},{"questionId":"30","message":"Please attach this demand letter when filing at the clerks office","conditions":[{"prevQuestion":"30","prevAnswer":"Yes"}]}];
+var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc120.pdf","pdfDisplayName":"SC-120","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","conditions":[{"prevQuestion":"1","prevAnswer":"Yes"}],"isBigParagraph":false}];
+var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"17":["Name","Phone Number","Mailing Address","Email Address"],"20":["Phone Number","Mailing Address","Email Address"],"length":0};
-var amountMap = {"17":[],"20":["Name"],"length":0};
+var labelMap = {"length":0};
+var amountMap = {"length":0};
 var linkedDropdowns = [];
 var isHandlingLink = false;
 var sectionStack = [];
@@ -1500,8 +1319,23 @@ var hiddenTextCalculations = [];
  function updateVisibility(){
   var anyMatch=false;
   (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="other";
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
     var cPrevQNum="1";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
@@ -1517,1154 +1351,14 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var checkQuestion = "1";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-3");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="2";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "2";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-4");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="none of the above";
-    var cPrevQNum="3";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "3";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-5");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="an offer or contract for personal, family, or household goods, services, or loans";
-    var cPrevQNum="3";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="a vehicle finance sale";
-    var cPrevQNum="3";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="a retail installment contract (like a credit card)";
-    var cPrevQNum="3";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="2";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="where the plaintiff was injured.";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="where the defendant lives";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="where the plaintiff’s property was damaged.";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="none of the above";
-    var cPrevQNum="3";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "3";
+   var selectQuestion = "1";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var selectQuestion = "3";
+   var selectQuestion = "1";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "3";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "2";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "1";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "1";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "1";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "1";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "3";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-6");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="5";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "5";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-8");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="6";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="5";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "6";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "5";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-9");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="8";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "8";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-11");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="9";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "9";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-7");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="9";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "9";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-10");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="9";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "9";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-12");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="other";
-    var cPrevQNum="10";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var checkQuestion = "10";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-13");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="a partnership";
-    var cPrevQNum="10";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="a limited liability";
-    var cPrevQNum="10";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="an association";
-    var cPrevQNum="10";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="a corporation";
-    var cPrevQNum="10";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="an individual";
-    var cPrevQNum="10";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="other";
-    var cPrevQNum="10";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var checkQuestion = "10";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "10";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "10";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "10";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "10";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "10";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-14");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="18";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "18";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-17");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="14";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "14";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-19");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="14";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="14";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "14";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "14";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-20");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="19";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "19";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-21");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="19";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "19";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-22");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="21";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "21";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-23");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="21";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "21";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-24");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="19";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "19";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-25");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="24";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "24";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-26");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="24";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="21";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="21";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "24";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "21";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "21";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-27");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="24";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="21";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="21";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "24";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "21";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "21";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-31");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="30";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "30";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-32");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="30";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "30";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-33");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="investigating if governmental rental assistance is available to the tenant";
-    var cPrevQNum="32";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="seeking governmental rental assistance for the tenant";
-    var cPrevQNum="32";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="cooperating with the tenants efforts to obtain rental assistance from any governmental entity or third party";
-    var cPrevQNum="32";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var checkQuestion = "32";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "32";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "32";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  updateVisibility();
 })();
@@ -2721,108 +1415,91 @@ function showValidationPopup() {
     showAlert(validationMessage);
 }
 
-function checkAlertLogic(changedElement) {
-    if (!alertLogics || alertLogics.length === 0) return;
-    
-    // Get the question ID from the changed element
-    let changedQuestionId = null;
-    if (changedElement) {
-        const elementId = changedElement.id;
-        // Try to extract question ID from element ID
-        for (const [qId, nameId] of Object.entries(questionNameIds)) {
-            if (elementId === nameId || elementId === 'answer' + qId) {
-                changedQuestionId = qId;
-                break;
-            }
-        }
-    }
-    
-    // If we can't determine which question changed, don't check any alerts
-    // This prevents alerts from triggering on unrelated form elements
-    if (!changedQuestionId) return;
-    
-    for (const alertLogic of alertLogics) {
-        if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
-        
-        // Only check this alert logic if it's related to the changed element
-        let shouldCheckThisAlert = false;
-        // Check if any condition in this alert logic references the changed question
-        for (const condition of alertLogic.conditions) {
-            if (condition.prevQuestion === changedQuestionId) {
-                shouldCheckThisAlert = true;
-                break;
-            }
-        }
-        
-        if (!shouldCheckThisAlert) continue;
-        
-        let shouldShowAlert = false;
-        
-        // Check if ANY of the conditions match (OR logic)
-        for (const condition of alertLogic.conditions) {
-            const prevQuestionId = condition.prevQuestion;
-            const prevAnswer = condition.prevAnswer;
-            
-            // Get the previous question's value
-            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
-                                      document.getElementById('answer' + prevQuestionId);
-            
-            if (prevQuestionElement) {
-                let prevValue = '';
-                
-                if (prevQuestionElement.type === 'checkbox') {
-                    prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
-                } else {
-                    prevValue = prevQuestionElement.value;
-                }
-                
-                // Check if the condition matches
-                if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
-                    shouldShowAlert = true;
-                    break; // Found a match, no need to check other conditions
-                }
-            }
-        }
-        
-        // Show alert if conditions are met
-        if (shouldShowAlert && alertLogic.message) {
-            showAlert(alertLogic.message);
-            return; // Show only the first matching alert
-        }
-    }
-}
-
-// Add event listeners for alert logic
-document.addEventListener('DOMContentLoaded', function() {
-    const formElements = document.querySelectorAll('input, select, textarea');
-    formElements.forEach(element => {
-        element.addEventListener('change', function() { checkAlertLogic(this); });
-        element.addEventListener('input', function() { checkAlertLogic(this); });
-    });
-    
-    // Initialize checkbox styling for beautiful blue borders
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
-        updateCheckboxStyle(checkbox);
-    });
-});
-
 // Always-available Cart Modal (global)
 window.showCartModal = function () {
-  const EXAMPLE_FORM_PRICE_ID = window.stripePriceId || stripePriceId || '123';
+  console.log('🛒 [CART DEBUG] showCartModal called');
+  
+  // Calculate all PDFs that will be added to cart
+  const allPdfsToAdd = [];
+  
+  // Add main form
+  const mainFormPriceId = window.stripePriceId || stripePriceId || '123';
+  allPdfsToAdd.push({
+    formId: (window.pdfOutputFileName || 'sc500.pdf').replace(/.pdf$/i, '').toLowerCase(),
+    title: window.pdfFileName || 'Form',
+    priceId: mainFormPriceId,
+    pdfName: window.pdfFileName || ''
+  });
+  
+  // Add conditional PDFs based on current form state
+  if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
+    console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items');
+    
+    for (const pdfLogic of window.pdfLogicPDFs) {
+      if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
+      
+      let matched = false;
+      const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+      for (const c of conds) {
+        const prevId = c?.prevQuestion;
+        const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+        if (!prevId) continue;
+        
+        const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                   document.getElementById('answer' + prevId);
+        if (!el) continue;
+        
+        let val = '';
+        if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+        else                        { val = el.value || ''; }
+        
+        if (val.toString().toLowerCase() === expect) {
+          matched = true;
+          console.log('🛒 [CART DEBUG] PDF logic matched:', pdfLogic.pdfDisplayName, 'for question', prevId, '=', expect);
+        }
+      }
+      
+      if (matched) {
+        allPdfsToAdd.push({
+          formId: pdfLogic.pdfName.replace(/.pdf$/i, '').toLowerCase(),
+          title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/.pdf$/i, ''),
+          priceId: pdfLogic.stripePriceId,
+          pdfName: pdfLogic.pdfName
+        });
+      }
+    }
+  }
+  
+  console.log('🛒 [CART DEBUG] Total PDFs to add:', allPdfsToAdd.length, allPdfsToAdd);
 
-  // Try to fetch price, but still show a working modal if fetch fails
-  async function fetchExampleFormPrice() {
-    try {
-      const r = await fetch('/stripe-price/' + EXAMPLE_FORM_PRICE_ID);
-      if (!r.ok) return null;
-      const data = await r.json();
-      return data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : null;
-    } catch { return null; }
+  // Fetch prices for all PDFs
+  async function fetchAllPrices() {
+    const prices = [];
+    for (const pdf of allPdfsToAdd) {
+      try {
+        const r = await fetch('/stripe-price/' + pdf.priceId);
+        if (r.ok) {
+          const data = await r.json();
+          const price = data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : '0.00';
+          prices.push(parseFloat(price));
+          console.log('🛒 [CART DEBUG] Price for', pdf.title, ':', price);
+        } else {
+          prices.push(0);
+        }
+      } catch (e) {
+        console.error('🛒 [CART DEBUG] Error fetching price for', pdf.title, ':', e);
+        prices.push(0);
+      }
+    }
+    return prices;
   }
 
-  fetchExampleFormPrice().then((price) => {
-    const priceDisplay = price ? '$' + price : '...';
+  fetchAllPrices().then((prices) => {
+    const totalPrice = prices.reduce((sum, price) => sum + price, 0);
+    const priceDisplay = totalPrice > 0 ? '$' + totalPrice.toFixed(2) : '...';
+    
+    console.log('🛒 [CART DEBUG] Total price:', priceDisplay);
+    
     const modal = document.createElement('div');
     modal.id = 'cart-modal';
     modal.style.cssText = 'position:fixed;inset:0;background:rgba(44,62,80,.45);display:flex;align-items:center;justify-content:center;z-index:99999;';
@@ -2830,6 +1507,7 @@ window.showCartModal = function () {
       <div style="background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(44,62,80,.18);padding:32px 28px 24px;max-width:470px;width:90%;text-align:center;position:relative;">
         <h2>Checkout</h2>
         <p>Your form has been completed! Add it to your cart to download.</p>
+        <p style="font-size:0.9em;color:#666;margin:10px 0;">${allPdfsToAdd.length} PDF(s) will be added to cart</p>
         <button id="addToCartBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%);color:#fff;border:none;border-radius:6px;padding:10px 28px;font-size:1.1em;font-weight:600;cursor:pointer;">
           Add to Cart - ${priceDisplay}
         </button>
@@ -2846,9 +1524,10 @@ window.showCartModal = function () {
     document.body.appendChild(modal);
 
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
-    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = 'cart.html'; };
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = '../Pages/cart.html'; };
     document.getElementById('addToCartBtn').onclick   = () => {
-      window.addFormToCart(EXAMPLE_FORM_PRICE_ID);
+      console.log('🛒 [CART DEBUG] Add to cart button clicked');
+      window.addFormToCart(mainFormPriceId);
       modal.remove();
     };
   });
@@ -2872,6 +1551,8 @@ function getUrlParam(name) {
 
 // Add to cart helper (global, no Firebase required)
 window.addFormToCart = function (priceId) {
+  console.log('🛒 [CART DEBUG] addFormToCart called with priceId:', priceId);
+  
   // 1) Fresh start each submission (prevents dupes/stale items across re-submits)
   clearCartState();
 
@@ -2887,9 +1568,11 @@ window.addFormToCart = function (priceId) {
     }
   }
 
+  console.log('🛒 [CART DEBUG] Form data collected:', Object.keys(formData).length, 'fields');
+
   // 3) Uniform metadata for every cart line
-  const originalFormId = (window.formId || 'custom-form');
-  const formTitle      = window.pdfOutputFileName || (typeof pdfOutputFileName !== 'undefined' ? pdfOutputFileName : 'Form');
+  const originalFormId = (window.pdfOutputFileName || 'sc500.pdf').replace(/.pdf$/i, '').toLowerCase();
+  const formTitle      = window.pdfFileName || (typeof pdfFileName !== 'undefined' ? pdfFileName : 'Form');
   const countyName     = getUrlParam('county');
   const defendantName  = getUrlParam('defendantName');
   const portfolioId    = getUrlParam('portfolioId');
@@ -2897,10 +1580,19 @@ window.addFormToCart = function (priceId) {
 
   // 4) Compute all PDF-logic matches (OR logic across conditions)
   const pdfLogicItems = [];
+  console.log('🛒 [CART DEBUG] Computing PDF logic items...');
+  
   try {
     if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
+      console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items to check');
+      
       for (const pdfLogic of window.pdfLogicPDFs) {
-        if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
+        if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) {
+          console.log('🛒 [CART DEBUG] Skipping invalid PDF logic:', pdfLogic);
+          continue;
+        }
+        
+        console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
 
         let matched = false;
         const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
@@ -2911,20 +1603,26 @@ window.addFormToCart = function (priceId) {
 
           const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
                      document.getElementById('answer' + prevId);
-          if (!el) continue;
+          if (!el) {
+            console.log('🛒 [CART DEBUG] Element not found for question', prevId);
+            continue;
+          }
 
           let val = '';
           if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
           else                        { val = el.value || ''; }
 
+          console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+
           if (val.toString().toLowerCase() === expect) {
             matched = true; // any condition match includes the PDF
+            console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
           }
         }
 
         if (matched) {
-          pdfLogicItems.push({
-            formId: pdfLogic.pdfName.replace(/.pdf$/i, ''),
+          const item = {
+            formId: pdfLogic.pdfName.replace(/.pdf$/i, '').toLowerCase(),
             title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/.pdf$/i, ''),
             priceId: pdfLogic.stripePriceId,
             pdfName: pdfLogic.pdfName,
@@ -2934,49 +1632,107 @@ window.addFormToCart = function (priceId) {
             countyName: countyName,
             defendantName: defendantName,
             timestamp: nowTs
-          });
+          };
+          pdfLogicItems.push(item);
+          console.log('🛒 [CART DEBUG] Added PDF logic item:', item.title, 'with priceId:', item.priceId);
+        } else {
+          console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName);
         }
       }
+    } else {
+      console.log('🛒 [CART DEBUG] No PDF logic items found');
     }
+    
+    console.log('🛒 [CART DEBUG] Final PDF logic items:', pdfLogicItems.length, pdfLogicItems);
   } catch (e) {
     console.warn('[PDF LOGIC] error computing matches:', e);
   }
 
   // 5) Preferred path: site cart manager
   if (typeof window.addToCart === 'function') {
-    // main item
-    window.addToCart(
-      originalFormId, formTitle, priceId, { ...formData }, countyName, defendantName,
-      { originalFormId, portfolioId, pdfName: (window.pdfFileName || '') }
-    );
-
-    // every matched PDF logic item
+    console.log('🛒 [CART DEBUG] Firebase addToCart function available');
+    
+    // Create a batch of all items to add
+    const allItems = [];
+    
+    // Add main item
+    const mainItem = {
+      formId: originalFormId,
+      title: formTitle,
+      priceId: priceId,
+      formData: { ...formData, originalFormId, portfolioId, pdfName: (window.pdfFileName || '') },
+      countyName: countyName,
+      defendantName: defendantName
+    };
+    allItems.push(mainItem);
+    console.log('🛒 [CART DEBUG] Main item:', mainItem.title, 'with priceId:', mainItem.priceId);
+    
+    // Add all matched PDF logic items
     for (const item of pdfLogicItems) {
-      window.addToCart(
-        item.formId, item.title, item.priceId, { ...item.formData },
-        item.countyName, item.defendantName,
-        { originalFormId: item.originalFormId, portfolioId: item.portfolioId, pdfName: item.pdfName }
-      );
+      const pdfItem = {
+        formId: item.formId.toLowerCase(),
+        title: item.title,
+        priceId: item.priceId,
+        formData: { ...item.formData, originalFormId: item.originalFormId, portfolioId: item.portfolioId, pdfName: item.pdfName },
+        countyName: item.countyName,
+        defendantName: item.defendantName
+      };
+      allItems.push(pdfItem);
+      console.log('🛒 [CART DEBUG] PDF logic item:', pdfItem.title, 'with priceId:', pdfItem.priceId);
     }
+    
+    console.log('🛒 [CART DEBUG] Total items to add to Firebase:', allItems.length, allItems);
+    
+    // Add all items to cart with a small delay between each to prevent race conditions
+    let addedCount = 0;
+    allItems.forEach((item, index) => {
+      setTimeout(() => {
+        console.log('🛒 [CART DEBUG] Adding item', index + 1, 'of', allItems.length, ':', item.title);
+        window.addToCart(
+          item.formId, item.title, item.priceId, item.formData,
+          item.countyName, item.defendantName, item.pdfName
+        );
+        addedCount++;
+        
+        // Check if all items have been added
+        if (addedCount === allItems.length) {
+          console.log('🛒 [CART DEBUG] All', allItems.length, 'items added to Firebase cart successfully');
+          const itemList = allItems.map(item => '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId).join('\n');
+          console.log('✅ Cart Debug: Successfully added ' + allItems.length + ' items to cart:\n' + itemList);
+          window.location.href = '../Pages/cart.html';
+        }
+      }, index * 200); // 200ms delay between each item
+    });
 
-    // redirect after everything is queued
-    setTimeout(() => { window.location.href = 'cart.html'; }, 0);
+    // Don't redirect automatically - let the alert handle it
     return;
   }
 
   // 6) Fallback: localStorage + cookie (fresh array due to clearCartState)
+  console.log('🛒 [CART DEBUG] Firebase not available, using fallback localStorage/cookie');
+  
   const cart = [];
-  cart.push({
+  const mainCartItem = {
     formId: originalFormId, title: formTitle, priceId,
     pdfName: (window.pdfFileName || ''),
     originalFormId, portfolioId, formData, countyName, defendantName, timestamp: nowTs
-  });
-  for (const item of pdfLogicItems) cart.push(item);
+  };
+  cart.push(mainCartItem);
+  console.log('🛒 [CART DEBUG] Main cart item:', mainCartItem.title, 'with priceId:', mainCartItem.priceId);
+  
+  for (const item of pdfLogicItems) {
+    cart.push(item);
+    console.log('🛒 [CART DEBUG] PDF logic cart item:', item.title, 'with priceId:', item.priceId);
+  }
+
+  console.log('🛒 [CART DEBUG] Total items in fallback cart:', cart.length, cart);
 
   try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch {}
   writeCartCookie(cart);
 
-  setTimeout(() => { window.location.href = 'cart.html'; }, 0);
+  const itemList = cart.map(item => '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId).join('\n');
+  console.log('✅ Cart Debug: Added ' + cart.length + ' items to local storage:\n' + itemList);
+  window.location.href = '../Pages/cart.html';
 };
 
 
@@ -4756,10 +3512,18 @@ if (typeof handleNext === 'function') {
                             const countyDisplay = item.countyName.toLowerCase().includes('county') ? item.countyName : item.countyName + ' County';
                             countyHtml = '<div style="color:#7f8c8d;">' + countyDisplay + '</div>';
                         }
+                        // Use the proper display name instead of the filename
+                        let displayTitle = item.title || 'Form';
+                        if (item.formId === 'sc120' || item.formId === 'SC-120') {
+                            displayTitle = 'SC-120';
+                        } else if (item.formId === 'sc500' || item.formId === 'SC-500') {
+                            displayTitle = 'SC-500';
+                        }
+                        
                         itemsHtml +=
      '<div class="cart-item">' +
        '<div class="cart-item-info">' +
-         '<div class="cart-item-title">' + (item.title || 'Form') + '</div>' +
+         '<div class="cart-item-title">' + displayTitle + '</div>' +
          defendantHtml +
          countyHtml +
        '</div>' +
@@ -4791,7 +3555,7 @@ if (typeof handleNext === 'function') {
                         cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
                         cartCheckoutBtn.style.display = 'block';
                         cartCheckoutBtn.onclick = function() {
-                            window.location.href = 'cart.html';
+                            window.location.href = '../Pages/cart.html';
                         };
                     }
                 } catch (error) {
