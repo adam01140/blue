@@ -294,7 +294,8 @@ class CartManager {
         
         await this.clearCart();
         
-        // Show debug alert with processing results
+        // Show debug alert with processing results (commented out for production)
+        /*
         const debugInfo = `🎉 Payment Debug Results:
         
 ✅ Successfully processed ${processedItems.length} PDF(s):
@@ -309,6 +310,11 @@ ${failedItems.map(item => `- ${item.title} (${item.formId})`).join('\n')}` : '�
 Forms page requested.`;
         
         alert(debugInfo);
+        */
+        
+        // Show success message and redirect to forms.html
+        alert('Payment successful! Your documents have been saved to My Documents.');
+        window.location.href = 'forms.html';
     }
 
     async removePortfolioEntries() {

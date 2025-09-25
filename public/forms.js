@@ -30,6 +30,16 @@ const signInBtn = document.getElementById('sign-in-btn');
 // Keep track of selected forms
 const selectedForms = new Set();
 
+// Generate a unique portfolio ID for form sessions
+function generatePortfolioId() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 20; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
+
 // Modal Functions
 function openSettings() {
     settingsModal.style.display = 'block';
@@ -289,16 +299,19 @@ async function loadAvailableForms() {
             const formData = doc.data();
             formData.id = doc.id;
             
-            // Transform URLs to use the correct format with Forms/ prefix
+            // Transform URLs to use the correct format with Forms/ prefix and include portfolio ID
             if (formData.url) {
+                // Generate a unique portfolio ID for this form session
+                const portfolioId = generatePortfolioId();
+                
                 if (formData.id === 'sc100') {
-                    formData.url = '../Forms/sc-100.html?formId=sc100';
+                    formData.url = `../Forms/sc-100.html?formId=sc100&portfolioId=${portfolioId}`;
                 } else if (formData.id === 'sc120') {
-                    formData.url = '../Forms/sc-120.html?formId=sc120';
+                    formData.url = `../Forms/sc-120.html?formId=sc120&portfolioId=${portfolioId}`;
                 } else if (formData.id === 'sc500') {
-                    formData.url = '../Forms/sc-500.html?formId=sc500';
+                    formData.url = `../Forms/sc-500.html?formId=sc500&portfolioId=${portfolioId}`;
                 } else if (formData.id === 'fee-waiver') {
-                    formData.url = '../Forms/fee-waiver.html?formId=fee-waiver';
+                    formData.url = `../Forms/fee-waiver.html?formId=fee-waiver&portfolioId=${portfolioId}`;
                 }
             }
             
