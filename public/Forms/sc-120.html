@@ -981,7 +981,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="../Pages/cart.js"></script>
 
 <script>
 // Firebase Configuration
@@ -1081,16 +1080,6 @@ document.addEventListener("DOMContentLoaded", function() {
             <input type="text" form="customForm" id="user_lastname" name="user_lastname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
         </div>
     </div>
-    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-        <div style="flex: 1;">
-            <label for="user_fullname" style="display: block; margin-bottom: 5px; font-weight: bold;">Full Name</label>
-            <input type="text" form="customForm" id="user_fullname" name="user_fullname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-        </div>
-        <div style="flex: 1;">
-            <label for="user_date" style="display: block; margin-bottom: 5px; font-weight: bold;">Date</label>
-            <input type="text" form="customForm" id="user_date" name="user_date" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-        </div>
-    </div>
     <div style="margin-bottom: 15px;">
         <label for="user_email" style="display: block; margin-bottom: 5px; font-weight: bold;">Email Address</label>
         <input type="email" form="customForm" id="user_email" name="user_email" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
@@ -1122,157 +1111,167 @@ document.addEventListener("DOMContentLoaded", function() {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">SC-103</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">SC-120</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" class="question-container"><label><h3>Where are you suing?</h3></label><div class="text-input-container"><input type="text" id="where_are_you_suing" name="where_are_you_suing" placeholder=""></div></div><div id="question-container-2" class="question-container"><label><h3>Please explain why you are suing at this location</h3></label><div><center><div id="checkmark" class="checkbox-group-2">
+        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">SC-103</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">SC-120</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" class="question-container"><label><h3>Please explain why you are suing at this location</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
       <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured.">
         <label class="checkbox-label">
           <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured." name="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured." value="Where the plaintiff was injured." 
-                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
           Where the plaintiff was injured.
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives">
         <label class="checkbox-label">
           <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives" name="please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives" value="Where the defendant lives" 
-                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
           Where the defendant lives
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged.">
         <label class="checkbox-label">
           <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged." name="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged." value="Where the plaintiff’s property was damaged." 
-                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
           Where the plaintiff’s property was damaged.
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_a_contract_(written_or_spoken)_was_made,_signed,_performed,_or_broken_by_the_defendant_or_where_the_defendant_lived_or_did_business_when_the_defendant_made_the_contract.">
         <label class="checkbox-label">
           <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_a_contract_(written_or_spoken)_was_made,_signed,_performed,_or_broken_by_the_defendant_or_where_the_defendant_lived_or_did_business_when_the_defendant_made_the_contract." name="please_explain_why_you_are_suing_at_this_location_where_a_contract_(written_or_spoken)_was_made,_signed,_performed,_or_broken_by_the_defendant_or_where_the_defendant_lived_or_did_business_when_the_defendant_made_the_contract." value="Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract." 
-                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
           Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_other">
         <label class="checkbox-label">
           <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_other" name="please_explain_why_you_are_suing_at_this_location_other" value="Other" 
-                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
           Other
         </label>
-      </span></div><br></div></div><div id="question-container-3" class="question-container hidden"><label><h3>Is it where the buyer or lessee signed the contract, lives now, or lived when the contract was made</h3></label><select id="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made" name="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made"
+      </span></div><br></div></div><div id="question-container-2" class="question-container hidden"><label><h3>Is it where the buyer or lessee signed the contract, lives now, or lived when the contract was made</h3></label><select id="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made" name="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made"
                       onchange="dropdownMirror(this, 'is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made')">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made"></div>
               <input type="text" id="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_dropdown" name="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-4" class="question-container hidden"><label><h3>What is your claim about?</h3></label><select id="what_is_your_claim_about" name="what_is_your_claim_about"
+                   readonly style="display:none;"></div><div id="question-container-3" class="question-container hidden"><label><h3>What is your claim about?</h3></label><select id="what_is_your_claim_about" name="what_is_your_claim_about"
                       onchange="dropdownMirror(this, 'what_is_your_claim_about')">
                        <option value="" disabled selected>Select an option</option><option value="None of the above">None of the above</option><option value="an offer or contract for personal, family, or household goods, services, or loans">an offer or contract for personal, family, or household goods, services, or loans</option><option value="a vehicle finance sale">a vehicle finance sale</option><option value="a retail installment contract (like a credit card)">a retail installment contract (like a credit card)</option></select><br>
               <div id="dropdowntext_what_is_your_claim_about"></div>
               <input type="text" id="what_is_your_claim_about_dropdown" name="what_is_your_claim_about_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-5" class="question-container hidden"><label><h3>Please explain why you're filing at this courthouse?</h3></label><div class="text-input-container"><textarea id="please_explain_why_youre_filing_at_this_courthouse" name="please_explain_why_youre_filing_at_this_courthouse" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-6" class="question-container hidden"><label><h3>Have you filed more than twelve other small claims w/in the last twelve months</h3></label><select id="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months" name="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months"
+                   readonly style="display:none;"></div><div id="question-container-4" class="question-container hidden"><label><h3>Please explain why you're filing at this courthouse?</h3></label><div class="text-input-container"><textarea id="please_explain_why_youre_filing_at_this_courthouse" name="please_explain_why_youre_filing_at_this_courthouse" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-5" class="question-container hidden"><label><h3>Have you filed more than twelve other small claims w/in the last twelve months</h3></label><select id="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months" name="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months"
                       onchange="dropdownMirror(this, 'have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months')">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months"></div>
               <input type="text" id="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months_dropdown" name="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-7" class="question-container hidden"><label><h3>Were 2 or more of those small claims cases more than $2,500?</h3></label><select id="were_2_or_more_of_those_small_claims_cases_more_than_2500" name="were_2_or_more_of_those_small_claims_cases_more_than_2500"
+                   readonly style="display:none;"></div><div id="question-container-6" class="question-container hidden"><label><h3>Were 2 or more of those small claims cases more than $2,500?</h3></label><select id="were_2_or_more_of_those_small_claims_cases_more_than_2500" name="were_2_or_more_of_those_small_claims_cases_more_than_2500"
                       onchange="dropdownMirror(this, 'were_2_or_more_of_those_small_claims_cases_more_than_2500')">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_were_2_or_more_of_those_small_claims_cases_more_than_2500"></div>
               <input type="text" id="were_2_or_more_of_those_small_claims_cases_more_than_2500_dropdown" name="were_2_or_more_of_those_small_claims_cases_more_than_2500_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-8" class="question-container hidden"><label><h3>Are you suing an attorney?</h3></label><select id="are_you_suing_an_attorney" name="are_you_suing_an_attorney"
+                   readonly style="display:none;"></div><div id="question-container-7" class="question-container hidden"><label><h3>Are you suing an attorney?</h3></label><select id="are_you_suing_an_attorney" name="are_you_suing_an_attorney"
                       onchange="dropdownMirror(this, 'are_you_suing_an_attorney')">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_are_you_suing_an_attorney"></div>
               <input type="text" id="are_you_suing_an_attorney_dropdown" name="are_you_suing_an_attorney_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-10" class="question-container hidden"><label><h3>Are you doing business under a fictious business name</h3></label><select id="are_you_doing_business_under_a_fictious_business_name" name="are_you_doing_business_under_a_fictious_business_name"
+                   readonly style="display:none;"></div><div id="question-container-9" class="question-container hidden"><label><h3>Are you doing business under a fictious business name</h3></label><select id="are_you_doing_business_under_a_fictious_business_name" name="are_you_doing_business_under_a_fictious_business_name"
                       onchange="dropdownMirror(this, 'are_you_doing_business_under_a_fictious_business_name')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_are_you_doing_business_under_a_fictious_business_name"></div>
               <input type="text" id="are_you_doing_business_under_a_fictious_business_name_dropdown" name="are_you_doing_business_under_a_fictious_business_name_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">SC-103</h1><div id="question-container-9" class="question-container"><label><h3>Please enter your business details</h3></label><div class="text-input-container"><input type="text" id="sc103_please_enter_your_business_details_name" name="sc103_please_enter_your_business_details_name" placeholder="Name"></div><div class="text-input-container"><input type="text" id="sc103_please_enter_your_business_details_business_address" name="sc103_please_enter_your_business_details_business_address" placeholder="Business Address"></div><div class="text-input-container"><input type="text" id="sc103_please_enter_your_business_details_mailing_address" name="sc103_please_enter_your_business_details_mailing_address" placeholder="Mailing Address"></div></div><div id="question-container-11" class="question-container"><label><h3>What do you do business as?</h3></label><div><center><div id="checkmark" class="checkbox-group-11">
-      <span class="checkbox-inline" id="checkbox-container-sc103_what_do_you_do_business_as_an_individual">
+                   readonly style="display:none;"></div><div id="question-container-11" class="question-container hidden"><label><h3>Are you suing for more than $10,000?</h3></label><select id="are_you_suing_for_more_than_10000" name="are_you_suing_for_more_than_10000"
+                      onchange="dropdownMirror(this, 'are_you_suing_for_more_than_10000')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_are_you_suing_for_more_than_10000"></div>
+              <input type="text" id="are_you_suing_for_more_than_10000_dropdown" name="are_you_suing_for_more_than_10000_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">SC-103</h1><div id="question-container-8" class="question-container hidden"><label><h3>Please enter your business details</h3></label><div class="text-input-container"><input type="text" id="Name" name="Name" placeholder="Name"></div><div class="text-input-container"><input type="text" id="Business Address" name="Business Address" placeholder="Address"></div><div class="text-input-container"><input type="text" id="Mailing Address" name="Mailing Address" placeholder="Mailing Address"></div></div><div id="question-container-10" class="question-container hidden"><label><h3>What do you do business as?</h3></label><div><center><div id="checkmark" class="checkbox-group-10">
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_an_individual">
         <label class="checkbox-label">
-          <input type="checkbox" id="sc103_what_do_you_do_business_as_an_individual" name="sc103_what_do_you_do_business_as_an_individual" value="An Individual" 
-                 onchange="toggleNoneOption(this, 11); updateCheckboxStyle(this);">
+          <input type="checkbox" id="what_do_you_do_business_as_an_individual" name="what_do_you_do_business_as_an_individual" value="An Individual" 
+                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
           An Individual
         </label>
       </span>
-      <span class="checkbox-inline" id="checkbox-container-sc103_what_do_you_do_business_as_an_association">
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_an_association">
         <label class="checkbox-label">
-          <input type="checkbox" id="sc103_what_do_you_do_business_as_an_association" name="sc103_what_do_you_do_business_as_an_association" value="An Association" 
-                 onchange="toggleNoneOption(this, 11); updateCheckboxStyle(this);">
+          <input type="checkbox" id="what_do_you_do_business_as_an_association" name="what_do_you_do_business_as_an_association" value="An Association" 
+                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
           An Association
         </label>
       </span>
-      <span class="checkbox-inline" id="checkbox-container-sc103_what_do_you_do_business_as_a_partnership">
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_a_partnership">
         <label class="checkbox-label">
-          <input type="checkbox" id="sc103_what_do_you_do_business_as_a_partnership" name="sc103_what_do_you_do_business_as_a_partnership" value="A Partnership" 
-                 onchange="toggleNoneOption(this, 11); updateCheckboxStyle(this);">
+          <input type="checkbox" id="what_do_you_do_business_as_a_partnership" name="what_do_you_do_business_as_a_partnership" value="A Partnership" 
+                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
           A Partnership
         </label>
       </span>
-      <span class="checkbox-inline" id="checkbox-container-sc103_what_do_you_do_business_as_a_limited_liability">
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_a_limited_liability">
         <label class="checkbox-label">
-          <input type="checkbox" id="sc103_what_do_you_do_business_as_a_limited_liability" name="sc103_what_do_you_do_business_as_a_limited_liability" value="A Limited Liability" 
-                 onchange="toggleNoneOption(this, 11); updateCheckboxStyle(this);">
+          <input type="checkbox" id="what_do_you_do_business_as_a_limited_liability" name="what_do_you_do_business_as_a_limited_liability" value="A Limited Liability" 
+                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
           A Limited Liability
         </label>
       </span>
-      <span class="checkbox-inline" id="checkbox-container-sc103_what_do_you_do_business_as_a_corporation">
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_a_corporation">
         <label class="checkbox-label">
-          <input type="checkbox" id="sc103_what_do_you_do_business_as_a_corporation" name="sc103_what_do_you_do_business_as_a_corporation" value="A Corporation" 
-                 onchange="toggleNoneOption(this, 11); updateCheckboxStyle(this);">
+          <input type="checkbox" id="what_do_you_do_business_as_a_corporation" name="what_do_you_do_business_as_a_corporation" value="A Corporation" 
+                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
           A Corporation
         </label>
       </span>
-      <span class="checkbox-inline" id="checkbox-container-sc103_what_do_you_do_business_as_other">
+      <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_other">
         <label class="checkbox-label">
-          <input type="checkbox" id="sc103_what_do_you_do_business_as_other" name="sc103_what_do_you_do_business_as_other" value="Other" 
-                 onchange="toggleNoneOption(this, 11); updateCheckboxStyle(this);">
+          <input type="checkbox" id="what_do_you_do_business_as_other" name="what_do_you_do_business_as_other" value="Other" 
+                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
           Other
         </label>
-      </span></div><br></div></div><div id="question-container-13" class="question-container hidden"><label><h3>Please explain what you do business as</h3></label><div class="text-input-container"><textarea id="sc103_please_explain_what_you_do_business_as" name="sc103_please_explain_what_you_do_business_as" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-14" class="question-container hidden"><label><h3>What county did you file your Fictious Business Name Statement</h3></label><div class="text-input-container"><input type="text" id="sc103_what_county_did_you_file_your_fictious_business_name_statement" name="sc103_what_county_did_you_file_your_fictious_business_name_statement" placeholder=""></div></div><div id="question-container-15" class="question-container"><label><h3>What is your fictious business name statement number</h3></label><div class="text-input-container"><input type="number" id="sc103_what_is_your_fictious_business_name_statement_number" name="sc103_what_is_your_fictious_business_name_statement_number" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-17" class="question-container"><label><h3>What is the date that your fictious businesses name statement expires</h3></label><div class="date-input-container"><input type="date" id="sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires" name="sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(2)" id="next-button-2">Next</button></div></div><div id="section3" class="section"><center><h1 class="section-title">SC-120</h1><div id="question-container-12" class="question-container"><label><h3>Are you being sued by yourself?</h3></label><select id="sc120_are_you_being_sued_by_yourself" name="sc120_are_you_being_sued_by_yourself"
-                      onchange="dropdownMirror(this, 'sc120_are_you_being_sued_by_yourself')">
-                       <option value="" disabled selected>Select an option</option><option value="SC-120">SC-120</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_sc120_are_you_being_sued_by_yourself"></div>
-              <input type="text" id="sc120_are_you_being_sued_by_yourself_dropdown" name="sc120_are_you_being_sued_by_yourself_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-16" class="question-container hidden"><label><h3>How many other people are being sued?</h3></label><select id="answer16" onchange="showTextboxLabels(16, this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer16"></div></div><div id="question-container-18" class="question-container hidden"><label><h3>Are any of the people suing you on active military duty?</h3></label><select id="sc120a_are_any_of_the_people_suing_you_on_active_military_duty" name="sc120a_are_any_of_the_people_suing_you_on_active_military_duty"
-                      onchange="dropdownMirror(this, 'sc120a_are_any_of_the_people_suing_you_on_active_military_duty')">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_sc120a_are_any_of_the_people_suing_you_on_active_military_duty"></div>
-              <input type="text" id="sc120a_are_any_of_the_people_suing_you_on_active_military_duty_dropdown" name="sc120a_are_any_of_the_people_suing_you_on_active_military_duty_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-19" class="question-container hidden"><label><h3>What is their name?</h3></label><div class="text-input-container"><input type="text" id="sc120a_what_is_their_name" name="sc120a_what_is_their_name" placeholder=""></div></div><div id="question-container-20" class="question-container hidden"><label><h3>Are you counter suing just one person?</h3></label><select id="sc120a_are_you_suing_more_than_one_person_2" name="sc120a_are_you_suing_more_than_one_person_2"
-                      onchange="dropdownMirror(this, 'sc120a_are_you_suing_more_than_one_person_2')">
+      </span></div><br></div></div><div id="question-container-12" class="question-container"><label><h3>Are you suing for more than $12,500?</h3></label><select id="are_you_suing_for_more_than_12500" name="are_you_suing_for_more_than_12500"
+                      onchange="dropdownMirror(this, 'are_you_suing_for_more_than_12500')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_sc120a_are_you_suing_more_than_one_person_2"></div>
-              <input type="text" id="sc120a_are_you_suing_more_than_one_person_2_dropdown" name="sc120a_are_you_suing_more_than_one_person_2_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-21" class="question-container hidden"><label><h3>How many people are you counter suing?</h3></label><select id="answer21" onchange="showTextboxLabels(21, this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer21"></div></div><div id="question-container-22" class="question-container hidden"><label><h3>Who are you counter suing?</h3></label><div class="text-input-container"><input type="text" id="sc120a_custom_question_name" name="sc120a_custom_question_name" placeholder="Name"></div><div class="text-input-container"><input type="text" id="sc120a_custom_question_phone_number" name="sc120a_custom_question_phone_number" placeholder="Phone Number"></div><div class="text-input-container"><input type="text" id="sc120a_custom_question_mailing_address" name="sc120a_custom_question_mailing_address" placeholder="Mailing Address"></div></div><div id="question-container-23" class="question-container hidden"><label><h3>How much are you counter-suing for?</h3></label><div class="text-input-container"><input type="number" id="sc120a_how_much_are_you_countersuing_for" name="sc120a_how_much_are_you_countersuing_for" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-24" class="question-container hidden"><label><h3>Explain why they owe you that money</h3></label><div class="text-input-container"><textarea id="sc120a_explain_why_they_owe_you_that_money_1_1" name="sc120a_explain_why_they_owe_you_that_money_1_1" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-25" class="question-container"><label><h3>Did the incident happen in one day or across many days?</h3></label><select id="sc120a_did_the_incident_happen_in_one_day_or_across_many" name="sc120a_did_the_incident_happen_in_one_day_or_across_many"
+              <div id="dropdowntext_are_you_suing_for_more_than_12500"></div>
+              <input type="text" id="are_you_suing_for_more_than_12500_dropdown" name="are_you_suing_for_more_than_12500_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-14" class="question-container hidden"><label><h3>Please explain what you do business as</h3></label><div class="text-input-container"><textarea id="sc103_please_explain_what_you_do_business_as" name="sc103_please_explain_what_you_do_business_as" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-15" class="question-container hidden"><label><h3>What county did you file your Fictious Business Name Statement</h3></label><div class="text-input-container"><input type="text" id="sc103_what_county_did_you_file_your_fictious_business_name_statement" name="sc103_what_county_did_you_file_your_fictious_business_name_statement" placeholder=""></div></div><div id="question-container-16" class="question-container"><label><h3>What is your fictious business name statement number</h3></label><div class="text-input-container"><input type="number" id="sc103_what_is_your_fictious_business_name_statement_number" name="sc103_what_is_your_fictious_business_name_statement_number" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-18" class="question-container"><label><h3>What is the date that your fictious businesses name statement expires</h3></label><div class="date-input-container"><input type="date" id="sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires" name="sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(2)" id="next-button-2">Next</button></div></div><div id="section3" class="section"><center><h1 class="section-title">SC-120</h1><div id="question-container-13" class="question-container hidden"><label><h3>Are you being sued by yourself?</h3></label><select id="are_you_being_sued_by_yourself" name="are_you_being_sued_by_yourself"
+                      onchange="dropdownMirror(this, 'are_you_being_sued_by_yourself')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option><option value="SC-120">SC-120</option></select><br>
+              <div id="dropdowntext_are_you_being_sued_by_yourself"></div>
+              <input type="text" id="are_you_being_sued_by_yourself_dropdown" name="are_you_being_sued_by_yourself_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-17" class="question-container hidden"><label><h3>How many other people are being sued?</h3></label><select id="answer17" onchange="showTextboxLabels(17, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer17"></div></div><div id="question-container-19" class="question-container hidden"><label><h3>Are any of the people suing you on active military duty?</h3></label><select id="are_any_of_the_people_suing_you_on_active_military_duty" name="are_any_of_the_people_suing_you_on_active_military_duty"
+                      onchange="dropdownMirror(this, 'are_any_of_the_people_suing_you_on_active_military_duty')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_are_any_of_the_people_suing_you_on_active_military_duty"></div>
+              <input type="text" id="are_any_of_the_people_suing_you_on_active_military_duty_dropdown" name="are_any_of_the_people_suing_you_on_active_military_duty_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-20" class="question-container hidden"><label><h3>What is their name?</h3></label><div class="text-input-container"><input type="text" id="sc120a_what_is_their_name" name="sc120a_what_is_their_name" placeholder=""></div></div><div id="question-container-21" class="question-container hidden"><label><h3>Are you counter suing just one person?</h3></label><select id="are_you_suing_more_than_one_person_2" name="are_you_suing_more_than_one_person_2"
+                      onchange="dropdownMirror(this, 'are_you_suing_more_than_one_person_2')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_suing_more_than_one_person_2"></div>
+              <input type="text" id="are_you_suing_more_than_one_person_2_dropdown" name="are_you_suing_more_than_one_person_2_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-22" class="question-container hidden"><label><h3>How many people are you counter suing?</h3></label><select id="answer22" onchange="showTextboxLabels(22, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer22"></div></div><div id="question-container-23" class="question-container hidden"><label><h3>Who are you counter suing?</h3></label><div class="text-input-container"><input type="text" id="Name" name="Name" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Phone Number" name="Phone Number" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Mailing Address" name="Mailing Address" placeholder="Enter value"></div></div><div id="question-container-24" class="question-container hidden"><label><h3>How much are you counter-suing for?</h3></label><div class="text-input-container"><input type="number" id="sc120a_how_much_are_you_countersuing_for" name="sc120a_how_much_are_you_countersuing_for" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-25" class="question-container hidden"><label><h3>Explain why they owe you that money</h3></label><div class="text-input-container"><textarea id="explain_why_they_owe_you_that_money_1_1" name="explain_why_they_owe_you_that_money_1_1" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-26" class="question-container"><label><h3>Did the incident happen in one day or across many days?</h3></label><select id="sc120a_did_the_incident_happen_in_one_day_or_across_many" name="sc120a_did_the_incident_happen_in_one_day_or_across_many"
                       onchange="dropdownMirror(this, 'sc120a_did_the_incident_happen_in_one_day_or_across_many')">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_sc120a_did_the_incident_happen_in_one_day_or_across_many"></div>
               <input type="text" id="sc120a_did_the_incident_happen_in_one_day_or_across_many_dropdown" name="sc120a_did_the_incident_happen_in_one_day_or_across_many_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-26" class="question-container hidden"><label><h3>When did this incident happen?</h3></label><div class="date-input-container"><input type="date" id="sc120a_when_did_this_incident_happen" name="sc120a_when_did_this_incident_happen"></div></div><div id="question-container-27" class="question-container hidden"><label><h3>Do you know the date range that it occured?</h3></label><select id="sc120a_do_you_know_the_date_range_that_it_occured" name="sc120a_do_you_know_the_date_range_that_it_occured"
-                      onchange="dropdownMirror(this, 'sc120a_do_you_know_the_date_range_that_it_occured')">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_sc120a_do_you_know_the_date_range_that_it_occured"></div>
-              <input type="text" id="sc120a_do_you_know_the_date_range_that_it_occured_dropdown" name="sc120a_do_you_know_the_date_range_that_it_occured_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-28" class="question-container hidden"><label><h3>When did this happen?</h3></label>
+                   readonly style="display:none;"></div><div id="question-container-27" class="question-container hidden"><label><h3>When did this incident happen?</h3></label><div class="date-input-container"><input type="date" id="sc120a_when_did_this_incident_happen" name="sc120a_when_did_this_incident_happen"></div></div><div id="question-container-28" class="question-container hidden"><label><h3>Do you know the date range that it occured?</h3></label><select id="do_you_know_the_date_range_that_it_occured" name="do_you_know_the_date_range_that_it_occured"
+                      onchange="dropdownMirror(this, 'do_you_know_the_date_range_that_it_occured')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_do_you_know_the_date_range_that_it_occured"></div>
+              <input type="text" id="do_you_know_the_date_range_that_it_occured_dropdown" name="do_you_know_the_date_range_that_it_occured_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-29" class="question-container hidden"><label><h3>When did this happen?</h3></label>
           <div style="display: flex; gap: 20px; justify-content: center; align-items: center; margin: 8px auto; width: 80%; max-width: 400px;">
             <div class="date-input-container" style="flex: 1;">
-              <label for="sc120a_when_did_this_happen_1" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Start Date</label>
-              <input type="date" id="sc120a_when_did_this_happen_1" name="sc120a_when_did_this_happen_1">
+              <label for="when_did_this_happen_1" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Start Date</label>
+              <input type="date" id="when_did_this_happen_1" name="when_did_this_happen_1">
             </div>
             <div style="font-weight: 600; color: #666; margin: 0 10px;">to</div>
             <div class="date-input-container" style="flex: 1;">
-              <label for="sc120a_when_did_this_happen_2" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">End Date</label>
-              <input type="date" id="sc120a_when_did_this_happen_2" name="sc120a_when_did_this_happen_2">
+              <label for="when_did_this_happen_2" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">End Date</label>
+              <input type="date" id="when_did_this_happen_2" name="when_did_this_happen_2">
             </div>
           </div>
           <script>
             // Add validation for date range (end date >= start date)
             document.addEventListener('DOMContentLoaded', function() {
-              const startDate = document.getElementById('sc120a_when_did_this_happen_1');
-              const endDate = document.getElementById('sc120a_when_did_this_happen_2');
+              const startDate = document.getElementById('when_did_this_happen_1');
+              const endDate = document.getElementById('when_did_this_happen_2');
               
               if (startDate && endDate) {
                 // Update min date for end date when start date changes
@@ -1293,26 +1292,24 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
               }
             });
-          </script></div><div id="question-container-29" class="question-container hidden"><label><h3>How did you calculate the money owed to you?</h3></label><div class="text-input-container"><textarea id="sc120a_how_did_you_calculate_the_money_owed_to_you" name="sc120a_how_did_you_calculate_the_money_owed_to_you" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-30" class="question-container"><label><h3>Have you sent a demand letter to them?</h3></label><select id="sc120a_have_you_sent_a_demand_letter_to_them" name="sc120a_have_you_sent_a_demand_letter_to_them"
+          </script></div><div id="question-container-30" class="question-container hidden"><label><h3>How did you calculate the money owed to you?</h3></label><div class="text-input-container"><textarea id="how_did_you_calculate_the_money_owed_to_you" name="how_did_you_calculate_the_money_owed_to_you" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-31" class="question-container"><label><h3>Have you sent a demand letter to them?</h3></label><select id="sc120a_have_you_sent_a_demand_letter_to_them" name="sc120a_have_you_sent_a_demand_letter_to_them"
                       onchange="dropdownMirror(this, 'sc120a_have_you_sent_a_demand_letter_to_them')">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_sc120a_have_you_sent_a_demand_letter_to_them"></div>
               <input type="text" id="sc120a_have_you_sent_a_demand_letter_to_them_dropdown" name="sc120a_have_you_sent_a_demand_letter_to_them_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-31" class="question-container hidden"><label><h3>Are you counter-suing a public entity?</h3></label><select id="sc120a_are_you_countersuing_a_public_entity" name="sc120a_are_you_countersuing_a_public_entity"
+                   readonly style="display:none;"></div><div id="question-container-32" class="question-container hidden"><label><h3>Are you counter-suing a public entity?</h3></label><select id="sc120a_are_you_countersuing_a_public_entity" name="sc120a_are_you_countersuing_a_public_entity"
                       onchange="dropdownMirror(this, 'sc120a_are_you_countersuing_a_public_entity')">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_sc120a_are_you_countersuing_a_public_entity"></div>
               <input type="text" id="sc120a_are_you_countersuing_a_public_entity_dropdown" name="sc120a_are_you_countersuing_a_public_entity_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-32" class="question-container hidden"><label><h3>Have you filed a written claim against the entity?</h3></label><select id="sc120a_have_you_filed_a_written_claim_against_the_entity_1" name="sc120a_have_you_filed_a_written_claim_against_the_entity_1"
-                      onchange="dropdownMirror(this, 'sc120a_have_you_filed_a_written_claim_against_the_entity_1')">
+                   readonly style="display:none;"></div><div id="question-container-33" class="question-container hidden"><label><h3>Have you filed a written claim against the entity?</h3></label><select id="have_you_filed_a_written_claim_against_the_entity_1" name="have_you_filed_a_written_claim_against_the_entity_1"
+                      onchange="dropdownMirror(this, 'have_you_filed_a_written_claim_against_the_entity_1')">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_sc120a_have_you_filed_a_written_claim_against_the_entity_1"></div>
-              <input type="text" id="sc120a_have_you_filed_a_written_claim_against_the_entity_1_dropdown" name="sc120a_have_you_filed_a_written_claim_against_the_entity_1_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-33" class="question-container hidden"><label><h3>When was the claim filed?</h3></label><div class="date-input-container"><input type="date" id="sc120a_when_was_the_claim_filed_1" name="sc120a_when_was_the_claim_filed_1"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+              <div id="dropdowntext_have_you_filed_a_written_claim_against_the_entity_1"></div>
+              <input type="text" id="have_you_filed_a_written_claim_against_the_entity_1_dropdown" name="have_you_filed_a_written_claim_against_the_entity_1_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-34" class="question-container hidden"><label><h3>When was the claim filed?</h3></label><div class="date-input-container"><input type="date" id="when_was_the_claim_filed_1" name="when_was_the_claim_filed_1"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
-<input type="hidden" id="user_fullname_hidden"  name="user_fullname_hidden">
-<input type="hidden" id="user_date_hidden"      name="user_date_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
 <input type="hidden" id="user_phone_hidden"     name="user_phone_hidden">
 <input type="hidden" id="user_street_hidden"    name="user_street_hidden">
@@ -1383,33 +1380,8 @@ document.addEventListener("DOMContentLoaded", function() {
     100% { transform: scale(1); opacity: 1; }
   }
   
-  .alert-close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    background: none;
-    border: none;
-    color: #7f8c8d;
-    font-size: 24px;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-    margin-bottom: 20px;
-  }
-  
-  .alert-close-btn:hover {
-    background: rgba(44, 62, 80, 0.1);
-    color: #2c3e50;
-  }
   
   .alert-message {
-    margin-top: 20px;
     margin-bottom: 28px;
     font-size: 1.08rem;
     line-height: 1.5;
@@ -1424,18 +1396,19 @@ document.addEventListener("DOMContentLoaded", function() {
   
   .alert-buttons {
     display: flex;
+    gap: 18px;
     justify-content: center;
   }
   
   .alert-btn {
-    padding: 12px 32px;
+    padding: 8px 22px;
     border-radius: 6px;
     border: none;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
-    min-width: 120px;
+    min-width: 100px;
   }
   
   .alert-btn-continue {
@@ -1450,7 +1423,6 @@ document.addEventListener("DOMContentLoaded", function() {
   
   <div id="alertOverlay" class="alert-overlay">
     <div class="alert-popup">
-      <button class="alert-close-btn" onclick="closeAlert()" title="Close">×</button>
       <div id="alertMessage" class="alert-message"></div>
       <div class="alert-buttons">
         <button class="alert-btn alert-btn-continue" onclick="closeAlert()">Continue</button>
@@ -1459,6 +1431,7 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
+window.formId = 'SC-120';
 
 /*───────────────────────────────*
  * return the true checkbox prefix
@@ -1475,12 +1448,6 @@ function getCbPrefix (qId){
 function buildCheckboxName (questionId, rawNameId, labelText){
     const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
     let namePart = (rawNameId || '').trim();
-    
-    // If nameId is provided and already contains the full identifier, use it directly
-    if (namePart && (namePart.startsWith(slugPrefix) || namePart.includes('_'))) {
-        return namePart;
-    }
-    
     if (!namePart){
         namePart = labelText.replace(/\W+/g, '_').toLowerCase();
     }
@@ -1493,49 +1460,86 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let isUserLoggedIn = false;
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
-      const formId = urlParams.get("formId");
-    var questionSlugMap       = {"1":"where_are_you_suing","2":"please_explain_why_you_are_suing_at_this_location","3":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","4":"what_is_your_claim_about","5":"please_explain_why_you_re_filing_at_this_courthouse","6":"have_you_filed_more_than_twelve_other_small_claims_w_in_the_last_twelve_months","7":"were_2_or_more_of_those_small_claims_cases_more_than_2_500","8":"are_you_suing_an_attorney","9":"please_enter_your_business_details","10":"are_you_doing_business_under_a_fictious_business_name","11":"what_do_you_do_business_as","12":"are_you_being_sued_by_yourself","13":"please_explain_what_you_do_business_as","14":"what_county_did_you_file_your_fictious_business_name_statement","15":"what_is_your_fictious_business_name_statement_number","16":"how_many_other_people_are_being_sued","17":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","18":"are_any_of_the_people_suing_you_on_active_military_duty","19":"what_is_their_name","20":"are_you_counter_suing_just_one_person","21":"how_many_people_are_you_counter_suing","22":"who_are_you_counter_suing","23":"how_much_are_you_counter_suing_for","24":"explain_why_they_owe_you_that_money","25":"did_the_incident_happen_in_one_day_or_across_many_days","26":"when_did_this_incident_happen","27":"do_you_know_the_date_range_that_it_occured","28":"when_did_this_happen","29":"how_did_you_calculate_the_money_owed_to_you","30":"have_you_sent_a_demand_letter_to_them","31":"are_you_counter_suing_a_public_entity","32":"have_you_filed_a_written_claim_against_the_entity","33":"when_was_the_claim_filed"};
-var questionNameIds = {"1":"where_are_you_suing","2":"please_explain_why_you_are_suing_at_this_location","3":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","4":"what_is_your_claim_about","5":"please_explain_why_youre_filing_at_this_courthouse","6":"have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months","7":"were_2_or_more_of_those_small_claims_cases_more_than_2500","8":"are_you_suing_an_attorney","10":"are_you_doing_business_under_a_fictious_business_name","11":"what_do_you_do_business_as","12":"sc120_are_you_being_sued_by_yourself","13":"sc103_please_explain_what_you_do_business_as","14":"sc103_what_county_did_you_file_your_fictious_business_name_statement","15":"sc103_what_is_your_fictious_business_name_statement_number","16":"answer16","17":"sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires","18":"sc120a_are_any_of_the_people_suing_you_on_active_military_duty","19":"sc120a_what_is_their_name","20":"sc120a_are_you_suing_more_than_one_person_2","21":"answer21","23":"sc120a_how_much_are_you_countersuing_for","24":"sc120a_explain_why_they_owe_you_that_money_1_1","25":"sc120a_did_the_incident_happen_in_one_day_or_across_many","26":"sc120a_when_did_this_incident_happen","27":"sc120a_do_you_know_the_date_range_that_it_occured","28":"sc120a_when_did_this_happen","29":"sc120a_how_did_you_calculate_the_money_owed_to_you","30":"sc120a_have_you_sent_a_demand_letter_to_them","31":"sc120a_are_you_countersuing_a_public_entity","32":"sc120a_have_you_filed_a_written_claim_against_the_entity_1","33":"sc120a_when_was_the_claim_filed_1"};
-var jumpLogics = [{"questionId":"7","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"8","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"10","questionType":"dropdown","jumpOption":"No","jumpTo":"3","section":1},{"questionId":"31","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":3},{"questionId":"32","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":3},{"questionId":"33","questionType":"date","jumpOption":"Any Text","jumpTo":"end","section":3}];
+      const formId = urlParams.get("formId") || window.formId || 'default';
+    var questionSlugMap       = {"1":"please_explain_why_you_are_suing_at_this_location","2":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","3":"what_is_your_claim_about","4":"please_explain_why_you_re_filing_at_this_courthouse","5":"have_you_filed_more_than_twelve_other_small_claims_w_in_the_last_twelve_months","6":"were_2_or_more_of_those_small_claims_cases_more_than_2_500","7":"are_you_suing_an_attorney","8":"please_enter_your_business_details","9":"are_you_doing_business_under_a_fictious_business_name","10":"what_do_you_do_business_as","11":"are_you_suing_for_more_than_10_000","12":"are_you_suing_for_more_than_12_500","13":"are_you_being_sued_by_yourself","14":"please_explain_what_you_do_business_as","15":"what_county_did_you_file_your_fictious_business_name_statement","16":"what_is_your_fictious_business_name_statement_number","17":"how_many_other_people_are_being_sued","18":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","19":"are_any_of_the_people_suing_you_on_active_military_duty","20":"what_is_their_name","21":"are_you_counter_suing_just_one_person","22":"how_many_people_are_you_counter_suing","23":"who_are_you_counter_suing","24":"how_much_are_you_counter_suing_for","25":"explain_why_they_owe_you_that_money","26":"did_the_incident_happen_in_one_day_or_across_many_days","27":"when_did_this_incident_happen","28":"do_you_know_the_date_range_that_it_occured","29":"when_did_this_happen","30":"how_did_you_calculate_the_money_owed_to_you","31":"have_you_sent_a_demand_letter_to_them","32":"are_you_counter_suing_a_public_entity","33":"have_you_filed_a_written_claim_against_the_entity","34":"when_was_the_claim_filed"};
+var questionNameIds = {"1":"please_explain_why_you_are_suing_at_this_location","2":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","3":"what_is_your_claim_about","4":"please_explain_why_youre_filing_at_this_courthouse","5":"have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months","6":"were_2_or_more_of_those_small_claims_cases_more_than_2500","7":"are_you_suing_an_attorney","9":"are_you_doing_business_under_a_fictious_business_name","10":"what_do_you_do_business_as","11":"are_you_suing_for_more_than_10000","12":"are_you_suing_for_more_than_12500","13":"are_you_being_sued_by_yourself","14":"sc103_please_explain_what_you_do_business_as","15":"sc103_what_county_did_you_file_your_fictious_business_name_statement","16":"sc103_what_is_your_fictious_business_name_statement_number","17":"answer17","18":"sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires","19":"are_any_of_the_people_suing_you_on_active_military_duty","20":"sc120a_what_is_their_name","21":"are_you_suing_more_than_one_person_2","22":"answer22","24":"sc120a_how_much_are_you_countersuing_for","25":"explain_why_they_owe_you_that_money_1_1","26":"sc120a_did_the_incident_happen_in_one_day_or_across_many","27":"sc120a_when_did_this_incident_happen","28":"do_you_know_the_date_range_that_it_occured","29":"when_did_this_happen","30":"how_did_you_calculate_the_money_owed_to_you","31":"sc120a_have_you_sent_a_demand_letter_to_them","32":"sc120a_are_you_countersuing_a_public_entity","33":"have_you_filed_a_written_claim_against_the_entity_1","34":"when_was_the_claim_filed_1"};
+var jumpLogics = [{"questionId":"6","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"7","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"11","questionType":"dropdown","jumpOption":"No","jumpTo":"3","section":1},{"questionId":"32","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":3},{"questionId":"33","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":3}];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"10","pdfName":"sc103.pdf","stripePriceId":"1234","conditions":[{"prevQuestion":"10","prevAnswer":"Yes"}],"isBigParagraph":false},{"questionId":"16","pdfName":"sc120a.pdf","stripePriceId":"1234","conditions":[{"prevQuestion":"12","prevAnswer":"No"}],"isBigParagraph":false},{"questionId":"21","pdfName":"sc120a.pdf","stripePriceId":"1234","conditions":[{"prevQuestion":"20","prevAnswer":"No"}],"isBigParagraph":false}];
-var alertLogics = [{"questionId":"7","message":"Sorry youre just not eligible","conditions":[{"prevQuestion":"7","prevAnswer":"Yes"}]},{"questionId":"8","message":"We cant take you on sorry","conditions":[{"prevQuestion":"8","prevAnswer":"Yes"}]},{"questionId":"27","message":"You will need to specify this date range on your paperwork before submitting it to the courthouse","conditions":[{"prevQuestion":"27","prevAnswer":"No"}]}];
+console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', [
+  {
+    "questionId": "9",
+    "pdfName": "sc103.pdf",
+    "pdfDisplayName": "SC-103",
+    "stripePriceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2",
+    "conditions": [
+      {
+        "prevQuestion": "9",
+        "prevAnswer": "Yes"
+      }
+    ],
+    "isBigParagraph": false
+  },
+  {
+    "questionId": "17",
+    "pdfName": "sc120a.pdf",
+    "pdfDisplayName": "SC-120A",
+    "stripePriceId": "price_1SB72hFJeSRMFQ8XF2eKjmUY",
+    "conditions": [
+      {
+        "prevQuestion": "13",
+        "prevAnswer": "No"
+      }
+    ],
+    "isBigParagraph": false
+  },
+  {
+    "questionId": "22",
+    "pdfName": "sc120a.pdf",
+    "pdfDisplayName": "SC-120A",
+    "stripePriceId": "price_1SB72hFJeSRMFQ8XF2eKjmUY",
+    "conditions": [
+      {
+        "prevQuestion": "21",
+        "prevAnswer": "No"
+      }
+    ],
+    "isBigParagraph": false
+  }
+]);
+var pdfLogicPDFs = [{"questionId":"9","pdfName":"sc103.pdf","pdfDisplayName":"SC-103","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","conditions":[{"prevQuestion":"9","prevAnswer":"Yes"}],"isBigParagraph":false},{"questionId":"17","pdfName":"sc120a.pdf","pdfDisplayName":"SC-120A","stripePriceId":"price_1SB72hFJeSRMFQ8XF2eKjmUY","conditions":[{"prevQuestion":"13","prevAnswer":"No"}],"isBigParagraph":false},{"questionId":"22","pdfName":"sc120a.pdf","pdfDisplayName":"SC-120A","stripePriceId":"price_1SB72hFJeSRMFQ8XF2eKjmUY","conditions":[{"prevQuestion":"21","prevAnswer":"No"}],"isBigParagraph":false}];
+var alertLogics = [{"questionId":"6","message":"Sorry youre just not eligible","conditions":[{"prevQuestion":"6","prevAnswer":"Yes"}]},{"questionId":"7","message":"We cant take you on sorry","conditions":[{"prevQuestion":"7","prevAnswer":"Yes"}]},{"questionId":"11","message":"Sorry you cant sue for that much","conditions":[{"prevQuestion":"11","prevAnswer":"Yes"}]},{"questionId":"12","message":"Sorry you cant sue for that much","conditions":[{"prevQuestion":"12","prevAnswer":"Yes"}]},{"questionId":"28","message":"Alert message","conditions":[{"prevQuestion":"28","prevAnswer":"No"}]}];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"16":["Name","Phone Number","Mailing Address"],"21":["Name","Phone Number","Mailing Address"],"length":0};
-var amountMap = {"16":[],"21":[],"length":0};
+var labelMap = {"17":["Name","Phone Number","Mailing Address"],"22":["Name","Phone Number","Mailing Address"],"length":0};
+var amountMap = {"17":[],"22":[],"length":0};
 var linkedDropdowns = [];
 var isHandlingLink = false;
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "";
-var pdfOutputFileName = "example.html";
-var stripePriceId = "";
+var pdfFileName = "SC-120";
+var pdfOutputFileName = "sc120.pdf";
+var stripePriceId = "price_1SB6ukFJeSRMFQ8XXhlqdkHX";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["", ];
+var allPdfFileNames = ["sc120", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
 
 (function(){
- var thisQ=document.getElementById("question-container-3");
+ var thisQ=document.getElementById("question-container-2");
  function updateVisibility(){
   var anyMatch=false;
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="other";
-    var cPrevQNum="2";
+    var cPrevQNum="1";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -1544,9 +1548,38 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var checkQuestion = "2";
+   var checkQuestion = "1";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-3");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="2";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "2";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  updateVisibility();
 })();
@@ -1557,7 +1590,7 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="yes";
+    var cPrevAns="none of the above";
     var cPrevQNum="3";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
@@ -1565,10 +1598,6 @@ var hiddenTextCalculations = [];
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -1590,18 +1619,134 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="none of the above";
-    var cPrevQNum="4";
+    var cPrevAns="an offer or contract for personal, family, or household goods, services, or loans";
+    var cPrevQNum="3";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="a vehicle finance sale";
+    var cPrevQNum="3";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="a retail installment contract (like a credit card)";
+    var cPrevQNum="3";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="2";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where the plaintiff was injured.";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where the defendant lives";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="where the plaintiff’s property was damaged.";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="none of the above";
+    var cPrevQNum="3";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -1610,7 +1755,47 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "4";
+   var selectQuestion = "3";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "3";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "3";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "2";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "1";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "1";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "1";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "1";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "3";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -1623,170 +1808,14 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="an offer or contract for personal, family, or household goods, services, or loans";
-    var cPrevQNum="4";
+    var cPrevAns="yes";
+    var cPrevQNum="5";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="a vehicle finance sale";
-    var cPrevQNum="4";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="a retail installment contract (like a credit card)";
-    var cPrevQNum="4";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="3";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.";
-    var cPrevQNum="2";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="where the plaintiff was injured.";
-    var cPrevQNum="2";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="where the defendant lives";
-    var cPrevQNum="2";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="where the plaintiff’s property was damaged.";
-    var cPrevQNum="2";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="none of the above";
-    var cPrevQNum="4";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -1795,47 +1824,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "4";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "4";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "4";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "3";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "2";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "2";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "2";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "2";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "4";
+   var selectQuestion = "5";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -1848,7 +1837,7 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="yes";
+    var cPrevAns="no";
     var cPrevQNum="6";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
@@ -1856,10 +1845,21 @@ var hiddenTextCalculations = [];
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="5";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -1872,11 +1872,16 @@ var hiddenTextCalculations = [];
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
+ (function(){
+   var selectQuestion = "5";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
  updateVisibility();
 })();
 
 (function(){
- var thisQ=document.getElementById("question-container-8");
+ var thisQ=document.getElementById("question-container-9");
  function updateVisibility(){
   var anyMatch=false;
   (function(){
@@ -1889,29 +1894,6 @@ var hiddenTextCalculations = [];
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="6";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -1924,8 +1906,61 @@ var hiddenTextCalculations = [];
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-11");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="9";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
  (function(){
-   var selectQuestion = "6";
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-8");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="9";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "9";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -1938,18 +1973,14 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="8";
+    var cPrevAns="yes";
+    var cPrevQNum="9";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -1958,42 +1989,9 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "8";
+   var selectQuestion = "9";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-13");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="other";
-    var cPrevQNum="11";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var checkQuestion = "11";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  updateVisibility();
 })();
@@ -2004,18 +2002,43 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="checkbox";
-    var cPrevAns="a partnership";
-    var cPrevQNum="11";
+    var cPrevAns="other";
+    var cPrevQNum="10";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var checkQuestion = "10";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-15");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="a partnership";
+    var cPrevQNum="10";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2024,17 +2047,13 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="a limited liability";
-    var cPrevQNum="11";
+    var cPrevQNum="10";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2043,17 +2062,13 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="an association";
-    var cPrevQNum="11";
+    var cPrevQNum="10";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2062,17 +2077,13 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="a corporation";
-    var cPrevQNum="11";
+    var cPrevQNum="10";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2081,17 +2092,13 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="an individual";
-    var cPrevQNum="11";
+    var cPrevQNum="10";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2100,17 +2107,13 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="other";
-    var cPrevQNum="11";
+    var cPrevQNum="10";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2119,32 +2122,32 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var checkQuestion = "11";
+   var checkQuestion = "10";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "11";
+   var checkQuestion = "10";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "11";
+   var checkQuestion = "10";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "11";
+   var checkQuestion = "10";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "11";
+   var checkQuestion = "10";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "11";
+   var checkQuestion = "10";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2152,7 +2155,7 @@ var hiddenTextCalculations = [];
 })();
 
 (function(){
- var thisQ=document.getElementById("question-container-16");
+ var thisQ=document.getElementById("question-container-13");
  function updateVisibility(){
   var anyMatch=false;
   (function(){
@@ -2165,10 +2168,6 @@ var hiddenTextCalculations = [];
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2185,42 +2184,19 @@ var hiddenTextCalculations = [];
 })();
 
 (function(){
- var thisQ=document.getElementById("question-container-18");
+ var thisQ=document.getElementById("question-container-17");
  function updateVisibility(){
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="no";
-    var cPrevQNum="12";
+    var cPrevQNum="13";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="12";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2229,12 +2205,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "12";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "12";
+   var selectQuestion = "13";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2247,18 +2218,29 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="18";
+    var cPrevAns="no";
+    var cPrevQNum="13";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="13";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2267,7 +2249,12 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "18";
+   var selectQuestion = "13";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "13";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2280,18 +2267,14 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="18";
+    var cPrevAns="yes";
+    var cPrevQNum="19";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2300,7 +2283,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "18";
+   var selectQuestion = "19";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2314,17 +2297,13 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="no";
-    var cPrevQNum="20";
+    var cPrevQNum="19";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2333,7 +2312,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "20";
+   var selectQuestion = "19";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2346,18 +2325,14 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="20";
+    var cPrevAns="no";
+    var cPrevQNum="21";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2366,7 +2341,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "20";
+   var selectQuestion = "21";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2379,37 +2354,14 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="20";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
     var cPrevAns="yes";
-    var cPrevQNum="20";
+    var cPrevQNum="21";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2418,12 +2370,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "20";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "20";
+   var selectQuestion = "21";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2437,17 +2384,13 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="no";
-    var cPrevQNum="20";
+    var cPrevQNum="21";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2456,17 +2399,13 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="yes";
-    var cPrevQNum="20";
+    var cPrevQNum="21";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2475,12 +2414,12 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "20";
+   var selectQuestion = "21";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var selectQuestion = "20";
+   var selectQuestion = "21";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2488,23 +2427,34 @@ var hiddenTextCalculations = [];
 })();
 
 (function(){
- var thisQ=document.getElementById("question-container-26");
+ var thisQ=document.getElementById("question-container-25");
  function updateVisibility(){
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="25";
+    var cPrevAns="no";
+    var cPrevQNum="21";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="21";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2513,7 +2463,12 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "25";
+   var selectQuestion = "21";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "21";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2526,18 +2481,14 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="25";
+    var cPrevAns="yes";
+    var cPrevQNum="26";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2546,7 +2497,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "25";
+   var selectQuestion = "26";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2559,18 +2510,14 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="27";
+    var cPrevAns="no";
+    var cPrevQNum="26";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2579,7 +2526,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "27";
+   var selectQuestion = "26";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2592,18 +2539,14 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="27";
+    var cPrevAns="yes";
+    var cPrevQNum="28";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2612,7 +2555,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "27";
+   var selectQuestion = "28";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2620,42 +2563,19 @@ var hiddenTextCalculations = [];
 })();
 
 (function(){
- var thisQ=document.getElementById("question-container-31");
+ var thisQ=document.getElementById("question-container-30");
  function updateVisibility(){
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="30";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
     var cPrevAns="no";
-    var cPrevQNum="30";
+    var cPrevQNum="28";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2664,12 +2584,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "30";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "30";
+   var selectQuestion = "28";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2690,10 +2605,21 @@ var hiddenTextCalculations = [];
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="31";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2701,6 +2627,11 @@ var hiddenTextCalculations = [];
   })();
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
+ (function(){
+   var selectQuestion = "31";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
  (function(){
    var selectQuestion = "31";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
@@ -2723,10 +2654,6 @@ var hiddenTextCalculations = [];
       var checkedVals=[];
       for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
       if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else if(cPrevType==="dateRange"){
-      var startDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_1");
-      var endDateEl=document.getElementById(questionNameIds[cPrevQNum] + "_2");
-      if(startDateEl && endDateEl){ var startVal=startDateEl.value.trim(); var endVal=endDateEl.value.trim(); if(startVal !== "" && endVal !== ""){ anyMatch=true;} }
     } else {
       var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
@@ -2742,9 +2669,52 @@ var hiddenTextCalculations = [];
  updateVisibility();
 })();
 
+(function(){
+ var thisQ=document.getElementById("question-container-34");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "33";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
 
 // Alert Logic Functions
+// Track page load time to prevent alerts in first 3 seconds
+const pageLoadTime = Date.now();
+const ALERT_DELAY_MS = 3000; // 3 seconds
+
 function showAlert(message) {
+    // Check if 3 seconds have passed since page load
+    const currentTime = Date.now();
+    const timeSinceLoad = currentTime - pageLoadTime;
+    
+    if (timeSinceLoad < ALERT_DELAY_MS) {
+        // If less than 3 seconds have passed, don't show the alert
+        console.log('Alert blocked: Page loaded less than 3 seconds ago');
+        return;
+    }
+    
     const alertOverlay = document.getElementById('alertOverlay');
     const alertMessage = document.getElementById('alertMessage');
     
@@ -2755,7 +2725,7 @@ function showAlert(message) {
             alertMessage.innerHTML = message;
         } else {
             // This is a regular text alert
-        alertMessage.textContent = message;
+            alertMessage.textContent = message;
         }
         alertOverlay.style.display = 'flex';
     }
@@ -2768,19 +2738,6 @@ function closeAlert() {
     }
 }
 
-function exitForm() {
-    // Check if this is a validation popup or regular alert
-    const alertMessage = document.getElementById('alertMessage');
-    if (alertMessage && alertMessage.innerHTML.includes('Please Complete All Questions')) {
-        // This is a validation popup - go back to forms page
-        if (confirm('Are you sure you want to exit? Your progress will be saved.')) {
-            window.location.href = 'forms.html';
-        }
-    } else {
-        // This is a regular alert - reload the page
-    window.location.reload();
-    }
-}
 
 // Show validation popup when user tries to proceed without answering all questions
 function showValidationPopup() {
@@ -2793,40 +2750,8 @@ function showValidationPopup() {
     showAlert(validationMessage);
 }
 
-// Initialize autofill flag and alert delay
-window.isAutofilling = false;
-window.alertsDisabled = true;
-
-// Enable alerts after 5 seconds
-setTimeout(() => {
-    window.alertsDisabled = false;
-    console.log('Alerts enabled after 5-second delay');
-}, 5000);
-
 function checkAlertLogic(changedElement) {
-    console.log('checkAlertLogic called for element:', changedElement ? changedElement.id : 'unknown');
-    if (!alertLogics || alertLogics.length === 0) {
-        console.log('No alert logics found');
-        return;
-    }
-    
-    // Don't show alerts during the first 5 seconds after page load
-    if (window.alertsDisabled) {
-        console.log('Alert blocked - still within 5-second delay period');
-        return;
-    }
-    
-    // Don't show alerts during autofill process
-    if (window.isAutofilling) {
-        console.log('Alert blocked during autofill');
-        return;
-    }
-    
-    // Additional safety check - don't show alerts if the element was just programmatically set
-    if (changedElement && changedElement.dataset && changedElement.dataset.autofilled === 'true') {
-        console.log('Alert blocked for autofilled element');
-        return;
-    }
+    if (!alertLogics || alertLogics.length === 0) return;
     
     // Get the question ID from the changed element
     let changedQuestionId = null;
@@ -2841,14 +2766,16 @@ function checkAlertLogic(changedElement) {
         }
     }
     
-    // Only check alert logic if we can identify which question changed
+    // If we can't determine which question changed, don't check any alerts
+    // This prevents alerts from triggering on unrelated form elements
     if (!changedQuestionId) return;
     
     for (const alertLogic of alertLogics) {
         if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
         
-        // Only check this alert logic if it's specifically for the changed question
+        // Only check this alert logic if it's related to the changed element
         let shouldCheckThisAlert = false;
+        // Check if any condition in this alert logic references the changed question
         for (const condition of alertLogic.conditions) {
             if (condition.prevQuestion === changedQuestionId) {
                 shouldCheckThisAlert = true;
@@ -2864,9 +2791,6 @@ function checkAlertLogic(changedElement) {
         for (const condition of alertLogic.conditions) {
             const prevQuestionId = condition.prevQuestion;
             const prevAnswer = condition.prevAnswer;
-            
-            // Only check conditions for the question that actually changed
-            if (prevQuestionId !== changedQuestionId) continue;
             
             // Get the previous question's value
             const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
@@ -2897,8 +2821,15 @@ function checkAlertLogic(changedElement) {
     }
 }
 
-// Initialize checkbox styling for beautiful blue borders on DOM load
+// Add event listeners for alert logic
 document.addEventListener('DOMContentLoaded', function() {
+    const formElements = document.querySelectorAll('input, select, textarea');
+    formElements.forEach(element => {
+        element.addEventListener('change', function() { checkAlertLogic(this); });
+        element.addEventListener('input', function() { checkAlertLogic(this); });
+    });
+    
+    // Initialize checkbox styling for beautiful blue borders
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(checkbox => {
         updateCheckboxStyle(checkbox);
@@ -2944,7 +2875,7 @@ window.showCartModal = function () {
     document.body.appendChild(modal);
 
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
-    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = '../Pages/cart.html'; };
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = 'cart.html'; };
     document.getElementById('addToCartBtn').onclick   = () => {
       window.addFormToCart(EXAMPLE_FORM_PRICE_ID);
       modal.remove();
@@ -2952,8 +2883,28 @@ window.showCartModal = function () {
   });
 };
 
+// --- Cart helpers (new) ---
+function clearCartState() {
+  try { localStorage.removeItem('formwiz_cart'); } catch {}
+  // expire cookie immediately
+  document.cookie = 'formwiz_cart=;path=/;max-age=0';
+}
+
+function writeCartCookie(cart) {
+  try { document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000'; } catch {}
+}
+
+function getUrlParam(name) {
+  const u = new URLSearchParams(window.location.search);
+  return u.get(name) || '';
+}
+
 // Add to cart helper (global, no Firebase required)
 window.addFormToCart = function (priceId) {
+  // 1) Fresh start each submission (prevents dupes/stale items across re-submits)
+  clearCartState();
+
+  // 2) Collect form data
   const form = document.getElementById('customForm');
   const formData = {};
   if (form) {
@@ -2965,97 +2916,98 @@ window.addFormToCart = function (priceId) {
     }
   }
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const countyName    = urlParams.get('county') || '';
-  const defendantName = urlParams.get('defendantName') || '';
-  const formTitle     = window.pdfOutputFileName || pdfOutputFileName || 'Form';
+  // 3) Uniform metadata for every cart line
+  const originalFormId = (window.formId || 'custom-form');
+  const formTitle      = window.pdfOutputFileName || (typeof pdfOutputFileName !== 'undefined' ? pdfOutputFileName : 'Form');
+  const countyName     = getUrlParam('county');
+  const defendantName  = getUrlParam('defendantName');
+  const portfolioId    = getUrlParam('portfolioId');
+  const nowTs          = Date.now();
 
-  // Check for PDF Logic PDFs that should be added to cart
+  // 4) Compute all PDF-logic matches (OR logic across conditions)
   const pdfLogicItems = [];
-  if (typeof pdfLogicPDFs !== 'undefined' && pdfLogicPDFs.length > 0) {
-    for (const pdfLogic of pdfLogicPDFs) {
-      if (pdfLogic.pdfName && pdfLogic.stripePriceId) {
-        // Check if conditions are met
-        let shouldAddToCart = false;
-        
-        pdfLogic.conditions.forEach(condition => {
-          const prevQuestionId = condition.prevQuestion;
-          const prevAnswer = condition.prevAnswer;
-          
-          // Get the previous question's value
-          const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
-                                    document.getElementById('answer' + prevQuestionId);
-          
-          if (prevQuestionElement) {
-            let prevValue = '';
-            
-            if (prevQuestionElement.type === 'checkbox') {
-              prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
-            } else {
-              prevValue = prevQuestionElement.value;
-            }
-            
-            // Check if the condition matches
-            if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
-              shouldAddToCart = true;
-            }
+  try {
+    if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
+      for (const pdfLogic of window.pdfLogicPDFs) {
+        if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
+
+        let matched = false;
+        const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+        for (const c of conds) {
+          const prevId = c?.prevQuestion;
+          const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+          if (!prevId) continue;
+
+          const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                     document.getElementById('answer' + prevId);
+          if (!el) continue;
+
+          let val = '';
+          if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+          else                        { val = el.value || ''; }
+
+          if (val.toString().toLowerCase() === expect) {
+            matched = true; // any condition match includes the PDF
           }
-        });
-        
-        // Add to cart if conditions are met
-        if (shouldAddToCart) {
+        }
+
+        if (matched) {
           pdfLogicItems.push({
-            formId: (window.formId || 'custom-form') + '_' + pdfLogic.questionId,
-            title: pdfLogic.pdfName.replace(/\.pdf$/i, ''),
+            formId: pdfLogic.pdfName.replace(/.pdf$/i, ''),
+            title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/.pdf$/i, ''),
             priceId: pdfLogic.stripePriceId,
+            pdfName: pdfLogic.pdfName,
+            originalFormId: originalFormId,
+            portfolioId: portfolioId,
             formData: formData,
             countyName: countyName,
             defendantName: defendantName,
-            timestamp: Date.now()
+            timestamp: nowTs
           });
         }
       }
     }
+  } catch (e) {
+    console.warn('[PDF LOGIC] error computing matches:', e);
   }
 
-  // Prefer existing cart manager if present
+  // 5) Preferred path: site cart manager
   if (typeof window.addToCart === 'function') {
-    const fid = (window.formId || 'custom-form');
-    window.addToCart(fid, formTitle, priceId, formData, countyName, defendantName);
-    
-    // Add PDF Logic items to cart
-    pdfLogicItems.forEach(item => {
-      window.addToCart(item.formId, item.title, item.priceId, item.formData, item.countyName, item.defendantName);
-    });
-    
-    window.location.href = '../Pages/cart.html';
+    // main item
+    window.addToCart(
+      originalFormId, formTitle, priceId, { ...formData }, countyName, defendantName,
+      { originalFormId, portfolioId, pdfName: (window.pdfFileName || '') }
+    );
+
+    // every matched PDF logic item
+    for (const item of pdfLogicItems) {
+      window.addToCart(
+        item.formId, item.title, item.priceId, { ...item.formData },
+        item.countyName, item.defendantName,
+        { originalFormId: item.originalFormId, portfolioId: item.portfolioId, pdfName: item.pdfName }
+      );
+    }
+
+    // redirect after everything is queued
+    setTimeout(() => { window.location.href = 'cart.html'; }, 0);
     return;
   }
 
-  // Fallback: localStorage/cookie
-  const cart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
-  
-  // Add main form
-  const mainItem = {
-    formId: (window.formId || 'custom-form'),
-    title: formTitle,
-    priceId,
-    formData,
-    countyName,
-    defendantName,
-    timestamp: Date.now()
-  };
-  cart.push(mainItem);
-  
-  // Add PDF Logic items
-  pdfLogicItems.forEach(item => {
-    cart.push(item);
+  // 6) Fallback: localStorage + cookie (fresh array due to clearCartState)
+  const cart = [];
+  cart.push({
+    formId: originalFormId, title: formTitle, priceId,
+    pdfName: (window.pdfFileName || ''),
+    originalFormId, portfolioId, formData, countyName, defendantName, timestamp: nowTs
   });
-  
-  localStorage.setItem('formwiz_cart', JSON.stringify(cart));
-  document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
-  window.location.href = '../Pages/cart.html';
+  for (const item of pdfLogicItems) cart.push(item);
+
+  try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch {}
+  writeCartCookie(cart);
+
+  setTimeout(() => { window.location.href = 'cart.html'; }, 0);
 };
+
 
 // Fallback cart count function (global, no Firebase required)
 window.getCartCount = function() {
@@ -3237,23 +3189,14 @@ function validateCurrentSection(sectionNumber) {
     const questions = section.querySelectorAll('.question-container:not(.hidden)');
     let isValid = true;
     
-    console.log('Validating section', sectionNumber, 'with', questions.length, 'visible questions');
-    
     questions.forEach(question => {
         const questionId = question.id.replace('question-container-', '');
         const questionType = getQuestionTypeFromContainer(question);
         
-        console.log('Validating question', questionId, 'of type', questionType);
-        
         if (!validateQuestion(question, questionType, questionId)) {
-            console.log('Question', questionId, 'failed validation');
             isValid = false;
-        } else {
-            console.log('Question', questionId, 'passed validation');
         }
     });
-    
-    console.log('Section validation result:', isValid);
     
     // Update next button state
     const nextButton = document.getElementById('next-button-' + sectionNumber);
@@ -3330,12 +3273,8 @@ function validateDropdownQuestion(questionContainer) {
     const select = questionContainer.querySelector('select');
     if (!select) return true;
     
-    // Debug logging
-    console.log('Validating dropdown:', select.id, 'Value:', select.value, 'Trimmed:', select.value.trim());
-    
     // Check if the dropdown has a value and it's not the default empty/disabled option
     const isValid = select.value && select.value.trim() !== '' && select.value !== 'Select an option';
-    console.log('Dropdown validation result:', isValid);
     return isValid;
 }
 
@@ -3378,8 +3317,16 @@ function addValidationListeners() {
     const formFields = currentSection.querySelectorAll('input, select, textarea');
     
     formFields.forEach(field => {
-        field.addEventListener('change', () => validateCurrentSection(sectionNumber));
-        field.addEventListener('input', () => validateCurrentSection(sectionNumber));
+        // Remove existing listeners to prevent duplicates
+        field.removeEventListener('change', field._validationHandler);
+        field.removeEventListener('input', field._validationHandler);
+        
+        // Create new handler
+        field._validationHandler = () => validateCurrentSection(sectionNumber);
+        
+        // Add listeners
+        field.addEventListener('change', field._validationHandler);
+        field.addEventListener('input', field._validationHandler);
     });
     
     // Initial validation
@@ -3389,9 +3336,6 @@ function addValidationListeners() {
 // Initialize validation when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     addValidationListeners();
-    
-    // Initialize hidden checkboxes for all dropdowns
-    initializeDropdownHiddenCheckboxes();
     
     // Trigger visibility updates on DOM load to show dependent questions
     setTimeout(() => {
@@ -3415,138 +3359,8 @@ document.addEventListener('DOMContentLoaded', function() {
         attributes: true,
         subtree: true
     });
-    
-    // Add Ctrl+Shift debug feature
-    addDebugKeyboardShortcut();
 });
 
-// Debug feature: Show all question and option IDs when pressing Ctrl+Shift
-function addDebugKeyboardShortcut() {
-    document.addEventListener('keydown', function(e) {
-        // Check for Ctrl+Shift combination
-        if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey) {
-            e.preventDefault();
-            showQuestionIdsDebug();
-        }
-    });
-}
-
-function showQuestionIdsDebug() {
-    const form = document.getElementById('customForm');
-    if (!form) return;
-    
-    const allElements = form.querySelectorAll('input, select, textarea');
-    const questionIds = [];
-    const optionIds = [];
-    const otherIds = [];
-    
-    allElements.forEach(element => {
-        if (element.name && element.id) {
-            const elementInfo = {
-                id: element.id,
-                name: element.name,
-                type: element.type || element.tagName.toLowerCase(),
-                value: element.value || (element.checked ? 'checked' : 'unchecked')
-            };
-            
-            // Categorize based on naming patterns
-            if (element.id.startsWith('answer') || element.name.startsWith('answer')) {
-                questionIds.push(elementInfo);
-            } else if (element.id.includes('_') || element.name.includes('_')) {
-                optionIds.push(elementInfo);
-            } else {
-                otherIds.push(elementInfo);
-            }
-        }
-    });
-    
-    // Create debug modal
-    const modal = document.createElement('div');
-    modal.id = 'debugModal';
-    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; font-family: "Courier New", monospace;';
-    
-    const modalContent = document.createElement('div');
-    modalContent.style.cssText = 'background: white; border-radius: 8px; padding: 20px; max-width: 80%; max-height: 80%; overflow-y: auto; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);';
-    
-    let html = '<h2 style="margin-top: 0; color: #2c3e50;">🔍 Form Debug: All Question & Option IDs</h2>';
-    html += '<p style="color: #7f8c8d; margin-bottom: 20px;">Press Ctrl+Shift again or click outside to close</p>';
-    
-    // Questions section
-    if (questionIds.length > 0) {
-        html += '<h3 style="color: #2980b9; border-bottom: 2px solid #2980b9; padding-bottom: 5px;">📝 Questions (' + questionIds.length + ')</h3>';
-        html += '<div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 15px;">';
-        questionIds.forEach(item => {
-            html += '<div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px; border-left: 3px solid #2980b9;">';
-            html += '<strong>ID:</strong> ' + item.id + '<br>';
-            html += '<strong>Name:</strong> ' + item.name + '<br>';
-            html += '<strong>Type:</strong> ' + item.type + '<br>';
-            html += '<strong>Value:</strong> ' + item.value;
-            html += '</div>';
-        });
-        html += '</div>';
-    }
-    
-    // Options section
-    if (optionIds.length > 0) {
-        html += '<h3 style="color: #27ae60; border-bottom: 2px solid #27ae60; padding-bottom: 5px;">☑️ Options (' + optionIds.length + ')</h3>';
-        html += '<div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 15px;">';
-        optionIds.forEach(item => {
-            html += '<div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px; border-left: 3px solid #27ae60;">';
-            html += '<strong>ID:</strong> ' + item.id + '<br>';
-            html += '<strong>Name:</strong> ' + item.name + '<br>';
-            html += '<strong>Type:</strong> ' + item.type + '<br>';
-            html += '<strong>Value:</strong> ' + item.value;
-            html += '</div>';
-        });
-        html += '</div>';
-    }
-    
-    // Other elements section
-    if (otherIds.length > 0) {
-        html += '<h3 style="color: #e74c3c; border-bottom: 2px solid #e74c3c; padding-bottom: 5px;">🔧 Other Elements (' + otherIds.length + ')</h3>';
-        html += '<div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 15px;">';
-        otherIds.forEach(item => {
-            html += '<div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px; border-left: 3px solid #e74c3c;">';
-            html += '<strong>ID:</strong> ' + item.id + '<br>';
-            html += '<strong>Name:</strong> ' + item.name + '<br>';
-            html += '<strong>Type:</strong> ' + item.type + '<br>';
-            html += '<strong>Value:</strong> ' + item.value;
-            html += '</div>';
-        });
-        html += '</div>';
-    }
-    
-    // Summary
-    const totalElements = questionIds.length + optionIds.length + otherIds.length;
-    html += '<div style="background: #2c3e50; color: white; padding: 15px; border-radius: 4px; text-align: center;">';
-    html += '<strong>Total Elements: ' + totalElements + '</strong><br>';
-    html += '<small>Questions: ' + questionIds.length + ' | Options: ' + optionIds.length + ' | Other: ' + otherIds.length + '</small>';
-    html += '</div>';
-    
-    modalContent.innerHTML = html;
-    modal.appendChild(modalContent);
-    document.body.appendChild(modal);
-    
-    // Close modal on click outside or Ctrl+Shift
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeDebugModal();
-        }
-    });
-    
-    // Close modal on Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeDebugModal();
-        }
-    });
-    
-    function closeDebugModal() {
-        if (modal && modal.parentNode) {
-            modal.parentNode.removeChild(modal);
-        }
-    }
-}
 
 function showTextboxLabels(questionId, count){
     const container = document.getElementById("labelContainer" + questionId);
@@ -3635,61 +3449,6 @@ function handleLinkedDropdowns(sourceName, selectedValue) {
     }
 }
 
-/*──────────────────────────────────────────────────────────────*
- * Update hidden checkboxes for dropdown options
- *──────────────────────────────────────────────────────────────*/
-function updateHiddenDropdownCheckboxes(baseName, selectedValue) {
-    // Find the dropdown element to get its options
-    const dropdown = document.getElementById(baseName);
-    if (!dropdown || dropdown.tagName !== 'SELECT') return;
-    
-    // Get all options from the dropdown
-    const options = Array.from(dropdown.options).filter(option => option.value.trim() !== '');
-    
-    // For each option, create or update the corresponding hidden checkbox
-    options.forEach(option => {
-        const optionValue = option.value.trim();
-        if (!optionValue) return;
-        
-        // Create checkbox ID based on the option value
-        const checkboxId = baseName + "_" + optionValue.replace(/W+/g, "_").toLowerCase();
-        
-        // Check if checkbox already exists
-        let checkbox = document.getElementById(checkboxId);
-        
-        if (!checkbox) {
-            // Create the hidden checkbox if it doesn't exist
-            checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = checkboxId;
-            checkbox.name = checkboxId;
-            checkbox.style.display = 'none';
-            
-            // Add it to the form or a hidden container
-            const form = document.getElementById('customForm');
-            if (form) {
-                form.appendChild(checkbox);
-            }
-        }
-        
-        // Set the checkbox state based on whether this option is selected
-        checkbox.checked = (optionValue === selectedValue);
-    });
-}
-
-/*──────────────────────────────────────────────────────────────*
- * Initialize hidden checkboxes for all dropdowns on page load
- *──────────────────────────────────────────────────────────────*/
-function initializeDropdownHiddenCheckboxes() {
-    // Find all dropdown elements in the form
-    const dropdowns = document.querySelectorAll('#customForm select');
-    
-    dropdowns.forEach(dropdown => {
-        // Initialize hidden checkboxes for this dropdown
-        updateHiddenDropdownCheckboxes(dropdown.id, dropdown.value);
-    });
-}
-
 /*──────── mirror a dropdown → textbox and checkbox ────────*/
 function dropdownMirror(selectEl, baseName){
     const wrap = document.getElementById("dropdowntext_"+baseName);
@@ -3698,8 +3457,6 @@ function dropdownMirror(selectEl, baseName){
     const val = selectEl.value.trim();
     if(!val) {
         wrap.innerHTML = "";
-        // Uncheck all hidden checkboxes when no option is selected
-        updateHiddenDropdownCheckboxes(baseName, "");
         return;
     }
 
@@ -3723,10 +3480,6 @@ function dropdownMirror(selectEl, baseName){
                      "<label for='" + checkboxId + "'> " + baseName + "_" + idSuffix + "</label>";
     
     wrap.appendChild(checkboxDiv);
-    
-    // Update hidden checkboxes for dropdown options
-    updateHiddenDropdownCheckboxes(baseName, val);
-    
     handleLinkedDropdowns(baseName, val);
 }
 
@@ -3778,27 +3531,6 @@ function handleNext(currentSection){
             if (chosen.includes(jl.jumpOption.trim().toLowerCase())){
                 nextSection = jl.jumpTo.toLowerCase();
                 break;
-            }
-        } else if (['text','bigParagraph','money','date'].includes(jl.questionType)){
-            // For textbox and single date questions, jump logic triggers regardless of input content
-            const el = document.getElementById(nmId);
-            if (el && jl.jumpOption === "Any Text"){
-                // For textbox and date questions, always jump if jump logic is enabled
-                nextSection = jl.jumpTo.toLowerCase();
-                break;
-            }
-        } else if (jl.questionType === 'dateRange'){
-            // For dateRange questions, check if both date inputs have values
-            const startDateEl = document.getElementById(nmId + '_1');
-            const endDateEl = document.getElementById(nmId + '_2');
-            if (startDateEl && endDateEl && jl.jumpOption === "Any Text"){
-                const startVal = startDateEl.value.trim();
-                const endVal = endDateEl.value.trim();
-                // For dateRange questions, jump only if both dates are filled
-                if (startVal !== "" && endVal !== ""){
-                    nextSection = jl.jumpTo.toLowerCase();
-                    break;
-                }
             }
         }
     }
@@ -4555,16 +4287,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Modal logic
 function showLoginRequiredModal() {
-  const modal = document.getElementById('loginRequiredModal');
-  if (modal) {
-    modal.style.display = 'flex';
-  }
+  document.getElementById('loginRequiredModal').style.display = 'flex';
 }
 function hideLoginRequiredModal() {
-  const modal = document.getElementById('loginRequiredModal');
-  if (modal) {
-    modal.style.display = 'none';
-  }
+  document.getElementById('loginRequiredModal').style.display = 'none';
 }
 document.addEventListener('DOMContentLoaded', function() {
   var backBtn = document.getElementById('modalBackBtn');
@@ -4579,10 +4305,7 @@ document.addEventListener('DOMContentLoaded', function() {
 if (typeof handleNext === 'function') {
   var originalHandleNext = handleNext;
   window.handleNext = function(currentSection) {
-    // Check if we're in preview mode (no login modal exists)
-    const isPreviewMode = !document.getElementById('loginRequiredModal');
-    
-    if (!isUserLoggedIn && !isPreviewMode) {
+    if (!isUserLoggedIn) {
       showLoginRequiredModal();
       return;
     }
@@ -4645,20 +4368,14 @@ if (typeof handleNext === 'function') {
                 if (doc.exists) {
                     const data = doc.data();
                     const fields = getFormFields();
-                    
-                    // Set flag to prevent alerts during autofill - set it early
-                    window.isAutofilling = true;
-                    
                     fields.forEach(el => {
                         if (data.hasOwnProperty(el.name)) {
                             // Check if this answer would trigger a jump to the end
                             if (wouldTriggerJumpToEnd(el, data[el.name])) {
                                 // Don't autofill this answer - keep it as default
+                                console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
                                 return;
                             }
-                            
-                            // Mark element as autofilled
-                            el.dataset.autofilled = 'true';
                             
                             if (el.type === 'checkbox' || el.type === 'radio') {
                                 el.checked = !!data[el.name];
@@ -4668,105 +4385,8 @@ if (typeof handleNext === 'function') {
                         }
                     });
                     
-                    // Also populate user data fields from Firebase user document
-                    try {
-                        const userDoc = await db.collection('users').doc(userId).get();
-                        if (userDoc.exists) {
-                            const userData = userDoc.data();
-                            
-                            // Wait for DOM to be ready before populating fields
-                            setTimeout(() => {
-                                
-                                const firstNameField = document.getElementById('user_firstname');
-                                const lastNameField = document.getElementById('user_lastname');
-                                
-                                if (firstNameField) {
-                                    firstNameField.value = userData.firstName || '';
-                                }
-                                
-                                if (lastNameField) {
-                                    lastNameField.value = userData.lastName || '';
-                                }
-                                
-                                // Populate user_fullname
-                                const fullNameField = document.getElementById('user_fullname');
-                                if (fullNameField) {
-                                    const fullName = (userData.firstName || '') + ' ' + (userData.lastName || '');
-                                    fullNameField.value = fullName.trim();
-                                }
-                                
-                                // Populate user_date
-                                const dateField = document.getElementById('user_date');
-                                if (dateField) {
-                                    const today = new Date().toLocaleDateString();
-                                    dateField.value = today;
-                                }
-                                
-                                document.getElementById('user_email').value = userData.email || '';
-                                
-                                // Update hidden fields
-                                document.getElementById('user_firstname_hidden').value = userData.firstName || '';
-                                document.getElementById('user_lastname_hidden').value = userData.lastName || '';
-                                
-                                // Populate hidden user_fullname
-                                const fullNameHiddenField = document.getElementById('user_fullname_hidden');
-                                if (fullNameHiddenField) {
-                                    const fullName = (userData.firstName || '') + ' ' + (userData.lastName || '');
-                                    fullNameHiddenField.value = fullName.trim();
-                                }
-                                
-                                // Populate hidden user_date
-                                const dateHiddenField = document.getElementById('user_date_hidden');
-                                if (dateHiddenField) {
-                                    const today = new Date().toLocaleDateString();
-                                    dateHiddenField.value = today;
-                                }
-                                
-                                document.getElementById('user_phone').value = userData.phone || '';
-                                document.getElementById('user_street').value = userData.address?.street || '';
-                                document.getElementById('user_city').value = userData.address?.city || '';
-                                document.getElementById('user_state').value = userData.address?.state || '';
-                                document.getElementById('user_zip').value = userData.address?.zip || '';
-                                
-                                // Update hidden fields
-                                document.getElementById('user_email_hidden').value = userData.email || '';
-                                document.getElementById('user_phone_hidden').value = userData.phone || '';
-                                document.getElementById('user_street_hidden').value = userData.address?.street || '';
-                                document.getElementById('user_city_hidden').value = userData.address?.city || '';
-                                document.getElementById('user_state_hidden').value = userData.address?.state || '';
-                                document.getElementById('user_zip_hidden').value = userData.address?.zip || '';
-                                
-                                // Set up event listeners for full name updates
-                                if (firstNameField && lastNameField) {
-                                    const updateFullName = () => {
-                                        const fullName = (firstNameField.value || '') + ' ' + (lastNameField.value || '');
-                                        const fullNameField = document.getElementById('user_fullname');
-                                        const fullNameHiddenField = document.getElementById('user_fullname_hidden');
-                                        if (fullNameField) fullNameField.value = fullName.trim();
-                                        if (fullNameHiddenField) fullNameHiddenField.value = fullName.trim();
-                                    };
-                                    
-                                    firstNameField.addEventListener('input', updateFullName);
-                                    lastNameField.addEventListener('input', updateFullName);
-                                }
-                            }, 500);
-                        }
-                    } catch (error) {
-                        // Error loading user data - silently continue
-                    }
-                    
-                    // Clear the autofill flag after a short delay to ensure all events have fired
+                    // After autofilling, trigger visibility updates for dependent questions
                     setTimeout(() => {
-                        window.isAutofilling = false;
-                        
-                        // Clear the autofilled flag from all elements
-                        fields.forEach(el => {
-                            if (el.dataset) {
-                                delete el.dataset.autofilled;
-                            }
-                        });
-                        
-                        // After autofilling, trigger visibility updates for dependent questions
                         if (typeof triggerVisibilityUpdates === 'function') {
                             triggerVisibilityUpdates();
                         }
@@ -4807,23 +4427,6 @@ if (typeof handleNext === 'function') {
                         if (answerValue.toString().toLowerCase() === jl.jumpOption.trim().toLowerCase()) {
                             return true;
                         }
-                    } else if (['text','bigParagraph','money','date'].includes(jl.questionType)) {
-                        // For textbox and single date questions, any input (or no input) triggers the jump
-                        if (jl.jumpOption === "Any Text") {
-                            return true;
-                        }
-                    } else if (jl.questionType === 'dateRange') {
-                        // For dateRange questions, check if both dates are filled
-                        if (jl.jumpOption === "Any Text") {
-                            const startDateEl = document.getElementById(questionNameIds[questionId] + '_1');
-                            const endDateEl = document.getElementById(questionNameIds[questionId] + '_2');
-                            if (startDateEl && endDateEl) {
-                                const startVal = startDateEl.value.trim();
-                                const endVal = endDateEl.value.trim();
-                                // Only trigger jump if both dates are filled
-                                return startVal !== "" && endVal !== "";
-                            }
-                        }
                     }
                 }
             }
@@ -4844,27 +4447,6 @@ if (typeof handleNext === 'function') {
                 el.addEventListener('input', saveAnswers);
                 el.addEventListener('change', saveAnswers);
             });
-            
-            // Attach alert listeners after autofill is complete
-            attachAlertListeners();
-        }
-        
-        function attachAlertListeners() {
-            // Only attach alert listeners to elements that have alert logic
-            for (const alertLogic of alertLogics) {
-                if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
-                
-                for (const condition of alertLogic.conditions) {
-                    const questionId = condition.prevQuestion;
-                    const questionElement = document.getElementById(questionNameIds[questionId]) || 
-                                          document.getElementById('answer' + questionId);
-                    
-                    if (questionElement) {
-                        questionElement.addEventListener('change', function() { checkAlertLogic(this); });
-                        questionElement.addEventListener('input', function() { checkAlertLogic(this); });
-                    }
-                }
-            }
         }
         
 
@@ -4899,10 +4481,10 @@ if (typeof handleNext === 'function') {
         firebase.auth().onAuthStateChanged(function(user) {
             isUserLoggedIn = !!user;
             userId = user ? user.uid : null;
-            
             if (isUserLoggedIn) {
                 const params = new URLSearchParams(window.location.search);
                 if (params.get('payment') === 'success') {
+                    console.log('Payment successful! Processing PDF...');
                     loadAnswers().then(() => {
                         processAllPdfs().then(() => {
                             wipeAnswers();
@@ -4913,9 +4495,6 @@ if (typeof handleNext === 'function') {
                 } else {
                     loadAnswers().then(attachAutosaveListeners);
                 }
-            } else {
-                // User not logged in, just attach alert listeners
-                attachAlertListeners();
             }
         });
 
@@ -5241,7 +4820,7 @@ if (typeof handleNext === 'function') {
                         cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
                         cartCheckoutBtn.style.display = 'block';
                         cartCheckoutBtn.onclick = function() {
-                            window.location.href = '../Pages/cart.html';
+                            window.location.href = 'cart.html';
                         };
                     }
                 } catch (error) {

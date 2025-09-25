@@ -981,7 +981,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="cart.js"></script>
 
 <script>
 // Firebase Configuration
@@ -1112,172 +1111,172 @@ document.addEventListener("DOMContentLoaded", function() {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">SC-103</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">SC-500</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" class="question-container"><label><h3>Where are you suing?</h3></label><div class="text-input-container"><input type="text" id="where_are_you_suing" name="where_are_you_suing" placeholder=""></div></div><div id="question-container-2" class="question-container"><label><h3>Please explain why you are suing at this location</h3></label><div><center><div id="checkmark" class="checkbox-group-2">
+        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">SC-103</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">SC-500</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" class="question-container"><label><h3>Please explain why you are suing at this location</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
       <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured.">
         <label class="checkbox-label">
           <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured." name="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff_was_injured." value="Where the plaintiff was injured." 
-                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
           Where the plaintiff was injured.
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives">
         <label class="checkbox-label">
           <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives" name="please_explain_why_you_are_suing_at_this_location_where_the_defendant_lives" value="Where the defendant lives" 
-                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
           Where the defendant lives
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged.">
         <label class="checkbox-label">
           <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged." name="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged." value="Where the plaintiff’s property was damaged." 
-                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
           Where the plaintiff’s property was damaged.
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_a_contract_(written_or_spoken)_was_made,_signed,_performed,_or_broken_by_the_defendant_or_where_the_defendant_lived_or_did_business_when_the_defendant_made_the_contract.">
         <label class="checkbox-label">
           <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_where_a_contract_(written_or_spoken)_was_made,_signed,_performed,_or_broken_by_the_defendant_or_where_the_defendant_lived_or_did_business_when_the_defendant_made_the_contract." name="please_explain_why_you_are_suing_at_this_location_where_a_contract_(written_or_spoken)_was_made,_signed,_performed,_or_broken_by_the_defendant_or_where_the_defendant_lived_or_did_business_when_the_defendant_made_the_contract." value="Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract." 
-                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
           Where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_other">
         <label class="checkbox-label">
           <input type="checkbox" id="please_explain_why_you_are_suing_at_this_location_other" name="please_explain_why_you_are_suing_at_this_location_other" value="Other" 
-                 onchange="toggleNoneOption(this, 2); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 1); updateCheckboxStyle(this);">
           Other
         </label>
-      </span></div><br></div></div><div id="question-container-3" class="question-container hidden"><label><h3>Is it where the buyer or lessee signed the contract, lives now, or lived when the contract was made</h3></label><select id="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made" name="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made"
+      </span></div><br></div></div><div id="question-container-2" class="question-container hidden"><label><h3>Is it where the buyer or lessee signed the contract, lives now, or lived when the contract was made</h3></label><select id="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made" name="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made"
                       onchange="dropdownMirror(this, 'is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made')">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made"></div>
               <input type="text" id="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_dropdown" name="is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-4" class="question-container hidden"><label><h3>What is your claim about?</h3></label><select id="what_is_your_claim_about" name="what_is_your_claim_about"
+                   readonly style="display:none;"></div><div id="question-container-3" class="question-container hidden"><label><h3>What is your claim about?</h3></label><select id="what_is_your_claim_about" name="what_is_your_claim_about"
                       onchange="dropdownMirror(this, 'what_is_your_claim_about')">
                        <option value="" disabled selected>Select an option</option><option value="None of the above">None of the above</option><option value="an offer or contract for personal, family, or household goods, services, or loans">an offer or contract for personal, family, or household goods, services, or loans</option><option value="a vehicle finance sale">a vehicle finance sale</option><option value="a retail installment contract (like a credit card)">a retail installment contract (like a credit card)</option></select><br>
               <div id="dropdowntext_what_is_your_claim_about"></div>
               <input type="text" id="what_is_your_claim_about_dropdown" name="what_is_your_claim_about_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-5" class="question-container hidden"><label><h3>Please explain why you're filing at this courthouse?</h3></label><div class="text-input-container"><textarea id="please_explain_why_youre_filing_at_this_courthouse" name="please_explain_why_youre_filing_at_this_courthouse" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-6" class="question-container hidden"><label><h3>Have you filed more than twelve other small claims w/in the last twelve months</h3></label><select id="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months" name="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months"
+                   readonly style="display:none;"></div><div id="question-container-4" class="question-container hidden"><label><h3>Please explain why you're filing at this courthouse?</h3></label><div class="text-input-container"><textarea id="please_explain_why_youre_filing_at_this_courthouse" name="please_explain_why_youre_filing_at_this_courthouse" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-5" class="question-container hidden"><label><h3>Have you filed more than twelve other small claims w/in the last twelve months</h3></label><select id="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months" name="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months"
                       onchange="dropdownMirror(this, 'have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months"></div>
               <input type="text" id="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months_dropdown" name="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-7" class="question-container hidden"><label><h3>Were 2 or more of those small claims cases more than $2,500?</h3></label><select id="were_2_or_more_of_those_small_claims_cases_more_than_2500" name="were_2_or_more_of_those_small_claims_cases_more_than_2500"
+                   readonly style="display:none;"></div><div id="question-container-6" class="question-container hidden"><label><h3>Were 2 or more of those small claims cases more than $2,500?</h3></label><select id="were_2_or_more_of_those_small_claims_cases_more_than_2500" name="were_2_or_more_of_those_small_claims_cases_more_than_2500"
                       onchange="dropdownMirror(this, 'were_2_or_more_of_those_small_claims_cases_more_than_2500')">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_were_2_or_more_of_those_small_claims_cases_more_than_2500"></div>
               <input type="text" id="were_2_or_more_of_those_small_claims_cases_more_than_2500_dropdown" name="were_2_or_more_of_those_small_claims_cases_more_than_2500_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-9" class="question-container hidden"><label><h3>Are you suing an attorney?</h3></label><select id="are_you_suing_an_attorney" name="are_you_suing_an_attorney"
+                   readonly style="display:none;"></div><div id="question-container-8" class="question-container hidden"><label><h3>Are you suing an attorney?</h3></label><select id="are_you_suing_an_attorney" name="are_you_suing_an_attorney"
                       onchange="dropdownMirror(this, 'are_you_suing_an_attorney')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_are_you_suing_an_attorney"></div>
               <input type="text" id="are_you_suing_an_attorney_dropdown" name="are_you_suing_an_attorney_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-10" class="question-container hidden"><label><h3>Are you doing business under a fictious business name</h3></label><select id="are_you_doing_business_under_a_fictious_business_name" name="are_you_doing_business_under_a_fictious_business_name"
+                   readonly style="display:none;"></div><div id="question-container-9" class="question-container hidden"><label><h3>Are you doing business under a fictious business name</h3></label><select id="are_you_doing_business_under_a_fictious_business_name" name="are_you_doing_business_under_a_fictious_business_name"
                       onchange="dropdownMirror(this, 'are_you_doing_business_under_a_fictious_business_name')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_are_you_doing_business_under_a_fictious_business_name"></div>
               <input type="text" id="are_you_doing_business_under_a_fictious_business_name_dropdown" name="are_you_doing_business_under_a_fictious_business_name_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-12" class="question-container hidden"><label><h3>Are you suing for more than $10,000?</h3></label><select id="are_you_suing_for_more_than_10000" name="are_you_suing_for_more_than_10000"
+                   readonly style="display:none;"></div><div id="question-container-11" class="question-container hidden"><label><h3>Are you suing for more than $10,000?</h3></label><select id="are_you_suing_for_more_than_10000" name="are_you_suing_for_more_than_10000"
                       onchange="dropdownMirror(this, 'are_you_suing_for_more_than_10000')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_are_you_suing_for_more_than_10000"></div>
               <input type="text" id="are_you_suing_for_more_than_10000_dropdown" name="are_you_suing_for_more_than_10000_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">SC-103</h1><div id="question-container-8" class="question-container hidden"><label><h3>Please enter your business details</h3></label><div class="text-input-container"><input type="text" id="Name" name="Name" placeholder="Name"></div><div class="text-input-container"><input type="text" id="Business Address" name="Business Address" placeholder="Address"></div><div class="text-input-container"><input type="text" id="Mailing Address" name="Mailing Address" placeholder="Mailing Address"></div></div><div id="question-container-11" class="question-container hidden"><label><h3>What do you do business as?</h3></label><div><center><div id="checkmark" class="checkbox-group-11">
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">SC-103</h1><div id="question-container-7" class="question-container hidden"><label><h3>Please enter your business details</h3></label><div class="text-input-container"><input type="text" id="Name" name="Name" placeholder="Name"></div><div class="text-input-container"><input type="text" id="Business Address" name="Business Address" placeholder="Address"></div><div class="text-input-container"><input type="text" id="Mailing Address" name="Mailing Address" placeholder="Mailing Address"></div></div><div id="question-container-10" class="question-container hidden"><label><h3>What do you do business as?</h3></label><div><center><div id="checkmark" class="checkbox-group-10">
       <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_an_individual">
         <label class="checkbox-label">
           <input type="checkbox" id="what_do_you_do_business_as_an_individual" name="what_do_you_do_business_as_an_individual" value="An Individual" 
-                 onchange="toggleNoneOption(this, 11); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
           An Individual
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_an_association">
         <label class="checkbox-label">
           <input type="checkbox" id="what_do_you_do_business_as_an_association" name="what_do_you_do_business_as_an_association" value="An Association" 
-                 onchange="toggleNoneOption(this, 11); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
           An Association
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_a_partnership">
         <label class="checkbox-label">
           <input type="checkbox" id="what_do_you_do_business_as_a_partnership" name="what_do_you_do_business_as_a_partnership" value="A Partnership" 
-                 onchange="toggleNoneOption(this, 11); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
           A Partnership
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_a_limited_liability">
         <label class="checkbox-label">
           <input type="checkbox" id="what_do_you_do_business_as_a_limited_liability" name="what_do_you_do_business_as_a_limited_liability" value="A Limited Liability" 
-                 onchange="toggleNoneOption(this, 11); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
           A Limited Liability
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_a_corporation">
         <label class="checkbox-label">
           <input type="checkbox" id="what_do_you_do_business_as_a_corporation" name="what_do_you_do_business_as_a_corporation" value="A Corporation" 
-                 onchange="toggleNoneOption(this, 11); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
           A Corporation
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_other">
         <label class="checkbox-label">
           <input type="checkbox" id="what_do_you_do_business_as_other" name="what_do_you_do_business_as_other" value="Other" 
-                 onchange="toggleNoneOption(this, 11); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
           Other
         </label>
-      </span></div><br></div></div><div id="question-container-13" class="question-container hidden"><label><h3>Please explain what you do business as</h3></label><div class="text-input-container"><textarea id="sc103_please_explain_what_you_do_business_as" name="sc103_please_explain_what_you_do_business_as" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-14" class="question-container hidden"><label><h3>What county did you file your Fictious Business Name Statement</h3></label><div class="text-input-container"><input type="text" id="sc103_what_county_did_you_file_your_fictious_business_name_statement" name="sc103_what_county_did_you_file_your_fictious_business_name_statement" placeholder=""></div></div><div id="question-container-15" class="question-container"><label><h3>Are you suing for more than $12,500?</h3></label><select id="are_you_suing_for_more_than_12500" name="are_you_suing_for_more_than_12500"
+      </span></div><br></div></div><div id="question-container-12" class="question-container hidden"><label><h3>Please explain what you do business as</h3></label><div class="text-input-container"><textarea id="sc103_please_explain_what_you_do_business_as" name="sc103_please_explain_what_you_do_business_as" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-13" class="question-container hidden"><label><h3>What county did you file your Fictious Business Name Statement</h3></label><div class="text-input-container"><input type="text" id="sc103_what_county_did_you_file_your_fictious_business_name_statement" name="sc103_what_county_did_you_file_your_fictious_business_name_statement" placeholder=""></div></div><div id="question-container-15" class="question-container"><label><h3>What is your fictious business name statement number</h3></label><div class="text-input-container"><input type="number" id="sc103_what_is_your_fictious_business_name_statement_number" name="sc103_what_is_your_fictious_business_name_statement_number" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-16" class="question-container"><label><h3>What is the date that your fictious businesses name statement expires</h3></label><div class="date-input-container"><input type="date" id="what_is_the_date_that_your_fictious_businesses_name_statement_expires" name="what_is_the_date_that_your_fictious_businesses_name_statement_expires"></div></div><div id="question-container-18" class="question-container"><label><h3>Are you suing for more than $12,500?</h3></label><select id="are_you_suing_for_more_than_12500" name="are_you_suing_for_more_than_12500"
                       onchange="dropdownMirror(this, 'are_you_suing_for_more_than_12500')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_are_you_suing_for_more_than_12500"></div>
               <input type="text" id="are_you_suing_for_more_than_12500_dropdown" name="are_you_suing_for_more_than_12500_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-16" class="question-container"><label><h3>What is your fictious business name statement number</h3></label><div class="text-input-container"><input type="number" id="sc103_what_is_your_fictious_business_name_statement_number" name="sc103_what_is_your_fictious_business_name_statement_number" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-18" class="question-container"><label><h3>What is the date that your fictious businesses name statement expires</h3></label><div class="date-input-container"><input type="date" id="what_is_the_date_that_your_fictious_businesses_name_statement_expires" name="what_is_the_date_that_your_fictious_businesses_name_statement_expires"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(2)" id="next-button-2">Next</button></div></div><div id="section3" class="section"><center><h1 class="section-title">SC-500</h1><div id="question-container-17" class="question-container hidden"><label><h3>Are you the only one suing?</h3></label><select id="are_you_the_only_one_suing" name="are_you_the_only_one_suing"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(2)" id="next-button-2">Next</button></div></div><div id="section3" class="section"><center><h1 class="section-title">SC-500</h1><div id="question-container-14" class="question-container hidden"><label><h3>Are you the only one suing?</h3></label><select id="are_you_the_only_one_suing" name="are_you_the_only_one_suing"
                       onchange="dropdownMirror(this, 'are_you_the_only_one_suing')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_are_you_the_only_one_suing"></div>
               <input type="text" id="are_you_the_only_one_suing_dropdown" name="are_you_the_only_one_suing_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-19" class="question-container hidden"><label><h3>How many other people are suing?</h3></label><select id="answer19" onchange="showTextboxLabels(19, this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer19"></div></div><div id="question-container-20" class="question-container hidden"><label><h3>Are you suing more than one person?</h3></label><select id="are_you_suing_more_than_one_person" name="are_you_suing_more_than_one_person"
+                   readonly style="display:none;"></div><div id="question-container-17" class="question-container hidden"><label><h3>How many other people are suing?</h3></label><select id="answer17" onchange="showTextboxLabels(17, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer17"></div></div><div id="question-container-19" class="question-container hidden"><label><h3>Are you suing more than one person?</h3></label><select id="are_you_suing_more_than_one_person" name="are_you_suing_more_than_one_person"
                       onchange="dropdownMirror(this, 'are_you_suing_more_than_one_person')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_are_you_suing_more_than_one_person"></div>
               <input type="text" id="are_you_suing_more_than_one_person_dropdown" name="are_you_suing_more_than_one_person_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-21" class="question-container hidden"><label><h3>How many other people are you suing?</h3></label><select id="answer21" onchange="showTextboxLabels(21, this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer21"></div></div><div id="question-container-22" class="question-container hidden"><label><h3>Is the defendant on active military duty?</h3></label><select id="is_the_defendant_on_active_military_duty" name="is_the_defendant_on_active_military_duty"
+                   readonly style="display:none;"></div><div id="question-container-20" class="question-container hidden"><label><h3>How many other people are you suing?</h3></label><select id="answer20" onchange="showTextboxLabels(20, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer20"></div></div><div id="question-container-21" class="question-container hidden"><label><h3>Is the defendant on active military duty?</h3></label><select id="is_the_defendant_on_active_military_duty" name="is_the_defendant_on_active_military_duty"
                       onchange="dropdownMirror(this, 'is_the_defendant_on_active_military_duty')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_is_the_defendant_on_active_military_duty"></div>
               <input type="text" id="is_the_defendant_on_active_military_duty_dropdown" name="is_the_defendant_on_active_military_duty_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-23" class="question-container hidden"><label><h3>Who are you suing?</h3></label><div class="text-input-container"><input type="text" id="Name" name="Name" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Phone" name="Phone" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Mailing Address" name="Mailing Address" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Email Address" name="Email Address" placeholder="Enter value"></div></div><div id="question-container-24" class="question-container hidden"><label><h3>Who are you suing?</h3></label><div class="text-input-container"><input type="text" id="Name" name="Name" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Phone" name="Phone" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Mailing Address" name="Mailing Address" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Email Address" name="Email Address" placeholder="Enter value"></div></div><div id="question-container-25" class="question-container hidden"><label><h3>Are any of the people being sued on active military duty?</h3></label><select id="are_any_of_the_people_being_sued_on_active_military_duty" name="are_any_of_the_people_being_sued_on_active_military_duty"
+                   readonly style="display:none;"></div><div id="question-container-22" class="question-container hidden"><label><h3>Who are you suing?</h3></label><div class="text-input-container"><input type="text" id="Name" name="Name" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Phone" name="Phone" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Mailing Address" name="Mailing Address" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Email Address" name="Email Address" placeholder="Enter value"></div></div><div id="question-container-23" class="question-container hidden"><label><h3>Who are you suing?</h3></label><div class="text-input-container"><input type="text" id="Name" name="Name" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Phone" name="Phone" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Mailing Address" name="Mailing Address" placeholder="Enter value"></div><div class="text-input-container"><input type="text" id="Email Address" name="Email Address" placeholder="Enter value"></div></div><div id="question-container-24" class="question-container hidden"><label><h3>Are any of the people being sued on active military duty?</h3></label><select id="are_any_of_the_people_being_sued_on_active_military_duty" name="are_any_of_the_people_being_sued_on_active_military_duty"
                       onchange="dropdownMirror(this, 'are_any_of_the_people_being_sued_on_active_military_duty')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_are_any_of_the_people_being_sued_on_active_military_duty"></div>
               <input type="text" id="are_any_of_the_people_being_sued_on_active_military_duty_dropdown" name="are_any_of_the_people_being_sued_on_active_military_duty_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-26" class="question-container hidden"><label><h3>Whats the name of the person on active military duty?</h3></label><div class="text-input-container"><input type="text" id="whats_the_name_of_the_person_on_active_military_duty" name="whats_the_name_of_the_person_on_active_military_duty" placeholder=""></div></div><div id="question-container-27" class="question-container hidden"><label><h3>How much are you suing for?</h3></label><div class="text-input-container"><input type="number" id="sc500_how_much_are_you_suing_for" name="sc500_how_much_are_you_suing_for" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-28" class="question-container hidden"><label><h3>List all the months that you claim the defendant owes you rent money. For each month, include each amount due and the date it came due.</h3></label><div class="text-input-container"><textarea id="sc500_list_all_the_months_that_you_claim_the_defendant_owes_you_rent_money_for_each_month_include_each_amount_due_and_the_date_it_came_due" name="sc500_list_all_the_months_that_you_claim_the_defendant_owes_you_rent_money_for_each_month_include_each_amount_due_and_the_date_it_came_due" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-29" class="question-container"><label><h3>List all unpaid financial obligations (other than rent) that you claim defendant owes. For each month, include each amount, the date it came due, and what it was for</h3></label><div class="text-input-container"><textarea id="sc500_list_all_unpaid_financial_obligations_other_than_rent_that_you_claim_defendant_owes_for_each_month_include_each_amount_the_date_it_came_due_and_what_it_was_for" name="sc500_list_all_unpaid_financial_obligations_other_than_rent_that_you_claim_defendant_owes_for_each_month_include_each_amount_the_date_it_came_due_and_what_it_was_for" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-30" class="question-container"><label><h3>List any amounts you received from defendant, rental assistance programs, and other third parties that you have already credited, and any other amounts you have offset or credited. Include each amount, when it was paid or credited, and what it was for.</h3></label><div class="text-input-container"><textarea id="sc500_list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for" name="sc500_list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-31" class="question-container"><label><h3>Have you sent a demand letter to D?</h3></label><select id="have_you_sent_a_demand_letter_to_d_1" name="have_you_sent_a_demand_letter_to_d_1"
+                   readonly style="display:none;"></div><div id="question-container-25" class="question-container hidden"><label><h3>Whats the name of the person on active military duty?</h3></label><div class="text-input-container"><input type="text" id="whats_the_name_of_the_person_on_active_military_duty" name="whats_the_name_of_the_person_on_active_military_duty" placeholder=""></div></div><div id="question-container-26" class="question-container hidden"><label><h3>How much are you suing for?</h3></label><div class="text-input-container"><input type="number" id="sc500_how_much_are_you_suing_for" name="sc500_how_much_are_you_suing_for" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-27" class="question-container hidden"><label><h3>List all the months that you claim the defendant owes you rent money. For each month, include each amount due and the date it came due.</h3></label><div class="text-input-container"><textarea id="sc500_list_all_the_months_that_you_claim_the_defendant_owes_you_rent_money_for_each_month_include_each_amount_due_and_the_date_it_came_due" name="sc500_list_all_the_months_that_you_claim_the_defendant_owes_you_rent_money_for_each_month_include_each_amount_due_and_the_date_it_came_due" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-28" class="question-container"><label><h3>List all unpaid financial obligations (other than rent) that you claim defendant owes. For each month, include each amount, the date it came due, and what it was for</h3></label><div class="text-input-container"><textarea id="sc500_list_all_unpaid_financial_obligations_other_than_rent_that_you_claim_defendant_owes_for_each_month_include_each_amount_the_date_it_came_due_and_what_it_was_for" name="sc500_list_all_unpaid_financial_obligations_other_than_rent_that_you_claim_defendant_owes_for_each_month_include_each_amount_the_date_it_came_due_and_what_it_was_for" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-29" class="question-container"><label><h3>List any amounts you received from defendant, rental assistance programs, and other third parties that you have already credited, and any other amounts you have offset or credited. Include each amount, when it was paid or credited, and what it was for.</h3></label><div class="text-input-container"><textarea id="sc500_list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for" name="sc500_list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-30" class="question-container"><label><h3>Have you sent a demand letter to D?</h3></label><select id="have_you_sent_a_demand_letter_to_d_1" name="have_you_sent_a_demand_letter_to_d_1"
                       onchange="dropdownMirror(this, 'have_you_sent_a_demand_letter_to_d_1')">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_have_you_sent_a_demand_letter_to_d_1"></div>
               <input type="text" id="have_you_sent_a_demand_letter_to_d_1_dropdown" name="have_you_sent_a_demand_letter_to_d_1_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-32" class="question-container hidden"><label><h3>Please explain why not</h3></label><div class="text-input-container"><textarea id="sc500_please_explain_why_not" name="sc500_please_explain_why_not" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-33" class="question-container hidden"><label><h3>Did you make a good faith effort to help the plaintiff obtain rental assistance through any of the following means:</h3></label><div><center><div id="checkmark" class="checkbox-group-33">
+                   readonly style="display:none;"></div><div id="question-container-31" class="question-container hidden"><label><h3>Please explain why not</h3></label><div class="text-input-container"><textarea id="sc500_please_explain_why_not" name="sc500_please_explain_why_not" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-32" class="question-container hidden"><label><h3>Did you make a good faith effort to help the plaintiff obtain rental assistance through any of the following means:</h3></label><div><center><div id="checkmark" class="checkbox-group-32">
       <span class="checkbox-inline" id="checkbox-container-did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_investigating_if_governmental_rental_assistance_is_available_to_the_tenant">
         <label class="checkbox-label">
           <input type="checkbox" id="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_investigating_if_governmental_rental_assistance_is_available_to_the_tenant" name="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_investigating_if_governmental_rental_assistance_is_available_to_the_tenant" value="Investigating if governmental rental assistance is available to the tenant" 
-                 onchange="toggleNoneOption(this, 33); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
           Investigating if governmental rental assistance is available to the tenant
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_seeking_governmental_rental_assistance_for_the_tenant">
         <label class="checkbox-label">
           <input type="checkbox" id="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_seeking_governmental_rental_assistance_for_the_tenant" name="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_seeking_governmental_rental_assistance_for_the_tenant" value="Seeking governmental rental assistance for the tenant" 
-                 onchange="toggleNoneOption(this, 33); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
           Seeking governmental rental assistance for the tenant
         </label>
       </span>
       <span class="checkbox-inline" id="checkbox-container-did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_cooperating_with_the_tenants_efforts_to_obtain_rental_assistance_from_any_governmental_entity_or_third_party">
         <label class="checkbox-label">
           <input type="checkbox" id="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_cooperating_with_the_tenants_efforts_to_obtain_rental_assistance_from_any_governmental_entity_or_third_party" name="did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means_cooperating_with_the_tenants_efforts_to_obtain_rental_assistance_from_any_governmental_entity_or_third_party" value="Cooperating with the tenants efforts to obtain rental assistance from any governmental entity or third party" 
-                 onchange="toggleNoneOption(this, 33); updateCheckboxStyle(this);">
+                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
           Cooperating with the tenants efforts to obtain rental assistance from any governmental entity or third party
         </label>
-      </span></div><br></div></div><div id="question-container-34" class="question-container hidden"><label><h3>Describe your efforts in detail</h3></label><div class="text-input-container"><textarea id="sc500_describe_your_efforts_in_detail" name="sc500_describe_your_efforts_in_detail" rows="5" cols="50" placeholder=""></textarea></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+      </span></div><br></div></div><div id="question-container-33" class="question-container hidden"><label><h3>Describe your efforts in detail</h3></label><div class="text-input-container"><textarea id="sc500_describe_your_efforts_in_detail" name="sc500_describe_your_efforts_in_detail" rows="5" cols="50" placeholder=""></textarea></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
@@ -1350,29 +1349,6 @@ document.addEventListener("DOMContentLoaded", function() {
     100% { transform: scale(1); opacity: 1; }
   }
   
-  .alert-close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    background: none;
-    border: none;
-    color: #7f8c8d;
-    font-size: 24px;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-  }
-  
-  .alert-close-btn:hover {
-    background: rgba(44, 62, 80, 0.1);
-    color: #2c3e50;
-  }
   
   .alert-message {
     margin-bottom: 28px;
@@ -1404,32 +1380,21 @@ document.addEventListener("DOMContentLoaded", function() {
     min-width: 100px;
   }
   
-  .alert-btn-back {
+  .alert-btn-continue {
     background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
     color: #fff;
   }
   
-  .alert-btn-back:hover {
+  .alert-btn-continue:hover {
     background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);
-  }
-  
-  .alert-btn-exit {
-    background: #e74c3c;
-    color: #fff;
-  }
-  
-  .alert-btn-exit:hover {
-    background: #c0392b;
   }
   </style>
   
   <div id="alertOverlay" class="alert-overlay">
     <div class="alert-popup">
-      <button class="alert-close-btn" onclick="closeAlert()" title="Close">×</button>
       <div id="alertMessage" class="alert-message"></div>
       <div class="alert-buttons">
-        <button class="alert-btn alert-btn-back" onclick="closeAlert()">Back</button>
-        <button class="alert-btn alert-btn-exit" onclick="exitForm()">Exit</button>
+        <button class="alert-btn alert-btn-continue" onclick="closeAlert()">Continue</button>
       </div>
     </div>
   </div>
@@ -1465,58 +1430,58 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"where_are_you_suing","2":"please_explain_why_you_are_suing_at_this_location","3":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","4":"what_is_your_claim_about","5":"please_explain_why_you_re_filing_at_this_courthouse","6":"have_you_filed_more_than_twelve_other_small_claims_w_in_the_last_twelve_months","7":"were_2_or_more_of_those_small_claims_cases_more_than_2_500","8":"please_enter_your_business_details","9":"are_you_suing_an_attorney","10":"are_you_doing_business_under_a_fictious_business_name","11":"what_do_you_do_business_as","12":"are_you_suing_for_more_than_10_000","13":"please_explain_what_you_do_business_as","14":"what_county_did_you_file_your_fictious_business_name_statement","15":"are_you_suing_for_more_than_12_500","16":"what_is_your_fictious_business_name_statement_number","17":"are_you_the_only_one_suing","18":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","19":"how_many_other_people_are_suing","20":"are_you_suing_more_than_one_person","21":"how_many_other_people_are_you_suing","22":"is_the_defendant_on_active_military_duty","23":"who_are_you_suing","24":"who_are_you_suing","25":"are_any_of_the_people_being_sued_on_active_military_duty","26":"whats_the_name_of_the_person_on_active_military_duty","27":"how_much_are_you_suing_for","28":"list_all_the_months_that_you_claim_the_defendant_owes_you_rent_money_for_each_month_include_each_amount_due_and_the_date_it_came_due","29":"list_all_unpaid_financial_obligations_other_than_rent_that_you_claim_defendant_owes_for_each_month_include_each_amount_the_date_it_came_due_and_what_it_was_for","30":"list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for","31":"have_you_sent_a_demand_letter_to_d","32":"please_explain_why_not","33":"did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means","34":"describe_your_efforts_in_detail"};
-var questionNameIds = {"1":"where_are_you_suing","2":"please_explain_why_you_are_suing_at_this_location","3":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","4":"what_is_your_claim_about","5":"please_explain_why_youre_filing_at_this_courthouse","6":"have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months","7":"were_2_or_more_of_those_small_claims_cases_more_than_2500","9":"are_you_suing_an_attorney","10":"are_you_doing_business_under_a_fictious_business_name","11":"what_do_you_do_business_as","12":"are_you_suing_for_more_than_10000","13":"sc103_please_explain_what_you_do_business_as","14":"sc103_what_county_did_you_file_your_fictious_business_name_statement","15":"are_you_suing_for_more_than_12500","16":"sc103_what_is_your_fictious_business_name_statement_number","17":"are_you_the_only_one_suing","18":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","19":"answer19","20":"are_you_suing_more_than_one_person","21":"answer21","22":"is_the_defendant_on_active_military_duty","25":"are_any_of_the_people_being_sued_on_active_military_duty","26":"whats_the_name_of_the_person_on_active_military_duty","27":"sc500_how_much_are_you_suing_for","28":"sc500_list_all_the_months_that_you_claim_the_defendant_owes_you_rent_money_for_each_month_include_each_amount_due_and_the_date_it_came_due","29":"sc500_list_all_unpaid_financial_obligations_other_than_rent_that_you_claim_defendant_owes_for_each_month_include_each_amount_the_date_it_came_due_and_what_it_was_for","30":"sc500_list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for","31":"have_you_sent_a_demand_letter_to_d_1","32":"sc500_please_explain_why_not","33":"did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means","34":"sc500_describe_your_efforts_in_detail"};
-var jumpLogics = [{"questionId":"7","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"9","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"12","questionType":"dropdown","jumpOption":"No","jumpTo":"3","section":1}];
+    var questionSlugMap       = {"1":"please_explain_why_you_are_suing_at_this_location","2":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","3":"what_is_your_claim_about","4":"please_explain_why_you_re_filing_at_this_courthouse","5":"have_you_filed_more_than_twelve_other_small_claims_w_in_the_last_twelve_months","6":"were_2_or_more_of_those_small_claims_cases_more_than_2_500","7":"please_enter_your_business_details","8":"are_you_suing_an_attorney","9":"are_you_doing_business_under_a_fictious_business_name","10":"what_do_you_do_business_as","11":"are_you_suing_for_more_than_10_000","12":"please_explain_what_you_do_business_as","13":"what_county_did_you_file_your_fictious_business_name_statement","14":"are_you_the_only_one_suing","15":"what_is_your_fictious_business_name_statement_number","16":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","17":"how_many_other_people_are_suing","18":"are_you_suing_for_more_than_12_500","19":"are_you_suing_more_than_one_person","20":"how_many_other_people_are_you_suing","21":"is_the_defendant_on_active_military_duty","22":"who_are_you_suing","23":"who_are_you_suing","24":"are_any_of_the_people_being_sued_on_active_military_duty","25":"whats_the_name_of_the_person_on_active_military_duty","26":"how_much_are_you_suing_for","27":"list_all_the_months_that_you_claim_the_defendant_owes_you_rent_money_for_each_month_include_each_amount_due_and_the_date_it_came_due","28":"list_all_unpaid_financial_obligations_other_than_rent_that_you_claim_defendant_owes_for_each_month_include_each_amount_the_date_it_came_due_and_what_it_was_for","29":"list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for","30":"have_you_sent_a_demand_letter_to_d","31":"please_explain_why_not","32":"did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means","33":"describe_your_efforts_in_detail"};
+var questionNameIds = {"1":"please_explain_why_you_are_suing_at_this_location","2":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","3":"what_is_your_claim_about","4":"please_explain_why_youre_filing_at_this_courthouse","5":"have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months","6":"were_2_or_more_of_those_small_claims_cases_more_than_2500","8":"are_you_suing_an_attorney","9":"are_you_doing_business_under_a_fictious_business_name","10":"what_do_you_do_business_as","11":"are_you_suing_for_more_than_10000","12":"sc103_please_explain_what_you_do_business_as","13":"sc103_what_county_did_you_file_your_fictious_business_name_statement","14":"are_you_the_only_one_suing","15":"sc103_what_is_your_fictious_business_name_statement_number","16":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","17":"answer17","18":"are_you_suing_for_more_than_12500","19":"are_you_suing_more_than_one_person","20":"answer20","21":"is_the_defendant_on_active_military_duty","24":"are_any_of_the_people_being_sued_on_active_military_duty","25":"whats_the_name_of_the_person_on_active_military_duty","26":"sc500_how_much_are_you_suing_for","27":"sc500_list_all_the_months_that_you_claim_the_defendant_owes_you_rent_money_for_each_month_include_each_amount_due_and_the_date_it_came_due","28":"sc500_list_all_unpaid_financial_obligations_other_than_rent_that_you_claim_defendant_owes_for_each_month_include_each_amount_the_date_it_came_due_and_what_it_was_for","29":"sc500_list_any_amounts_you_received_from_defendant_rental_assistance_programs_and_other_third_parties_that_you_have_already_credited_and_any_other_amounts_you_have_offset_or_credited_include_each_amount_when_it_was_paid_or_credited_and_what_it_was_for","30":"have_you_sent_a_demand_letter_to_d_1","31":"sc500_please_explain_why_not","32":"did_you_make_a_good_faith_effort_to_help_the_plaintiff_obtain_rental_assistance_through_any_of_the_following_means","33":"sc500_describe_your_efforts_in_detail"};
+var jumpLogics = [{"questionId":"6","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"8","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"11","questionType":"dropdown","jumpOption":"No","jumpTo":"3","section":1}];
 var conditionalPDFs = [];
 console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', [
   {
-    "questionId": "10",
+    "questionId": "9",
     "pdfName": "sc103.pdf",
-    "pdfDisplayName": "SC-100",
+    "pdfDisplayName": "SC-103",
     "stripePriceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2",
     "conditions": [
       {
-        "prevQuestion": "10",
+        "prevQuestion": "9",
         "prevAnswer": "Yes"
       }
     ],
     "isBigParagraph": false
   },
   {
-    "questionId": "17",
+    "questionId": "14",
     "pdfName": "sc500a.pdf",
-    "pdfDisplayName": "SC-100",
+    "pdfDisplayName": "SC-500A",
     "stripePriceId": "price_1SB7DUFJeSRMFQ8X5tzen50D",
     "conditions": [
       {
-        "prevQuestion": "17",
+        "prevQuestion": "14",
         "prevAnswer": "No"
       }
     ],
     "isBigParagraph": false
   },
   {
-    "questionId": "20",
+    "questionId": "19",
     "pdfName": "sc500a.pdf",
-    "pdfDisplayName": "SC-100",
+    "pdfDisplayName": "SC-500A",
     "stripePriceId": "price_1SB7DUFJeSRMFQ8X5tzen50D",
     "conditions": [
       {
-        "prevQuestion": "20",
+        "prevQuestion": "19",
         "prevAnswer": "Yes"
       }
     ],
     "isBigParagraph": false
   }
 ]);
-var pdfLogicPDFs = [{"questionId":"10","pdfName":"sc103.pdf","pdfDisplayName":"SC-100","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","conditions":[{"prevQuestion":"10","prevAnswer":"Yes"}],"isBigParagraph":false},{"questionId":"17","pdfName":"sc500a.pdf","pdfDisplayName":"SC-100","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","conditions":[{"prevQuestion":"17","prevAnswer":"No"}],"isBigParagraph":false},{"questionId":"20","pdfName":"sc500a.pdf","pdfDisplayName":"SC-100","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","conditions":[{"prevQuestion":"20","prevAnswer":"Yes"}],"isBigParagraph":false}];
-var alertLogics = [{"questionId":"7","message":"Sorry youre just not eligible","conditions":[{"prevQuestion":"7","prevAnswer":"Yes"}]},{"questionId":"9","message":"We cant take you on sorry","conditions":[{"prevQuestion":"9","prevAnswer":"Yes"}]},{"questionId":"12","message":"Sorry you cant sue for that much","conditions":[{"prevQuestion":"12","prevAnswer":"Yes"}]},{"questionId":"15","message":"Sorry you cant sue for that much","conditions":[{"prevQuestion":"15","prevAnswer":"Yes"}]},{"questionId":"31","message":"Alert message","conditions":[{"prevQuestion":"31","prevAnswer":"Yes"}]}];
+var pdfLogicPDFs = [{"questionId":"9","pdfName":"sc103.pdf","pdfDisplayName":"SC-103","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","conditions":[{"prevQuestion":"9","prevAnswer":"Yes"}],"isBigParagraph":false},{"questionId":"14","pdfName":"sc500a.pdf","pdfDisplayName":"SC-500A","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","conditions":[{"prevQuestion":"14","prevAnswer":"No"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc500a.pdf","pdfDisplayName":"SC-500A","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","conditions":[{"prevQuestion":"19","prevAnswer":"Yes"}],"isBigParagraph":false}];
+var alertLogics = [{"questionId":"6","message":"Sorry youre just not eligible","conditions":[{"prevQuestion":"6","prevAnswer":"Yes"}]},{"questionId":"8","message":"We cant take you on sorry","conditions":[{"prevQuestion":"8","prevAnswer":"Yes"}]},{"questionId":"11","message":"Sorry you cant sue for that much","conditions":[{"prevQuestion":"11","prevAnswer":"Yes"}]},{"questionId":"18","message":"Sorry you cant sue for that much","conditions":[{"prevQuestion":"18","prevAnswer":"Yes"}]},{"questionId":"30","message":"Please attach this demand letter when filing at the clerks office","conditions":[{"prevQuestion":"30","prevAnswer":"Yes"}]}];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"19":["Name","Phone Number","Mailing Address","Email Address"],"21":["Phone Number","Mailing Address","Email Address"],"length":0};
-var amountMap = {"19":[],"21":["Name"],"length":0};
+var labelMap = {"17":["Name","Phone Number","Mailing Address","Email Address"],"20":["Phone Number","Mailing Address","Email Address"],"length":0};
+var amountMap = {"17":[],"20":["Name"],"length":0};
 var linkedDropdowns = [];
 var isHandlingLink = false;
 var sectionStack = [];
@@ -1525,18 +1490,47 @@ var pdfFileName = "SC-500";
 var pdfOutputFileName = "sc500.pdf";
 var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["SC-500", ];
+var allPdfFileNames = ["sc500", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
+
+(function(){
+ var thisQ=document.getElementById("question-container-2");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="other";
+    var cPrevQNum="1";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var checkQuestion = "1";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
 
 (function(){
  var thisQ=document.getElementById("question-container-3");
  function updateVisibility(){
   var anyMatch=false;
   (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="other";
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
     var cPrevQNum="2";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
@@ -1552,9 +1546,9 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var checkQuestion = "2";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+   var selectQuestion = "2";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  updateVisibility();
 })();
@@ -1565,7 +1559,7 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="yes";
+    var cPrevAns="none of the above";
     var cPrevQNum="3";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
@@ -1594,37 +1588,8 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="none of the above";
-    var cPrevQNum="4";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "4";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-6");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
     var cPrevAns="an offer or contract for personal, family, or household goods, services, or loans";
-    var cPrevQNum="4";
+    var cPrevQNum="3";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -1639,7 +1604,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="a vehicle finance sale";
-    var cPrevQNum="4";
+    var cPrevQNum="3";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -1654,7 +1619,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="a retail installment contract (like a credit card)";
-    var cPrevQNum="4";
+    var cPrevQNum="3";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -1669,7 +1634,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="no";
-    var cPrevQNum="3";
+    var cPrevQNum="2";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -1684,7 +1649,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="where a contract (written or spoken) was made, signed, performed, or broken by the defendant or where the defendant lived or did business when the defendant made the contract.";
-    var cPrevQNum="2";
+    var cPrevQNum="1";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -1699,7 +1664,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="where the plaintiff was injured.";
-    var cPrevQNum="2";
+    var cPrevQNum="1";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -1714,7 +1679,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="where the defendant lives";
-    var cPrevQNum="2";
+    var cPrevQNum="1";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -1729,7 +1694,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="where the plaintiff’s property was damaged.";
-    var cPrevQNum="2";
+    var cPrevQNum="1";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -1744,7 +1709,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="none of the above";
-    var cPrevQNum="4";
+    var cPrevQNum="3";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -1759,17 +1724,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "4";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "4";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "4";
+   var selectQuestion = "3";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -1779,27 +1734,37 @@ var hiddenTextCalculations = [];
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "2";
+   var selectQuestion = "3";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "2";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "1";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "2";
+   var checkQuestion = "1";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "2";
+   var checkQuestion = "1";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "2";
+   var checkQuestion = "1";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var selectQuestion = "4";
+   var selectQuestion = "3";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -1807,13 +1772,57 @@ var hiddenTextCalculations = [];
 })();
 
 (function(){
- var thisQ=document.getElementById("question-container-7");
+ var thisQ=document.getElementById("question-container-6");
  function updateVisibility(){
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="yes";
+    var cPrevQNum="5";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "5";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-8");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
     var cPrevQNum="6";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="5";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -1829,6 +1838,11 @@ var hiddenTextCalculations = [];
 }
  (function(){
    var selectQuestion = "6";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "5";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -1842,22 +1856,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="no";
-    var cPrevQNum="7";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="6";
+    var cPrevQNum="8";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -1872,12 +1871,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "7";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "6";
+   var selectQuestion = "8";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -1885,7 +1879,7 @@ var hiddenTextCalculations = [];
 })();
 
 (function(){
- var thisQ=document.getElementById("question-container-10");
+ var thisQ=document.getElementById("question-container-11");
  function updateVisibility(){
   var anyMatch=false;
   (function(){
@@ -1914,12 +1908,70 @@ var hiddenTextCalculations = [];
 })();
 
 (function(){
+ var thisQ=document.getElementById("question-container-7");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="9";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-10");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="9";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
  var thisQ=document.getElementById("question-container-12");
  function updateVisibility(){
   var anyMatch=false;
   (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
+    var cPrevType="checkbox";
+    var cPrevAns="other";
     var cPrevQNum="10";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
@@ -1935,67 +1987,9 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "10";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-8");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="10";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "10";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-11");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="10";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "10";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+   var checkQuestion = "10";
+   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  updateVisibility();
 })();
@@ -2006,37 +2000,8 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="checkbox";
-    var cPrevAns="other";
-    var cPrevQNum="11";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var checkQuestion = "11";
-   var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-14");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="checkbox";
     var cPrevAns="a partnership";
-    var cPrevQNum="11";
+    var cPrevQNum="10";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2051,7 +2016,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="a limited liability";
-    var cPrevQNum="11";
+    var cPrevQNum="10";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2066,7 +2031,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="an association";
-    var cPrevQNum="11";
+    var cPrevQNum="10";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2081,7 +2046,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="a corporation";
-    var cPrevQNum="11";
+    var cPrevQNum="10";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2096,7 +2061,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="an individual";
-    var cPrevQNum="11";
+    var cPrevQNum="10";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2111,7 +2076,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="other";
-    var cPrevQNum="11";
+    var cPrevQNum="10";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2126,34 +2091,63 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var checkQuestion = "11";
+   var checkQuestion = "10";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "11";
+   var checkQuestion = "10";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "11";
+   var checkQuestion = "10";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "11";
+   var checkQuestion = "10";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "11";
+   var checkQuestion = "10";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "11";
+   var checkQuestion = "10";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-14");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="18";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "18";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  updateVisibility();
 })();
@@ -2165,7 +2159,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="no";
-    var cPrevQNum="15";
+    var cPrevQNum="14";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2180,7 +2174,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "15";
+   var selectQuestion = "14";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2193,8 +2187,23 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="14";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
     var cPrevAns="no";
-    var cPrevQNum="17";
+    var cPrevQNum="14";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2209,7 +2218,12 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "17";
+   var selectQuestion = "14";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "14";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2223,22 +2237,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="yes";
-    var cPrevQNum="17";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="17";
+    var cPrevQNum="19";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2253,12 +2252,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "17";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "17";
+   var selectQuestion = "19";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2271,8 +2265,8 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="20";
+    var cPrevAns="no";
+    var cPrevQNum="19";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2287,7 +2281,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "20";
+   var selectQuestion = "19";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2301,7 +2295,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="no";
-    var cPrevQNum="20";
+    var cPrevQNum="21";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2316,7 +2310,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "20";
+   var selectQuestion = "21";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2329,8 +2323,8 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="22";
+    var cPrevAns="yes";
+    var cPrevQNum="21";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2345,7 +2339,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "22";
+   var selectQuestion = "21";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2359,7 +2353,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="yes";
-    var cPrevQNum="22";
+    var cPrevQNum="19";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2374,7 +2368,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "22";
+   var selectQuestion = "19";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2388,7 +2382,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="yes";
-    var cPrevQNum="20";
+    var cPrevQNum="24";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2403,7 +2397,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "20";
+   var selectQuestion = "24";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2416,8 +2410,38 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="24";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
     var cPrevAns="yes";
-    var cPrevQNum="25";
+    var cPrevQNum="21";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="21";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2432,7 +2456,17 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "25";
+   var selectQuestion = "24";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "21";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "21";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2446,7 +2480,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="no";
-    var cPrevQNum="25";
+    var cPrevQNum="24";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2461,7 +2495,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="yes";
-    var cPrevQNum="22";
+    var cPrevQNum="21";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2476,7 +2510,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="no";
-    var cPrevQNum="22";
+    var cPrevQNum="21";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2491,17 +2525,17 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "25";
+   var selectQuestion = "24";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var selectQuestion = "22";
+   var selectQuestion = "21";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var selectQuestion = "22";
+   var selectQuestion = "21";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2509,43 +2543,13 @@ var hiddenTextCalculations = [];
 })();
 
 (function(){
- var thisQ=document.getElementById("question-container-28");
+ var thisQ=document.getElementById("question-container-31");
  function updateVisibility(){
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
     var cPrevAns="no";
-    var cPrevQNum="25";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="22";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="22";
+    var cPrevQNum="30";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2560,17 +2564,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "25";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "22";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "22";
+   var selectQuestion = "30";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2583,8 +2577,8 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="31";
+    var cPrevAns="yes";
+    var cPrevQNum="30";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2599,7 +2593,7 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "31";
+   var selectQuestion = "30";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2611,38 +2605,9 @@ var hiddenTextCalculations = [];
  function updateVisibility(){
   var anyMatch=false;
   (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="31";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "31";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-34");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
     var cPrevType="checkbox";
     var cPrevAns="investigating if governmental rental assistance is available to the tenant";
-    var cPrevQNum="33";
+    var cPrevQNum="32";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2657,7 +2622,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="seeking governmental rental assistance for the tenant";
-    var cPrevQNum="33";
+    var cPrevQNum="32";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2672,7 +2637,7 @@ var hiddenTextCalculations = [];
   (function(){
     var cPrevType="checkbox";
     var cPrevAns="cooperating with the tenants efforts to obtain rental assistance from any governmental entity or third party";
-    var cPrevQNum="33";
+    var cPrevQNum="32";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2687,17 +2652,17 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var checkQuestion = "33";
+   var checkQuestion = "32";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "33";
+   var checkQuestion = "32";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var checkQuestion = "33";
+   var checkQuestion = "32";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2706,7 +2671,21 @@ var hiddenTextCalculations = [];
 
 
 // Alert Logic Functions
+// Track page load time to prevent alerts in first 3 seconds
+const pageLoadTime = Date.now();
+const ALERT_DELAY_MS = 3000; // 3 seconds
+
 function showAlert(message) {
+    // Check if 3 seconds have passed since page load
+    const currentTime = Date.now();
+    const timeSinceLoad = currentTime - pageLoadTime;
+    
+    if (timeSinceLoad < ALERT_DELAY_MS) {
+        // If less than 3 seconds have passed, don't show the alert
+        console.log('Alert blocked: Page loaded less than 3 seconds ago');
+        return;
+    }
+    
     const alertOverlay = document.getElementById('alertOverlay');
     const alertMessage = document.getElementById('alertMessage');
     
@@ -2730,19 +2709,6 @@ function closeAlert() {
     }
 }
 
-function exitForm() {
-    // Check if this is a validation popup or regular alert
-    const alertMessage = document.getElementById('alertMessage');
-    if (alertMessage && alertMessage.innerHTML.includes('Please Complete All Questions')) {
-        // This is a validation popup - go back to forms page
-        if (confirm('Are you sure you want to exit? Your progress will be saved.')) {
-            window.location.href = 'forms.html';
-        }
-    } else {
-        // This is a regular alert - reload the page
-        window.location.reload();
-    }
-}
 
 // Show validation popup when user tries to proceed without answering all questions
 function showValidationPopup() {
@@ -2771,22 +2737,21 @@ function checkAlertLogic(changedElement) {
         }
     }
     
+    // If we can't determine which question changed, don't check any alerts
+    // This prevents alerts from triggering on unrelated form elements
+    if (!changedQuestionId) return;
+    
     for (const alertLogic of alertLogics) {
         if (!alertLogic.conditions || alertLogic.conditions.length === 0) continue;
         
         // Only check this alert logic if it's related to the changed element
         let shouldCheckThisAlert = false;
-        if (changedQuestionId) {
-            // Check if any condition in this alert logic references the changed question
-            for (const condition of alertLogic.conditions) {
-                if (condition.prevQuestion === changedQuestionId) {
-                    shouldCheckThisAlert = true;
-                    break;
-                }
+        // Check if any condition in this alert logic references the changed question
+        for (const condition of alertLogic.conditions) {
+            if (condition.prevQuestion === changedQuestionId) {
+                shouldCheckThisAlert = true;
+                break;
             }
-        } else {
-            // If we can't determine which question changed, check all alerts (fallback)
-            shouldCheckThisAlert = true;
         }
         
         if (!shouldCheckThisAlert) continue;
@@ -3195,23 +3160,14 @@ function validateCurrentSection(sectionNumber) {
     const questions = section.querySelectorAll('.question-container:not(.hidden)');
     let isValid = true;
     
-    console.log('Validating section', sectionNumber, 'with', questions.length, 'visible questions');
-    
     questions.forEach(question => {
         const questionId = question.id.replace('question-container-', '');
         const questionType = getQuestionTypeFromContainer(question);
         
-        console.log('Validating question', questionId, 'of type', questionType);
-        
         if (!validateQuestion(question, questionType, questionId)) {
-            console.log('Question', questionId, 'failed validation');
             isValid = false;
-        } else {
-            console.log('Question', questionId, 'passed validation');
         }
     });
-    
-    console.log('Section validation result:', isValid);
     
     // Update next button state
     const nextButton = document.getElementById('next-button-' + sectionNumber);
@@ -3288,12 +3244,8 @@ function validateDropdownQuestion(questionContainer) {
     const select = questionContainer.querySelector('select');
     if (!select) return true;
     
-    // Debug logging
-    console.log('Validating dropdown:', select.id, 'Value:', select.value, 'Trimmed:', select.value.trim());
-    
     // Check if the dropdown has a value and it's not the default empty/disabled option
     const isValid = select.value && select.value.trim() !== '' && select.value !== 'Select an option';
-    console.log('Dropdown validation result:', isValid);
     return isValid;
 }
 
@@ -3336,8 +3288,16 @@ function addValidationListeners() {
     const formFields = currentSection.querySelectorAll('input, select, textarea');
     
     formFields.forEach(field => {
-        field.addEventListener('change', () => validateCurrentSection(sectionNumber));
-        field.addEventListener('input', () => validateCurrentSection(sectionNumber));
+        // Remove existing listeners to prevent duplicates
+        field.removeEventListener('change', field._validationHandler);
+        field.removeEventListener('input', field._validationHandler);
+        
+        // Create new handler
+        field._validationHandler = () => validateCurrentSection(sectionNumber);
+        
+        // Add listeners
+        field.addEventListener('change', field._validationHandler);
+        field.addEventListener('input', field._validationHandler);
     });
     
     // Initial validation

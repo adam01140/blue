@@ -255,10 +255,18 @@ function exportFlowchartJson(download = true) {
     return cellData;
   });
 
+  // Include Form Properties in export
+  let formProperties = null;
+  if (typeof window.getFormProperties === 'function') {
+    formProperties = window.getFormProperties();
+    console.log("🔧 [FORM PROPERTIES DEBUG] Including Form Properties in export:", formProperties);
+  }
+
   const output = {
     cells: simplifiedCells,
     sectionPrefs: JSON.parse(JSON.stringify(sectionPrefs)),
-    groups: JSON.parse(JSON.stringify(groups))
+    groups: JSON.parse(JSON.stringify(groups)),
+    formProperties: formProperties
   };
 
   const jsonStr = JSON.stringify(output, null, 2);
