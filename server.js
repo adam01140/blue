@@ -200,6 +200,40 @@ app.post('/api/admin-save-forms', async (req, res) => {
   }
 });
 
+// Admin save individual form endpoint
+app.post('/api/admin-save-form', async (req, res) => {
+  try {
+    const { formId, formData } = req.body;
+    
+    if (!formId || !formData) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Form ID and form data are required' 
+      });
+    }
+
+    console.log(`Saving individual form ${formId} to Firebase...`);
+    
+    // Remove the id from formData since it's the document ID
+    const { id, ...dataToSave } = formData;
+    
+    await db.collection('forms').doc(formId).set(dataToSave);
+    
+    console.log(`Successfully saved form ${formId} to Firebase`);
+    res.json({ 
+      success: true, 
+      message: 'Form saved successfully' 
+    });
+
+  } catch (error) {
+    console.error('Error saving individual admin form:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to save form' 
+    });
+  }
+});
+
 // Admin delete form endpoint
 app.delete('/api/admin-delete-form/:formId', async (req, res) => {
   try {

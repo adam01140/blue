@@ -936,10 +936,48 @@
                 formsData[currentEditIndex].counties = counties;
                 formsData[currentEditIndex].defendant = defendant;
                 
-                // Save to Firebase
-                const formRef = db.collection('forms').doc(id);
-                const { id: formId, ...formData } = formsData[currentEditIndex];
-                await formRef.set(formData);
+                // Save to server via API
+                console.log('🔍 DEBUG: About to save form with data:', {
+                    formId: id,
+                    formData: formsData[currentEditIndex],
+                    url: '/api/admin-save-form'
+                });
+                
+                const requestBody = { 
+                    formId: id,
+                    formData: formsData[currentEditIndex]
+                };
+                
+                console.log('🔍 DEBUG: Request body:', JSON.stringify(requestBody, null, 2));
+                
+                const response = await fetch('/api/admin-save-form', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                console.log('🔍 DEBUG: Response status:', response.status);
+                console.log('🔍 DEBUG: Response headers:', Object.fromEntries(response.headers.entries()));
+                console.log('🔍 DEBUG: Response ok:', response.ok);
+                
+                const responseText = await response.text();
+                console.log('🔍 DEBUG: Raw response text:', responseText);
+                
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                    console.log('🔍 DEBUG: Parsed JSON result:', result);
+                } catch (parseError) {
+                    console.error('🔍 DEBUG: JSON parse error:', parseError);
+                    console.error('🔍 DEBUG: Response was not valid JSON. Status:', response.status);
+                    throw new Error(`Server returned non-JSON response (status ${response.status}): ${responseText.substring(0, 200)}...`);
+                }
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to save form');
+                }
                 
                 // Re-render table
         renderFormsTable();
@@ -951,8 +989,16 @@
                 const isNewForm = currentEditIndex === formsData.length - 1 && formsData[currentEditIndex].id === '';
                 document.getElementById('file-name').textContent = isNewForm ? 'New form added to Firebase successfully' : 'Form updated in Firebase successfully';
             } catch (error) {
-                console.error('Error saving form to Firebase:', error);
-                alert('Error saving form to Firebase: ' + error.message);
+                console.error('🔍 DEBUG: Error saving form to Firebase:', error);
+                console.error('🔍 DEBUG: Error stack:', error.stack);
+                console.error('🔍 DEBUG: Error details:', {
+                    name: error.name,
+                    message: error.message,
+                    currentEditIndex,
+                    formId: id,
+                    formData: formsData[currentEditIndex]
+                });
+                alert('Error saving form to Firebase: ' + error.message + '\n\nCheck console for detailed debug info.');
             }
         }
 

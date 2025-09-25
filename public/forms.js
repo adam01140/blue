@@ -206,7 +206,12 @@ function renderMyForms(forms) {
                     hideSavingOverlay();
                     // Append county and portfolioId to the URL for autosave separation
                     const separator = form.url.includes('?') ? '&' : '?';
-                    let url = form.url + separator + 'county=' + encodeURIComponent(form.countyName || '') + '&portfolioId=' + encodeURIComponent(form.id);
+                    // Fix URL path by removing Pages/ prefix if present
+                    let correctedUrl = form.url;
+                    if (correctedUrl.includes('Pages/Forms/')) {
+                        correctedUrl = correctedUrl.replace('Pages/Forms/', '../Forms/');
+                    }
+                    let url = correctedUrl + separator + 'county=' + encodeURIComponent(form.countyName || '') + '&portfolioId=' + encodeURIComponent(form.id);
                     if (form.defendantName) url += '&defendantName=' + encodeURIComponent(form.defendantName);
                     window.location.href = url;
                 } catch (err) {
@@ -248,7 +253,7 @@ removeSelectedButton.addEventListener('click', async () => {
     try {
         await batch.commit();
         selectedForms.clear();
-        fetchMyForms(userId);
+        // No need to call fetchMyForms - the real-time listener will automatically update
     } catch (error) {
         console.error('Error removing selected forms:', error);
     }
@@ -287,13 +292,13 @@ async function loadAvailableForms() {
             // Transform URLs to use the correct format with Forms/ prefix
             if (formData.url) {
                 if (formData.id === 'sc100') {
-                    formData.url = 'Forms/sc-100.html?formId=sc100';
+                    formData.url = '../Forms/sc-100.html?formId=sc100';
                 } else if (formData.id === 'sc120') {
-                    formData.url = 'Forms/sc-120.html?formId=sc120';
+                    formData.url = '../Forms/sc-120.html?formId=sc120';
                 } else if (formData.id === 'sc500') {
-                    formData.url = 'Forms/sc-500.html?formId=sc500';
+                    formData.url = '../Forms/sc-500.html?formId=sc500';
                 } else if (formData.id === 'fee-waiver') {
-                    formData.url = 'Forms/fee-waiver.html?formId=fee-waiver';
+                    formData.url = '../Forms/fee-waiver.html?formId=fee-waiver';
                 }
             }
             
@@ -312,7 +317,7 @@ let countyZipMap = null;
 async function loadCountyZipMap() {
     if (countyZipMap) return countyZipMap;
     try {
-        const response = await fetch('county-zips.json');
+        const response = await fetch('../JSON/county-zips.json');
         if (!response.ok) throw new Error('Failed to load county-zips.json');
         countyZipMap = await response.json();
         return countyZipMap;
@@ -805,7 +810,12 @@ renderMyForms = function(forms) {
                     }
                     hideSavingOverlay();
                     const separator = form.url.includes('?') ? '&' : '?';
-                    let url = form.url + separator + 'county=' + encodeURIComponent(form.countyName || '') + '&portfolioId=' + encodeURIComponent(form.id);
+                    // Fix URL path by removing Pages/ prefix if present
+                    let correctedUrl = form.url;
+                    if (correctedUrl.includes('Pages/Forms/')) {
+                        correctedUrl = correctedUrl.replace('Pages/Forms/', '../Forms/');
+                    }
+                    let url = correctedUrl + separator + 'county=' + encodeURIComponent(form.countyName || '') + '&portfolioId=' + encodeURIComponent(form.id);
                     if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
                     window.location.href = url;
                 } catch (err) {
