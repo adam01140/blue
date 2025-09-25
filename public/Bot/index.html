@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FormWiz - Simplify Your Paperwork</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="../Pages/cart.css" rel="stylesheet">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Cart functionality -->
+    <script src="../Pages/cart.js"></script>
     <!-- AI Configuration removed - now handled server-side -->
     <style>
         html, body {
@@ -18,6 +22,7 @@
             font-family: 'Montserrat', sans-serif;
             color: #333;
             background-color: #eaf1f8;
+            zoom: 0.90;
         }
         header {
             background-color: #2c3e50;
@@ -92,6 +97,52 @@
             background: #f4f4f4;
             color: #2980b9;
             box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+        }
+        .nav-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 38px;
+            background: #fff;
+            min-width: 210px;
+            box-shadow: 0 4px 24px rgba(44,62,80,0.13);
+            border-radius: 10px;
+            z-index: 1002;
+            padding: 12px 0;
+            flex-direction: column;
+            gap: 0;
+        }
+        .dropdown-menu a {
+            color: #222;
+            padding: 12px 28px;
+            text-decoration: none;
+            display: block;
+            font-weight: 600;
+            font-size: 1.08em;
+            border-radius: 0;
+            transition: background 0.18s, color 0.18s;
+        }
+        .dropdown-menu a:hover {
+            background: #eaf1f8;
+            color: #2980b9;
+        }
+        .nav-dropdown-wrapper.open .dropdown-menu {
+            display: flex;
+            animation: dropdownFadeIn 0.22s cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .forms-chevron {
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+        }
+        .nav-dropdown-wrapper.open .forms-chevron {
+            transform: rotate(-90deg);
         }
         .btn {
             background-color: #2980b9;
@@ -1576,13 +1627,87 @@
                 height: 35px;
             }
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: #e74c3c;
+        }
+
+        /* Defendant Modal Styles */
+        #defendant-modal .modal-content {
+            text-align: center;
+            max-width: 500px;
+        }
+        #defendant-modal h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        #defendant-modal p {
+            font-size: 1.1em;
+            margin: 20px 0;
+            line-height: 1.5;
+            color: #34495e;
+        }
+        #defendant-modal .btn {
+            width: auto;
+            padding: 12px 30px;
+            margin: 0 10px;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        #defendant-modal-submit {
+            background-color: #2980b9;
+        }
+        #defendant-modal-submit:hover {
+            background-color: #1c598a;
+        }
+        #defendant-modal-cancel {
+            background-color: #95a5a6;
+        }
+        #defendant-modal-cancel:hover {
+            background-color: #7f8c8d;
+        }
     </style>
 </head>
 <body>
     <header>
-        <img src="logo.png" alt="Logo" width="130" height="80" onclick="location.href='index.html';">
+        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='../index.html';">
         <nav>
-            <a href="index.html">Home
+            <a href="../index.html">Home
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
             <div class="nav-dropdown-wrapper" id="forms-dropdown-wrapper">
@@ -1590,21 +1715,38 @@
                     <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </a>
                 <div class="dropdown-menu" id="forms-dropdown-menu">
-                    <a href="FreeForm.html">Free Form</a>
-                    <a href="Family.html">Family</a>
-                    <a href="Probate.html">Probate</a>
-                    <a href="Property.html">Property</a>
-                    <a href="Immigration.html">Immigration</a>
-                    <a href="SmallClaims.html">Small Claims</a>
-                    <a href="Other.html">Other</a>
+                    <a href="../Pages/forms.html">My Forms</a>
+                    <a href="../Pages/FreeForm.html">Free Form</a>
+                    <a href="../Pages/Family.html">Family</a>
+                    <a href="../Pages/Property.html">Property</a>
+                    <a href="../Pages/Immigration.html">Immigration</a>
+                    <a href="../Pages/smallclaims.html">Small Claims</a>
+                    <a href="../Pages/Other.html">Other</a>
                 </div>
             </div>
-            <a href="contact.html">Contact Us
+            <a href="../Pages/about.html">About Us
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <a href="../Pages/contact.html">Contact Us
+                <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <a href="../Pages/FAQ.html">FAQ
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
         </nav>
         <div class="header-actions">
-            <a href="account.html" class="sign-in-btn">Sign In</a>
+            <a href="../Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
+            <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
+            <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
+                <span class="cart-circle">
+                    <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="10" cy="21" r="1.5"/>
+                        <circle cx="18" cy="21" r="1.5"/>
+                        <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
+                    </svg>
+                    <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
+                </span>
+            </a>
         </div>
     </header>
 
@@ -1691,21 +1833,72 @@
     <footer>
         &copy; 2024 Placeholder Company. All rights reserved.
     </footer>
+
+    <!-- County Selection Modal -->
+    <div id="county-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <span class="close-modal" id="county-modal-close">&times;</span>
+            <h2 id="county-modal-title">Which county are you filing in?</h2>
+            <p id="county-modal-message" style="font-size: 1.1em; margin: 20px 0; line-height: 1.5;">Enter your zip code below to determine your county.</p>
+            <input type="text" id="county-zip-input" placeholder="Enter zip code" maxlength="5" style="width: 90%; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0; margin-bottom: 18px; text-align: center;">
+            <div id="county-modal-error" style="color: #e74c3c; font-size: 1em; margin-bottom: 10px; display: none;"></div>
+              <div id="county-modal-buttons" style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
+                  <button type="button" id="county-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">Cancel</button>
+                  <button type="button" id="county-modal-submit" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9;">Submit</button>
+              </div>
+        </div>
+    </div>
+
+    <!-- Defendant Name Modal -->
+    <div id="defendant-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <span class="close-modal" id="defendant-modal-close">&times;</span>
+            <h2>Defendant Information</h2>
+            <p style="font-size: 1.1em; margin: 20px 0; line-height: 1.5;">Who are you suing?</p>
+            <input type="text" id="defendant-name-input" placeholder="Enter defendant's name" style="width: 90%; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0; margin-bottom: 18px;">
+            <div id="defendant-modal-error" style="color: #e74c3c; font-size: 1em; margin-bottom: 10px; display: none;"></div>
+              <div style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
+                  <button type="button" id="defendant-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">Cancel</button>
+                  <button type="button" id="defendant-modal-submit" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9;">Submit</button>
+              </div>
+        </div>
+    </div>
     <script>
-        // Firebase configuration
+        // Firebase configuration (matching forms.js)
         const firebaseConfig = {
-            apiKey: "AIzaSyACh8hp2kL4P0xBPkwkvpLA0zNAqtw5IQc",
-            authDomain: "invoice-4f2b4.firebaseapp.com",
-            projectId: "invoice-4f2b4",
-            storageBucket: "invoice-4f2b4.firebasestorage.app",
-            messagingSenderId: "1028270499799",
-            appId: "1:1028270499799:web:31401d335232bb21bc4d92",
-            measurementId: "G-Z1HX6QN3DG"
+            apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+            authDomain: "formwiz-3f4fd.firebaseapp.com",
+            projectId: "formwiz-3f4fd",
+            storageBucket: "formwiz-3f4fd.firebasestorage.app",
+            messagingSenderId: "404259212529",
+            appId: "1:404259212529:web:15a33bce82383b21cfed50",
+            measurementId: "G-P07YEN0HPD"
         };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // --- CART SIDE MENU LOGIC ---
+        function openCartSideMenu() {
+            const cartOverlay = document.getElementById('cart-overlay');
+            const cartSideMenu = document.getElementById('cart-side-menu');
+            cartOverlay.classList.add('active');
+            cartSideMenu.classList.add('active');
+            cartOverlay.style.opacity = '1';
+            cartOverlay.style.visibility = 'visible';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeCartSideMenu() {
+            const cartOverlay = document.getElementById('cart-overlay');
+            const cartSideMenu = document.getElementById('cart-side-menu');
+            cartOverlay.classList.remove('active');
+            cartSideMenu.classList.remove('active');
+            cartOverlay.style.opacity = '0';
+            cartOverlay.style.visibility = 'hidden';
+            document.body.style.overflow = '';
+        }
 
         // Forms data from Firebase
         let availableForms = [];
@@ -2066,13 +2259,13 @@
                     ${form.description}
                 </div>
                 <div class="form-module-actions">
-                    <a href="${form.url}" class="form-get-started-btn" target="_blank">
+                    <button class="form-get-started-btn" onclick="showCountyModal('${form.id}', '${form.url}', '${form.name.replace(/'/g, "\\'")}')">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M10 6H6C4.9 6 4 6.9 4 8V18C4 19.1 4.9 20 6 20H16C17.1 20 18 19.1 18 18V14M14 4H20M20 4V10M20 4L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                         Get Started
-                    </a>
-                    <span class="form-module-info">Click to open the form in a new tab</span>
+                    </button>
+                    <span class="form-module-info">Click to start the form process</span>
                 </div>
             `;
             
@@ -2413,6 +2606,688 @@ What specific legal topic would you like to know more about?
             });
         }
 
+        // County and Defendant Modal Functions
+        let countyZipMap = null;
+        let pendingCountyData = null;
+        let currentCounty = null;
+        let pendingDefendantData = null;
+
+        // Load county-zip mapping
+        async function loadCountyZipMap() {
+            if (countyZipMap) return countyZipMap;
+            try {
+                const response = await fetch('../JSON/county-zips.json');
+                if (!response.ok) throw new Error('Failed to load county-zips.json');
+                countyZipMap = await response.json();
+                return countyZipMap;
+            } catch (e) {
+                console.error('Error loading county-zips.json:', e);
+                return {};
+            }
+        }
+
+        // County Selection Modal
+        function showCountyModal(formId, formUrl, formName) {
+            console.log('🔍 DEBUG: showCountyModal called with:', { formId, formUrl, formName });
+            
+            const modal = document.getElementById('county-modal');
+            const closeBtn = document.getElementById('county-modal-close');
+            const submitBtn = document.getElementById('county-modal-submit');
+            const cancelBtn = document.getElementById('county-modal-cancel');
+            const zipInput = document.getElementById('county-zip-input');
+            const errorDiv = document.getElementById('county-modal-error');
+            const title = document.getElementById('county-modal-title');
+            const message = document.getElementById('county-modal-message');
+            
+            console.log('🔍 DEBUG: Modal elements found:', { modal, closeBtn, submitBtn, cancelBtn, zipInput, errorDiv, title, message });
+            
+            // Reset modal to initial state
+            title.textContent = 'Which county are you filing in?';
+            message.textContent = 'Enter your zip code below to determine your county.';
+            zipInput.style.display = 'block';
+            zipInput.value = '';
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+            submitBtn.textContent = 'Submit';
+            submitBtn.style.display = 'block';
+            cancelBtn.style.display = 'block';
+            modal.style.display = 'block';
+            
+            pendingCountyData = { formId, formUrl, formName };
+            currentCounty = null;
+            
+            console.log('🔍 DEBUG: Modal displayed, pendingCountyData set:', pendingCountyData);
+            
+            function closeModal() {
+                modal.style.display = 'none';
+                pendingCountyData = null;
+                currentCounty = null;
+            }
+            
+            closeBtn.onclick = closeModal;
+            cancelBtn.onclick = closeModal;
+            
+            window.onclick = function(event) {
+                if (event.target == modal) closeModal();
+            };
+            
+            // Handle zip code input - only allow numbers
+            zipInput.addEventListener('input', function() {
+                let val = zipInput.value.replace(/\D/g, '');
+                if (val.length > 5) val = val.slice(0, 5);
+                zipInput.value = val;
+            });
+            
+            submitBtn.onclick = async function() {
+                console.log('🔍 DEBUG: Submit button clicked, currentCounty:', currentCounty);
+                
+                if (!currentCounty) {
+                    console.log('🔍 DEBUG: First step - validating zip code');
+                    // First step: validate zip code and find county
+                    const zipValue = zipInput.value.trim();
+                    console.log('🔍 DEBUG: Zip value entered:', zipValue);
+                    
+                    if (!zipValue || zipValue.length !== 5) {
+                        console.log('🔍 DEBUG: Invalid zip code');
+                        errorDiv.textContent = 'Please enter a valid 5-digit zip code.';
+                        errorDiv.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Find county for this zip
+                    console.log('🔍 DEBUG: Loading county zip map');
+                    const countyZipMap = await loadCountyZipMap();
+                    console.log('🔍 DEBUG: County zip map loaded:', countyZipMap);
+                    
+                    let foundCounty = null;
+                    for (const [county, zips] of Object.entries(countyZipMap)) {
+                        if (zips.includes(zipValue)) {
+                            foundCounty = county;
+                            console.log('🔍 DEBUG: Found county:', foundCounty);
+                            break;
+                        }
+                    }
+                    
+                    if (!foundCounty) {
+                        console.log('🔍 DEBUG: No county found for zip:', zipValue);
+                        errorDiv.textContent = 'No county found for this zip code.';
+                        errorDiv.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Check if form supports this county
+                    let formObj = availableForms.find(f => f.id === formId);
+                    if (formObj && (!Array.isArray(formObj.counties) || !formObj.counties.includes(foundCounty))) {
+                        errorDiv.textContent = `This form is not offered in ${foundCounty} County. Please try a different zip code.`;
+                        errorDiv.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Show confirmation step
+                    currentCounty = foundCounty;
+                    title.textContent = 'Confirm County';
+                    message.textContent = `Great, you're filing in ${foundCounty} County right?`;
+                    zipInput.style.display = 'none';
+                    errorDiv.style.display = 'none';
+                    submitBtn.textContent = 'Yes';
+                    cancelBtn.textContent = 'No';
+                    
+                } else {
+                    console.log('🔍 DEBUG: Second step - user confirmed county:', currentCounty);
+                    // Second step: user confirmed county, proceed with form addition
+                    modal.style.display = 'none';
+                    
+                    if (pendingCountyData) {
+                        console.log('🔍 DEBUG: Processing pending county data:', pendingCountyData);
+                        // Check for duplicates
+                        const user = auth.currentUser;
+                        console.log('🔍 DEBUG: Current user:', user);
+                        
+                        if (!user) {
+                            console.log('🔍 DEBUG: No user logged in, redirecting to form directly (no portfolio ID)');
+                            // If not logged in, redirect to form directly (like forms.js does)
+                            const separator = pendingCountyData.formUrl.includes('?') ? '&' : '?';
+                            const redirectUrl = pendingCountyData.formUrl + separator + 'county=' + encodeURIComponent(currentCounty);
+                            console.log('🔍 DEBUG: Redirecting to:', redirectUrl);
+                            window.location.href = redirectUrl;
+                            return;
+                        }
+                        
+                        const userId = user.uid;
+                        try {
+                            console.log('🔍 DEBUG: About to check for duplicates');
+                            const formsSnapshot = await db.collection('users').doc(userId).collection('forms').get();
+                            console.log('🔍 DEBUG: Forms snapshot retrieved, size:', formsSnapshot.size);
+                            let duplicateFound = false;
+                            
+                            formsSnapshot.forEach(doc => {
+                                const formData = doc.data();
+                                console.log('🔍 DEBUG: Checking form:', { docId: doc.id, formData, pendingFormId: pendingCountyData.formId, currentCounty });
+                                if ((formData.originalFormId === pendingCountyData.formId || doc.id === pendingCountyData.formId) && formData.countyName === currentCounty) {
+                                    duplicateFound = true;
+                                    console.log('🔍 DEBUG: Duplicate found!');
+                                }
+                            });
+                            
+                            console.log('🔍 DEBUG: Duplicate check complete, duplicateFound:', duplicateFound);
+                            
+                            if (duplicateFound) {
+                                console.log('🔍 DEBUG: Processing duplicate form');
+                                // For now, just proceed with the form (you can add duplicate handling later)
+                                await addFormToPortfolioInternal(pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty);
+                            } else {
+                                console.log('🔍 DEBUG: No duplicate found, checking if form requires defendant');
+                                // Check if form requires defendant
+                                let formObj = availableForms.find(f => f.id === pendingCountyData.formId);
+                                console.log('🔍 DEBUG: Form object found:', formObj);
+                                
+                                if (formObj && formObj.defendant && formObj.defendant.toUpperCase() === 'YES') {
+                                    console.log('🔍 DEBUG: Form requires defendant, showing defendant modal');
+                                    showDefendantModal(formObj, pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty);
+                                } else {
+                                    console.log('🔍 DEBUG: Form does not require defendant, adding to portfolio');
+                                    await addFormToPortfolioInternal(pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty);
+                                }
+                            }
+                        } catch (error) {
+                            console.error('🔍 DEBUG: Error checking for duplicate form:', error);
+                            console.error('🔍 DEBUG: Error details:', {
+                                message: error.message,
+                                stack: error.stack,
+                                pendingCountyData,
+                                currentCounty,
+                                userId
+                            });
+                            // Show Form switch attempted alert
+                            alert("Form switch attempted");
+                        }
+                        
+                        pendingCountyData = null;
+                        currentCounty = null;
+                    }
+                }
+            };
+            
+            // Handle "No" button - go back to zip code input
+            cancelBtn.onclick = function() {
+                if (currentCounty) {
+                    // Go back to zip code input
+                    title.textContent = 'Which county are you filing in?';
+                    message.textContent = 'Enter your zip code below to determine your county.';
+                    zipInput.style.display = 'block';
+                    zipInput.value = '';
+                    errorDiv.style.display = 'none';
+                    errorDiv.textContent = '';
+                    submitBtn.textContent = 'Submit';
+                    cancelBtn.textContent = 'Cancel';
+                    currentCounty = null;
+                } else {
+                    closeModal();
+                }
+            };
+        }
+
+        // Defendant Name Modal
+        function showDefendantModal(formObj, formId, formUrl, formName, countyName) {
+            const modal = document.getElementById('defendant-modal');
+            const closeBtn = document.getElementById('defendant-modal-close');
+            const submitBtn = document.getElementById('defendant-modal-submit');
+            const cancelBtn = document.getElementById('defendant-modal-cancel');
+            const input = document.getElementById('defendant-name-input');
+            const errorDiv = document.getElementById('defendant-modal-error');
+            input.value = '';
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+            modal.style.display = 'block';
+            pendingDefendantData = { formObj, formId, formUrl, formName, countyName };
+            
+            function closeModal() {
+                modal.style.display = 'none';
+                pendingDefendantData = null;
+            }
+            
+            closeBtn.onclick = closeModal;
+            cancelBtn.onclick = closeModal;
+            
+            window.onclick = function(event) {
+                if (event.target == modal) closeModal();
+            };
+            
+            submitBtn.onclick = async function() {
+                const defendantName = input.value.trim();
+                if (!defendantName) {
+                    errorDiv.textContent = 'Please enter the defendant\'s name.';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+                modal.style.display = 'none';
+                if (pendingDefendantData) {
+                    await addFormToPortfolioInternal(
+                        pendingDefendantData.formId,
+                        pendingDefendantData.formUrl,
+                        pendingDefendantData.formName,
+                        pendingDefendantData.countyName,
+                        false,
+                        defendantName
+                    );
+                    pendingDefendantData = null;
+                }
+            };
+        }
+
+        // Add form to portfolio
+        async function addFormToPortfolioInternal(formId, formUrl, formName, countyName, isDuplicate = false, defendantName = null) {
+            console.log('🔍 DEBUG: ===== addFormToPortfolioInternal START =====');
+            console.log('🔍 DEBUG: addFormToPortfolioInternal called with:', { formId, formUrl, formName, countyName, isDuplicate, defendantName });
+            
+            const user = auth.currentUser;
+            console.log('🔍 DEBUG: Current user:', user);
+            
+            if (!user) {
+                console.log('🔍 DEBUG: No user logged in, redirecting to form directly (no portfolio ID)');
+                // If not logged in, redirect to form directly (like forms.js does)
+                const separator = formUrl.includes('?') ? '&' : '?';
+                let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
+                if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                console.log('🔍 DEBUG: Redirecting to form:', url);
+                window.location.href = url;
+                return;
+            }
+            
+            const userId = user.uid;
+            console.log('🔍 DEBUG: User ID:', userId);
+            
+            try {
+                if (isDuplicate) {
+                    console.log('🔍 DEBUG: Creating duplicate form');
+                    // For duplicates, always create a new document with a unique ID
+                    const newFormRef = db.collection('users').doc(userId).collection('forms').doc();
+                    const formData = {
+                        originalFormId: formId,
+                        name: formName,
+                        url: formUrl,
+                        addedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
+                        countyName: countyName,
+                        isDuplicate: true
+                    };
+                    if (defendantName) formData.defendantName = defendantName;
+                    
+                    console.log('🔍 DEBUG: Setting duplicate form data:', formData);
+                    await newFormRef.set(formData);
+                    console.log('🔍 DEBUG: Duplicate form set successfully');
+                    
+                    // Verify the form was actually stored by reading it back
+                    const verifyDoc = await newFormRef.get();
+                    if (verifyDoc.exists) {
+                        const storedData = verifyDoc.data();
+                        console.log('🔍 DEBUG: Verification successful, stored data:', storedData);
+                        
+                        // Show success alert with debug info
+                        console.log('🔍 DEBUG: ===== SUCCESS: Duplicate form added =====');
+                        alert(`✅ Form successfully added to portfolio!\n\nDebug Info:\n- Form ID: ${formId}\n- Form Name: ${formName}\n- County: ${countyName}\n- Portfolio ID: ${newFormRef.id}\n- Stored Name Field: ${storedData.name}\n- Defendant Name: ${defendantName || 'N/A'}\n- Is Duplicate: ${isDuplicate}\n\nClick OK to proceed to the form.`);
+                        
+                        // Redirect to form
+                        const separator = formUrl.includes('?') ? '&' : '?';
+                        let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
+                        url += '&portfolioId=' + encodeURIComponent(newFormRef.id);
+                        if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                        console.log('🔍 DEBUG: Redirecting to form:', url);
+                        window.location.href = url;
+                    } else {
+                        console.error('🔍 DEBUG: Failed to verify duplicate form was stored!');
+                        alert('❌ Error: Form was not properly stored in portfolio. Please try again.');
+                    }
+                } else {
+                    console.log('🔍 DEBUG: Creating new form (not duplicate)');
+                    // For new forms, check if it already exists for the same county
+                    const formsSnapshot = await db.collection('users').doc(userId).collection('forms').get();
+                    console.log('🔍 DEBUG: Existing forms count:', formsSnapshot.size);
+                    
+                    let existingFormDoc = null;
+                    
+                    formsSnapshot.forEach(doc => {
+                        const formData = doc.data();
+                        console.log('🔍 DEBUG: Checking existing form:', { docId: doc.id, formData });
+                        // Check if this is the same form type and same county
+                        if ((formData.originalFormId === formId || doc.id === formId) && formData.countyName === countyName) {
+                            existingFormDoc = doc;
+                            console.log('🔍 DEBUG: Found existing form for same county');
+                        }
+                    });
+                    
+                    if (existingFormDoc) {
+                        console.log('🔍 DEBUG: Updating existing form');
+                        // Update lastOpened in Firestore for the existing form
+                        await existingFormDoc.ref.update({
+                            lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
+                            countyName: countyName
+                        });
+                        console.log('🔍 DEBUG: Existing form updated successfully');
+                        
+                        // Verify the form was actually updated by reading it back
+                        const verifyDoc = await existingFormDoc.ref.get();
+                        if (verifyDoc.exists) {
+                            const storedData = verifyDoc.data();
+                            console.log('🔍 DEBUG: Verification successful, updated data:', storedData);
+                            
+                            // Show success alert with debug info
+                            console.log('🔍 DEBUG: ===== SUCCESS: Existing form updated =====');
+                            alert(`✅ Form successfully updated in portfolio!\n\nDebug Info:\n- Form ID: ${formId}\n- Form Name: ${formName}\n- County: ${countyName}\n- Portfolio ID: ${existingFormDoc.id}\n- Stored Name Field: ${storedData.name}\n- Defendant Name: ${defendantName || 'N/A'}\n- Is Existing Form: true\n\nClick OK to proceed to the form.`);
+                            
+                            // Redirect to form
+                            const separator = formUrl.includes('?') ? '&' : '?';
+                            let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
+                            url += '&portfolioId=' + encodeURIComponent(existingFormDoc.id);
+                            if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                            console.log('🔍 DEBUG: Redirecting to form:', url);
+                            window.location.href = url;
+                        } else {
+                            console.error('🔍 DEBUG: Failed to verify existing form was updated!');
+                            alert('❌ Error: Form was not properly updated in portfolio. Please try again.');
+                        }
+                    } else {
+                        console.log('🔍 DEBUG: Creating new form document');
+                        // Create a new form document with auto-generated ID
+                        const newFormRef = db.collection('users').doc(userId).collection('forms').doc();
+                        const formData = {
+                            originalFormId: formId,
+                            name: formName,
+                            url: formUrl,
+                            addedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
+                            countyName: countyName
+                        };
+                        if (defendantName) formData.defendantName = defendantName;
+                        
+                        console.log('🔍 DEBUG: Setting new form data:', formData);
+                        await newFormRef.set(formData);
+                        console.log('🔍 DEBUG: New form set successfully');
+                        
+                        // Verify the form was actually stored by reading it back
+                        const verifyDoc = await newFormRef.get();
+                        if (verifyDoc.exists) {
+                            const storedData = verifyDoc.data();
+                            console.log('🔍 DEBUG: Verification successful, stored data:', storedData);
+                            
+                            // Show success alert with debug info
+                            console.log('🔍 DEBUG: ===== SUCCESS: New form added =====');
+                            alert(`✅ Form successfully added to portfolio!\n\nDebug Info:\n- Form ID: ${formId}\n- Form Name: ${formName}\n- County: ${countyName}\n- Portfolio ID: ${newFormRef.id}\n- Stored Name Field: ${storedData.name}\n- Defendant Name: ${defendantName || 'N/A'}\n- Is New Form: true\n\nClick OK to proceed to the form.`);
+                            
+                            // Redirect to form
+                            const separator = formUrl.includes('?') ? '&' : '?';
+                            let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
+                            url += '&portfolioId=' + encodeURIComponent(newFormRef.id);
+                            if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                            console.log('🔍 DEBUG: Redirecting to form:', url);
+                            window.location.href = url;
+                        } else {
+                            console.error('🔍 DEBUG: Failed to verify new form was stored!');
+                            alert('❌ Error: Form was not properly stored in portfolio. Please try again.');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('🔍 DEBUG: ===== ERROR IN addFormToPortfolioInternal =====');
+                console.error('🔍 DEBUG: Error handling form:', error);
+                console.error('🔍 DEBUG: Error details:', {
+                    message: error.message,
+                    stack: error.stack,
+                    formId,
+                    formName,
+                    countyName,
+                    userId
+                });
+                console.log('🔍 DEBUG: Redirecting to form due to error (no portfolio ID available)');
+                const separator = formUrl.includes('?') ? '&' : '?';
+                let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
+                if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                window.location.href = url;
+            }
+            console.log('🔍 DEBUG: ===== addFormToPortfolioInternal END =====');
+        }
+
+        // Update cart count badge in header
+        function updateCartCountBadge() {
+            const cartCountElement = document.getElementById('cart-count-badge');
+            if (cartCountElement) {
+                let count = 0;
+                
+                // Try to get count from getCartCount function first
+                if (typeof getCartCount === 'function') {
+                    count = getCartCount();
+                } else {
+                    // Fallback to localStorage
+                    try {
+                        const cartData = localStorage.getItem('formwiz_cart');
+                        if (cartData) {
+                            const cart = JSON.parse(cartData);
+                            count = Array.isArray(cart) ? cart.length : 0;
+                        }
+                    } catch (e) {
+                        count = 0;
+                    }
+                }
+                
+                // Always update the text content, even if count is 0
+                cartCountElement.textContent = count;
+                
+                if (count > 0) {
+                    cartCountElement.style.display = 'flex';
+                } else {
+                    cartCountElement.style.display = 'none';
+                }
+            }
+        }
+
+        // Initialize header features (dropdown, auth, cart)
+        function initializeHeaderFeatures() {
+            // Forms dropdown functionality
+            const formsWrapper = document.getElementById('forms-dropdown-wrapper');
+            const formsLink = document.getElementById('forms-nav-link');
+            const formsMenu = document.getElementById('forms-dropdown-menu');
+            
+            if (formsLink && formsMenu) {
+                formsLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    formsWrapper.classList.toggle('open');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!formsWrapper.contains(e.target)) {
+                        formsWrapper.classList.remove('open');
+                    }
+                });
+            }
+            
+            // Authentication state management
+            const signInBtn = document.getElementById('sign-in-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            
+            auth.onAuthStateChanged(function(user) {
+                if (user) {
+                    if (signInBtn) signInBtn.style.display = 'none';
+                    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+                } else {
+                    if (signInBtn) signInBtn.style.display = 'inline-block';
+                    if (logoutBtn) logoutBtn.style.display = 'none';
+                }
+            });
+            
+            // Logout functionality
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    auth.signOut().then(() => {
+                        window.location.href = '../index.html';
+                    }).catch((error) => {
+                        alert('Sign Out Error: ' + error.message);
+                    });
+                });
+            }
+            
+            // Cart functionality (matching forms.js exactly)
+            const cartIconLink = document.getElementById('cart-icon-link');
+            const cartOverlay = document.getElementById('cart-overlay');
+            const cartSideMenu = document.getElementById('cart-side-menu');
+            const cartCloseBtn = document.getElementById('cart-close-btn');
+            const cartContent = document.getElementById('cart-content');
+            const cartMessage = document.getElementById('cart-message');
+            const cartDescription = document.getElementById('cart-description');
+            const cartSignupBtn = document.getElementById('cart-signup-btn');
+            const cartItemsList = document.getElementById('cart-items-list');
+            const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
+            
+            if (cartIconLink) {
+                cartIconLink.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    if (auth.currentUser) {
+                        openCartSideMenu();
+                        cartMessage.style.display = 'none';
+                        cartDescription.style.display = 'none';
+                        cartSignupBtn.style.display = 'none';
+                        cartItemsList.style.display = 'block';
+                        cartCheckoutBtn.style.display = 'none';
+                        cartItemsList.innerHTML = '';
+                        // --- Use formwiz_cart cookie for cart data (like cart.html) ---
+                        function getCookie(name) {
+                            const eq = name + '=';
+                            const parts = document.cookie.split(';');
+                            for (let c of parts) {
+                                while (c.charAt(0) === ' ') c = c.slice(1);
+                                if (c.indexOf(eq) === 0) return c.slice(eq.length);
+                            }
+                            return null;
+                        }
+                        let cart = [];
+                        try {
+                            // Try cookie first, then localStorage as fallback
+                            let cartData = getCookie('formwiz_cart');
+                            if (!cartData) {
+                                cartData = localStorage.getItem('formwiz_cart');
+                            }
+                            if (cartData) {
+                                // Decode URL-encoded data if needed
+                                const decodedData = cartData.startsWith('%') ? decodeURIComponent(cartData) : cartData;
+                                cart = JSON.parse(decodedData);
+                            }
+                        } catch (e) { 
+                            console.error('Error parsing cart data:', e);
+                            cart = []; 
+                        }
+                        if (!Array.isArray(cart) || cart.length === 0) {
+                            cartItemsList.innerHTML = '<div style="color:#7f8c8d;font-size:1.1em;margin-top:18px;">Your cart is empty.</div>';
+                            cartCheckoutBtn.style.display = 'none';
+                            return;
+                        }
+                        let total = 0;
+                        // Fetch prices for all items (simulate fetchStripePrice)
+                        async function fetchStripePrice(priceId) {
+                            try {
+                                const res = await fetch(`/stripe-price/${priceId}`, { mode: 'cors' });
+                                if (!res.ok) return null;
+                                const data = await res.json();
+                                return data;
+                            } catch {
+                                return null;
+                            }
+                        }
+                        // Render cart items with price fetch
+                        cartItemsList.innerHTML = '<div style="color:#7f8c8d;font-size:1.1em;margin-top:18px;">Loading cart...</div>';
+                        let html = '';
+                        let totalAmount = 0;
+                        let itemCount = 0;
+                        for (const item of cart) {
+                            const priceInfo = await fetchStripePrice(item.priceId);
+                            let display = '...';
+                            let priceVal = 0;
+                            if (priceInfo && priceInfo.unit_amount != null) {
+                                display = `$${(priceInfo.unit_amount / 100).toFixed(2)}`;
+                                priceVal = priceInfo.unit_amount / 100;
+                                totalAmount += priceVal;
+                            }
+                            // Capitalize defendant's name if present
+                            let defendantDisplay = '';
+                            if (item.defendantName) {
+                                const capName = String(item.defendantName)
+                                  .split(/\s+/)
+                                  .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+                                  .join(' ');
+                                defendantDisplay = `<div style='font-weight:bold;color:#e74c3c;'>Defendant: ${capName}</div>`;
+                            }
+                            html += `
+                                <div class="cart-item">
+                                    <div class="cart-item-info">
+                                        <div class="cart-item-title">${item.title || 'Form'}</div>
+                                        ${defendantDisplay}
+                                        ${item.countyName ? `<div class='cart-item-county' style='font-size:0.98em;color:#153a5b;margin-bottom:2px;'>${item.countyName}${item.countyName.toLowerCase().includes('county') ? '' : ' County'}</div>` : ''}
+                                        <div class="cart-item-price">${display}</div>
+                                    </div>
+                                    <button class="remove-item" title="Remove" onclick="(function(){const cart=JSON.parse(decodeURIComponent(document.cookie.split('; ').find(row=>row.startsWith('formwiz_cart='))?.split('=')[1]||'[]'));cart.splice(${itemCount},1);document.cookie='formwiz_cart='+encodeURIComponent(JSON.stringify(cart))+';path=/;max-age=2592000';window.location.reload();})()">
+                                        <svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 20 20' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='3 6 5 6 21 6'></polyline><path d='M19 6l-2 14H7L5 6'></path><path d='M10 11v6'></path><path d='M14 11v6'></path><path d='M5 6V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2'></path></svg>
+                                    </button>
+                                </div>
+                            `;
+                            itemCount++;
+                        }
+                        // Total and checkout
+                        html += `<div class="cart-summary">
+                            <div class="summary-label">Total:</div>
+                            <div class="total-amount">$${totalAmount.toFixed(2)}</div>
+                        </div>`;
+                        cartItemsList.innerHTML = html;
+                        cartCheckoutBtn.style.display = 'block';
+                    } else {
+                        openCartSideMenu();
+                        cartMessage.style.display = 'block';
+                        cartDescription.style.display = 'block';
+                        cartSignupBtn.style.display = 'inline-block';
+                        cartItemsList.style.display = 'none';
+                        cartCheckoutBtn.style.display = 'none';
+                    }
+                });
+            }
+            if (cartCloseBtn) {
+                cartCloseBtn.addEventListener('click', closeCartSideMenu);
+            }
+            if (cartOverlay) {
+                cartOverlay.addEventListener('click', function(e) {
+                    if (e.target === cartOverlay) closeCartSideMenu();
+                });
+            }
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeCartSideMenu();
+            });
+            if (cartCheckoutBtn) {
+                cartCheckoutBtn.addEventListener('click', function() {
+                    window.location.href = '../Pages/cart.html';
+                });
+            }
+            
+            // Initialize cart count badge
+            updateCartCountBadge();
+            setInterval(updateCartCountBadge, 5000);
+        }
+
+        // Keyboard shortcut to trigger SC-100 form (Ctrl+Shift)
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.shiftKey) {
+                event.preventDefault();
+                console.log('🔍 DEBUG: Ctrl+Shift pressed - triggering SC-100 form');
+                
+                // Find the SC-100 form and trigger its "Get Started" function
+                const sc100Form = availableForms.find(form => form.id === 'sc100');
+                if (sc100Form) {
+                    console.log('🔍 DEBUG: Found SC-100 form:', sc100Form);
+                    showCountyModal(sc100Form.id, sc100Form.url, sc100Form.name);
+                } else {
+                    console.log('🔍 DEBUG: SC-100 form not found in availableForms');
+                    alert('SC-100 form not available. Please try again later.');
+                }
+            }
+        });
+
         // Initialize all features
         document.addEventListener('DOMContentLoaded', function() {
             // Ensure page starts at the top
@@ -2420,10 +3295,34 @@ What specific legal topic would you like to know more about?
             document.body.scrollTop = 0;
             document.documentElement.scrollTop = 0;
             
+            // Initialize header functionality
+            initializeHeaderFeatures();
+            
             initializeLegacyFeatures();
             initializeHeroAnimation();
             initializeDropdown();
         });
     </script>
+
+    <!-- Cart Overlay (matching forms.html exactly) -->
+    <div class="cart-overlay" id="cart-overlay">
+        <div class="cart-side-menu" id="cart-side-menu">
+            <div class="cart-header">
+                <h2>🛒 Cart</h2>
+                <button class="cart-close-btn" id="cart-close-btn">&times;</button>
+            </div>
+            <div class="cart-content" id="cart-content">
+                <div class="cart-icon-large">🛒</div>
+                <div class="cart-message" id="cart-message">Create an account to start shopping!</div>
+                <div class="cart-description" id="cart-description">
+                    To add forms to your cart and make purchases, you'll need to create a FormWiz account. 
+                    Sign up now to access our complete library of legal forms and start simplifying your paperwork.
+                </div>
+                <a href="../Pages/account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
+                <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>
+                <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

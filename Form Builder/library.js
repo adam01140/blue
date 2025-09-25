@@ -984,6 +984,7 @@ window.fixCapitalizationInJumps();
 
 // Save flowchart to Firebase
 window.saveFlowchart = function() {
+  console.log("🔧 [PDF DEBUG] ===== saveFlowchart CALLED =====");
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to save flowcharts. Guest users cannot save."); return;}  
   renumberQuestionIds();
   let flowchartName = currentFlowchartName;
@@ -992,9 +993,13 @@ window.saveFlowchart = function() {
     if (!flowchartName || !flowchartName.trim()) return;
     currentFlowchartName = flowchartName;
   }
+  console.log("🔧 [PDF DEBUG] Saving flowchart with name:", flowchartName);
+  
   // Gather data and save
   const data = { cells: [] };
   const cells = graph.getModel().cells;
+  
+  console.log("🔧 [PDF DEBUG] Found", Object.keys(cells).length, "cells in graph");
   for (let id in cells) {
     if (id === "0" || id === "1") continue;
     const cell = cells[id];
@@ -1024,8 +1029,20 @@ window.saveFlowchart = function() {
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
-      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null
+      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, 
+      _pdfUrl: cell._pdfUrl||null, _pdfDisplayName: cell._pdfDisplayName||null, _pdfFilename: cell._pdfFilename||null, _priceId: cell._priceId||null
     };
+    
+    // Log PDF properties being saved
+    if (cell.vertex && cell.style && cell.style.includes("nodeType=pdfNode")) {
+      console.log(`🔧 [PDF DEBUG] Saving PDF node ${cell.id} to library with properties:`, {
+        _pdfUrl: cellData._pdfUrl,
+        _pdfDisplayName: cellData._pdfDisplayName,
+        _pdfFilename: cellData._pdfFilename,
+        _priceId: cellData._priceId
+      });
+    }
+    
     if (isCalculationNode(cell)) {
       cellData._calcTitle = cell._calcTitle;
       cellData._calcAmountLabel = cell._calcAmountLabel;
@@ -1110,11 +1127,32 @@ function displayFlowcharts(flowcharts) {
 }
 
 window.openSavedFlowchart = function(name) {
+  console.log("🔧 [PDF DEBUG] ===== openSavedFlowchart CALLED =====");
+  console.log("🔧 [PDF DEBUG] Loading flowchart:", name);
+  
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to open saved flowcharts. Guest users cannot load."); return; }
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
     .get().then(docSnap=>{
       if (!docSnap.exists) { alert("No flowchart named " + name); return; }
-      loadFlowchartData(docSnap.data().flowchart);
+      
+      const flowchartData = docSnap.data().flowchart;
+      console.log("🔧 [PDF DEBUG] Loaded flowchart data:", flowchartData);
+      
+      // Log PDF nodes in the loaded data
+      if (flowchartData.cells) {
+        const pdfCells = flowchartData.cells.filter(cell => cell.style && cell.style.includes("nodeType=pdfNode"));
+        console.log("🔧 [PDF DEBUG] Found", pdfCells.length, "PDF nodes in loaded data");
+        pdfCells.forEach((cell, index) => {
+          console.log(`🔧 [PDF DEBUG] PDF Node ${index + 1} (ID: ${cell.id}) in loaded data:`, {
+            _pdfUrl: cell._pdfUrl,
+            _pdfDisplayName: cell._pdfDisplayName,
+            _pdfFilename: cell._pdfFilename,
+            _priceId: cell._priceId
+          });
+        });
+      }
+      
+      loadFlowchartData(flowchartData);
       currentFlowchartName = name;
       
       // Update last used timestamp
@@ -1331,10 +1369,27 @@ function exportGuiJson() {
  * Load a flowchart from JSON data.
  */
 function loadFlowchartData(data) {
+  console.log("🔧 [PDF DEBUG] ===== loadFlowchartData CALLED =====");
+  console.log("🔧 [PDF DEBUG] Data received:", data);
+  
   if (!data.cells) {
     alert("Invalid flowchart data");
     return;
   }
+  
+  console.log("🔧 [PDF DEBUG] Found", data.cells.length, "cells to load");
+  
+  // Log PDF cells in the data
+  const pdfCells = data.cells.filter(cell => cell.style && cell.style.includes("nodeType=pdfNode"));
+  console.log("🔧 [PDF DEBUG] Found", pdfCells.length, "PDF cells in data");
+  pdfCells.forEach((cell, index) => {
+    console.log(`🔧 [PDF DEBUG] PDF Cell ${index + 1} (ID: ${cell.id}) in data:`, {
+      _pdfUrl: cell._pdfUrl,
+      _pdfDisplayName: cell._pdfDisplayName,
+      _pdfFilename: cell._pdfFilename,
+      _priceId: cell._priceId
+    });
+  });
   
   // Check if we have edges without an existing edge style - add default style
   data.cells.forEach(item => {
@@ -1387,6 +1442,16 @@ function loadFlowchartData(data) {
         newCell.vertex = true;
         newCell.id = item.id;
         
+        // Log PDF cell creation
+        if (item.style && item.style.includes("nodeType=pdfNode")) {
+          console.log(`🔧 [PDF DEBUG] Creating PDF cell ${item.id} with properties:`, {
+            _pdfUrl: item._pdfUrl,
+            _pdfDisplayName: item._pdfDisplayName,
+            _pdfFilename: item._pdfFilename,
+            _priceId: item._priceId
+          });
+        }
+        
         // Transfer all custom properties
         if (item._textboxes) newCell._textboxes = JSON.parse(JSON.stringify(item._textboxes));
         if (item._questionText) newCell._questionText = item._questionText;
@@ -1408,6 +1473,17 @@ function loadFlowchartData(data) {
         if (item._pdfDisplayName !== undefined) newCell._pdfDisplayName = item._pdfDisplayName;
         if (item._priceId !== undefined) newCell._priceId = item._priceId;
         if (item._characterLimit !== undefined) newCell._characterLimit = item._characterLimit;
+        
+        // Log PDF properties after transfer
+        if (item.style && item.style.includes("nodeType=pdfNode")) {
+          console.log(`🔧 [PDF DEBUG] After property transfer for PDF cell ${item.id}:`, {
+            _pdfUrl: newCell._pdfUrl,
+            _pdfDisplayName: newCell._pdfDisplayName,
+            _pdfFilename: newCell._pdfFilename,
+            _priceId: newCell._priceId,
+            _characterLimit: newCell._characterLimit
+          });
+        }
         
         
         // Notes node properties
