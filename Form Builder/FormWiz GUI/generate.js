@@ -2782,9 +2782,22 @@ window.addFormToCart = function (priceId) {
         }
 
         if (matched) {
+          // Create a proper display name for the PDF logic item
+          let displayTitle;
+          
+          // If there's a custom PDF display name from the PDF logic, use it
+          if (pdfLogic.pdfDisplayName && pdfLogic.pdfDisplayName.trim() !== '') {
+            displayTitle = pdfLogic.pdfDisplayName.trim();
+          } else {
+            // Create a title based on the main form name + PDF name
+            const mainFormName = window.pdfFileName || 'Form';
+            const pdfBaseName = pdfLogic.pdfName.replace(/\.pdf$/i, '').toUpperCase();
+            displayTitle = mainFormName + ' ' + pdfBaseName;
+          }
+          
           const item = {
             formId: pdfLogic.pdfName.replace(/\.pdf$/i, '').toLowerCase(),
-            title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/\.pdf$/i, ''),
+            title: displayTitle,
             priceId: pdfLogic.stripePriceId,
             pdfName: pdfLogic.pdfName,
             originalFormId: originalFormId,
@@ -2795,7 +2808,7 @@ window.addFormToCart = function (priceId) {
             timestamp: nowTs
           };
           pdfLogicItems.push(item);
-          console.log('🛒 [CART DEBUG] Added PDF logic item:', item.title, 'with priceId:', item.priceId);
+          console.log('🛒 [CART DEBUG] Added PDF logic item:', item.title, 'with priceId:', item.priceId, 'portfolioId:', item.portfolioId);
         } else {
           console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName);
         }
@@ -2849,8 +2862,17 @@ window.addFormToCart = function (priceId) {
     allItems.forEach((item, index) => {
       setTimeout(() => {
         console.log('🛒 [CART DEBUG] Adding item', index + 1, 'of', allItems.length, ':', item.title);
+        
+        // Ensure formData includes portfolio ID for proper grouping
+        const enhancedFormData = {
+          ...item.formData,
+          originalFormId: item.originalFormId,
+          portfolioId: item.portfolioId,
+          pdfName: item.pdfName
+        };
+        
         window.addToCart(
-          item.formId, item.title, item.priceId, item.formData,
+          item.formId, item.title, item.priceId, enhancedFormData,
           item.countyName, item.defendantName, item.pdfName
         );
         addedCount++;
@@ -2858,9 +2880,21 @@ window.addFormToCart = function (priceId) {
         // Check if all items have been added
         if (addedCount === allItems.length) {
           console.log('🛒 [CART DEBUG] All', allItems.length, 'items added to Firebase cart successfully');
-          const itemList = allItems.map(item => '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId).join('\\n');
+          const itemList = allItems.map(item => {
+            let itemInfo = '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId + ' - PortfolioId: ' + (item.portfolioId || 'N/A');
+            if (item.defendantName && item.defendantName.trim() !== '') {
+              itemInfo += ' - Defendant: ' + item.defendantName;
+            }
+            return itemInfo;
+          }).join('\\n');
           console.log('✅ Cart Debug: Successfully added ' + allItems.length + ' items to cart:\\n' + itemList);
-          window.location.href = '../Pages/cart.html';
+          
+          // Show debugging alert with cart data
+          const debugInfo = 'Cart Debug: Successfully added ' + allItems.length + ' items to cart:\\n\\n' + itemList;
+          alert(debugInfo);
+          
+          // Show cart page requested alert
+          alert('Cart page requested');
         }
       }, index * 200); // 200ms delay between each item
     });
@@ -2891,9 +2925,21 @@ window.addFormToCart = function (priceId) {
   try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch {}
   writeCartCookie(cart);
 
-  const itemList = cart.map(item => '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId).join('\\n');
+  const itemList = cart.map(item => {
+    let itemInfo = '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId + ' - PortfolioId: ' + (item.portfolioId || 'N/A');
+    if (item.defendantName && item.defendantName.trim() !== '') {
+      itemInfo += ' - Defendant: ' + item.defendantName;
+    }
+    return itemInfo;
+  }).join('\\n');
   console.log('✅ Cart Debug: Added ' + cart.length + ' items to local storage:\\n' + itemList);
-  window.location.href = '../Pages/cart.html';
+  
+  // Show debugging alert with cart data
+  const debugInfo = 'Cart Debug: Added ' + cart.length + ' items to local storage:\\n\\n' + itemList;
+  alert(debugInfo);
+  
+  // Show cart page requested alert
+  alert('Cart page requested');
 };
 
 
@@ -3675,11 +3721,11 @@ function showThankYouMessage (event) {
 
 /*──── process all PDFs sequentially ────*/
 async function processAllPdfs() {
-    // Process main PDFs
-    for (const pdfName of allPdfFileNames) {
-        if (pdfName) {
-            await editAndDownloadPDF(pdfName);
-        }
+    // Process main PDFs - use the actual PDF filename, not the form name
+    if (pdfOutputFileName) {
+        // Remove .pdf extension if present since server adds it automatically
+        const baseName = pdfOutputFileName.replace(/\.pdf$/i, '');
+        await editAndDownloadPDF(baseName);
     }
     
     // Process Conditional PDFs

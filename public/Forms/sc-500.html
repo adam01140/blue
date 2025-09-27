@@ -1111,17 +1111,12 @@ document.addEventListener("DOMContentLoaded", function() {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Intro 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Enter section name</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Intro 1</h1><div id="question-container-1" class="question-container"><label><h3>Hungry?</h3></label><select id="hungry" name="hungry"
-                      onchange="dropdownMirror(this, 'hungry')">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_hungry"></div>
-              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Enter section name</h1><div id="question-container-2" class="question-container hidden"><label><h3>Thirsty?</h3></label><select id="thirsty" name="thirsty"
-                      onchange="dropdownMirror(this, 'thirsty')">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_thirsty"></div>
-              <input type="text" id="thirsty_dropdown" name="thirsty_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Intro 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Intro 1</h1><div id="question-container-1" class="question-container"><label><h3>Hungry?</h3></label><select id="test_hungry" name="test_hungry"
+                      onchange="dropdownMirror(this, 'test_hungry')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_test_hungry"></div>
+              <input type="text" id="test_hungry_dropdown" name="test_hungry_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
@@ -1245,7 +1240,7 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = 'SC-500';
+window.formId = 'Small Claims 500';
 
 /*───────────────────────────────*
  * return the true checkbox prefix
@@ -1275,16 +1270,16 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"hungry","2":"thirsty"};
-var questionNameIds = {"1":"hungry","2":"thirsty"};
+    var questionSlugMap       = {"1":"hungry"};
+var questionNameIds = {"1":"test_hungry"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', [
   {
     "questionId": "1",
-    "pdfName": "sc120.pdf",
-    "pdfDisplayName": "SC-120",
-    "stripePriceId": "price_1S8YpVFJeSRMFQ8XLldrcqu2",
+    "pdfName": "sc500a.pdf",
+    "pdfDisplayName": "Small Claims 500A",
+    "stripePriceId": "price_1SB7DUFJeSRMFQ8X5tzen50D",
     "conditions": [
       {
         "prevQuestion": "1",
@@ -1294,7 +1289,7 @@ console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', [
     "isBigParagraph": false
   }
 ]);
-var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc120.pdf","pdfDisplayName":"SC-120","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","conditions":[{"prevQuestion":"1","prevAnswer":"Yes"}],"isBigParagraph":false}];
+var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc500a.pdf","pdfDisplayName":"Small Claims 500A","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","conditions":[{"prevQuestion":"1","prevAnswer":"Yes"}],"isBigParagraph":false}];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
@@ -1305,7 +1300,7 @@ var linkedDropdowns = [];
 var isHandlingLink = false;
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "SC-500";
+var pdfFileName = "Small Claims 500";
 var pdfOutputFileName = "sc500.pdf";
 var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
 var additionalPdfFileNames = [];
@@ -1313,55 +1308,6 @@ var allPdfFileNames = ["sc500", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
-
-(function(){
- var thisQ=document.getElementById("question-container-2");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="1";
-    if(cPrevType==="checkbox"){
-      var cbPrefix = getCbPrefix(cPrevQNum);
-      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
-}
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
 
 
 // Alert Logic Functions
@@ -1621,9 +1567,22 @@ window.addFormToCart = function (priceId) {
         }
 
         if (matched) {
+          // Create a proper display name for the PDF logic item
+          let displayTitle;
+          
+          // If there's a custom PDF display name from the PDF logic, use it
+          if (pdfLogic.pdfDisplayName && pdfLogic.pdfDisplayName.trim() !== '') {
+            displayTitle = pdfLogic.pdfDisplayName.trim();
+          } else {
+            // Create a title based on the main form name + PDF name
+            const mainFormName = window.pdfFileName || 'Form';
+            const pdfBaseName = pdfLogic.pdfName.replace(/.pdf$/i, '').toUpperCase();
+            displayTitle = mainFormName + ' ' + pdfBaseName;
+          }
+          
           const item = {
             formId: pdfLogic.pdfName.replace(/.pdf$/i, '').toLowerCase(),
-            title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/.pdf$/i, ''),
+            title: displayTitle,
             priceId: pdfLogic.stripePriceId,
             pdfName: pdfLogic.pdfName,
             originalFormId: originalFormId,
@@ -1634,7 +1593,7 @@ window.addFormToCart = function (priceId) {
             timestamp: nowTs
           };
           pdfLogicItems.push(item);
-          console.log('🛒 [CART DEBUG] Added PDF logic item:', item.title, 'with priceId:', item.priceId);
+          console.log('🛒 [CART DEBUG] Added PDF logic item:', item.title, 'with priceId:', item.priceId, 'portfolioId:', item.portfolioId);
         } else {
           console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName);
         }
@@ -1688,8 +1647,17 @@ window.addFormToCart = function (priceId) {
     allItems.forEach((item, index) => {
       setTimeout(() => {
         console.log('🛒 [CART DEBUG] Adding item', index + 1, 'of', allItems.length, ':', item.title);
+        
+        // Ensure formData includes portfolio ID for proper grouping
+        const enhancedFormData = {
+          ...item.formData,
+          originalFormId: item.originalFormId,
+          portfolioId: item.portfolioId,
+          pdfName: item.pdfName
+        };
+        
         window.addToCart(
-          item.formId, item.title, item.priceId, item.formData,
+          item.formId, item.title, item.priceId, enhancedFormData,
           item.countyName, item.defendantName, item.pdfName
         );
         addedCount++;
@@ -1697,9 +1665,15 @@ window.addFormToCart = function (priceId) {
         // Check if all items have been added
         if (addedCount === allItems.length) {
           console.log('🛒 [CART DEBUG] All', allItems.length, 'items added to Firebase cart successfully');
-          const itemList = allItems.map(item => '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId).join('\n');
+          const itemList = allItems.map(item => '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId + ' - PortfolioId: ' + (item.portfolioId || 'N/A')).join('\n');
           console.log('✅ Cart Debug: Successfully added ' + allItems.length + ' items to cart:\n' + itemList);
-          window.location.href = '../Pages/cart.html';
+          
+          // Show debugging alert with cart data
+          const debugInfo = 'Cart Debug: Successfully added ' + allItems.length + ' items to cart:\n\n' + itemList;
+          alert(debugInfo);
+          
+          // Show cart page requested alert
+          alert('Cart page requested');
         }
       }, index * 200); // 200ms delay between each item
     });
@@ -1730,9 +1704,15 @@ window.addFormToCart = function (priceId) {
   try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch {}
   writeCartCookie(cart);
 
-  const itemList = cart.map(item => '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId).join('\n');
+  const itemList = cart.map(item => '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId + ' - PortfolioId: ' + (item.portfolioId || 'N/A')).join('\n');
   console.log('✅ Cart Debug: Added ' + cart.length + ' items to local storage:\n' + itemList);
-  window.location.href = '../Pages/cart.html';
+  
+  // Show debugging alert with cart data
+  const debugInfo = 'Cart Debug: Added ' + cart.length + ' items to local storage:\n\n' + itemList;
+  alert(debugInfo);
+  
+  // Show cart page requested alert
+  alert('Cart page requested');
 };
 
 
@@ -2417,11 +2397,11 @@ function showThankYouMessage (event) {
 
 /*──── process all PDFs sequentially ────*/
 async function processAllPdfs() {
-    // Process main PDFs
-    for (const pdfName of allPdfFileNames) {
-        if (pdfName) {
-            await editAndDownloadPDF(pdfName);
-        }
+    // Process main PDFs - use the actual PDF filename, not the form name
+    if (pdfOutputFileName) {
+        // Remove .pdf extension if present since server adds it automatically
+        const baseName = pdfOutputFileName.replace(/.pdf$/i, '');
+        await editAndDownloadPDF(baseName);
     }
     
     // Process Conditional PDFs

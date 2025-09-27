@@ -1181,11 +1181,6 @@ document.addEventListener("DOMContentLoaded", function() {
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_are_you_suing_for_more_than_10000"></div>
               <input type="text" id="are_you_suing_for_more_than_10000_dropdown" name="are_you_suing_for_more_than_10000_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-12" class="question-container"><label><h3>Are you suing for more than $12,500?</h3></label><select id="are_you_suing_for_more_than_12500" name="are_you_suing_for_more_than_12500"
-                      onchange="dropdownMirror(this, 'are_you_suing_for_more_than_12500')">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_are_you_suing_for_more_than_12500"></div>
-              <input type="text" id="are_you_suing_for_more_than_12500_dropdown" name="are_you_suing_for_more_than_12500_dropdown"
                    readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">SC-103</h1><div id="question-container-8" class="question-container hidden"><label><h3>Please enter your business details</h3></label><div class="text-input-container"><input type="text" id="Name" name="Name" placeholder="Name"></div><div class="text-input-container"><input type="text" id="Business Address" name="Business Address" placeholder="Address"></div><div class="text-input-container"><input type="text" id="Mailing Address" name="Mailing Address" placeholder="Mailing Address"></div></div><div id="question-container-10" class="question-container hidden"><label><h3>What do you do business as?</h3></label><div><center><div id="checkmark" class="checkbox-group-10">
       <span class="checkbox-inline" id="checkbox-container-what_do_you_do_business_as_an_individual">
         <label class="checkbox-label">
@@ -1228,7 +1223,12 @@ document.addEventListener("DOMContentLoaded", function() {
                  onchange="toggleNoneOption(this, 10); updateCheckboxStyle(this);">
           Other
         </label>
-      </span></div><br></div></div><div id="question-container-14" class="question-container hidden"><label><h3>Please explain what you do business as</h3></label><div class="text-input-container"><textarea id="sc103_please_explain_what_you_do_business_as" name="sc103_please_explain_what_you_do_business_as" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-15" class="question-container hidden"><label><h3>What county did you file your Fictious Business Name Statement</h3></label><div class="text-input-container"><input type="text" id="sc103_what_county_did_you_file_your_fictious_business_name_statement" name="sc103_what_county_did_you_file_your_fictious_business_name_statement" placeholder=""></div></div><div id="question-container-16" class="question-container"><label><h3>What is your fictious business name statement number</h3></label><div class="text-input-container"><input type="number" id="sc103_what_is_your_fictious_business_name_statement_number" name="sc103_what_is_your_fictious_business_name_statement_number" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-18" class="question-container"><label><h3>What is the date that your fictious businesses name statement expires</h3></label><div class="date-input-container"><input type="date" id="sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires" name="sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(2)" id="next-button-2">Next</button></div></div><div id="section3" class="section"><center><h1 class="section-title">SC-100</h1><div id="question-container-13" class="question-container"><label><h3>Are you suing by yourself?</h3></label><select id="are_you_suing_by_yourself" name="are_you_suing_by_yourself"
+      </span></div><br></div></div><div id="question-container-12" class="question-container"><label><h3>Are you suing for more than $12,500?</h3></label><select id="are_you_suing_for_more_than_12500" name="are_you_suing_for_more_than_12500"
+                      onchange="dropdownMirror(this, 'are_you_suing_for_more_than_12500')">
+                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
+              <div id="dropdowntext_are_you_suing_for_more_than_12500"></div>
+              <input type="text" id="are_you_suing_for_more_than_12500_dropdown" name="are_you_suing_for_more_than_12500_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-14" class="question-container hidden"><label><h3>Please explain what you do business as</h3></label><div class="text-input-container"><textarea id="sc103_please_explain_what_you_do_business_as" name="sc103_please_explain_what_you_do_business_as" rows="5" cols="50" placeholder=""></textarea></div></div><div id="question-container-15" class="question-container hidden"><label><h3>What county did you file your Fictious Business Name Statement</h3></label><div class="text-input-container"><input type="text" id="sc103_what_county_did_you_file_your_fictious_business_name_statement" name="sc103_what_county_did_you_file_your_fictious_business_name_statement" placeholder=""></div></div><div id="question-container-16" class="question-container"><label><h3>What is your fictious business name statement number</h3></label><div class="text-input-container"><input type="number" id="sc103_what_is_your_fictious_business_name_statement_number" name="sc103_what_is_your_fictious_business_name_statement_number" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-18" class="question-container"><label><h3>What is the date that your fictious businesses name statement expires</h3></label><div class="date-input-container"><input type="date" id="sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires" name="sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(2)" id="next-button-2">Next</button></div></div><div id="section3" class="section"><center><h1 class="section-title">SC-100</h1><div id="question-container-13" class="question-container hidden"><label><h3>Are you suing by yourself?</h3></label><select id="are_you_suing_by_yourself" name="are_you_suing_by_yourself"
                       onchange="dropdownMirror(this, 'are_you_suing_by_yourself')">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_are_you_suing_by_yourself"></div>
@@ -1468,7 +1468,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       const formId = urlParams.get("formId") || window.formId || 'default';
     var questionSlugMap       = {"1":"please_explain_why_you_are_suing_at_this_location","2":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","3":"what_is_your_claim_about","4":"please_explain_why_you_re_filing_at_this_courthouse","5":"have_you_filed_more_than_twelve_other_small_claims_w_in_the_last_twelve_months","6":"were_2_or_more_of_those_small_claims_cases_more_than_2_500","7":"are_you_suing_an_attorney","8":"please_enter_your_business_details","9":"are_you_doing_business_under_a_fictious_business_name","10":"what_do_you_do_business_as","11":"are_you_suing_for_more_than_10_000","12":"are_you_suing_for_more_than_12_500","13":"are_you_suing_by_yourself","14":"please_explain_what_you_do_business_as","15":"what_county_did_you_file_your_fictious_business_name_statement","16":"what_is_your_fictious_business_name_statement_number","17":"how_many_people_are_suing_with_you","18":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","19":"are_you_suing_more_than_one_person","20":"are_you_suing_anybody_on_active_military_duty","21":"who_are_you_suing","22":"how_many_people_are_you_suing","23":"what_is_their_name","24":"are_you_a_licensee_or_deferred_deposit_originator_payday_lender","25":"are_you_suing_an_individual_a_business_or_a_public_entity","26":"list_the_person_or_agent_authorized_for_service","27":"have_you_filed_a_written_claim_against_the_entity","28":"when_was_the_claim_filed","29":"how_much_are_you_suing_for","30":"explain_why_they_owe_you_that_money","31":"do_you_know_the_date_of_the_incident","32":"when_did_the_incident_occur","33":"do_you_know_the_date_range_that_it_occured","34":"when_did_this_happen","35":"how_did_you_calculate_the_money_owed_to_you","36":"have_you_sent_a_demand_letter_to_d","37":"explain_why_not"};
 var questionNameIds = {"1":"please_explain_why_you_are_suing_at_this_location","2":"is_it_where_the_buyer_or_lessee_signed_the_contract_lives_now_or_lived_when_the_contract_was_made","3":"what_is_your_claim_about","4":"please_explain_why_youre_filing_at_this_courthouse","5":"have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months","6":"were_2_or_more_of_those_small_claims_cases_more_than_2500","7":"are_you_suing_an_attorney","9":"are_you_doing_business_under_a_fictious_business_name","10":"what_do_you_do_business_as","11":"are_you_suing_for_more_than_10000","12":"are_you_suing_for_more_than_12500","13":"are_you_suing_by_yourself","14":"sc103_please_explain_what_you_do_business_as","15":"sc103_what_county_did_you_file_your_fictious_business_name_statement","16":"sc103_what_is_your_fictious_business_name_statement_number","17":"answer17","18":"sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires","19":"are_you_suing_more_than_one_person","20":"are_you_suing_anybody_on_active_military_duty","22":"answer22","23":"what_is_their_name","24":"are_you_a_licensee_or_deferred_deposit_originator_payday_lender","25":"are_you_suing_an_individual_a_business_or_a_public_entity","27":"have_you_filed_a_written_claim_against_the_entity","28":"when_was_the_claim_filed","29":"how_much_are_you_suing_for","30":"explain_why_they_owe_you_that_money","31":"do_you_know_the_date_of_the_incident","32":"sc100_when_did_this_happen_1","33":"do_you_know_the_date_range_that_it_occured_1","34":"when_did_this_happen","35":"how_did_you_calculate_the_money_owed_to_you","36":"have_you_sent_a_demand_letter_to_d","37":"explain_why_not"};
-var jumpLogics = [{"questionId":"6","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"7","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"11","questionType":"dropdown","jumpOption":"No","jumpTo":"3","section":1},{"questionId":"12","questionType":"dropdown","jumpOption":"No","jumpTo":"3","section":1},{"questionId":"36","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":3},{"questionId":"36","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":3}];
+var jumpLogics = [{"questionId":"6","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"7","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"11","questionType":"dropdown","jumpOption":"No","jumpTo":"3","section":1},{"questionId":"36","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":3},{"questionId":"36","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":3}];
 var conditionalPDFs = [];
 console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', [
   {
@@ -2155,6 +2155,35 @@ var hiddenTextCalculations = [];
    var checkQuestion = "10";
    var cbs = document.querySelectorAll('input[id^="' + getCbPrefix(checkQuestion) + '"]');
    for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-13");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="12";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "12";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  updateVisibility();
 })();
@@ -3041,20 +3070,89 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Always-available Cart Modal (global)
 window.showCartModal = function () {
-  const EXAMPLE_FORM_PRICE_ID = window.stripePriceId || stripePriceId || '123';
+  console.log('🛒 [CART DEBUG] showCartModal called');
+  
+  // Calculate all PDFs that will be added to cart
+  const allPdfsToAdd = [];
+  
+  // Add main form
+  const mainFormPriceId = window.stripePriceId || stripePriceId || '123';
+  allPdfsToAdd.push({
+    formId: (window.pdfOutputFileName || 'sc500.pdf').replace(/.pdf$/i, '').toLowerCase(),
+    title: window.pdfFileName || 'Form',
+    priceId: mainFormPriceId,
+    pdfName: window.pdfFileName || ''
+  });
+  
+  // Add conditional PDFs based on current form state
+  if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
+    console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items');
+    
+    for (const pdfLogic of window.pdfLogicPDFs) {
+      if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
+      
+      let matched = false;
+      const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+      for (const c of conds) {
+        const prevId = c?.prevQuestion;
+        const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+        if (!prevId) continue;
+        
+        const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                   document.getElementById('answer' + prevId);
+        if (!el) continue;
+        
+        let val = '';
+        if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+        else                        { val = el.value || ''; }
+        
+        if (val.toString().toLowerCase() === expect) {
+          matched = true;
+          console.log('🛒 [CART DEBUG] PDF logic matched:', pdfLogic.pdfDisplayName, 'for question', prevId, '=', expect);
+        }
+      }
+      
+      if (matched) {
+        allPdfsToAdd.push({
+          formId: pdfLogic.pdfName.replace(/.pdf$/i, '').toLowerCase(),
+          title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/.pdf$/i, ''),
+          priceId: pdfLogic.stripePriceId,
+          pdfName: pdfLogic.pdfName
+        });
+      }
+    }
+  }
+  
+  console.log('🛒 [CART DEBUG] Total PDFs to add:', allPdfsToAdd.length, allPdfsToAdd);
 
-  // Try to fetch price, but still show a working modal if fetch fails
-  async function fetchExampleFormPrice() {
-    try {
-      const r = await fetch('/stripe-price/' + EXAMPLE_FORM_PRICE_ID);
-      if (!r.ok) return null;
-      const data = await r.json();
-      return data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : null;
-    } catch { return null; }
+  // Fetch prices for all PDFs
+  async function fetchAllPrices() {
+    const prices = [];
+    for (const pdf of allPdfsToAdd) {
+      try {
+        const r = await fetch('/stripe-price/' + pdf.priceId);
+        if (r.ok) {
+          const data = await r.json();
+          const price = data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : '0.00';
+          prices.push(parseFloat(price));
+          console.log('🛒 [CART DEBUG] Price for', pdf.title, ':', price);
+        } else {
+          prices.push(0);
+        }
+      } catch (e) {
+        console.error('🛒 [CART DEBUG] Error fetching price for', pdf.title, ':', e);
+        prices.push(0);
+      }
+    }
+    return prices;
   }
 
-  fetchExampleFormPrice().then((price) => {
-    const priceDisplay = price ? '$' + price : '...';
+  fetchAllPrices().then((prices) => {
+    const totalPrice = prices.reduce((sum, price) => sum + price, 0);
+    const priceDisplay = totalPrice > 0 ? '$' + totalPrice.toFixed(2) : '...';
+    
+    console.log('🛒 [CART DEBUG] Total price:', priceDisplay);
+    
     const modal = document.createElement('div');
     modal.id = 'cart-modal';
     modal.style.cssText = 'position:fixed;inset:0;background:rgba(44,62,80,.45);display:flex;align-items:center;justify-content:center;z-index:99999;';
@@ -3062,6 +3160,7 @@ window.showCartModal = function () {
       <div style="background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(44,62,80,.18);padding:32px 28px 24px;max-width:470px;width:90%;text-align:center;position:relative;">
         <h2>Checkout</h2>
         <p>Your form has been completed! Add it to your cart to download.</p>
+        <p style="font-size:0.9em;color:#666;margin:10px 0;">${allPdfsToAdd.length} PDF(s) will be added to cart</p>
         <button id="addToCartBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%);color:#fff;border:none;border-radius:6px;padding:10px 28px;font-size:1.1em;font-weight:600;cursor:pointer;">
           Add to Cart - ${priceDisplay}
         </button>
@@ -3080,7 +3179,8 @@ window.showCartModal = function () {
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
     document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = '../Pages/cart.html'; };
     document.getElementById('addToCartBtn').onclick   = () => {
-      window.addFormToCart(EXAMPLE_FORM_PRICE_ID);
+      console.log('🛒 [CART DEBUG] Add to cart button clicked');
+      window.addFormToCart(mainFormPriceId);
       modal.remove();
     };
   });
@@ -3104,6 +3204,8 @@ function getUrlParam(name) {
 
 // Add to cart helper (global, no Firebase required)
 window.addFormToCart = function (priceId) {
+  console.log('🛒 [CART DEBUG] addFormToCart called with priceId:', priceId);
+  
   // 1) Fresh start each submission (prevents dupes/stale items across re-submits)
   clearCartState();
 
@@ -3119,9 +3221,11 @@ window.addFormToCart = function (priceId) {
     }
   }
 
+  console.log('🛒 [CART DEBUG] Form data collected:', Object.keys(formData).length, 'fields');
+
   // 3) Uniform metadata for every cart line
-  const originalFormId = (window.formId || 'custom-form');
-  const formTitle      = window.pdfOutputFileName || (typeof pdfOutputFileName !== 'undefined' ? pdfOutputFileName : 'Form');
+  const originalFormId = (window.pdfOutputFileName || 'sc500.pdf').replace(/.pdf$/i, '').toLowerCase();
+  const formTitle      = window.pdfFileName || (typeof pdfFileName !== 'undefined' ? pdfFileName : 'Form');
   const countyName     = getUrlParam('county');
   const defendantName  = getUrlParam('defendantName');
   const portfolioId    = getUrlParam('portfolioId');
@@ -3129,10 +3233,19 @@ window.addFormToCart = function (priceId) {
 
   // 4) Compute all PDF-logic matches (OR logic across conditions)
   const pdfLogicItems = [];
+  console.log('🛒 [CART DEBUG] Computing PDF logic items...');
+  
   try {
     if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
+      console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items to check');
+      
       for (const pdfLogic of window.pdfLogicPDFs) {
-        if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
+        if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) {
+          console.log('🛒 [CART DEBUG] Skipping invalid PDF logic:', pdfLogic);
+          continue;
+        }
+        
+        console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
 
         let matched = false;
         const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
@@ -3143,20 +3256,26 @@ window.addFormToCart = function (priceId) {
 
           const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
                      document.getElementById('answer' + prevId);
-          if (!el) continue;
+          if (!el) {
+            console.log('🛒 [CART DEBUG] Element not found for question', prevId);
+            continue;
+          }
 
           let val = '';
           if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
           else                        { val = el.value || ''; }
 
+          console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+
           if (val.toString().toLowerCase() === expect) {
             matched = true; // any condition match includes the PDF
+            console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
           }
         }
 
         if (matched) {
-          pdfLogicItems.push({
-            formId: pdfLogic.pdfName.replace(/.pdf$/i, ''),
+          const item = {
+            formId: pdfLogic.pdfName.replace(/.pdf$/i, '').toLowerCase(),
             title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/.pdf$/i, ''),
             priceId: pdfLogic.stripePriceId,
             pdfName: pdfLogic.pdfName,
@@ -3166,49 +3285,107 @@ window.addFormToCart = function (priceId) {
             countyName: countyName,
             defendantName: defendantName,
             timestamp: nowTs
-          });
+          };
+          pdfLogicItems.push(item);
+          console.log('🛒 [CART DEBUG] Added PDF logic item:', item.title, 'with priceId:', item.priceId);
+        } else {
+          console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName);
         }
       }
+    } else {
+      console.log('🛒 [CART DEBUG] No PDF logic items found');
     }
+    
+    console.log('🛒 [CART DEBUG] Final PDF logic items:', pdfLogicItems.length, pdfLogicItems);
   } catch (e) {
     console.warn('[PDF LOGIC] error computing matches:', e);
   }
 
   // 5) Preferred path: site cart manager
   if (typeof window.addToCart === 'function') {
-    // main item
-    window.addToCart(
-      originalFormId, formTitle, priceId, { ...formData }, countyName, defendantName,
-      { originalFormId, portfolioId, pdfName: (window.pdfFileName || '') }
-    );
-
-    // every matched PDF logic item
+    console.log('🛒 [CART DEBUG] Firebase addToCart function available');
+    
+    // Create a batch of all items to add
+    const allItems = [];
+    
+    // Add main item
+    const mainItem = {
+      formId: originalFormId,
+      title: formTitle,
+      priceId: priceId,
+      formData: { ...formData, originalFormId, portfolioId, pdfName: (window.pdfFileName || '') },
+      countyName: countyName,
+      defendantName: defendantName
+    };
+    allItems.push(mainItem);
+    console.log('🛒 [CART DEBUG] Main item:', mainItem.title, 'with priceId:', mainItem.priceId);
+    
+    // Add all matched PDF logic items
     for (const item of pdfLogicItems) {
-      window.addToCart(
-        item.formId, item.title, item.priceId, { ...item.formData },
-        item.countyName, item.defendantName,
-        { originalFormId: item.originalFormId, portfolioId: item.portfolioId, pdfName: item.pdfName }
-      );
+      const pdfItem = {
+        formId: item.formId.toLowerCase(),
+        title: item.title,
+        priceId: item.priceId,
+        formData: { ...item.formData, originalFormId: item.originalFormId, portfolioId: item.portfolioId, pdfName: item.pdfName },
+        countyName: item.countyName,
+        defendantName: item.defendantName
+      };
+      allItems.push(pdfItem);
+      console.log('🛒 [CART DEBUG] PDF logic item:', pdfItem.title, 'with priceId:', pdfItem.priceId);
     }
+    
+    console.log('🛒 [CART DEBUG] Total items to add to Firebase:', allItems.length, allItems);
+    
+    // Add all items to cart with a small delay between each to prevent race conditions
+    let addedCount = 0;
+    allItems.forEach((item, index) => {
+      setTimeout(() => {
+        console.log('🛒 [CART DEBUG] Adding item', index + 1, 'of', allItems.length, ':', item.title);
+        window.addToCart(
+          item.formId, item.title, item.priceId, item.formData,
+          item.countyName, item.defendantName, item.pdfName
+        );
+        addedCount++;
+        
+        // Check if all items have been added
+        if (addedCount === allItems.length) {
+          console.log('🛒 [CART DEBUG] All', allItems.length, 'items added to Firebase cart successfully');
+          const itemList = allItems.map(item => '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId).join('\n');
+          console.log('✅ Cart Debug: Successfully added ' + allItems.length + ' items to cart:\n' + itemList);
+          window.location.href = '../Pages/cart.html';
+        }
+      }, index * 200); // 200ms delay between each item
+    });
 
-    // redirect after everything is queued
-    setTimeout(() => { window.location.href = '../Pages/cart.html'; }, 0);
+    // Don't redirect automatically - let the alert handle it
     return;
   }
 
   // 6) Fallback: localStorage + cookie (fresh array due to clearCartState)
+  console.log('🛒 [CART DEBUG] Firebase not available, using fallback localStorage/cookie');
+  
   const cart = [];
-  cart.push({
+  const mainCartItem = {
     formId: originalFormId, title: formTitle, priceId,
     pdfName: (window.pdfFileName || ''),
     originalFormId, portfolioId, formData, countyName, defendantName, timestamp: nowTs
-  });
-  for (const item of pdfLogicItems) cart.push(item);
+  };
+  cart.push(mainCartItem);
+  console.log('🛒 [CART DEBUG] Main cart item:', mainCartItem.title, 'with priceId:', mainCartItem.priceId);
+  
+  for (const item of pdfLogicItems) {
+    cart.push(item);
+    console.log('🛒 [CART DEBUG] PDF logic cart item:', item.title, 'with priceId:', item.priceId);
+  }
+
+  console.log('🛒 [CART DEBUG] Total items in fallback cart:', cart.length, cart);
 
   try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch {}
   writeCartCookie(cart);
 
-  setTimeout(() => { window.location.href = '../Pages/cart.html'; }, 0);
+  const itemList = cart.map(item => '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId).join('\n');
+  console.log('✅ Cart Debug: Added ' + cart.length + ' items to local storage:\n' + itemList);
+  window.location.href = '../Pages/cart.html';
 };
 
 
@@ -4988,10 +5165,18 @@ if (typeof handleNext === 'function') {
                             const countyDisplay = item.countyName.toLowerCase().includes('county') ? item.countyName : item.countyName + ' County';
                             countyHtml = '<div style="color:#7f8c8d;">' + countyDisplay + '</div>';
                         }
+                        // Use the proper display name instead of the filename
+                        let displayTitle = item.title || 'Form';
+                        if (item.formId === 'sc120' || item.formId === 'SC-120') {
+                            displayTitle = 'SC-120';
+                        } else if (item.formId === 'sc500' || item.formId === 'SC-500') {
+                            displayTitle = 'SC-500';
+                        }
+                        
                         itemsHtml +=
      '<div class="cart-item">' +
        '<div class="cart-item-info">' +
-         '<div class="cart-item-title">' + (item.title || 'Form') + '</div>' +
+         '<div class="cart-item-title">' + displayTitle + '</div>' +
          defendantHtml +
          countyHtml +
        '</div>' +
