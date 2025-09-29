@@ -905,7 +905,7 @@
 </head>
 <body>
 <header>
-    <img src="../logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='../index.html';">
+    <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='index.html';">
     <nav>
         <a href="index.html">Home
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -915,27 +915,27 @@
                 <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
             <div class="dropdown-menu" id="forms-dropdown-menu">
-                <a href="forms.html">My Forms</a>
-                <a href="FreeForm.html">Free Form</a>
-                <a href="Family.html">Family</a>
-                <a href="Property.html">Property</a>
-                <a href="Immigration.html">Immigration</a>
-                <a href="smallclaims.html">Small Claims</a>
-                <a href="Other.html">Other</a>
+                <a href="../Pages/forms.html">My Forms</a>
+                <a href="../Pages/FreeForm.html">Free Form</a>
+                <a href="../Pages/Family.html">Family</a>
+                <a href="../Pages/Property.html">Property</a>
+                <a href="../Pages/Immigration.html">Immigration</a>
+                <a href="../Pages/smallclaims.html">Small Claims</a>
+                <a href="../Pages/Other.html">Other</a>
             </div>
         </div>
-        <a href="about.html">About Us
+        <a href="../Pages/about.html">About Us
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </a>
-        <a href="contact.html">Contact Us
+        <a href="../Pages/contact.html">Contact Us
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </a>
-        <a href="FAQ.html">FAQ
+        <a href="../Pages/FAQ.html">FAQ
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </a>
     </nav>
     <div class="header-actions">
-        <a href="account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
+        <a href="../Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
         <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
         <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
             <span class="cart-circle">
@@ -964,7 +964,7 @@
                     To add forms to your cart and make purchases, you\'ll need to create a FormWiz account. 
                     Sign up now to access our complete library of legal forms and start simplifying your paperwork.
                 </div>
-                <a href="account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
+                <a href="../Pages/account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
                 <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>
                 <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>
             </div>
@@ -981,7 +981,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="../Pages/cart.js"></script>
 
 <script>
 // Firebase Configuration
@@ -1112,17 +1111,163 @@ document.addEventListener("DOMContentLoaded", function() {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Intro 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Enter section name</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Intro 1</h1><div id="question-container-1" class="question-container"><label><h3>Hungry?</h3></label><select id="hungry" name="hungry"
-                      onchange="dropdownMirror(this, 'hungry')">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_hungry"></div>
-              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Enter section name</h1><div id="question-container-2" class="question-container hidden"><label><h3>Thirsty?</h3></label><select id="thirsty" name="thirsty"
-                      onchange="dropdownMirror(this, 'thirsty')">
-                       <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
-              <div id="dropdowntext_thirsty"></div>
-              <input type="text" id="thirsty_dropdown" name="thirsty_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+        <form id="customForm" onsubmit="return showThankYouMessage(event);"><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Demographics</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Employment Info</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">Legal Info</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="4"><div class="stepper-circle">4</div><div class="stepper-label">Qualified Assistance</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="5"><div class="stepper-circle">5</div><div class="stepper-label">Household Income Qualifications</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="6"><div class="stepper-circle">6</div><div class="stepper-label">Income Sources</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="7"><div class="stepper-circle">7</div><div class="stepper-label">Living Conditions</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="8"><div class="stepper-circle">8</div><div class="stepper-label">Financials</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="9"><div class="stepper-circle">9</div><div class="stepper-label">Assets Owned</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="10"><div class="stepper-circle">10</div><div class="stepper-label">Real Estate Assets</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="11"><div class="stepper-circle">11</div><div class="stepper-label">Personal Property</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="12"><div class="stepper-circle">12</div><div class="stepper-label">Payroll Deductions</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="13"><div class="stepper-circle">13</div><div class="stepper-label">Monthly Deductions & Expenses</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="14"><div class="stepper-circle">14</div><div class="stepper-label">Payment Installments</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="15"><div class="stepper-circle">15</div><div class="stepper-label">Wage Garnishments</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="16"><div class="stepper-circle">16</div><div class="stepper-label">Other Expenses</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Demographics</h1><div id="question-container-1" class="question-container"><label><h3>Are you currently employed</h3></label><select id="are_you_currently_employed" name="are_you_currently_employed"
+                      onchange="dropdownMirror(this, 'are_you_currently_employed')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_are_you_currently_employed"></div>
+              <input type="text" id="are_you_currently_employed_dropdown" name="are_you_currently_employed_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Employment Info</h1><div id="question-container-2" class="question-container hidden"><label><h3>Please enter your work info</h3></label><div class="text-input-container"><input type="text" id="Job Title" name="Job Title" placeholder="Job Title"></div><div class="text-input-container"><input type="text" id="Job Address" name="Job Address" placeholder="Job Address"></div><div class="text-input-container"><input type="text" id="Employer Name" name="Employer Name" placeholder="Employer Name"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(2)" id="next-button-2">Next</button></div></div><div id="section3" class="section"><center><h1 class="section-title">Legal Info</h1><div id="question-container-3" class="question-container"><label><h3>Do you have a lawyer</h3></label><select id="do_you_have_a_lawyer" name="do_you_have_a_lawyer"
+                      onchange="dropdownMirror(this, 'do_you_have_a_lawyer')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_a_lawyer"></div>
+              <input type="text" id="do_you_have_a_lawyer_dropdown" name="do_you_have_a_lawyer_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-4" class="question-container hidden"><label><h3>Please enter lawyer info</h3></label><div class="text-input-container"><input type="text" id="Laywer Name" name="Laywer Name" placeholder="Laywer Name"></div><div class="text-input-container"><input type="text" id="Lawyer Firm" name="Lawyer Firm" placeholder="Lawyer Firm"></div><div class="text-input-container"><input type="text" id="Laywer Address" name="Laywer Address" placeholder="Laywer Address"></div><div class="text-input-container"><input type="text" id="Lawyer Phone Number" name="Lawyer Phone Number" placeholder="Lawyer Phone Number"></div><div class="text-input-container"><input type="text" id="State Bar Number" name="State Bar Number" placeholder="State Bar Number"></div></div><div id="question-container-5" class="question-container hidden"><label><h3>Has your lawyer agreed to cover a portion of your fees?</h3></label><select id="has_your_lawyer_agreed_to_cover_a_portion_of_your" name="has_your_lawyer_agreed_to_cover_a_portion_of_your"
+                      onchange="dropdownMirror(this, 'has_your_lawyer_agreed_to_cover_a_portion_of_your')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_has_your_lawyer_agreed_to_cover_a_portion_of_your"></div>
+              <input type="text" id="has_your_lawyer_agreed_to_cover_a_portion_of_your_dropdown" name="has_your_lawyer_agreed_to_cover_a_portion_of_your_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-6" class="question-container hidden"><label><h3>Have you filed a claim before</h3></label><select id="have_you_filed_a_claim_before" name="have_you_filed_a_claim_before"
+                      onchange="dropdownMirror(this, 'have_you_filed_a_claim_before')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_have_you_filed_a_claim_before"></div>
+              <input type="text" id="have_you_filed_a_claim_before_dropdown" name="have_you_filed_a_claim_before_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(3)" id="next-button-3">Next</button></div></div><div id="section4" class="section"><center><h1 class="section-title">Qualified Assistance</h1><div id="question-container-7" class="question-container"><label><h3>Do you receive any of the following?</h3></label><div><center><div id="checkmark" class="checkbox-group-7">
+      <span class="checkbox-inline" id="checkbox-container-do_you_receive_any_of_the_following_unemployment">
+        <label class="checkbox-label">
+          <input type="checkbox" id="do_you_receive_any_of_the_following_unemployment" name="do_you_receive_any_of_the_following_unemployment" value="unemployment" 
+                 onchange="toggleNoneOption(this, 7); updateCheckboxStyle(this);">
+          unemployment
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-do_you_receive_any_of_the_following_food_stamps">
+        <label class="checkbox-label">
+          <input type="checkbox" id="do_you_receive_any_of_the_following_food_stamps" name="do_you_receive_any_of_the_following_food_stamps" value="food stamps" 
+                 onchange="toggleNoneOption(this, 7); updateCheckboxStyle(this);">
+          food stamps
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-do_you_receive_any_of_the_following_none">
+        <label class="checkbox-label">
+          <input type="checkbox" id="do_you_receive_any_of_the_following_none" name="do_you_receive_any_of_the_following_none" value="None of the above" 
+                 onchange="handleNoneOfTheAboveToggle(this, 7); updateCheckboxStyle(this);">
+          None of the above
+        </label>
+      </span></div><br></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(4)" id="next-button-4">Next</button></div></div><div id="section5" class="section"><center><h1 class="section-title">Household Income Qualifications</h1><div id="question-container-8" class="question-container"><label><h3>Is your household monthly income less than the amount below?</h3></label><select id="is_your_household_monthly_income_less_than_the_amo" name="is_your_household_monthly_income_less_than_the_amo"
+                      onchange="dropdownMirror(this, 'is_your_household_monthly_income_less_than_the_amo')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_is_your_household_monthly_income_less_than_the_amo"></div>
+              <input type="text" id="is_your_household_monthly_income_less_than_the_amo_dropdown" name="is_your_household_monthly_income_less_than_the_amo_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-9" class="question-container hidden"><label><h3>What would you like the court to do?</h3></label><select id="what_would_you_like_the_court_to_do" name="what_would_you_like_the_court_to_do"
+                      onchange="dropdownMirror(this, 'what_would_you_like_the_court_to_do')">
+                       <option value="" disabled selected>Select an option</option><option value="waive some fees">waive some fees</option><option value="waive all fees">waive all fees</option><option value="let me pay them over time">let me pay them over time</option></select><br>
+              <div id="dropdowntext_what_would_you_like_the_court_to_do"></div>
+              <input type="text" id="what_would_you_like_the_court_to_do_dropdown" name="what_would_you_like_the_court_to_do_dropdown"
+                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(5)" id="next-button-5">Next</button></div></div><div id="section6" class="section"><center><h1 class="section-title">Income Sources</h1><div id="question-container-10" class="question-container"><label><h3>Does your income change a lot from month to month?</h3></label><select id="does_your_income_change_a_lot_from_month_to_month" name="does_your_income_change_a_lot_from_month_to_month"
+                      onchange="dropdownMirror(this, 'does_your_income_change_a_lot_from_month_to_month')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_does_your_income_change_a_lot_from_month_to_month"></div>
+              <input type="text" id="does_your_income_change_a_lot_from_month_to_month_dropdown" name="does_your_income_change_a_lot_from_month_to_month_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-11" class="question-container hidden"><label><h3>How many sources of income do you have?</h3></label><select id="answer11" onchange="showTextboxLabels(11, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer11"></div></div><div id="question-container-14" class="question-container"><label><h3>Does your income change a lot from month to month?</h3></label><select id="does_your_income_change_a_lot_from_month_to_month" name="does_your_income_change_a_lot_from_month_to_month"
+                      onchange="dropdownMirror(this, 'does_your_income_change_a_lot_from_month_to_month')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_does_your_income_change_a_lot_from_month_to_month"></div>
+              <input type="text" id="does_your_income_change_a_lot_from_month_to_month_dropdown" name="does_your_income_change_a_lot_from_month_to_month_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-15" class="question-container hidden"><label><h3>How many sources of income do you have?</h3></label><select id="answer15" onchange="showTextboxLabels(15, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer15"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(6)" id="next-button-6">Next</button></div></div><div id="section7" class="section"><center><h1 class="section-title">Living Conditions</h1><div id="question-container-12" class="question-container"><label><h3>Does anybody else live in your home?</h3></label><select id="does_anybody_else_live_in_your_home" name="does_anybody_else_live_in_your_home"
+                      onchange="dropdownMirror(this, 'does_anybody_else_live_in_your_home')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_does_anybody_else_live_in_your_home"></div>
+              <input type="text" id="does_anybody_else_live_in_your_home_dropdown" name="does_anybody_else_live_in_your_home_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-13" class="question-container hidden"><label><h3>How many other people live in your household?</h3></label><select id="answer13" onchange="showTextboxLabels(13, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer13"></div></div><div id="question-container-16" class="question-container"><label><h3>Do you have anybody else living in your home?</h3></label><select id="do_you_have_anybody_else_living_in_your_home" name="do_you_have_anybody_else_living_in_your_home"
+                      onchange="dropdownMirror(this, 'do_you_have_anybody_else_living_in_your_home')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_anybody_else_living_in_your_home"></div>
+              <input type="text" id="do_you_have_anybody_else_living_in_your_home_dropdown" name="do_you_have_anybody_else_living_in_your_home_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-17" class="question-container hidden"><label><h3>How many other people live in your household?</h3></label><select id="answer17" onchange="showTextboxLabels(17, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer17"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(7)" id="next-button-7">Next</button></div></div><div id="section8" class="section"><center><h1 class="section-title">Financials</h1><div id="question-container-18" class="question-container"><label><h3>Do you have any cash savings?</h3></label><select id="do_you_have_any_cash_savings" name="do_you_have_any_cash_savings"
+                      onchange="dropdownMirror(this, 'do_you_have_any_cash_savings')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_any_cash_savings"></div>
+              <input type="text" id="do_you_have_any_cash_savings_dropdown" name="do_you_have_any_cash_savings_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-19" class="question-container hidden"><label><h3>How much cash saving do you have?</h3></label><div class="text-input-container"><input type="number" id="how_much_cash_saving_do_you_have" name="how_much_cash_saving_do_you_have" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-20" class="question-container hidden"><label><h3>Do you have a bank account?</h3></label><select id="do_you_have_a_bank_account" name="do_you_have_a_bank_account"
+                      onchange="dropdownMirror(this, 'do_you_have_a_bank_account')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_a_bank_account"></div>
+              <input type="text" id="do_you_have_a_bank_account_dropdown" name="do_you_have_a_bank_account_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-21" class="question-container hidden"><label><h3>How many bank accounts do you have?</h3></label><select id="answer21" onchange="showTextboxLabels(21, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer21"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(8)" id="next-button-8">Next</button></div></div><div id="section9" class="section"><center><h1 class="section-title">Assets Owned</h1><div id="question-container-22" class="question-container"><label><h3>Do you own any cars, boats, and other vehicles:</h3></label><select id="do_you_own_any_cars_boats_and_other_vehicles" name="do_you_own_any_cars_boats_and_other_vehicles"
+                      onchange="dropdownMirror(this, 'do_you_own_any_cars_boats_and_other_vehicles')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_own_any_cars_boats_and_other_vehicles"></div>
+              <input type="text" id="do_you_own_any_cars_boats_and_other_vehicles_dropdown" name="do_you_own_any_cars_boats_and_other_vehicles_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-23" class="question-container hidden"><label><h3>How many vehicles do you own?</h3></label><select id="answer23" onchange="showTextboxLabels(23, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer23"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(9)" id="next-button-9">Next</button></div></div><div id="section10" class="section"><center><h1 class="section-title">Real Estate Assets</h1><div id="question-container-24" class="question-container"><label><h3>Do you own any real estate:</h3></label><select id="do_you_own_any_real_estate" name="do_you_own_any_real_estate"
+                      onchange="dropdownMirror(this, 'do_you_own_any_real_estate')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_own_any_real_estate"></div>
+              <input type="text" id="do_you_own_any_real_estate_dropdown" name="do_you_own_any_real_estate_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-25" class="question-container hidden"><label><h3>How many real estate properties do you have?</h3></label><select id="answer25" onchange="showTextboxLabels(25, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option></select><br><div id="labelContainer25"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(10)" id="next-button-10">Next</button></div></div><div id="section11" class="section"><center><h1 class="section-title">Personal Property</h1><div id="question-container-26" class="question-container"><label><h3>Do you own any other personal property? (jewelry, furniture, furs, bonds, ect)</h3></label><select id="do_you_own_any_other_personal_property_jewelry_fur" name="do_you_own_any_other_personal_property_jewelry_fur"
+                      onchange="dropdownMirror(this, 'do_you_own_any_other_personal_property_jewelry_fur')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_own_any_other_personal_property_jewelry_fur"></div>
+              <input type="text" id="do_you_own_any_other_personal_property_jewelry_fur_dropdown" name="do_you_own_any_other_personal_property_jewelry_fur_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-27" class="question-container hidden"><label><h3>How many items</h3></label><select id="answer27" onchange="showTextboxLabels(27, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option></select><br><div id="labelContainer27"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(11)" id="next-button-11">Next</button></div></div><div id="section12" class="section"><center><h1 class="section-title">Payroll Deductions</h1><div id="question-container-28" class="question-container"><label><h3>Do you have any payroll deductions?</h3></label><select id="do_you_have_any_payroll_deductions" name="do_you_have_any_payroll_deductions"
+                      onchange="dropdownMirror(this, 'do_you_have_any_payroll_deductions')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_any_payroll_deductions"></div>
+              <input type="text" id="do_you_have_any_payroll_deductions_dropdown" name="do_you_have_any_payroll_deductions_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-29" class="question-container hidden"><label><h3>How many deductions?</h3></label><select id="answer29" onchange="showTextboxLabels(29, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer29"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(12)" id="next-button-12">Next</button></div></div><div id="section13" class="section"><center><h1 class="section-title">Monthly Deductions & Expenses</h1><div id="question-container-30" class="question-container"><label><h3>Mark All That Apply:</h3></label><div><center><div id="checkmark" class="checkbox-group-30">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_rent">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_rent" name="mark_all_that_apply_rent" value="rent" 
+                 onchange="toggleAmountField('mark_all_that_apply_rent_amount', this.checked); toggleNoneOption(this, 30); updateCheckboxStyle(this);">
+          rent
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_rent_amount"
+                 name="value"
+                 placeholder="Enter amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_car_payment">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_car_payment" name="mark_all_that_apply_car_payment" value="car payment" 
+                 onchange="toggleAmountField('mark_all_that_apply_car_payment_amount', this.checked); toggleNoneOption(this, 30); updateCheckboxStyle(this);">
+          car payment
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_car_payment_amount"
+                 name="value"
+                 placeholder="Enter amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_none_of_the_above">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_none_of_the_above" name="mark_all_that_apply_none_of_the_above" value="none of the above" 
+                 onchange="toggleNoneOption(this, 30); updateCheckboxStyle(this);">
+          none of the above
+        </label>
+      </span></div><br></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(13)" id="next-button-13">Next</button></div></div><div id="section14" class="section"><center><h1 class="section-title">Payment Installments</h1><div id="question-container-31" class="question-container"><label><h3>Do you have any installment payments?</h3></label><select id="do_you_have_any_installment_payments" name="do_you_have_any_installment_payments"
+                      onchange="dropdownMirror(this, 'do_you_have_any_installment_payments')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_any_installment_payments"></div>
+              <input type="text" id="do_you_have_any_installment_payments_dropdown" name="do_you_have_any_installment_payments_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-32" class="question-container hidden"><label><h3>How many installment payments do you have?</h3></label><select id="answer32" onchange="showTextboxLabels(32, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer32"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(14)" id="next-button-14">Next</button></div></div><div id="section15" class="section"><center><h1 class="section-title">Wage Garnishments</h1><div id="question-container-33" class="question-container"><label><h3>Do you have any wages/earnings withheld by the court:</h3></label><select id="do_you_have_any_wagesearnings_withheld_by_the_cour" name="do_you_have_any_wagesearnings_withheld_by_the_cour"
+                      onchange="dropdownMirror(this, 'do_you_have_any_wagesearnings_withheld_by_the_cour')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_any_wagesearnings_withheld_by_the_cour"></div>
+              <input type="text" id="do_you_have_any_wagesearnings_withheld_by_the_cour_dropdown" name="do_you_have_any_wagesearnings_withheld_by_the_cour_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-34" class="question-container hidden"><label><h3>How much is being withheld?</h3></label><div class="text-input-container"><input type="number" id="how_much_is_being_withheld" name="how_much_is_being_withheld" min="0" step="0.01" placeholder="Enter amount"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(15)" id="next-button-15">Next</button></div></div><div id="section16" class="section"><center><h1 class="section-title">Other Expenses</h1><div id="question-container-35" class="question-container"><label><h3>Do you have any other monthly expenses?</h3></label><select id="do_you_have_any_other_monthly_expenses" name="do_you_have_any_other_monthly_expenses"
+                      onchange="dropdownMirror(this, 'do_you_have_any_other_monthly_expenses')">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_any_other_monthly_expenses"></div>
+              <input type="text" id="do_you_have_any_other_monthly_expenses_dropdown" name="do_you_have_any_other_monthly_expenses_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-36" class="question-container hidden"><label><h3>How many other monthly expenses do you have?</h3></label><select id="answer36" onchange="showTextboxLabels(36, this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer36"></div></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
@@ -1132,14 +1277,14 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
 </div></form>
-<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="window.location.href='forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
+<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
 </div>
 </section>
 </div>
 <div class="pro-footer">
         <div class="pro-footer-col address-col">
             <div class="pro-footer-logo">
-                <img src="../logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
+                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
             </div>
             <div class="pro-footer-title">FormWiz</div>
             <div class="pro-footer-contact">
@@ -1149,11 +1294,11 @@ document.addEventListener("DOMContentLoaded", function() {
         </div>
         <div class="pro-footer-col nav-col">
             <div class="pro-footer-title">Navigation</div>
-            <a href="index.html">Home</a>
-            <a href="FreeForm.html">Forms</a>
-            <a href="FAQ.html">FAQ</a>
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact Us</a>
+            <a href="../Pages/index.html">Home</a>
+            <a href="../Pages/FreeForm.html">Forms</a>
+            <a href="../Pages/FAQ.html">FAQ</a>
+            <a href="../Pages/about.html">About Us</a>
+            <a href="../Pages/contact.html">Contact Us</a>
         </div>
         <div class="pro-footer-col company-col">
             <div class="pro-footer-title company-title">About FormWiz</div>
@@ -1195,29 +1340,6 @@ document.addEventListener("DOMContentLoaded", function() {
     100% { transform: scale(1); opacity: 1; }
   }
   
-  .alert-close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    background: none;
-    border: none;
-    color: #7f8c8d;
-    font-size: 24px;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-  }
-  
-  .alert-close-btn:hover {
-    background: rgba(44, 62, 80, 0.1);
-    color: #2c3e50;
-  }
   
   .alert-message {
     margin-bottom: 28px;
@@ -1249,38 +1371,27 @@ document.addEventListener("DOMContentLoaded", function() {
     min-width: 100px;
   }
   
-  .alert-btn-back {
+  .alert-btn-continue {
     background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%);
     color: #fff;
   }
   
-  .alert-btn-back:hover {
+  .alert-btn-continue:hover {
     background: linear-gradient(90deg, #38d39f 0%, #4f8cff 100%);
-  }
-  
-  .alert-btn-exit {
-    background: #e74c3c;
-    color: #fff;
-  }
-  
-  .alert-btn-exit:hover {
-    background: #c0392b;
   }
   </style>
   
   <div id="alertOverlay" class="alert-overlay">
     <div class="alert-popup">
-      <button class="alert-close-btn" onclick="closeAlert()" title="Close">×</button>
       <div id="alertMessage" class="alert-message"></div>
       <div class="alert-buttons">
-        <button class="alert-btn alert-btn-back" onclick="closeAlert()">Back</button>
-        <button class="alert-btn alert-btn-exit" onclick="exitForm()">Exit</button>
+        <button class="alert-btn alert-btn-continue" onclick="closeAlert()">Continue</button>
       </div>
     </div>
   </div>
   
 <script>
-window.formId = 'sc100';
+window.formId = 'Fee Waiver';
 
 /*───────────────────────────────*
  * return the true checkbox prefix
@@ -1310,26 +1421,27 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"hungry","2":"thirsty"};
-var questionNameIds = {"1":"hungry","2":"thirsty"};
-var jumpLogics = [];
+    var questionSlugMap       = {"1":"are_you_currently_employed","2":"please_enter_your_work_info","3":"do_you_have_a_lawyer","4":"please_enter_lawyer_info","5":"has_your_lawyer_agreed_to_cover_a_portion_of_your_fees","6":"have_you_filed_a_claim_before","7":"do_you_receive_any_of_the_following","8":"is_your_household_monthly_income_less_than_the_amount_below","9":"what_would_you_like_the_court_to_do","10":"does_your_income_change_a_lot_from_month_to_month","11":"how_many_sources_of_income_do_you_have","12":"does_anybody_else_live_in_your_home","13":"how_many_other_people_live_in_your_household","14":"does_your_income_change_a_lot_from_month_to_month","15":"how_many_sources_of_income_do_you_have","16":"do_you_have_anybody_else_living_in_your_home","17":"how_many_other_people_live_in_your_household","18":"do_you_have_any_cash_savings","19":"how_much_cash_saving_do_you_have","20":"do_you_have_a_bank_account","21":"how_many_bank_accounts_do_you_have","22":"do_you_own_any_cars_boats_and_other_vehicles","23":"how_many_vehicles_do_you_own","24":"do_you_own_any_real_estate","25":"how_many_real_estate_properties_do_you_have","26":"do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect","27":"how_many_items","28":"do_you_have_any_payroll_deductions","29":"how_many_deductions","30":"mark_all_that_apply","31":"do_you_have_any_installment_payments","32":"how_many_installment_payments_do_you_have","33":"do_you_have_any_wages_earnings_withheld_by_the_court","34":"how_much_is_being_withheld","35":"do_you_have_any_other_monthly_expenses","36":"how_many_other_monthly_expenses_do_you_have"};
+var questionNameIds = {"1":"are_you_currently_employed","3":"do_you_have_a_lawyer","5":"has_your_lawyer_agreed_to_cover_a_portion_of_your","6":"have_you_filed_a_claim_before","7":"do_you_receive_any_of_the_following","8":"is_your_household_monthly_income_less_than_the_amo","9":"what_would_you_like_the_court_to_do","10":"does_your_income_change_a_lot_from_month_to_month","11":"answer11","12":"does_anybody_else_live_in_your_home","13":"answer13","14":"does_your_income_change_a_lot_from_month_to_month","15":"answer15","16":"do_you_have_anybody_else_living_in_your_home","17":"answer17","18":"do_you_have_any_cash_savings","19":"how_much_cash_saving_do_you_have","20":"do_you_have_a_bank_account","21":"answer21","22":"do_you_own_any_cars_boats_and_other_vehicles","23":"answer23","24":"do_you_own_any_real_estate","25":"answer25","26":"do_you_own_any_other_personal_property_jewelry_fur","27":"answer27","28":"do_you_have_any_payroll_deductions","29":"answer29","30":"mark_all_that_apply","31":"do_you_have_any_installment_payments","32":"answer32","33":"do_you_have_any_wagesearnings_withheld_by_the_cour","34":"how_much_is_being_withheld","35":"do_you_have_any_other_monthly_expenses","36":"answer36"};
+var jumpLogics = [{"questionId":"1","questionType":"dropdown","jumpOption":"No","jumpTo":"3","section":1},{"questionId":"7","questionType":"checkbox","jumpOption":"unemployment","jumpTo":"end","section":4},{"questionId":"7","questionType":"checkbox","jumpOption":"food stamps","jumpTo":"end","section":4},{"questionId":"12","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":7},{"questionId":"12","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":7},{"questionId":"35","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":16},{"questionId":"35","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":16}];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc500.pdf","pdfDisplayName":"Small Claims 500 Form","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","conditions":[{"prevQuestion":"1","prevAnswer":"Yes"}],"isBigParagraph":false}];
+console.log('🔍 [PDF LOGIC DEBUG] Final pdfLogicPDFs array:', []);
+var pdfLogicPDFs = [];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"length":0};
-var amountMap = {"length":0};
+var labelMap = {"11":["Description","Amount"],"13":["Name","Age","Relationship","Monthly Income"],"15":["Income Source","Income Value"],"17":["Name","Age","Relationship","Monthly Income"],"21":["Bank Name","Amount"],"23":["Make/Year","Fair Market Value","Amount Owed"],"25":["Address","Fair Market Value","Amount Owed"],"27":["Description","Fair Market Value","Amount Owed"],"29":["Description","Fair Market Value"],"32":["Description","Amount"],"36":["Description","Amount"],"length":0};
+var amountMap = {"11":[],"13":[],"15":[],"17":[],"21":[],"23":[],"25":[],"27":[],"29":[],"32":[],"36":[],"length":0};
 var linkedDropdowns = [];
 var isHandlingLink = false;
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "sc100.pdf";
-var pdfOutputFileName = "Small Claims 100 Form";
-var stripePriceId = "price_1S8afyFJeSRMFQ8XkAJHVYSv";
+var pdfFileName = "Fee Waiver";
+var pdfOutputFileName = "feewaiver.pdf";
+var stripePriceId = "price_1SCYyUFJeSRMFQ8Xzk0GWZpM";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["sc100.pdf", ];
+var allPdfFileNames = ["feewaiver", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
@@ -1353,10 +1465,24 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-4");
+ function updateVisibility(){
+  var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="1";
+    var cPrevAns="yes";
+    var cPrevQNum="3";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -1371,12 +1497,600 @@ var hiddenTextCalculations = [];
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
  (function(){
-   var selectQuestion = "1";
+   var selectQuestion = "3";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-5");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="3";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "3";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-6");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="5";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="5";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="3";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "5";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var selectQuestion = "1";
+   var selectQuestion = "5";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "3";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-9");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="8";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "8";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-11");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="10";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="10";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "10";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "10";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-15");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="14";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="14";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "14";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "14";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-13");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="12";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "12";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-17");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="16";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "16";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-19");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="18";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "18";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-20");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="18";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="18";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "18";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "18";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-21");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="20";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "20";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-23");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="22";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "22";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-25");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="24";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "24";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-27");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="26";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "26";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-29");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="28";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "28";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-32");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="31";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "31";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-34");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "33";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-36");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="35";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
+}
+ (function(){
+   var selectQuestion = "35";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -1385,7 +2099,21 @@ var hiddenTextCalculations = [];
 
 
 // Alert Logic Functions
+// Track page load time to prevent alerts in first 3 seconds
+const pageLoadTime = Date.now();
+const ALERT_DELAY_MS = 3000; // 3 seconds
+
 function showAlert(message) {
+    // Check if 3 seconds have passed since page load
+    const currentTime = Date.now();
+    const timeSinceLoad = currentTime - pageLoadTime;
+    
+    if (timeSinceLoad < ALERT_DELAY_MS) {
+        // If less than 3 seconds have passed, don't show the alert
+        console.log('Alert blocked: Page loaded less than 3 seconds ago');
+        return;
+    }
+    
     const alertOverlay = document.getElementById('alertOverlay');
     const alertMessage = document.getElementById('alertMessage');
     
@@ -1409,19 +2137,6 @@ function closeAlert() {
     }
 }
 
-function exitForm() {
-    // Check if this is a validation popup or regular alert
-    const alertMessage = document.getElementById('alertMessage');
-    if (alertMessage && alertMessage.innerHTML.includes('Please Complete All Questions')) {
-        // This is a validation popup - go back to forms page
-        if (confirm('Are you sure you want to exit? Your progress will be saved.')) {
-            window.location.href = 'forms.html';
-        }
-    } else {
-        // This is a regular alert - reload the page
-        window.location.reload();
-    }
-}
 
 // Show validation popup when user tries to proceed without answering all questions
 function showValidationPopup() {
@@ -1436,20 +2151,89 @@ function showValidationPopup() {
 
 // Always-available Cart Modal (global)
 window.showCartModal = function () {
-  const EXAMPLE_FORM_PRICE_ID = window.stripePriceId || stripePriceId || '123';
+  console.log('🛒 [CART DEBUG] showCartModal called');
+  
+  // Calculate all PDFs that will be added to cart
+  const allPdfsToAdd = [];
+  
+  // Add main form
+  const mainFormPriceId = window.stripePriceId || stripePriceId || '123';
+  allPdfsToAdd.push({
+    formId: (window.pdfOutputFileName || 'sc500.pdf').replace(/.pdf$/i, '').toLowerCase(),
+    title: window.pdfFileName || 'Form',
+    priceId: mainFormPriceId,
+    pdfName: window.pdfFileName || ''
+  });
+  
+  // Add conditional PDFs based on current form state
+  if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
+    console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items');
+    
+    for (const pdfLogic of window.pdfLogicPDFs) {
+      if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
+      
+      let matched = false;
+      const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+      for (const c of conds) {
+        const prevId = c?.prevQuestion;
+        const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+        if (!prevId) continue;
+        
+        const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                   document.getElementById('answer' + prevId);
+        if (!el) continue;
+        
+        let val = '';
+        if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+        else                        { val = el.value || ''; }
+        
+        if (val.toString().toLowerCase() === expect) {
+          matched = true;
+          console.log('🛒 [CART DEBUG] PDF logic matched:', pdfLogic.pdfDisplayName, 'for question', prevId, '=', expect);
+        }
+      }
+      
+      if (matched) {
+        allPdfsToAdd.push({
+          formId: pdfLogic.pdfName.replace(/.pdf$/i, '').toLowerCase(),
+          title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/.pdf$/i, ''),
+          priceId: pdfLogic.stripePriceId,
+          pdfName: pdfLogic.pdfName
+        });
+      }
+    }
+  }
+  
+  console.log('🛒 [CART DEBUG] Total PDFs to add:', allPdfsToAdd.length, allPdfsToAdd);
 
-  // Try to fetch price, but still show a working modal if fetch fails
-  async function fetchExampleFormPrice() {
-    try {
-      const r = await fetch('/stripe-price/' + EXAMPLE_FORM_PRICE_ID);
-      if (!r.ok) return null;
-      const data = await r.json();
-      return data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : null;
-    } catch { return null; }
+  // Fetch prices for all PDFs
+  async function fetchAllPrices() {
+    const prices = [];
+    for (const pdf of allPdfsToAdd) {
+      try {
+        const r = await fetch('/stripe-price/' + pdf.priceId);
+        if (r.ok) {
+          const data = await r.json();
+          const price = data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : '0.00';
+          prices.push(parseFloat(price));
+          console.log('🛒 [CART DEBUG] Price for', pdf.title, ':', price);
+        } else {
+          prices.push(0);
+        }
+      } catch (e) {
+        console.error('🛒 [CART DEBUG] Error fetching price for', pdf.title, ':', e);
+        prices.push(0);
+      }
+    }
+    return prices;
   }
 
-  fetchExampleFormPrice().then((price) => {
-    const priceDisplay = price ? '$' + price : '...';
+  fetchAllPrices().then((prices) => {
+    const totalPrice = prices.reduce((sum, price) => sum + price, 0);
+    const priceDisplay = totalPrice > 0 ? '$' + totalPrice.toFixed(2) : '...';
+    
+    console.log('🛒 [CART DEBUG] Total price:', priceDisplay);
+    
     const modal = document.createElement('div');
     modal.id = 'cart-modal';
     modal.style.cssText = 'position:fixed;inset:0;background:rgba(44,62,80,.45);display:flex;align-items:center;justify-content:center;z-index:99999;';
@@ -1457,6 +2241,7 @@ window.showCartModal = function () {
       <div style="background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(44,62,80,.18);padding:32px 28px 24px;max-width:470px;width:90%;text-align:center;position:relative;">
         <h2>Checkout</h2>
         <p>Your form has been completed! Add it to your cart to download.</p>
+        <p style="font-size:0.9em;color:#666;margin:10px 0;">${allPdfsToAdd.length} PDF(s) will be added to cart</p>
         <button id="addToCartBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%);color:#fff;border:none;border-radius:6px;padding:10px 28px;font-size:1.1em;font-weight:600;cursor:pointer;">
           Add to Cart - ${priceDisplay}
         </button>
@@ -1473,16 +2258,39 @@ window.showCartModal = function () {
     document.body.appendChild(modal);
 
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
-    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); };
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = '../Pages/cart.html'; };
     document.getElementById('addToCartBtn').onclick   = () => {
-      window.addFormToCart(EXAMPLE_FORM_PRICE_ID);
+      console.log('🛒 [CART DEBUG] Add to cart button clicked');
+      window.addFormToCart(mainFormPriceId);
       modal.remove();
     };
   });
 };
 
+// --- Cart helpers (new) ---
+function clearCartState() {
+  try { localStorage.removeItem('formwiz_cart'); } catch {}
+  // expire cookie immediately
+  document.cookie = 'formwiz_cart=;path=/;max-age=0';
+}
+
+function writeCartCookie(cart) {
+  try { document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000'; } catch {}
+}
+
+function getUrlParam(name) {
+  const u = new URLSearchParams(window.location.search);
+  return u.get(name) || '';
+}
+
 // Add to cart helper (global, no Firebase required)
 window.addFormToCart = function (priceId) {
+  console.log('🛒 [CART DEBUG] addFormToCart called with priceId:', priceId);
+  
+  // 1) Fresh start each submission (prevents dupes/stale items across re-submits)
+  clearCartState();
+
+  // 2) Collect form data
   const form = document.getElementById('customForm');
   const formData = {};
   if (form) {
@@ -1494,171 +2302,219 @@ window.addFormToCart = function (priceId) {
     }
   }
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const countyName    = urlParams.get('county') || '';
-  const defendantName = urlParams.get('defendantName') || '';
-  const portfolioId   = urlParams.get('portfolioId') || '';
-  const formTitle     = window.pdfOutputFileName || pdfOutputFileName || 'Form';
+  console.log('🛒 [CART DEBUG] Form data collected:', Object.keys(formData).length, 'fields');
 
-  // Check for PDF Logic PDFs that should be added to cart
+  // 3) Uniform metadata for every cart line
+  const originalFormId = (window.pdfOutputFileName || 'sc500.pdf').replace(/.pdf$/i, '').toLowerCase();
+  const formTitle      = window.pdfFileName || (typeof pdfFileName !== 'undefined' ? pdfFileName : 'Form');
+  const countyName     = getUrlParam('county');
+  const defendantName  = getUrlParam('defendantName');
+  const portfolioId    = getUrlParam('portfolioId');
+  const nowTs          = Date.now();
+
+  // 4) Compute all PDF-logic matches (OR logic across conditions)
   const pdfLogicItems = [];
-  console.log('🔍 Checking PDF Logic PDFs:', pdfLogicPDFs);
+  console.log('🛒 [CART DEBUG] Computing PDF logic items...');
   
-  if (typeof pdfLogicPDFs !== 'undefined' && pdfLogicPDFs.length > 0) {
-    for (const pdfLogic of pdfLogicPDFs) {
-      console.log('📋 Processing PDF Logic item:', pdfLogic);
+  try {
+    if (Array.isArray(window.pdfLogicPDFs) && window.pdfLogicPDFs.length > 0) {
+      console.log('🛒 [CART DEBUG] Found', window.pdfLogicPDFs.length, 'PDF logic items to check');
       
-      if (pdfLogic.pdfName && pdfLogic.stripePriceId) {
-        // Check if conditions are met
-        let shouldAddToCart = false;
+      for (const pdfLogic of window.pdfLogicPDFs) {
+        if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) {
+          console.log('🛒 [CART DEBUG] Skipping invalid PDF logic:', pdfLogic);
+          continue;
+        }
         
-        pdfLogic.conditions.forEach(condition => {
-          const prevQuestionId = condition.prevQuestion;
-          const prevAnswer = condition.prevAnswer;
-          
-          console.log('🔍 Checking condition:', { prevQuestionId, prevAnswer });
-          
-          // Get the previous question's value
-          const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
-                                    document.getElementById('answer' + prevQuestionId);
-          
-          if (prevQuestionElement) {
-            let prevValue = '';
-            
-            if (prevQuestionElement.type === 'checkbox') {
-              prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
-            } else {
-              prevValue = prevQuestionElement.value;
-            }
-            
-            console.log('📝 Question value:', { 
-              questionId: prevQuestionId, 
-              value: prevValue, 
-              expected: prevAnswer,
-              matches: prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()
-            });
-            
-            // Check if the condition matches
-            if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
-              shouldAddToCart = true;
-            }
+        console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
+
+        let matched = false;
+        const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+        for (const c of conds) {
+          const prevId = c?.prevQuestion;
+          const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+          if (!prevId) continue;
+
+          const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                     document.getElementById('answer' + prevId);
+          if (!el) {
+            console.log('🛒 [CART DEBUG] Element not found for question', prevId);
+            continue;
           }
-        });
-        
-        console.log('✅ Should add to cart:', shouldAddToCart);
-        
-        // Add to cart if conditions are met
-        if (shouldAddToCart) {
-          const pdfLogicItem = {
-            formId: pdfLogic.pdfName.replace(/\.pdf$/i, ''), // Use the PDF name without extension as formId
-            originalFormId: window.formId || 'custom-form', // Track the original form that generated this document
-            portfolioId: portfolioId, // Track the portfolio ID for grouping
-            pdfName: pdfLogic.pdfName, // Store the actual PDF name for generation
-            title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/\.pdf$/i, ''),
+
+          let val = '';
+          if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+          else                        { val = el.value || ''; }
+
+          console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+
+          if (val.toString().toLowerCase() === expect) {
+            matched = true; // any condition match includes the PDF
+            console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
+          }
+        }
+
+        if (matched) {
+          // Create a proper display name for the PDF logic item
+          let displayTitle;
+          
+          // If there's a custom PDF display name from the PDF logic, use it
+          if (pdfLogic.pdfDisplayName && pdfLogic.pdfDisplayName.trim() !== '') {
+            displayTitle = pdfLogic.pdfDisplayName.trim();
+          } else {
+            // Create a title based on the main form name + PDF name
+            const mainFormName = window.pdfFileName || 'Form';
+            const pdfBaseName = pdfLogic.pdfName.replace(/.pdf$/i, '').toUpperCase();
+            displayTitle = mainFormName + ' ' + pdfBaseName;
+          }
+          
+          const item = {
+            formId: pdfLogic.pdfName.replace(/.pdf$/i, '').toLowerCase(),
+            title: displayTitle,
             priceId: pdfLogic.stripePriceId,
-            formData: { ...formData, originalFormId: window.formId || 'custom-form', portfolioId: portfolioId }, // Include portfolioId in formData
+            pdfName: pdfLogic.pdfName,
+            originalFormId: originalFormId,
+            portfolioId: portfolioId,
+            formData: formData,
             countyName: countyName,
             defendantName: defendantName,
-            timestamp: Date.now()
+            timestamp: nowTs
           };
-          
-          console.log('📦 Adding PDF Logic item to cart:', pdfLogicItem);
-          pdfLogicItems.push(pdfLogicItem);
+          pdfLogicItems.push(item);
+          console.log('🛒 [CART DEBUG] Added PDF logic item:', item.title, 'with priceId:', item.priceId, 'portfolioId:', item.portfolioId);
+        } else {
+          console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName);
         }
       }
+    } else {
+      console.log('🛒 [CART DEBUG] No PDF logic items found');
     }
-  }
-  
-  console.log('📋 Final PDF Logic items:', pdfLogicItems);
-
-  // Clear old cart items first
-  console.log('🧹 Clearing old cart items...');
-  console.log('🔍 Cart before clearing - localStorage:', localStorage.getItem('formwiz_cart'));
-  console.log('🔍 Cart before clearing - cookies:', document.cookie);
-  localStorage.removeItem('formwiz_cart');
-  document.cookie = 'formwiz_cart=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';
-  console.log('✅ Cart cleared from both localStorage and cookies');
-
-  // Prefer existing cart manager if present
-  // Check if addToCart function exists
-  if (typeof window.addToCart === 'function') {
-    const fid = (window.formId || 'custom-form');
-    console.log('🛒 Adding main form to cart:', { fid, formTitle, priceId });
-    // Add originalFormId and portfolioId to the main form data
-    const mainFormData = { ...formData, originalFormId: fid, portfolioId: portfolioId };
-    console.log('🛒 Main form data with portfolioId:', { mainFormData, portfolioId });
-    window.addToCart(fid, formTitle, priceId, mainFormData, countyName, defendantName);
     
-    // Add PDF Logic items to cart
-    console.log('🛒 Adding PDF Logic items to cart:', pdfLogicItems.length, 'items');
-    pdfLogicItems.forEach((item, index) => {
-      console.log(`🛒 Adding PDF Logic item ${index + 1}:`, {
-        formId: item.formId,
+    console.log('🛒 [CART DEBUG] Final PDF logic items:', pdfLogicItems.length, pdfLogicItems);
+  } catch (e) {
+    console.warn('[PDF LOGIC] error computing matches:', e);
+  }
+
+  // 5) Preferred path: site cart manager
+  if (typeof window.addToCart === 'function') {
+    console.log('🛒 [CART DEBUG] Firebase addToCart function available');
+    
+    // Create a batch of all items to add
+    const allItems = [];
+    
+    // Add main item
+    const mainItem = {
+      formId: originalFormId,
+      title: formTitle,
+      priceId: priceId,
+      formData: { ...formData, originalFormId, portfolioId, pdfName: (window.pdfFileName || '') },
+      countyName: countyName,
+      defendantName: defendantName
+    };
+    allItems.push(mainItem);
+    console.log('🛒 [CART DEBUG] Main item:', mainItem.title, 'with priceId:', mainItem.priceId);
+    
+    // Add all matched PDF logic items
+    for (const item of pdfLogicItems) {
+      const pdfItem = {
+        formId: item.formId.toLowerCase(),
         title: item.title,
         priceId: item.priceId,
-        pdfName: item.pdfName
-      });
-      
-      console.log('🛒 Calling addToCart with parameters:', {
-        formId: item.formId,
-        formTitle: item.title,
-        priceId: item.priceId,
-        formData: item.formData,
+        formData: { ...item.formData, originalFormId: item.originalFormId, portfolioId: item.portfolioId, pdfName: item.pdfName },
         countyName: item.countyName,
-        defendantName: item.defendantName,
-        pdfName: item.pdfName
-      });
-      
-      window.addToCart(item.formId, item.title, item.priceId, item.formData, item.countyName, item.defendantName, item.pdfName);
-    });
-    
-    // Debug: Show final cart state after adding items
-    console.log('🔍 Final cart state after adding items:');
-    console.log('📦 localStorage cart:', localStorage.getItem('formwiz_cart'));
-    console.log('🍪 Cookie cart:', document.cookie);
-    
-    // Try to parse and show the cart contents
-    try {
-      const finalCart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
-      console.log('📋 Final parsed cart contents:', finalCart);
-      console.log('📊 Final cart length:', finalCart.length);
-    } catch (e) {
-      console.error('❌ Error parsing final cart:', e);
+        defendantName: item.defendantName
+      };
+      allItems.push(pdfItem);
+      console.log('🛒 [CART DEBUG] PDF logic item:', pdfItem.title, 'with priceId:', pdfItem.priceId);
     }
+    
+    console.log('🛒 [CART DEBUG] Total items to add to Firebase:', allItems.length, allItems);
+    
+    // Add all items to cart with a small delay between each to prevent race conditions
+    let addedCount = 0;
+    allItems.forEach((item, index) => {
+      setTimeout(() => {
+        console.log('🛒 [CART DEBUG] Adding item', index + 1, 'of', allItems.length, ':', item.title);
+        
+        // Ensure formData includes portfolio ID for proper grouping
+        const enhancedFormData = {
+          ...item.formData,
+          originalFormId: item.originalFormId,
+          portfolioId: item.portfolioId,
+          pdfName: item.pdfName
+        };
+        
+        window.addToCart(
+          item.formId, item.title, item.priceId, enhancedFormData,
+          item.countyName, item.defendantName, item.pdfName
+        );
+        addedCount++;
+        
+        // Check if all items have been added
+        if (addedCount === allItems.length) {
+          console.log('🛒 [CART DEBUG] All', allItems.length, 'items added to Firebase cart successfully');
+          const itemList = allItems.map(item => {
+            let itemInfo = '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId + ' - PortfolioId: ' + (item.portfolioId || 'N/A');
+            if (item.defendantName && item.defendantName.trim() !== '') {
+              itemInfo += ' - Defendant: ' + item.defendantName;
+            }
+            return itemInfo;
+          }).join('\n');
+          console.log('✅ Cart Debug: Successfully added ' + allItems.length + ' items to cart:\n' + itemList);
+          
+          // Show debugging alert with cart data
+          const debugInfo = 'Cart Debug: Successfully added ' + allItems.length + ' items to cart:\n\n' + itemList;
+          alert(debugInfo);
+          
+          // Show cart page requested alert
+          alert('Cart page requested');
+        }
+      }, index * 200); // 200ms delay between each item
+    });
 
+    // Don't redirect automatically - let the alert handle it
     return;
-  } else {
-    // Fallback to localStorage method
   }
 
-  // Fallback: localStorage/cookie
-  console.log('🔄 Using fallback localStorage method');
-  const cart = JSON.parse(localStorage.getItem('formwiz_cart') || '[]');
+  // 6) Fallback: localStorage + cookie (fresh array due to clearCartState)
+  console.log('🛒 [CART DEBUG] Firebase not available, using fallback localStorage/cookie');
   
-  // Add main form
-  const mainItem = {
-    formId: (window.formId || 'custom-form'),
-    title: formTitle,
-    priceId,
-    formData,
-    countyName,
-    defendantName,
-    timestamp: Date.now()
+  const cart = [];
+  const mainCartItem = {
+    formId: originalFormId, title: formTitle, priceId,
+    pdfName: (window.pdfFileName || ''),
+    originalFormId, portfolioId, formData, countyName, defendantName, timestamp: nowTs
   };
-  cart.push(mainItem);
-  console.log('📦 Added main form to fallback cart:', mainItem);
+  cart.push(mainCartItem);
+  console.log('🛒 [CART DEBUG] Main cart item:', mainCartItem.title, 'with priceId:', mainCartItem.priceId);
   
-  // Add PDF Logic items
-  pdfLogicItems.forEach(item => {
-    console.log('📦 Adding PDF Logic item to fallback cart:', item);
+  for (const item of pdfLogicItems) {
     cart.push(item);
-  });
-  
-  console.log('💾 Saving fallback cart to localStorage:', cart);
-  localStorage.setItem('formwiz_cart', JSON.stringify(cart));
-  document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
+    console.log('🛒 [CART DEBUG] PDF logic cart item:', item.title, 'with priceId:', item.priceId);
+  }
 
+  console.log('🛒 [CART DEBUG] Total items in fallback cart:', cart.length, cart);
+
+  try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch {}
+  writeCartCookie(cart);
+
+  const itemList = cart.map(item => {
+    let itemInfo = '- ' + item.title + ' (' + item.formId + ') - PriceId: ' + item.priceId + ' - PortfolioId: ' + (item.portfolioId || 'N/A');
+    if (item.defendantName && item.defendantName.trim() !== '') {
+      itemInfo += ' - Defendant: ' + item.defendantName;
+    }
+    return itemInfo;
+  }).join('\n');
+  console.log('✅ Cart Debug: Added ' + cart.length + ' items to local storage:\n' + itemList);
+  
+  // Show debugging alert with cart data
+  const debugInfo = 'Cart Debug: Added ' + cart.length + ' items to local storage:\n\n' + itemList;
+  alert(debugInfo);
+  
+  // Show cart page requested alert
+  alert('Cart page requested');
 };
+
 
 // Fallback cart count function (global, no Firebase required)
 window.getCartCount = function() {
@@ -1840,23 +2696,14 @@ function validateCurrentSection(sectionNumber) {
     const questions = section.querySelectorAll('.question-container:not(.hidden)');
     let isValid = true;
     
-    console.log('Validating section', sectionNumber, 'with', questions.length, 'visible questions');
-    
     questions.forEach(question => {
         const questionId = question.id.replace('question-container-', '');
         const questionType = getQuestionTypeFromContainer(question);
         
-        console.log('Validating question', questionId, 'of type', questionType);
-        
         if (!validateQuestion(question, questionType, questionId)) {
-            console.log('Question', questionId, 'failed validation');
             isValid = false;
-        } else {
-            console.log('Question', questionId, 'passed validation');
         }
     });
-    
-    console.log('Section validation result:', isValid);
     
     // Update next button state
     const nextButton = document.getElementById('next-button-' + sectionNumber);
@@ -1933,12 +2780,8 @@ function validateDropdownQuestion(questionContainer) {
     const select = questionContainer.querySelector('select');
     if (!select) return true;
     
-    // Debug logging
-    console.log('Validating dropdown:', select.id, 'Value:', select.value, 'Trimmed:', select.value.trim());
-    
     // Check if the dropdown has a value and it's not the default empty/disabled option
     const isValid = select.value && select.value.trim() !== '' && select.value !== 'Select an option';
-    console.log('Dropdown validation result:', isValid);
     return isValid;
 }
 
@@ -1981,8 +2824,16 @@ function addValidationListeners() {
     const formFields = currentSection.querySelectorAll('input, select, textarea');
     
     formFields.forEach(field => {
-        field.addEventListener('change', () => validateCurrentSection(sectionNumber));
-        field.addEventListener('input', () => validateCurrentSection(sectionNumber));
+        // Remove existing listeners to prevent duplicates
+        field.removeEventListener('change', field._validationHandler);
+        field.removeEventListener('input', field._validationHandler);
+        
+        // Create new handler
+        field._validationHandler = () => validateCurrentSection(sectionNumber);
+        
+        // Add listeners
+        field.addEventListener('change', field._validationHandler);
+        field.addEventListener('input', field._validationHandler);
     });
     
     // Initial validation
@@ -2346,11 +3197,11 @@ function showThankYouMessage (event) {
 
 /*──── process all PDFs sequentially ────*/
 async function processAllPdfs() {
-    // Process main PDFs
-    for (const pdfName of allPdfFileNames) {
-        if (pdfName) {
-            await editAndDownloadPDF(pdfName);
-        }
+    // Process main PDFs - use the actual PDF filename, not the form name
+    if (pdfOutputFileName) {
+        // Remove .pdf extension if present since server adds it automatically
+        const baseName = pdfOutputFileName.replace(/.pdf$/i, '');
+        await editAndDownloadPDF(baseName);
     }
     
     // Process Conditional PDFs
@@ -2953,7 +3804,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var contBtn = document.getElementById('modalContinueBtn');
   if (backBtn) backBtn.onclick = hideLoginRequiredModal;
   if (contBtn) contBtn.onclick = function() {
-    window.location.href = 'account.html';
+    window.location.href = '../Pages/account.html';
   };
 });
 
@@ -3215,7 +4066,7 @@ if (typeof handleNext === 'function') {
                 logoutBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     auth.signOut().then(function() {
-                        window.location.href = 'index.html';
+                        window.location.href = '../Pages/index.html';
                     }).catch(function(error) {
                         console.error('Error signing out:', error);
                     });
@@ -3441,10 +4292,18 @@ if (typeof handleNext === 'function') {
                             const countyDisplay = item.countyName.toLowerCase().includes('county') ? item.countyName : item.countyName + ' County';
                             countyHtml = '<div style="color:#7f8c8d;">' + countyDisplay + '</div>';
                         }
+                        // Use the proper display name instead of the filename
+                        let displayTitle = item.title || 'Form';
+                        if (item.formId === 'sc120' || item.formId === 'SC-120') {
+                            displayTitle = 'SC-120';
+                        } else if (item.formId === 'sc500' || item.formId === 'SC-500') {
+                            displayTitle = 'SC-500';
+                        }
+                        
                         itemsHtml +=
      '<div class="cart-item">' +
        '<div class="cart-item-info">' +
-         '<div class="cart-item-title">' + (item.title || 'Form') + '</div>' +
+         '<div class="cart-item-title">' + displayTitle + '</div>' +
          defendantHtml +
          countyHtml +
        '</div>' +
@@ -3476,7 +4335,7 @@ if (typeof handleNext === 'function') {
                         cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
                         cartCheckoutBtn.style.display = 'block';
                         cartCheckoutBtn.onclick = function() {
-                            
+                            window.location.href = '../Pages/cart.html';
                         };
                     }
                 } catch (error) {
