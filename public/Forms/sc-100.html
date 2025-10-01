@@ -1257,7 +1257,7 @@ document.addEventListener("DOMContentLoaded", function() {
               <input type="text" id="sc100_are_you_a_licensee_or_deferred_deposit_originator_payday_lender_dropdown" name="sc100_are_you_a_licensee_or_deferred_deposit_originator_payday_lender_dropdown"
                    readonly style="display:none;"></div><div id="question-container-27" class="question-container hidden"><label><h3>Are you suing an individual, a business or a public entity</h3></label><select id="sc100_are_you_suing_an_individual_a_business_or_a_public_entity" name="sc100_are_you_suing_an_individual_a_business_or_a_public_entity"
                       onchange="dropdownMirror(this, 'sc100_are_you_suing_an_individual_a_business_or_a_public_entity')">
-                       <option value="" disabled selected>Select an option</option><option value="Individual">Individual</option><option value="Public entity">Public entity</option><option value="Business">Business</option></select><br>
+                       <option value="" disabled selected>Select an option</option><option value="Public entity">Public entity</option><option value="Business">Business</option><option value="Individual">Individual</option></select><br>
               <div id="dropdowntext_sc100_are_you_suing_an_individual_a_business_or_a_public_entity"></div>
               <input type="text" id="sc100_are_you_suing_an_individual_a_business_or_a_public_entity_dropdown" name="sc100_are_you_suing_an_individual_a_business_or_a_public_entity_dropdown"
                    readonly style="display:none;"></div><div id="question-container-28" class="question-container hidden"><label><h3>List the person or agent authorized for service</h3></label><div class="text-input-container"><input type="text" id="sc_100_list_the_person_or_agent_authorized_for_service_name" name="sc_100_list_the_person_or_agent_authorized_for_service_name" placeholder="Name"></div><div class="text-input-container"><input type="text" id="sc_100_list_the_person_or_agent_authorized_for_service_job" name="sc_100_list_the_person_or_agent_authorized_for_service_job" placeholder="Job"></div><div class="text-input-container"><input type="text" id="sc_100_list_the_person_or_agent_authorized_for_service_address" name="sc_100_list_the_person_or_agent_authorized_for_service_address" placeholder="Address"></div></div><div id="question-container-29" class="question-container hidden"><label><h3>Have you filed a written claim against the entity?</h3></label><select id="sc100_have_you_filed_a_written_claim_against_the_entity" name="sc100_have_you_filed_a_written_claim_against_the_entity"
@@ -2637,6 +2637,21 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
+    var cPrevAns="individual";
+    var cPrevQNum="27";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
     var cPrevAns="business";
     var cPrevQNum="27";
     if(cPrevType==="checkbox"){
@@ -2682,8 +2697,8 @@ var hiddenTextCalculations = [];
   })();
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="individual";
-    var cPrevQNum="27";
+    var cPrevAns="yes";
+    var cPrevQNum="29";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2708,12 +2723,17 @@ var hiddenTextCalculations = [];
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
+   var selectQuestion = "27";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
    var selectQuestion = "29";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var selectQuestion = "27";
+   var selectQuestion = "29";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2726,6 +2746,21 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
+    var cPrevAns="individual";
+    var cPrevQNum="27";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
     var cPrevAns="business";
     var cPrevQNum="27";
     if(cPrevType==="checkbox"){
@@ -2771,8 +2806,8 @@ var hiddenTextCalculations = [];
   })();
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="individual";
-    var cPrevQNum="27";
+    var cPrevAns="yes";
+    var cPrevQNum="29";
     if(cPrevType==="checkbox"){
       var cbPrefix = getCbPrefix(cPrevQNum);
       var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
@@ -2797,12 +2832,17 @@ var hiddenTextCalculations = [];
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
+   var selectQuestion = "27";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
    var selectQuestion = "29";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
  (function(){
-   var selectQuestion = "27";
+   var selectQuestion = "29";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -2915,8 +2955,48 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="33";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="35";
+    if(cPrevType==="checkbox"){
+      var cbPrefix = getCbPrefix(cPrevQNum);
+      var cbs=document.querySelectorAll('input[id^="'+cbPrefix+'"]');
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true;}
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { thisQ.classList.add("hidden"); }
 }
+ (function(){
+   var selectQuestion = "35";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "33";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
  (function(){
    var selectQuestion = "35";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
@@ -5139,6 +5219,21 @@ if (typeof handleNext === 'function') {
                         }
                     });
                     
+                    // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
+                    fields.forEach(el => {
+                        if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
+                            console.log('🔧 [AUTOFILL DEBUG] Triggering dropdownMirror for regular dropdown:', el.id, 'with value:', el.value);
+                            if (typeof dropdownMirror === 'function') {
+                                dropdownMirror(el, el.id);
+                            }
+                        }
+                    });
+                    
+                    // Create hidden checkboxes for all autofilled dropdowns
+                    if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
+                        createHiddenCheckboxesForAutofilledDropdowns();
+                    }
+                    
                     // Second autofill pass for dynamically generated textbox inputs
                     // Use a longer delay to ensure textbox inputs are fully generated
                     setTimeout(() => {
@@ -5371,6 +5466,21 @@ if (typeof handleNext === 'function') {
                                 }
                             }
                         });
+                        
+                        // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
+                        fields.forEach(el => {
+                            if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
+                                console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Triggering dropdownMirror for regular dropdown:', el.id, 'with value:', el.value);
+                                if (typeof dropdownMirror === 'function') {
+                                    dropdownMirror(el, el.id);
+                                }
+                            }
+                        });
+                        
+                        // Create hidden checkboxes for all autofilled dropdowns
+                        if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
+                            createHiddenCheckboxesForAutofilledDropdowns();
+                        }
                         
                         // Second autofill pass for dynamically generated textbox inputs
                         // Use a longer delay to ensure textbox inputs are fully generated
@@ -5883,6 +5993,65 @@ function addVirtualDropdownCheckboxes(inputData) {
   });
 }
 
+// Create a hidden checkbox in the DOM for virtual checkboxes that should be checked
+function createHiddenCheckbox(checkboxId, checkboxName, baseName) {
+  // Find the dropdown wrapper or create a container
+  let wrap = document.getElementById("dropdowntext_" + baseName);
+  if (!wrap) {
+    // If no wrapper exists, create one
+    wrap = document.createElement("div");
+    wrap.id = "dropdowntext_" + baseName;
+    wrap.style.display = "none";
+    
+    // Find the dropdown element and insert the wrapper after it
+    const dropdown = document.getElementById(baseName);
+    if (dropdown && dropdown.parentNode) {
+      dropdown.parentNode.insertBefore(wrap, dropdown.nextSibling);
+    } else {
+      // Fallback: append to body
+      document.body.appendChild(wrap);
+    }
+  }
+  
+  // Create the hidden checkbox
+  const checkboxDiv = document.createElement("div");
+  checkboxDiv.style.display = "none";
+  checkboxDiv.innerHTML = "<input type='checkbox' id='" + checkboxId + "' name='" + checkboxName + "' checked>" +
+                   "<label for='" + checkboxId + "'> " + checkboxName + "</label>";
+  
+  wrap.appendChild(checkboxDiv);
+  console.log('🔧 [VIRTUAL CHECKBOX DEBUG] Created hidden checkbox:', checkboxId, 'for dropdown:', baseName);
+}
+
+// Create real hidden checkboxes for all autofilled dropdowns
+function createHiddenCheckboxesForAutofilledDropdowns() {
+  console.log('🔧 [AUTOFILL CHECKBOX DEBUG] Creating hidden checkboxes for autofilled dropdowns...');
+  
+  // Find all dropdown/select elements
+  const dropdowns = document.querySelectorAll('select');
+  
+  dropdowns.forEach(dropdown => {
+    if (!dropdown.id || dropdown.id.startsWith('answer')) return; // Skip numbered dropdowns
+    
+    const baseName = dropdown.id;
+    const selectedValue = dropdown.value.trim();
+    
+    if (selectedValue) {
+      // Generate checkbox ID using the same pattern as dropdownMirror
+      const idSuffix = selectedValue.replace(/W+/g, "_").toLowerCase();
+      const checkboxId = baseName + "_" + idSuffix;
+      const checkboxName = baseName + "_" + idSuffix;
+      
+      // Check if this checkbox already exists
+      const existingCheckbox = document.getElementById(checkboxId);
+      if (!existingCheckbox) {
+        console.log('🔧 [AUTOFILL CHECKBOX DEBUG] Creating hidden checkbox for autofilled dropdown:', baseName, 'value:', selectedValue);
+        createHiddenCheckbox(checkboxId, checkboxName, baseName);
+      }
+    }
+  });
+}
+
 // Add virtual entries for regular dropdowns (checkbox combinations)
 function addRegularDropdownVirtualEntries(inputData, dropdown) {
   const baseName = dropdown.id;
@@ -5903,7 +6072,13 @@ function addRegularDropdownVirtualEntries(inputData, dropdown) {
     if (!exists) {
       // Check if this checkbox actually exists in the DOM (user selected this option)
       const actualCheckbox = document.getElementById(checkboxId);
-      const isChecked = actualCheckbox ? actualCheckbox.checked : false;
+      // Also check if the dropdown value matches this option (for autofilled dropdowns)
+      const isChecked = actualCheckbox ? actualCheckbox.checked : (dropdown.value === optionValue);
+      
+      // If the virtual checkbox should be checked, create the actual hidden checkbox in the DOM
+      if (isChecked && !actualCheckbox) {
+        createHiddenCheckbox(checkboxId, checkboxName, baseName);
+      }
       
       // Add virtual checkbox entry
       inputData.push({
@@ -5914,7 +6089,7 @@ function addRegularDropdownVirtualEntries(inputData, dropdown) {
         inputType: 'checkbox',
         placeholder: '',
         required: false,
-        isVirtual: true,
+        isVirtual: !actualCheckbox, // Only virtual if it doesn't exist in DOM
         dropdownSource: dropdown.id,
         optionValue: optionValue
       });
@@ -6039,6 +6214,31 @@ function populateDebugContent() {
   
   // Add virtual checkbox entries for dropdown questions
   addVirtualDropdownCheckboxes(inputData);
+  
+  // After potentially creating real checkboxes from virtual ones, re-scan the DOM to include them
+  const updatedInputs = document.querySelectorAll('input, select, textarea');
+  updatedInputs.forEach(input => {
+    // Include all inputs that have either an ID or a name (or both)
+    if (input.id || input.name) {
+      // Check if this input is already in inputData
+      const exists = inputData.some(item => item.id === input.id && item.name === input.name);
+      if (!exists) {
+        const value = input.type === 'checkbox' ? input.checked : input.value;
+        const type = input.tagName.toLowerCase();
+        const inputType = input.type || 'text';
+        
+        inputData.push({
+          id: input.id || '',
+          name: input.name || '',
+          value: value,
+          type: type,
+          inputType: inputType,
+          placeholder: input.placeholder || '',
+          required: input.required
+        });
+      }
+    }
+  });
   
   // Filter by search term with bidirectional space/underscore normalization
   const normalizedSearchTermUnderscore = searchTerm.replace(/[_s]/g, '_');
