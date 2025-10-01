@@ -187,6 +187,26 @@ function showFlowchartLoadedNotification() {
 window.exportFlowchartJson = function(download = true) {
   if (!graph) return null;
   
+  // Automatically reset PDF inheritance and Node IDs before export
+  // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
+  console.log('🔄 [AUTO RESET] Running automatic PDF and Node ID reset before export...');
+  
+  // Reset PDF inheritance for all nodes FIRST
+  if (typeof window.resetAllPdfInheritance === 'function') {
+    window.resetAllPdfInheritance();
+    console.log('🔄 [AUTO RESET] PDF inheritance reset completed before export');
+  } else {
+    console.warn('🔄 [AUTO RESET] resetAllPdfInheritance function not available');
+  }
+  
+  // Reset all Node IDs SECOND (after PDF inheritance is fixed)
+  if (typeof resetAllNodeIds === 'function') {
+    resetAllNodeIds();
+    console.log('🔄 [AUTO RESET] Node IDs reset completed before export');
+  } else {
+    console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
+  }
+  
   const parent = graph.getDefaultParent();
   const cells = graph.getChildCells(parent, true, true);
   

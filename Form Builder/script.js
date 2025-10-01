@@ -240,10 +240,8 @@ document.addEventListener("DOMContentLoaded", function() {
               if (window.updateOptionNodeCell) window.updateOptionNodeCell(cell);
             }
             
-            // Refresh option node ID to ensure proper format
-            if (window.refreshOptionNodeId) {
-              window.refreshOptionNodeId(cell);
-            }
+            // DISABLED: Automatic Node ID regeneration during text editing
+            // Node IDs will only change when manually edited or reset using the button
           }
           
           // Handle PDF nodes
@@ -703,51 +701,8 @@ graph.isCellEditable = function (cell) {
     hideContextMenu();
   });
 
-  // Notes context menu event handlers
-  document.getElementById('notesBoldButton').addEventListener("click", () => {
-    const selectedCells = graph.getSelectionCells();
-    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
-      const notesCell = selectedCells[0];
-      notesCell._notesBold = !notesCell._notesBold;
-      updateNotesNodeCell(notesCell);
-      refreshSpecificCells([notesCell]);
-      requestAutosave();
-    }
-    hideContextMenu();
-  });
-
-  document.getElementById('notesFontButton').addEventListener("click", () => {
-    const selectedCells = graph.getSelectionCells();
-    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
-      const notesCell = selectedCells[0];
-      const currentFontSize = notesCell._notesFontSize || 14;
-      const newFontSize = prompt('Enter font size (number):', currentFontSize);
-      if (newFontSize && !isNaN(newFontSize) && newFontSize > 0) {
-        notesCell._notesFontSize = parseInt(newFontSize);
-        updateNotesNodeCell(notesCell);
-        refreshSpecificCells([notesCell]);
-        requestAutosave();
-      }
-    }
-    hideContextMenu();
-  });
-
-  document.getElementById('notesCopyButton').addEventListener("click", () => {
-    const selectedCells = graph.getSelectionCells();
-    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
-      copySelectedNodeAsJson();
-    }
-    hideContextMenu();
-  });
-
-  document.getElementById('notesDeleteButton').addEventListener("click", () => {
-    const selectedCells = graph.getSelectionCells();
-    if (selectedCells.length === 1 && isNotesNode(selectedCells[0])) {
-      graph.removeCells(selectedCells);
-      refreshAllCells();
-    }
-    hideContextMenu();
-  });
+  // Notes context menu event handlers are now handled in context-menus.js
+  // Removed duplicate event listeners to prevent conflicts
 
   // Increase the "section number" for a question
   newSectionButton.addEventListener("click", () => {
@@ -787,6 +742,42 @@ keyHandler.bindControlKey(86, () => {
   const mousePos = graph.getPointForEvent(graph.lastEvent);
   window.pasteNodeFromJson(mousePos ? mousePos.x : undefined,
                     mousePos ? mousePos.y : undefined);
+});
+
+/* Ctrl + Shift – reset all PDF and node IDs */
+document.addEventListener('keydown', function(event) {
+  if (event.ctrlKey && event.shiftKey && !event.altKey && !event.metaKey) {
+    // Only trigger on the initial keydown, not on key repeats
+    if (event.repeat) return;
+    
+    if (isUserTyping()) return; // Don't trigger if user is typing
+    
+    // Confirm with user
+    const confirmed = confirm("This will reset ALL PDF inheritance and node IDs in the flowchart. This action cannot be undone. Continue?");
+    if (!confirmed) {
+      return;
+    }
+    
+    console.log('🔄 [CTRL+SHIFT] Running reset all PDF and node IDs...');
+    
+    // Reset PDF inheritance for all nodes FIRST
+    if (typeof window.resetAllPdfInheritance === 'function') {
+      window.resetAllPdfInheritance();
+      console.log('🔄 [CTRL+SHIFT] PDF inheritance reset completed');
+    } else {
+      console.warn('🔄 [CTRL+SHIFT] resetAllPdfInheritance function not available');
+    }
+    
+    // Reset all Node IDs SECOND (after PDF inheritance is fixed)
+    if (typeof resetAllNodeIds === 'function') {
+      resetAllNodeIds();
+      console.log('🔄 [CTRL+SHIFT] Node IDs reset completed');
+    } else {
+      console.warn('🔄 [CTRL+SHIFT] resetAllNodeIds function not available');
+    }
+    
+    event.preventDefault();
+  }
 });
 
   
@@ -900,7 +891,8 @@ keyHandler.bindControlKey(86, () => {
               let style = cell.style || "";
               style += ";nodeType=question;";
               graph.getModel().setStyle(cell, style);
-              refreshNodeIdFromLabel(cell);
+              // DISABLED: Automatic Node ID generation
+              // Node IDs will only change when manually edited or reset using the button
             }
           }
         }
@@ -1039,20 +1031,10 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         }
     }
 
-    // Refresh Node IDs to apply PDF naming convention when connections change
-    for (const cellId in allCells) {
-      const cell = allCells[cellId];
-      if (cell && cell.vertex && typeof window.setNodeId === 'function') {
-        // Clear the existing Node ID from the style to force regeneration
-        let style = cell.style || '';
-        style = style.replace(/nodeId=[^;]+/, '');
-        graph.getModel().setStyle(cell, style);
-        
-        // Now get a fresh Node ID using getNodeId (which will apply PDF naming convention)
-        const freshId = typeof window.getNodeId === 'function' ? window.getNodeId(cell) : (cell._nameId || cell.id);
-        window.setNodeId(cell, freshId);
-      }
-    }
+    // DISABLED: Automatic Node ID regeneration has been completely disabled
+    // Node IDs will only change when manually edited or reset using the button
+    // This prevents Node IDs from changing when connections change or structure changes
+    // Users will set all Node IDs at the end when the structure is complete
 
     refreshAllCells();
 });
@@ -1129,6 +1111,8 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
   document.getElementById('closeSettingsBtn').addEventListener('click', hideSettingsMenu);
   document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
   document.getElementById('cancelSettingsBtn').addEventListener('click', hideSettingsMenu);
+  document.getElementById('resetAllNodeIdsBtn').addEventListener('click', resetAllNodeIds);
+  document.getElementById('resetAllPdfBtn').addEventListener('click', window.resetAllPdfInheritance);
   
   // Load settings on startup
   loadSettingsFromLocalStorage();
@@ -1517,34 +1501,58 @@ window.copyMultipleDropdownId = function(cellId, index) {
   const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
   const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
   
-  // Prompt user for number
-  const number = prompt('Enter a number for this ID:');
-  if (number === null || number.trim() === '') {
-    return; // User cancelled or entered empty
-  }
-  
-  // Create the ID string
+  // Create the ID string with default number "1" first
   const sanitizedQuestionText = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
   const sanitizedEntryText = entryText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
-  const sanitizedNumber = number.trim();
   
-  // Build the final ID with PDF name if available
-  let textToCopy;
+  // Build the default ID with PDF name if available
+  let defaultTextToCopy;
   if (sanitizedPdfName) {
-    textToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+    defaultTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_1_${sanitizedEntryText}`;
   } else {
-    textToCopy = `${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+    defaultTextToCopy = `${sanitizedQuestionText}_1_${sanitizedEntryText}`;
   }
   
-  // Copy to clipboard
+  // Copy the default ID to clipboard immediately
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(textToCopy).catch(() => {
+    navigator.clipboard.writeText(defaultTextToCopy).catch(() => {
       // Fallback for older browsers
-      fallbackCopyToClipboard(textToCopy);
+      fallbackCopyToClipboard(defaultTextToCopy);
     });
   } else {
     // Fallback for older browsers
-    fallbackCopyToClipboard(textToCopy);
+    fallbackCopyToClipboard(defaultTextToCopy);
+  }
+  
+  // Prompt user for number with default value of "1"
+  const number = prompt('Enter a number for this ID:', '1');
+  if (number === null) {
+    return; // User cancelled, but ID was already copied with default value
+  }
+  const finalNumber = number.trim() || '1'; // Use "1" as default if empty
+  
+  // If user entered a different number, copy the updated ID
+  if (finalNumber !== '1') {
+    const sanitizedNumber = finalNumber;
+    
+    // Build the updated ID with PDF name if available
+    let updatedTextToCopy;
+    if (sanitizedPdfName) {
+      updatedTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+    } else {
+      updatedTextToCopy = `${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
+    }
+    
+    // Copy the updated ID to clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(updatedTextToCopy).catch(() => {
+        // Fallback for older browsers
+        fallbackCopyToClipboard(updatedTextToCopy);
+      });
+    } else {
+      // Fallback for older browsers
+      fallbackCopyToClipboard(updatedTextToCopy);
+    }
   }
 };
 
@@ -1770,19 +1778,9 @@ function updateInfoNodeCell(cell) {
  ************  HELPER / STYLING / JSON Exports  ********
  *******************************************************/
 function autoUpdateNodeIdBasedOnLabel(cell) {
-  if (!cell.vertex) return;
-  
-  // Check if this cell has been manually assigned an ID and should skip reassignment
-  const style = cell.style || "";
-  if (style.includes("skipReassign=true")) return;
-  
-  const label = (cell.value || "").trim();
-  if (!label) return;
-  if (isQuestion(cell)) {
-    refreshNodeIdFromLabel(cell);
-  } else if (isOptions(cell)) {
-    refreshOptionNodeId(cell);
-  }
+  // DISABLED: Automatic Node ID regeneration has been completely disabled
+  // Node IDs will only change when manually edited or reset using the button
+  return;
 }
   // isQuestion function moved to questions.js module
 function isOptions(cell) {
@@ -1808,54 +1806,10 @@ function setNodeId(cell, nodeId) {
     console.log("Original style:", cell.style);
   }
   
-  // Apply PDF prefix logic if the cell has PDF properties
+  // DISABLED: PDF prefix logic has been completely disabled
+  // Node IDs will only be set when manually edited or reset using the button
+  // Users will set all Node IDs at the end when the structure is complete
   let finalNodeId = nodeId;
-  if (typeof window.getNodeId === 'function') {
-    // Get the PDF name using the same logic as getNodeId
-    const getPdfName = (cell, visited = new Set()) => {
-      // Check for PDF properties in various formats - only if they're not empty
-      if (cell._pdfName && cell._pdfName.trim()) return cell._pdfName.trim();
-      if (cell._pdfFilename && cell._pdfFilename.trim()) return cell._pdfFilename.trim();
-      if (cell._pdfFile && cell._pdfFile.trim()) return cell._pdfFile.trim();
-      if (cell._pdfUrl && cell._pdfUrl.trim()) {
-        // Extract filename from URL
-        const urlParts = cell._pdfUrl.split('/');
-        const filename = urlParts[urlParts.length - 1];
-        const cleanFilename = filename.replace(/\.pdf$/i, '').trim(); // Remove .pdf extension
-        return cleanFilename || null; // Return null if filename is empty after cleaning
-      }
-      return null;
-    };
-    
-    const pdfName = getPdfName(cell);
-    
-    // Only apply PDF naming convention if the cell actually has a PDF name property set
-    const hasDirectPdfName = (cell._pdfName && cell._pdfName.trim()) || 
-                            (cell._pdfFilename && cell._pdfFilename.trim()) || 
-                            (cell._pdfUrl && cell._pdfUrl.trim()) ||
-                            (cell._pdfFile && cell._pdfFile.trim());
-    
-    // Check if connected to a PDF node (even without direct PDF properties)
-    const isConnectedToPdfNode = pdfName && pdfName.trim() && !hasDirectPdfName;
-    
-    if (pdfName && pdfName.trim() && (hasDirectPdfName || isConnectedToPdfNode)) {
-      // Sanitize PDF name (remove .pdf extension and clean up)
-      const cleanPdfName = pdfName.replace(/\.pdf$/i, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
-      
-      // Check if the nodeId already starts with the PDF name to avoid stacking
-      const pdfPrefix = `${cleanPdfName}_`;
-      if (!nodeId.startsWith(pdfPrefix)) {
-        finalNodeId = `${cleanPdfName}_${nodeId}`;
-        if (DEBUG_NODE_ID) {
-          console.log("Applied PDF prefix:", finalNodeId);
-        }
-      }
-    } else {
-      if (DEBUG_NODE_ID) {
-        console.log("No PDF naming convention applied - PDF name found:", pdfName, "Has direct PDF name:", hasDirectPdfName);
-      }
-    }
-  }
   
   let style = cell.style || "";
   style = style.replace(/nodeId=[^;]+/, "");
@@ -1876,95 +1830,9 @@ function setNodeId(cell, nodeId) {
 // which includes PDF name prefixing logic
 
 function refreshNodeIdFromLabel(cell) {
-  // Debug mode - set to true only when debugging node ID issues
-  const DEBUG_NODE_ID = false;
-  
-  if (DEBUG_NODE_ID) {
-    console.log("ðŸ”„ REFRESH NODE ID FROM LABEL DEBUG START");
-    console.log("Cell:", cell);
-    console.log("Cell ID:", cell.id);
-    console.log("Cell value:", cell.value);
-    console.log("Cell _questionText:", cell._questionText);
-  }
-  
-  // Check if there's already a custom Node ID that should be preserved
-  const existingNodeId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
-  const hasCustomNodeId = existingNodeId && existingNodeId !== "unnamed_node" && 
-                         !existingNodeId.startsWith("node_") && 
-                         !existingNodeId.match(/^[a-z]+_question_node$/) &&
-                         !existingNodeId.match(/^\d+$/); // Don't preserve numeric IDs like "2"
-  
-  if (DEBUG_NODE_ID) {
-    console.log("Existing Node ID:", existingNodeId);
-    console.log("Has custom Node ID:", hasCustomNodeId);
-  }
-  
-  // If there's a custom Node ID, don't regenerate it
-  if (hasCustomNodeId) {
-    if (DEBUG_NODE_ID) {
-      console.log("Preserving custom Node ID:", existingNodeId);
-      console.log("ðŸ”„ REFRESH NODE ID FROM LABEL DEBUG END (PRESERVED)");
-    }
-    return;
-  }
-  
-  let labelText = "";
-
-  if (isQuestion(cell)) {
-    const qType = getQuestionType(cell);
-    if (DEBUG_NODE_ID) {
-      console.log("Question type:", qType);
-    }
-    if (qType === "multipleTextboxes" || qType === "multipleDropdownType") {
-      labelText = cell._questionText || "custom_question";
-      if (DEBUG_NODE_ID) {
-        console.log("Using _questionText:", labelText);
-      }
-    } else {
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = cell.value || "";
-      labelText = tempDiv.textContent || tempDiv.innerText || "";
-      if (DEBUG_NODE_ID) {
-        console.log("Extracted from cell.value:", labelText);
-      }
-    }
-  } else {
-    labelText = cell.value || "";
-    if (DEBUG_NODE_ID) {
-      console.log("Non-question node, using cell.value:", labelText);
-    }
-  }
-
-  const cleanedText = labelText
-    .trim()
-    .replace(/<[^>]+>/g, "")  
-    .replace(/[^\w\s]/gi, "") 
-    .replace(/\s+/g, "_")
-    .toLowerCase();
-
-  if (DEBUG_NODE_ID) {
-    console.log("Cleaned text:", cleanedText);
-  }
-
-  const baseNodeId = cleanedText || "unnamed_node";
-  if (DEBUG_NODE_ID) {
-    console.log("Base node ID:", baseNodeId);
-  }
-  
-  // Check for duplicates and add numbering if needed
-  const uniqueNodeId = generateUniqueNodeId(baseNodeId, cell);
-  if (DEBUG_NODE_ID) {
-    console.log("Unique node ID:", uniqueNodeId);
-    console.log("Calling setNodeId with:", uniqueNodeId);
-  }
-  setNodeId(cell, uniqueNodeId);
-  
-  // Verify the ID was set
-  const verifyId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
-  if (DEBUG_NODE_ID) {
-    console.log("Verification - getNodeId returns:", verifyId);
-    console.log("ðŸ”„ REFRESH NODE ID FROM LABEL DEBUG END");
-  }
+  // DISABLED: Automatic Node ID regeneration has been completely disabled
+  // Node IDs will only change when manually edited or reset using the button
+  return;
 }
 
 function generateUniqueNodeId(baseNodeId, currentCell) {
@@ -2002,82 +1870,9 @@ function generateUniqueNodeId(baseNodeId, currentCell) {
 }
 
 function refreshOptionNodeId(cell) {
-  // Debug mode - set to true only when debugging node ID issues
-  const DEBUG_NODE_ID = false;
-  
-  if (DEBUG_NODE_ID) {
-    console.log("Cell:", cell);
-    console.log("Cell ID:", cell.id);
-    console.log("Cell value:", cell.value);
-    console.log("Cell style:", cell.style);
-  }
-  
-  const edges = graph.getIncomingEdges(cell) || [];
-  if (DEBUG_NODE_ID) {
-    console.log("Incoming edges:", edges);
-  }
-  
-  let parentNodeId = "ParentQuestion";
-  for (let e of edges) {
-    const p = e.source;
-    if (DEBUG_NODE_ID) {
-      console.log("Checking edge source:", p);
-      console.log("Is question?", isQuestion(p));
-    }
-    if (isQuestion(p)) {
-      const parentId = (typeof window.getNodeId === 'function' ? window.getNodeId(p) : '') || "";
-      if (DEBUG_NODE_ID) {
-        console.log("Parent node ID from getNodeId:", parentId);
-      }
-      parentNodeId = parentId || "ParentQuestion";
-      if (DEBUG_NODE_ID) {
-        console.log("Final parent node ID:", parentNodeId);
-      }
-      break;
-    }
-  }
-  
-  // Extract option text from the cell value and sanitize it
-  let optionText = "Option";
-  if (cell.value) {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = cell.value;
-    optionText = (tempDiv.textContent || tempDiv.innerText || "").trim();
-    if (DEBUG_NODE_ID) {
-      console.log("Extracted option text:", optionText);
-    }
-  }
-  
-  // Sanitize the option text: lowercase, replace spaces with underscores, remove special chars
-  const sanitizedOptionText = optionText
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, '') // Remove special characters except spaces
-    .replace(/\s+/g, '_') // Replace spaces with underscores
-    .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
-  
-  if (DEBUG_NODE_ID) {
-    console.log("Sanitized option text:", sanitizedOptionText);
-  }
-  
-  // Create the base node ID in format: parent_question_id_option_text
-  const baseNodeId = `${parentNodeId}_${sanitizedOptionText}`;
-  if (DEBUG_NODE_ID) {
-    console.log("Base node ID:", baseNodeId);
-  }
-  
-  // Check for duplicates and add numbering if needed
-  const uniqueNodeId = generateUniqueNodeId(baseNodeId, cell);
-  if (DEBUG_NODE_ID) {
-    console.log("Unique node ID:", uniqueNodeId);
-    console.log("Calling setNodeId with:", uniqueNodeId);
-  }
-  setNodeId(cell, uniqueNodeId);
-  
-  // Verify the ID was set
-  const verifyId = (typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || "";
-  if (DEBUG_NODE_ID) {
-    console.log("Verification - getNodeId returns:", verifyId);
-  }
+  // DISABLED: Automatic Node ID regeneration has been completely disabled
+  // Node IDs will only change when manually edited or reset using the button
+  return;
 }
 
 // Function to refresh all option node IDs in the graph
@@ -2098,7 +1893,8 @@ function refreshAllOptionNodeIds() {
     console.log("Is options?", isOptions(cell));
     if (isOptions(cell)) {
       console.log("Refreshing option node ID for:", cell);
-      refreshOptionNodeId(cell);
+      // DISABLED: Automatic Node ID regeneration
+      // refreshOptionNodeId(cell);
       updatedCount++;
     }
   });
@@ -2157,17 +1953,8 @@ window.pickTypeForCell = function(cellId, val) {
   graph.getModel().beginUpdate();
   try {
     setQuestionType(c, val);
-    // Always try to generate a proper Node ID from the cell's text content
-    // This ensures we get a meaningful ID instead of generic ones
-    if (typeof window.refreshNodeIdFromLabel === 'function') {
-      window.refreshNodeIdFromLabel(c);
-    } else if (!c._nameId) {
-      // Fallback to a proper default only if no Node ID generation function exists
-      c._nameId = "question_node";
-      if (typeof window.setNodeId === 'function') {
-        window.setNodeId(c, "question_node");
-      }
-    }
+    // DISABLED: Automatic Node ID generation when changing question type
+    // Node IDs will only change when manually edited or reset using the button
     
     if (!c._placeholder) {
       c._placeholder = "";
@@ -2803,7 +2590,8 @@ function setOptionType(cell, newType) {
       default:
         updateOptionNodeCell(cell);
     }
-    refreshOptionNodeId(cell);
+    // DISABLED: Automatic Node ID regeneration during option type changes
+    // Node IDs will only change when manually edited or reset using the button
   } finally {
     graph.getModel().endUpdate();
   }
@@ -2870,7 +2658,8 @@ function setOptionType(cell, newType) {
       console.log("Is question?", isQuestion(cell));
       if (isQuestion(cell)) {
         console.log("Refreshing question node ID for:", cell);
-        refreshNodeIdFromLabel(cell);
+        // DISABLED: Automatic Node ID generation
+        // Node IDs will only change when manually edited or reset using the button
         updatedCount++;
       }
     });
@@ -3087,7 +2876,8 @@ function createYesNoOptions(parentCell) {
     const noY = geo.y + geo.height + 50;
     let noStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;pointerEvents=1;overflow=fill;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
     const noNode = graph.insertVertex(parent, null, "<div style=\"text-align:center;\">No</div>", noX, noY, 100, 60, noStyle);
-    refreshOptionNodeId(noNode);
+    // DISABLED: Automatic Node ID regeneration during node creation
+    // Node IDs will only change when manually edited or reset using the button
     if (parentCell !== jumpModeNode) {
       setSection(noNode, parentSection);
     }
@@ -3109,7 +2899,8 @@ function createYesNoOptions(parentCell) {
     const yesY = geo.y + geo.height + 50;
     let yesStyle = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;pointerEvents=1;overflow=fill;nodeType=options;questionType=dropdown;spacing=12;fontSize=16;";
     const yesNode = graph.insertVertex(parent, null, "<div style=\"text-align:center;\">Yes</div>", yesX, yesY, 100, 60, yesStyle);
-    refreshOptionNodeId(yesNode);
+    // DISABLED: Automatic Node ID regeneration during node creation
+    // Node IDs will only change when manually edited or reset using the button
     if (parentCell !== jumpModeNode) {
       setSection(yesNode, parentSection);
     }
@@ -3596,7 +3387,8 @@ window.updateText2Handler = function(cellId, text) {
         graph.getModel().endUpdate();
       }
   
-  refreshNodeIdFromLabel(cell);
+  // DISABLED: Automatic Node ID generation
+  // Node IDs will only change when manually edited or reset using the button
 };
 
 /**
@@ -3710,7 +3502,8 @@ window.updateSimpleQuestionTitle = function(cellId, text) {
                          !existingNodeId.match(/^[a-z]+_question_node$/);
   
   if (!hasCustomNodeId) {
-    refreshNodeIdFromLabel(cell);
+    // DISABLED: Automatic Node ID generation
+  // Node IDs will only change when manually edited or reset using the button
   }
 };
 
@@ -3812,7 +3605,8 @@ window.updateInputQuestionTitle = function(cellId, text) {
   } else if (getQuestionType(cell) === 'multipleDropdownType') {
     updatemultipleDropdownTypeCell(cell);
   }
-  refreshNodeIdFromLabel(cell);
+  // DISABLED: Automatic Node ID generation
+  // Node IDs will only change when manually edited or reset using the button
 };
 
 // Handle Enter key: blur on Enter
@@ -3950,17 +3744,8 @@ window.pickTypeForCell = function(cellId, val) {
   graph.getModel().beginUpdate();
   try {
     setQuestionType(c, val);
-    // Always try to generate a proper Node ID from the cell's text content
-    // This ensures we get a meaningful ID instead of generic ones
-    if (typeof window.refreshNodeIdFromLabel === 'function') {
-      window.refreshNodeIdFromLabel(c);
-    } else if (!c._nameId) {
-      // Fallback to a proper default only if no Node ID generation function exists
-      c._nameId = "question_node";
-      if (typeof window.setNodeId === 'function') {
-        window.setNodeId(c, "question_node");
-      }
-    }
+    // DISABLED: Automatic Node ID generation when changing question type
+    // Node IDs will only change when manually edited or reset using the button
     
     if (!c._placeholder) {
       c._placeholder = "";
@@ -4324,6 +4109,9 @@ function setupAutosaveHooks() {
   // Save after loadFlowchartData (delayed to ensure groups are loaded)
   const origLoadFlowchartData = window.loadFlowchartData;
   window.loadFlowchartData = function(data) {
+    // Set flag to prevent automatic Node ID regeneration during loading
+    window._isLoadingFlowchart = true;
+    
     origLoadFlowchartData.apply(this, arguments);
     
     // Apply groups from imported JSON if present
@@ -4350,11 +4138,42 @@ function setupAutosaveHooks() {
       }, 100); // Small delay to ensure DOM is ready
     }
     
+    // Automatically reset PDF inheritance and Node IDs after flowchart loading
+    // Note: This runs after the internal loadFlowchartData processes:
+    // - 500ms: PDF properties propagation
+    // - 1000ms: Node ID validation and correction
+    // - 3000ms: Our automatic reset (after all internal processes complete)
+    // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
+    setTimeout(() => {
+      console.log('🔄 [AUTO RESET] Running automatic PDF and Node ID reset after flowchart load...');
+      
+      // Reset PDF inheritance for all nodes FIRST
+      if (typeof window.resetAllPdfInheritance === 'function') {
+        window.resetAllPdfInheritance();
+        console.log('🔄 [AUTO RESET] PDF inheritance reset completed');
+      } else {
+        console.warn('🔄 [AUTO RESET] resetAllPdfInheritance function not available');
+      }
+      
+      // Reset all Node IDs SECOND (after PDF inheritance is fixed)
+      if (typeof resetAllNodeIds === 'function') {
+        resetAllNodeIds();
+        console.log('🔄 [AUTO RESET] Node IDs reset completed');
+      } else {
+        console.warn('🔄 [AUTO RESET] resetAllNodeIds function not available');
+      }
+    }, 3000); // Increased delay to ensure all internal loading processes are complete
+    
     // Delay autosave to ensure groups are loaded
     setTimeout(() => {
       console.log('Autosaving after loadFlowchartData, current groups:', groups);
       autosaveFlowchartToLocalStorage();
     }, 1000); // Increased delay to ensure groups are fully processed
+    
+    // Clear the loading flag after all loading processes are complete
+    setTimeout(() => {
+      window._isLoadingFlowchart = false;
+    }, 4000); // Clear flag after all loading processes (including the 3000ms automatic reset)
   };
   
   // Removed: console.log('[AUTOSAVE][localStorage] Autosave hooks set up with throttling.');
@@ -4409,7 +4228,8 @@ function showAutosaveRestorePrompt() {
     modal.remove();
     const data = getAutosaveFlowchartFromLocalStorage();
     if (data) {
-      console.log('Restoring autosave with groups:', data.groups);
+      console.log('🔄 [AUTOSAVE RESTORE] Restoring autosave with groups:', data.groups);
+      console.log('🔄 [AUTOSAVE RESTORE] Calling loadFlowchartData (which includes automatic PDF and Node ID resets)');
       window.loadFlowchartData(data);
       // Removed: console.log('[AUTOSAVE][localStorage] User chose YES: loaded autosaved flowchart.');
       // Wait for groups to be loaded before setting up autosave hooks
@@ -4658,6 +4478,13 @@ function copySelectedNodeAsJson() {
 }
 
 window.pasteNodeFromJson = function(x, y) {
+  // Prevent multiple simultaneous paste operations
+  if (window._isPasting) {
+    console.log('Paste operation already in progress, ignoring duplicate call');
+    return;
+  }
+  window._isPasting = true;
+  
   // Try to get data from localStorage first (for cross-tab functionality)
   let clipboardData = localStorage.getItem(FLOWCHART_CLIPBOARD_KEY);
   let timestamp = localStorage.getItem(FLOWCHART_CLIPBOARD_TIMESTAMP_KEY);
@@ -4675,9 +4502,11 @@ window.pasteNodeFromJson = function(x, y) {
         pasteNodeFromJsonData(text, x, y);
       } catch (e) {
         alert("No valid node data found in clipboard");
+        window._isPasting = false; // Clear flag on error
       }
     }).catch(err => {
       alert("No node data found to paste");
+      window._isPasting = false; // Clear flag on error
     });
     return;
   }
@@ -4691,6 +4520,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
     data = JSON.parse(clipboardData);
   } catch (e) {
     alert("Clipboard data is invalid");
+    window._isPasting = false; // Clear flag on error
     return;
   }
   
@@ -4748,7 +4578,8 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         } else if (isPdfNode(newCell)) {
           updatePdfNodeCell(newCell);
         } else if (isOptions(newCell)) {
-          refreshOptionNodeId(newCell);
+          // DISABLED: Automatic Node ID regeneration during node creation
+          // Node IDs will only change when manually edited or reset using the button
         } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
           if (typeof updateCalculationNodeCell === "function") updateCalculationNodeCell(newCell);
         }
@@ -4863,7 +4694,8 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         } else if (isPdfNode(newCell)) {
           updatePdfNodeCell(newCell);
         } else if (isOptions(newCell)) {
-          refreshOptionNodeId(newCell);
+          // DISABLED: Automatic Node ID regeneration during node creation
+          // Node IDs will only change when manually edited or reset using the button
         } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
           // FIRST OCCURRENCE - Calculation node copy/paste now handled by calc.js
           if (typeof window.handleCalculationNodeCopyPaste === "function") {
@@ -4902,6 +4734,9 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
   } finally {
     graph.getModel().endUpdate();
   }
+  
+  // Clear the paste flag
+  window._isPasting = false;
   
   // Correct Node IDs for pasted nodes to follow proper naming scheme
   setTimeout(() => {
@@ -5124,13 +4959,36 @@ function updatePdfNodeCell(cell) {
 window.updatePdfNameField = function(cellId, value) {
   const cell = graph.getModel().getCell(cellId);
   if (!cell || !isPdfNode(cell)) return;
+  
+  const oldPdfName = cell._pdfName;
   cell._pdfName = value;
+  
+  // DISABLED: Automatic Node ID updates when PDF names change
+  // Node IDs will only change when manually edited or reset using the button
+  // if (oldPdfName && oldPdfName !== value) {
+  //   updateAllNodeIdsForPdfChange(oldPdfName, value);
+  // }
+  
   // Trigger autosave
   if (typeof window.requestAutosave === 'function') {
     window.requestAutosave();
   }
   // Don't call updatePdfNodeCell here to avoid re-rendering while typing
 };
+
+/**
+ * Update all Node IDs when a PDF name changes
+ */
+function updateAllNodeIdsForPdfChange(oldPdfName, newPdfName) {
+  // DISABLED: Automatic Node ID updates have been completely disabled
+  // Node IDs will only change when manually edited or reset using the button
+  // Users will set all Node IDs at the end when the structure is complete
+  console.log("🔄 [DISABLED] updateAllNodeIdsForPdfChange - Automatic Node ID updates disabled");
+  return;
+}
+
+// Export the function to window object
+window.updateAllNodeIdsForPdfChange = updateAllNodeIdsForPdfChange;
 
 // Handler for updating PDF File field
 window.updatePdfFileField = function(cellId, value) {
@@ -5374,6 +5232,55 @@ function saveSettings() {
     saveSettingsToLocalStorage();
   }
   
+  hideSettingsMenu();
+}
+
+// Reset all node IDs to match naming convention
+function resetAllNodeIds() {
+  if (!window.graph) {
+    console.warn("Graph not available");
+    return;
+  }
+  
+  // Proceed without confirmation dialog
+  
+  const graph = window.graph;
+  const parent = graph.getDefaultParent();
+  const cells = graph.getChildVertices(parent);
+  
+  let resetCount = 0;
+  
+  // Process each cell
+  cells.forEach(cell => {
+    if (typeof window.generateCorrectNodeId === 'function') {
+      const correctNodeId = window.generateCorrectNodeId(cell);
+      if (correctNodeId) {
+        // Clear the manually edited flag since we're resetting to automatic generation
+        cell._manuallyEditedNodeId = false;
+        
+        // Update the cell's Node ID
+        if (typeof window.setNodeId === 'function') {
+          window.setNodeId(cell, correctNodeId);
+          resetCount++;
+        }
+      }
+    }
+  });
+  
+  // Refresh all cells to update the display
+  if (typeof window.refreshAllCells === 'function') {
+    window.refreshAllCells();
+  }
+  
+  // Trigger autosave
+  if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
+  }
+  
+  // Show success message
+  alert(`Successfully reset ${resetCount} node IDs to match the naming convention.`);
+  
+  // Close settings menu
   hideSettingsMenu();
 }
 

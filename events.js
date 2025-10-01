@@ -263,11 +263,8 @@ function setupGraphEventListeners(graph) {
   
   // Selection change event
   graph.getSelectionModel().addListener(mxEvent.CHANGE, () => {
-    if (window.lastSelectedCell) {
-      if (typeof window.autoUpdateNodeIdBasedOnLabel === 'function') {
-        window.autoUpdateNodeIdBasedOnLabel(window.lastSelectedCell);
-      }
-    }
+    // DO NOT auto-update Node IDs when selection changes
+    // Node IDs should only change when manually edited or reset using the button
     window.lastSelectedCell = graph.getSelectionCell();
     
     // Highlight the section in the legend if a cell is selected
@@ -554,7 +551,16 @@ function setupCustomClickHandlers(graph) {
       return;
     }
     
-    // d) Edge double-click = reset geometry
+    // d) PDF node double-click = show properties popup
+    if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
+    
+    // e) Edge double-click = reset geometry
     if (cell && cell.edge) {
       const geo = new mxGeometry();
       graph.getModel().setGeometry(cell, geo);

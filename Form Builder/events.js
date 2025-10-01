@@ -263,11 +263,8 @@ function setupGraphEventListeners(graph) {
   
   // Selection change event
   graph.getSelectionModel().addListener(mxEvent.CHANGE, () => {
-    if (window.lastSelectedCell) {
-      if (typeof window.autoUpdateNodeIdBasedOnLabel === 'function') {
-        window.autoUpdateNodeIdBasedOnLabel(window.lastSelectedCell);
-      }
-    }
+    // DO NOT auto-update Node IDs when selection changes
+    // Node IDs should only change when manually edited or reset using the button
     window.lastSelectedCell = graph.getSelectionCell();
     
     // Highlight the section in the legend if a cell is selected
@@ -361,10 +358,9 @@ function setupGraphEventListeners(graph) {
       } else if ((typeof window.isNotesNode === 'function' && window.isNotesNode(cell)) || 
                  (typeof window.isChecklistNode === 'function' && window.isChecklistNode(cell)) || 
                  (typeof window.isAlertNode === 'function' && window.isAlertNode(cell)) || 
-                 (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) || 
                  (typeof window.isSubtitleNode === 'function' && window.isSubtitleNode(cell)) || 
                  (typeof window.isInfoNode === 'function' && window.isInfoNode(cell))) {
-        // When dragging a notes/checklist/alert/pdf/subtitle/info node, check if it points to a question node
+        // When dragging a notes/checklist/alert/subtitle/info node, check if it points to a question node
         const incomingEdges = graph.getIncomingEdges(cell) || [];
         const outgoingEdges = graph.getOutgoingEdges(cell) || [];
         
@@ -400,6 +396,10 @@ function setupGraphEventListeners(graph) {
             });
           }
         });
+      } else if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
+        // PDF nodes should NOT drag any connected nodes - they move independently
+        // This prevents PDF nodes from dragging question nodes or other connected elements
+        console.log('PDF node dragged independently - no connected nodes moved');
       }
     });
     

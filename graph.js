@@ -231,6 +231,15 @@ function setupCustomDoubleClickBehavior(graph) {
           return;
         }
         
+        // Show properties popup for PDF nodes
+        if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
+          console.log("🎯 PDF node detected, showing properties popup");
+          if (typeof window.showPropertiesPopup === 'function') {
+            window.showPropertiesPopup(cell);
+          }
+          return;
+        }
+        
         // Reset the tracking
         lastClickTime = 0;
         lastClickedCell = null;
@@ -292,6 +301,15 @@ function setupCustomDoubleClickBehavior(graph) {
       return;
     }
     
+    // Show properties popup for PDF nodes on double-click
+    if (cell && typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
+    
     // Add direct editing for subtitle and info nodes on double-click
     if (cell && (isSubtitleNode(cell) || isInfoNode(cell))) {
       graph.startEditingAtCell(cell);
@@ -339,30 +357,21 @@ function showPropertiesPopup(cell) {
   
   // Prevent multiple popups
   if (window.__propertiesPopupOpen) {
-    console.log("🔧 [PROPERTIES POPUP DEBUG] Popup already open, returning early");
     return;
   }
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Setting popup open flag");
   window.__propertiesPopupOpen = true;
   
   // Clean up any existing popups
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Cleaning up existing popups");
   const existingPopups = document.querySelectorAll('.properties-modal');
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Found existing popups:", existingPopups.length);
   existingPopups.forEach(n => n.remove());
   
   // Hide any old properties menu that might be showing
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Hiding old properties menu");
   const oldPropertiesMenu = document.getElementById('propertiesMenu');
   if (oldPropertiesMenu) {
-    console.log("🔧 [PROPERTIES POPUP DEBUG] Old properties menu found, hiding it");
     oldPropertiesMenu.style.display = 'none';
-  } else {
-    console.log("🔧 [PROPERTIES POPUP DEBUG] No old properties menu found");
   }
   
   // Create popup container
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Creating popup container");
   const popup = document.createElement('div');
   popup.className = 'properties-modal';
   popup.style.cssText = `
@@ -382,18 +391,14 @@ function showPropertiesPopup(cell) {
     pointer-events: auto;
     opacity: 1;
   `;
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup CSS styles applied (matching working version)");
   
   // Force the popup to be visible by setting styles directly
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Setting popup visibility styles");
   popup.style.pointerEvents = 'auto';
   popup.style.opacity = '1';
   popup.style.display = 'block';
   popup.style.visibility = 'visible';
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup styles set, adding to DOM");
   
   // Create header
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Creating header element");
   const header = document.createElement('div');
   header.style.cssText = `
     display: flex;
@@ -406,7 +411,12 @@ function showPropertiesPopup(cell) {
   `;
   
   const title = document.createElement('h3');
-  title.textContent = 'Node Properties';
+  // Use different title for PDF nodes
+  if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
+    title.textContent = 'PDF Node Properties';
+  } else {
+    title.textContent = 'Node Properties';
+  }
   title.style.cssText = `
     margin: 0;
     color: #1976d2;
@@ -435,10 +445,8 @@ function showPropertiesPopup(cell) {
   
   header.appendChild(title);
   header.appendChild(closeBtn);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Header created with content");
   
   // Create content area
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Creating content area");
   const content = document.createElement('div');
   content.style.cssText = `
     max-height: 400px;
@@ -449,7 +457,6 @@ function showPropertiesPopup(cell) {
     border-radius: 8px;
     padding: 15px;
   `;
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Content area created with styles");
   
   // Get cell properties with improved text extraction
   const nodeText = (() => {
@@ -460,7 +467,7 @@ function showPropertiesPopup(cell) {
     
     // If _questionText is empty, try to extract from cell.value
     if (cell.value) {
-    const tempDiv = document.createElement('div');
+      const tempDiv = document.createElement('div');
       tempDiv.innerHTML = cell.value;
       const extractedText = (tempDiv.textContent || tempDiv.innerText || "").trim();
       
@@ -501,7 +508,6 @@ function showPropertiesPopup(cell) {
   // Always use getNodeId to ensure PDF naming convention is applied
   if (typeof window.getNodeId === 'function') {
     nodeId = window.getNodeId(cell) || 'N/A';
-    console.log('🔧 [NODE ID DEBUG] Using Node ID with PDF naming convention:', nodeId);
   } else {
     // Fallback logic if window.getNodeId is not available
     // PRIORITY 1: Check if we have a saved Node ID in the style
@@ -509,20 +515,17 @@ function showPropertiesPopup(cell) {
       const styleMatch = cell.style.match(/nodeId=([^;]+)/);
       if (styleMatch) {
         nodeId = decodeURIComponent(styleMatch[1]);
-        console.log('🔧 [NODE ID DEBUG] Using saved Node ID from style:', nodeId);
       }
     }
     
     // PRIORITY 2: Check _nameId property
     if (nodeId === 'N/A' && cell._nameId) {
       nodeId = cell._nameId;
-      console.log('🔧 [NODE ID DEBUG] Using saved Node ID from _nameId:', nodeId);
     }
     
     // PRIORITY 3: Generate default Node ID
     if (nodeId === 'N/A') {
       nodeId = generateDefaultNodeId(nodeText) || cell.id || 'N/A';
-      console.log('🔧 [NODE ID DEBUG] Using fallback generated Node ID:', nodeId);
     }
   }
   
@@ -598,6 +601,27 @@ function showPropertiesPopup(cell) {
     return (sectionPrefs[section] && sectionPrefs[section].name) || 'Enter section name';
   })();
   
+  // Get all available section names for dropdown
+  const availableSections = (() => {
+    const sectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {};
+    const sections = [];
+    
+    // Add all existing sections
+    Object.keys(sectionPrefs).forEach(sectionNum => {
+      const sectionData = sectionPrefs[sectionNum];
+      const name = sectionData.name || `Section ${sectionNum}`;
+      sections.push({
+        value: sectionNum,
+        text: `${sectionNum}: ${name}`
+      });
+    });
+    
+    // Sort by section number
+    sections.sort((a, b) => parseInt(a.value) - parseInt(b.value));
+    
+    return sections;
+  })();
+  
   // Get question number - try multiple sources
   const questionNumber = (() => {
     if (cell._questionId) return cell._questionId;
@@ -624,25 +648,18 @@ function showPropertiesPopup(cell) {
     
     // Function to find PDF properties - check both direct and incoming connections
     const findPdfProperties = (startCell) => {
-      // Check if this node has direct PDF properties
-      if (startCell._pdfName || startCell._pdfFilename || startCell._pdfUrl) {
-        return {
-          nodeId: startCell.id,
-          filename: startCell._pdfUrl || startCell._pdfFilename || startCell._pdfName || "",
-          pdfUrl: startCell._pdfUrl || "",
-          priceId: startCell._priceId || ""
-        };
-      }
-      
       // Check if this is a PDF node
       if (typeof window.isPdfNode === 'function' && window.isPdfNode(startCell)) {
         return {
           nodeId: startCell.id,
-          filename: startCell._pdfUrl || "",
-          pdfUrl: startCell._pdfUrl || "",
-          priceId: startCell._priceId || ""
+          filename: startCell._pdfFile || startCell._pdfName || "",
+          pdfUrl: startCell._pdfFile || "",
+          priceId: startCell._pdfPrice || ""
         };
       }
+      
+      // Only check for direct PDF properties if the cell is actually connected to a PDF node
+      // This prevents showing PDF properties on cells that just have leftover PDF data
       
       // Check direct outgoing connections to PDF nodes
       const outgoingEdges = graph.getOutgoingEdges(startCell) || [];
@@ -655,9 +672,9 @@ function showPropertiesPopup(cell) {
         const targetCell = pdfNode.target;
         return {
           nodeId: targetCell.id,
-          filename: targetCell._pdfUrl || "",
-          pdfUrl: targetCell._pdfUrl || "",
-          priceId: targetCell._priceId || ""
+          filename: targetCell._pdfFile || targetCell._pdfName || "",
+          pdfUrl: targetCell._pdfFile || "",
+          priceId: targetCell._pdfPrice || ""
         };
       }
       
@@ -666,23 +683,13 @@ function showPropertiesPopup(cell) {
       for (const edge of incomingEdges) {
         const sourceCell = edge.source;
         if (sourceCell) {
-          // Check if the source node has PDF properties
-          if (sourceCell._pdfName || sourceCell._pdfFilename || sourceCell._pdfUrl) {
-            return {
-              nodeId: sourceCell.id,
-              filename: sourceCell._pdfUrl || sourceCell._pdfFilename || sourceCell._pdfName || "",
-              pdfUrl: sourceCell._pdfUrl || "",
-              priceId: sourceCell._priceId || ""
-            };
-          }
-          
-          // Check if the source node is a PDF node
+          // Check if the source node is actually a PDF node
           if (typeof window.isPdfNode === 'function' && window.isPdfNode(sourceCell)) {
             return {
               nodeId: sourceCell.id,
-              filename: sourceCell._pdfUrl || "",
-              pdfUrl: sourceCell._pdfUrl || "",
-              priceId: sourceCell._priceId || ""
+              filename: sourceCell._pdfFile || sourceCell._pdfName || "",
+              pdfUrl: sourceCell._pdfFile || "",
+              priceId: sourceCell._pdfPrice || ""
             };
           }
           
@@ -693,9 +700,9 @@ function showPropertiesPopup(cell) {
             if (sourceTarget && typeof window.isPdfNode === 'function' && window.isPdfNode(sourceTarget)) {
               return {
                 nodeId: sourceTarget.id,
-                filename: sourceTarget._pdfUrl || "",
-                pdfUrl: sourceTarget._pdfUrl || "",
-                priceId: sourceTarget._priceId || ""
+                filename: sourceTarget._pdfFile || sourceTarget._pdfName || "",
+                pdfUrl: sourceTarget._pdfFile || "",
+                priceId: sourceTarget._pdfPrice || ""
               };
             }
           }
@@ -708,21 +715,57 @@ function showPropertiesPopup(cell) {
     return findPdfProperties(cell);
   })();
   
-  // Create property fields
-  const properties = [
-    { label: 'Node Text', value: nodeText, id: 'propNodeText', editable: true },
-    { label: 'Node ID', value: nodeId, id: 'propNodeId', editable: true },
-    { 
-      label: 'Node Type', 
-      value: nodeType, 
-      id: 'propNodeType', 
-      editable: false,
-      isQuestionTypeDropdown: typeof window.isQuestion === 'function' && window.isQuestion(cell)
-    },
-    { label: 'Section', value: section, id: 'propNodeSection', editable: true },
-    { label: 'Section Name', value: sectionName, id: 'propSectionName', editable: true },
-    { label: 'Question Number', value: questionNumber, id: 'propQuestionNumber', editable: true }
-  ];
+  // Create property fields - different for PDF nodes vs other nodes
+  let properties = [];
+  
+  // For PDF nodes, only show the 3 required fields
+  if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
+    properties = [
+      { label: 'PDF Name', value: cell._pdfName || 'PDF Document', id: 'propPdfName', editable: true },
+      { label: 'PDF File', value: cell._pdfFile || '', id: 'propPdfFile', editable: true },
+      { label: 'PDF Price', value: cell._pdfPrice || '', id: 'propPdfPrice', editable: true }
+    ];
+  } else {
+    // For all other nodes, show the standard properties
+    properties = [
+      { label: 'Node Text', value: nodeText, id: 'propNodeText', editable: true },
+      { label: 'Node ID', value: nodeId, id: 'propNodeId', editable: true },
+      { 
+        label: 'Node Type', 
+        value: nodeType, 
+        id: 'propNodeType', 
+        editable: false,
+        isQuestionTypeDropdown: typeof window.isQuestion === 'function' && window.isQuestion(cell)
+      },
+      { 
+        label: 'Section Name', 
+        value: section, 
+        id: 'propSectionName', 
+        editable: true,
+        isSectionNameDropdown: true,
+        dropdownOptions: availableSections,
+        dropdownChange: (selectedSection) => {
+          // Reassign the node to the selected section
+          if (typeof window.setSection === 'function') {
+            window.setSection(cell, selectedSection);
+            console.log(`🔧 [SECTION CHANGE] Reassigned node to section ${selectedSection}`);
+          }
+        }
+      }
+    ];
+  }
+  
+  // Add Question Number field only for question nodes
+  if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
+    properties.push({
+      label: 'Question Number', 
+      value: questionNumber, 
+      id: 'propQuestionNumber', 
+      editable: true
+    });
+  }
+  
+  // PDF Name field will be added later in the unified section
   
   // Add Copy ID dropdown and button for date range nodes
   if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'dateRange') {
@@ -811,22 +854,62 @@ function showPropertiesPopup(cell) {
     });
   }
   
-  // Add PDF properties if this node has PDF properties OR if it's a question node (but not for date range nodes)
-  if (pdfProperties || (typeof window.isQuestion === 'function' && window.isQuestion(cell) && 
-      !(typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'dateRange'))) {
-    // Use the actual PDF filename directly from _pdfUrl, or empty string for new question nodes
-    const pdfName = pdfProperties ? (pdfProperties.filename || 'PDF Document') : (cell._pdfName || '');
+  // Add unified PDF Name field for non-PDF nodes that have PDF properties
+  if (!(typeof window.isPdfNode === 'function' && window.isPdfNode(cell))) {
+    // Use the same source as the inherited field for consistency
+    let pdfName = '';
+    let isInherited = false;
     
-    properties.push(
-      { label: 'PDF Name', value: pdfName, id: 'propPdfName', editable: true }
-    );
+    // First try to get PDF name from the unified function
+    if (typeof window.getPdfNameForNode === 'function') {
+      const inheritedPdfName = window.getPdfNameForNode(cell);
+      if (inheritedPdfName && inheritedPdfName.trim()) {
+        pdfName = inheritedPdfName;
+        isInherited = true;
+      }
+    }
+    
+    // Fallback to pdfProperties if no inherited name found
+    if (!pdfName && pdfProperties) {
+      pdfName = pdfProperties.filename || '';
+    }
+    
+    // Only add PDF Name field if it has a meaningful value
+    if (pdfName && pdfName.trim() !== '' && pdfName !== 'PDF Document') {
+      properties.push({
+        label: 'PDF Name',
+        value: pdfName,
+        id: 'propPdfName',
+        editable: !isInherited, // Make inherited fields read-only
+        isInherited: isInherited
+      });
+      
+      // Add Reset PDF button for inherited fields
+      if (isInherited) {
+        properties.push({
+          label: '',
+          value: '',
+          id: 'propResetPdf',
+          editable: false,
+          isButton: true,
+          buttonText: 'Reset PDF',
+          buttonAction: () => {
+            const newPdfName = window.resetPdfInheritance(cell);
+            if (newPdfName) {
+              // Update the input field value immediately
+              const pdfNameInput = document.getElementById('propPdfName');
+              if (pdfNameInput) {
+                pdfNameInput.value = newPdfName;
+              }
+            }
+          }
+        });
+      }
+    }
   }
   
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Properties array:", properties);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Properties count:", properties.length);
   
   properties.forEach((prop, index) => {
-    console.log(`🔧 [PROPERTIES POPUP DEBUG] Processing property ${index}:`, prop);
     const fieldDiv = document.createElement('div');
     fieldDiv.style.cssText = `
       margin-bottom: 16px;
@@ -835,12 +918,13 @@ function showPropertiesPopup(cell) {
     `;
     
     const label = document.createElement('label');
-    label.textContent = prop.label ? prop.label + ':' : '';
+    label.textContent = prop.label ? prop.label + (prop.isInherited ? ' (inherited):' : ':') : '';
     label.style.cssText = `
       font-weight: 600;
       color: #333;
       min-width: 120px;
       margin-right: 12px;
+      ${prop.isInherited ? 'color: #4caf50;' : ''}
     `;
     
     // Special handling for question type dropdown
@@ -920,32 +1004,12 @@ function showPropertiesPopup(cell) {
       return; // Skip the normal field creation
     }
     
-    // Only create valueSpan for regular input fields, not for dropdowns or buttons
-    let valueSpan = null;
-    if (!prop.isDropdown && !prop.isButton) {
-      valueSpan = document.createElement('span');
-    valueSpan.id = prop.id;
-    valueSpan.textContent = prop.value;
-    valueSpan.style.cssText = `
-      flex: 1;
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background: ${prop.editable ? '#f9f9f9' : '#f5f5f5'};
-      color: ${prop.editable ? '#333' : '#666'};
-      cursor: ${prop.editable ? 'text' : 'default'};
-      transition: all 0.2s ease;
-    `;
-      console.log(`🔧 [VALUE SPAN DEBUG] Created valueSpan for ${prop.id} with textContent: "${valueSpan.textContent}"`);
-    }
-    
-    if (prop.isDropdown) {
-      // Handle dropdown fields
+    // Special handling for section name dropdown
+    if (prop.isSectionNameDropdown) {
       const dropdown = document.createElement('select');
       dropdown.id = prop.id;
       dropdown.style.cssText = `
-        flex: 0 0 auto;
-        width: 200px;
+        flex: 1;
         padding: 8px 12px;
         border: 1px solid #ddd;
         border-radius: 6px;
@@ -978,12 +1042,77 @@ function showPropertiesPopup(cell) {
         }
       });
       
-      // Center the dropdown if no label
+      fieldDiv.appendChild(label);
+      fieldDiv.appendChild(dropdown);
+      content.appendChild(fieldDiv);
+      return; // Skip the normal field creation
+    }
+    
+    // Only create valueSpan for regular input fields, not for dropdowns or buttons
+    let valueSpan = null;
+    if (!prop.isDropdown && !prop.isButton) {
+      valueSpan = document.createElement('span');
+      valueSpan.id = prop.id;
+      valueSpan.textContent = prop.value;
+      valueSpan.style.cssText = `
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: ${prop.editable ? '#f9f9f9' : '#f5f5f5'};
+        color: ${prop.editable ? '#333' : '#666'};
+        cursor: ${prop.editable ? 'text' : 'default'};
+        transition: all 0.2s ease;
+        ${prop.isInherited ? 'border-left: 4px solid #4caf50; font-style: italic;' : ''}
+      `;
+      console.log(`🔧 [VALUE SPAN DEBUG] Created valueSpan for ${prop.id} with textContent: "${valueSpan.textContent}"`);
+    }
+    
+    if (prop.isDropdown) {
+      // Handle dropdown fields
+      const dropdown = document.createElement('select');
+      dropdown.id = prop.id;
+      dropdown.style.cssText = `
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: white;
+        color: #333;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      `;
+      
+      // Add options
+      if (prop.dropdownOptions) {
+        prop.dropdownOptions.forEach(option => {
+          const optionElement = document.createElement('option');
+          optionElement.value = option.value;
+          optionElement.textContent = option.text;
+          dropdown.appendChild(optionElement);
+        });
+      }
+      
+      // Set initial value
+      if (prop.value) {
+        dropdown.value = prop.value;
+      }
+      
+      // Add change listener
+      dropdown.addEventListener('change', () => {
+        if (prop.dropdownChange) {
+          prop.dropdownChange(dropdown.value);
+        }
+      });
+      
+      // For dropdowns, use the same horizontal layout as other fields
       if (!prop.label) {
         fieldDiv.style.justifyContent = 'center';
         fieldDiv.style.width = '100%';
         fieldDiv.appendChild(dropdown);
       } else {
+        // Use standard horizontal layout like Node Type dropdown
         fieldDiv.appendChild(label);
         fieldDiv.appendChild(dropdown);
       }
@@ -1032,8 +1161,6 @@ function showPropertiesPopup(cell) {
     } else if (prop.editable) {
       // Special handling for Node ID field - make it editable with copy functionality
       if (prop.id === 'propNodeId') {
-        console.log(`🔧 [NODE ID DEBUG] Processing propNodeId, valueSpan:`, valueSpan);
-        console.log(`🔧 [NODE ID DEBUG] valueSpan.textContent: "${valueSpan ? valueSpan.textContent : 'null'}"`);
         // Make it contenteditable for editing
         valueSpan.contentEditable = 'true';
         valueSpan.style.cursor = 'text';
@@ -1044,7 +1171,6 @@ function showPropertiesPopup(cell) {
           e.preventDefault();
           try {
             await navigator.clipboard.writeText(prop.value);
-            console.log('Node ID copied to clipboard:', prop.value);
             
             // Show visual feedback
             const originalText = valueSpan.textContent;
@@ -1085,7 +1211,6 @@ function showPropertiesPopup(cell) {
         valueSpan.addEventListener('blur', () => {
           const newValue = valueSpan.textContent.trim();
           if (newValue !== prop.value && newValue !== '') {
-            console.log('🔧 [NODE ID DEBUG] Saving Node ID change from', prop.value, 'to', newValue);
             
             // Update the cell's node ID using the proper method
             if (typeof window.setNodeId === 'function') {
@@ -1115,30 +1240,120 @@ function showPropertiesPopup(cell) {
             graph.getModel().beginUpdate();
             graph.getModel().endUpdate();
             
-            console.log('🔧 [NODE ID DEBUG] Node ID updated successfully');
           }
         });
         
-        // Add the valueSpan to the fieldDiv for Node ID field
+        // Create reset button for Node ID
+        const resetButton = document.createElement('button');
+        resetButton.textContent = 'Reset';
+        resetButton.title = 'Reset Node ID to match naming convention';
+        resetButton.style.cssText = `
+          background-color: #f8f9fa;
+          border: 1px solid #dee2e6;
+          border-radius: 3px;
+          padding: 4px 8px;
+          font-size: 11px;
+          color: #495057;
+          cursor: pointer;
+          margin-left: 8px;
+          vertical-align: middle;
+          transition: all 0.2s;
+        `;
+        
+        // Add hover effects
+        resetButton.addEventListener('mouseover', () => {
+          resetButton.style.backgroundColor = '#e9ecef';
+          resetButton.style.borderColor = '#adb5bd';
+        });
+        
+        resetButton.addEventListener('mouseout', () => {
+          resetButton.style.backgroundColor = '#f8f9fa';
+          resetButton.style.borderColor = '#dee2e6';
+        });
+        
+        // Add click handler for reset functionality
+        resetButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Generate the correct Node ID using the naming convention
+          let correctNodeId = '';
+          if (typeof window.generateCorrectNodeId === 'function') {
+            correctNodeId = window.generateCorrectNodeId(cell);
+          } else {
+            console.warn("generateCorrectNodeId function not available");
+            return;
+          }
+          
+          if (!correctNodeId) {
+            console.warn("Could not generate correct Node ID");
+            return;
+          }
+          
+          // Update the Node ID field display
+          valueSpan.textContent = correctNodeId;
+          
+          // Update the actual cell's Node ID
+          if (typeof window.setNodeId === 'function') {
+            window.setNodeId(cell, correctNodeId);
+          } else {
+            console.warn("setNodeId function not available");
+            return;
+          }
+          
+          // Refresh all cells to update the display
+          if (typeof window.refreshAllCells === 'function') {
+            window.refreshAllCells();
+          }
+          
+          // Trigger autosave
+          if (typeof window.requestAutosave === 'function') {
+            window.requestAutosave();
+          }
+          
+          console.log("Node ID reset to:", correctNodeId);
+        });
+        
+        // Add the valueSpan and reset button to the fieldDiv for Node ID field
         fieldDiv.appendChild(label);
         fieldDiv.appendChild(valueSpan);
+        fieldDiv.appendChild(resetButton);
         content.appendChild(fieldDiv);
-        console.log(`🔧 [PROPERTIES POPUP DEBUG] Added Node ID field to content, content now has ${content.children.length} children`);
         return; // Skip the normal field creation
       } else {
         // Regular editable field behavior for other fields
         valueSpan.addEventListener('click', () => {
-          const input = document.createElement('input');
-          input.type = 'text';
+          // For Node Text field, use textarea to maintain size
+          const isNodeText = prop.id === 'propNodeText';
+          const input = document.createElement(isNodeText ? 'textarea' : 'input');
+          if (!isNodeText) {
+            input.type = 'text';
+          }
           input.value = prop.value;
-          input.style.cssText = `
-            width: 100%;
-            padding: 8px 12px;
-            border: 2px solid #1976d2;
-            border-radius: 6px;
-            font-size: 14px;
-            outline: none;
-          `;
+          
+          if (isNodeText) {
+            input.style.cssText = `
+              width: 100%;
+              min-height: 80px;
+              padding: 8px 12px;
+              border: 2px solid #1976d2;
+              border-radius: 6px;
+              font-size: 14px;
+              outline: none;
+              resize: vertical;
+              font-family: inherit;
+              line-height: 1.4;
+            `;
+          } else {
+            input.style.cssText = `
+              width: 100%;
+              padding: 8px 12px;
+              border: 2px solid #1976d2;
+              border-radius: 6px;
+              font-size: 14px;
+              outline: none;
+            `;
+          }
           
           valueSpan.style.display = 'none';
           valueSpan.parentNode.insertBefore(input, valueSpan);
@@ -1157,33 +1372,8 @@ function showPropertiesPopup(cell) {
                 cell._questionText = newValue;
                 cell.value = newValue;
                 
-                // Auto-update node ID based on text for all question nodes
-                if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
-                  const autoNodeId = newValue.toLowerCase()
-                    .replace(/[^a-z0-9\s]/g, '') // Remove special characters
-                    .replace(/\s+/g, '_') // Replace spaces with underscores
-                    .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
-                    .substring(0, 50); // Increase length limit for question nodes
-                  
-                  if (autoNodeId) {
-                    // Update the node ID using the proper function
-                    if (typeof window.setNodeId === 'function') {
-                      window.setNodeId(cell, autoNodeId);
-                    } else {
-                    cell._nameId = autoNodeId;
-                    }
-                    
-                    // Update the node ID field in the popup if it exists
-                    const nodeIdField = document.getElementById('propNodeId');
-                    if (nodeIdField) {
-                      const nodeIdSpan = nodeIdField.querySelector('span');
-                      if (nodeIdSpan) {
-                        nodeIdSpan.textContent = autoNodeId;
-                      }
-                    }
-                    console.log('Auto-updated node ID to:', autoNodeId);
-                  }
-                }
+                // DO NOT auto-update node ID when editing node text
+                // Node IDs should only change when manually edited or reset using the button
                 break;
               case 'propNodeSection':
                 // Update section using the proper setSection function
@@ -1244,8 +1434,15 @@ function showPropertiesPopup(cell) {
                 break;
               case 'propPdfName':
                 // Update the PDF name property
+                const oldPdfName = cell._pdfName;
                 cell._pdfName = newValue;
-                // Apply PDF naming convention to the Node ID
+                
+                // Update all Node IDs that use this PDF name
+                if (oldPdfName && oldPdfName !== newValue && typeof window.updateAllNodeIdsForPdfChange === 'function') {
+                  window.updateAllNodeIdsForPdfChange(oldPdfName, newValue);
+                }
+                
+                // Apply PDF naming convention to the current Node ID
                 if (typeof window.setNodeId === 'function') {
                   // Get the current Node ID without PDF prefix
                   const currentNodeId = document.getElementById('propNodeId');
@@ -1265,6 +1462,26 @@ function showPropertiesPopup(cell) {
                       nodeIdSpan.textContent = newNodeId;
                     }
                   }
+                }
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
+              case 'propPdfFile':
+                // Update the PDF file property
+                cell._pdfFile = newValue;
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
+              case 'propPdfPrice':
+                // Update the PDF price property
+                cell._pdfPrice = newValue;
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
                 }
                 break;
             }
@@ -1304,18 +1521,14 @@ function showPropertiesPopup(cell) {
     
     fieldDiv.appendChild(label);
     if (valueSpan) {
-    fieldDiv.appendChild(valueSpan);
+      fieldDiv.appendChild(valueSpan);
     }
     content.appendChild(fieldDiv);
-    console.log(`🔧 [PROPERTIES POPUP DEBUG] Added field ${index} to content, content now has ${content.children.length} children`);
   });
   
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Finished processing properties, content has", content.children.length, "children");
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Content innerHTML length:", content.innerHTML.length);
   
   // Ensure content has some content even if properties array was empty
   if (content.children.length === 0) {
-    console.log("🔧 [PROPERTIES POPUP DEBUG] No properties found, adding fallback content");
     const fallbackDiv = document.createElement('div');
     fallbackDiv.innerHTML = `
       <div style="margin-bottom: 15px;">
@@ -1332,7 +1545,6 @@ function showPropertiesPopup(cell) {
       </div>
     `;
     content.appendChild(fallbackDiv);
-    console.log("🔧 [PROPERTIES POPUP DEBUG] Fallback content added");
   }
   
   // Create buttons
@@ -1363,30 +1575,18 @@ function showPropertiesPopup(cell) {
   buttonContainer.appendChild(cancelBtn);
   
   // Assemble popup
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Assembling popup elements");
   popup.appendChild(header);
   popup.appendChild(content);
   popup.appendChild(buttonContainer);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup assembled, adding to document body");
   document.body.appendChild(popup);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup added to DOM successfully");
   
   // Verify popup is actually in the DOM
   const popupInDOM = document.querySelector('.properties-modal');
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup found in DOM:", popupInDOM);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup parent:", popup.parentNode);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup in document.body:", document.body.contains(popup));
   
   // Check popup dimensions immediately after adding to DOM
   const initialRect = popup.getBoundingClientRect();
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Initial popup dimensions:", initialRect);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup children count:", popup.children.length);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Header children:", header.children.length);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Content children:", content.children.length);
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Button container children:", buttonContainer.children.length);
   
   // Check for any conflicting CSS rules
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Checking for CSS conflicts...");
   const allStyles = document.styleSheets;
   let conflictingRules = [];
   for (let i = 0; i < allStyles.length; i++) {
@@ -1407,28 +1607,16 @@ function showPropertiesPopup(cell) {
       // Skip stylesheets that can't be accessed (CORS issues)
     }
   }
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Conflicting CSS rules found:", conflictingRules);
   
   
   // Popup should now be visible
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup should now be visible");
-  
-  // Simple visibility check (matching working version approach)
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup should be visible now");
-  const finalRect = popup.getBoundingClientRect();
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Final popup dimensions:", finalRect);
-  
-  // Popup should now be visible without the DOM re-insertion issue
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Popup creation completed successfully");
   
   // Temporary alert to confirm popup creation
   setTimeout(() => {
     // Check if popup still exists after 100ms
     const popupStillExists = document.querySelector('.properties-modal');
-    console.log("🔧 [PROPERTIES POPUP DEBUG] Popup still exists after 100ms:", popupStillExists);
     if (popupStillExists) {
       const rect = popupStillExists.getBoundingClientRect();
-      console.log("🔧 [PROPERTIES POPUP DEBUG] Popup dimensions after 100ms:", rect);
       //alert("Properties popup created successfully! You should see the properties dialog in the center of the screen. Dimensions: " + rect.width + "x" + rect.height);
     } else {
       //alert("ERROR: Properties popup was created but disappeared after 100ms! Something is removing it.");
@@ -1436,19 +1624,13 @@ function showPropertiesPopup(cell) {
   }, 100);
   
   // Auto-copy node ID to clipboard when popup opens
-  console.log("🔧 [PROPERTIES POPUP DEBUG] Checking node ID for clipboard copy");
   if (nodeId && nodeId.trim()) {
-    console.log("🔧 [PROPERTIES POPUP DEBUG] Copying node ID to clipboard:", nodeId);
     navigator.clipboard.writeText(nodeId).then(() => {
-      console.log('🔧 [PROPERTIES POPUP DEBUG] Node ID copied to clipboard:', nodeId);
+      console.log('Node ID copied to clipboard:', nodeId);
     }).catch(err => {
-      console.error('🔧 [PROPERTIES POPUP DEBUG] Failed to copy node ID to clipboard:', err);
+      // Clipboard access failed, ignore
     });
-  } else {
-    console.log("🔧 [PROPERTIES POPUP DEBUG] No node ID to copy to clipboard");
   }
-  
-  console.log("🔧 [PROPERTIES POPUP DEBUG] ===== showPropertiesPopup COMPLETED =====");
   
   // Focus management
   let focusTimeout = null;
@@ -1508,7 +1690,7 @@ function showPropertiesPopup(cell) {
   
   // Add event listener to document for outside clicks with a delay to prevent immediate closure
   setTimeout(() => {
-  document.addEventListener('click', handleOutsideClick);
+    document.addEventListener('click', handleOutsideClick);
   }, 200);
   
   // Clean up the outside click listener when popup closes
@@ -1805,10 +1987,8 @@ function showQuestionTextPopup(cell) {
           console.log("Graph model update failed:", error);
         }
 
-        // Update the _nameId based on the new question text
-        if (typeof window.refreshNodeIdFromLabel === 'function') {
-          window.refreshNodeIdFromLabel(cell);
-        }
+        // DISABLED: Automatic Node ID generation when submitting question text
+        // Node IDs will only change when manually edited or reset using the button
         
         if (typeof window.refreshAllCells === 'function') {
           window.refreshAllCells();

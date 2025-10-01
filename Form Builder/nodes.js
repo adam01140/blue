@@ -307,13 +307,64 @@ window.getNodeId = function(cell) {
     console.log("Cell.id:", cell.id);
   }
   
-  // Helper function to get PDF name from cell
+  // PRIORITY 1: Return existing Node ID from style if it exists (most reliable)
+  if (cell.style) {
+    const styleMatch = cell.style.match(/nodeId=([^;]+)/);
+    if (styleMatch) {
+      const existingNodeId = decodeURIComponent(styleMatch[1]);
+      // Only return existing Node ID if it's not a temporary/default one
+      if (existingNodeId && 
+          existingNodeId !== 'new_question' && 
+          !existingNodeId.startsWith('Option_') &&
+          existingNodeId !== 'unnamed_node' &&
+          existingNodeId !== 'N/A') {
+        return existingNodeId;
+      }
+    }
+  }
+  
+  // PRIORITY 2: Return _nameId if it exists and is not temporary/default
+  if (cell._nameId && 
+      cell._nameId !== 'new_question' && 
+      !cell._nameId.startsWith('Option_') &&
+      cell._nameId !== 'unnamed_node' &&
+      cell._nameId !== 'N/A') {
+    return cell._nameId;
+  }
+  
+  // PRIORITY 3: Return cell.id if it's not temporary/default
+  if (cell.id && 
+      cell.id !== 'new_question' && 
+      !cell.id.startsWith('Option_') &&
+      cell.id !== 'unnamed_node' &&
+      cell.id !== 'N/A') {
+    return cell.id;
+  }
+  
+  // If this Node ID has been manually edited, return the existing Node ID without modification
+  if (cell._manuallyEditedNodeId) {
+    // Return the existing Node ID from style or _nameId without applying PDF naming convention
+    if (cell.style) {
+      const styleMatch = cell.style.match(/nodeId=([^;]+)/);
+      if (styleMatch) {
+        return decodeURIComponent(styleMatch[1]);
+      }
+    }
+    if (cell._nameId) {
+      return cell._nameId;
+    }
+    return cell.id || '';
+  }
+  
+  // Use the global function for reading PDF names from HTML inputs
+
+  // Helper function to get PDF name from cell (now reads dynamically from PDF nodes)
   const getPdfName = (cell, visited = new Set()) => {
     if (DEBUG_NODE_ID) {
       console.log("🔍 GET PDF NAME DEBUG START for cell:", cell.id);
     }
-    // Check for PDF properties in various formats - only if they're not empty
-    if (cell._pdfName && cell._pdfName.trim()) return cell._pdfName.trim();
+    // Check for PDF properties in various formats - only if they're not empty and not default values
+    if (cell._pdfName && cell._pdfName.trim() && cell._pdfName.trim() !== "PDF Document") return cell._pdfName.trim();
     if (cell._pdfFilename && cell._pdfFilename.trim()) return cell._pdfFilename.trim();
     if (cell._pdfFile && cell._pdfFile.trim()) return cell._pdfFile.trim();
     if (cell._pdfUrl && cell._pdfUrl.trim()) {
@@ -327,9 +378,16 @@ window.getNodeId = function(cell) {
     // Check if this node is connected to a PDF node (either directly or through flow path)
     const graph = window.graph;
     if (graph) {
-      // Helper function to extract PDF name from a cell
+      // Helper function to extract PDF name from a cell (now reads dynamically from HTML inputs)
       const extractPdfName = (targetCell) => {
-        if (targetCell._pdfName && targetCell._pdfName.trim()) return targetCell._pdfName.trim();
+        // If it's a PDF node, read from HTML input field (dynamic)
+        if (typeof window.isPdfNode === 'function' && window.isPdfNode(targetCell)) {
+          const currentPdfName = window.getCurrentPdfNameFromHtml(targetCell);
+          if (currentPdfName) return currentPdfName;
+        }
+        
+        // Fallback to stored properties for non-PDF nodes
+        if (targetCell._pdfName && targetCell._pdfName.trim() && targetCell._pdfName.trim() !== "PDF Document") return targetCell._pdfName.trim();
         if (targetCell._pdfFilename && targetCell._pdfFilename.trim()) return targetCell._pdfFilename.trim();
         if (targetCell._pdfFile && targetCell._pdfFile.trim()) return targetCell._pdfFile.trim();
         if (targetCell._pdfUrl && targetCell._pdfUrl.trim()) {
@@ -338,18 +396,11 @@ window.getNodeId = function(cell) {
           const cleanFilename = filename.replace(/\.pdf$/i, '').trim(); // Remove .pdf extension
           return cleanFilename || null; // Return null if filename is empty after cleaning
         }
-        // Try to extract from the PDF node's value
-        if (targetCell.value) {
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = targetCell.value || "";
-          const pdfText = (tempDiv.textContent || tempDiv.innerText || "").trim();
-          const cleanPdfText = pdfText.replace(/\.pdf$/i, '').trim(); // Remove .pdf extension
-          return cleanPdfText || null; // Return null if text is empty after cleaning
-        }
+        
         return null;
       };
       
-      // Check direct connections first
+      // Check direct connections first - look for PDF nodes
       const outgoingEdges = graph.getOutgoingEdges(cell) || [];
       let pdfNode = outgoingEdges.find(edge => {
         const target = edge.target;
@@ -360,6 +411,8 @@ window.getNodeId = function(cell) {
         const pdfName = extractPdfName(pdfNode.target);
         if (pdfName) return pdfName;
       }
+      
+      // PDF inheritance flows both ways: from incoming edges (downstream) and to outgoing edges (upstream)
       
       // Check incoming edges for PDF properties (nodes that point to this node)
       const incomingEdges = graph.getIncomingEdges(cell) || [];
@@ -396,12 +449,15 @@ window.getNodeId = function(cell) {
             }
           }
           
-          // Check if the source node has PDF properties
-          if (sourceCell._pdfName || sourceCell._pdfFilename || sourceCell._pdfUrl) {
+          // Check if the source node has PDF properties (PDF inheritance)
+          if ((sourceCell._pdfName && sourceCell._pdfName.trim() && sourceCell._pdfName.trim() !== "PDF Document") || 
+              (sourceCell._pdfFilename && sourceCell._pdfFilename.trim()) || 
+              (sourceCell._pdfFile && sourceCell._pdfFile.trim()) ||
+              (sourceCell._pdfUrl && sourceCell._pdfUrl.trim())) {
             const pdfName = extractPdfName(sourceCell);
             if (pdfName) {
               if (DEBUG_NODE_ID) {
-                console.log("🔍 Found PDF name from source cell properties:", pdfName);
+                console.log("🔍 Found PDF inheritance from source cell:", pdfName);
               }
               return pdfName;
             }
@@ -420,60 +476,7 @@ window.getNodeId = function(cell) {
         }
       }
       
-      // Check for downward propagation - if this node connects to nodes that have PDF properties
-      // This allows PDF properties to flow down through the flowchart
-      if (DEBUG_NODE_ID) {
-        console.log("🔍 Checking downward propagation for cell:", cell.id, "outgoing edges:", outgoingEdges.length);
-        console.log("🔍 Cell object details:", {
-          id: cell.id,
-          edges: cell.edges,
-          parent: cell.parent,
-          children: cell.children,
-          value: cell.value
-        });
-        console.log("🔍 Graph model edges for this cell:", graph.model.getEdges(cell));
-        console.log("🔍 All edges in model:", graph.model.getEdges());
-        
-        // Debug the specific edge that's returned
-        const modelEdges = graph.model.getEdges(cell);
-        if (modelEdges && modelEdges.length > 0) {
-          console.log("🔍 First model edge details:", {
-            id: modelEdges[0].id,
-            source: modelEdges[0].source ? modelEdges[0].source.id : 'null',
-            target: modelEdges[0].target ? modelEdges[0].target.id : 'null',
-            style: modelEdges[0].style,
-            edge: modelEdges[0].edge
-          });
-        }
-      }
-      for (const edge of outgoingEdges) {
-        const targetCell = edge.target;
-        if (targetCell && !visited.has(targetCell.id)) {
-          visited.add(targetCell.id);
-          
-          // Check if the target node has PDF properties (one level of downward propagation)
-          if ((targetCell._pdfName && targetCell._pdfName.trim()) || 
-              (targetCell._pdfFilename && targetCell._pdfFilename.trim()) || 
-              (targetCell._pdfUrl && targetCell._pdfUrl.trim())) {
-            const pdfName = extractPdfName(targetCell);
-            if (pdfName) return pdfName;
-          }
-          
-          // Check if the target node is a PDF node
-          if (typeof window.isPdfNode === 'function' && window.isPdfNode(targetCell)) {
-            const pdfName = extractPdfName(targetCell);
-            if (pdfName) return pdfName;
-          }
-          
-          // Recursively check downstream nodes for PDF properties (multi-level propagation)
-          const downstreamPdfName = getPdfName(targetCell, visited);
-          if (downstreamPdfName) return downstreamPdfName;
-        }
-      }
-      
-      if (DEBUG_NODE_ID) {
-        console.log("🔍 No PDF connection found in downward flow");
-      }
+      // PDF inheritance only flows downstream (from incoming edges), not upstream (outgoing edges)
     }
     
     return null;
@@ -542,7 +545,7 @@ window.getNodeId = function(cell) {
         .replace(/[^a-z0-9\s]/g, '') // Remove special characters
         .replace(/\s+/g, '_') // Replace spaces with underscores
         .replace(/^_+|_+$/g, '') // Remove leading/trailing underscores
-        .substring(0, 50); // Limit length
+        ; // No length limit
       
       if (DEBUG_NODE_ID) {
         console.log("Generated base nodeId from text:", baseNodeId);
@@ -558,47 +561,16 @@ window.getNodeId = function(cell) {
     }
   }
   
-  // Check for PDF name and prepend it if found
-  const pdfName = getPdfName(cell, new Set());
-  if (DEBUG_NODE_ID) {
-    console.log("PDF name found:", pdfName);
-  }
+  // DISABLED: PDF naming convention application has been completely disabled
+  // Node IDs will only be set when manually edited or reset using the button
+  // Users will set all Node IDs at the end when the structure is complete
   
   let finalNodeId = baseNodeId;
   
-  // Apply PDF naming convention if:
-  // 1. A PDF name was found AND
-  // 2. Either the cell has direct PDF properties OR is connected to a PDF node
-  const hasDirectPdfName = (cell._pdfName && cell._pdfName.trim()) || 
-                          (cell._pdfFilename && cell._pdfFilename.trim()) || 
-                          (cell._pdfUrl && cell._pdfUrl.trim()) ||
-                          (cell._pdfFile && cell._pdfFile.trim());
-  
-  // Check if connected to a PDF node (even without direct PDF properties)
-  const isConnectedToPdfNode = pdfName && pdfName.trim() && !hasDirectPdfName;
-  
-  if (pdfName && pdfName.trim() && (hasDirectPdfName || isConnectedToPdfNode)) {
-    // Sanitize PDF name (remove .pdf extension and clean up)
-    const cleanPdfName = pdfName.replace(/\.pdf$/i, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
-    
-    // Check if the baseNodeId already starts with the PDF name to avoid stacking
-    const pdfPrefix = `${cleanPdfName}_`;
-    if (!baseNodeId.startsWith(pdfPrefix)) {
-      finalNodeId = `${cleanPdfName}_${baseNodeId}`;
-      if (DEBUG_NODE_ID) {
-        console.log("Final nodeId with PDF prefix:", finalNodeId);
-      }
-    } else {
-      if (DEBUG_NODE_ID) {
-        console.log("Base nodeId already has PDF prefix, no stacking needed:", baseNodeId);
-      }
-      finalNodeId = baseNodeId;
-    }
-  } else {
-    if (DEBUG_NODE_ID) {
-      console.log("No PDF naming convention applied - PDF name found:", pdfName, "Has direct PDF name:", hasDirectPdfName);
-    }
-  }
+  // DISABLED: PDF naming convention application
+  // All PDF naming convention logic has been disabled
+  // Node IDs will only be set when manually edited or reset using the button
+  finalNodeId = baseNodeId;
   
   if (DEBUG_NODE_ID) {
     console.log("Returning final nodeId:", finalNodeId);

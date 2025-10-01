@@ -115,7 +115,7 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     "<head>",
     '    <meta charset="UTF-8">',
     '    <meta name="viewport" content="width=device-width, initial-scale=1.0">',
-    "    <title>Custom Form</title>",
+    "    <title>Example Form</title>",
     '    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">',
     '    <link rel="stylesheet" href="generate.css">',
     "    <style>",
@@ -1814,18 +1814,28 @@ formHTML += `</div><br></div>`;
       } else if (questionType === "numberedDropdown") {
         const stEl = qBlock.querySelector("#numberRangeStart" + questionId);
         const enEl = qBlock.querySelector("#numberRangeEnd" + questionId);
+        const nodeIdEl = qBlock.querySelector("#nodeId" + questionId);
         const ddMin = stEl ? parseInt(stEl.value, 10) : 1;
         const ddMax = enEl ? parseInt(enEl.value, 10) : 1;
+        const nodeId = nodeIdEl ? nodeIdEl.value.trim() : "";
 
-        // gather labels
+        // gather labels and their node IDs
         const lblInputs = qBlock.querySelectorAll(
-          "#textboxLabels" + questionId + " input"
+          "#textboxLabels" + questionId + " input[type='text']:first-of-type"
+        );
+        const labelNodeIdInputs = qBlock.querySelectorAll(
+          "#textboxLabels" + questionId + " input[type='text']:last-of-type"
         );
         const labelVals = [];
+        const labelNodeIds = [];
         for (let L = 0; L < lblInputs.length; L++) {
           labelVals.push(lblInputs[L].value.trim());
+          labelNodeIds.push(labelNodeIdInputs[L] ? labelNodeIdInputs[L].value.trim() : "");
         }
         labelMap[questionId] = labelVals;
+        // Store label node IDs for use in showTextboxLabels function
+        window.labelNodeIdsMap = window.labelNodeIdsMap || {};
+        window.labelNodeIdsMap[questionId] = labelNodeIds;
 
         // gather amounts
         const amtInputs = qBlock.querySelectorAll(
@@ -1837,9 +1847,10 @@ formHTML += `</div><br></div>`;
         }
         amountMap[questionId] = amountVals;
 
-        // Then build the dropdown
-        questionNameIds[questionId] = "answer" + questionId;
-        formHTML += `<select id="answer${questionId}" onchange="showTextboxLabels(${questionId}, this.value)">
+        // Then build the dropdown - use nodeId if provided, otherwise fallback to answer + questionId
+        const dropdownId = nodeId || "answer" + questionId;
+        questionNameIds[questionId] = dropdownId;
+        formHTML += `<select id="${dropdownId}" name="${dropdownId}" onchange="showTextboxLabels(${questionId}, this.value); updateHiddenCheckboxes(${questionId}, this.value)">
                        <option value="" disabled selected>Select an option</option>`;
         for (let rnum = ddMin; rnum <= ddMax; rnum++) {
           formHTML += `<option value="${rnum}">${rnum}</option>`;
@@ -2360,6 +2371,11 @@ function buildCheckboxName (questionId, rawNameId, labelText){
                       document.getElementById('user_lastname').value = userData.lastName || '';
                       document.getElementById('user_email').value = userData.email || '';
                       document.getElementById('user_phone').value = userData.phone || '';
+                      
+                      // Update full name with 2-second delay to ensure DOM is ready
+                      setTimeout(() => {
+                      updateUserFullName();
+                      }, 2000);
                       document.getElementById('user_street').value = userData.address?.street || '';
                       document.getElementById('user_city').value = userData.address?.city || '';
                       document.getElementById('user_state').value = userData.address?.state || '';
@@ -2398,6 +2414,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
   formHTML += `var conditionalAlerts = ${JSON.stringify(conditionalAlerts || [])};\n`;
   formHTML += `var labelMap = ${JSON.stringify(labelMap || {})};\n`;
   formHTML += `var amountMap = ${JSON.stringify(amountMap || {})};\n`;
+  formHTML += `var labelNodeIdsMap = ${JSON.stringify(window.labelNodeIdsMap || {})};\n`;
   formHTML += `var linkedDropdowns = ${JSON.stringify(linkedDropdowns || [])};\n`;
   formHTML += `var isHandlingLink = false;\n`;
   
@@ -3407,24 +3424,151 @@ function showTextboxLabels(questionId, count){
         ?.querySelector("h3")?.textContent || ("answer" + questionId);
     const qSafe = sanitizeQuestionText(questionH3);
 
+    // Generate hidden checkboxes for the selected count
+    generateHiddenCheckboxes(questionId, qSafe, count);
+
     for(let j = 1; j <= count; j++){
         /* label inputs */
-        for(const lbl of theseLabels){
-            const id = qSafe + "_" + j + "_" + sanitizeQuestionText(lbl);
+        for(let lblIndex = 0; lblIndex < theseLabels.length; lblIndex++){
+            const lbl = theseLabels[lblIndex];
+            const labelNodeIds = window.labelNodeIdsMap && window.labelNodeIdsMap[questionId] ? window.labelNodeIdsMap[questionId] : [];
+            const labelNodeId = labelNodeIds[lblIndex] || "";
+            
+            // Use label node ID if provided, otherwise fallback to the original pattern
+            const id = labelNodeId ? 
+              labelNodeId + "_" + j : 
+              qSafe + "_" + j + "_" + sanitizeQuestionText(lbl);
+              
             container.innerHTML +=
               '<input type="text" id="' + id + '" name="' + id + '" placeholder="' + lbl + ' ' + j + '" style="text-align:center;"><br>';
+            console.log('🔧 [TEXTBOX GENERATION DEBUG] Created textbox input with ID:', id, 'name:', id);
         }
         /* amount inputs */
         for(const amt of theseAmounts){
             const id = qSafe + "_" + j + "_" + sanitizeQuestionText(amt);
             container.innerHTML +=
               '<input type="number" id="' + id + '" name="' + id + '" placeholder="' + amt + ' ' + j + '" style="text-align:center;"><br>';
+            console.log('🔧 [AMOUNT GENERATION DEBUG] Created amount input with ID:', id, 'name:', id);
         }
         container.innerHTML += "<br>";
     }
     attachCalculationListeners();   // keep this
+    
+    // Attach autosave listeners to newly generated textbox inputs
+    const newInputs = container.querySelectorAll('input[type="text"], input[type="number"]');
+    newInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            // Add a small delay to ensure the value is properly set before saving
+            setTimeout(() => {
+                if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                    if (typeof saveAnswers === 'function') {
+                        saveAnswers();
+                    }
+                } else {
+                    if (typeof saveAnswersToLocalStorage === 'function') {
+                        saveAnswersToLocalStorage();
+                    }
+                }
+            }, 100); // 100ms delay to ensure value is set
+        });
+        input.addEventListener('change', function() {
+            // Add a small delay to ensure the value is properly set before saving
+            setTimeout(() => {
+                if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+                    if (typeof saveAnswers === 'function') {
+                        saveAnswers();
+                    }
+                } else {
+                    if (typeof saveAnswersToLocalStorage === 'function') {
+                        saveAnswersToLocalStorage();
+                    }
+                }
+            }, 100); // 100ms delay to ensure value is set
+        });
+    });
 }
 
+// Generate hidden checkboxes for numbered dropdown questions
+function generateHiddenCheckboxes(questionId, questionSafe, selectedCount) {
+    // Get the dropdown element to find the range
+    const dropdown = document.getElementById("answer" + questionId);
+    if (!dropdown) return;
+    
+    // Find the maximum possible value from the dropdown options
+    let maxRange = 0;
+    for (let i = 0; i < dropdown.options.length; i++) {
+        const optionValue = parseInt(dropdown.options[i].value);
+        if (!isNaN(optionValue) && optionValue > maxRange) {
+            maxRange = optionValue;
+        }
+    }
+    
+    // Remove any existing hidden checkboxes for this question
+    const existingCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="' + questionSafe + '_"]');
+    existingCheckboxes.forEach(checkbox => checkbox.remove());
+    
+    // Generate hidden checkboxes for the full range
+    for (let i = 1; i <= maxRange; i++) {
+        const checkboxId = questionSafe + "_" + i;
+        const checkboxName = questionSafe + "_" + i;
+        
+        // Create hidden checkbox
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = checkboxId;
+        checkbox.name = checkboxName;
+        checkbox.style.display = 'none'; // Hidden
+        checkbox.checked = i <= selectedCount; // Check if this number is within the selected range
+        
+        // Add to the form (find the form element or add to body)
+        const form = document.querySelector('form') || document.body;
+        form.appendChild(checkbox);
+    }
+}
+
+// Update hidden checkboxes when dropdown selection changes
+function updateHiddenCheckboxes(questionId, selectedCount) {
+    // Get the question's safe name
+    const questionH3 = document
+        .getElementById("question-container-" + questionId)
+        ?.querySelector("h3")?.textContent || ("answer" + questionId);
+    const qSafe = sanitizeQuestionText(questionH3);
+    
+    // Get the dropdown element to find the range
+    const dropdown = document.getElementById("answer" + questionId);
+    if (!dropdown) return;
+    
+    // Find the maximum possible value from the dropdown options
+    let maxRange = 0;
+    for (let i = 0; i < dropdown.options.length; i++) {
+        const optionValue = parseInt(dropdown.options[i].value);
+        if (!isNaN(optionValue) && optionValue > maxRange) {
+            maxRange = optionValue;
+        }
+    }
+    
+    // Update existing checkboxes or create new ones if they don't exist
+    for (let i = 1; i <= maxRange; i++) {
+        const checkboxId = qSafe + "_" + i;
+        let checkbox = document.getElementById(checkboxId);
+        
+        if (!checkbox) {
+            // Create new checkbox if it doesn't exist
+            checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = checkboxId;
+            checkbox.name = qSafe + "_" + i;
+            checkbox.style.display = 'none'; // Hidden
+            
+            // Add to the form
+            const form = document.querySelector('form') || document.body;
+            form.appendChild(checkbox);
+        }
+        
+        // Update the checked state based on the selected count
+        checkbox.checked = i <= selectedCount;
+    }
+}
 
 // Handle linked dropdown logic
 function handleLinkedDropdowns(sourceName, selectedValue) {
@@ -3583,6 +3727,61 @@ function handleNext(currentSection){
 
 
 /*------------------------------------------------------------------
+ *  resetHiddenQuestionsToDefaults(sectionNumber)
+ *  – resets hidden questions in the current section to their default values
+ *    This prevents Firebase autosave from keeping values for questions
+ *    that are hidden due to conditional logic
+ *-----------------------------------------------------------------*/
+function resetHiddenQuestionsToDefaults(sectionNumber) {
+    // Get the current section
+    const currentSection = document.getElementById('section' + sectionNumber);
+    if (!currentSection) {
+        console.log('Reset function: Section not found for section', sectionNumber);
+        return;
+    }
+    
+    // Find all hidden question containers in this section
+    const hiddenQuestions = currentSection.querySelectorAll('.question-container.hidden');
+    
+    if (hiddenQuestions.length === 0) {
+        console.log('Reset function: No hidden questions found in section', sectionNumber);
+        return;
+    }
+    
+    console.log('Reset function: Found', hiddenQuestions.length, 'hidden questions in section', sectionNumber);
+    
+    hiddenQuestions.forEach((questionContainer, index) => {
+        // Get all form elements within this hidden question
+        const formElements = questionContainer.querySelectorAll('input, select, textarea');
+        
+        formElements.forEach(element => {
+            const elementName = element.name || element.id || 'unnamed';
+            const oldValue = element.value || element.checked;
+            
+            if (element.tagName === 'SELECT') {
+                // Reset dropdown to default "Select an option"
+                element.value = '';
+                // Find the default option and set it as selected
+                const defaultOption = element.querySelector('option[disabled][selected]');
+                if (defaultOption) {
+                    defaultOption.selected = true;
+                }
+                console.log('Reset function: Reset dropdown', elementName, 'from', oldValue, 'to default');
+            } else if (element.type === 'checkbox' || element.type === 'radio') {
+                // Reset checkboxes and radio buttons to unchecked
+                element.checked = false;
+                console.log('Reset function: Reset', element.type, elementName, 'from', oldValue, 'to false');
+            } else if (element.type === 'text' || element.type === 'email' || element.type === 'tel' || 
+                      element.type === 'number' || element.type === 'date' || element.tagName === 'TEXTAREA') {
+                // Reset text inputs to empty
+                element.value = '';
+                console.log('Reset function: Reset', element.type || 'textarea', elementName, 'from', oldValue, 'to empty');
+            }
+        });
+    });
+}
+
+/*------------------------------------------------------------------
  *  navigateSection(sectionNumber)
  *  – shows exactly one section (or Thank‑you) and records history
  *-----------------------------------------------------------------*/
@@ -3617,6 +3816,10 @@ function navigateSection(sectionNumber){
     (target || sections[maxSection - 1]).classList.add('active');
 
     currentSectionNumber = sectionNumber;
+    
+    // Reset hidden questions to default values after Firebase autosave
+    resetHiddenQuestionsToDefaults(sectionNumber);
+    
     updateProgressBar();
 }
 
@@ -3721,8 +3924,14 @@ function showThankYouMessage (event) {
 
 /*──── process all PDFs sequentially ────*/
 async function processAllPdfs() {
+    console.log('🔧 [PDF DEBUG] processAllPdfs() called');
+    console.log('🔧 [PDF DEBUG] pdfOutputFileName:', pdfOutputFileName);
+    console.log('🔧 [PDF DEBUG] conditionalPDFs:', conditionalPDFs);
+    console.log('🔧 [PDF DEBUG] pdfLogicPDFs:', pdfLogicPDFs);
+    
     // Process main PDFs - use the actual PDF filename, not the form name
     if (pdfOutputFileName) {
+        console.log('🔧 [PDF DEBUG] Processing main PDF:', pdfOutputFileName);
         // Remove .pdf extension if present since server adds it automatically
         const baseName = pdfOutputFileName.replace(/\.pdf$/i, '');
         await editAndDownloadPDF(baseName);
@@ -3825,15 +4034,19 @@ async function processAllPdfs() {
 
 // Manual PDF download function (called when user clicks "Download PDF" button)
 async function downloadAllPdfs() {
+    console.log('🔧 [PDF DEBUG] downloadAllPdfs() called');
     try {
         // Show loading state
         const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
+        console.log('🔧 [PDF DEBUG] Download button found:', !!downloadButton);
         if (downloadButton) {
             downloadButton.textContent = 'Processing...';
             downloadButton.disabled = true;
         }
         
+        console.log('🔧 [PDF DEBUG] Calling processAllPdfs()...');
         await processAllPdfs();
+        console.log('🔧 [PDF DEBUG] processAllPdfs() completed successfully');
         
         // Reset button
         if (downloadButton) {
@@ -3841,7 +4054,7 @@ async function downloadAllPdfs() {
             downloadButton.disabled = false;
         }
     } catch (error) {
-        console.error('Error downloading PDFs:', error);
+        console.error('🔧 [PDF DEBUG] Error downloading PDFs:', error);
         // Reset button on error
         const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
         if (downloadButton) {
@@ -3854,32 +4067,57 @@ async function downloadAllPdfs() {
 /*──── build FormData with **everything inside the form** ────*/
 async function editAndDownloadPDF (pdfName) {
     try {
+        console.log('🔧 [PDF DEBUG] Starting PDF processing for:', pdfName);
+        
         /* this grabs every control that belongs to <form id="customForm">,
            including those specified with form="customForm" attributes   */
         const fd = new FormData(document.getElementById('customForm'));
+        console.log('🔧 [PDF DEBUG] FormData created with', fd.entries().length, 'entries');
 
         // Use the /edit_pdf endpoint with the PDF name as a query parameter
         // Remove the .pdf extension if present since server adds it automatically
         const baseName = pdfName.replace(/\.pdf$/i, '');
-        const res = await fetch('/edit_pdf?pdf=' + encodeURIComponent(baseName), { 
+        const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
+        console.log('🔧 [PDF DEBUG] Making request to:', endpoint);
+        
+        const res = await fetch(endpoint, { 
             method: 'POST', 
             body: fd 
         });
         
+        console.log('🔧 [PDF DEBUG] Response status:', res.status, 'OK:', res.ok);
+        console.log('🔧 [PDF DEBUG] Response headers:', Object.fromEntries(res.headers.entries()));
+        
         if (!res.ok) {
-            throw new Error("HTTP error! status: " + res.status);
+            const errorText = await res.text();
+            console.error('🔧 [PDF DEBUG] Server error response:', errorText);
+            throw new Error("HTTP error! status: " + res.status + " - " + errorText);
         }
         
         const blob = await res.blob();
+        console.log('🔧 [PDF DEBUG] Blob created, size:', blob.size, 'type:', blob.type);
+        
+        if (blob.size === 0) {
+            throw new Error("Received empty PDF blob from server");
+        }
+        
         const url = URL.createObjectURL(blob);
+        console.log('🔧 [PDF DEBUG] Object URL created:', url);
 
         // Trigger download
         const a = document.createElement('a');
         a.href = url;
         a.download = 'Edited_' + pdfName;
+        console.log('🔧 [PDF DEBUG] Triggering download for:', a.download);
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        
+        // Clean up the object URL after a delay
+        setTimeout(() => {
+            URL.revokeObjectURL(url);
+            console.log('🔧 [PDF DEBUG] Object URL cleaned up');
+        }, 1000);
 
         // inline preview - only show the last one
         const frame = document.getElementById('pdfFrame');
@@ -4357,8 +4595,11 @@ if (typeof handleNext === 'function') {
         const urlParams = new URLSearchParams(window.location.search);
         const baseFormId = urlParams.get('formId') || window.formId || 'default';
         const county = urlParams.get('county') || '';
-        // Create a unique form ID that includes county information for autosave separation
-        const formId = county ? baseFormId + '_' + county.replace(/\s+/g, '_') : baseFormId;
+        const portfolioId = urlParams.get('portfolioId') || '';
+        // Create a unique form ID that includes county and portfolio information for autosave separation
+        let formId = baseFormId;
+        if (county) formId += '_' + county.replace(/\s+/g, '_');
+        if (portfolioId) formId += '_' + portfolioId;
         let userId = null;
         let isUserLoggedIn = false;
 
@@ -4367,13 +4608,18 @@ if (typeof handleNext === 'function') {
         // Helper: get all form fields to save
         function getFormFields() {
             const form = document.getElementById('customForm');
-            if (!form) return [];
-            return Array.from(form.elements).filter(el =>
+            if (!form) {
+                console.log('🔧 [GETFORMFIELDS DEBUG] Form not found');
+                return [];
+            }
+            const fields = Array.from(form.elements).filter(el =>
                 el.name &&
                 !el.disabled &&
                 ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) &&
                 !['hidden', 'button', 'submit', 'reset'].includes(el.type)
             );
+            console.log('🔧 [GETFORMFIELDS DEBUG] Found', fields.length, 'form fields:', fields.map(f => f.name + '=' + f.value));
+            return fields;
         }
 
         // Helper: save answers
@@ -4388,30 +4634,86 @@ if (typeof handleNext === 'function') {
                     answers[el.name] = el.value;
                 }
             });
+            
+   
+            
             await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
+            
+            
         }
 
         // Helper: load answers
         async function loadAnswers() {
-            if (!isUserLoggedIn || !userId) return;
+            console.log('🔧 [AUTOFILL DEBUG] loadAnswers() called - isUserLoggedIn:', isUserLoggedIn, 'userId:', userId, 'formId:', formId);
+            if (!isUserLoggedIn || !userId) {
+                console.log('🔧 [AUTOFILL DEBUG] Skipping loadAnswers - user not logged in or no userId');
+                return;
+            }
             try {
+                // First, try to load user profile data from a user profile document
+                console.log('🔧 [AUTOFILL DEBUG] Attempting to fetch user profile data...');
+                const userProfileDoc = await db.collection('users').doc(userId).get();
+                console.log('🔧 [AUTOFILL DEBUG] User profile document exists:', userProfileDoc.exists);
+                
+                let userProfileData = {};
+                if (userProfileDoc.exists) {
+                    userProfileData = userProfileDoc.data();
+                    console.log('🔧 [AUTOFILL DEBUG] User profile data loaded:', userProfileData);
+                }
+                
+                // Then, try to load form-specific data
+                console.log('🔧 [AUTOFILL DEBUG] Attempting to fetch Firebase document for formId:', formId);
                 const doc = await db.collection('users').doc(userId).collection('formAnswers').doc(formId).get();
+                console.log('🔧 [AUTOFILL DEBUG] Firebase document exists:', doc.exists);
+                
+                let formData = {};
                 if (doc.exists) {
-                    const data = doc.data();
+                    formData = doc.data();
+                    console.log('🔧 [AUTOFILL DEBUG] Form data loaded:', formData);
+                }
+                
+                // Combine user profile data with form data
+                const data = { ...userProfileData, ...formData };
+                console.log('🔧 [AUTOFILL DEBUG] Combined data (user profile + form):', data);
+                
+                // Helper function to map Firebase data to form field names
+                function mapFirebaseDataToFormFields(firebaseData) {
+                    const mappedData = { ...firebaseData };
+                    
+                    // Map user info fields from Firebase structure to form field names
+                    if (firebaseData.firstName) mappedData.user_firstname = firebaseData.firstName;
+                    if (firebaseData.lastName) mappedData.user_lastname = firebaseData.lastName;
+                    if (firebaseData.email) mappedData.user_email = firebaseData.email;
+                    if (firebaseData.phone) mappedData.user_phone = firebaseData.phone;
+                    
+                    // Map address fields
+                    if (firebaseData.address) {
+                        if (firebaseData.address.street) mappedData.user_street = firebaseData.address.street;
+                        if (firebaseData.address.city) mappedData.user_city = firebaseData.address.city;
+                        if (firebaseData.address.state) mappedData.user_state = firebaseData.address.state;
+                        if (firebaseData.address.zip) mappedData.user_zip = firebaseData.address.zip;
+                    }
+                    
+                    console.log('🔧 [AUTOFILL DEBUG] Mapped data for form fields:', mappedData);
+                    return mappedData;
+                }
+                
+                const mappedData = mapFirebaseDataToFormFields(data);
                     const fields = getFormFields();
                     fields.forEach(el => {
-                        if (data.hasOwnProperty(el.name)) {
+                    if (mappedData.hasOwnProperty(el.name)) {
                             // Check if this answer would trigger a jump to the end
-                            if (wouldTriggerJumpToEnd(el, data[el.name])) {
+                        if (wouldTriggerJumpToEnd(el, mappedData[el.name])) {
                                 // Don't autofill this answer - keep it as default
                                 console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
                                 return;
                             }
                             
+                        console.log('🔧 [AUTOFILL DEBUG] Autofilling field:', el.name, 'with value:', mappedData[el.name]);
                             if (el.type === 'checkbox' || el.type === 'radio') {
-                                el.checked = !!data[el.name];
+                            el.checked = !!mappedData[el.name];
                             } else {
-                                el.value = data[el.name];
+                            el.value = mappedData[el.name];
                             }
                         }
                     });
@@ -4421,10 +4723,69 @@ if (typeof handleNext === 'function') {
                         if (typeof triggerVisibilityUpdates === 'function') {
                             triggerVisibilityUpdates();
                         }
+                    
+                    // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
+                    fields.forEach(el => {
+                        if (el.tagName === 'SELECT' && el.id.startsWith('answer') && el.value) {
+                            const questionId = el.id.replace('answer', '');
+                            if (typeof showTextboxLabels === 'function') {
+                                showTextboxLabels(questionId, el.value);
+                            }
+                            if (typeof updateHiddenCheckboxes === 'function') {
+                                updateHiddenCheckboxes(questionId, el.value);
+                            }
+                        }
+                    });
+                    
+                    // Second autofill pass for dynamically generated textbox inputs
+                    // Use a longer delay to ensure textbox inputs are fully generated
+                    setTimeout(() => {
+                        console.log('🔧 [AUTOFILL DEBUG] Starting second autofill pass for dynamically generated inputs');
+                        const allFields = getFormFields();
+                        console.log('🔧 [AUTOFILL DEBUG] Found', allFields.length, 'total form fields');
+                        
+                        // Also try to find fields by ID directly as a fallback
+                        const fieldsById = {};
+                        allFields.forEach(el => {
+                            if (el.id) {
+                                fieldsById[el.id] = el;
+                            }
+                        });
+                        
+                        allFields.forEach(el => {
+                            if (mappedData.hasOwnProperty(el.name)) {
+                                console.log('🔧 [AUTOFILL DEBUG] Autofilling field:', el.name, 'with value:', mappedData[el.name]);
+                                if (el.type === 'checkbox' || el.type === 'radio') {
+                                    el.checked = !!mappedData[el.name];
+                                } else {
+                                    el.value = mappedData[el.name];
+                                    console.log('🔧 [AUTOFILL DEBUG] Set value for', el.name, 'to:', el.value);
+                                }
+                            }
+                        });
+                        
+                        // Additional pass: try to autofill by ID for any fields that might have been missed
+                        Object.keys(mappedData).forEach(fieldName => {
+                            const fieldById = fieldsById[fieldName];
+                            if (fieldById && !fieldById.value && mappedData[fieldName]) {
+                                console.log('🔧 [AUTOFILL DEBUG] Additional autofill by ID for:', fieldName, 'with value:', mappedData[fieldName]);
+                                if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
+                                    fieldById.checked = !!mappedData[fieldName];
+                                } else {
+                                    fieldById.value = mappedData[fieldName];
+                                    console.log('🔧 [AUTOFILL DEBUG] Set value by ID for', fieldName, 'to:', fieldById.value);
+                                }
+                            }
+                        });
+                    }, 1500);
+                    
+                        // Reset hidden questions to defaults after autofill and visibility updates
+                        if (typeof currentSectionNumber === 'number') {
+                            resetHiddenQuestionsToDefaults(currentSectionNumber);
+                        }
                     }, 100);
-                }
             } catch (e) {
-                // ignore
+                console.log('🔧 [AUTOFILL DEBUG] Error in loadAnswers:', e);
             }
         }
         
@@ -4475,9 +4836,45 @@ if (typeof handleNext === 'function') {
         function attachAutosaveListeners() {
             const fields = getFormFields();
             fields.forEach(el => {
-                el.addEventListener('input', saveAnswers);
-                el.addEventListener('change', saveAnswers);
+                el.addEventListener('input', function() {
+                    if (isUserLoggedIn) {
+                        saveAnswers();
+                    } else {
+                        saveAnswersToLocalStorage();
+                    }
+                    
+                    // Update full name if first or last name changed
+                    if (el.id === 'user_firstname' || el.id === 'user_lastname') {
+                        if (typeof updateUserFullName === 'function') {
+                            updateUserFullName();
+                        }
+                    }
+                });
+                el.addEventListener('change', function() {
+                    if (isUserLoggedIn) {
+                        saveAnswers();
+                    } else {
+                        saveAnswersToLocalStorage();
+                    }
+                    
+                    // Update full name if first or last name changed
+                    if (el.id === 'user_firstname' || el.id === 'user_lastname') {
+                        if (typeof updateUserFullName === 'function') {
+                            updateUserFullName();
+                        }
+                    }
+                });
             });
+            
+            // Set up periodic autosave every 2 seconds
+            setInterval(() => {
+                console.log('🔄 [PERIODIC AUTOSAVE] Triggering periodic save every 2 seconds');
+                if (isUserLoggedIn) {
+                    saveAnswers();
+                } else {
+                    saveAnswersToLocalStorage();
+                }
+            }, 2000);
         }
         
 
@@ -4508,11 +4905,126 @@ if (typeof handleNext === 'function') {
         
         // Cart Modal Logic - now handled by global functions outside Firebase IIFE
 
+        // Helper: save answers to localStorage for non-logged-in users
+        function saveAnswersToLocalStorage() {
+            try {
+                const fields = getFormFields();
+                const answers = {};
+                fields.forEach(el => {
+                    if (el.type === 'checkbox' || el.type === 'radio') {
+                        answers[el.name] = el.checked;
+                    } else {
+                        answers[el.name] = el.value;
+                    }
+                });
+                
+                localStorage.setItem('formData_' + formId, JSON.stringify(answers));
+            } catch (e) {
+                console.log('Error saving to localStorage:', e);
+            }
+        }
+
+        // Helper: load answers from localStorage for non-logged-in users
+        function loadAnswersFromLocalStorage() {
+            try {
+                const savedData = localStorage.getItem('formData_' + formId);
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] localStorage data loaded:', data);
+                    const fields = getFormFields();
+                    fields.forEach(el => {
+                        if (data.hasOwnProperty(el.name)) {
+                            console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Autofilling field:', el.name, 'with value:', data[el.name]);
+                            if (el.type === 'checkbox' || el.type === 'radio') {
+                                el.checked = !!data[el.name];
+                            } else {
+                                el.value = data[el.name];
+                            }
+                        }
+                    });
+                    
+                    // Update full name after autofilling with delay to ensure DOM is ready
+                    setTimeout(() => {
+                        if (typeof updateUserFullName === 'function') {
+                            updateUserFullName();
+                        }
+                    }, 2000);
+                    
+                    // Trigger visibility updates for dependent questions
+                    setTimeout(() => {
+                        if (typeof triggerVisibilityUpdates === 'function') {
+                            triggerVisibilityUpdates();
+                        }
+                        
+                        // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
+                        const fields = getFormFields();
+                        fields.forEach(el => {
+                            if (el.tagName === 'SELECT' && el.id.startsWith('answer') && el.value) {
+                                const questionId = el.id.replace('answer', '');
+                                if (typeof showTextboxLabels === 'function') {
+                                    showTextboxLabels(questionId, el.value);
+                                }
+                                if (typeof updateHiddenCheckboxes === 'function') {
+                                    updateHiddenCheckboxes(questionId, el.value);
+                                }
+                            }
+                        });
+                        
+                        // Second autofill pass for dynamically generated textbox inputs
+                        // Use a longer delay to ensure textbox inputs are fully generated
+                        setTimeout(() => {
+                            console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Starting second autofill pass for dynamically generated inputs');
+                            const allFields = getFormFields();
+                            console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Found', allFields.length, 'total form fields');
+                            
+                            // Also try to find fields by ID directly as a fallback
+                            const fieldsById = {};
+                            allFields.forEach(el => {
+                                if (el.id) {
+                                    fieldsById[el.id] = el;
+                                }
+                            });
+                            
+                            allFields.forEach(el => {
+                                if (data.hasOwnProperty(el.name)) {
+                                    console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Autofilling field:', el.name, 'with value:', data[el.name]);
+                                    if (el.type === 'checkbox' || el.type === 'radio') {
+                                        el.checked = !!data[el.name];
+                                    } else {
+                                        el.value = data[el.name];
+                                        console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Set value for', el.name, 'to:', el.value);
+                                    }
+                                }
+                            });
+                            
+                            // Additional pass: try to autofill by ID for any fields that might have been missed
+                            Object.keys(data).forEach(fieldName => {
+                                const fieldById = fieldsById[fieldName];
+                                if (fieldById && !fieldById.value && data[fieldName]) {
+                                    console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Additional autofill by ID for:', fieldName, 'with value:', data[fieldName]);
+                                    if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
+                                        fieldById.checked = !!data[fieldName];
+                                    } else {
+                                        fieldById.value = data[fieldName];
+                                        console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Set value by ID for', fieldName, 'to:', fieldById.value);
+                                    }
+                                }
+                            });
+                        }, 1500);
+                    }, 200);
+                }
+            } catch (e) {
+                console.log('No localStorage data found or error loading:', e);
+            }
+        }
+
         // On auth state change
         firebase.auth().onAuthStateChanged(function(user) {
+            console.log('🔧 [AUTH DEBUG] Firebase auth state changed - user:', user ? 'logged in' : 'not logged in', 'userId:', user ? user.uid : 'none');
             isUserLoggedIn = !!user;
             userId = user ? user.uid : null;
             if (isUserLoggedIn) {
+                console.log('🔧 [AUTH DEBUG] User is logged in, checking for payment success...');
                 const params = new URLSearchParams(window.location.search);
                 if (params.get('payment') === 'success') {
                     console.log('Payment successful! Processing PDF...');
@@ -4524,8 +5036,14 @@ if (typeof handleNext === 'function') {
                         });
                     });
                 } else {
+                    console.log('🔧 [AUTH DEBUG] No payment success, calling loadAnswers()...');
                     loadAnswers().then(attachAutosaveListeners);
                 }
+            } else {
+                console.log('🔧 [AUTH DEBUG] User not logged in, trying localStorage...');
+                // For non-logged-in users, try to load from localStorage
+                loadAnswersFromLocalStorage();
+                attachAutosaveListeners();
             }
         });
 
@@ -4879,6 +5397,583 @@ if (typeof handleNext === 'function') {
     });
 
 </script>
+
+<!-- Debug Menu -->
+<div id="debugMenu" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 99999; font-family: 'Montserrat', sans-serif;">
+  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); width: 90%; max-width: 800px; max-height: 80%; overflow: hidden; display: flex; flex-direction: column;">
+    <!-- Header -->
+    <div style="background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; position: relative;">
+      <h2 style="margin: 0; font-size: 1.5em; font-weight: 700;">🔍 Form Debug Menu</h2>
+      <button id="closeDebugMenu" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: white; font-size: 1.5em; cursor: pointer; padding: 5px; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">&times;</button>
+    </div>
+    
+    <!-- Search Bar -->
+    <div style="padding: 20px; border-bottom: 1px solid #eee;">
+      <input type="text" id="debugSearch" placeholder="Search inputs by name, ID, or value..." style="width: 100%; padding: 12px 16px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+      <div style="text-align: center; margin-top: 10px;">
+        <button id="exportNamesIdsBtn" style="background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3);">
+          📋 Export Names/IDs
+        </button>
+      </div>
+    </div>
+    
+    <!-- Content -->
+    <div id="debugContent" style="flex: 1; overflow-y: auto; padding: 20px;">
+      <!-- Content will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<script>
+// Debug Menu Functionality
+let debugMenuVisible = false;
+
+// Show debug menu on Ctrl+Shift
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.shiftKey && !debugMenuVisible) {
+    e.preventDefault();
+    showDebugMenu();
+  }
+});
+
+// Close debug menu
+document.getElementById('closeDebugMenu').addEventListener('click', hideDebugMenu);
+
+// Close on escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && debugMenuVisible) {
+    hideDebugMenu();
+  }
+});
+
+// Removed click-outside-to-close functionality - user must use X button
+
+function showDebugMenu() {
+  debugMenuVisible = true;
+  document.getElementById('debugMenu').style.display = 'block';
+  populateDebugContent();
+  document.getElementById('debugSearch').focus();
+}
+
+function hideDebugMenu() {
+  debugMenuVisible = false;
+  document.getElementById('debugMenu').style.display = 'none';
+}
+
+// Add virtual checkbox entries for dropdown questions
+function addVirtualDropdownCheckboxes(inputData) {
+  // Find all dropdown/select elements
+  const dropdowns = document.querySelectorAll('select');
+  
+  dropdowns.forEach(dropdown => {
+    if (!dropdown.id) return;
+    
+    // Check if this is a numbered dropdown
+    const isNumberedDropdown = dropdown.id.startsWith('answer') && dropdown.querySelector('option[value="1"]');
+    
+    if (isNumberedDropdown) {
+      // Handle numbered dropdown - generate all possible textbox label combinations
+      addNumberedDropdownVirtualEntries(inputData, dropdown);
+    } else {
+      // Handle regular dropdown - generate checkbox combinations
+      addRegularDropdownVirtualEntries(inputData, dropdown);
+    }
+  });
+}
+
+// Add virtual entries for regular dropdowns (checkbox combinations)
+function addRegularDropdownVirtualEntries(inputData, dropdown) {
+  const baseName = dropdown.id;
+  const options = dropdown.querySelectorAll('option[value]:not([value=""])');
+  
+  options.forEach(option => {
+    const optionValue = option.value.trim();
+    if (!optionValue) return;
+    
+    // Generate checkbox ID using the same pattern as dropdownMirror
+    const idSuffix = optionValue.replace(/\W+/g, "_").toLowerCase();
+    const checkboxId = baseName + "_" + idSuffix;
+    const checkboxName = baseName + "_" + idSuffix;
+    
+    // Check if this virtual checkbox already exists in inputData
+    const exists = inputData.some(item => item.id === checkboxId);
+    
+    if (!exists) {
+      // Check if this checkbox actually exists in the DOM (user selected this option)
+      const actualCheckbox = document.getElementById(checkboxId);
+      const isChecked = actualCheckbox ? actualCheckbox.checked : false;
+      
+      // Add virtual checkbox entry
+      inputData.push({
+        id: checkboxId,
+        name: checkboxName,
+        value: isChecked,
+        type: 'input',
+        inputType: 'checkbox',
+        placeholder: '',
+        required: false,
+        isVirtual: true,
+        dropdownSource: dropdown.id,
+        optionValue: optionValue
+      });
+    }
+  });
+}
+
+// Add virtual entries for numbered dropdowns (textbox label combinations)
+function addNumberedDropdownVirtualEntries(inputData, dropdown) {
+  // Extract question ID from dropdown ID (e.g., "answer123" -> "123")
+  const questionId = dropdown.id.replace('answer', '');
+  
+  // Get the question's Node ID from the question text (this is the base we should use)
+  const questionH3 = document.getElementById("question-container-" + questionId)?.querySelector("h3")?.textContent;
+  const questionNodeId = questionH3 ? sanitizeQuestionText(questionH3) : dropdown.id;
+  
+  // Get the range from the dropdown options
+  const options = dropdown.querySelectorAll('option[value]:not([value=""])');
+  let maxRange = 0;
+  options.forEach(option => {
+    const value = parseInt(option.value);
+    if (!isNaN(value) && value > maxRange) {
+      maxRange = value;
+    }
+  });
+  
+  // Get label information from the global maps
+  const labelVals = labelMap[questionId] || [];
+  const labelNodeIds = window.labelNodeIdsMap && window.labelNodeIdsMap[questionId] ? window.labelNodeIdsMap[questionId] : [];
+  
+  
+  // Generate all possible combinations
+  for (let j = 1; j <= maxRange; j++) {
+    // Add textbox label combinations
+    for (let lblIndex = 0; lblIndex < labelVals.length; lblIndex++) {
+      const lbl = labelVals[lblIndex];
+      const labelNodeId = labelNodeIds[lblIndex] || "";
+      
+      // Use label node ID if provided, otherwise use question Node ID + label + number
+      const id = labelNodeId ? 
+        labelNodeId + "_" + j : 
+        questionNodeId + "_" + j + "_" + sanitizeQuestionText(lbl);
+      
+      // Check if this virtual input already exists in inputData
+      const exists = inputData.some(item => item.id === id);
+      
+      if (!exists) {
+        // Check if this input actually exists in the DOM
+        const actualInput = document.getElementById(id);
+        const value = actualInput ? actualInput.value : '';
+        
+        // Add virtual input entry
+        inputData.push({
+          id: id,
+          name: id,
+          value: value,
+          type: 'input',
+          inputType: 'text',
+          placeholder: lbl + ' ' + j,
+          required: false,
+          isVirtual: true,
+          dropdownSource: dropdown.id,
+          optionValue: j.toString(),
+          labelText: lbl
+        });
+      }
+    }
+    
+    // Add hidden checkbox combinations (for the numbered dropdown hidden checkboxes)
+    const checkboxId = questionNodeId + "_" + j;
+    const checkboxExists = inputData.some(item => item.id === checkboxId);
+    
+    if (!checkboxExists) {
+      // Check if this checkbox actually exists in the DOM
+      const actualCheckbox = document.getElementById(checkboxId);
+      const isChecked = actualCheckbox ? actualCheckbox.checked : false;
+      
+      // Add virtual checkbox entry
+      inputData.push({
+        id: checkboxId,
+        name: checkboxId,
+        value: isChecked,
+        type: 'input',
+        inputType: 'checkbox',
+        placeholder: '',
+        required: false,
+        isVirtual: true,
+        dropdownSource: dropdown.id,
+        optionValue: j.toString(),
+        labelText: 'Hidden checkbox for option ' + j
+      });
+    }
+  }
+}
+
+function populateDebugContent() {
+  const content = document.getElementById('debugContent');
+  const searchTerm = document.getElementById('debugSearch').value.toLowerCase();
+  
+  // Get all form inputs
+  const inputs = document.querySelectorAll('input, select, textarea');
+  const inputData = [];
+  
+  inputs.forEach(input => {
+    // Include all inputs that have either an ID or a name (or both)
+    if (input.id || input.name) {
+      const value = input.type === 'checkbox' ? input.checked : input.value;
+      const type = input.tagName.toLowerCase();
+      const inputType = input.type || 'text';
+      
+      inputData.push({
+        id: input.id || '',
+        name: input.name || '',
+        value: value,
+        type: type,
+        inputType: inputType,
+        placeholder: input.placeholder || '',
+        required: input.required
+      });
+    }
+  });
+  
+  // Add virtual checkbox entries for dropdown questions
+  addVirtualDropdownCheckboxes(inputData);
+  
+  // Filter by search term with bidirectional space/underscore normalization
+  const normalizedSearchTermUnderscore = searchTerm.replace(/[_\s]/g, '_');
+  const normalizedSearchTermSpace = searchTerm.replace(/[_\s]/g, ' ');
+  
+  const filteredData = inputData.filter(item => {
+    const normalizedIdUnderscore = item.id.toLowerCase().replace(/[_\s]/g, '_');
+    const normalizedNameUnderscore = item.name.toLowerCase().replace(/[_\s]/g, '_');
+    const normalizedValueUnderscore = String(item.value).toLowerCase().replace(/[_\s]/g, '_');
+    const normalizedPlaceholderUnderscore = item.placeholder.toLowerCase().replace(/[_\s]/g, '_');
+    
+    const normalizedIdSpace = item.id.toLowerCase().replace(/[_\s]/g, ' ');
+    const normalizedNameSpace = item.name.toLowerCase().replace(/[_\s]/g, ' ');
+    const normalizedValueSpace = String(item.value).toLowerCase().replace(/[_\s]/g, ' ');
+    const normalizedPlaceholderSpace = item.placeholder.toLowerCase().replace(/[_\s]/g, ' ');
+    
+    // Check all combinations: underscore search vs underscore data, space search vs space data, and cross-matches
+    return normalizedIdUnderscore.includes(normalizedSearchTermUnderscore) ||
+           normalizedNameUnderscore.includes(normalizedSearchTermUnderscore) ||
+           normalizedValueUnderscore.includes(normalizedSearchTermUnderscore) ||
+           normalizedPlaceholderUnderscore.includes(normalizedSearchTermUnderscore) ||
+           normalizedIdSpace.includes(normalizedSearchTermSpace) ||
+           normalizedNameSpace.includes(normalizedSearchTermSpace) ||
+           normalizedValueSpace.includes(normalizedSearchTermSpace) ||
+           normalizedPlaceholderSpace.includes(normalizedSearchTermSpace) ||
+           // Cross-matches: underscore search vs space data
+           normalizedIdSpace.includes(normalizedSearchTermUnderscore) ||
+           normalizedNameSpace.includes(normalizedSearchTermUnderscore) ||
+           normalizedValueSpace.includes(normalizedSearchTermUnderscore) ||
+           normalizedPlaceholderSpace.includes(normalizedSearchTermUnderscore) ||
+           // Cross-matches: space search vs underscore data
+           normalizedIdUnderscore.includes(normalizedSearchTermSpace) ||
+           normalizedNameUnderscore.includes(normalizedSearchTermSpace) ||
+           normalizedValueUnderscore.includes(normalizedSearchTermSpace) ||
+           normalizedPlaceholderUnderscore.includes(normalizedSearchTermSpace) ||
+           // Original exact matches for backward compatibility
+    item.id.toLowerCase().includes(searchTerm) ||
+    item.name.toLowerCase().includes(searchTerm) ||
+    String(item.value).toLowerCase().includes(searchTerm) ||
+           item.placeholder.toLowerCase().includes(searchTerm);
+  });
+  
+  // Group by type
+  const grouped = {
+    text: [],
+    email: [],
+    tel: [],
+    number: [],
+    date: [],
+    select: [],
+    textarea: [],
+    checkbox: [],
+    radio: [],
+    other: []
+  };
+  
+  filteredData.forEach(item => {
+    if (item.inputType === 'text' || item.inputType === 'email' || item.inputType === 'tel' || item.inputType === 'number' || item.inputType === 'date') {
+      grouped[item.inputType].push(item);
+    } else if (item.type === 'select') {
+      grouped.select.push(item);
+    } else if (item.type === 'textarea') {
+      grouped.textarea.push(item);
+    } else if (item.inputType === 'checkbox') {
+      grouped.checkbox.push(item);
+    } else if (item.inputType === 'radio') {
+      grouped.radio.push(item);
+    } else {
+      grouped.other.push(item);
+    }
+  });
+  
+  // Generate HTML
+  let html = '';
+  
+  const typeLabels = {
+    text: '📝 Text Inputs',
+    email: '📧 Email Inputs', 
+    tel: '📞 Phone Inputs',
+    number: '🔢 Number Inputs',
+    date: '📅 Date Inputs',
+    select: '📋 Dropdowns',
+    textarea: '📄 Text Areas',
+    checkbox: '☑️ Checkboxes',
+    radio: '🔘 Radio Buttons',
+    other: '❓ Other Inputs'
+  };
+  
+  Object.keys(grouped).forEach(type => {
+    if (grouped[type].length > 0) {
+      html += '<div style="margin-bottom: 30px;">';
+      html += '<h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 1.2em; border-bottom: 2px solid #e0e7ef; padding-bottom: 8px;">' + typeLabels[type] + ' (' + grouped[type].length + ')</h3>';
+      
+      grouped[type].forEach(item => {
+        const valueDisplay = item.value === '' ? '<em style="color: #999;">(empty)</em>' : 
+                           item.value === true ? '<span style="color: #38d39f;">✓ checked</span>' :
+                           item.value === false ? '<span style="color: #e74c3c;">✗ unchecked</span>' :
+                           '<span style="color: #2c3e50;">' + String(item.value).substring(0, 100) + (String(item.value).length > 100 ? '...' : '') + '</span>';
+        
+        const requiredBadge = item.required ? '<span style="background: #e74c3c; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 8px;">REQUIRED</span>' : '';
+        const virtualBadge = item.isVirtual ? '<span style="background: #4f8cff; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 8px;">VIRTUAL</span>' : '';
+        
+        // Determine the primary identifier (ID if available, otherwise name)
+        const primaryId = item.id || item.name || 'unnamed';
+        const displayId = item.id || '<em style="color: #999;">(no ID)</em>';
+        const displayName = item.name || '<em style="color: #999;">(no name)</em>';
+        
+        html += '<div class="debug-entry" data-id="' + primaryId + '" style="background: #f8faff; border: 1px solid #e0e7ef; border-radius: 8px; padding: 15px; margin-bottom: 10px; transition: all 0.3s ease; cursor: pointer; position: relative;">' +
+          '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">' +
+            '<div style="flex: 1; min-width: 0;">' +
+              '<strong style="color: #2c3e50; font-size: 1.1em; word-break: break-all; line-height: 1.3; display: block;">' + displayId + '</strong>' +
+              requiredBadge + virtualBadge +
+            '</div>' +
+            '<span style="background: #e0e7ef; color: #2c3e50; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; flex-shrink: 0; white-space: nowrap;">' + item.inputType + '</span>' +
+          '</div>' +
+          '<div style="margin-bottom: 5px;">' +
+            '<span style="color: #666; font-size: 0.9em;">Name: </span>' +
+            '<code style="background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; word-break: break-all; display: inline-block; max-width: 100%;">' + displayName + '</code>' +
+          '</div>' +
+          (item.placeholder ? '<div style="margin-bottom: 5px;"><span style="color: #666; font-size: 0.9em;">Placeholder: </span><span style="color: #999;">' + item.placeholder + '</span></div>' : '') +
+          (item.isVirtual && item.dropdownSource ? '<div style="margin-bottom: 5px;"><span style="color: #666; font-size: 0.9em;">From Dropdown: </span><span style="color: #4f8cff; font-weight: bold;">' + item.dropdownSource + '</span> → <span style="color: #2c3e50;">' + item.optionValue + '</span></div>' : '') +
+          '<div>' +
+            '<span style="color: #666; font-size: 0.9em;">Value: </span>' +
+            valueDisplay +
+          '</div>' +
+          '<div class="copy-indicator" style="position: absolute; top: 10px; right: 10px; background: #38d39f; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; opacity: 0; transform: scale(0.8); transition: all 0.3s ease;">COPIED!</div>' +
+        '</div>';
+      });
+      
+      html += '</div>';
+    }
+  });
+  
+  if (html === '') {
+    html = '<div style="text-align: center; color: #666; padding: 40px;"><p>No inputs found matching your search.</p></div>';
+  }
+  
+  content.innerHTML = html;
+  
+  // Add click event listeners to debug entries
+  const debugEntries = content.querySelectorAll('.debug-entry');
+  debugEntries.forEach(entry => {
+    entry.addEventListener('click', function() {
+      const id = this.getAttribute('data-id');
+      copyToClipboard(id, this);
+    });
+    
+    // Add hover effects
+    entry.addEventListener('mouseenter', function() {
+      this.style.background = '#f0f8ff';
+      this.style.borderColor = '#4f8cff';
+      this.style.transform = 'translateY(-2px)';
+      this.style.boxShadow = '0 4px 12px rgba(79, 140, 255, 0.15)';
+    });
+    
+    entry.addEventListener('mouseleave', function() {
+      this.style.background = '#f8faff';
+      this.style.borderColor = '#e0e7ef';
+      this.style.transform = 'translateY(0)';
+      this.style.boxShadow = 'none';
+    });
+  });
+}
+
+// Copy to clipboard function
+function copyToClipboard(text, element) {
+  // Remove any existing copy highlights
+  const allEntries = document.querySelectorAll('.debug-entry');
+  allEntries.forEach(entry => {
+    entry.style.background = '#f8faff';
+    entry.style.borderColor = '#e0e7ef';
+    entry.style.borderWidth = '1px';
+    const indicator = entry.querySelector('.copy-indicator');
+    if (indicator) {
+      indicator.style.opacity = '0';
+      indicator.style.transform = 'scale(0.8)';
+    }
+  });
+  
+  // Highlight the clicked entry
+  element.style.background = '#e8f5e8';
+  element.style.borderColor = '#38d39f';
+  element.style.borderWidth = '2px';
+  
+  // Show copy indicator
+  const copyIndicator = element.querySelector('.copy-indicator');
+  if (copyIndicator) {
+    copyIndicator.style.opacity = '1';
+    copyIndicator.style.transform = 'scale(1)';
+  }
+  
+  // Copy to clipboard
+  if (navigator.clipboard && window.isSecureContext) {
+    // Use modern clipboard API
+    navigator.clipboard.writeText(text).then(() => {
+      console.log('Copied to clipboard:', text);
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+      fallbackCopyToClipboard(text);
+    });
+  } else {
+    // Fallback for older browsers
+    fallbackCopyToClipboard(text);
+  }
+  
+  // Reset highlight after 2 seconds
+  setTimeout(() => {
+    element.style.background = '#f8faff';
+    element.style.borderColor = '#e0e7ef';
+    element.style.borderWidth = '1px';
+    if (copyIndicator) {
+      copyIndicator.style.opacity = '0';
+      copyIndicator.style.transform = 'scale(0.8)';
+    }
+  }, 2000);
+}
+
+// Fallback copy function for older browsers
+function fallbackCopyToClipboard(text) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-999999px';
+  textArea.style.top = '-999999px';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  
+  try {
+    document.execCommand('copy');
+    console.log('Copied to clipboard (fallback):', text);
+  } catch (err) {
+    console.error('Fallback copy failed: ', err);
+  }
+  
+  document.body.removeChild(textArea);
+}
+
+// Export Names/IDs function
+function exportNamesAndIds() {
+  const formData = {
+    exportDate: new Date().toISOString(),
+    formTitle: document.title || 'Form Data',
+    inputs: []
+  };
+  
+  // Get all form inputs
+  const inputs = document.querySelectorAll('input, select, textarea');
+  
+  inputs.forEach((input, index) => {
+    // Only include inputs that have an ID
+    if (input.id) {
+      const inputData = {
+        id: input.id
+      };
+      formData.inputs.push(inputData);
+    }
+  });
+  
+  // Create and download JSON file
+  const jsonString = JSON.stringify(formData, null, 2);
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'form-names-ids-' + new Date().toISOString().split('T')[0] + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  // Show success message
+  const button = document.getElementById('exportNamesIdsBtn');
+  const originalText = button.textContent;
+  button.textContent = '✅ Exported!';
+  button.style.background = 'linear-gradient(90deg, #38d39f 0%, #4f8cff 100%)';
+  
+  setTimeout(() => {
+    button.textContent = originalText;
+    button.style.background = 'linear-gradient(90deg, #4f8cff 0%, #38d39f 100%)';
+  }, 2000);
+}
+
+// Search functionality
+document.getElementById('debugSearch').addEventListener('input', populateDebugContent);
+
+// Export Names/IDs functionality
+document.getElementById('exportNamesIdsBtn').addEventListener('click', exportNamesAndIds);
+
+// Update content when form values change
+document.addEventListener('input', function() {
+  if (debugMenuVisible) {
+    populateDebugContent();
+  }
+});
+
+document.addEventListener('change', function() {
+  if (debugMenuVisible) {
+    populateDebugContent();
+  }
+});
+
+// Function to update user full name
+function updateUserFullName() {
+  const firstName = document.getElementById('user_firstname')?.value || '';
+  const lastName = document.getElementById('user_lastname')?.value || '';
+  const fullNameField = document.getElementById('user_fullname');
+  
+  if (fullNameField) {
+    // Simply combine first and last name with a space
+    const fullName = (firstName + ' ' + lastName).trim();
+    fullNameField.value = fullName;
+  }
+}
+
+// Add event listeners for first and last name fields
+document.addEventListener('DOMContentLoaded', function() {
+  const firstNameField = document.getElementById('user_firstname');
+  const lastNameField = document.getElementById('user_lastname');
+  
+  if (firstNameField) {
+    firstNameField.addEventListener('input', updateUserFullName);
+    firstNameField.addEventListener('change', updateUserFullName);
+  }
+  
+  if (lastNameField) {
+    lastNameField.addEventListener('input', updateUserFullName);
+    lastNameField.addEventListener('change', updateUserFullName);
+  }
+  
+  // Set user_fullname 2 seconds after page loads to ensure all autopopulation is complete
+  setTimeout(() => {
+    updateUserFullName();
+  }, 2000);
+});
+</script>
+
 </body>
 </html>
 `;
@@ -4936,6 +6031,7 @@ function generateHiddenPDFFields() {
     hiddenFieldsHTML += `
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
+<input type="hidden" id="user_fullname"         name="user_fullname">
 <input type="hidden" id="user_email_hidden"     name="user_email_hidden">
 <input type="hidden" id="user_phone_hidden"     name="user_phone_hidden">
 <input type="hidden" id="user_street_hidden"    name="user_street_hidden">

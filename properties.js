@@ -10,7 +10,7 @@
 // Use shared dependency accessors from dependencies.js module
 
 // Properties Panel DOM Elements
-let propNodeText, propNodeId, propNodeType, propNodeSection, propSectionName, propPdfNode, propPdfFilename, propPdfDisplayName, propPdfPriceId;
+let propNodeText, propNodeId, propNodeType, propNodeSection, propSectionName, propPdfNode, propPdfFilename;
 
 // Initialize Properties Panel DOM Elements
 function initializePropertiesPanelElements() {
@@ -21,8 +21,6 @@ function initializePropertiesPanelElements() {
   propSectionName = document.getElementById("propSectionName");
   propPdfNode = document.getElementById("propPdfNode");
   propPdfFilename = document.getElementById("propPdfFilename");
-  propPdfDisplayName = document.getElementById("propPdfDisplayName");
-  propPdfPriceId = document.getElementById("propPdfPriceId");
 }
 
 // Utility: make <span> text editable on double-click
@@ -83,9 +81,8 @@ function onNodeTextFieldChange(newText) {
         selectedCell.value = newText.trim();
       }
       
-      if (typeof window.refreshNodeIdFromLabel === 'function') {
-        window.refreshNodeIdFromLabel(selectedCell);
-      }
+      // DISABLED: Automatic Node ID generation when editing node text
+      // Node IDs will only change when manually edited or reset using the button
       
       // Update dependent calculation nodes if the text changed 
       // (which would change the nodeId)
@@ -217,6 +214,65 @@ function setupPropertiesPanelEventListeners() {
   // No need to duplicate the event listener here
 }
 
+// Setup Reset Node ID Button
+function setupResetNodeIdButton() {
+  const resetBtn = document.getElementById('resetNodeIdBtn');
+  if (!resetBtn) {
+    console.warn("Reset Node ID button not found");
+    return;
+  }
+  
+  resetBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const selectedCell = window.selectedCell;
+    if (!selectedCell) {
+      console.warn("No cell selected for reset");
+      return;
+    }
+    
+    // Generate the correct Node ID using the naming convention
+    let correctNodeId = '';
+    if (typeof window.generateCorrectNodeId === 'function') {
+      correctNodeId = window.generateCorrectNodeId(selectedCell);
+    } else {
+      console.warn("generateCorrectNodeId function not available");
+      return;
+    }
+    
+    if (!correctNodeId) {
+      console.warn("Could not generate correct Node ID");
+      return;
+    }
+    
+    // Update the Node ID field display
+    if (propNodeId) {
+      propNodeId.textContent = correctNodeId;
+    }
+    
+    // Update the actual cell's Node ID
+    if (typeof window.setNodeId === 'function') {
+      window.setNodeId(selectedCell, correctNodeId);
+    } else {
+      console.warn("setNodeId function not available");
+      return;
+    }
+    
+    // Refresh all cells to update the display
+    if (typeof window.refreshAllCells === 'function') {
+      window.refreshAllCells();
+    }
+    
+    // Trigger autosave
+    if (typeof window.requestAutosave === 'function') {
+      window.requestAutosave();
+    }
+    
+    console.log("Node ID reset to:", correctNodeId);
+  });
+}
+
 // Setup Editable Fields
 function setupEditableFields() {
   if (!propNodeText || !propNodeId || !propNodeSection || !propSectionName) {
@@ -228,6 +284,9 @@ function setupEditableFields() {
   makeEditableField(propNodeId, onNodeIdFieldChange);
   makeEditableField(propNodeSection, onNodeSectionFieldChange);
   makeEditableField(propSectionName, onSectionNameFieldChange);
+  
+  // Setup reset button for Node ID
+  setupResetNodeIdButton();
 
   // For amount fields
   const propAmountName = document.getElementById("propAmountName");
@@ -286,6 +345,7 @@ window.properties = {
   // Setup functions
   setupPropertiesPanelEventListeners,
   setupEditableFields,
+  setupResetNodeIdButton,
   
   // Initialization
   initializePropertiesPanelModule
@@ -297,7 +357,8 @@ Object.assign(window, {
   onNodeTextFieldChange,
   onNodeIdFieldChange,
   onNodeSectionFieldChange,
-  onSectionNameFieldChange
+  onSectionNameFieldChange,
+  setupResetNodeIdButton
 });
 
 // Initialize the module when DOM is ready
