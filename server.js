@@ -637,7 +637,7 @@ app.post('/edit_pdf', async (req, res) => {
       return res.status(400).send('No PDF provided (upload a file or pass ?pdf=filename).');
     }
     const sanitized = path.basename(pdfName) + '.pdf';
-    const pdfPath   = path.join(__dirname, 'public', sanitized);
+    const pdfPath   = path.join(__dirname, 'public', 'Forms', sanitized);
     if (!fs.existsSync(pdfPath)) {
       return res.status(400).send('Requested PDF does not exist on the server.');
     }
