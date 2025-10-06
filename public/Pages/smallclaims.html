@@ -1220,6 +1220,7 @@
         let currentFormId = null;
         let currentFormName = null;
         let currentCounty = null;
+        let currentZipCode = null;
         let availableFormsData = [];
 
         // Load county data from JSON file
@@ -1290,6 +1291,7 @@
             currentFormId = null;
             currentFormName = null;
             currentCounty = null;
+            currentZipCode = null;
         }
 
         // Hide county modal without resetting variables
@@ -1350,7 +1352,8 @@
             }
             
             currentCounty = county;
-            console.log('County set:', { currentFormId, currentFormName, currentCounty });
+            currentZipCode = zipCode;
+            console.log('County and zip code set:', { currentFormId, currentFormName, currentCounty, currentZipCode });
             
             // Update modal for confirmation
             document.getElementById('county-modal-title').textContent = 'Confirm Your County';
@@ -1383,7 +1386,7 @@
             });
             
             document.getElementById('county-confirm-yes').addEventListener('click', async function() {
-                console.log('County confirmed, variables before transition:', { currentFormId, currentFormName, currentCounty });
+                console.log('County confirmed, variables before transition:', { currentFormId, currentFormName, currentCounty, currentZipCode });
                 // Hide county modal but don't reset variables yet
                 hideCountyModal();
                 
@@ -1409,12 +1412,7 @@
                         return;
                     }
                     
-                    addFormToCart(currentFormId, formNameToUse, null, currentCounty);
-                    
-                    // Reset variables after successful form addition
-                    currentFormId = null;
-                    currentFormName = null;
-                    currentCounty = null;
+                    addFormToCart(currentFormId, formNameToUse, null, currentCounty, currentZipCode);
                 }
             });
         }
@@ -1446,19 +1444,17 @@
             }
             
             // Add form to cart and redirect
-            addFormToCart(currentFormId, formNameToUse, defendantName, currentCounty);
+            addFormToCart(currentFormId, formNameToUse, defendantName, currentCounty, currentZipCode);
             closeDefendantModal();
-            
-            // Reset variables after successful form addition
-            currentFormId = null;
-            currentFormName = null;
-            currentCounty = null;
         }
 
         // Add form to portfolio (using the same system as forms.html)
-        async function addFormToCart(formId, formName, defendantName, county) {
-            console.log('Adding form to portfolio:', { formId, formName, defendantName, county });
+        async function addFormToCart(formId, formName, defendantName, county, zipCode = null) {
+            console.log('Adding form to portfolio:', { formId, formName, defendantName, county, zipCode, currentZipCode });
             console.log('Form name being stored:', formName);
+            
+            // Use the passed zipCode parameter or fall back to the global currentZipCode
+            const zipCodeToUse = zipCode || currentZipCode;
             
             const user = auth.currentUser;
             if (!user) {
@@ -1466,6 +1462,10 @@
                 const formUrl = getFormUrl(formId);
                 let url = formUrl + '&county=' + encodeURIComponent(county);
                 if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                // Include zip code in URL if available
+                if (zipCodeToUse) {
+                    url += '&zipCode=' + encodeURIComponent(zipCodeToUse);
+                }
                 window.location.href = url;
                 return;
             }
@@ -1484,7 +1484,8 @@
                     url: formUrl, // Use 'url' field like forms.js
                     countyName: county,
                     addedAt: firebase.firestore.FieldValue.serverTimestamp(), // Use 'addedAt' like forms.js
-                    lastOpened: firebase.firestore.FieldValue.serverTimestamp()
+                    lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
+                    zipCode: zipCodeToUse // Store the zip code like forms.js does
                 };
                 
                 // Only add defendantName if it's provided
@@ -1510,8 +1511,18 @@
                     const separator = formUrl.includes('?') ? '&' : '?';
                     let url = formUrl + separator + 'county=' + encodeURIComponent(county) + '&portfolioId=' + encodeURIComponent(portfolioId);
                     if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                    // Include zip code in URL if available
+                    if (currentZipCode) {
+                        url += '&zipCode=' + encodeURIComponent(currentZipCode);
+                    }
                     
                     window.location.href = url;
+                    
+                    // Reset variables after successful form addition and URL construction
+                    currentFormId = null;
+                    currentFormName = null;
+                    currentCounty = null;
+                    currentZipCode = null;
                 } else {
                     console.error('Failed to verify form was stored!');
                     //alert('❌ Error: Form was not properly stored in portfolio. Please try again.');
@@ -1534,7 +1545,17 @@
                 const formUrl = getFormUrl(formId);
                 let url = formUrl + '&county=' + encodeURIComponent(county);
                 if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                // Include zip code in URL if available
+                if (zipCodeToUse) {
+                    url += '&zipCode=' + encodeURIComponent(zipCodeToUse);
+                }
                 window.location.href = url;
+                
+                // Reset variables after error fallback
+                currentFormId = null;
+                currentFormName = null;
+                currentCounty = null;
+                currentZipCode = null;
             }
         }
         

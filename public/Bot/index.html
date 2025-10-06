@@ -2725,6 +2725,10 @@ What specific legal topic would you like to know more about?
                     
                     // Show confirmation step
                     currentCounty = foundCounty;
+                    // Store the zip code for later use
+                    if (pendingCountyData) {
+                        pendingCountyData.zipCode = zipValue;
+                    }
                     title.textContent = 'Confirm County';
                     message.textContent = `Great, you're filing in ${foundCounty} County right?`;
                     zipInput.style.display = 'none';
@@ -2783,7 +2787,7 @@ What specific legal topic would you like to know more about?
                                 
                                 if (formObj && formObj.defendant && formObj.defendant.toUpperCase() === 'YES') {
                                     console.log('🔍 DEBUG: Form requires defendant, showing defendant modal');
-                                    showDefendantModal(formObj, pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty);
+                                    showDefendantModal(formObj, pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty, pendingCountyData.zipCode);
                                 } else {
                                     console.log('🔍 DEBUG: Form does not require defendant, adding to portfolio');
                                     await addFormToPortfolioInternal(pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty);
@@ -2802,8 +2806,7 @@ What specific legal topic would you like to know more about?
                             alert("Form switch attempted");
                         }
                         
-                        pendingCountyData = null;
-                        currentCounty = null;
+                        // Variables will be reset after URL construction in addFormToPortfolioInternal
                     }
                 }
             };
@@ -2828,7 +2831,7 @@ What specific legal topic would you like to know more about?
         }
 
         // Defendant Name Modal
-        function showDefendantModal(formObj, formId, formUrl, formName, countyName) {
+        function showDefendantModal(formObj, formId, formUrl, formName, countyName, zipCode = null) {
             const modal = document.getElementById('defendant-modal');
             const closeBtn = document.getElementById('defendant-modal-close');
             const submitBtn = document.getElementById('defendant-modal-submit');
@@ -2839,7 +2842,7 @@ What specific legal topic would you like to know more about?
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
             modal.style.display = 'block';
-            pendingDefendantData = { formObj, formId, formUrl, formName, countyName };
+            pendingDefendantData = { formObj, formId, formUrl, formName, countyName, zipCode };
             
             function closeModal() {
                 modal.style.display = 'none';
@@ -2870,7 +2873,7 @@ What specific legal topic would you like to know more about?
                         false,
                         defendantName
                     );
-                    pendingDefendantData = null;
+                    // Variables will be reset after URL construction in addFormToPortfolioInternal
                 }
             };
         }
@@ -2889,6 +2892,11 @@ What specific legal topic would you like to know more about?
                 const separator = formUrl.includes('?') ? '&' : '?';
                 let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
                 if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                // Include zip code in URL if available
+                const zipCode = (pendingCountyData && pendingCountyData.zipCode) || (pendingDefendantData && pendingDefendantData.zipCode);
+                if (zipCode) {
+                    url += '&zipCode=' + encodeURIComponent(zipCode);
+                }
                 console.log('🔍 DEBUG: Redirecting to form:', url);
                 window.location.href = url;
                 return;
@@ -2909,7 +2917,8 @@ What specific legal topic would you like to know more about?
                         addedAt: firebase.firestore.FieldValue.serverTimestamp(),
                         lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
                         countyName: countyName,
-                        isDuplicate: true
+                        isDuplicate: true,
+                        zipCode: (pendingCountyData && pendingCountyData.zipCode) || (pendingDefendantData && pendingDefendantData.zipCode) ? (pendingCountyData ? pendingCountyData.zipCode : pendingDefendantData.zipCode) : null
                     };
                     if (defendantName) formData.defendantName = defendantName;
                     
@@ -2932,6 +2941,11 @@ What specific legal topic would you like to know more about?
                         let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
                         url += '&portfolioId=' + encodeURIComponent(newFormRef.id);
                         if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                        // Include zip code in URL if available
+                        const zipCode = (pendingCountyData && pendingCountyData.zipCode) || (pendingDefendantData && pendingDefendantData.zipCode);
+                        if (zipCode) {
+                            url += '&zipCode=' + encodeURIComponent(zipCode);
+                        }
                         console.log('🔍 DEBUG: Redirecting to form:', url);
                         window.location.href = url;
                     } else {
@@ -2961,7 +2975,8 @@ What specific legal topic would you like to know more about?
                         // Update lastOpened in Firestore for the existing form
                         await existingFormDoc.ref.update({
                             lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
-                            countyName: countyName
+                            countyName: countyName,
+                            zipCode: (pendingCountyData && pendingCountyData.zipCode) || (pendingDefendantData && pendingDefendantData.zipCode) ? (pendingCountyData ? pendingCountyData.zipCode : pendingDefendantData.zipCode) : null
                         });
                         console.log('🔍 DEBUG: Existing form updated successfully');
                         
@@ -2980,6 +2995,11 @@ What specific legal topic would you like to know more about?
                             let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
                             url += '&portfolioId=' + encodeURIComponent(existingFormDoc.id);
                             if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                            // Include zip code in URL if available
+                            const zipCode = (pendingCountyData && pendingCountyData.zipCode) || (pendingDefendantData && pendingDefendantData.zipCode);
+                            if (zipCode) {
+                                url += '&zipCode=' + encodeURIComponent(zipCode);
+                            }
                             console.log('🔍 DEBUG: Redirecting to form:', url);
                             window.location.href = url;
                         } else {
@@ -2996,7 +3016,8 @@ What specific legal topic would you like to know more about?
                             url: formUrl,
                             addedAt: firebase.firestore.FieldValue.serverTimestamp(),
                             lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
-                            countyName: countyName
+                            countyName: countyName,
+                            zipCode: (pendingCountyData && pendingCountyData.zipCode) || (pendingDefendantData && pendingDefendantData.zipCode) ? (pendingCountyData ? pendingCountyData.zipCode : pendingDefendantData.zipCode) : null
                         };
                         if (defendantName) formData.defendantName = defendantName;
                         
@@ -3019,6 +3040,11 @@ What specific legal topic would you like to know more about?
                             let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
                             url += '&portfolioId=' + encodeURIComponent(newFormRef.id);
                             if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                            // Include zip code in URL if available
+                            const zipCode = (pendingCountyData && pendingCountyData.zipCode) || (pendingDefendantData && pendingDefendantData.zipCode);
+                            if (zipCode) {
+                                url += '&zipCode=' + encodeURIComponent(zipCode);
+                            }
                             console.log('🔍 DEBUG: Redirecting to form:', url);
                             window.location.href = url;
                         } else {
@@ -3042,8 +3068,19 @@ What specific legal topic would you like to know more about?
                 const separator = formUrl.includes('?') ? '&' : '?';
                 let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
                 if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                // Include zip code in URL if available
+                const zipCode = (pendingCountyData && pendingCountyData.zipCode) || (pendingDefendantData && pendingDefendantData.zipCode);
+                if (zipCode) {
+                    url += '&zipCode=' + encodeURIComponent(zipCode);
+                }
                 window.location.href = url;
             }
+            
+            // Reset variables after URL construction
+            pendingCountyData = null;
+            currentCounty = null;
+            pendingDefendantData = null;
+            
             console.log('🔍 DEBUG: ===== addFormToPortfolioInternal END =====');
         }
 
