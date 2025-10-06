@@ -675,11 +675,17 @@ addFormToPortfolioInternal = async function(formId, formUrl, formName, countyNam
                 lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
                 countyName: countyName,
                 isDuplicate: true,
-                defendantName: defendantName ? defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : null
+                defendantName: defendantName ? defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : null,
+                zipCode: (pendingCountyData && pendingCountyData.zipCode) || (pendingDefendantData && pendingDefendantData.zipCode) ? (pendingCountyData ? pendingCountyData.zipCode : pendingDefendantData.zipCode) : null
             });
             const separator = formUrl.includes('?') ? '&' : '?';
             let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
             if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+            // Include zip code in URL if available
+            const zipCode = (pendingCountyData && pendingCountyData.zipCode) || (pendingDefendantData && pendingDefendantData.zipCode);
+            if (zipCode) {
+                url += '&zipCode=' + encodeURIComponent(zipCode);
+            }
             window.location.href = url;
         } else {
             const formsSnapshot = await db.collection('users').doc(userId).collection('forms').get();
@@ -694,11 +700,17 @@ addFormToPortfolioInternal = async function(formId, formUrl, formName, countyNam
                 await existingFormDoc.ref.update({
                     lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
                     countyName: countyName,
-                    defendantName: defendantName ? defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : null
+                    defendantName: defendantName ? defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : null,
+                    zipCode: (pendingCountyData && pendingCountyData.zipCode) || (pendingDefendantData && pendingDefendantData.zipCode) ? (pendingCountyData ? pendingCountyData.zipCode : pendingDefendantData.zipCode) : null
                 });
                 const separator = formUrl.includes('?') ? '&' : '?';
                 let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
                 if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                // Include zip code in URL if available
+                const zipCode = (pendingCountyData && pendingCountyData.zipCode) || (pendingDefendantData && pendingDefendantData.zipCode);
+                if (zipCode) {
+                    url += '&zipCode=' + encodeURIComponent(zipCode);
+                }
                 window.location.href = url;
             } else {
                 const newFormRef = db.collection('users').doc(userId).collection('forms').doc();
@@ -709,11 +721,17 @@ addFormToPortfolioInternal = async function(formId, formUrl, formName, countyNam
                     addedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
                     countyName: countyName,
-                    defendantName: defendantName ? defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : null
+                    defendantName: defendantName ? defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ') : null,
+                    zipCode: (pendingCountyData && pendingCountyData.zipCode) || (pendingDefendantData && pendingDefendantData.zipCode) ? (pendingCountyData ? pendingCountyData.zipCode : pendingDefendantData.zipCode) : null
                 });
                 const separator = formUrl.includes('?') ? '&' : '?';
                 let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
                 if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                // Include zip code in URL if available
+                const zipCode = (pendingCountyData && pendingCountyData.zipCode) || (pendingDefendantData && pendingDefendantData.zipCode);
+                if (zipCode) {
+                    url += '&zipCode=' + encodeURIComponent(zipCode);
+                }
                 window.location.href = url;
             }
         }
@@ -830,6 +848,10 @@ renderMyForms = function(forms) {
                     }
                     let url = correctedUrl + separator + 'county=' + encodeURIComponent(form.countyName || '') + '&portfolioId=' + encodeURIComponent(form.id);
                     if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                    // Include zip code in URL if available
+                    if (form.zipCode) {
+                        url += '&zipCode=' + encodeURIComponent(form.zipCode);
+                    }
                     window.location.href = url;
                 } catch (err) {
                     hideSavingOverlay();
@@ -2105,6 +2127,10 @@ function showCountyModal(formId, formUrl, formName) {
             
             // Show confirmation step
             currentCounty = foundCounty;
+            // Store the zip code for later use
+            if (pendingCountyData) {
+                pendingCountyData.zipCode = zipValue;
+            }
             title.textContent = 'Confirm County';
             message.textContent = `Great, you're filing in ${foundCounty} County right?`;
             zipInput.style.display = 'none';
@@ -2189,7 +2215,7 @@ function showDefendantModal(formObj, formId, formUrl, formName, countyName, isDu
     errorDiv.style.display = 'none';
     errorDiv.textContent = '';
     modal.style.display = 'block';
-    pendingDefendantData = { formObj, formId, formUrl, formName, countyName, isDuplicate };
+    pendingDefendantData = { formObj, formId, formUrl, formName, countyName, isDuplicate, zipCode: pendingCountyData ? pendingCountyData.zipCode : null };
     function closeModal() {
         modal.style.display = 'none';
         pendingDefendantData = null;

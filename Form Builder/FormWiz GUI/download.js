@@ -336,6 +336,32 @@ function loadFormData(formData) {
                                 checkboxOptionsDiv.parentNode.appendChild(noneContainer);
                             }
                         }
+
+                        // Add the "Mark only one" checkbox if it exists in the data
+                        if (question.markOnlyOne) {
+                            // Find the container for the "Mark only one" option
+                            let markOnlyOneContainer = document.createElement('div');
+                            markOnlyOneContainer.id = `markOnlyOneContainer${question.questionId}`;
+                            markOnlyOneContainer.style.marginTop = '10px';
+                            markOnlyOneContainer.style.marginBottom = '10px';
+                            markOnlyOneContainer.innerHTML = `
+                                <label>
+                                    <input type="checkbox" id="markOnlyOne${question.questionId}" checked>
+                                    Mark only one
+                                </label>
+                            `;
+                            
+                            // Add it right after the options div (or after the "None of the above" container if it exists)
+                            const insertAfter = hasNoneOption ? 
+                                document.getElementById(`noneOfTheAboveContainer${question.questionId}`) :
+                                checkboxOptionsDiv;
+                            
+                            if (insertAfter.nextSibling) {
+                                insertAfter.parentNode.insertBefore(markOnlyOneContainer, insertAfter.nextSibling);
+                            } else {
+                                insertAfter.parentNode.appendChild(markOnlyOneContainer);
+                            }
+                        }
                         
                         // Update conditional PDF answers for checkbox
                         updateConditionalPDFAnswersForCheckbox(question.questionId);
@@ -542,6 +568,7 @@ function loadFormData(formData) {
                     const nameInput = questionBlock.querySelector(`#textboxName${question.questionId}`);
                     const placeholderInput = questionBlock.querySelector(`#textboxPlaceholder${question.questionId}`);
                     const lineLimitInput = questionBlock.querySelector(`#lineLimit${question.questionId}`);
+                    const maxCharacterLimitInput = questionBlock.querySelector(`#maxCharacterLimit${question.questionId}`);
                     if (nameInput) {
                         nameInput.value = question.nameId || '';
                     }
@@ -550,6 +577,9 @@ function loadFormData(formData) {
                     }
                     if (lineLimitInput && question.lineLimit) {
                         lineLimitInput.value = question.lineLimit;
+                    }
+                    if (maxCharacterLimitInput && question.maxCharacterLimit) {
+                        maxCharacterLimitInput.value = question.maxCharacterLimit;
                     }
                 }
 
@@ -1204,6 +1234,10 @@ function exportForm() {
                         hasAmount: false
                     });
                 }
+
+                // Check if user enabled "Mark only one"
+                const markOnlyOneCheckbox = questionBlock.querySelector(`#markOnlyOne${questionId}`);
+                questionData.markOnlyOne = markOnlyOneCheckbox ? markOnlyOneCheckbox.checked : false;
             }
             else if (questionType === 'dropdown') {
                 const dropdownOptionEls = questionBlock.querySelectorAll(`#dropdownOptions${questionId} input`);
@@ -1339,10 +1373,14 @@ function exportForm() {
                 const nameId = questionBlock.querySelector(`#textboxName${questionId}`)?.value.trim() || `answer${questionId}`;
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
                 const lineLimit = questionBlock.querySelector(`#lineLimit${questionId}`)?.value.trim() || '';
+                const maxCharacterLimit = questionBlock.querySelector(`#maxCharacterLimit${questionId}`)?.value.trim() || '';
                 questionData.nameId = nameId;
                 questionData.placeholder = placeholder;
                 if (lineLimit) {
                     questionData.lineLimit = parseInt(lineLimit);
+                }
+                if (maxCharacterLimit) {
+                    questionData.maxCharacterLimit = parseInt(maxCharacterLimit);
                 }
             }
 

@@ -68,18 +68,13 @@ function getCbPrefix (qId){
 
 /* build the final <input>.id / name for a checkbox option */
 function buildCheckboxName (questionId, rawNameId, labelText){
-    const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
-
     // if the designer left the name blank, derive it from the label
     let namePart = (rawNameId || '').trim();
     if (!namePart){
         namePart = labelText.replace(/\W+/g, '_').toLowerCase();
     }
 
-    // ensure we have our prefix exactly once
-    if (!namePart.startsWith(slugPrefix)){
-        namePart = slugPrefix + namePart;
-    }
+    // Return the name part directly without adding question prefix
     return namePart;
 }
 
@@ -106,6 +101,10 @@ logicScriptBuffer = "";
 // Check if test mode is enabled
 const isTestMode = document.getElementById('testModeCheckbox') && document.getElementById('testModeCheckbox').checked;
 
+// Get form name from the form name input field
+const formNameEl = document.getElementById('formNameInput');
+const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim() : 'Example Form';
+
 
 
   // Top HTML (head, body, header, etc.)
@@ -115,7 +114,7 @@ const isTestMode = document.getElementById('testModeCheckbox') && document.getEl
     "<head>",
     '    <meta charset="UTF-8">',
     '    <meta name="viewport" content="width=device-width, initial-scale=1.0">',
-    "    <title>Example Form</title>",
+    `    <title>${formName}</title>`,
     '    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">',
     '    <link rel="stylesheet" href="generate.css">',
     '    <link rel="stylesheet" href="generate2.css">',
@@ -596,9 +595,13 @@ questionSlugMap[questionId] = slug;
       } else if (questionType === "bigParagraph") {
         const nmEl2 = qBlock.querySelector("#textboxName" + questionId);
         const phEl2 = qBlock.querySelector("#textboxPlaceholder" + questionId);
+        const maxCharLimitEl = qBlock.querySelector("#maxCharacterLimit" + questionId);
+        const lineLimitEl = qBlock.querySelector("#lineLimit" + questionId);
         const nameId2 =
           nmEl2 && nmEl2.value ? nmEl2.value : "answer" + questionId;
         const ph2 = phEl2 && phEl2.value ? phEl2.value : "";
+        const maxCharLimit = maxCharLimitEl && maxCharLimitEl.value ? parseInt(maxCharLimitEl.value) : null;
+        const lineLimit = lineLimitEl && lineLimitEl.value ? parseInt(lineLimitEl.value) : null;
         questionNameIds[questionId] = nameId2;
         
         // Check if this Big Paragraph has PDF logic with character limits
@@ -614,12 +617,18 @@ questionSlugMap[questionId] = slug;
         
         if (hasPdfLogic && characterLimits.length > 0) {
           const maxLimit = Math.max(...characterLimits);
+          const effectiveMaxLength = maxCharLimit ? Math.min(maxCharLimit, maxLimit * 2) : maxLimit * 2;
+          const lineLimitAttr = lineLimit ? ` data-line-limit="${lineLimit}"` : '';
+          const onInputHandler = lineLimit ? 
+            ` oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)}); handleLineSplitting('${nameId2}', ${lineLimit});"` :
+            ` oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)})"`;
+          
           formHTML += `
             <div class="big-paragraph-container">
               <textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}" 
-                        maxlength="${maxLimit * 2}" oninput="updateCharacterCount('${nameId2}', ${JSON.stringify(characterLimits)})"></textarea>
+                        maxlength="${effectiveMaxLength}"${lineLimitAttr}${onInputHandler}></textarea>
               <div class="character-count" id="charCount_${nameId2}">
-                <span class="current-count">0</span> / <span class="limit-display">${maxLimit}</span> characters
+                <span class="current-count">0</span> / <span class="limit-display">${maxCharLimit || maxLimit}</span> characters
               </div>
             </div><br>
             <script>
@@ -644,10 +653,103 @@ questionSlugMap[questionId] = slug;
                   }
                 }
               }
+              
+              function handleLineSplitting(textareaId, lineLimit) {
+                const textarea = document.getElementById(textareaId);
+                const text = textarea.value;
+                const totalChars = text.length;
+                
+                // Calculate how many lines we need
+                const linesNeeded = Math.ceil(totalChars / lineLimit);
+                
+                // Create or update hidden textboxes for each line
+                for (let i = 1; i <= linesNeeded; i++) {
+                  const startIndex = (i - 1) * lineLimit;
+                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                  const lineText = text.substring(startIndex, endIndex);
+                  
+                  const hiddenInputId = textareaId + '_line' + i;
+                  let hiddenInput = document.getElementById(hiddenInputId);
+                  
+                  if (!hiddenInput) {
+                    // Create new hidden input
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = hiddenInputId;
+                    hiddenInput.name = hiddenInputId;
+                    textarea.parentNode.appendChild(hiddenInput);
+                  }
+                  
+                  hiddenInput.value = lineText;
+                }
+                
+                // Remove any extra hidden inputs that are no longer needed
+                let lineNum = linesNeeded + 1;
+                while (true) {
+                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
+                  if (extraInput) {
+                    extraInput.remove();
+                    lineNum++;
+                  } else {
+                    break;
+                  }
+                }
+              }
             </script>
           `;
         } else {
-        formHTML += `<div class="text-input-container"><textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}"></textarea></div>`;
+          const maxLengthAttr = maxCharLimit ? ` maxlength="${maxCharLimit}"` : '';
+          const lineLimitAttr = lineLimit ? ` data-line-limit="${lineLimit}"` : '';
+          const onInputHandler = lineLimit ? ` oninput="handleLineSplitting('${nameId2}', ${lineLimit})"` : '';
+          
+          formHTML += `
+            <div class="text-input-container">
+              <textarea id="${nameId2}" name="${nameId2}" rows="5" cols="50" placeholder="${ph2}"${maxLengthAttr}${lineLimitAttr}${onInputHandler}></textarea>
+            </div>
+            <script>
+              function handleLineSplitting(textareaId, lineLimit) {
+                const textarea = document.getElementById(textareaId);
+                const text = textarea.value;
+                const totalChars = text.length;
+                
+                // Calculate how many lines we need
+                const linesNeeded = Math.ceil(totalChars / lineLimit);
+                
+                // Create or update hidden textboxes for each line
+                for (let i = 1; i <= linesNeeded; i++) {
+                  const startIndex = (i - 1) * lineLimit;
+                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                  const lineText = text.substring(startIndex, endIndex);
+                  
+                  const hiddenInputId = textareaId + '_line' + i;
+                  let hiddenInput = document.getElementById(hiddenInputId);
+                  
+                  if (!hiddenInput) {
+                    // Create new hidden input
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = hiddenInputId;
+                    hiddenInput.name = hiddenInputId;
+                    textarea.parentNode.appendChild(hiddenInput);
+                  }
+                  
+                  hiddenInput.value = lineText;
+                }
+                
+                // Remove any extra hidden inputs that are no longer needed
+                let lineNum = linesNeeded + 1;
+                while (true) {
+                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
+                  if (extraInput) {
+                    extraInput.remove();
+                    lineNum++;
+                  } else {
+                    break;
+                  }
+                }
+              }
+            </script>
+          `;
         }
       } else if (questionType === "money") {
         const mnNmEl = qBlock.querySelector("#textboxName" + questionId);
@@ -827,6 +929,10 @@ const cboxOptions = [];
 const qSlug = questionSlugMap[questionId] || ('answer' + questionId);
 questionNameIds[questionId] = qSlug;      // so helpers know the base
 
+/* ── check for "Mark only one" option ─────────────────────────── */
+const markOnlyOneEl = qBlock.querySelector(`#markOnlyOne${questionId}`);
+const markOnlyOne = markOnlyOneEl?.checked || false;
+
 formHTML += `<div><center><div id="checkmark" class="checkbox-group-${questionId}">`;
 
 /* ── render each checkbox option ───────────────────────────── */
@@ -858,12 +964,17 @@ for (let co = 0; co < cOptsDivs.length; co++){
     });
 
     /* actual input */
+    const inputType = markOnlyOne ? 'radio' : 'checkbox';
+    const inputName = markOnlyOne ? qSlug : optionNameId; // Radio buttons share the same name
+    const onChangeHandler = markOnlyOne ? 
+      `onchange="handleMarkOnlyOneSelection(this, ${questionId}); ${hasAmount ? `toggleAmountField('${optionNameId}_amount', this.checked);` : ''} updateCheckboxStyle(this);"` :
+      `onchange="${hasAmount ? `toggleAmountField('${optionNameId}_amount', this.checked); toggleNoneOption(this, ${questionId});` : `toggleNoneOption(this, ${questionId});`} updateCheckboxStyle(this);"`;
+    
     formHTML += `
       <span class="checkbox-inline" id="checkbox-container-${optionNameId}">
         <label class="checkbox-label">
-          <input type="checkbox" id="${optionNameId}" name="${optionNameId}" value="${optionValue}" 
-                 ${hasAmount ? `onchange="toggleAmountField('${optionNameId}_amount', this.checked); toggleNoneOption(this, ${questionId}); updateCheckboxStyle(this);"` : 
-                               `onchange="toggleNoneOption(this, ${questionId}); updateCheckboxStyle(this);"`}>
+          <input type="${inputType}" id="${optionNameId}" name="${inputName}" value="${optionValue}" 
+                 ${onChangeHandler}>
           ${labelText}
         </label>
       </span>`;
@@ -891,11 +1002,17 @@ if (noneEl?.checked){
         optionValue: noneStr
     });
 
+    const noneInputType = markOnlyOne ? 'radio' : 'checkbox';
+    const noneInputName = markOnlyOne ? qSlug : noneNameId;
+    const noneOnChangeHandler = markOnlyOne ? 
+      `onchange="handleMarkOnlyOneSelection(this, ${questionId}); updateCheckboxStyle(this);"` :
+      `onchange="handleNoneOfTheAboveToggle(this, ${questionId}); updateCheckboxStyle(this);"`;
+
     formHTML += `
       <span class="checkbox-inline" id="checkbox-container-${noneNameId}">
         <label class="checkbox-label">
-          <input type="checkbox" id="${noneNameId}" name="${noneNameId}" value="${noneStr}" 
-                 onchange="handleNoneOfTheAboveToggle(this, ${questionId}); updateCheckboxStyle(this);">
+          <input type="${noneInputType}" id="${noneNameId}" name="${noneInputName}" value="${noneStr}" 
+                 ${noneOnChangeHandler}>
           ${noneStr}
         </label>
       </span>`;
@@ -1351,6 +1468,10 @@ if (s > 1){
   // Insert hidden fields (including multi-term calculations)
   const genHidden = generateHiddenPDFFields();
   formHTML += genHidden.hiddenFieldsHTML;
+  
+  // Add default checkbox based on form name
+  const formNameSafe = formName.replace(/\W+/g, '_').toLowerCase();
+  formHTML += `<input type="checkbox" id="${formNameSafe}_default_checkbox" name="${formNameSafe}_default_checkbox" checked style="display: none;">`;
 
   // Close the form & add the thank-you message
   formHTML += [
@@ -1493,14 +1614,11 @@ function getCbPrefix (qId){
  * buildCheckboxName(questionId, rawNameId, labelText)
  *───────────────────────────────*/
 function buildCheckboxName (questionId, rawNameId, labelText){
-    const slugPrefix = (questionSlugMap[questionId] || ('answer' + questionId)) + '_';
     let namePart = (rawNameId || '').trim();
     if (!namePart){
         namePart = labelText.replace(/\\W+/g, '_').toLowerCase();
     }
-    if (!namePart.startsWith(slugPrefix)){
-        namePart = slugPrefix + namePart;
-    }
+    // Return the name part directly without adding question prefix
     return namePart;
 }
 `;
@@ -1760,6 +1878,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Always add cart functions (they're needed for the Continue button)
   formHTML += `
+// Helper function to deduplicate PDFs based on pdfName
+function deduplicatePdfs(pdfArray) {
+  const seen = new Set();
+  const deduplicated = [];
+  
+  for (const pdf of pdfArray) {
+    const key = pdf.pdfName || pdf.formId || pdf.title;
+    if (!seen.has(key)) {
+      seen.add(key);
+      deduplicated.push(pdf);
+    } else {
+      console.log('🛒 [CART DEBUG] Skipping duplicate PDF:', key);
+    }
+  }
+  
+  return deduplicated;
+}
+
 // Always-available Cart Modal (global)
 window.showCartModal = function () {
   console.log('🛒 [CART DEBUG] showCartModal called');
@@ -1815,12 +1951,17 @@ window.showCartModal = function () {
     }
   }
   
-  console.log('🛒 [CART DEBUG] Total PDFs to add:', allPdfsToAdd.length, allPdfsToAdd);
+  // Deduplicate PDFs to prevent multiple requests for the same PDF
+  const originalCount = allPdfsToAdd.length;
+  const deduplicatedPdfs = deduplicatePdfs(allPdfsToAdd);
+  console.log('🛒 [CART DEBUG] Deduplication: Original count:', originalCount, 'After deduplication:', deduplicatedPdfs.length);
+  
+  console.log('🛒 [CART DEBUG] Total PDFs to add:', deduplicatedPdfs.length, deduplicatedPdfs);
 
   // Fetch prices for all PDFs
   async function fetchAllPrices() {
     const prices = [];
-    for (const pdf of allPdfsToAdd) {
+    for (const pdf of deduplicatedPdfs) {
       try {
         const r = await fetch('/stripe-price/' + pdf.priceId);
         if (r.ok) {
@@ -1852,7 +1993,7 @@ window.showCartModal = function () {
       <div style="background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(44,62,80,.18);padding:32px 28px 24px;max-width:470px;width:90%;text-align:center;position:relative;">
         <h2>Checkout</h2>
         <p>Your form has been completed! Add it to your cart to download.</p>
-        <p style="font-size:0.9em;color:#666;margin:10px 0;">\${allPdfsToAdd.length} PDF(s) will be added to cart</p>
+        <p style="font-size:0.9em;color:#666;margin:10px 0;">\${deduplicatedPdfs.length} PDF(s) will be added to cart</p>
         <button id="addToCartBtn" style="background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%);color:#fff;border:none;border-radius:6px;padding:10px 28px;font-size:1.1em;font-weight:600;cursor:pointer;">
           Add to Cart - \${priceDisplay}
         </button>
@@ -2001,7 +2142,12 @@ window.addFormToCart = function (priceId) {
       console.log('🛒 [CART DEBUG] No PDF logic items found');
     }
     
-    console.log('🛒 [CART DEBUG] Final PDF logic items:', pdfLogicItems.length, pdfLogicItems);
+    // Deduplicate PDF logic items to prevent multiple requests for the same PDF
+    const originalPdfLogicCount = pdfLogicItems.length;
+    const deduplicatedPdfLogicItems = deduplicatePdfs(pdfLogicItems);
+    console.log('🛒 [CART DEBUG] PDF Logic Deduplication: Original count:', originalPdfLogicCount, 'After deduplication:', deduplicatedPdfLogicItems.length);
+    
+    console.log('🛒 [CART DEBUG] Final PDF logic items:', deduplicatedPdfLogicItems.length, deduplicatedPdfLogicItems);
   } catch (e) {
     console.warn('[PDF LOGIC] error computing matches:', e);
   }
@@ -2026,7 +2172,7 @@ window.addFormToCart = function (priceId) {
     console.log('🛒 [CART DEBUG] Main item:', mainItem.title, 'with priceId:', mainItem.priceId);
     
     // Add all matched PDF logic items
-    for (const item of pdfLogicItems) {
+    for (const item of deduplicatedPdfLogicItems) {
       const pdfItem = {
         formId: item.formId.toLowerCase(),
         title: item.title,
@@ -2099,7 +2245,7 @@ window.addFormToCart = function (priceId) {
   cart.push(mainCartItem);
   console.log('🛒 [CART DEBUG] Main cart item:', mainCartItem.title, 'with priceId:', mainCartItem.priceId);
   
-  for (const item of pdfLogicItems) {
+  for (const item of deduplicatedPdfLogicItems) {
     cart.push(item);
     console.log('🛒 [CART DEBUG] PDF logic cart item:', item.title, 'with priceId:', item.priceId);
   }
@@ -2295,6 +2441,29 @@ function toggleAmountField(amountFieldId, show) {
         amountField.style.display = show ? 'block' : 'none';
         if (!show) amountField.value = '';
     }
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Handle "Mark only one" selection functionality
+ *──────────────────────────────────────────────────────────────*/
+function handleMarkOnlyOneSelection(selectedInput, questionId) {
+    if (!selectedInput.checked) return;
+    
+    // Find all radio buttons in this question group
+    const container = document.querySelector('.checkbox-group-' + questionId);
+    if (!container) return;
+    
+    const allInputs = container.querySelectorAll('input[type="radio"]');
+    allInputs.forEach(input => {
+        if (input !== selectedInput) {
+            input.checked = false;
+            // Update styling for unchecked inputs
+            updateCheckboxStyle(input);
+        }
+    });
+    
+    // Update styling for the selected input
+    updateCheckboxStyle(selectedInput);
 }
 
 /*──────────────────────────────────────────────────────────────*
@@ -3156,12 +3325,20 @@ async function processAllPdfs() {
     console.log('🔧 [PDF DEBUG] conditionalPDFs:', conditionalPDFs);
     console.log('🔧 [PDF DEBUG] pdfLogicPDFs:', pdfLogicPDFs);
     
+    // Track processed PDFs to prevent duplicates
+    const processedPdfs = new Set();
+    
     // Process main PDFs - use the actual PDF filename, not the form name
     if (pdfOutputFileName) {
         console.log('🔧 [PDF DEBUG] Processing main PDF:', pdfOutputFileName);
         // Remove .pdf extension if present since server adds it automatically
         const baseName = pdfOutputFileName.replace(/\.pdf$/i, '');
+        if (!processedPdfs.has(baseName)) {
+            processedPdfs.add(baseName);
         await editAndDownloadPDF(baseName);
+        } else {
+            console.log('🔧 [PDF DEBUG] Skipping duplicate main PDF:', baseName);
+        }
     }
     
     // Process Conditional PDFs
@@ -3192,7 +3369,13 @@ async function processAllPdfs() {
                 
                 // Download PDF if conditions are met
                 if (shouldDownload) {
-                    await editAndDownloadPDF(conditionalPDF.pdfName);
+                    const baseName = conditionalPDF.pdfName.replace(/\.pdf$/i, '');
+                    if (!processedPdfs.has(baseName)) {
+                        processedPdfs.add(baseName);
+                        await editAndDownloadPDF(baseName);
+                    } else {
+                        console.log('🔧 [PDF DEBUG] Skipping duplicate conditional PDF:', baseName);
+                    }
                 }
             }
         }
@@ -3252,7 +3435,13 @@ async function processAllPdfs() {
                 
                 // Download PDF if conditions are met
                 if (shouldDownload) {
-                    await editAndDownloadPDF(pdfLogic.pdfName);
+                    const baseName = pdfLogic.pdfName.replace(/\.pdf$/i, '');
+                    if (!processedPdfs.has(baseName)) {
+                        processedPdfs.add(baseName);
+                        await editAndDownloadPDF(baseName);
+                    } else {
+                        console.log('🔧 [PDF DEBUG] Skipping duplicate PDF logic PDF:', baseName);
+                    }
                 }
             }
         }
@@ -3889,6 +4078,68 @@ if (typeof handleNext === 'function') {
             
         }
 
+        // Helper function to trigger line splitting for autofilled textareas
+        function triggerLineSplittingForAutofilledTextareas() {
+            console.log('🔧 [LINE SPLITTING DEBUG] Checking for textareas that need line splitting...');
+            
+            // Find all textareas that have a line limit data attribute
+            const textareas = document.querySelectorAll('textarea[data-line-limit]');
+            textareas.forEach(textarea => {
+                const lineLimit = parseInt(textarea.getAttribute('data-line-limit'));
+                if (lineLimit && textarea.value && textarea.value.length > 0) {
+                    console.log('🔧 [LINE SPLITTING DEBUG] Triggering line splitting for textarea:', textarea.id, 'with', textarea.value.length, 'characters, line limit:', lineLimit);
+                    
+                    // Call the handleLineSplitting function if it exists
+                    if (typeof handleLineSplitting === 'function') {
+                        handleLineSplitting(textarea.id, lineLimit);
+                    } else {
+                        // Fallback: manually trigger the line splitting logic
+                        const text = textarea.value;
+                        const totalChars = text.length;
+                        const linesNeeded = Math.ceil(totalChars / lineLimit);
+                        
+                        console.log('🔧 [LINE SPLITTING DEBUG] Creating', linesNeeded, 'hidden textboxes for textarea:', textarea.id);
+                        
+                        // Create or update hidden textboxes for each line
+                        for (let i = 1; i <= linesNeeded; i++) {
+                            const startIndex = (i - 1) * lineLimit;
+                            const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                            const lineText = text.substring(startIndex, endIndex);
+                            
+                            const hiddenInputId = textarea.id + '_line' + i;
+                            let hiddenInput = document.getElementById(hiddenInputId);
+                            
+                            if (!hiddenInput) {
+                                // Create new hidden input
+                                hiddenInput = document.createElement('input');
+                                hiddenInput.type = 'hidden';
+                                hiddenInput.id = hiddenInputId;
+                                hiddenInput.name = hiddenInputId;
+                                textarea.parentNode.appendChild(hiddenInput);
+                                console.log('🔧 [LINE SPLITTING DEBUG] Created hidden input:', hiddenInputId);
+                            }
+                            
+                            hiddenInput.value = lineText;
+                            console.log('🔧 [LINE SPLITTING DEBUG] Set value for', hiddenInputId, 'to:', lineText);
+                        }
+                        
+                        // Remove any extra hidden inputs that are no longer needed
+                        let lineNum = linesNeeded + 1;
+                        while (true) {
+                            const extraInput = document.getElementById(textarea.id + '_line' + lineNum);
+                            if (extraInput) {
+                                extraInput.remove();
+                                console.log('🔧 [LINE SPLITTING DEBUG] Removed extra hidden input:', textarea.id + '_line' + lineNum);
+                                lineNum++;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         // Helper: load answers
         async function loadAnswers() {
             console.log('🔧 [AUTOFILL DEBUG] loadAnswers() called - isUserLoggedIn:', isUserLoggedIn, 'userId:', userId, 'formId:', formId);
@@ -4013,6 +4264,9 @@ if (typeof handleNext === 'function') {
                         createHiddenCheckboxesForAutofilledDropdowns();
                     }
                     
+                    // Trigger line splitting for autofilled textareas
+                    triggerLineSplittingForAutofilledTextareas();
+                    
                     // Second autofill pass for dynamically generated textbox inputs
                     // Use a longer delay to ensure textbox inputs are fully generated
                     setTimeout(() => {
@@ -4053,6 +4307,9 @@ if (typeof handleNext === 'function') {
                                 }
                             }
                         });
+                        
+                        // Trigger line splitting again after the second autofill pass
+                        triggerLineSplittingForAutofilledTextareas();
                     }, 1500);
                     
                         // Reset hidden questions to defaults after autofill and visibility updates
@@ -4272,6 +4529,9 @@ if (typeof handleNext === 'function') {
                             createHiddenCheckboxesForAutofilledDropdowns();
                         }
                         
+                        // Trigger line splitting for autofilled textareas
+                        triggerLineSplittingForAutofilledTextareas();
+                        
                         // Second autofill pass for dynamically generated textbox inputs
                         // Use a longer delay to ensure textbox inputs are fully generated
                         setTimeout(() => {
@@ -4312,6 +4572,9 @@ if (typeof handleNext === 'function') {
                                     }
                                 }
                             });
+                            
+                            // Trigger line splitting again after the second autofill pass
+                            triggerLineSplittingForAutofilledTextareas();
                         }, 1500);
                     }, 2000);
                 }
@@ -5148,6 +5411,9 @@ function populateDebugContent() {
       grouped.checkbox.push(item);
     } else if (item.inputType === 'radio') {
       grouped.radio.push(item);
+    } else if (item.inputType === 'hidden' && item.name.includes('_line')) {
+      // Hidden textboxes created by line splitting should be categorized as text inputs
+      grouped.text.push(item);
     } else {
       grouped.other.push(item);
     }
@@ -5321,8 +5587,13 @@ function fallbackCopyToClipboard(text) {
 
 // Export Names/IDs function
 function exportNamesAndIds() {
+  // Get form name from the form name input field
+  const formNameEl = document.getElementById('formNameInput');
+  const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim() : 'Example Form';
+  
   const formData = {
     exportDate: new Date().toISOString(),
+    formName: formName,
     formTitle: document.title || 'Form Data',
     inputs: []
   };
@@ -5369,6 +5640,55 @@ document.getElementById('debugSearch').addEventListener('input', populateDebugCo
 
 // Export Names/IDs functionality
 document.getElementById('exportNamesIdsBtn').addEventListener('click', exportNamesAndIds);
+
+// Function to create Form Name input field (to be called from the form editor interface)
+function createFormNameInput() {
+  const formNameContainer = document.createElement('div');
+  formNameContainer.id = 'formNameContainer';
+  formNameContainer.style.cssText = 
+    'background: #fff; ' +
+    'border: 2px solid #2980b9; ' +
+    'border-radius: 10px; ' +
+    'padding: 20px; ' +
+    'margin: 20px auto; ' +
+    'max-width: 600px; ' +
+    'box-shadow: 0 4px 12px rgba(0,0,0,0.1);';
+  
+  formNameContainer.innerHTML = 
+    '<h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50; font-size: 1.3em;">Form Name</h3>' +
+    '<div style="text-align: center;">' +
+      '<label for="formNameInput" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Form Name:</label>' +
+      '<input type="text" id="formNameInput" name="formNameInput" ' +
+             'placeholder="Enter your form name (e.g., Customer Survey, Job Application)" ' +
+             'style="width: 100%; max-width: 400px; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; text-align: center;" ' +
+             'value="Example Form">' +
+      '<p style="margin-top: 8px; font-size: 0.9em; color: #666; font-style: italic;">' +
+        'This name will appear in the browser title and be used for the default checkbox.' +
+      '</p>' +
+    '</div>';
+  
+  return formNameContainer;
+}
+
+// Function to insert Form Name input above the first section
+function insertFormNameInput() {
+  // Check if form name input already exists
+  if (document.getElementById('formNameContainer')) {
+    return; // Already exists
+  }
+  
+  // Find the first section or a suitable insertion point
+  const firstSection = document.querySelector('[id^="sectionBlock"]');
+  const formNameInput = createFormNameInput();
+  
+  if (firstSection) {
+    firstSection.parentNode.insertBefore(formNameInput, firstSection);
+  } else {
+    // If no sections found, append to body or a container
+    const container = document.querySelector('#formEditor') || document.body;
+    container.insertBefore(formNameInput, container.firstChild);
+  }
+}
 
 // Update content when form values change
 document.addEventListener('input', function() {
