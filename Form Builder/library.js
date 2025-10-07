@@ -83,6 +83,18 @@ function detectSectionJumps(cell, questionCellMap, questionIdMap) {
   // Section jump detection (existing code)
 }
 window.exportGuiJson = function(download = true) {
+  // Automatically reset PDF inheritance and Node IDs before export
+  // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
+  // Reset PDF inheritance for all nodes FIRST
+  if (typeof window.resetAllPdfInheritance === 'function') {
+    window.resetAllPdfInheritance();
+  }
+  
+  // Reset all Node IDs SECOND (after PDF inheritance is fixed)
+  if (typeof resetAllNodeIds === 'function') {
+    resetAllNodeIds();
+  }
+  
   // Renumber questions by Y position before export
   renumberQuestionIds();
   
@@ -263,6 +275,9 @@ window.exportGuiJson = function(download = true) {
         if (cell._characterLimit !== undefined && cell._characterLimit !== '') {
           question.characterLimit = parseInt(cell._characterLimit) || 0;
         }
+        if (cell._paragraphLimit !== undefined && cell._paragraphLimit !== '') {
+          question.paragraphLimit = parseInt(cell._paragraphLimit) || 0;
+        }
       }
     
     // For text2, clean the text from HTML
@@ -290,7 +305,7 @@ window.exportGuiJson = function(download = true) {
       question.text = cleanedText;
     }
     
-    // For multiple textboxes, add the textboxes array and nodeId
+    // For multiple textboxes, add the textboxes array and nodeId with location data support
     if (questionType === "multipleTextboxes" && cell._textboxes) {
       // Get PDF name if available
       const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
@@ -302,6 +317,52 @@ window.exportGuiJson = function(download = true) {
       // Create nodeId with PDF prefix if available
       const nodeId = sanitizedPdfName ? `${sanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
       
+      // Create allFieldsInOrder array to maintain proper field ordering
+      const allFieldsInOrder = [];
+      const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
+      
+      // Process each textbox in order
+      cell._textboxes.forEach((tb, index) => {
+        const labelName = tb.nameId || "";
+        const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
+        
+        allFieldsInOrder.push({
+          type: "label",
+          label: labelName,
+          nodeId: fieldNodeId,
+          order: index + 1
+        });
+      });
+      
+      // Insert location fields at the correct position if locationIndex is set
+      if (locationIndex >= 0 && locationIndex <= cell._textboxes.length) {
+        const locationFields = [
+          { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
+          { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
+          { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
+          { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
+        ];
+        
+        // Insert location fields at the specified position
+        locationFields.forEach((field, fieldIndex) => {
+          allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
+            type: field.label === "Zip" ? "amount" : "label",
+            label: field.label,
+            nodeId: field.nodeId,
+            order: locationIndex + fieldIndex + 1
+          });
+        });
+        
+        // Update order numbers for all fields after insertion
+        allFieldsInOrder.forEach((field, index) => {
+          field.order = index + 1;
+        });
+      }
+      
+      // Set the allFieldsInOrder array
+      question.allFieldsInOrder = allFieldsInOrder;
+      
+      // Keep backward compatibility with old format
       question.textboxes = cell._textboxes.map(tb => ({
         label: "", // Empty label field as required
         nameId: tb.nameId ? `${nodeId}_${sanitizeNameId(tb.nameId)}` : "",
@@ -495,6 +556,66 @@ window.exportGuiJson = function(download = true) {
       }
     }
     
+    // Check for hidden logic - look for hidden checkbox/textbox nodes connected to options
+    const hiddenLogicConfigs = [];
+    if (outgoingEdges) {
+      for (const edge of outgoingEdges) {
+        const targetCell = edge.target;
+        if (targetCell && isOptions(targetCell)) {
+          // Get the option text
+          let optionText = targetCell.value || "";
+          if (optionText) {
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = optionText;
+            let cleanedText = textarea.value;
+            const temp = document.createElement("div");
+            temp.innerHTML = cleanedText;
+            cleanedText = temp.textContent || temp.innerText || cleanedText;
+            cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
+            optionText = cleanedText;
+          }
+          
+          // Check if this option connects to hidden nodes
+          const optionOutgoingEdges = graph.getOutgoingEdges(targetCell);
+          if (optionOutgoingEdges) {
+            for (const optionEdge of optionOutgoingEdges) {
+              const hiddenNode = optionEdge.target;
+              if (hiddenNode && typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(hiddenNode)) {
+                // Hidden checkbox node
+                hiddenLogicConfigs.push({
+                  trigger: optionText.trim(),
+                  type: "checkbox",
+                  nodeId: hiddenNode._hiddenNodeId || "hidden_checkbox",
+                  textboxText: ""
+                });
+              } else if (hiddenNode && typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(hiddenNode)) {
+                // Hidden textbox node
+                hiddenLogicConfigs.push({
+                  trigger: optionText.trim(),
+                  type: "textbox",
+                  nodeId: hiddenNode._hiddenNodeId || "hidden_textbox",
+                  textboxText: hiddenNode._defaultText || ""
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    // Set hidden logic if any hidden nodes are connected to options
+    if (hiddenLogicConfigs.length > 0) {
+      question.hiddenLogic = {
+        enabled: true,
+        configs: hiddenLogicConfigs
+      };
+    } else {
+      question.hiddenLogic = {
+        enabled: false,
+        configs: []
+      };
+    }
+    
     // Set jump logic if any options lead to end nodes or section jumps
     if (jumpConditions.length > 0) {
       question.jump.enabled = true;
@@ -565,10 +686,10 @@ window.exportGuiJson = function(download = true) {
         return "";
       }).filter(opt => opt !== null); // Remove null entries (image options)
       
-      // Add linking field
-      question.linking = { enabled: false, targetId: "" };
-      // Add image field: use imageData if found, else default
-      question.image = imageData || { url: "", width: 0, height: 0 };
+      // Update image field if imageData is found
+      if (imageData) {
+        question.image = imageData;
+      }
     }
     
     // --- PATCH: For checkboxes, convert options to proper checkbox format ---
@@ -642,32 +763,63 @@ window.exportGuiJson = function(download = true) {
       // Create nodeId with PDF prefix if available
       const nodeId = sanitizedPdfName ? `${sanitizedPdfName}_${baseQuestionName}` : baseQuestionName;
       
-      // Extract labels and amounts from textboxes
+      // Extract labels and amounts from textboxes with location data support
       if (cell._textboxes && Array.isArray(cell._textboxes)) {
-        // Labels should only include non-amount options
-        question.labels = [];
-        // Amounts should be a simple array of strings for amount options
-        question.amounts = [];
-        // LabelNodeIds array for numberedDropdown
-        question.labelNodeIds = [];
+        // Create allFieldsInOrder array to maintain proper field ordering
+        const allFieldsInOrder = [];
+        const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
         
-        cell._textboxes.forEach(tb => {
-          if (tb.isAmountOption === true) {
-            // Add to amounts as a simple string
-            question.amounts.push(tb.nameId || tb.placeholder || "");
-          } else {
-            // Add to labels as a simple string
-            const labelName = tb.nameId || tb.placeholder || "";
-            question.labels.push(labelName);
-            // Create labelNodeId with PDF prefix if available
-            const labelNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
-            question.labelNodeIds.push(labelNodeId);
-          }
+        // Process each textbox in order
+        cell._textboxes.forEach((tb, index) => {
+          const labelName = tb.nameId || tb.placeholder || "";
+          const fieldType = tb.isAmountOption === true ? "amount" : "label";
+          const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
+          
+          allFieldsInOrder.push({
+            type: fieldType,
+            label: labelName,
+            nodeId: fieldNodeId,
+            order: index + 1
+          });
         });
+        
+        // Insert location fields at the correct position if locationIndex is set
+        if (locationIndex >= 0 && locationIndex <= cell._textboxes.length) {
+          const locationFields = [
+            { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
+            { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
+            { label: "State", nodeId: sanitizedPdfName ? `${nodeId}_state` : `${baseQuestionName}_state` },
+            { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
+          ];
+          
+          // Insert location fields at the specified position
+          locationFields.forEach((field, fieldIndex) => {
+            allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
+              type: field.label === "Zip" ? "amount" : "label",
+              label: field.label,
+              nodeId: field.nodeId,
+              order: locationIndex + fieldIndex + 1
+            });
+          });
+          
+          // Update order numbers for all fields after insertion
+          allFieldsInOrder.forEach((field, index) => {
+            field.order = index + 1;
+          });
+        }
+        
+        // Set the allFieldsInOrder array
+        question.allFieldsInOrder = allFieldsInOrder;
+        
+        // Keep empty arrays for backward compatibility
+        question.labels = [];
+        question.amounts = [];
+        question.labelNodeIds = [];
       } else {
         question.labels = [];
         question.amounts = [];
         question.labelNodeIds = [];
+        question.allFieldsInOrder = [];
       }
       
       // Extract min and max from _twoNumbers
@@ -947,6 +1099,75 @@ window.exportGuiJson = function(download = true) {
     sectionMap[section].questions.push(question);
   }
   
+  // Process calculation nodes and convert them to hidden fields
+  const calculationNodes = vertices.filter(cell => typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell));
+  for (const cell of calculationNodes) {
+    // Skip if this calculation node doesn't have the required properties
+    if (!cell._calcTitle || !cell._calcTerms || cell._calcTerms.length === 0) {
+      continue;
+    }
+    
+    // Create hidden field for calculation node
+    const hiddenField = {
+      hiddenFieldId: hiddenFieldCounter.toString(),
+      type: cell._calcFinalOutputType === "checkbox" ? "checkbox" : "text",
+      name: cell._calcTitle,
+      checked: cell._calcFinalCheckboxChecked || false,
+      conditions: [],
+      calculations: []
+    };
+    
+    // For checkbox type, don't add calculations - just add the hidden field
+    if (cell._calcFinalOutputType === "checkbox") {
+      hiddenFields.push(hiddenField);
+      hiddenFieldCounter++;
+    } else {
+      // For text type, convert calculation terms to the expected format
+      const calculation = {
+        terms: [],
+        compareOperator: cell._calcOperator || "=",
+        threshold: cell._calcThreshold || "0",
+        fillValue: cell._calcFinalText || ""
+      };
+      
+      // Process each calculation term
+      for (const term of cell._calcTerms) {
+        if (term.amountLabel) {
+          // Extract the question name from the amount label
+          let questionNameId = term.amountLabel;
+          
+          // If it's in the format "question_value:answer1:how_much (answer1)", extract the clean name
+          if (term.amountLabel.startsWith('question_value:')) {
+            const parts = term.amountLabel.split(':');
+            if (parts.length >= 3) {
+              // Extract the clean question name from the display part
+              // Format: "question_value:answer1:how_much (answer1)"
+              // We want "how_much" from the third part
+              const displayPart = parts[2];
+              // Remove the "(answer1)" part if it exists
+              questionNameId = displayPart.replace(/\s*\([^)]*\)$/, '');
+            }
+          } else {
+            // For regular labels, use as-is
+            questionNameId = term.amountLabel;
+          }
+          
+          calculation.terms.push({
+            operator: term.mathOperator || "",
+            questionNameId: questionNameId
+          });
+        }
+      }
+      
+      // Only add the calculation if it has terms
+      if (calculation.terms.length > 0) {
+        hiddenField.calculations.push(calculation);
+        hiddenFields.push(hiddenField);
+        hiddenFieldCounter++;
+      }
+    }
+  }
+  
   // Sort questions within each section by questionId
   for (const secNum in sectionMap) {
     sectionMap[secNum].questions.sort((a, b) => {
@@ -980,6 +1201,9 @@ window.exportGuiJson = function(download = true) {
   const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
     window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
   
+  // Get form name
+  const formName = document.getElementById('formNameInput')?.value || 'Example Form';
+  
   // Create final output object
   const output = {
     sections: sections,
@@ -989,6 +1213,7 @@ window.exportGuiJson = function(download = true) {
     questionCounter: questionCounter,
     hiddenFieldCounter: hiddenFieldCounter,
     groupCounter: 1,
+    formName: formName,
     defaultPDFName: defaultPdfProps.pdfName || "",
     pdfOutputName: defaultPdfProps.pdfFile || "",
     stripePriceId: defaultPdfProps.pdfPrice || "",
@@ -1094,6 +1319,8 @@ window.exportBothJson = function() {
       if (cell._calcThreshold !== undefined) cellData._calcThreshold = cell._calcThreshold;
       if (cell._calcFinalText !== undefined) cellData._calcFinalText = cell._calcFinalText;
       if (cell._calcTerms !== undefined) cellData._calcTerms = JSON.parse(JSON.stringify(cell._calcTerms));
+      if (cell._calcFinalOutputType !== undefined) cellData._calcFinalOutputType = cell._calcFinalOutputType;
+      if (cell._calcFinalCheckboxChecked !== undefined) cellData._calcFinalCheckboxChecked = cell._calcFinalCheckboxChecked;
       
       // subtitle & info nodes
       if (cell._subtitleText !== undefined) cellData._subtitleText = cell._subtitleText;
@@ -1105,6 +1332,14 @@ window.exportBothJson = function() {
       // big paragraph properties
       if (cell._lineLimit !== undefined) cellData._lineLimit = cell._lineLimit;
       if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
+      if (cell._paragraphLimit !== undefined) cellData._paragraphLimit = cell._paragraphLimit;
+      
+      // Hidden node properties
+      if (cell._hiddenNodeId !== undefined) cellData._hiddenNodeId = cell._hiddenNodeId;
+      if (cell._defaultText !== undefined) cellData._defaultText = cell._defaultText;
+      
+      // mult dropdown location indicator
+      if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
 
       return cellData;
     });
@@ -1113,11 +1348,15 @@ window.exportBothJson = function() {
     const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
       window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
     
+    // Get form name
+    const formName = document.getElementById('formNameInput')?.value || '';
+    
     const flowchartExportObj = {
       cells: simplifiedCells,
       sectionPrefs: sectionPrefs,
       groups: getGroupsData(),
-      defaultPdfProperties: defaultPdfProps
+      defaultPdfProperties: defaultPdfProps,
+      formName: formName
     };
 
     const flowchartJson = JSON.stringify(flowchartExportObj, null, 2);
@@ -1175,8 +1414,16 @@ window.saveFlowchart = function() {
   renumberQuestionIds();
   let flowchartName = currentFlowchartName;
   if (!flowchartName) {
-    flowchartName = prompt("Enter a name for this flowchart:");
-    if (!flowchartName || !flowchartName.trim()) return;
+    // Get form name from input field
+    const formNameInput = document.getElementById('formNameInput');
+    const formName = formNameInput ? formNameInput.value.trim() : '';
+    
+    if (formName) {
+      flowchartName = formName;
+    } else {
+      flowchartName = prompt("Enter a name for this flowchart:");
+      if (!flowchartName || !flowchartName.trim()) return;
+    }
     currentFlowchartName = flowchartName;
   }
   // Gather data and save
@@ -1213,15 +1460,19 @@ window.saveFlowchart = function() {
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
       _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null,
       _checkboxAvailability: cell._checkboxAvailability||null,
-      _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null
+      _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
+      _locationIndex: cell._locationIndex||null,
+      _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null
     };
     if (isCalculationNode(cell)) {
-      cellData._calcTitle = cell._calcTitle;
-      cellData._calcAmountLabel = cell._calcAmountLabel;
-      cellData._calcOperator = cell._calcOperator;
-      cellData._calcThreshold = cell._calcThreshold;
-      cellData._calcFinalText = cell._calcFinalText;
-      cellData._calcTerms = cell._calcTerms;
+      cellData._calcTitle = cell._calcTitle || null;
+      cellData._calcAmountLabel = cell._calcAmountLabel || null;
+      cellData._calcOperator = cell._calcOperator || null;
+      cellData._calcThreshold = cell._calcThreshold || null;
+      cellData._calcFinalText = cell._calcFinalText || null;
+      cellData._calcTerms = cell._calcTerms || null;
+      cellData._calcFinalOutputType = cell._calcFinalOutputType || null;
+      cellData._calcFinalCheckboxChecked = cell._calcFinalCheckboxChecked || null;
     }
     data.cells.push(cellData);
   }
@@ -1234,6 +1485,10 @@ window.saveFlowchart = function() {
   const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
     window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
   data.defaultPdfProperties = defaultPdfProps;
+  
+  // Get form name
+  const formName = document.getElementById('formNameInput')?.value || '';
+  data.formName = formName;
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
     flowchart: data,
     lastUsed: Date.now()
@@ -1315,8 +1570,8 @@ window.openSavedFlowchart = function(name) {
       if (!docSnap.exists) { alert("No flowchart named " + name); return; }
       
       console.log('📚 [LIBRARY LOAD] Flowchart data retrieved, calling loadFlowchartData');
-      loadFlowchartData(docSnap.data().flowchart);
       currentFlowchartName = name;
+      loadFlowchartData(docSnap.data().flowchart, name);
       
       // Update last used timestamp
       db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name)
@@ -1708,8 +1963,19 @@ window.resetPdfInheritance = function(cell) {
     return;
   }
   
+  // Check if cell is valid
+  if (!cell) {
+    console.error('Cell is undefined for PDF reset');
+    return;
+  }
+  
   // Recursive function to find the source PDF node by following the inheritance chain
   function findSourcePdfNode(currentCell, visited = new Set()) {
+    // Check if currentCell is valid
+    if (!currentCell || !currentCell.id) {
+      return null;
+    }
+    
     if (visited.has(currentCell.id)) {
       return null; // Avoid infinite loops
     }
@@ -1828,6 +2094,14 @@ window.resetAllPdfInheritance = function() {
     // Skip PDF nodes themselves (they don't need inheritance reset)
     if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
       return;
+    }
+    
+    // Skip hidden nodes - they should not be affected by PDF reset
+    if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+      return; // Skip hidden checkbox nodes
+    }
+    if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+      return; // Skip hidden textbox nodes
     }
     
     // Check if this cell has PDF inheritance
@@ -1984,8 +2258,12 @@ window.validateAllNodeIds = function() {
 /**
  * Load a flowchart from JSON data.
  */
-window.loadFlowchartData = function(data) {
+window.loadFlowchartData = function(data, libraryFlowchartName) {
   console.log('📥 [LOAD FLOWCHART] Starting to load flowchart data');
+  console.log('📥 [LOAD FLOWCHART] Library flowchart name:', libraryFlowchartName || 'None (regular import)');
+  
+  // Store library flowchart name in a global variable for autosave to access
+  window._loadingLibraryFlowchartName = libraryFlowchartName || null;
   
   if (!data.cells) {
     alert("Invalid flowchart data");
@@ -2131,6 +2409,7 @@ window.loadFlowchartData = function(data) {
         if (item._nameId) newCell._nameId = item._nameId;
         if (item._placeholder) newCell._placeholder = item._placeholder;
         if (item._questionId) newCell._questionId = item._questionId;
+        if (item._locationIndex !== undefined) newCell._locationIndex = item._locationIndex;
         
         // Amount option properties
         if (item._amountName) newCell._amountName = item._amountName;
@@ -2183,6 +2462,21 @@ window.loadFlowchartData = function(data) {
           newCell._alertText = alertText;
         }
         
+        // Hidden node properties
+        if (item._hiddenNodeId !== undefined) newCell._hiddenNodeId = item._hiddenNodeId;
+        if (item._defaultText !== undefined) {
+          let defaultText = item._defaultText;
+          if (typeof defaultText === 'string') {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = defaultText;
+            defaultText = tempDiv.textContent || tempDiv.innerText || defaultText;
+          }
+          newCell._defaultText = defaultText;
+          console.log('🔍 [LOAD DEBUG] Loaded _defaultText for cell:', item.id, 'value:', defaultText);
+        } else {
+          console.log('🔍 [LOAD DEBUG] No _defaultText found for cell:', item.id);
+        }
+        
         // Calculation properties
         if (item._calcTitle !== undefined) {
           let calcTitle = item._calcTitle;
@@ -2214,6 +2508,8 @@ window.loadFlowchartData = function(data) {
           newCell._calcFinalText = calcFinalText;
         }
         if (item._calcTerms !== undefined) newCell._calcTerms = JSON.parse(JSON.stringify(item._calcTerms));
+        if (item._calcFinalOutputType !== undefined) newCell._calcFinalOutputType = item._calcFinalOutputType;
+        if (item._calcFinalCheckboxChecked !== undefined) newCell._calcFinalCheckboxChecked = item._calcFinalCheckboxChecked;
         
         // Subtitle and info node properties - decode HTML entities
         if (item._subtitleText !== undefined) {
@@ -2241,6 +2537,7 @@ window.loadFlowchartData = function(data) {
         // Big paragraph properties
         if (item._lineLimit !== undefined) newCell._lineLimit = item._lineLimit;
         if (item._characterLimit !== undefined) newCell._characterLimit = item._characterLimit;
+        if (item._paragraphLimit !== undefined) newCell._paragraphLimit = item._paragraphLimit;
 
         graph.addCell(newCell, parent);
         createdCells[item.id] = newCell;
@@ -2362,6 +2659,14 @@ window.loadFlowchartData = function(data) {
     // Clear default PDF properties if the loaded flowchart doesn't have them
     if (typeof window.setDefaultPdfProperties === 'function') {
       window.setDefaultPdfProperties({ pdfName: "", pdfFile: "", pdfPrice: "" });
+    }
+  }
+  
+  // Load form name if present
+  if (data.formName) {
+    const formNameInput = document.getElementById('formNameInput');
+    if (formNameInput) {
+      formNameInput.value = data.formName;
     }
   }
   

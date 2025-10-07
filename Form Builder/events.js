@@ -142,15 +142,12 @@ function setupMouseEventListeners(graph) {
     if (!mxEvent.isConsumed(evt)) {
       // Get zoom sensitivity from settings (default to 0.01 if not set)
       const sensitivity = window.userSettings?.zoomSensitivity || 0.01;
-      console.log('🔧 [ZOOM DEBUG] Regular wheel zoom - sensitivity:', sensitivity, 'userSettings:', window.userSettings);
       
       // Apply custom zoom based on sensitivity
       const currentScale = graph.view.scale;
       const baseZoomFactor = 1.02; // Much smaller base zoom factor
       const sensitivityFactor = sensitivity * 50; // Scale up the sensitivity value
       const zoomFactor = 1 + (baseZoomFactor - 1) * sensitivityFactor;
-      
-      console.log('🔧 [ZOOM DEBUG] Regular wheel zoom - currentScale:', currentScale, 'baseZoomFactor:', baseZoomFactor, 'sensitivityFactor:', sensitivityFactor, 'zoomFactor:', zoomFactor);
       
       let newScale;
       if (up) {
@@ -314,7 +311,7 @@ function setupGraphEventListeners(graph) {
     }
   });
   
-  // Move cells event for connected node handling
+  // Move cells event - nodes now move independently without dragging connected nodes
   graph.addListener(mxEvent.MOVE_CELLS, function(sender, evt) {
     const movedCells = evt.getProperty('cells');
     const dx = evt.getProperty('dx');
@@ -322,108 +319,8 @@ function setupGraphEventListeners(graph) {
     
     if (!movedCells || movedCells.length === 0) return;
     
-    const movedIds = new Set(movedCells.map(c => c.id));
-    
-    // Function to get all connected descendants (including notes nodes)
-    const getConnectedDescendants = (cell) => {
-      const descendants = new Set();
-      const queue = [cell];
-      
-      while (queue.length > 0) {
-        const current = queue.shift();
-        const edges = graph.getOutgoingEdges(current) || [];
-        
-        edges.forEach(edge => {
-          const target = edge.target;
-          if (!descendants.has(target) && !movedIds.has(target.id)) {
-            descendants.add(target);
-            queue.push(target);
-          }
-        });
-      }
-      return Array.from(descendants);
-    };
-    
-    // Function to get all connected ancestors (for notes nodes pointing to questions)
-    const getConnectedAncestors = (cell) => {
-      const ancestors = new Set();
-      const queue = [cell];
-      
-      while (queue.length > 0) {
-        const current = queue.shift();
-        const edges = graph.getIncomingEdges(current) || [];
-        
-        edges.forEach(edge => {
-          const source = edge.source;
-          if (!ancestors.has(source) && !movedIds.has(source.id)) {
-            ancestors.add(source);
-            queue.push(source);
-          }
-        });
-      }
-      return Array.from(ancestors);
-    };
-    
-    movedCells.forEach(cell => {
-      if (typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
-        // When dragging a question node, move all connected descendants (including notes nodes)
-        const descendants = getConnectedDescendants(cell);
-        descendants.forEach(descendant => {
-          const geo = descendant.geometry;
-          if (geo) {
-            const newGeo = geo.clone();
-            newGeo.x += dx;
-            newGeo.y += dy;
-            graph.getModel().setGeometry(descendant, newGeo);
-          }
-        });
-      } else if ((typeof window.isNotesNode === 'function' && window.isNotesNode(cell)) || 
-                 (typeof window.isChecklistNode === 'function' && window.isChecklistNode(cell)) || 
-                 (typeof window.isAlertNode === 'function' && window.isAlertNode(cell)) || 
-                 (typeof window.isSubtitleNode === 'function' && window.isSubtitleNode(cell)) || 
-                 (typeof window.isInfoNode === 'function' && window.isInfoNode(cell))) {
-        // When dragging a notes/checklist/alert/subtitle/info node, check if it points to a question node
-        const incomingEdges = graph.getIncomingEdges(cell) || [];
-        const outgoingEdges = graph.getOutgoingEdges(cell) || [];
-        
-        // If node has outgoing edges (points to other nodes), move those descendants
-        if (outgoingEdges.length > 0) {
-          const descendants = getConnectedDescendants(cell);
-          descendants.forEach(descendant => {
-            const geo = descendant.geometry;
-            if (geo) {
-              const newGeo = geo.clone();
-              newGeo.x += dx;
-              newGeo.y += dy;
-              graph.getModel().setGeometry(descendant, newGeo);
-            }
-          });
-        }
-        
-        // If node has incoming edges (is pointed to by other nodes), 
-        // check if any of those are question nodes and move them with their descendants
-        incomingEdges.forEach(edge => {
-          const source = edge.source;
-          if (typeof window.isQuestion === 'function' && window.isQuestion(source) && !movedIds.has(source.id)) {
-            // Move the question node and all its descendants
-            const questionAndDescendants = [source, ...getConnectedDescendants(source)];
-            questionAndDescendants.forEach(descendant => {
-              const geo = descendant.geometry;
-              if (geo) {
-                const newGeo = geo.clone();
-                newGeo.x += dx;
-                newGeo.y += dy;
-                graph.getModel().setGeometry(descendant, newGeo);
-              }
-            });
-          }
-        });
-      } else if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
-        // PDF nodes should NOT drag any connected nodes - they move independently
-        // This prevents PDF nodes from dragging question nodes or other connected elements
-        console.log('PDF node dragged independently - no connected nodes moved');
-      }
-    });
+    // All nodes now move independently - no connected node dragging
+    console.log('Nodes moved independently - no connected nodes dragged along');
     
     // Renumber question IDs based on new Y positions
     if (typeof window.renumberQuestionIds === 'function') {
@@ -436,29 +333,8 @@ function setupGraphEventListeners(graph) {
 function setupKeyboardEventListeners(graph) {
   if (!graph) return;
   
-  // Keyboard shortcuts for copy/paste
-  document.addEventListener('keydown', function(evt) {
-    // Only handle shortcuts when not typing in input fields
-    if (typeof window.isUserTyping === 'function' && window.isUserTyping(evt)) return;
-    
-    if (evt.ctrlKey || evt.metaKey) {
-      if (evt.key === 'c') {
-        evt.preventDefault();
-        if (typeof window.copySelectedNodeAsJson === 'function') {
-          window.copySelectedNodeAsJson();
-        }
-      } else if (evt.key === 'v') {
-        evt.preventDefault();
-        // Get the center of the viewport for pasting
-        const viewport = graph.view.getGraphBounds();
-        const centerX = viewport.x + viewport.width / 2;
-        const centerY = viewport.y + viewport.height / 2;
-        if (typeof window.pasteNodeFromJson === 'function') {
-          window.pasteNodeFromJson(centerX, centerY);
-        }
-      }
-    }
-  });
+  // Keyboard shortcuts for copy/paste are handled in script.js using keyHandler.bindControlKey
+  // Removed duplicate event listeners to prevent double copy-paste behavior
   
   // Additional keyboard event listeners
   document.addEventListener('keydown', function(event) {
@@ -569,8 +445,8 @@ function setupCustomClickHandlers(graph) {
     
     // c) Calculation node double-click = show calculation properties
     if (typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell)) {
-      if (typeof window.showCalculationProperties === 'function') {
-        window.showCalculationProperties(cell, evt);
+      if (typeof window.showCalculationNodeProperties === 'function') {
+        window.showCalculationNodeProperties(cell);
       }
       mxEvent.consume(evt);
       return;
@@ -585,7 +461,25 @@ function setupCustomClickHandlers(graph) {
       return;
     }
     
-    // e) Edge double-click = reset geometry
+    // e) Hidden checkbox node double-click = show properties popup
+    if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
+    
+    // f) Hidden textbox node double-click = show properties popup
+    if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+      if (typeof window.showPropertiesPopup === 'function') {
+        window.showPropertiesPopup(cell);
+      }
+      mxEvent.consume(evt);
+      return;
+    }
+    
+    // g) Edge double-click = reset geometry
     if (cell && cell.edge) {
       const geo = new mxGeometry();
       graph.getModel().setGeometry(cell, geo);

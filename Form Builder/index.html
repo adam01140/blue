@@ -115,6 +115,20 @@
   >
     Alert Node
   </div>
+  <div
+    class="shape"
+    data-type="hiddenCheckbox"
+    data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=hiddenCheckbox;spacing=12;fontSize=16;strokeWidth=3;strokeColor=#0066CC;strokeDasharray=5,5;"
+  >
+    Hidden Checkbox
+  </div>
+  <div
+    class="shape"
+    data-type="hiddenTextbox"
+    data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=hiddenTextbox;spacing=12;fontSize=16;strokeWidth=3;strokeColor=#0066CC;strokeDasharray=5,5;"
+  >
+    Hidden Textbox
+  </div>
 
   <div class="button-bar">
     <button onclick="previewForm()">Preview Form</button><br>
@@ -129,6 +143,12 @@
     <button onclick="exportGuiJson(true)">Export GUI JSON</button><br>
     <button onclick="exportBothJson()">Export Both</button>
     <button onclick="generateShareableUrl()">Share Flowchart URL</button>
+  </div>
+
+  <!-- Form Name -->
+  <div class="form-name-container">
+    <label for="formNameInput" style="font-weight: bold; margin-right: 10px;">Form Name:</label>
+    <input type="text" id="formNameInput" placeholder="Enter form name..." style="width: 200px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
   </div>
 
   <!-- Search Box -->
@@ -276,6 +296,8 @@
   <button id="placePdfNode">PDF Node</button>
   <button id="placeAmountNode">Amount Option Node</button>
   <button id="placeEndNode">End Node</button>
+  <button id="placeHiddenCheckboxNode">Hidden Checkbox Node</button>
+  <button id="placeHiddenTextboxNode">Hidden Textbox Node</button>
 </div>
 
 <!-- Type Submenu -->
@@ -377,8 +399,8 @@
       <div class="setting-item">
         <label for="zoomSensitivityInput">Zoom Sensitivity:</label>
         <div class="slider-container">
-          <input type="number" id="zoomSensitivityInput" min="0.001" max="0.1" step="0.001" value="0.01" onchange="updateZoomSensitivity(this.value)" style="width: 80px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
-          <span id="zoomSensitivityValue" style="margin-left: 10px; font-weight: bold;">0.01</span>
+          <input type="number" id="zoomSensitivityInput" min="0.001" max="0.1" step="0.001" value="0.67" onchange="updateZoomSensitivity(this.value)" style="width: 80px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
+          <span id="zoomSensitivityValue" style="margin-left: 10px; font-weight: bold;">0.67</span>
         </div>
       </div>
       <div class="settings-actions">

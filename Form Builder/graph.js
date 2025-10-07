@@ -185,6 +185,40 @@ function setupCustomGraphEditing(graph) {
       }
       
       evt.consume();
+    } else if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+      // Update hidden checkbox node - sync text with node ID
+      graph.getModel().beginUpdate();
+      try {
+        // Save the plain text and sync with node ID
+        value = value.trim() || "Hidden Checkbox";
+        cell._hiddenNodeId = value;
+        
+        // Update the display value with the appropriate styling
+        if (window.updateHiddenCheckboxNodeCell) {
+          window.updateHiddenCheckboxNodeCell(cell);
+        }
+      } finally {
+        graph.getModel().endUpdate();
+      }
+      
+      evt.consume();
+    } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+      // Update hidden textbox node - sync text with node ID
+      graph.getModel().beginUpdate();
+      try {
+        // Save the plain text and sync with node ID
+        value = value.trim() || "Hidden Textbox";
+        cell._hiddenNodeId = value;
+        
+        // Update the display value with the appropriate styling
+        if (window.updateHiddenTextboxNodeCell) {
+          window.updateHiddenTextboxNodeCell(cell);
+        }
+      } finally {
+        graph.getModel().endUpdate();
+      }
+      
+      evt.consume();
     }
   });
 }
@@ -205,6 +239,7 @@ function setupCustomDoubleClickBehavior(graph) {
   
   // Track the currently selected cell for click-out detection
   let currentlySelectedCell = null;
+  let clickOutTimeout = null;
   
   // Add click listener to detect double-clicks and click-out
   graph.addListener(mxEvent.CLICK, function(sender, evt) {
@@ -216,20 +251,30 @@ function setupCustomDoubleClickBehavior(graph) {
       return;
     }
     
+    // Clear any pending click-out reset
+    if (clickOutTimeout) {
+      clearTimeout(clickOutTimeout);
+      clickOutTimeout = null;
+    }
+    
     // Handle click-out: if we had a selected cell and now clicking on empty space or different cell
     if (currentlySelectedCell && currentlySelectedCell !== cell) {
-      // Reset PDF and ID for the previously selected cell
-      if (typeof window.resetPdfInheritance === 'function') {
-        window.resetPdfInheritance(currentlySelectedCell);
-      }
-      
-      // Reset node ID by clearing any custom ID properties
-      if (currentlySelectedCell._nameId) {
-        currentlySelectedCell._nameId = '';
-      }
-      if (currentlySelectedCell._customId) {
-        currentlySelectedCell._customId = '';
-      }
+      // Debounce the reset operations to improve performance on large graphs
+      clickOutTimeout = setTimeout(() => {
+        // Reset PDF and ID for the previously selected cell
+        if (typeof window.resetPdfInheritance === 'function' && currentlySelectedCell) {
+          window.resetPdfInheritance(currentlySelectedCell);
+        }
+        
+        // Reset node ID by clearing any custom ID properties
+        if (currentlySelectedCell && currentlySelectedCell._nameId) {
+          currentlySelectedCell._nameId = '';
+        }
+        if (currentlySelectedCell && currentlySelectedCell._customId) {
+          currentlySelectedCell._customId = '';
+        }
+        clickOutTimeout = null;
+      }, 100); // Small delay to batch operations
     }
     
     // Update currently selected cell
@@ -242,6 +287,12 @@ function setupCustomDoubleClickBehavior(graph) {
       if (lastClickedCell === cell && (currentTime - lastClickTime) <= DOUBLE_CLICK_DELAY) {
         //console.log("🎯 DOUBLE CLICK DETECTED manually!");
         //alert("double click detected");
+        
+        // Clear any pending click-out reset since we're handling a double-click
+        if (clickOutTimeout) {
+          clearTimeout(clickOutTimeout);
+          clickOutTimeout = null;
+        }
         
         // Reset PDF and ID for the node on double-click
         if (typeof window.resetPdfInheritance === 'function') {
@@ -273,6 +324,24 @@ function setupCustomDoubleClickBehavior(graph) {
           return;
         }
         
+        // Show properties popup for hidden checkbox nodes
+        if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+          console.log("🎯 Hidden checkbox node detected, showing properties popup");
+          if (typeof window.showPropertiesPopup === 'function') {
+            window.showPropertiesPopup(cell);
+          }
+          return;
+        }
+        
+        // Show properties popup for hidden textbox nodes
+        if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+          console.log("🎯 Hidden textbox node detected, showing properties popup");
+          if (typeof window.showPropertiesPopup === 'function') {
+            window.showPropertiesPopup(cell);
+          }
+          return;
+        }
+        
         // Reset the tracking
         lastClickTime = 0;
         lastClickedCell = null;
@@ -284,102 +353,7 @@ function setupCustomDoubleClickBehavior(graph) {
     }
   });
   
-  // Also keep the original dblClick override for compatibility
-  // Override the graph's dblClick method
-  const originalDblClick = graph.dblClick;
-  graph.dblClick = function (evt, cell) {
-    
-    // Only process left clicks, ignore right clicks
-    if (evt && evt.button !== undefined && evt.button !== 0) {
-      return;
-    }
-    
-    // Show properties popup for question nodes
-    if (cell && cell.vertex) {
-      if (typeof isQuestion === 'function' && isQuestion(cell)) {
-        if (typeof window.showPropertiesPopup === 'function') {
-          window.showPropertiesPopup(cell);
-        }
-        mxEvent.consume(evt);
-        return;
-      }
-    }
-    
-    // Ensure the cell is selected before editing
-    if (cell && !graph.isCellSelected(cell)) {
-      graph.setSelectionCell(cell);
-    }
-    
-    // Handle question nodes with properties popup
-    if (cell && typeof isQuestion === 'function' && isQuestion(cell)) {
-      if (typeof window.showPropertiesPopup === 'function') {
-        window.showPropertiesPopup(cell);
-        mxEvent.consume(evt);
-        return;
-      }
-    } else if (cell && typeof window.isQuestion === 'function' && window.isQuestion(cell)) {
-      if (typeof window.showPropertiesPopup === 'function') {
-        window.showPropertiesPopup(cell);
-        mxEvent.consume(evt);
-        return;
-      }
-    }
-    
-    // Show properties popup for option nodes on double-click
-    if (cell && isOptions(cell) && !getQuestionType(cell).includes('image') && !getQuestionType(cell).includes('amount')) {
-      if (typeof window.showPropertiesPopup === 'function') {
-        window.showPropertiesPopup(cell);
-      }
-      mxEvent.consume(evt);
-      return;
-    }
-    
-    // Show properties popup for PDF nodes on double-click
-    if (cell && typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
-      if (typeof window.showPropertiesPopup === 'function') {
-        window.showPropertiesPopup(cell);
-      }
-      mxEvent.consume(evt);
-      return;
-    }
-    
-    // Add direct editing for subtitle and info nodes on double-click
-    if (cell && (isSubtitleNode(cell) || isInfoNode(cell))) {
-      graph.startEditingAtCell(cell);
-      mxEvent.consume(evt);
-      return;
-    }
-    
-    // Handle alert nodes - focus on the input field instead of editing the whole cell
-    if (cell && isAlertNode(cell)) {
-      const state = graph.view.getState(cell);
-      if (state && state.text && state.text.node) {
-        const inputField = state.text.node.querySelector('input[type="text"]');
-        if (inputField) {
-          graph.selectionModel.setCell(cell);
-          inputField.focus();
-          inputField.select();
-          mxEvent.consume(evt);
-          return;
-        }
-      }
-    }
-
-    // For all other nodes, enable general text editing
-    if (cell && cell.vertex && !cell.edge) {
-      try {
-        graph.startEditingAtCell(cell);
-        mxEvent.consume(evt);
-        return;
-      } catch (error) {
-        originalDblClick(evt, cell);
-        return;
-      }
-    }
-
-    // anything else keeps the stock behaviour
-    originalDblClick(evt, cell);
-  };
+  // Double-click behavior is now handled in events.js module
   
 }
 
@@ -387,18 +361,6 @@ function setupCustomDoubleClickBehavior(graph) {
  * Show the Properties popup for any node
  */
 function showPropertiesPopup(cell) {
-  // Automatically reset PDF inheritance and Node IDs before opening properties
-  // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
-  // Reset PDF inheritance for all nodes FIRST
-  if (typeof window.resetAllPdfInheritance === 'function') {
-    window.resetAllPdfInheritance();
-  }
-  
-  // Reset all Node IDs SECOND (after PDF inheritance is fixed)
-  if (typeof resetAllNodeIds === 'function') {
-    resetAllNodeIds();
-  }
-  
   // Prevent multiple popups or opening while closing
   if (window.__propertiesPopupOpen || window.__propertiesPopupClosing) {
     return;
@@ -455,9 +417,13 @@ function showPropertiesPopup(cell) {
   `;
   
   const title = document.createElement('h3');
-  // Use different title for PDF nodes
+  // Use different title for different node types
   if (typeof window.isPdfNode === 'function' && window.isPdfNode(cell)) {
     title.textContent = 'PDF Node Properties';
+  } else if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+    title.textContent = 'Hidden Checkbox Properties';
+  } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+    title.textContent = 'Hidden Textbox Properties';
   } else {
     title.textContent = 'Node Properties';
   }
@@ -528,13 +494,6 @@ function showPropertiesPopup(cell) {
     return '';
   })();
   
-  // Debug logging for big paragraph nodes
-  if (typeof window.getQuestionType === 'function' && window.getQuestionType(cell) === 'bigParagraph') {
-    console.log('🔧 [BIG PARAGRAPH DEBUG] Cell:', cell);
-    console.log('🔧 [BIG PARAGRAPH DEBUG] cell._questionText:', cell._questionText);
-    console.log('🔧 [BIG PARAGRAPH DEBUG] cell.value:', cell.value);
-    console.log('🔧 [BIG PARAGRAPH DEBUG] Extracted nodeText:', nodeText);
-  }
   
   // Generate default Node ID based on question text if _nameId is not set
   const generateDefaultNodeId = (text) => {
@@ -549,27 +508,37 @@ function showPropertiesPopup(cell) {
   // Use the correct window.getNodeId function (same as the old properties menu)
   let nodeId = 'N/A';
   
-  // Always use getNodeId to ensure PDF naming convention is applied
-  if (typeof window.getNodeId === 'function') {
-    nodeId = window.getNodeId(cell) || 'N/A';
+  // Special handling for hidden nodes - use _hiddenNodeId directly to preserve underscores
+  if ((typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) ||
+      (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell))) {
+    if (cell._hiddenNodeId) {
+      nodeId = cell._hiddenNodeId;
+    } else {
+      nodeId = 'N/A';
+    }
   } else {
-    // Fallback logic if window.getNodeId is not available
-    // PRIORITY 1: Check if we have a saved Node ID in the style
-    if (cell.style) {
-      const styleMatch = cell.style.match(/nodeId=([^;]+)/);
-      if (styleMatch) {
-        nodeId = decodeURIComponent(styleMatch[1]);
+    // Regular nodes use getNodeId function
+    if (typeof window.getNodeId === 'function') {
+      nodeId = window.getNodeId(cell) || 'N/A';
+    } else {
+      // Fallback logic if window.getNodeId is not available
+      // PRIORITY 1: Check if we have a saved Node ID in the style
+      if (cell.style) {
+        const styleMatch = cell.style.match(/nodeId=([^;]+)/);
+        if (styleMatch) {
+          nodeId = decodeURIComponent(styleMatch[1]);
+        }
       }
-    }
-    
-    // PRIORITY 2: Check _nameId property
-    if (nodeId === 'N/A' && cell._nameId) {
-      nodeId = cell._nameId;
-    }
-    
-    // PRIORITY 3: Generate default Node ID
-    if (nodeId === 'N/A') {
-      nodeId = generateDefaultNodeId(nodeText) || cell.id || 'N/A';
+      
+      // PRIORITY 2: Check _nameId property
+      if (nodeId === 'N/A' && cell._nameId) {
+        nodeId = cell._nameId;
+      }
+      
+      // PRIORITY 3: Generate default Node ID
+      if (nodeId === 'N/A') {
+        nodeId = generateDefaultNodeId(nodeText) || cell.id || 'N/A';
+      }
     }
   }
   
@@ -769,6 +738,17 @@ function showPropertiesPopup(cell) {
       { label: 'PDF File', value: cell._pdfFile || '', id: 'propPdfFile', editable: true },
       { label: 'PDF Price', value: cell._pdfPrice || '', id: 'propPdfPrice', editable: true }
     ];
+  } else if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+    // For hidden checkbox nodes, only show Node ID
+    properties = [
+      { label: 'Node ID', value: cell._hiddenNodeId || 'hidden_checkbox', id: 'propHiddenNodeId', editable: true }
+    ];
+  } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+    // For hidden textbox nodes, show Node ID and Default Text
+    properties = [
+      { label: 'Node ID', value: cell._hiddenNodeId || 'hidden_textbox', id: 'propHiddenNodeId', editable: true },
+      { label: 'Default Text', value: cell._defaultText || '', id: 'propDefaultText', editable: true }
+    ];
   } else {
     // For all other nodes, show the standard properties
     properties = [
@@ -792,7 +772,6 @@ function showPropertiesPopup(cell) {
           // Reassign the node to the selected section
           if (typeof window.setSection === 'function') {
             window.setSection(cell, selectedSection);
-            console.log(`🔧 [SECTION CHANGE] Reassigned node to section ${selectedSection}`);
           }
         }
       }
@@ -839,6 +818,14 @@ function showPropertiesPopup(cell) {
       editable: true,
       inputType: 'number'
     });
+    
+    properties.push({
+      label: 'Paragraph Limit',
+      value: cell._paragraphLimit || '',
+      id: 'propParagraphLimit',
+      editable: true,
+      inputType: 'number'
+    });
   }
   
   // PDF Name field will be added later in the unified section
@@ -879,17 +866,10 @@ function showPropertiesPopup(cell) {
           const nodeIdField = document.getElementById('propNodeId');
           let baseId = cell.id; // fallback to cell.id
           
-          console.log('🔧 [COPY ID DEBUG] cell.id:', cell.id);
-          console.log('🔧 [COPY ID DEBUG] nodeIdField:', nodeIdField);
-          console.log('🔧 [COPY ID DEBUG] nodeIdField.innerHTML:', nodeIdField ? nodeIdField.innerHTML : 'null');
-          console.log('🔧 [COPY ID DEBUG] nodeIdField.outerHTML:', nodeIdField ? nodeIdField.outerHTML : 'null');
           
           if (nodeIdField) {
             // Check if there's an active input field (user is editing)
             const activeInput = nodeIdField.parentNode.querySelector('input[type="text"]');
-            console.log('🔧 [COPY ID DEBUG] activeInput:', activeInput);
-            console.log('🔧 [COPY ID DEBUG] nodeIdField.textContent:', nodeIdField.textContent);
-            console.log('🔧 [COPY ID DEBUG] nodeIdField.value:', nodeIdField.value);
             
             if (activeInput) {
               baseId = activeInput.value.trim();
@@ -1515,7 +1495,11 @@ function showPropertiesPopup(cell) {
             const newValue = input.value.trim();
             valueSpan.textContent = newValue;
             valueSpan.style.display = 'block';
-            input.remove();
+            
+            // Safely remove input element if it still exists
+            if (input && input.parentNode) {
+              input.remove();
+            }
             
             // Update cell property
             switch(prop.id) {
@@ -1565,6 +1549,9 @@ function showPropertiesPopup(cell) {
                 break;
               case 'propCharacterLimit':
                 cell._characterLimit = newValue;
+                break;
+              case 'propParagraphLimit':
+                cell._paragraphLimit = newValue;
                 break;
               case 'propNodeId':
                 // Update the _nameId property
@@ -1641,6 +1628,36 @@ function showPropertiesPopup(cell) {
                   window.requestAutosave();
                 }
                 break;
+              case 'propHiddenNodeId':
+                // Update the hidden node ID property
+                cell._hiddenNodeId = newValue;
+                
+                // Update the node text to match the Node ID for hidden nodes
+                if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+                  // Update hidden checkbox node display
+                  if (typeof window.updateHiddenCheckboxNodeCell === 'function') {
+                    window.updateHiddenCheckboxNodeCell(cell);
+                  }
+                } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+                  // Update hidden textbox node display
+                  if (typeof window.updateHiddenTextboxNodeCell === 'function') {
+                    window.updateHiddenTextboxNodeCell(cell);
+                  }
+                }
+                
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
+              case 'propDefaultText':
+                // Update the default text property for hidden textbox
+                cell._defaultText = newValue;
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
             }
             
             // Refresh the graph
@@ -1659,7 +1676,10 @@ function showPropertiesPopup(cell) {
               saveValue();
             } else if (e.key === 'Escape') {
               valueSpan.style.display = 'block';
-              input.remove();
+              // Safely remove input element if it still exists
+              if (input && input.parentNode) {
+                input.remove();
+              }
             }
           });
         });
@@ -1842,7 +1862,7 @@ function showPropertiesPopup(cell) {
     newClosePopup();
   });
   
-  // Handle clicking outside popup
+  // Handle clicking outside popup (optimized version)
   let outsideClickHandler = null;
   
   const handleOutsideClick = (e) => {
@@ -1853,20 +1873,19 @@ function showPropertiesPopup(cell) {
     
     // Check if the click is outside the popup
     if (!popup.contains(e.target)) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation(); // Prevent other handlers from running
+      // Simple check: if click is not on the popup, close it
+      // No expensive cell detection - just close on any outside click
       newClosePopup();
     }
   };
   
-  // Add event listener to document for outside clicks with a delay to prevent immediate closure
+  // Add event listener with a reasonable delay to avoid interfering with double-click
   setTimeout(() => {
     outsideClickHandler = handleOutsideClick;
-    document.addEventListener('click', outsideClickHandler, true); // Use capture phase
-  }, 200);
+    document.addEventListener('click', outsideClickHandler, true);
+  }, 300); // 300ms delay - longer than double-click detection (250ms)
   
-  // Clean up the outside click listener when popup closes
+  // Clean up event listeners when popup closes
   const originalClosePopup = closePopup;
   const newClosePopup = () => {
     if (outsideClickHandler) {
@@ -2414,7 +2433,28 @@ function setupPanningAndZooming(graph) {
       
       // Limit zoom range
       if (scale >= 0.1 && scale <= 3.0) {
+        // Get mouse position relative to the container
+        const rect = container.getBoundingClientRect();
+        const mouseX = evt.clientX - rect.left;
+        const mouseY = evt.clientY - rect.top;
+        
+        // Get current view state
+        const currentTranslate = graph.view.translate;
+        const currentScale = graph.view.scale;
+        
+        // Calculate the point in graph coordinates that the mouse is over
+        const graphX = (mouseX / currentScale) - currentTranslate.x;
+        const graphY = (mouseY / currentScale) - currentTranslate.y;
+        
+        // Set the new scale
         graph.view.setScale(scale);
+        
+        // Calculate the new translation to keep the mouse point in the same screen position
+        const newTranslateX = (mouseX / scale) - graphX;
+        const newTranslateY = (mouseY / scale) - graphY;
+        
+        // Apply the new translation
+        graph.view.setTranslate(newTranslateX, newTranslateY);
       }
     }
   });

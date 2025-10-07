@@ -1,0 +1,61 @@
+FORMWIZ BRAND DESIGN DOCUMENT
+================================
+
+COLOR PALETTE
+-------------
+Primary Colors:
+- Header Background: #2c3e50 (Dark Blue)
+- Primary Blue: #2980b9 (Used for buttons, dropdowns, and form borders)
+- Light Blue Background: #f8f9ff (Used for form container backgrounds)
+- White: #ffffff (Form backgrounds, input fields)
+
+Secondary Colors:
+- Light Gray: #e1e5e9 (Input field borders)
+- Placeholder Text: #6c757d
+- Focus Blue: #007bff (Input focus states)
+
+FORM STYLING
+------------
+Entry Container Border:
+- Color: #2980b9 (matches dropdown borders)
+- Width: 2px solid
+- Border Radius: 12px
+- Padding: 20px
+- Margin: 20px auto (centered)
+- Background: #f8f9ff
+- Box Shadow: 0 4px 8px rgba(41, 128, 185, 0.15)
+- Display: inline-block
+- Width: auto with min-width: 450px
+- Max-width: 100%
+
+Input Fields:
+- Border: 2px solid #e1e5e9
+- Border Radius: 8px
+- Padding: 12px 16px
+- Background: #ffffff
+- Focus Border: #007bff
+- Focus Shadow: 0 0 0 3px rgba(0, 123, 255, 0.1)
+
+DESIGN DECISIONS
+----------------
+1. Entry containers use the same blue (#2980b9) as dropdown borders for consistency
+2. Light blue background (#f8f9ff) provides good contrast while maintaining readability
+3. Border width set to fit content with minimum 450px for proper visual balance
+4. All form elements maintain consistent border radius and padding
+5. Focus states use a lighter blue (#007bff) for clear user feedback
+
+TYPOGRAPHY
+----------
+- Primary Font: 'Montserrat', sans-serif
+- Section Titles: Bold, underlined, centered
+- Form Labels: Standard weight, left-aligned
+
+LAYOUT PRINCIPLES
+-----------------
+- Form containers are centered horizontally
+- Consistent spacing between elements (20px margins)
+- Input fields stack vertically within containers
+- Visual grouping through bordered containers
+- Responsive design with max-width constraints
+
+Last Updated: [Current Date]

@@ -615,7 +615,9 @@ function addQuestion(sectionId, questionId = null) {
             <label>Line Limit: </label>
             <input type="number" id="lineLimit${currentQuestionId}" placeholder="Enter line limit" min="1" max="100"><br><br>
             <label>Max character limit: </label>
-            <input type="number" id="maxCharacterLimit${currentQuestionId}" placeholder="Enter max character limit" min="1" max="10000">
+            <input type="number" id="maxCharacterLimit${currentQuestionId}" placeholder="Enter max character limit" min="1" max="10000"><br><br>
+            <label>Paragraph limit: </label>
+            <input type="number" id="paragraphLimit${currentQuestionId}" placeholder="Enter paragraph limit" min="1" max="10000">
         </div>
 
         <!-- Numbered Dropdown Options -->
@@ -626,18 +628,23 @@ function addQuestion(sectionId, questionId = null) {
             <label>Number Range: </label>
             <input type="number" id="numberRangeStart${currentQuestionId}" placeholder="Start" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})">
             <input type="number" id="numberRangeEnd${currentQuestionId}" placeholder="End" min="1" style="width: 60px;" onchange="updateNumberedDropdownEvents(${currentQuestionId})"><br><br>
-
-            <label>Textbox Labels:</label>
-            <div id="textboxLabels${currentQuestionId}"></div>
-            <button type="button" onclick="addTextboxLabel(${currentQuestionId})">Add Label</button>
             
-            <br><br>
+            <div style="text-align: center; margin: 15px 0;">
+                <button type="button" onclick="addTextboxAmount(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Amount</button>
+                <button type="button" onclick="addLocationFields(${currentQuestionId}, 'numberedDropdown')" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #4CAF50; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Location</button>
+                <button type="button" onclick="addTextboxLabel(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Label</button>
+            </div>
             
-            <label>Amount Labels:</label>
-            <div id="textboxAmounts${currentQuestionId}"></div>
-            <button type="button" onclick="addTextboxAmount(${currentQuestionId})">Add Amount</button>
+            <!-- Hidden containers for backward compatibility -->
+            <div id="textboxLabels${currentQuestionId}" style="display: none;"></div>
+            <div id="textboxAmounts${currentQuestionId}" style="display: none;"></div>
         </div><br>
 
+        <!-- Shared Unified Fields Container (for both numberedDropdown and multipleTextboxes) -->
+        <div id="unifiedFieldsContainer${currentQuestionId}" style="display: none;">
+            <label>Fields (in creation order):</label>
+            <div id="unifiedFields${currentQuestionId}"></div>
+        </div><br>
 
         <!-- Dropdown Options -->
         <div id="optionsBlock${currentQuestionId}" class="dropdown-options" style="display: none;">
@@ -679,10 +686,16 @@ function addQuestion(sectionId, questionId = null) {
         <div id="multipleTextboxesOptionsBlock${currentQuestionId}" class="multiple-textboxes-options" style="display: none;">
             <label>Node ID: </label>
             <input type="text" id="multipleTextboxesNodeId${currentQuestionId}" placeholder="Enter custom node ID" oninput="updateMultipleTextboxesNodeId(${currentQuestionId})"><br><br>
-            <label>Textboxes: </label>
-            <div id="multipleTextboxesOptions${currentQuestionId}"></div>
-            <button type="button" onclick="addMultipleTextboxOption(${currentQuestionId})">Add Textbox</button>
-            <button type="button" onclick="addMultipleAmountOption(${currentQuestionId})">Add Amount</button>
+            
+            <div style="text-align: center; margin: 15px 0;">
+                <button type="button" onclick="addTextboxAmount(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Amount</button>
+                <button type="button" onclick="addLocationFields(${currentQuestionId}, 'multipleTextboxes')" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #4CAF50; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Location</button>
+                <button type="button" onclick="addTextboxLabel(${currentQuestionId})" style="margin: 5px; padding: 8px 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-size: 14px; display: inline-block;">Add Label</button>
+            </div>
+            
+            <!-- Hidden containers for backward compatibility -->
+            <div id="textboxLabels${currentQuestionId}" style="display: none;"></div>
+            <div id="textboxAmounts${currentQuestionId}" style="display: none;"></div>
         </div><br>
         
         <!-- Linking Logic for Dropdown -->
@@ -786,6 +799,18 @@ function addQuestion(sectionId, questionId = null) {
                     <option value="Yes">Yes</option>
                     <option value="No">No</option>
                 </select><br>
+            </div>
+        </div><br>
+
+        <!-- Hidden Logic -->
+        <div id="hiddenLogic${currentQuestionId}" style="display: none;">
+            <label>Enable Hidden Logic: </label>
+            <input type="checkbox" id="enableHiddenLogic${currentQuestionId}" onchange="toggleHiddenLogic(${currentQuestionId})"><br><br>
+            <div id="hiddenLogicBlock${currentQuestionId}" style="display: none;">
+                <div id="hiddenLogicConfigs${currentQuestionId}">
+                    <!-- First hidden logic configuration will be added here -->
+                </div>
+                <button type="button" onclick="addHiddenLogicConfig(${currentQuestionId})" style="margin-top: 10px;">+ Add Another</button>
             </div>
         </div><br>
 
@@ -1027,10 +1052,20 @@ function toggleOptions(questionId) {
 
         case 'multipleTextboxes':
             multipleTextboxesBlock.style.display = 'block';
+            // Show the shared unified fields container
+            const unifiedFieldsContainerMultiple = document.getElementById(`unifiedFieldsContainer${questionId}`);
+            if (unifiedFieldsContainerMultiple) {
+                unifiedFieldsContainerMultiple.style.display = 'block';
+            }
             break;
 
         case 'numberedDropdown':
             numberedDropdownBlock.style.display = 'block';
+            // Show the shared unified fields container
+            const unifiedFieldsContainerNumbered = document.getElementById(`unifiedFieldsContainer${questionId}`);
+            if (unifiedFieldsContainerNumbered) {
+                unifiedFieldsContainerNumbered.style.display = 'block';
+            }
             // Update jump options for numbered dropdown
             const jumpConditions = document.querySelectorAll(`#jumpConditions${questionId} .jump-condition`);
             jumpConditions.forEach(condition => {
@@ -1057,6 +1092,14 @@ function toggleOptions(questionId) {
         }
     } else {
         pdfBlock.style.display = 'none';
+    }
+
+    // Handle hidden logic visibility - show only for dropdown questions
+    const hiddenLogicBlock = document.getElementById(`hiddenLogic${questionId}`);
+    if (questionType === 'dropdown') {
+        hiddenLogicBlock.style.display = 'block';
+    } else {
+        hiddenLogicBlock.style.display = 'none';
     }
 
     // Handle PDF Logic visibility - show for all question types
@@ -1536,6 +1579,176 @@ function toggleConditionalPDFLogic(questionId) {
     conditionalPDFBlock.style.display = conditionalPDFEnabled ? 'block' : 'none';
 }
 
+// Hidden logic toggling
+function toggleHiddenLogic(questionId) {
+    const hiddenLogicEnabled = document.getElementById(`enableHiddenLogic${questionId}`).checked;
+    const hiddenLogicBlock = document.getElementById(`hiddenLogicBlock${questionId}`);
+    hiddenLogicBlock.style.display = hiddenLogicEnabled ? 'block' : 'none';
+    
+    // Create first configuration when enabling
+    if (hiddenLogicEnabled) {
+        const configsContainer = document.getElementById(`hiddenLogicConfigs${questionId}`);
+        if (configsContainer && configsContainer.children.length === 0) {
+            addHiddenLogicConfig(questionId);
+        }
+    }
+    
+    // Clear all configurations when disabling
+    if (!hiddenLogicEnabled) {
+        const configsContainer = document.getElementById(`hiddenLogicConfigs${questionId}`);
+        if (configsContainer) {
+            configsContainer.innerHTML = '';
+        }
+    }
+}
+
+// Hidden logic type options toggling
+function toggleHiddenLogicOptions(questionId, configIndex = 0) {
+    const typeSelect = document.getElementById(`hiddenLogicType${questionId}_${configIndex}`);
+    const optionsDiv = document.getElementById(`hiddenLogicOptions${questionId}_${configIndex}`);
+    const textboxOptionsDiv = document.getElementById(`hiddenLogicTextboxOptions${questionId}_${configIndex}`);
+    
+    if (typeSelect && optionsDiv) {
+        const selectedType = typeSelect.value;
+        
+        if (selectedType) {
+            optionsDiv.style.display = 'block';
+            
+            // Show textbox options only if textbox is selected
+            if (textboxOptionsDiv) {
+                textboxOptionsDiv.style.display = selectedType === 'textbox' ? 'block' : 'none';
+            }
+        } else {
+            optionsDiv.style.display = 'none';
+            if (textboxOptionsDiv) textboxOptionsDiv.style.display = 'none';
+        }
+    }
+}
+
+// Update hidden logic trigger options from dropdown question options
+function updateHiddenLogicTriggerOptions(questionId) {
+    // Update all trigger selects for this question
+    const triggerSelects = document.querySelectorAll(`[id^="hiddenLogicTrigger${questionId}_"]`);
+    triggerSelects.forEach(triggerSelect => {
+        // Clear existing options except the first one
+        triggerSelect.innerHTML = '<option value="">Select Trigger</option>';
+        
+        // Get dropdown options from the question
+        const dropdownOptionsDiv = document.getElementById(`dropdownOptions${questionId}`);
+        if (!dropdownOptionsDiv) return;
+        
+        const optionInputs = dropdownOptionsDiv.querySelectorAll('input[type="text"]');
+        optionInputs.forEach(optionInput => {
+            const val = optionInput.value.trim();
+            if (val) {
+                const opt = document.createElement('option');
+                opt.value = val;
+                opt.text = val;
+                triggerSelect.appendChild(opt);
+            }
+        });
+    });
+}
+
+// Add a new hidden logic configuration
+function addHiddenLogicConfig(questionId) {
+    const configsContainer = document.getElementById(`hiddenLogicConfigs${questionId}`);
+    if (!configsContainer) return;
+    
+    // Get the next config index
+    const existingConfigs = configsContainer.querySelectorAll('.hidden-logic-config');
+    const configIndex = existingConfigs.length;
+    
+    // Create the configuration HTML
+    const configHtml = `
+        <div class="hidden-logic-config" id="hiddenLogicConfig${questionId}_${configIndex}" style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 5px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <strong>Hidden Logic Configuration ${configIndex + 1}</strong>
+                ${configIndex > 0 ? `<button type="button" onclick="removeHiddenLogicConfig(${questionId}, ${configIndex})" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Remove</button>` : ''}
+            </div>
+            <label>Trigger Condition:</label>
+            <select id="hiddenLogicTrigger${questionId}_${configIndex}">
+                <option value="">Select Trigger</option>
+            </select><br><br>
+            <label>Hidden Logic Type:</label>
+            <select id="hiddenLogicType${questionId}_${configIndex}" onchange="toggleHiddenLogicOptions(${questionId}, ${configIndex})">
+                <option value="">Select Type</option>
+                <option value="checkbox">Checkbox</option>
+                <option value="textbox">Textbox</option>
+            </select><br><br>
+            <div id="hiddenLogicOptions${questionId}_${configIndex}" style="display: none;">
+                <label>Node ID:</label>
+                <input type="text" id="hiddenLogicNodeId${questionId}_${configIndex}" placeholder="Enter node ID"><br><br>
+                <div id="hiddenLogicTextboxOptions${questionId}_${configIndex}" style="display: none;">
+                    <label>Textbox Text:</label>
+                    <input type="text" id="hiddenLogicTextboxText${questionId}_${configIndex}" placeholder="Enter textbox text"><br><br>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add the configuration to the container
+    configsContainer.insertAdjacentHTML('beforeend', configHtml);
+    
+    // Populate trigger options for the new configuration
+    updateHiddenLogicTriggerOptions(questionId);
+}
+
+// Remove a hidden logic configuration
+function removeHiddenLogicConfig(questionId, configIndex) {
+    const configElement = document.getElementById(`hiddenLogicConfig${questionId}_${configIndex}`);
+    if (configElement) {
+        configElement.remove();
+        
+        // Renumber remaining configurations
+        renumberHiddenLogicConfigs(questionId);
+    }
+}
+
+// Renumber hidden logic configurations after removal
+function renumberHiddenLogicConfigs(questionId) {
+    const configsContainer = document.getElementById(`hiddenLogicConfigs${questionId}`);
+    if (!configsContainer) return;
+    
+    const configs = configsContainer.querySelectorAll('.hidden-logic-config');
+    configs.forEach((config, newIndex) => {
+        const oldId = config.id;
+        const newId = `hiddenLogicConfig${questionId}_${newIndex}`;
+        
+        // Update the container ID
+        config.id = newId;
+        
+        // Update the title
+        const titleElement = config.querySelector('strong');
+        if (titleElement) {
+            titleElement.textContent = `Hidden Logic Configuration ${newIndex + 1}`;
+        }
+        
+        // Update all input IDs and names
+        const inputs = config.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            const oldInputId = input.id;
+            if (oldInputId) {
+                const newInputId = oldInputId.replace(/_\d+$/, `_${newIndex}`);
+                input.id = newInputId;
+                
+                // Update onchange handlers
+                if (input.onchange) {
+                    input.onchange = new Function(`toggleHiddenLogicOptions(${questionId}, ${newIndex})`);
+                }
+            }
+        });
+        
+        // Update remove button
+        const removeButton = config.querySelector('button[onclick*="removeHiddenLogicConfig"]');
+        if (removeButton && newIndex > 0) {
+            removeButton.onclick = new Function(`removeHiddenLogicConfig(${questionId}, ${newIndex})`);
+        } else if (removeButton && newIndex === 0) {
+            removeButton.remove();
+        }
+    });
+}
+
 // PDF Logic toggling
 function togglePdfLogic(questionId) {
     const pdfLogicEnabled = document.getElementById(`pdfLogic${questionId}`).checked;
@@ -1660,6 +1873,9 @@ function addDropdownOption(questionId) {
             const conditionId = condition.id.split('_')[1];
             updateJumpOptions(questionId, conditionId);
         });
+        
+        // Update hidden logic trigger options
+        updateHiddenLogicTriggerOptions(questionId);
     });
 
     // Update all existing jump conditions
@@ -1667,6 +1883,9 @@ function addDropdownOption(questionId) {
     
     // Update all checklist logic dropdowns
     updateAllChecklistLogicDropdowns();
+    
+    // Update hidden logic trigger options
+    updateHiddenLogicTriggerOptions(questionId);
 }
 
 function removeDropdownOption(questionId, optionNumber) {
@@ -1687,6 +1906,9 @@ function removeDropdownOption(questionId, optionNumber) {
     
     // Update all checklist logic dropdowns
     updateAllChecklistLogicDropdowns();
+    
+    // Update hidden logic trigger options
+    updateHiddenLogicTriggerOptions(questionId);
 }
 
 function addCheckboxOption(questionId) {
@@ -1793,17 +2015,74 @@ function removeCheckboxOption(questionId, optionNumber) {
 
 
 function addTextboxAmount(questionId) {
+    const unifiedDiv = getUnifiedContainer(questionId);
+    
+    // Remove placeholder if it exists
+    const placeholder = unifiedDiv.querySelector('div[style*="font-style: italic"]');
+    if (placeholder) {
+        placeholder.remove();
+    }
+    
+    const fieldCount = unifiedDiv.children.length + 1;
+
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = `unified-field field-${fieldCount}`;
+    fieldDiv.setAttribute('data-type', 'amount');
+    fieldDiv.setAttribute('data-order', fieldCount);
+    fieldDiv.innerHTML = `
+        <div style="margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="font-weight: bold; color: #333;">Amount: <span id="labelText${questionId}_${fieldCount}">Amount ${fieldCount}</span></div>
+            <div style="font-size: 0.9em; color: #666;">Node ID: <span id="nodeIdText${questionId}_${fieldCount}">amount_${fieldCount}</span></div>
+            <div style="font-size: 0.8em; color: #999; margin-top: 5px;">Type: <span id="typeText${questionId}_${fieldCount}">Amount</span> | Order: ${fieldCount}</div>
+            <button type="button" onclick="removeUnifiedField(${questionId}, ${fieldCount})" style="margin-top: 5px; background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">Remove</button>
+        </div>
+    `;
+    unifiedDiv.appendChild(fieldDiv);
+    console.log('🔧 [ADD AMOUNT DEBUG] Added field to unified container. New count:', unifiedDiv.children.length);
+    console.log('🔧 [ADD AMOUNT DEBUG] Unified container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
+    console.log('🔧 [ADD AMOUNT DEBUG] Unified container display style:', window.getComputedStyle(unifiedDiv).display);
+    console.log('🔧 [ADD AMOUNT DEBUG] Field div dimensions:', fieldDiv.offsetWidth, 'x', fieldDiv.offsetHeight);
+    
+    // Force the container to be visible and have dimensions
+    unifiedDiv.style.minHeight = '50px';
+    unifiedDiv.style.border = '1px solid #e0e0e0';
+    unifiedDiv.style.borderRadius = '5px';
+    unifiedDiv.style.padding = '10px';
+    unifiedDiv.style.backgroundColor = '#fafafa';
+    unifiedDiv.style.margin = '10px 0';
+    unifiedDiv.style.width = '100%';
+    unifiedDiv.style.display = 'block';
+    unifiedDiv.style.position = 'relative';
+    
+    console.log('🔧 [ADD AMOUNT DEBUG] After styling - Unified container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
+    console.log('🔧 [ADD AMOUNT DEBUG] After styling - Field div dimensions:', fieldDiv.offsetWidth, 'x', fieldDiv.offsetHeight);
+    
+    // Add double-click event listener as backup
+    const displayDiv = fieldDiv.querySelector('div');
+    if (displayDiv) {
+        // Remove any existing event listeners to prevent duplicates
+        if (displayDiv._dblclickHandler) {
+            displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
+        }
+        
+        // Add event listener for double-click editing
+        displayDiv._dblclickHandler = function() {
+            editUnifiedField(questionId, fieldCount);
+        };
+        displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
+    }
+    
+    // Also add to hidden container for backward compatibility
     const textboxAmountsDiv = document.getElementById(`textboxAmounts${questionId}`);
     const amountCount = textboxAmountsDiv.children.length + 1;
-
-    const amountDiv = document.createElement('div');
-    amountDiv.className = `amount${amountCount}`;
-    amountDiv.innerHTML = `
+    const hiddenAmountDiv = document.createElement('div');
+    hiddenAmountDiv.className = `amount${amountCount}`;
+    hiddenAmountDiv.innerHTML = `
         <input type="text" id="amount${questionId}_${amountCount}" 
                placeholder="Amount ${amountCount} (placeholder text)">
         <button type="button" onclick="removeTextboxAmount(${questionId}, ${amountCount})">Remove</button>
     `;
-    textboxAmountsDiv.appendChild(amountDiv);
+    textboxAmountsDiv.appendChild(hiddenAmountDiv);
 }
 
 
@@ -1826,24 +2105,149 @@ function removeTextboxAmount(questionId, amountNumber) {
             btn.setAttribute('onclick', `removeTextboxAmount(${questionId}, ${newAmountNumber})`);
         });
     }
+    
+    // Note: updateUnifiedFieldsDisplay is not called here because we're already adding directly to unified container
 }
 
+function getUnifiedContainer(questionId) {
+  // Get the unified container (should be in the correct position now)
+  let container = document.getElementById(`unifiedFields${questionId}`);
+  
+  // If not found at all (corrupt DOM or old data), create it in the right place
+  if (!container) {
+    // Find the question block to place it at the end
+    const qb = document.getElementById(`questionBlock${questionId}`);
+    if (qb) {
+      container = document.createElement('div');
+      container.id = `unifiedFields${questionId}`;
+      container.style.display = 'block';
+      qb.appendChild(container);
+    }
+  }
 
+  // Always ensure it's visible when we're going to write into it
+  if (container && container.style.display === 'none') {
+    container.style.display = 'block';
+  }
+
+  return container;
+}
 
 function addTextboxLabel(questionId) {
+    const unifiedDiv = getUnifiedContainer(questionId);
+    console.log('🔧 [ADD LABEL DEBUG] Looking for unified container:', `unifiedFields${questionId}`);
+    console.log('🔧 [ADD LABEL DEBUG] Found unified container:', !!unifiedDiv);
+    console.log('🔧 [ADD LABEL DEBUG] Unified container display style:', unifiedDiv ? window.getComputedStyle(unifiedDiv).display : 'N/A');
+    console.log('🔧 [ADD LABEL DEBUG] Unified container visibility:', unifiedDiv ? window.getComputedStyle(unifiedDiv).visibility : 'N/A');
+    
+    // Check parent container
+    if (unifiedDiv && unifiedDiv.parentElement) {
+        console.log('🔧 [ADD LABEL DEBUG] Parent container:', unifiedDiv.parentElement.tagName, unifiedDiv.parentElement.id);
+        console.log('🔧 [ADD LABEL DEBUG] Parent display style:', window.getComputedStyle(unifiedDiv.parentElement).display);
+        console.log('🔧 [ADD LABEL DEBUG] Parent dimensions:', unifiedDiv.parentElement.offsetWidth, 'x', unifiedDiv.parentElement.offsetHeight);
+    }
+    
+    if (!unifiedDiv) {
+        console.error('🔧 [ADD LABEL DEBUG] Unified container not found!');
+        return;
+    }
+    
+    // Ensure the unified container is visible
+    if (unifiedDiv.style.display === 'none') {
+        console.log('🔧 [ADD LABEL DEBUG] Unified container was hidden, making it visible');
+        unifiedDiv.style.display = 'block';
+    }
+    
+    // Remove placeholder if it exists
+    const placeholder = unifiedDiv.querySelector('div[style*="font-style: italic"]');
+    if (placeholder) {
+        placeholder.remove();
+    }
+    
+    const fieldCount = unifiedDiv.children.length + 1;
+    console.log('🔧 [ADD LABEL DEBUG] Current field count:', fieldCount);
+
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = `unified-field field-${fieldCount}`;
+    fieldDiv.setAttribute('data-type', 'label');
+    fieldDiv.setAttribute('data-order', fieldCount);
+    fieldDiv.innerHTML = `
+        <div style="margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="font-weight: bold; color: #333;">Label: <span id="labelText${questionId}_${fieldCount}">Label ${fieldCount}</span></div>
+            <div style="font-size: 0.9em; color: #666;">Node ID: <span id="nodeIdText${questionId}_${fieldCount}">label_${fieldCount}</span></div>
+            <div style="font-size: 0.8em; color: #999; margin-top: 5px;">Type: <span id="typeText${questionId}_${fieldCount}">Label</span> | Order: ${fieldCount}</div>
+            <button type="button" onclick="removeUnifiedField(${questionId}, ${fieldCount})" style="margin-top: 5px; background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">Remove</button>
+        </div>
+    `;
+    unifiedDiv.appendChild(fieldDiv);
+    console.log('🔧 [ADD LABEL DEBUG] Added field to unified container. New count:', unifiedDiv.children.length);
+    console.log('🔧 [ADD LABEL DEBUG] Unified container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
+    console.log('🔧 [ADD LABEL DEBUG] Unified container display style:', window.getComputedStyle(unifiedDiv).display);
+    console.log('🔧 [ADD LABEL DEBUG] Field div dimensions:', fieldDiv.offsetWidth, 'x', fieldDiv.offsetHeight);
+    
+    // Force a reflow and check if the container has any content
+    unifiedDiv.offsetHeight; // Force reflow
+    console.log('🔧 [ADD LABEL DEBUG] Container has children:', unifiedDiv.children.length);
+    console.log('🔧 [ADD LABEL DEBUG] Container innerHTML length:', unifiedDiv.innerHTML.length);
+    
+    // Try adding a temporary visible element to force dimensions
+    if (unifiedDiv.offsetWidth === 0 && unifiedDiv.offsetHeight === 0) {
+        console.log('🔧 [ADD LABEL DEBUG] Container has zero dimensions, adding temporary content');
+        const tempDiv = document.createElement('div');
+        tempDiv.style.width = '100px';
+        tempDiv.style.height = '20px';
+        tempDiv.style.backgroundColor = 'red';
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.top = '0';
+        tempDiv.style.left = '0';
+        tempDiv.textContent = 'TEMP';
+        unifiedDiv.appendChild(tempDiv);
+        
+        console.log('🔧 [ADD LABEL DEBUG] After temp content - Container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
+    }
+    
+    // Force the container to be visible and have dimensions
+    unifiedDiv.style.minHeight = '50px';
+    unifiedDiv.style.border = '1px solid #e0e0e0';
+    unifiedDiv.style.borderRadius = '5px';
+    unifiedDiv.style.padding = '10px';
+    unifiedDiv.style.backgroundColor = '#fafafa';
+    unifiedDiv.style.margin = '10px 0';
+    unifiedDiv.style.width = '100%';
+    unifiedDiv.style.display = 'block';
+    unifiedDiv.style.position = 'relative';
+    
+    console.log('🔧 [ADD LABEL DEBUG] After styling - Unified container dimensions:', unifiedDiv.offsetWidth, 'x', unifiedDiv.offsetHeight);
+    console.log('🔧 [ADD LABEL DEBUG] After styling - Field div dimensions:', fieldDiv.offsetWidth, 'x', fieldDiv.offsetHeight);
+    
+    // Add double-click event listener as backup
+    const displayDiv = fieldDiv.querySelector('div');
+    if (displayDiv) {
+        // Remove any existing event listeners to prevent duplicates
+        if (displayDiv._dblclickHandler) {
+            displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
+        }
+        
+        // Add event listener for double-click editing
+        displayDiv._dblclickHandler = function() {
+            editUnifiedField(questionId, fieldCount);
+        };
+        displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
+    }
+    
+    // Also add to hidden container for backward compatibility
     const textboxLabelsDiv = document.getElementById(`textboxLabels${questionId}`);
     const labelCount = textboxLabelsDiv.children.length + 1;
-
-    const labelDiv = document.createElement('div');
-    labelDiv.className = `label${labelCount}`;
-    labelDiv.innerHTML = `
+    const hiddenLabelDiv = document.createElement('div');
+    hiddenLabelDiv.className = `label${labelCount}`;
+    hiddenLabelDiv.innerHTML = `
         <input type="text" id="label${questionId}_${labelCount}" placeholder="Label ${labelCount}">
         <br>
         <label style="font-size: 0.9em; color: #666;">Node ID: </label>
         <input type="text" id="labelNodeId${questionId}_${labelCount}" placeholder="Enter node ID for this label" style="width: 200px; margin-top: 5px;">
         <button type="button" onclick="removeTextboxLabel(${questionId}, ${labelCount})" style="margin-top: 5px;">Remove</button>
     `;
-    textboxLabelsDiv.appendChild(labelDiv);
+    textboxLabelsDiv.appendChild(hiddenLabelDiv);
 }
 
 function removeTextboxLabel(questionId, labelNumber) {
@@ -1863,6 +2267,8 @@ function removeTextboxLabel(questionId, labelNumber) {
             btn.setAttribute('onclick', `removeTextboxLabel(${questionId}, ${newLabelNumber})`);
         });
     }
+    
+    // Note: updateUnifiedFieldsDisplay is not called here because we're already adding directly to unified container
 }
 
 function addMultipleTextboxOption(questionId) {
@@ -2250,4 +2656,1069 @@ function createPdfConfigurationModule() {
             container.insertBefore(pdfConfigContainer, container.firstChild);
         }
     }
+}
+
+// ============================================
+// ===========  ADD LOCATION FIELDS  =========
+// ============================================
+function addLocationFields(questionId, questionType) {
+    const locationFields = [
+        { label: 'Street', nodeId: 'street' },
+        { label: 'City', nodeId: 'city' },
+        { label: 'State', nodeId: 'state' }
+    ];
+    
+    if (questionType === 'numberedDropdown') {
+        // Add labels to numbered dropdown
+        locationFields.forEach(field => {
+            addTextboxLabel(questionId);
+            // Set the label value in the unified container
+            const unifiedDiv = getUnifiedContainer(questionId);
+            const lastField = unifiedDiv.lastElementChild;
+            if (lastField) {
+                const fieldOrder = lastField.getAttribute('data-order');
+                const labelTextEl = lastField.querySelector('#labelText' + questionId + '_' + fieldOrder);
+                const nodeIdTextEl = lastField.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                if (labelTextEl) labelTextEl.textContent = field.label;
+                if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+            }
+        });
+        
+        // Add amount field for Zip
+        addTextboxAmount(questionId);
+        const unifiedDiv = getUnifiedContainer(questionId);
+        const lastField = unifiedDiv.lastElementChild;
+        if (lastField) {
+            const fieldOrder = lastField.getAttribute('data-order');
+            const labelTextEl = lastField.querySelector('#labelText' + questionId + '_' + fieldOrder);
+            if (labelTextEl) labelTextEl.textContent = 'Zip';
+        }
+        
+        // Update hidden containers to keep them in sync
+        updateHiddenContainers(questionId);
+        
+    } else if (questionType === 'multipleTextboxes') {
+        // Use unified fields system for multiple textboxes too
+        locationFields.forEach(field => {
+            addTextboxLabel(questionId);
+            // Set the label value in the unified container
+            const unifiedDiv = getUnifiedContainer(questionId);
+            const lastField = unifiedDiv.lastElementChild;
+            if (lastField) {
+                const fieldOrder = lastField.getAttribute('data-order');
+                const labelTextEl = lastField.querySelector('#labelText' + questionId + '_' + fieldOrder);
+                const nodeIdTextEl = lastField.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                if (labelTextEl) labelTextEl.textContent = field.label;
+                if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+            }
+        });
+        
+        // Add amount field for Zip
+        addTextboxAmount(questionId);
+        const unifiedDiv = getUnifiedContainer(questionId);
+        const lastField = unifiedDiv.lastElementChild;
+        if (lastField) {
+            const fieldOrder = lastField.getAttribute('data-order');
+            const labelTextEl = lastField.querySelector('#labelText' + questionId + '_' + fieldOrder);
+            const nodeIdTextEl = lastField.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+            if (labelTextEl) labelTextEl.textContent = 'Zip';
+            if (nodeIdTextEl) nodeIdTextEl.textContent = 'zip';
+        }
+        
+        // Update hidden containers to keep them in sync
+        updateHiddenContainers(questionId);
+    }
+    
+    // Note: updateUnifiedFieldsDisplay is not called here because we're already adding directly to unified container
+}
+
+// ============================================
+// ===========  UNIFIED FIELD REMOVAL  =======
+// ============================================
+function removeUnifiedField(questionId, fieldOrder) {
+    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    const fieldToRemove = unifiedDiv.querySelector(`[data-order="${fieldOrder}"]`);
+    
+    if (fieldToRemove) {
+        const fieldType = fieldToRemove.getAttribute('data-type');
+        fieldToRemove.remove();
+        
+        // Update order numbers for remaining fields
+        const remainingFields = unifiedDiv.querySelectorAll('.unified-field');
+        remainingFields.forEach((field, index) => {
+            const newOrder = index + 1;
+            field.setAttribute('data-order', newOrder);
+            field.className = `unified-field field-${newOrder}`;
+            
+            // Update the order display
+            const orderDisplay = field.querySelector('div:last-of-type');
+            if (orderDisplay && orderDisplay.textContent.includes('Order:')) {
+                orderDisplay.textContent = orderDisplay.textContent.replace(/Order: \d+/, `Order: ${newOrder}`);
+            }
+            
+            // Update button onclick
+            const removeButton = field.querySelector('button');
+            if (removeButton) {
+                removeButton.setAttribute('onclick', `removeUnifiedField(${questionId}, ${newOrder})`);
+            }
+            
+            // Update double-click event
+            const displayDiv = field.querySelector('div');
+            if (displayDiv) {
+            // Remove any existing event listeners to prevent duplicates
+            if (displayDiv._dblclickHandler) {
+                displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
+            }
+            
+            // Add event listener for double-click editing
+            displayDiv._dblclickHandler = function() {
+                editUnifiedField(questionId, newOrder);
+            };
+            displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
+            }
+        });
+        
+        // Also remove from hidden containers for backward compatibility
+        if (fieldType === 'label') {
+            const hiddenLabelDiv = document.querySelector(`#textboxLabels${questionId} .label${fieldOrder}`);
+            if (hiddenLabelDiv) hiddenLabelDiv.remove();
+        } else if (fieldType === 'amount') {
+            const hiddenAmountDiv = document.querySelector(`#textboxAmounts${questionId} .amount${fieldOrder}`);
+            if (hiddenAmountDiv) hiddenAmountDiv.remove();
+        }
+    }
+}
+
+// ============================================
+// ===========  UNIFIED FIELD EDITING  =======
+// ============================================
+function editUnifiedField(questionId, fieldOrder) {
+    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    const fieldDiv = unifiedDiv.querySelector(`[data-order="${fieldOrder}"]`);
+    
+    if (!fieldDiv) {
+        return;
+    }
+    
+    const currentType = fieldDiv.getAttribute('data-type');
+    const labelTextEl = document.getElementById('labelText' + questionId + '_' + fieldOrder);
+    const nodeIdTextEl = document.getElementById('nodeIdText' + questionId + '_' + fieldOrder);
+    
+    if (!labelTextEl || !nodeIdTextEl) {
+        return;
+    }
+    
+    const labelText = labelTextEl.textContent;
+    const nodeIdText = nodeIdTextEl.textContent;
+    
+    // Create edit form
+    const editForm = document.createElement('div');
+    editForm.style.cssText = 'margin: 10px 0; padding: 20px; border: 2px solid #007bff; border-radius: 12px; background: #f0f8ff; box-shadow: 0 2px 8px rgba(0,123,255,0.1);';
+    editForm.innerHTML = `
+        <h4 style="margin-top: 0; color: #007bff;">Edit Field</h4>
+        <div style="margin-bottom: 10px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Field Name:</label>
+            <input type="text" id="editLabel${questionId}_${fieldOrder}" value="${labelText}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Node ID:</label>
+            <input type="text" id="editNodeId${questionId}_${fieldOrder}" value="${nodeIdText}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Type:</label>
+            <select id="editType${questionId}_${fieldOrder}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px;">
+                <option value="label" ${currentType === 'label' ? 'selected' : ''}>Label</option>
+                <option value="amount" ${currentType === 'amount' ? 'selected' : ''}>Amount</option>
+            </select>
+        </div>
+        <div style="text-align: center; margin-top: 15px;">
+            <button type="button" onclick="saveUnifiedField(${questionId}, ${fieldOrder})" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin: 0 10px; font-size: 14px; font-weight: 500; display: inline-block;">Save</button>
+            <button type="button" onclick="cancelEditUnifiedField(${questionId}, ${fieldOrder})" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin: 0 10px; font-size: 14px; font-weight: 500; display: inline-block;">Cancel</button>
+        </div>
+    `;
+    
+    // Replace the field with the edit form
+    fieldDiv.style.display = 'none';
+    fieldDiv.parentNode.insertBefore(editForm, fieldDiv.nextSibling);
+}
+
+function saveUnifiedField(questionId, fieldOrder) {
+    const newLabel = document.getElementById(`editLabel${questionId}_${fieldOrder}`).value.trim();
+    const newNodeId = document.getElementById(`editNodeId${questionId}_${fieldOrder}`).value.trim();
+    const newType = document.getElementById(`editType${questionId}_${fieldOrder}`).value;
+    
+    
+    if (!newLabel) {
+        alert('Field name cannot be empty');
+        return;
+    }
+    
+    // Update the field data
+    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    const fieldDiv = unifiedDiv.querySelector(`[data-order="${fieldOrder}"]`);
+    const editForm = fieldDiv.nextSibling;
+    
+    // Update field attributes
+    fieldDiv.setAttribute('data-type', newType);
+    
+    // Update display elements
+    const labelTextEl = document.getElementById('labelText' + questionId + '_' + fieldOrder);
+    const nodeIdTextEl = document.getElementById('nodeIdText' + questionId + '_' + fieldOrder);
+    const typeTextEl = document.getElementById('typeText' + questionId + '_' + fieldOrder);
+    
+    labelTextEl.textContent = newLabel;
+    nodeIdTextEl.textContent = newNodeId;
+    typeTextEl.textContent = newType;
+    
+    // Update the display text based on type
+    const displayDiv = fieldDiv.querySelector('div');
+    if (newType === 'label') {
+        displayDiv.querySelector('div:first-child').innerHTML = 'Label: <span id="labelText' + questionId + '_' + fieldOrder + '">' + newLabel + '</span>';
+    } else {
+        displayDiv.querySelector('div:first-child').innerHTML = 'Amount: <span id="labelText' + questionId + '_' + fieldOrder + '">' + newLabel + '</span>';
+    }
+    
+    // Remove any existing event listeners to prevent duplicates
+    if (displayDiv._dblclickHandler) {
+        displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
+    }
+    
+    // Add event listener for double-click editing
+    displayDiv._dblclickHandler = function() {
+        editUnifiedField(questionId, fieldOrder);
+    };
+    displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
+    
+    // Remove edit form and show field
+    editForm.remove();
+    fieldDiv.style.display = 'block';
+    
+    // Update hidden containers for backward compatibility (but don't interfere with the unified structure)
+    setTimeout(() => {
+        updateHiddenContainers(questionId);
+    }, 100);
+}
+
+function cancelEditUnifiedField(questionId, fieldOrder) {
+    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    const fieldDiv = unifiedDiv.querySelector(`[data-order="${fieldOrder}"]`);
+    const editForm = fieldDiv.nextSibling;
+    
+    editForm.remove();
+    fieldDiv.style.display = 'block';
+}
+
+function updateHiddenContainers(questionId) {
+    // Clear hidden containers
+    const textboxLabelsDiv = document.getElementById(`textboxLabels${questionId}`);
+    const textboxAmountsDiv = document.getElementById(`textboxAmounts${questionId}`);
+    textboxLabelsDiv.innerHTML = '';
+    textboxAmountsDiv.innerHTML = '';
+    
+    // Rebuild hidden containers from unified data
+    const unifiedDiv = document.getElementById(`unifiedFields${questionId}`);
+    const fields = unifiedDiv.querySelectorAll('.unified-field');
+    
+    let labelCount = 1;
+    let amountCount = 1;
+    
+    fields.forEach(field => {
+        const fieldType = field.getAttribute('data-type');
+        const fieldOrder = field.getAttribute('data-order');
+        const labelText = document.getElementById('labelText' + questionId + '_' + fieldOrder).textContent;
+        const nodeIdText = document.getElementById('nodeIdText' + questionId + '_' + fieldOrder).textContent;
+        
+        if (fieldType === 'label') {
+            const hiddenLabelDiv = document.createElement('div');
+            hiddenLabelDiv.className = `label${labelCount}`;
+            hiddenLabelDiv.innerHTML = `
+                <input type="text" id="label${questionId}_${labelCount}" value="${labelText}">
+                <br>
+                <label style="font-size: 0.9em; color: #666;">Node ID: </label>
+                <input type="text" id="labelNodeId${questionId}_${labelCount}" value="${nodeIdText}" style="width: 200px; margin-top: 5px;">
+                <button type="button" onclick="removeTextboxLabel(${questionId}, ${labelCount})" style="margin-top: 5px;">Remove</button>
+            `;
+            textboxLabelsDiv.appendChild(hiddenLabelDiv);
+            labelCount++;
+        } else if (fieldType === 'amount') {
+            const hiddenAmountDiv = document.createElement('div');
+            hiddenAmountDiv.className = `amount${amountCount}`;
+            hiddenAmountDiv.innerHTML = `
+                <input type="text" id="amount${questionId}_${amountCount}" value="${labelText}">
+                <button type="button" onclick="removeTextboxAmount(${questionId}, ${amountCount})">Remove</button>
+            `;
+            textboxAmountsDiv.appendChild(hiddenAmountDiv);
+            amountCount++;
+        }
+    });
+}
+
+// ============================================
+// ===========  UNIFIED FIELDS DISPLAY  =====
+// ============================================
+function updateUnifiedFieldsDisplay(questionId) {
+    const unifiedDiv = document.getElementById('unifiedFields' + questionId);
+    if (!unifiedDiv) return;
+    
+    // Get all elements from both containers
+    const labelElements = Array.from(document.querySelectorAll('#textboxLabels' + questionId + ' > div'));
+    const amountElements = Array.from(document.querySelectorAll('#textboxAmounts' + questionId + ' > div'));
+    
+    // Create a combined array with position information
+    const allElements = [];
+    
+    labelElements.forEach((el) => {
+        const labelInput = el.querySelector('input[type="text"]:first-of-type');
+        const nodeIdInput = el.querySelector('input[type="text"]:last-of-type');
+        allElements.push({
+            type: 'label',
+            label: labelInput ? labelInput.value.trim() : "",
+            nodeId: nodeIdInput ? nodeIdInput.value.trim() : "",
+            element: el,
+            position: el.getBoundingClientRect().top
+        });
+    });
+    
+    amountElements.forEach((el) => {
+        const amountInput = el.querySelector('input[type="text"]');
+        allElements.push({
+            type: 'amount',
+            label: amountInput ? amountInput.value.trim() : "",
+            nodeId: "",
+            element: el,
+            position: el.getBoundingClientRect().top
+        });
+    });
+    
+    // Sort by position in the document (creation order)
+    allElements.sort((a, b) => a.position - b.position);
+    
+    // Clear and rebuild the unified display
+    unifiedDiv.innerHTML = '';
+    
+    allElements.forEach((field, index) => {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.style.cssText = 'margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9;';
+        
+        if (field.type === 'label') {
+            fieldDiv.innerHTML = `
+                <div style="font-weight: bold; color: #333;">Label: ${field.label}</div>
+                <div style="font-size: 0.9em; color: #666;">Node ID: ${field.nodeId}</div>
+                <div style="font-size: 0.8em; color: #999; margin-top: 5px;">Type: Label | Order: ${index + 1}</div>
+            `;
+        } else if (field.type === 'amount') {
+            fieldDiv.innerHTML = `
+                <div style="font-weight: bold; color: #333;">Amount: ${field.label}</div>
+                <div style="font-size: 0.8em; color: #999; margin-top: 5px;">Type: Amount | Order: ${index + 1}</div>
+            `;
+        }
+        
+        unifiedDiv.appendChild(fieldDiv);
+    });
+}
+
+// ============================================
+// ===========  LINKED FIELDS FUNCTIONALITY  =====
+// ============================================
+
+// Global variables for linked fields
+let linkedFieldCounter = 0;
+let currentLinkedFieldConfig = [];
+
+// Open the linked field modal
+function openLinkedFieldModal() {
+    console.log('🔍 [DEBUG] openLinkedFieldModal called');
+    
+    // Create modal if it doesn't exist
+    if (!document.getElementById('linkedFieldModal')) {
+        console.log('🔍 [DEBUG] Creating linked field modal');
+        createLinkedFieldModal();
+    }
+    
+    // Reset current configuration
+    currentLinkedFieldConfig = [];
+    
+    // Show modal
+    document.getElementById('linkedFieldModal').style.display = 'block';
+    console.log('🔍 [DEBUG] Modal displayed');
+    
+    // Initialize with two dropdowns
+    addLinkedFieldDropdown();
+    addLinkedFieldDropdown();
+}
+
+// Create the linked field modal
+function createLinkedFieldModal() {
+    const modal = document.createElement('div');
+    modal.id = 'linkedFieldModal';
+    modal.style.cssText = `
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        " onclick="event.stopPropagation()">
+            <h3 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">Configure Linked Fields</h3>
+            <div id="linkedFieldDropdowns" style="margin-bottom: 20px;">
+                <!-- Dropdowns will be added here -->
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Linked Field ID:</label>
+                <input type="text" id="linkedFieldIdInput" placeholder="Enter linked field ID (e.g., linked_name_address)" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <button type="button" onclick="addLinkedFieldDropdown()" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    Link Another
+                </button>
+                <button type="button" onclick="finalizeLinkedField()" style="background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    Done
+                </button>
+                <button type="button" onclick="closeLinkedFieldModal()" style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Add event listeners for modal functionality
+    modal.addEventListener('click', function(event) {
+        // Close modal when clicking on the backdrop (outside the modal content)
+        if (event.target === modal) {
+            closeLinkedFieldModal();
+        }
+    });
+    
+    // Add Enter key functionality
+    document.addEventListener('keydown', function(event) {
+        if (modal.style.display === 'block' && event.key === 'Enter') {
+            event.preventDefault();
+            finalizeLinkedField();
+        }
+    });
+}
+
+// Add a dropdown to the linked field configuration
+function addLinkedFieldDropdown() {
+    console.log('🔍 [DEBUG] addLinkedFieldDropdown called');
+    
+    const dropdownsContainer = document.getElementById('linkedFieldDropdowns');
+    const dropdownIndex = currentLinkedFieldConfig.length;
+    
+    console.log('🔍 [DEBUG] dropdownsContainer:', dropdownsContainer);
+    console.log('🔍 [DEBUG] dropdownIndex:', dropdownIndex);
+    
+    const dropdownDiv = document.createElement('div');
+    dropdownDiv.id = `linkedFieldDropdown${dropdownIndex}`;
+    dropdownDiv.style.cssText = `
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    `;
+    
+    dropdownDiv.innerHTML = `
+        <div style="flex: 1; margin-right: 10px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Text Question ${dropdownIndex + 1}:</label>
+            <select id="linkedFieldSelect${dropdownIndex}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="">Select a text question...</option>
+            </select>
+        </div>
+        <button type="button" onclick="removeLinkedFieldDropdown(${dropdownIndex})" style="background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+            Delete
+        </button>
+    `;
+    
+    dropdownsContainer.appendChild(dropdownDiv);
+    
+    // Populate dropdown with text questions
+    populateLinkedFieldDropdown(dropdownIndex);
+    
+    // Add to current configuration
+    currentLinkedFieldConfig.push({
+        index: dropdownIndex,
+        selectedValue: ''
+    });
+}
+
+// Populate a linked field dropdown with text questions
+function populateLinkedFieldDropdown(dropdownIndex) {
+    console.log('🔍 [DEBUG] populateLinkedFieldDropdown called with dropdownIndex:', dropdownIndex);
+    
+    const select = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
+    if (!select) {
+        console.log('❌ [DEBUG] Select element not found for dropdownIndex:', dropdownIndex);
+        return;
+    }
+    
+    console.log('✅ [DEBUG] Found select element:', select);
+    
+    // Clear existing options
+    select.innerHTML = '<option value="">Select a text question...</option>';
+    
+    // Find all text questions and numbered dropdown fields
+    const textQuestions = [];
+    const questionBlocks = document.querySelectorAll('[id^="questionBlock"]');
+    
+    console.log('🔍 [DEBUG] Found question blocks:', questionBlocks.length);
+    
+    questionBlocks.forEach((block, blockIndex) => {
+        const questionId = block.id.replace('questionBlock', '');
+        console.log(`🔍 [DEBUG] Processing block ${blockIndex}: questionId=${questionId}, block.id=${block.id}`);
+        
+        const questionTypeSelect = block.querySelector(`#questionType${questionId}`);
+        const questionNameInput = block.querySelector(`#textboxName${questionId}`);
+        
+        console.log(`🔍 [DEBUG] Block ${blockIndex} - questionTypeSelect:`, questionTypeSelect);
+        console.log(`🔍 [DEBUG] Block ${blockIndex} - questionNameInput:`, questionNameInput);
+        
+        if (questionTypeSelect) {
+            console.log(`🔍 [DEBUG] Block ${blockIndex} - questionType:`, questionTypeSelect.value);
+        }
+        
+        // Handle regular text questions
+        if (questionTypeSelect && (questionTypeSelect.value === 'textbox' || questionTypeSelect.value === 'text') && questionNameInput) {
+            const nodeId = questionNameInput.value.trim() || `answer${questionId}`;
+            const questionText = block.querySelector(`#questionText${questionId}`)?.value || `Question ${questionId}`;
+            
+            console.log(`✅ [DEBUG] Found text question: ${questionText} (${nodeId})`);
+            
+            textQuestions.push({
+                questionId: questionId,
+                nodeId: nodeId,
+                questionText: questionText
+            });
+        }
+        
+        // Handle numbered dropdown questions
+        if (questionTypeSelect && questionTypeSelect.value === 'numberedDropdown') {
+            console.log(`🔍 [DEBUG] Found numberedDropdown question ${questionId}`);
+            
+            const questionText = block.querySelector(`#questionText${questionId}`)?.value || `Question ${questionId}`;
+            const nodeId = block.querySelector(`#nodeId${questionId}`)?.value || `answer${questionId}`;
+            const minValue = parseInt(block.querySelector(`#numberRangeStart${questionId}`)?.value || '1');
+            const maxValue = parseInt(block.querySelector(`#numberRangeEnd${questionId}`)?.value || '1');
+            
+            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - questionText:`, questionText);
+            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - nodeId:`, nodeId);
+            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - minValue:`, minValue);
+            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - maxValue:`, maxValue);
+            
+            // Get all fields from the numbered dropdown using the unified fields container
+            const unifiedFieldsContainer = block.querySelector(`#unifiedFields${questionId}`);
+            console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - unifiedFieldsContainer:`, unifiedFieldsContainer);
+            
+            if (unifiedFieldsContainer) {
+                const fieldContainers = unifiedFieldsContainer.querySelectorAll('.unified-field');
+                console.log(`🔍 [DEBUG] NumberedDropdown ${questionId} - fieldContainers found:`, fieldContainers.length);
+                
+                fieldContainers.forEach((fieldContainer, fieldIndex) => {
+                    console.log(`🔍 [DEBUG] Processing field container ${fieldIndex} for question ${questionId}`);
+                    
+                    const fieldType = fieldContainer.getAttribute('data-type');
+                    const fieldOrder = fieldContainer.getAttribute('data-order');
+                    
+                    console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldType:`, fieldType);
+                    console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldOrder:`, fieldOrder);
+                    
+                    if (fieldType && (fieldType === 'label' || fieldType === 'amount')) {
+                        // Get the field data from the spans
+                        const fieldLabelSpan = fieldContainer.querySelector(`#labelText${questionId}_${fieldOrder}`);
+                        const fieldNodeIdSpan = fieldContainer.querySelector(`#nodeIdText${questionId}_${fieldOrder}`);
+                        
+                        console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldLabelSpan:`, fieldLabelSpan);
+                        console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldNodeIdSpan:`, fieldNodeIdSpan);
+                        
+                        if (fieldLabelSpan && fieldNodeIdSpan) {
+                            const fieldLabel = fieldLabelSpan.textContent.trim();
+                            const fieldNodeId = fieldNodeIdSpan.textContent.trim();
+                            
+                            console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldLabel:`, fieldLabel);
+                            console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldNodeId:`, fieldNodeId);
+                            
+                            if (fieldLabel && fieldNodeId) {
+                                console.log(`✅ [DEBUG] Valid field found: ${fieldLabel} (${fieldNodeId})`);
+                                
+                                // Generate numbered options for each field
+                                for (let i = minValue; i <= maxValue; i++) {
+                                    const numberedNodeId = `${fieldNodeId}_${i}`;
+                                    const questionTextWithNumber = `${questionText} - ${fieldLabel} ${i}`;
+                                    
+                                    console.log(`✅ [DEBUG] Adding numbered field: ${questionTextWithNumber} (${numberedNodeId})`);
+                                    
+                                    textQuestions.push({
+                                        questionId: questionId,
+                                        nodeId: numberedNodeId,
+                                        questionText: questionTextWithNumber
+                                    });
+                                }
+                            }
+                        } else {
+                            console.log(`❌ [DEBUG] Field ${fieldIndex} missing spans - fieldLabelSpan: ${!!fieldLabelSpan}, fieldNodeIdSpan: ${!!fieldNodeIdSpan}`);
+                        }
+                    } else {
+                        console.log(`❌ [DEBUG] Field ${fieldIndex} doesn't meet criteria - fieldType: ${fieldType}`);
+                    }
+                });
+            } else {
+                console.log(`❌ [DEBUG] No unifiedFieldsContainer found for question ${questionId}`);
+            }
+        }
+        
+        // Handle multiple textboxes questions
+        if (questionTypeSelect && questionTypeSelect.value === 'multipleTextboxes') {
+            console.log(`🔍 [DEBUG] Found multipleTextboxes question ${questionId}`);
+            
+            const questionText = block.querySelector(`#questionText${questionId}`)?.value || `Question ${questionId}`;
+            const nodeId = block.querySelector(`#nodeId${questionId}`)?.value || `answer${questionId}`;
+            
+            console.log(`🔍 [DEBUG] MultipleTextboxes ${questionId} - questionText:`, questionText);
+            console.log(`🔍 [DEBUG] MultipleTextboxes ${questionId} - nodeId:`, nodeId);
+            
+            // Get all fields from the multiple textboxes using the unified fields container
+            const unifiedFieldsContainer = block.querySelector(`#unifiedFields${questionId}`);
+            console.log(`🔍 [DEBUG] MultipleTextboxes ${questionId} - unifiedFieldsContainer:`, unifiedFieldsContainer);
+            
+            if (unifiedFieldsContainer) {
+                const fieldContainers = unifiedFieldsContainer.querySelectorAll('.unified-field');
+                console.log(`🔍 [DEBUG] MultipleTextboxes ${questionId} - fieldContainers found:`, fieldContainers.length);
+                
+                fieldContainers.forEach((fieldContainer, fieldIndex) => {
+                    console.log(`🔍 [DEBUG] Processing field container ${fieldIndex} for question ${questionId}`);
+                    
+                    const fieldType = fieldContainer.getAttribute('data-type');
+                    const fieldOrder = fieldContainer.getAttribute('data-order');
+                    
+                    console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldType:`, fieldType);
+                    console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldOrder:`, fieldOrder);
+                    
+                    if (fieldType && (fieldType === 'label' || fieldType === 'amount')) {
+                        // Get the field data from the spans
+                        const fieldLabelSpan = fieldContainer.querySelector(`#labelText${questionId}_${fieldOrder}`);
+                        const fieldNodeIdSpan = fieldContainer.querySelector(`#nodeIdText${questionId}_${fieldOrder}`);
+                        
+                        console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldLabelSpan:`, fieldLabelSpan);
+                        console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldNodeIdSpan:`, fieldNodeIdSpan);
+                        
+                        if (fieldLabelSpan && fieldNodeIdSpan) {
+                            const fieldLabel = fieldLabelSpan.textContent.trim();
+                            const fieldNodeId = fieldNodeIdSpan.textContent.trim();
+                            
+                            console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldLabel:`, fieldLabel);
+                            console.log(`🔍 [DEBUG] Field ${fieldIndex} - fieldNodeId:`, fieldNodeId);
+                            
+                            if (fieldLabel && fieldNodeId) {
+                                console.log(`✅ [DEBUG] Valid field found: ${fieldLabel} (${fieldNodeId})`);
+                                
+                                // For multipleTextboxes, we only need the first numbered field (_1)
+                                // because only one field is actually generated
+                                const numberedNodeId = `${fieldNodeId}_1`;
+                                const questionTextWithNumber = `${questionText} - ${fieldLabel}`;
+                                
+                                console.log(`✅ [DEBUG] Adding multiple textbox field: ${questionTextWithNumber} (${numberedNodeId})`);
+                                
+                                textQuestions.push({
+                                    questionId: questionId,
+                                    nodeId: numberedNodeId,
+                                    questionText: questionTextWithNumber
+                                });
+                            }
+                        } else {
+                            console.log(`❌ [DEBUG] Field ${fieldIndex} missing spans - fieldLabelSpan: ${!!fieldLabelSpan}, fieldNodeIdSpan: ${!!fieldNodeIdSpan}`);
+                        }
+                    } else {
+                        console.log(`❌ [DEBUG] Field ${fieldIndex} doesn't meet criteria - fieldType: ${fieldType}`);
+                    }
+                });
+            } else {
+                console.log(`❌ [DEBUG] No unifiedFieldsContainer found for question ${questionId}`);
+            }
+        }
+    });
+    
+    console.log('🔍 [DEBUG] Final textQuestions array:', textQuestions);
+    
+    // Add options to dropdown
+    textQuestions.forEach(question => {
+        const option = document.createElement('option');
+        option.value = question.nodeId;
+        option.textContent = `${question.questionText} (${question.nodeId})`;
+        select.appendChild(option);
+        console.log(`✅ [DEBUG] Added option: ${option.textContent}`);
+    });
+    
+    console.log(`✅ [DEBUG] Total options added: ${textQuestions.length}`);
+    
+    // Add change event listener
+    select.addEventListener('change', function() {
+        currentLinkedFieldConfig[dropdownIndex].selectedValue = this.value;
+    });
+}
+
+// Remove a linked field dropdown
+function removeLinkedFieldDropdown(dropdownIndex) {
+    const dropdownDiv = document.getElementById(`linkedFieldDropdown${dropdownIndex}`);
+    if (dropdownDiv) {
+        dropdownDiv.remove();
+        
+        // Remove from current configuration
+        currentLinkedFieldConfig = currentLinkedFieldConfig.filter(config => config.index !== dropdownIndex);
+        
+        // Renumber remaining dropdowns
+        renumberLinkedFieldDropdowns();
+    }
+}
+
+// Renumber linked field dropdowns after removal
+function renumberLinkedFieldDropdowns() {
+    const dropdownsContainer = document.getElementById('linkedFieldDropdowns');
+    const dropdowns = dropdownsContainer.querySelectorAll('[id^="linkedFieldDropdown"]');
+    
+    dropdowns.forEach((dropdown, newIndex) => {
+        const oldId = dropdown.id;
+        const newId = `linkedFieldDropdown${newIndex}`;
+        
+        // Update ID
+        dropdown.id = newId;
+        
+        // Update label
+        const label = dropdown.querySelector('label');
+        if (label) {
+            label.textContent = `Text Question ${newIndex + 1}:`;
+        }
+        
+        // Update select ID and event listener
+        const select = dropdown.querySelector('select');
+        if (select) {
+            const oldSelectId = select.id;
+            const newSelectId = `linkedFieldSelect${newIndex}`;
+            select.id = newSelectId;
+            
+            // Remove old event listener and add new one
+            select.removeEventListener('change', select._changeHandler);
+            select._changeHandler = function() {
+                currentLinkedFieldConfig[newIndex].selectedValue = this.value;
+            };
+            select.addEventListener('change', select._changeHandler);
+        }
+        
+        // Update delete button
+        const deleteButton = dropdown.querySelector('button');
+        if (deleteButton) {
+            deleteButton.onclick = new Function(`removeLinkedFieldDropdown(${newIndex})`);
+        }
+        
+        // Update configuration index
+        const configIndex = currentLinkedFieldConfig.findIndex(config => config.index === parseInt(oldId.replace('linkedFieldDropdown', '')));
+        if (configIndex !== -1) {
+            currentLinkedFieldConfig[configIndex].index = newIndex;
+        }
+    });
+}
+
+// Finalize the linked field configuration
+function finalizeLinkedField() {
+    // Validate that at least 2 fields are selected
+    const selectedFields = currentLinkedFieldConfig.filter(config => config.selectedValue);
+    if (selectedFields.length < 2) {
+        alert('Please select at least 2 text questions to link.');
+        return;
+    }
+    
+    // Get the linked field ID
+    const linkedFieldIdInput = document.getElementById('linkedFieldIdInput');
+    const linkedFieldId = linkedFieldIdInput ? linkedFieldIdInput.value.trim() : '';
+    
+    if (!linkedFieldId) {
+        alert('Please enter a Linked Field ID.');
+        return;
+    }
+    
+    // Check if we're editing an existing linked field
+    if (window.editingLinkedFieldId) {
+        console.log('🔍 [DEBUG] Editing existing linked field:', window.editingLinkedFieldId);
+        
+        // Remove the old display
+        removeLinkedFieldDisplay(window.editingLinkedFieldId);
+        
+        // Create the new linked field display
+        createLinkedFieldDisplay(selectedFields, linkedFieldId);
+        
+        // Clear the editing flag
+        window.editingLinkedFieldId = null;
+    } else {
+        console.log('🔍 [DEBUG] Creating new linked field');
+        
+        // Create the linked field display
+        createLinkedFieldDisplay(selectedFields, linkedFieldId);
+    }
+    
+    // Close modal
+    closeLinkedFieldModal();
+}
+
+// Create the linked field display
+function createLinkedFieldDisplay(selectedFields, linkedFieldId) {
+    const displayId = `linkedField${linkedFieldCounter++}`;
+    
+    // Create container for linked fields if it doesn't exist
+    let linkedFieldsContainer = document.getElementById('linkedFieldsContainer');
+    if (!linkedFieldsContainer) {
+        linkedFieldsContainer = document.createElement('div');
+        linkedFieldsContainer.id = 'linkedFieldsContainer';
+        linkedFieldsContainer.style.cssText = `
+            background: #fff;
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        `;
+        
+        // Insert before the Form Editor section
+        const formBuilder = document.getElementById('formBuilder');
+        if (formBuilder) {
+            formBuilder.insertBefore(linkedFieldsContainer, formBuilder.firstChild);
+        }
+    }
+    
+    // Create linked field display
+    const linkedFieldDiv = document.createElement('div');
+    linkedFieldDiv.id = displayId;
+    linkedFieldDiv.style.cssText = `
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f9f9f9;
+        transition: all 0.2s ease;
+    `;
+    
+    // Add hover effect
+    linkedFieldDiv.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = '#f0f0f0';
+        this.style.borderColor = '#27ae60';
+        this.style.transform = 'translateY(-1px)';
+        this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+    });
+    
+    linkedFieldDiv.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = '#f9f9f9';
+        this.style.borderColor = '#ddd';
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = 'none';
+    });
+    
+    const fieldNames = selectedFields.map(config => config.selectedValue).join(' ↔ ');
+    
+    linkedFieldDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div onclick="editLinkedFieldDisplay('${displayId}')" style="cursor: pointer; flex: 1;">
+                <h4 style="margin: 0 0 5px 0; color: #2c3e50;">Linked Fields (${linkedFieldId})</h4>
+                <p style="margin: 0; color: #666; font-size: 0.9em;">${fieldNames}</p>
+            </div>
+            <button type="button" onclick="removeLinkedFieldDisplay('${displayId}')" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
+                Remove
+            </button>
+        </div>
+    `;
+    
+    linkedFieldsContainer.appendChild(linkedFieldDiv);
+    
+    // Store the configuration
+    window.linkedFieldsConfig = window.linkedFieldsConfig || [];
+    window.linkedFieldsConfig.push({
+        id: displayId,
+        linkedFieldId: linkedFieldId,
+        fields: selectedFields.map(config => config.selectedValue)
+    });
+}
+
+// Remove a linked field display
+function removeLinkedFieldDisplay(linkedFieldId) {
+    const linkedFieldDiv = document.getElementById(linkedFieldId);
+    if (linkedFieldDiv) {
+        linkedFieldDiv.remove();
+        
+        // Remove from configuration
+        if (window.linkedFieldsConfig) {
+            window.linkedFieldsConfig = window.linkedFieldsConfig.filter(config => config.id !== linkedFieldId);
+        }
+        
+        // If no more linked fields, remove the container
+        const linkedFieldsContainer = document.getElementById('linkedFieldsContainer');
+        if (linkedFieldsContainer && linkedFieldsContainer.children.length === 0) {
+            linkedFieldsContainer.remove();
+        }
+    }
+}
+
+// Edit a linked field display
+function editLinkedFieldDisplay(displayId) {
+    console.log('🔍 [DEBUG] editLinkedFieldDisplay called with displayId:', displayId);
+    
+    // Find the configuration for this display
+    const config = window.linkedFieldsConfig.find(c => c.id === displayId);
+    if (!config) {
+        console.log('❌ [DEBUG] Configuration not found for displayId:', displayId);
+        return;
+    }
+    
+    console.log('✅ [DEBUG] Found configuration:', config);
+    
+    // Store the display ID we're editing
+    window.editingLinkedFieldId = displayId;
+    
+    // Create modal if it doesn't exist
+    if (!document.getElementById('linkedFieldModal')) {
+        console.log('🔍 [DEBUG] Creating linked field modal');
+        createLinkedFieldModal();
+    }
+    
+    // Reset current configuration
+    currentLinkedFieldConfig = [];
+    
+    // Pre-populate the modal with existing data
+    const linkedFieldIdInput = document.getElementById('linkedFieldIdInput');
+    if (linkedFieldIdInput) {
+        linkedFieldIdInput.value = config.linkedFieldId || '';
+    }
+    
+    // Create dropdowns for each field
+    config.fields.forEach(fieldId => {
+        addLinkedFieldDropdown();
+        const dropdownIndex = currentLinkedFieldConfig.length - 1;
+        const select = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
+        if (select) {
+            select.value = fieldId;
+            currentLinkedFieldConfig[dropdownIndex].selectedValue = fieldId;
+        }
+    });
+    
+    // Show modal
+    document.getElementById('linkedFieldModal').style.display = 'block';
+    console.log('🔍 [DEBUG] Modal displayed for editing');
+}
+
+// Close the linked field modal
+function closeLinkedFieldModal() {
+    document.getElementById('linkedFieldModal').style.display = 'none';
+    
+    // Clear current configuration
+    currentLinkedFieldConfig = [];
+    
+    // Clear dropdowns
+    const dropdownsContainer = document.getElementById('linkedFieldDropdowns');
+    if (dropdownsContainer) {
+        dropdownsContainer.innerHTML = '';
+    }
+    
+    // Clear linked field ID input
+    const linkedFieldIdInput = document.getElementById('linkedFieldIdInput');
+    if (linkedFieldIdInput) {
+        linkedFieldIdInput.value = '';
+    }
+    
+    // Clear the editing flag
+    window.editingLinkedFieldId = null;
+}
+
+// Create linked field display from import data
+function createLinkedFieldDisplayFromImport(linkedFieldData) {
+    const displayId = `linkedField${linkedFieldCounter++}`;
+    const linkedFieldId = linkedFieldData.linkedFieldId || 'Unknown';
+    
+    // Create container for linked fields if it doesn't exist
+    let linkedFieldsContainer = document.getElementById('linkedFieldsContainer');
+    if (!linkedFieldsContainer) {
+        linkedFieldsContainer = document.createElement('div');
+        linkedFieldsContainer.id = 'linkedFieldsContainer';
+        linkedFieldsContainer.style.cssText = `
+            background: #fff;
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        `;
+        
+        // Insert before the Form Editor section
+        const formBuilder = document.getElementById('formBuilder');
+        if (formBuilder) {
+            formBuilder.insertBefore(linkedFieldsContainer, formBuilder.firstChild);
+        }
+    }
+    
+    // Create linked field display
+    const linkedFieldDiv = document.createElement('div');
+    linkedFieldDiv.id = displayId;
+    linkedFieldDiv.style.cssText = `
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f9f9f9;
+        transition: all 0.2s ease;
+    `;
+    
+    // Add hover effect
+    linkedFieldDiv.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = '#f0f0f0';
+        this.style.borderColor = '#27ae60';
+        this.style.transform = 'translateY(-1px)';
+        this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+    });
+    
+    linkedFieldDiv.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = '#f9f9f9';
+        this.style.borderColor = '#ddd';
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = 'none';
+    });
+    
+    const fieldNames = linkedFieldData.fields.join(' ↔ ');
+    
+    linkedFieldDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div onclick="editLinkedFieldDisplay('${displayId}')" style="cursor: pointer; flex: 1;">
+                <h4 style="margin: 0 0 5px 0; color: #2c3e50;">Linked Fields (${linkedFieldId})</h4>
+                <p style="margin: 0; color: #666; font-size: 0.9em;">${fieldNames}</p>
+            </div>
+            <button type="button" onclick="removeLinkedFieldDisplay('${displayId}')" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
+                Remove
+            </button>
+        </div>
+    `;
+    
+    linkedFieldsContainer.appendChild(linkedFieldDiv);
+    
+    // Store the configuration
+    window.linkedFieldsConfig = window.linkedFieldsConfig || [];
+    window.linkedFieldsConfig.push({
+        id: displayId,
+        linkedFieldId: linkedFieldId,
+        fields: linkedFieldData.fields
+    });
 }

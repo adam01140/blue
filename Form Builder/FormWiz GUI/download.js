@@ -70,13 +70,40 @@ function generateAndDownloadForm() {
 }
 
 function showPreview() {
+    console.log("🔧 [PREVIEW DEBUG] showPreview() called");
+    
     // Check if the getFormHTML function exists
     if (typeof getFormHTML !== 'function') {
+        console.error("🔧 [PREVIEW DEBUG] getFormHTML function not found");
         alert("Preview function not available in this context. Please try again from the form editor.");
         return;
     }
     
-    const formHTML = getFormHTML();
+    console.log("🔧 [PREVIEW DEBUG] getFormHTML function exists, proceeding...");
+    
+    let formHTML;
+    try {
+        console.log("🔧 [PREVIEW DEBUG] Calling getFormHTML()...");
+        formHTML = getFormHTML();
+        console.log("🔧 [PREVIEW DEBUG] getFormHTML returned HTML length:", formHTML ? formHTML.length : 'null');
+    } catch (error) {
+        console.error("🔧 [PREVIEW DEBUG] Error calling getFormHTML:", error);
+        alert('Error generating form HTML: ' + error.message);
+        return;
+    }
+    
+    if (!formHTML || formHTML.trim() === '') {
+        console.error("🔧 [PREVIEW DEBUG] getFormHTML returned empty HTML");
+        alert('No form content to preview. Please add some questions first.');
+        return;
+    }
+    
+    // Check if the HTML contains actual form content (not just the basic structure)
+    if (!formHTML.includes('customForm') || !formHTML.includes('question')) {
+        console.error("🔧 [PREVIEW DEBUG] HTML does not contain form content");
+        alert('Form appears to be empty. Please add some questions first.');
+        return;
+    }
     
     // Copy HTML to clipboard automatically when previewing
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -97,10 +124,30 @@ function showPreview() {
         });
     }
     
+    console.log("🔧 [PREVIEW DEBUG] Getting modal elements...");
     const previewModal = document.getElementById('previewModal');
     const previewFrame = document.getElementById('previewFrame');
+    
+    console.log("🔧 [PREVIEW DEBUG] previewModal found:", !!previewModal);
+    console.log("🔧 [PREVIEW DEBUG] previewFrame found:", !!previewFrame);
+    
+    if (!previewModal || !previewFrame) {
+        console.error("🔧 [PREVIEW DEBUG] Modal elements not found");
+        alert('Preview modal elements not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    console.log("🔧 [PREVIEW DEBUG] Setting iframe content and showing modal...");
     previewFrame.srcdoc = formHTML;
     previewModal.style.display = 'flex';
+    previewModal.style.zIndex = '9999';
+    
+    console.log("🔧 [PREVIEW DEBUG] Modal should now be visible");
+    console.log("🔧 [PREVIEW DEBUG] Modal display style:", previewModal.style.display);
+    console.log("🔧 [PREVIEW DEBUG] Modal computed style:", window.getComputedStyle(previewModal).display);
+    
+    // Force a reflow to ensure the modal is visible
+    previewModal.offsetHeight;
 }
 
 function downloadHTML(content, filename) {
@@ -127,7 +174,29 @@ function loadFormData(formData) {
     hiddenFieldCounter = formData.hiddenFieldCounter || 1;
     groupCounter = formData.groupCounter || 1;
 
-    // 3) Set PDF name and other form settings
+    // 3) Set form name and other form settings
+    if (formData.formName) {
+        // Ensure the form name module exists
+        if (!document.getElementById('formNameContainer')) {
+            if (typeof addFormNameModule === 'function') {
+                addFormNameModule();
+            }
+        }
+        
+        const formNameInput = document.getElementById('formNameInput');
+        if (formNameInput) {
+            formNameInput.value = formData.formName;
+        }
+    }
+    
+    // Ensure the PDF configuration module exists
+    if (!document.getElementById('pdfConfigurationModule')) {
+        if (typeof createPdfConfigurationModule === 'function') {
+            createPdfConfigurationModule();
+        }
+    }
+    
+    // Set PDF name
     if (formData.defaultPDFName) {
         const formPDFNameInput = document.getElementById('formPDFName');
         if (formPDFNameInput) {
@@ -449,7 +518,51 @@ function loadFormData(formData) {
                         nodeIdInput.value = question.nodeId;
                     }
                     
-                    // Rebuild multiple textboxes
+                    // Check if we have unified fields data (new format)
+                    if (question.allFieldsInOrder && question.allFieldsInOrder.length > 0) {
+                        console.log('🔧 [IMPORT DEBUG] MultipleTextboxes Loading unified fields:', question.allFieldsInOrder);
+                        
+                        // Rebuild unified fields from exported data
+                        const unifiedFieldsDiv = questionBlock.querySelector(`#unifiedFields${question.questionId}`);
+                        if (unifiedFieldsDiv) {
+                            unifiedFieldsDiv.innerHTML = '';
+                            
+                            question.allFieldsInOrder.forEach((field, index) => {
+                                if (field.type === 'label') {
+                                    // Add a label field
+                                    addTextboxLabel(question.questionId);
+                                    
+                                    // Set the field values
+                                    const lastField = unifiedFieldsDiv.lastElementChild;
+                                    if (lastField) {
+                                        const fieldOrder = lastField.getAttribute('data-order');
+                                        const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                        const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                        if (labelTextEl) labelTextEl.textContent = field.label;
+                                        if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    }
+                                } else if (field.type === 'amount') {
+                                    // Add an amount field
+                                    addTextboxAmount(question.questionId);
+                                    
+                                    // Set the field values
+                                    const lastField = unifiedFieldsDiv.lastElementChild;
+                                    if (lastField) {
+                                        const fieldOrder = lastField.getAttribute('data-order');
+                                        const labelTextEl = lastField.querySelector('#labelText' + question.questionId + '_' + fieldOrder);
+                                        const nodeIdTextEl = lastField.querySelector('#nodeIdText' + question.questionId + '_' + fieldOrder);
+                                        if (labelTextEl) labelTextEl.textContent = field.label;
+                                        if (nodeIdTextEl) nodeIdTextEl.textContent = field.nodeId;
+                                    }
+                                }
+                            });
+                            
+                            // Update hidden containers to keep them in sync
+                            updateHiddenContainers(question.questionId);
+                        }
+                    } else {
+                        // Fallback to old format
+                        console.log('🔧 [IMPORT DEBUG] MultipleTextboxes Using fallback format');
                     const multipleTextboxesBlock = questionBlock.querySelector(`#multipleTextboxesOptions${question.questionId}`);
                     if (multipleTextboxesBlock) {
                         multipleTextboxesBlock.innerHTML = '';
@@ -487,6 +600,7 @@ function loadFormData(formData) {
                             if (nameIdInput)       nameIdInput.value = amt.nameId || '';
                             if (placeholderInput)  placeholderInput.value = amt.placeholder || '';
                         });
+                        }
                     }
                 }
                // In the numbered dropdown section of loadFormData()
@@ -503,40 +617,81 @@ function loadFormData(formData) {
                         nodeIdEl.value = question.nodeId;
                     }
 
-                    // Rebuild custom text labels with their Node IDs
-                    const textboxLabelsDiv = questionBlock.querySelector(`#textboxLabels${question.questionId}`);
-                    if (textboxLabelsDiv) {
-                        textboxLabelsDiv.innerHTML = '';
-                        const labels = question.labels || [];
-                        const labelNodeIds = question.labelNodeIds || [];
-                        labels.forEach((labelValue, ldx) => {
-                            addTextboxLabel(question.questionId);
-                            const labelInput = textboxLabelsDiv.querySelector(
-                                `#label${question.questionId}_${ldx + 1}`
-                            );
-                            if (labelInput) labelInput.value = labelValue;
+                    // Rebuild unified fields from exported data
+                    const unifiedFieldsDiv = questionBlock.querySelector(`#unifiedFields${question.questionId}`);
+                    if (unifiedFieldsDiv) {
+                        unifiedFieldsDiv.innerHTML = '';
+                        
+                        // Use the new allFieldsInOrder format if available, otherwise fallback to old format
+                        let allFields = [];
+                        
+                        if (question.allFieldsInOrder && Array.isArray(question.allFieldsInOrder)) {
+                            // New format: fields are already in correct order
+                            allFields = question.allFieldsInOrder;
+                        } else {
+                            // Fallback to old format for backward compatibility
+                            const labels = question.labels || [];
+                            const labelNodeIds = question.labelNodeIds || [];
+                            const amounts = question.amounts || [];
                             
-                            // Restore the Node ID for this label
-                            const labelNodeIdInput = textboxLabelsDiv.querySelector(
-                                `#labelNodeId${question.questionId}_${ldx + 1}`
-                            );
-                            if (labelNodeIdInput && labelNodeIds[ldx]) {
-                                labelNodeIdInput.value = labelNodeIds[ldx];
+                            // Add labels first (they were exported first)
+                            labels.forEach((labelValue, ldx) => {
+                                allFields.push({
+                                    type: 'label',
+                                    label: labelValue,
+                                    nodeId: labelNodeIds[ldx] || '',
+                                    order: ldx + 1
+                                });
+                            });
+                            
+                            // Add amounts after labels
+                            amounts.forEach((amountValue, index) => {
+                                allFields.push({
+                                    type: 'amount',
+                                    label: amountValue,
+                                    nodeId: '',
+                                    order: labels.length + index + 1
+                                });
+                            });
+                        }
+                        
+                        // Rebuild fields in the unified container
+                        allFields.forEach((field, index) => {
+                            const fieldOrder = field.order || (index + 1);
+                            const fieldDiv = document.createElement('div');
+                            fieldDiv.className = `unified-field field-${fieldOrder}`;
+                            fieldDiv.setAttribute('data-type', field.type);
+                            fieldDiv.setAttribute('data-order', fieldOrder);
+                            
+                            const fieldTypeLabel = field.type === 'label' ? 'Label' : 'Amount';
+                            fieldDiv.innerHTML = `
+                                <div style="margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                    <div style="font-weight: bold; color: #333;">${fieldTypeLabel}: <span id="labelText${question.questionId}_${fieldOrder}">${field.label}</span></div>
+                                    <div style="font-size: 0.9em; color: #666;">Node ID: <span id="nodeIdText${question.questionId}_${fieldOrder}">${field.nodeId}</span></div>
+                                    <div style="font-size: 0.8em; color: #999; margin-top: 5px;">Type: <span id="typeText${question.questionId}_${fieldOrder}">${fieldTypeLabel}</span> | Order: ${fieldOrder}</div>
+                                    <button type="button" onclick="removeUnifiedField(${question.questionId}, ${fieldOrder})" style="margin-top: 5px; background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">Remove</button>
+                                </div>
+                            `;
+                            unifiedFieldsDiv.appendChild(fieldDiv);
+                            
+                            // Add double-click event listener as backup
+                            const displayDiv = fieldDiv.querySelector('div');
+                            if (displayDiv) {
+                                // Remove any existing event listeners to prevent duplicates
+                                if (displayDiv._dblclickHandler) {
+                                    displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
+                                }
+                                
+                                // Add event listener for double-click editing
+                                displayDiv._dblclickHandler = function() {
+                                    editUnifiedField(question.questionId, fieldOrder);
+                                };
+                                displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
                             }
                         });
-                    }
-
-                    // Rebuild amount labels - ADD THIS SECTION
-                    const textboxAmountsDiv = questionBlock.querySelector(`#textboxAmounts${question.questionId}`);
-                    if (textboxAmountsDiv) {
-                        textboxAmountsDiv.innerHTML = '';
-                        (question.amounts || []).forEach((amountValue, adx) => {
-                            addTextboxAmount(question.questionId);
-                            const amountInput = textboxAmountsDiv.querySelector(
-                                `#amount${question.questionId}_${adx + 1}`
-                            );
-                            if (amountInput) amountInput.value = amountValue;
-                        });
+                        
+                        // Also rebuild hidden containers for backward compatibility
+                        updateHiddenContainers(question.questionId);
                     }
                     
                     // After setting min/max values, update any jump logic dropdowns
@@ -569,6 +724,7 @@ function loadFormData(formData) {
                     const placeholderInput = questionBlock.querySelector(`#textboxPlaceholder${question.questionId}`);
                     const lineLimitInput = questionBlock.querySelector(`#lineLimit${question.questionId}`);
                     const maxCharacterLimitInput = questionBlock.querySelector(`#maxCharacterLimit${question.questionId}`);
+                    const paragraphLimitInput = questionBlock.querySelector(`#paragraphLimit${question.questionId}`);
                     if (nameInput) {
                         nameInput.value = question.nameId || '';
                     }
@@ -580,6 +736,9 @@ function loadFormData(formData) {
                     }
                     if (maxCharacterLimitInput && question.maxCharacterLimit) {
                         maxCharacterLimitInput.value = question.maxCharacterLimit;
+                    }
+                    if (paragraphLimitInput && question.paragraphLimit) {
+                        paragraphLimitInput.value = question.paragraphLimit;
                     }
                 }
 
@@ -680,6 +839,51 @@ function loadFormData(formData) {
                     }
                     if (pdfAnswerSelect) {
                         pdfAnswerSelect.value = question.conditionalPDF.answer;
+                    }
+                }
+
+                // ============== Hidden Logic ==============
+                if (question.hiddenLogic && question.hiddenLogic.enabled) {
+                    const hiddenLogicCbox = questionBlock.querySelector(`#enableHiddenLogic${question.questionId}`);
+                    if (hiddenLogicCbox) {
+                        hiddenLogicCbox.checked = true;
+                        toggleHiddenLogic(question.questionId);
+                    }
+                    
+                    // Clear existing configurations
+                    const configsContainer = questionBlock.querySelector(`#hiddenLogicConfigs${question.questionId}`);
+                    if (configsContainer) {
+                        configsContainer.innerHTML = '';
+                    }
+                    
+                    // Restore configurations
+                    if (question.hiddenLogic.configs && question.hiddenLogic.configs.length > 0) {
+                        question.hiddenLogic.configs.forEach((config, index) => {
+                            // Add configuration
+                            addHiddenLogicConfig(question.questionId);
+                            
+                            // Wait a moment for DOM to update, then set values
+                            setTimeout(() => {
+                                const triggerSelect = questionBlock.querySelector(`#hiddenLogicTrigger${question.questionId}_${index}`);
+                                const typeSelect = questionBlock.querySelector(`#hiddenLogicType${question.questionId}_${index}`);
+                                const nodeIdInput = questionBlock.querySelector(`#hiddenLogicNodeId${question.questionId}_${index}`);
+                                const textboxTextInput = questionBlock.querySelector(`#hiddenLogicTextboxText${question.questionId}_${index}`);
+                                
+                                if (triggerSelect) {
+                                    triggerSelect.value = config.trigger;
+                                }
+                                if (typeSelect) {
+                                    typeSelect.value = config.type;
+                                    toggleHiddenLogicOptions(question.questionId, index);
+                                }
+                                if (nodeIdInput) {
+                                    nodeIdInput.value = config.nodeId;
+                                }
+                                if (textboxTextInput) {
+                                    textboxTextInput.value = config.textboxText;
+                                }
+                            }, 10);
+                        });
                     }
                 }
 
@@ -851,6 +1055,18 @@ function loadFormData(formData) {
         });
     }
 
+    // Load linked fields
+    if (formData.linkedFields && formData.linkedFields.length > 0) {
+        // Initialize linked fields configuration
+        window.linkedFieldsConfig = [];
+        linkedFieldCounter = 0;
+        
+        formData.linkedFields.forEach(linkedField => {
+            // Create the linked field display
+            createLinkedFieldDisplayFromImport(linkedField);
+        });
+    }
+
     // 7) Build groups from JSON
     if (formData.groups && formData.groups.length > 0) {
         console.log('Importing groups:', formData.groups); // Debug log
@@ -905,6 +1121,9 @@ function exportForm() {
         questionCounter: questionCounter,
         hiddenFieldCounter: hiddenFieldCounter,
         groupCounter: groupCounter,
+        formName: document.getElementById('formNameInput')
+            ? document.getElementById('formNameInput').value.trim()
+            : '',
         defaultPDFName: document.getElementById('formPDFName')
             ? document.getElementById('formPDFName').value.trim()
             : '',
@@ -915,7 +1134,8 @@ function exportForm() {
             ? document.getElementById('stripePriceId').value.trim()
             : '',
         additionalPDFs: [], // New field for additional PDFs
-        checklistItems: [] // New field for checklist items
+        checklistItems: [], // New field for checklist items
+        linkedFields: [] // New field for linked fields
     };
 
     // Collect all additional PDF names
@@ -940,6 +1160,15 @@ function exportForm() {
                 formData.checklistItems.push(itemText);
             }
         });
+    }
+
+    // Collect all linked fields
+    if (window.linkedFieldsConfig && window.linkedFieldsConfig.length > 0) {
+        formData.linkedFields = window.linkedFieldsConfig.map(config => ({
+            id: config.id,
+            linkedFieldId: config.linkedFieldId,
+            fields: config.fields
+        }));
     }
 
     // Create a map of questionId to question text for easy lookup
@@ -1027,6 +1256,30 @@ function exportForm() {
             const condPDFEnabled = questionBlock.querySelector(`#enableConditionalPDF${questionId}`)?.checked || false;
             const condPDFName = questionBlock.querySelector(`#conditionalPDFName${questionId}`)?.value || "";
             const condPDFAnswer = questionBlock.querySelector(`#conditionalPDFAnswer${questionId}`)?.value || "";
+
+            // ---------- Hidden Logic ----------
+            const hiddenLogicEnabled = questionBlock.querySelector(`#enableHiddenLogic${questionId}`)?.checked || false;
+            const hiddenLogicConfigs = [];
+            
+            if (hiddenLogicEnabled) {
+                // Get all hidden logic configurations
+                const configElements = questionBlock.querySelectorAll('.hidden-logic-config');
+                configElements.forEach((configElement, index) => {
+                    const trigger = configElement.querySelector(`#hiddenLogicTrigger${questionId}_${index}`)?.value || "";
+                    const type = configElement.querySelector(`#hiddenLogicType${questionId}_${index}`)?.value || "";
+                    const nodeId = configElement.querySelector(`#hiddenLogicNodeId${questionId}_${index}`)?.value || "";
+                    const textboxText = configElement.querySelector(`#hiddenLogicTextboxText${questionId}_${index}`)?.value || "";
+                    
+                    if (trigger && type && nodeId) {
+                        hiddenLogicConfigs.push({
+                            trigger: trigger,
+                            type: type,
+                            nodeId: nodeId,
+                            textboxText: textboxText
+                        });
+                    }
+                });
+            }
 
             // ---------- PDF Logic ----------
             const pdfLogicEnabled = questionBlock.querySelector(`#pdfLogic${questionId}`)?.checked || false;
@@ -1153,6 +1406,10 @@ function exportForm() {
                     enabled: condPDFEnabled,
                     pdfName: condPDFName,
                     answer: condPDFAnswer
+                },
+                hiddenLogic: {
+                    enabled: hiddenLogicEnabled,
+                    configs: hiddenLogicConfigs
                 },
                 pdfLogic: {
                     enabled: pdfLogicEnabled,
@@ -1292,29 +1549,107 @@ function exportForm() {
                     questionData.nodeId = nodeIdInput.value.trim();
                 }
                 
-                // Collect text labels and their Node IDs
-                const labelInputs = questionBlock.querySelectorAll(`#textboxLabels${questionId} input[type='text']:first-of-type`);
-                const labelNodeIdInputs = questionBlock.querySelectorAll(`#textboxLabels${questionId} input[type='text']:last-of-type`);
-                const labels = [];
-                const labelNodeIds = [];
-                labelInputs.forEach((lbl, index) => {
-                    labels.push(lbl.value.trim());
-                    const nodeIdInput = labelNodeIdInputs[index];
-                    labelNodeIds.push(nodeIdInput ? nodeIdInput.value.trim() : '');
+                // Collect unified field data in true creation order
+                const unifiedContainer = questionBlock.querySelector(`#unifiedFields${questionId}`);
+                console.log('🔧 [EXPORT DEBUG] Looking for unified container:', `#unifiedFields${questionId}`);
+                console.log('🔧 [EXPORT DEBUG] Found unified container:', !!unifiedContainer);
+                
+                if (unifiedContainer) {
+                    console.log('🔧 [EXPORT DEBUG] Unified container children count:', unifiedContainer.children.length);
+                    console.log('🔧 [EXPORT DEBUG] Unified container innerHTML length:', unifiedContainer.innerHTML.length);
+                    console.log('🔧 [EXPORT DEBUG] Unified container innerHTML preview:', unifiedContainer.innerHTML.substring(0, 200));
+                }
+                
+                const unifiedFields = questionBlock.querySelectorAll(`#unifiedFields${questionId} .unified-field`);
+                console.log('🔧 [EXPORT DEBUG] Found', unifiedFields.length, 'unified fields');
+                
+                // Also try a more direct approach
+                const directUnifiedFields = document.querySelectorAll(`#unifiedFields${questionId} .unified-field`);
+                console.log('🔧 [EXPORT DEBUG] Direct query found', directUnifiedFields.length, 'unified fields');
+                
+                // Use the direct query if the questionBlock query didn't work
+                const fieldsToProcess = unifiedFields.length > 0 ? unifiedFields : directUnifiedFields;
+                console.log('🔧 [EXPORT DEBUG] Using', fieldsToProcess.length, 'fields for processing');
+                
+                const allFieldsInOrder = [];
+                
+                // Process fields in their creation order
+                fieldsToProcess.forEach((field, index) => {
+                    const fieldType = field.getAttribute('data-type');
+                    const fieldOrder = field.getAttribute('data-order');
+                    const labelTextEl = field.querySelector('#labelText' + questionId + '_' + fieldOrder);
+                    const nodeIdTextEl = field.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                    
+                    console.log('🔧 [EXPORT DEBUG] Processing field', index, ':', {
+                        fieldType,
+                        fieldOrder,
+                        hasLabelText: !!labelTextEl,
+                        hasNodeIdText: !!nodeIdTextEl,
+                        labelText: labelTextEl ? labelTextEl.textContent.trim() : 'N/A',
+                        nodeIdText: nodeIdTextEl ? nodeIdTextEl.textContent.trim() : 'N/A'
+                    });
+                    
+                    if (labelTextEl && nodeIdTextEl) {
+                        const labelText = labelTextEl.textContent.trim();
+                        const nodeIdText = nodeIdTextEl.textContent.trim();
+                        
+                        allFieldsInOrder.push({
+                            type: fieldType,
+                            label: labelText,
+                            nodeId: nodeIdText,
+                            order: parseInt(fieldOrder)
+                        });
+                    }
                 });
-
-                // Collect amount labels
-                const amountInputs = questionBlock.querySelectorAll(`#textboxAmounts${questionId} input`);
-                const amounts = [];
-                amountInputs.forEach(amt => {
-                    amounts.push(amt.value.trim());
-                });
+                
+                // Sort by order to ensure correct sequence
+                allFieldsInOrder.sort((a, b) => a.order - b.order);
+                console.log('🔧 [EXPORT DEBUG] Final allFieldsInOrder:', allFieldsInOrder);
 
                 questionData.min = rangeStart;
                 questionData.max = rangeEnd;
+                questionData.allFieldsInOrder = allFieldsInOrder;
+                
+                // Fallback to old format if no unified fields found
+                if (allFieldsInOrder.length === 0) {
+                    console.log('🔧 [EXPORT DEBUG] No unified fields found, falling back to old format');
+                    
+                    // Try to get data from the old hidden containers
+                    const textboxLabelsDiv = questionBlock.querySelector(`#textboxLabels${questionId}`);
+                    const textboxAmountsDiv = questionBlock.querySelector(`#textboxAmounts${questionId}`);
+                    
+                    const labels = [];
+                    const labelNodeIds = [];
+                    const amounts = [];
+                    
+                    if (textboxLabelsDiv) {
+                        const labelDivs = textboxLabelsDiv.querySelectorAll('.label');
+                        labelDivs.forEach((labelDiv, index) => {
+                            const labelInput = labelDiv.querySelector('input[type="text"]');
+                            const nodeIdInput = labelDiv.querySelector('input[type="text"]:last-of-type');
+                            if (labelInput) {
+                                labels.push(labelInput.value.trim());
+                                labelNodeIds.push(nodeIdInput ? nodeIdInput.value.trim() : '');
+                            }
+                        });
+                    }
+                    
+                    if (textboxAmountsDiv) {
+                        const amountDivs = textboxAmountsDiv.querySelectorAll('.amount');
+                        amountDivs.forEach((amountDiv) => {
+                            const amountInput = amountDiv.querySelector('input[type="text"]');
+                            if (amountInput) {
+                                amounts.push(amountInput.value.trim());
+                            }
+                        });
+                    }
+                    
                 questionData.labels = labels;
-                questionData.labelNodeIds = labelNodeIds;
+                    questionData.labelNodeIds = labelNodeIds;
                 questionData.amounts = amounts;
+                    
+                    console.log('🔧 [EXPORT DEBUG] Fallback data:', { labels, labelNodeIds, amounts });
+                }
             }
             else if (questionType === 'multipleTextboxes') {
                 // Export custom Node ID if it exists
@@ -1323,6 +1658,54 @@ function exportForm() {
                     questionData.nodeId = nodeIdInput.value.trim();
                 }
                 
+                // Use the same unified fields system as numberedDropdown
+                const unifiedContainer = questionBlock.querySelector(`#unifiedFields${questionId}`);
+                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Looking for unified container:', `#unifiedFields${questionId}`);
+                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Found unified container:', !!unifiedContainer);
+                
+                if (unifiedContainer) {
+                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Unified container children count:', unifiedContainer.children.length);
+                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Unified container innerHTML length:', unifiedContainer.innerHTML.length);
+                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Unified container innerHTML preview:', unifiedContainer.innerHTML.substring(0, 200));
+                }
+                
+                const unifiedFields = questionBlock.querySelectorAll(`#unifiedFields${questionId} .unified-field`);
+                console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Found', unifiedFields.length, 'unified fields');
+                
+                if (unifiedFields.length > 0) {
+                    // Use unified fields data
+                    const allFieldsInOrder = [];
+                    
+                    unifiedFields.forEach((el) => {
+                        const fieldType = el.getAttribute('data-type');
+                        const fieldOrder = parseInt(el.getAttribute('data-order'));
+                        const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
+                        const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                        
+                        console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Processing field:', {fieldType, fieldOrder, labelTextEl: !!labelTextEl, nodeIdTextEl: !!nodeIdTextEl});
+                        
+                        if (labelTextEl && nodeIdTextEl) {
+                            const fieldData = {
+                                type: fieldType,
+                                label: labelTextEl.textContent.trim(),
+                                nodeId: nodeIdTextEl.textContent.trim(),
+                                order: fieldOrder
+                            };
+                            console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Field data:', fieldData);
+                            allFieldsInOrder.push(fieldData);
+                        }
+                    });
+                    
+                    // Sort by data-order attribute (creation order)
+                    allFieldsInOrder.sort((a, b) => a.order - b.order);
+                    
+                    // Store in the same format as numberedDropdown
+                    questionData.allFieldsInOrder = allFieldsInOrder;
+                    
+                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes Final allFieldsInOrder:', allFieldsInOrder);
+                } else {
+                    // Fallback to old format if no unified fields found
+                    console.log('🔧 [EXPORT DEBUG] MultipleTextboxes No unified fields found, using fallback');
                 const multiBlocks = questionBlock.querySelectorAll(`#multipleTextboxesOptions${questionId} > div`);
                 questionData.textboxes = [];
                 questionData.amounts = [];
@@ -1354,6 +1737,7 @@ function exportForm() {
                         });
                     }
                 });
+                }
             }
             else if (
                 questionType === 'text' ||
@@ -1374,6 +1758,7 @@ function exportForm() {
                 const placeholder = questionBlock.querySelector(`#textboxPlaceholder${questionId}`)?.value.trim() || '';
                 const lineLimit = questionBlock.querySelector(`#lineLimit${questionId}`)?.value.trim() || '';
                 const maxCharacterLimit = questionBlock.querySelector(`#maxCharacterLimit${questionId}`)?.value.trim() || '';
+                const paragraphLimit = questionBlock.querySelector(`#paragraphLimit${questionId}`)?.value.trim() || '';
                 questionData.nameId = nameId;
                 questionData.placeholder = placeholder;
                 if (lineLimit) {
@@ -1381,6 +1766,9 @@ function exportForm() {
                 }
                 if (maxCharacterLimit) {
                     questionData.maxCharacterLimit = parseInt(maxCharacterLimit);
+                }
+                if (paragraphLimit) {
+                    questionData.paragraphLimit = parseInt(paragraphLimit);
                 }
             }
 

@@ -263,6 +263,7 @@ window.exportFlowchartJson = function(download = true) {
     // big paragraph properties
     if (cell._lineLimit !== undefined) cellData._lineLimit = cell._lineLimit;
     if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
+    if (cell._paragraphLimit !== undefined) cellData._paragraphLimit = cell._paragraphLimit;
     if (cell._checklistText) cellData._checklistText = cell._checklistText;
     if (cell._alertText) cellData._alertText = cell._alertText;
     if (cell._calcTitle) cellData._calcTitle = cell._calcTitle;
@@ -271,6 +272,14 @@ window.exportFlowchartJson = function(download = true) {
     if (cell._calcThreshold) cellData._calcThreshold = cell._calcThreshold;
     if (cell._calcFinalText) cellData._calcFinalText = cell._calcFinalText;
     if (cell._characterLimit) cellData._characterLimit = cell._characterLimit;
+    if (cell._paragraphLimit) cellData._paragraphLimit = cell._paragraphLimit;
+    
+    // Hidden node properties
+    if (cell._hiddenNodeId !== undefined) cellData._hiddenNodeId = cell._hiddenNodeId;
+    if (cell._defaultText !== undefined) cellData._defaultText = cell._defaultText;
+    
+    // mult dropdown location indicator
+    if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
 
     return cellData;
   });
@@ -284,11 +293,15 @@ window.exportFlowchartJson = function(download = true) {
   const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
     window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
   
+  // Get form name
+  const formName = document.getElementById('formNameInput')?.value || '';
+  
   const output = {
     cells: simplifiedCells,
     sectionPrefs: JSON.parse(JSON.stringify(currentSectionPrefs)),
     groups: JSON.parse(JSON.stringify(groups)),
-    defaultPdfProperties: defaultPdfProps
+    defaultPdfProperties: defaultPdfProps,
+    formName: formName
   };
 
   const jsonStr = JSON.stringify(output, null, 2);

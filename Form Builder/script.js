@@ -6,6 +6,9 @@
   
   // Colors moved to config.js module
 
+// TEST: Script.js is loading!
+console.log('🚀 SCRIPT.JS IS LOADING!');
+
 
 /**************************************************
  *            GLOBAL  TYPING  HELPER              *
@@ -142,11 +145,21 @@ document.addEventListener("DOMContentLoaded", function() {
     if (typeof initializeGraph === 'function') {
       graph = initializeGraph();
       console.log('Graph initialized:', graph);
+      
+      // Set up zoom sensitivity for the new graph
+      if (typeof window.setupZoomSensitivityForGraph === 'function') {
+        window.setupZoomSensitivityForGraph(graph);
+      }
     } else {
       console.error('initializeGraph function not found');
       // Fallback: create graph directly
   graph = new mxGraph(container);
       console.log('Fallback graph created:', graph);
+      
+      // Set up zoom sensitivity for the fallback graph
+      if (typeof window.setupZoomSensitivityForGraph === 'function') {
+        window.setupZoomSensitivityForGraph(graph);
+      }
     }
     
     // Mouse event listeners moved to events.js module
@@ -479,6 +492,12 @@ graph.isCellEditable = function (cell) {
           updateNotesNodeCell(change.cell);
         }, 10); // Small delay to ensure geometry is updated
       }
+      
+      // Check for geometry changes (resize/move) on calculation nodes
+      if (change instanceof mxGeometryChange && change.cell && typeof window.isCalculationNode === 'function' && window.isCalculationNode(change.cell)) {
+        // Calculation node was resized - alert disabled
+        // Dimensions are now handled silently without showing alert
+      }
     });
   });
   
@@ -526,7 +545,6 @@ graph.isCellEditable = function (cell) {
     if (!mxEvent.isConsumed(evt)) {
       // Get zoom sensitivity from settings (default to 0.01 if not set)
       const sensitivity = window.userSettings?.zoomSensitivity || 0.01;
-      console.log('🔧 [ZOOM DEBUG] Script.js wheel zoom - sensitivity:', sensitivity, 'userSettings:', window.userSettings);
       
       // Apply custom zoom based on sensitivity
       const currentScale = graph.view.scale;
@@ -534,7 +552,6 @@ graph.isCellEditable = function (cell) {
       const sensitivityFactor = sensitivity * 50; // Scale up the sensitivity value
       const zoomFactor = 1 + (baseZoomFactor - 1) * sensitivityFactor;
       
-      console.log('🔧 [ZOOM DEBUG] Script.js wheel zoom - currentScale:', currentScale, 'baseZoomFactor:', baseZoomFactor, 'sensitivityFactor:', sensitivityFactor, 'zoomFactor:', zoomFactor);
       
       let newScale;
       if (up) {
@@ -545,7 +562,29 @@ graph.isCellEditable = function (cell) {
       
       // Limit zoom range
       if (newScale >= 0.1 && newScale <= 3.0) {
+        // Get mouse position relative to the container
+        const container = graph.container;
+        const rect = container.getBoundingClientRect();
+        const mouseX = evt.clientX - rect.left;
+        const mouseY = evt.clientY - rect.top;
+        
+        // Get current view state
+        const currentTranslate = graph.view.translate;
+        const currentScale = graph.view.scale;
+        
+        // Calculate the point in graph coordinates that the mouse is over
+        const graphX = (mouseX / currentScale) - currentTranslate.x;
+        const graphY = (mouseY / currentScale) - currentTranslate.y;
+        
+        // Set the new scale
         graph.view.setScale(newScale);
+        
+        // Calculate the new translation to keep the mouse point in the same screen position
+        const newTranslateX = (mouseX / newScale) - graphX;
+        const newTranslateY = (mouseY / newScale) - graphY;
+        
+        // Apply the new translation
+        graph.view.setTranslate(newTranslateX, newTranslateY);
       }
       
       mxEvent.consume(evt);
@@ -1141,7 +1180,62 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
   document.getElementById('resetAllPdfBtn').addEventListener('click', window.resetAllPdfInheritance);
   
   // Load settings on startup
-  loadSettingsFromLocalStorage();
+  function loadSettingsWhenReady() {
+    if (typeof window.loadSettingsFromLocalStorage === 'function') {
+      try {
+        const result = window.loadSettingsFromLocalStorage();
+        if (result && typeof result.then === 'function') {
+          result.then(() => {
+          }).catch(error => {
+            console.error('Error loading settings:', error);
+          });
+        } else {
+        }
+      } catch (error) {
+        console.error('Error calling loadSettingsFromLocalStorage:', error);
+      }
+    } else {
+      // Try again after a short delay if the function isn't available yet
+      setTimeout(loadSettingsWhenReady, 100);
+    }
+  }
+  
+  loadSettingsWhenReady();
+  
+  // Load zoom sensitivity from Firebase after page loads
+  setTimeout(async () => {
+    try {
+      if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+        const user = firebase.auth().currentUser;
+        const db = firebase.firestore();
+        const doc = await db.collection('userSettings').doc(user.uid).get();
+        
+        if (doc.exists) {
+          const data = doc.data();
+          if (data.zoomSensitivity !== undefined) {
+            // Update the global settings
+            if (window.userSettings) {
+              window.userSettings.zoomSensitivity = data.zoomSensitivity;
+            }
+            
+            // Update the UI
+            const input = document.getElementById('zoomSensitivityInput');
+            const displaySpan = document.getElementById('zoomSensitivityValue');
+            
+            if (input) {
+              input.value = data.zoomSensitivity;
+            }
+            
+            if (displaySpan) {
+              displaySpan.textContent = data.zoomSensitivity;
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error loading zoom sensitivity from Firebase:', error);
+    }
+  }, 1000);
   
   // Initialize search functionality
   initializeSearch();
@@ -1176,6 +1270,9 @@ function propagatePdfPropertiesDownstream(startCell, sourceCell, visited = new S
         style = "shape=roundRect;rounded=1;arcSize=10;whiteSpace=wrap;html=1;nodeType=calculation;spacing=12;fontSize=16;pointerEvents=1;overflow=fill;";
         label = "Calculation node";
           }
+          // Set fixed dimensions for calculation nodes
+          width = 400;
+          height = 450;
       } else if (nodeType === 'notesNode') {
         style = "shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=options;questionType=notesNode;spacing=12;fontSize=16;strokeWidth=3;strokeColor=#000000;";
         label = "Notes Node";
@@ -1382,6 +1479,16 @@ function updatemultipleDropdownTypeCell(cell) {
     const val = tb.nameId || '';
     const ph = tb.placeholder || 'Enter value';
     const checked = tb.isAmountOption ? 'checked' : '';
+    
+    // Add location indicator before this option if it's at the location index
+    if (index === locationIndex) {
+      html += `
+        <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+          📍 Location Date Inserted
+          <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+        </div>`;
+    }
+    
     html += `
       <div class="textbox-entry" style="margin-bottom:4px; text-align:center; display: flex; align-items: center; gap: 4px;" data-index="${index}">
         <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">â‹®â‹®</div>
@@ -1394,8 +1501,19 @@ function updatemultipleDropdownTypeCell(cell) {
         </label>
       </div>`;
   });
+  
+  // Add location indicator at the end if location index is beyond the current options
+  if (locationIndex >= cell._textboxes.length) {
+    html += `
+      <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+        📍 Location Date Inserted
+        <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+      </div>`;
+  }
+  
   html += `<div style="text-align:center; margin-top:8px;">
       <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
+      <button onclick="window.addMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Add Location</button>
       <button onclick="window.showReorderModal('${cell.id}', 'multipleDropdownType')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
     </div>
     </div>
@@ -1479,7 +1597,20 @@ window.addmultipleDropdownTypeHandler = function(cellId) {
     graph.getModel().beginUpdate();
     try {
       if (!cell._textboxes) cell._textboxes = [];
-      cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
+      
+      // If there's a location indicator, add the new option after it
+      if (cell._locationIndex !== undefined && cell._locationIndex >= cell._textboxes.length) {
+        // Location is at the end, just add normally
+        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
+      } else {
+        // Add the new option
+        cell._textboxes.push({ nameId: "", placeholder: "Enter value", isAmountOption: false });
+        
+        // If there's a location indicator before the end, shift it down
+        if (cell._locationIndex !== undefined && cell._locationIndex < cell._textboxes.length - 1) {
+          cell._locationIndex++;
+        }
+      }
     } finally {
       graph.getModel().endUpdate();
     }
@@ -1493,6 +1624,18 @@ window.deletemultipleDropdownTypeHandler = function(cellId, index) {
     graph.getModel().beginUpdate();
     try {
       cell._textboxes.splice(index, 1);
+      
+      // Adjust location index if needed
+      if (cell._locationIndex !== undefined) {
+        if (index < cell._locationIndex) {
+          // Deleted option was before location indicator, shift location index up
+          cell._locationIndex--;
+        } else if (index === cell._locationIndex) {
+          // Deleted option was at the location indicator position, remove location indicator
+          delete cell._locationIndex;
+        }
+        // If index > locationIndex, no adjustment needed
+      }
     } finally {
       graph.getModel().endUpdate();
     }
@@ -1506,6 +1649,34 @@ window.toggleMultipleDropdownAmount = function(cellId, index, checked) {
     graph.getModel().beginUpdate();
     try {
       cell._textboxes[index].isAmountOption = checked;
+    } finally {
+      graph.getModel().endUpdate();
+    }
+    updatemultipleDropdownTypeCell(cell);
+  }
+};
+
+window.addMultipleDropdownLocationHandler = function(cellId) {
+  const cell = graph.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleDropdownType") {
+    graph.getModel().beginUpdate();
+    try {
+      // Set the location index to the current number of textboxes (at the end)
+      cell._locationIndex = cell._textboxes ? cell._textboxes.length : 0;
+    } finally {
+      graph.getModel().endUpdate();
+    }
+    updatemultipleDropdownTypeCell(cell);
+  }
+};
+
+window.removeMultipleDropdownLocationHandler = function(cellId) {
+  const cell = graph.getModel().getCell(cellId);
+  if (cell && getQuestionType(cell) === "multipleDropdownType") {
+    graph.getModel().beginUpdate();
+    try {
+      // Remove the location index
+      delete cell._locationIndex;
     } finally {
       graph.getModel().endUpdate();
     }
@@ -2033,10 +2204,20 @@ function renderTextboxes(cell) {
   }
 
   let html = "";
+  const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
 
   cell._textboxes.forEach((tb, index) => {
     const val = tb.nameId || "";
     const ph  = tb.placeholder || "Enter value";
+
+    // Add location indicator before this option if it's at the location index
+    if (index === locationIndex) {
+      html += `
+        <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+          📍 Location Date Inserted
+          <button onclick="window.removeMultipleTextboxLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+        </div>`;
+    }
 
     html += `
       <div class="textbox-entry" style="margin-bottom:8px;text-align:center;">
@@ -2046,9 +2227,19 @@ function renderTextboxes(cell) {
       </div>`;
   });
 
+  // Add location indicator at the end if location index is beyond the current options
+  if (locationIndex >= cell._textboxes.length) {
+    html += `
+      <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+        📍 Location Date Inserted
+        <button onclick="window.removeMultipleTextboxLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+      </div>`;
+  }
+
   html += `
     <div style="text-align:center;margin-top:8px;">
       <button onclick="window.addMultipleTextboxHandler('${cell.id}')">Add Option</button>
+      <button onclick="window.addMultipleTextboxLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Add Location</button>
       <button onclick="window.showReorderModal('${cell.id}', 'multipleTextboxes')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
     </div>`;
 
@@ -2474,10 +2665,22 @@ function updatemultipleDropdownTypeCell(cell) {
 
       <div class="multiple-textboxes-container" style="margin-top:8px;width:100%;">`;
 
+  // Check if there's a location indicator position
+  const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
+  
   cell._textboxes.forEach((tb, index) => {
     const val      = tb.nameId      || "";
     const ph       = tb.placeholder || "Enter value";
     const checked  = tb.isAmountOption ? "checked" : "";
+
+    // Add location indicator before this option if it's at the location index
+    if (index === locationIndex) {
+      html += `
+        <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+          📍 Location Date Inserted
+          <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+        </div>`;
+    }
 
     html += `
       <div class="textbox-entry" style="margin-bottom:4px;text-align:center;">
@@ -2490,10 +2693,20 @@ function updatemultipleDropdownTypeCell(cell) {
         </label>
       </div>`;
   });
+  
+  // Add location indicator at the end if location index is beyond the current options
+  if (locationIndex >= cell._textboxes.length) {
+    html += `
+      <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+        📍 Location Date Inserted
+        <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+      </div>`;
+  }
 
   html += `
         <div style="text-align:center;margin-top:8px;">
           <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
+          <button onclick="window.addMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Add Location</button>
           <button onclick="window.showReorderModal('${cell.id}', 'multipleDropdownType')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
         </div>
       </div>
@@ -3255,11 +3468,9 @@ function updateCanvasPosition() {
     const graphY = (my / oldScale) - oldTy;
     // Get zoom sensitivity from settings (default to 0.01 if not set)
     const sensitivity = window.userSettings?.zoomSensitivity || 0.01;
-    console.log('🔧 [ZOOM DEBUG] Keyboard zoom - sensitivity:', sensitivity, 'userSettings:', window.userSettings);
     const sensitivityFactor = sensitivity * 50; // Scale up the sensitivity value
     const zoomFactor = 1 + (BASE_ZOOM_FACTOR - 1) * sensitivityFactor;
     
-    console.log('🔧 [ZOOM DEBUG] Keyboard zoom - sensitivityFactor:', sensitivityFactor, 'zoomFactor:', zoomFactor);
     
     // New scale
     let newScale;
@@ -3696,10 +3907,23 @@ function updatemultipleDropdownTypeCell(cell) {
       <input type="number" value="${escapeAttr(twoNums.second)}" onkeydown="window.handleTitleInputKeydown(event)" onblur="window.updatemultipleDropdownTypeNumber('${cell.id}', 'second', this.value)"/>
     </div>
     <div class="multiple-textboxes-container" style="margin-top:8px;width:100%;">`;
+  // Check if there's a location indicator position
+  const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
+  
   cell._textboxes.forEach((tb, index) => {
     const val = tb.nameId || '';
     const ph = tb.placeholder || 'Enter value';
     const checked = tb.isAmountOption ? 'checked' : '';
+    
+    // Add location indicator before this option if it's at the location index
+    if (index === locationIndex) {
+      html += `
+        <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+          📍 Location Date Inserted
+          <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+        </div>`;
+    }
+    
     html += `
       <div class="textbox-entry" style="margin-bottom:4px; text-align:center; display: flex; align-items: center; gap: 4px;" data-index="${index}">
         <div class="drag-handle" style="cursor: move; color: #666; font-size: 14px; user-select: none; padding: 2px;" draggable="true" data-cell-id="${cell.id}" ondragstart="window.handleDragStart(event, '${cell.id}', ${index})" ondragend="window.handleDragEnd(event)" onmousedown="event.stopPropagation()">â‹®â‹®</div>
@@ -3712,8 +3936,19 @@ function updatemultipleDropdownTypeCell(cell) {
         </label>
       </div>`;
   });
+  
+  // Add location indicator at the end if location index is beyond the current options
+  if (locationIndex >= cell._textboxes.length) {
+    html += `
+      <div class="location-indicator" style="margin: 8px 0; padding: 8px; background-color: #e8f5e8; border: 2px dashed #28a745; border-radius: 4px; text-align: center; color: #28a745; font-weight: bold; font-size: 12px;">
+        📍 Location Date Inserted
+        <button onclick="window.removeMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 10px;">Remove</button>
+      </div>`;
+  }
+  
   html += `<div style="text-align:center; margin-top:8px;">
       <button onclick="window.addmultipleDropdownTypeHandler('${cell.id}')">Add Option</button>
+      <button onclick="window.addMultipleDropdownLocationHandler('${cell.id}')" style="margin-left: 8px; background-color: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Add Location</button>
       <button onclick="window.showReorderModal('${cell.id}', 'multipleDropdownType')" style="margin-left: 8px; background-color: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500;">Reorder</button>
     </div>
     </div>
@@ -4005,6 +4240,7 @@ function autosaveFlowchartToLocalStorage() {
       if (cell._nameId) cellData._nameId = cell._nameId;
       if (cell._placeholder) cellData._placeholder = cell._placeholder;
       if (cell._questionId) cellData._questionId = cell._questionId;
+      if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
       
       // textbox properties
       if (cell._amountName) cellData._amountName = cell._amountName;
@@ -4029,10 +4265,23 @@ function autosaveFlowchartToLocalStorage() {
       // Alert node properties
       if (cell._alertText !== undefined) cellData._alertText = cell._alertText;
       
+      // Hidden node properties - always save these if they exist on the cell
+      if (cell.hasOwnProperty('_hiddenNodeId')) cellData._hiddenNodeId = cell._hiddenNodeId;
+      if (cell.hasOwnProperty('_defaultText')) cellData._defaultText = cell._defaultText;
+      
+      // Special handling for hidden textbox nodes - always save _defaultText even if empty
+      if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+        // Always save _defaultText for hidden textbox nodes, even if undefined or empty
+        cellData._defaultText = cell._defaultText !== undefined ? cell._defaultText : "";
+        console.log('🔍 [AUTOSAVE DEBUG] Saving hidden textbox _defaultText:', cellData._defaultText);
+      }
+      
       // calculation node properties
         // Calculation node data export now handled by calc.js
-        if (typeof window.exportCalculationNodeData === 'function') {
-          window.exportCalculationNodeData(cell, cellData);
+        if (typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell)) {
+          if (typeof window.exportCalculationNodeData === 'function') {
+            window.exportCalculationNodeData(cell, cellData);
+          }
         }
       
       // subtitle & info nodes
@@ -4045,6 +4294,7 @@ function autosaveFlowchartToLocalStorage() {
       // big paragraph properties
       if (cell._lineLimit !== undefined) cellData._lineLimit = cell._lineLimit;
       if (cell._characterLimit !== undefined) cellData._characterLimit = cell._characterLimit;
+      if (cell._paragraphLimit !== undefined) cellData._paragraphLimit = cell._paragraphLimit;
 
       return cellData;
     });
@@ -4064,11 +4314,26 @@ function autosaveFlowchartToLocalStorage() {
     const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
       window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
     
+    // Get form name
+    const formName = document.getElementById('formNameInput')?.value || '';
+    
+    // Get current library flowchart name (if any)
+    const libraryFlowchartName = window.currentFlowchartName || null;
+    
+    // Debug logging for library flowchart name
+    if (libraryFlowchartName) {
+      console.log('🔍 [AUTOSAVE DEBUG] Saving library flowchart name:', libraryFlowchartName);
+    } else {
+      console.log('🔍 [AUTOSAVE DEBUG] No library flowchart name to save');
+    }
+    
     const data = {
       cells: simplifiedCells,
       sectionPrefs: sectionPrefsCopy,
       groups: groupsArray,
-      defaultPdfProperties: defaultPdfProps
+      defaultPdfProperties: defaultPdfProps,
+      formName: formName,
+      libraryFlowchartName: libraryFlowchartName
     };
     
     // Cache the data and hash for next comparison
@@ -4220,7 +4485,17 @@ function setupAutosaveHooks() {
     // Delay autosave to ensure groups are loaded
     setTimeout(() => {
       console.log('Autosaving after loadFlowchartData, current groups:', groups);
+      // Get library flowchart name from global variable (set by loadFlowchartData)
+      const libraryName = window._loadingLibraryFlowchartName;
+      console.log('🔍 [AUTOSAVE DEBUG] Library name from global variable:', libraryName);
+      // Set currentFlowchartName before autosave if we're loading from library
+      if (libraryName) {
+        window.currentFlowchartName = libraryName;
+        console.log('🔍 [AUTOSAVE DEBUG] Set currentFlowchartName to:', libraryName);
+      }
       autosaveFlowchartToLocalStorage();
+      // Clear the global variable after autosave
+      window._loadingLibraryFlowchartName = null;
     }, 1000); // Increased delay to ensure groups are fully processed
     
     // Clear the loading flag after all loading processes are complete
@@ -4281,12 +4556,43 @@ function showAutosaveRestorePrompt() {
     modal.remove();
     const data = getAutosaveFlowchartFromLocalStorage();
     if (data) {
-      console.log('🔄 [AUTOSAVE RESTORE] Restoring autosave with groups:', data.groups);
-      console.log('🔄 [AUTOSAVE RESTORE] Calling loadFlowchartData (which includes automatic PDF and Node ID resets)');
-      window.loadFlowchartData(data);
-      // Removed: console.log('[AUTOSAVE][localStorage] User chose YES: loaded autosaved flowchart.');
-      // Wait for groups to be loaded before setting up autosave hooks
-      setTimeout(safeSetupAutosaveHooks, 1000);
+      // Debug logging for autosave restore
+      console.log('🔍 [AUTOSAVE RESTORE DEBUG] Autosave data:', data);
+      console.log('🔍 [AUTOSAVE RESTORE DEBUG] Library flowchart name:', data.libraryFlowchartName);
+      console.log('🔍 [AUTOSAVE RESTORE DEBUG] openSavedFlowchart function available:', typeof window.openSavedFlowchart === 'function');
+      
+      // Check if this was a library flowchart and handle it specially
+      if (data.libraryFlowchartName && typeof window.openSavedFlowchart === 'function') {
+        console.log('🔄 [AUTOSAVE RESTORE] Detected library flowchart:', data.libraryFlowchartName);
+        
+        // Show alert to user
+        alert(`Opening ${data.libraryFlowchartName} from library`);
+        
+        // Set the current flowchart name first
+        window.currentFlowchartName = data.libraryFlowchartName;
+        
+        // Open the library flowchart directly (this will load the latest version from the library)
+        window.openSavedFlowchart(data.libraryFlowchartName);
+        
+        // Wait for groups to be loaded before setting up autosave hooks
+        setTimeout(safeSetupAutosaveHooks, 1000);
+      } else {
+        // Handle regular autosave restore (non-library flowchart)
+        console.log('🔄 [AUTOSAVE RESTORE] Restoring autosave with groups:', data.groups);
+        console.log('🔄 [AUTOSAVE RESTORE] Calling loadFlowchartData (which includes automatic PDF and Node ID resets)');
+        window.loadFlowchartData(data);
+        
+        // Restore form name if it exists
+        if (data.formName) {
+          const formNameInput = document.getElementById('formNameInput');
+          if (formNameInput) {
+            formNameInput.value = data.formName;
+          }
+        }
+        
+        // Wait for groups to be loaded before setting up autosave hooks
+        setTimeout(safeSetupAutosaveHooks, 1000);
+      }
     } else {
       setTimeout(safeSetupAutosaveHooks, 500);
     }
@@ -4421,7 +4727,7 @@ function copySelectedNodeAsJson() {
         '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
         '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
               '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
-      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice'
+      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText'
       ];
       
       safeProperties.forEach(prop => {
@@ -4608,7 +4914,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.id = nodeData.newId;
         
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText"].forEach(k => {
           if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
         });
         
@@ -4635,6 +4941,19 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           // Node IDs will only change when manually edited or reset using the button
         } else if (isCalculationNode && typeof isCalculationNode === "function" && isCalculationNode(newCell)) {
           if (typeof updateCalculationNodeCell === "function") updateCalculationNodeCell(newCell);
+        }
+        
+        // Handle hidden node copy/paste
+        if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(newCell)) {
+          // Update hidden checkbox node display
+          if (typeof window.updateHiddenCheckboxNodeCell === 'function') {
+            window.updateHiddenCheckboxNodeCell(newCell);
+          }
+        } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(newCell)) {
+          // Update hidden textbox node display
+          if (typeof window.updateHiddenTextboxNodeCell === 'function') {
+            window.updateHiddenTextboxNodeCell(newCell);
+          }
         }
       });
       
@@ -4728,7 +5047,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         const newCell = new mxCell(cellData.value, geo, cellData.style);
         newCell.vertex = true;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText"].forEach(k => {
           if (cellData[k] !== undefined) newCell[k] = cellData[k];
         });
         // Section
@@ -4753,6 +5072,19 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           // FIRST OCCURRENCE - Calculation node copy/paste now handled by calc.js
           if (typeof window.handleCalculationNodeCopyPaste === "function") {
             window.handleCalculationNodeCopyPaste(newCell);
+          }
+        }
+        
+        // Handle hidden node copy/paste
+        if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(newCell)) {
+          // Update hidden checkbox node display
+          if (typeof window.updateHiddenCheckboxNodeCell === 'function') {
+            window.updateHiddenCheckboxNodeCell(newCell);
+          }
+        } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(newCell)) {
+          // Update hidden textbox node display
+          if (typeof window.updateHiddenTextboxNodeCell === 'function') {
+            window.updateHiddenTextboxNodeCell(newCell);
           }
         }
       });
@@ -5305,6 +5637,14 @@ function resetAllNodeIds() {
   
   // Process each cell
   cells.forEach(cell => {
+    // Skip hidden nodes - they should keep their custom Node IDs
+    if (typeof window.isHiddenCheckbox === 'function' && window.isHiddenCheckbox(cell)) {
+      return; // Skip hidden checkbox nodes
+    }
+    if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
+      return; // Skip hidden textbox nodes
+    }
+    
     if (typeof window.generateCorrectNodeId === 'function') {
       const correctNodeId = window.generateCorrectNodeId(cell);
       if (correctNodeId) {
