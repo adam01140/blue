@@ -1597,6 +1597,7 @@ function renderSingleDocument(doc) {
             a.addEventListener('click', function(e) { e.preventDefault(); });
     // Add defendant name under document name if present (styled like portfolio)
     let defendantDiv = null;
+    console.log('🔍 [DOCUMENTS DEBUG] renderSingleDocument - doc.defendantName:', doc.defendantName);
     if (doc.defendantName) {
         let capName = doc.defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
         defendantDiv = document.createElement('div');
@@ -1604,6 +1605,9 @@ function renderSingleDocument(doc) {
         defendantDiv.style.fontWeight = 'bold';
         defendantDiv.style.color = '#e74c3c';
         defendantDiv.textContent = 'Defendant: ' + capName;
+        console.log('🔍 [DOCUMENTS DEBUG] renderSingleDocument - Created defendant div with text:', defendantDiv.textContent);
+    } else {
+        console.log('🔍 [DOCUMENTS DEBUG] renderSingleDocument - No defendant name found in doc');
     }
             // Add county name under document name if present
             let countyDiv = null;
@@ -1732,6 +1736,23 @@ function renderDocumentGroup(docs, groupIndex) {
     a.style.color = '#2980b9';
     a.addEventListener('click', function(e) { e.preventDefault(); });
     
+    // Add defendant name if available (from first document)
+    let defendantDiv = null;
+    console.log('🔍 [DOCUMENTS DEBUG] renderDocumentGroup - docs[0].defendantName:', docs[0].defendantName);
+    if (docs[0].defendantName) {
+        defendantDiv = document.createElement('div');
+        defendantDiv.className = 'form-county';
+        defendantDiv.style.fontSize = '14px';
+        defendantDiv.style.fontWeight = 'bold';
+        defendantDiv.style.color = '#e74c3c';
+        defendantDiv.style.marginTop = '4px';
+        let capName = docs[0].defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        defendantDiv.textContent = 'Defendant: ' + capName;
+        console.log('🔍 [DOCUMENTS DEBUG] renderDocumentGroup - Created defendant div with text:', defendantDiv.textContent);
+    } else {
+        console.log('🔍 [DOCUMENTS DEBUG] renderDocumentGroup - No defendant name found in docs[0]');
+    }
+    
     // Add county info if available (from first document)
     let countyDiv = null;
     if (docs[0].countyName) {
@@ -1785,6 +1806,7 @@ function renderDocumentGroup(docs, groupIndex) {
     li.appendChild(checkbox);
     li.appendChild(purchaseDateDiv);
     li.appendChild(a);
+    if (defendantDiv) li.appendChild(defendantDiv);
     if (countyDiv) li.appendChild(countyDiv);
     li.appendChild(downloadAllBtn);
     

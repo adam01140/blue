@@ -204,12 +204,60 @@ class CartManager {
         try {
             await this.saveAllFormData();
             const total = await this.getCartTotal();
-            const res = await fetch('/create-cart-checkout-session', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cartItems: this.cart, totalAmount: total }),
-                mode: 'cors'
+            
+            // Debug: Check payload size
+            const payload = { cartItems: this.cart, totalAmount: total };
+            const payloadString = JSON.stringify(payload);
+            const payloadSize = new Blob([payloadString]).size;
+            console.log('📦 [CHECKOUT DEBUG] Payload size:', payloadSize, 'bytes (', (payloadSize / 1024).toFixed(2), 'KB)');
+            console.log('📦 [CHECKOUT DEBUG] Cart items count:', this.cart.length);
+            
+            // Log cart item sizes
+            this.cart.forEach((item, index) => {
+                const itemSize = new Blob([JSON.stringify(item)]).size;
+                console.log(`📦 [CHECKOUT DEBUG] Item ${index + 1} (${item.title}) size:`, itemSize, 'bytes');
+                if (item.formData) {
+                    const formDataSize = new Blob([JSON.stringify(item.formData)]).size;
+                    console.log(`📦 [CHECKOUT DEBUG] Item ${index + 1} formData size:`, formDataSize, 'bytes');
+                }
             });
+            
+            // If payload is too large, optimize it
+            if (payloadSize > 100000) { // 100KB limit
+                console.log('⚠️ [CHECKOUT DEBUG] Payload too large, optimizing...');
+                const optimizedCartItems = this.cart.map(item => ({
+                    cartItemId: item.cartItemId,
+                    formId: item.formId,
+                    title: item.title,
+                    priceId: item.priceId,
+                    countyName: item.countyName,
+                    defendantName: item.defendantName,
+                    pdfName: item.pdfName,
+                    originalFormId: item.originalFormId,
+                    portfolioId: item.portfolioId,
+                    timestamp: item.timestamp
+                    // Remove formData to reduce size - it's already saved to Firebase
+                }));
+                
+                const optimizedPayload = { cartItems: optimizedCartItems, totalAmount: total };
+                const optimizedPayloadString = JSON.stringify(optimizedPayload);
+                const optimizedPayloadSize = new Blob([optimizedPayloadString]).size;
+                console.log('📦 [CHECKOUT DEBUG] Optimized payload size:', optimizedPayloadSize, 'bytes (', (optimizedPayloadSize / 1024).toFixed(2), 'KB)');
+                
+                var res = await fetch('/create-cart-checkout-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: optimizedPayloadString,
+                    mode: 'cors'
+                });
+            } else {
+                var res = await fetch('/create-cart-checkout-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: payloadString,
+                    mode: 'cors'
+                });
+            }
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             if (data.sessionId) {
@@ -326,12 +374,14 @@ Forms page requested.`;
         alert(debugInfo);
         */
         
-        // Show success message and alert for troubleshooting
+        // Show success message and redirect to forms page
         alert('Payment successful! Your documents have been saved to My Documents.');
-        alert('Forms page requested');
         
         // Clear the URL parameters to prevent re-triggering on page reload
         window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Redirect to forms page
+        window.location.href = 'forms.html';
     }
 
     async removePortfolioEntries() {
@@ -497,12 +547,19 @@ Forms page requested.`;
                     let docName = cartItem.title || cartItem.formId;
                     let docCounty = null;
                     let docDefendant = null;
+                    
+                    console.log('🔍 [DEFENDANT DEBUG] Cart item defendantName:', cartItem.defendantName);
+                    console.log('🔍 [DEFENDANT DEBUG] Cart item originalFormId:', cartItem.originalFormId);
+                    console.log('🔍 [DEFENDANT DEBUG] Cart item formId:', cartItem.formId);
+                    
                     try {
                         // For conditional PDFs, try to get data from the original form first
                         const formIdToCheck = cartItem.originalFormId || cartItem.formId;
+                        console.log('🔍 [DEFENDANT DEBUG] Checking form document with ID:', formIdToCheck);
                         const formDoc = await db.collection('users').doc(user.uid).collection('forms').doc(formIdToCheck).get();
                         if (formDoc.exists) {
                             const formData = formDoc.data();
+                            console.log('🔍 [DEFENDANT DEBUG] Form document data:', formData);
                             if (formData && formData.name) {
                                 // For conditional PDFs, use the conditional PDF name but keep the main form context
                                 if (cartItem.originalFormId && cartItem.originalFormId !== cartItem.formId) {
@@ -513,15 +570,23 @@ Forms page requested.`;
                             }
                             if (formData && formData.countyName) docCounty = formData.countyName;
                             if (formData && formData.defendantName) docDefendant = formData.defendantName;
+                            console.log('🔍 [DEFENDANT DEBUG] Defendant name from form data:', docDefendant);
+                        } else {
+                            console.log('⚠️ [DEFENDANT DEBUG] Form document does not exist:', formIdToCheck);
                         }
                     } catch (e) {
                         // fallback: use cartItem data
-                        console.log('⚠️ Could not fetch form data from Firebase, using cart item data');
+                        console.log('⚠️ [DEFENDANT DEBUG] Could not fetch form data from Firebase, using cart item data:', e);
                     }
                     
                     // Fallback to cart item data if Firebase data is not available
                     if (!docCounty && cartItem.countyName) docCounty = cartItem.countyName;
-                    if (!docDefendant && cartItem.defendantName) docDefendant = cartItem.defendantName;
+                    if (!docDefendant && cartItem.defendantName) {
+                        docDefendant = cartItem.defendantName;
+                        console.log('🔍 [DEFENDANT DEBUG] Using defendant name from cart item:', docDefendant);
+                    }
+                    
+                    console.log('🔍 [DEFENDANT DEBUG] Final defendant name for document:', docDefendant);
 
                     const documentData = {
                         name: docName,
