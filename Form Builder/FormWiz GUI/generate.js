@@ -429,10 +429,10 @@ const formName = formNameEl && formNameEl.value.trim() ? formNameEl.value.trim()
     "    <!-- Sliding Cart Menu -->",
     '    <div class="cart-overlay" id="cart-overlay">',
     '        <div class="cart-side-menu" id="cart-side-menu">',
-    "            <div class=\"cart-header\">",
-    "                <h2>🛒 Cart</h2>",
-    '                <button class="cart-close-btn" id="cart-close-btn">&times;</button>',
-    "            </div>",
+            "            <div class=\"cart-header\" style=\"background:#2c3e50;color:#fff;padding:20px 0 20px 20px;display:flex;justify-content:space-between;align-items:center;\">",
+            "                <h2 style=\"margin:0;font-size:1.5em;font-weight:700;\">🛒 Cart</h2>",
+            '                <button class="cart-close-btn" id="cart-close-btn" style="background:none;border:none;color:#fff;font-size:1.5em;cursor:pointer;padding:0;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s;margin-right:8px;">&times;</button>',
+            "            </div>",
                 '            <div class="cart-content" id="cart-content">',
             '                <div class="cart-icon-large">🛒</div>',
             '                <div class="cart-message" id="cart-message">Create an account to start shopping!</div>',
@@ -2716,18 +2716,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Always add cart functions (they're needed for the Continue button)
   formHTML += `
-// Helper function to deduplicate PDFs based on pdfName
+// Helper function to deduplicate PDFs based on comprehensive unique key
 function deduplicatePdfs(pdfArray) {
   const seen = new Set();
   const deduplicated = [];
   
   for (const pdf of pdfArray) {
-    const key = pdf.pdfName || pdf.formId || pdf.title;
+    // Create a comprehensive unique key using formId + priceId + portfolioId
+    const key = (pdf.formId || pdf.pdfName || pdf.title) + '_' + pdf.priceId + '_' + (pdf.portfolioId || 'default');
     if (!seen.has(key)) {
       seen.add(key);
       deduplicated.push(pdf);
     } else {
-      console.log('🛒 [CART DEBUG] Skipping duplicate PDF:', key);
+      console.log('🛒 [CART DEBUG] Skipping duplicate PDF:', key, 'Original:', pdf.title);
     }
   }
   
@@ -2757,34 +2758,157 @@ window.showCartModal = function () {
     for (const pdfLogic of window.pdfLogicPDFs) {
       if (!pdfLogic || !pdfLogic.pdfName || !pdfLogic.stripePriceId) continue;
       
+      console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
+      console.log('🛒 [CART DEBUG] PDF Logic details:', {
+        questionId: pdfLogic.questionId,
+        pdfName: pdfLogic.pdfName,
+        isBigParagraph: pdfLogic.isBigParagraph,
+        conditions: pdfLogic.conditions,
+        triggerOption: pdfLogic.triggerOption,
+        numberTrigger: pdfLogic.numberTrigger,
+        numberValue: pdfLogic.numberValue
+      });
+
       let matched = false;
-      const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
-      for (const c of conds) {
-        const prevId = c?.prevQuestion;
-        const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
-        if (!prevId) continue;
+      
+      // Check if this is a bigParagraph with character limit
+      if (pdfLogic.isBigParagraph) {
+        // For Big Paragraph questions, check character limit
+        const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                   document.getElementById('answer' + pdfLogic.questionId);
         
-        const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
-                   document.getElementById('answer' + prevId);
-        if (!el) continue;
+        console.log('🔧 [PDF LOGIC DEBUG] Checking bigParagraph character limit:');
+        console.log('  - Question ID:', pdfLogic.questionId);
+        console.log('  - Element found:', el);
+        console.log('  - Conditions:', pdfLogic.conditions);
         
-        let val = '';
-        if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
-        else                        { val = el.value || ''; }
-        
-        if (val.toString().toLowerCase() === expect) {
-          matched = true;
-          console.log('🛒 [CART DEBUG] PDF logic matched:', pdfLogic.pdfDisplayName, 'for question', prevId, '=', expect);
+        if (el) {
+          const questionValue = el.value || '';
+          console.log('🔧 [PDF LOGIC DEBUG] BigParagraph question', pdfLogic.questionId, 'value length:', questionValue.length);
+          
+          // Check each character limit condition
+          for (const condition of pdfLogic.conditions) {
+            if (condition.characterLimit) {
+              console.log('🔧 [PDF LOGIC DEBUG] Checking character limit:', condition.characterLimit, 'against value length:', questionValue.length);
+              if (questionValue.length > condition.characterLimit) {
+                matched = true;
+                console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for bigParagraph character limit:', pdfLogic.pdfDisplayName);
+                break; // Exit the loop once we find a match
+              }
+            }
+          }
+          
+          if (!matched) {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - character limit not exceeded');
+          }
+        } else {
+          console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for bigParagraph question', pdfLogic.questionId);
         }
-      }
+      } else if (pdfLogic.triggerOption) {
+        // For numbered dropdown with trigger option, check if the selected value matches the trigger
+        const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                   document.getElementById('answer' + pdfLogic.questionId);
+        
+        console.log('🔧 [PDF LOGIC DEBUG] Checking numbered dropdown trigger:');
+        console.log('  - Question ID:', pdfLogic.questionId);
+        console.log('  - Trigger Option:', pdfLogic.triggerOption);
+        console.log('  - Element found:', el);
+        console.log('  - Question Name IDs:', window.questionNameIds);
+        
+        if (el) {
+          const val = el.value || '';
+          console.log('🔧 [PDF LOGIC DEBUG] Numbered dropdown question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.triggerOption);
+          
+          if (val === pdfLogic.triggerOption) {
+            matched = true;
+            console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for numbered dropdown:', pdfLogic.pdfDisplayName);
+          } else {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - value:', val, 'expected:', pdfLogic.triggerOption);
+          }
+        } else {
+          console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for numbered dropdown question', pdfLogic.questionId);
+        }
+      } else if (pdfLogic.numberTrigger && pdfLogic.numberValue) {
+        // For number questions with trigger conditions, check if the number meets the condition
+        const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                   document.getElementById('answer' + pdfLogic.questionId);
+        
+        console.log('🔧 [PDF LOGIC DEBUG] Checking number trigger:');
+        console.log('  - Question ID:', pdfLogic.questionId);
+        console.log('  - Number Trigger:', pdfLogic.numberTrigger);
+        console.log('  - Number Value:', pdfLogic.numberValue);
+        console.log('  - Element found:', el);
+        
+        if (el) {
+          const val = parseFloat(el.value) || 0;
+          const triggerValue = parseFloat(pdfLogic.numberValue) || 0;
+          console.log('🔧 [PDF LOGIC DEBUG] Number question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.numberTrigger, 'triggerValue:', triggerValue);
+          
+          let conditionMet = false;
+          if (pdfLogic.numberTrigger === '=') {
+            conditionMet = val === triggerValue;
+          } else if (pdfLogic.numberTrigger === '>') {
+            conditionMet = val > triggerValue;
+          } else if (pdfLogic.numberTrigger === '<') {
+            conditionMet = val < triggerValue;
+          }
+          
+          if (conditionMet) {
+            matched = true;
+            console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for number trigger:', pdfLogic.pdfDisplayName);
+          } else {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - number condition not met');
+          }
+        } else {
+          console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for number question', pdfLogic.questionId);
+        }
+      } else {
+        // For regular conditions, check previous question logic
+        const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+        for (const c of conds) {
+          const prevId = c?.prevQuestion;
+          const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+          if (!prevId) continue;
+
+          const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                     document.getElementById('answer' + prevId);
+          if (!el) {
+            console.log('🛒 [CART DEBUG] Element not found for question', prevId);
+            continue;
+          }
+
+          let val = '';
+          if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+          else                        { val = el.value || ''; }
+
+          console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+
+          if (val.toString().toLowerCase() === expect) {
+            matched = true; // any condition match includes the PDF
+            console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
+            }
+          }
+        }
       
       if (matched) {
+        // Format the display name properly (e.g., "sc103" -> "SC-103")
+        let displayTitle;
+        if (pdfLogic.pdfDisplayName && pdfLogic.pdfDisplayName.trim() !== '') {
+          const baseName = pdfLogic.pdfDisplayName.trim();
+          displayTitle = baseName.toUpperCase().replace(/([A-Z])(\d+)/g, '$1-$2');
+        } else {
+          displayTitle = pdfLogic.pdfName.replace(/.pdf$/i, '');
+        }
+        
         allPdfsToAdd.push({
           formId: pdfLogic.pdfName.replace(/.pdf$/i, '').toLowerCase(),
-          title: pdfLogic.pdfDisplayName || pdfLogic.pdfName.replace(/.pdf$/i, ''),
+          title: displayTitle,
           priceId: pdfLogic.stripePriceId,
           pdfName: pdfLogic.pdfName
         });
+        console.log('🛒 [CART DEBUG] Added PDF logic item to showCartModal:', displayTitle);
+      } else {
+        console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
       }
     }
   }
@@ -2881,7 +3005,35 @@ window.addFormToCart = function (priceId) {
   clearCartState();
 
   // 2) Collect form data
+  console.log('🔍 [CART DEBUG] Starting form data collection...');
+  
+  // First, ensure all dynamic fields are up-to-date
+  console.log('🔍 [CART DEBUG] Updating dynamic fields...');
+  if (typeof updateUserFullName === 'function') {
+    console.log('🔍 [CART DEBUG] Calling updateUserFullName()...');
+    updateUserFullName();
+    
+    // Check if user_fullname was updated
+    const fullNameField = document.getElementById('user_fullname');
+    if (fullNameField) {
+      console.log('🔍 [CART DEBUG] user_fullname field value after updateUserFullName():', fullNameField.value);
+    } else {
+      console.log('🔍 [CART DEBUG] user_fullname field not found in DOM');
+    }
+  } else {
+    console.log('🔍 [CART DEBUG] updateUserFullName function not available');
+  }
+  
+  if (typeof updateUserAddressFields === 'function') {
+    console.log('🔍 [CART DEBUG] Calling updateUserAddressFields()...');
+    updateUserAddressFields();
+  } else {
+    console.log('🔍 [CART DEBUG] updateUserAddressFields function not available');
+  }
+  
   const form = document.getElementById('customForm');
+  console.log('🔍 [CART DEBUG] Form element found:', !!form);
+  
   const formData = {};
   if (form) {
     // Include both elements inside the form AND elements with form="customForm" attribute
@@ -2889,22 +3041,72 @@ window.addFormToCart = function (priceId) {
     const externalFormElements = Array.from(document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]'));
     const allFormElements = [...formElements, ...externalFormElements];
     
+    console.log('🔍 [CART DEBUG] Form elements found:');
+    console.log('  - Elements inside form:', formElements.length);
+    console.log('  - External elements with form="customForm":', externalFormElements.length);
+    console.log('  - Total elements to process:', allFormElements.length);
+    
+    // Log all elements we're about to process
+    console.log('🔍 [CART DEBUG] All form elements:');
+    allFormElements.forEach((el, index) => {
+      console.log('  ' + (index + 1) + '. ' + el.tagName + ' - id: "' + el.id + '" - name: "' + el.name + '" - type: "' + el.type + '" - value: "' + el.value + '" - disabled: ' + el.disabled);
+    });
+    
     for (const el of allFormElements) {
-      if (!el.name || el.disabled) continue;
-      if (!['INPUT','TEXTAREA','SELECT'].includes(el.tagName)) continue;
-      if (['hidden','button','submit','reset'].includes(el.type)) continue;
+      if (!el.name || el.disabled) {
+        console.log('🔍 [CART DEBUG] Skipping element - id: "' + el.id + '" - name: "' + el.name + '" - disabled: ' + el.disabled);
+        continue;
+      }
+      if (!['INPUT','TEXTAREA','SELECT'].includes(el.tagName)) {
+        console.log('🔍 [CART DEBUG] Skipping non-form element - tagName: "' + el.tagName + '"');
+        continue;
+      }
+      if (['button','submit','reset'].includes(el.type)) {
+        console.log('🔍 [CART DEBUG] Skipping ' + el.type + ' element - id: "' + el.id + '"');
+        continue;
+      }
+      
+      // For hidden fields, include them if they have values
+      if (el.type === 'hidden') {
+        if (el.value && el.value.trim() !== '') {
+          formData[el.name] = el.value;
+          console.log('🔍 [CART DEBUG] Added hidden field - name: "' + el.name + '" - value: "' + el.value + '"');
+        } else {
+          console.log('🔍 [CART DEBUG] Skipping empty hidden field - name: "' + el.name + '" - value: "' + el.value + '"');
+        }
+        continue;
+      }
       
       // For checkboxes and radios, only include if checked
       if (el.type === 'checkbox' || el.type === 'radio') {
         if (el.checked) {
           formData[el.name] = 'on'; // Send 'on' for checked checkboxes (standard HTML form behavior)
+          console.log('🔍 [CART DEBUG] Added checked ' + el.type + ' - name: "' + el.name + '" - value: "on"');
+        } else {
+          console.log('🔍 [CART DEBUG] Skipping unchecked ' + el.type + ' - name: "' + el.name + '"');
         }
         // Skip unchecked checkboxes entirely - don't send them to server
       } else {
-        formData[el.name] = el.value;
+        let value = el.value;
+        
+        // Format date inputs to mm/dd/yyyy (same as manual download)
+        if (el.type === 'date' && value) {
+          const originalValue = value;
+          value = formatDateForServer(value);
+          console.log('🔍 [CART DEBUG] Formatted date - name: "' + el.name + '" - original: "' + originalValue + '" - formatted: "' + value + '"');
+        }
+        
+        formData[el.name] = value;
+        console.log('🔍 [CART DEBUG] Added field - name: "' + el.name + '" - value: "' + value + '"');
       }
     }
   }
+  
+  console.log('🔍 [CART DEBUG] Final form data collected:');
+  console.log('🔍 [CART DEBUG] Total fields:', Object.keys(formData).length);
+  Object.keys(formData).forEach(key => {
+    console.log('🔍 [CART DEBUG]   ' + key + ': "' + formData[key] + '"');
+  });
 
   console.log('🛒 [CART DEBUG] Form data collected:', Object.keys(formData).length, 'fields');
 
@@ -2918,6 +3120,7 @@ window.addFormToCart = function (priceId) {
 
   // 4) Compute all PDF-logic matches (OR logic across conditions)
   const pdfLogicItems = [];
+  let deduplicatedPdfLogicItems = []; // Declare outside try-catch to ensure it's always defined
   console.log('🛒 [CART DEBUG] Computing PDF logic items...');
   
   try {
@@ -2931,11 +3134,52 @@ window.addFormToCart = function (priceId) {
         }
         
         console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
+        console.log('🛒 [CART DEBUG] PDF Logic details:', {
+          questionId: pdfLogic.questionId,
+          pdfName: pdfLogic.pdfName,
+          isBigParagraph: pdfLogic.isBigParagraph,
+          conditions: pdfLogic.conditions,
+          triggerOption: pdfLogic.triggerOption,
+          numberTrigger: pdfLogic.numberTrigger,
+          numberValue: pdfLogic.numberValue
+        });
 
         let matched = false;
         
-        // Check if this is a numbered dropdown with trigger option
-        if (pdfLogic.triggerOption) {
+        // Check if this is a bigParagraph with character limit
+        if (pdfLogic.isBigParagraph) {
+          // For Big Paragraph questions, check character limit
+          const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                     document.getElementById('answer' + pdfLogic.questionId);
+          
+          console.log('🔧 [PDF LOGIC DEBUG] Checking bigParagraph character limit:');
+          console.log('  - Question ID:', pdfLogic.questionId);
+          console.log('  - Element found:', el);
+          console.log('  - Conditions:', pdfLogic.conditions);
+          
+          if (el) {
+            const questionValue = el.value || '';
+            console.log('🔧 [PDF LOGIC DEBUG] BigParagraph question', pdfLogic.questionId, 'value length:', questionValue.length);
+            
+            // Check each character limit condition
+            for (const condition of pdfLogic.conditions) {
+              if (condition.characterLimit) {
+                console.log('🔧 [PDF LOGIC DEBUG] Checking character limit:', condition.characterLimit, 'against value length:', questionValue.length);
+                if (questionValue.length > condition.characterLimit) {
+                  matched = true;
+                  console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for bigParagraph character limit:', pdfLogic.pdfDisplayName);
+                  break; // Exit the loop once we find a match
+                }
+              }
+            }
+            
+            if (!matched) {
+              console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - character limit not exceeded');
+            }
+          } else {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for bigParagraph question', pdfLogic.questionId);
+          }
+        } else if (pdfLogic.triggerOption) {
           // For numbered dropdown with trigger option, check if the selected value matches the trigger
           const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                      document.getElementById('answer' + pdfLogic.questionId);
@@ -3027,7 +3271,10 @@ window.addFormToCart = function (priceId) {
           
           // If there's a custom PDF display name from the PDF logic, use it
           if (pdfLogic.pdfDisplayName && pdfLogic.pdfDisplayName.trim() !== '') {
-            displayTitle = pdfLogic.pdfDisplayName.trim();
+            // Format the display name properly (e.g., "sc103" -> "SC-103")
+            const baseName = pdfLogic.pdfDisplayName.trim();
+            // Convert to uppercase and add dashes for better formatting
+            displayTitle = baseName.toUpperCase().replace(/([A-Z])(\d+)/g, '$1-$2');
           } else {
             // Create a title based on the main form name + PDF name
             const mainFormName = window.pdfFileName || 'Form';
@@ -3048,9 +3295,9 @@ window.addFormToCart = function (priceId) {
             timestamp: nowTs
           };
           pdfLogicItems.push(item);
-          console.log('🛒 [CART DEBUG] Added PDF logic item:', item.title, 'with priceId:', item.priceId, 'portfolioId:', item.portfolioId);
+          console.log('🛒 [CART DEBUG] Added PDF logic item to cart:', item.title, 'with priceId:', item.priceId, 'portfolioId:', item.portfolioId);
         } else {
-          console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName);
+          console.log('🛒 [CART DEBUG] ❌ PDF logic not matched for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
         }
       }
     } else {
@@ -3059,12 +3306,14 @@ window.addFormToCart = function (priceId) {
     
     // Deduplicate PDF logic items to prevent multiple requests for the same PDF
     const originalPdfLogicCount = pdfLogicItems.length;
-    const deduplicatedPdfLogicItems = deduplicatePdfs(pdfLogicItems);
+    deduplicatedPdfLogicItems = deduplicatePdfs(pdfLogicItems);
     console.log('🛒 [CART DEBUG] PDF Logic Deduplication: Original count:', originalPdfLogicCount, 'After deduplication:', deduplicatedPdfLogicItems.length);
     
     console.log('🛒 [CART DEBUG] Final PDF logic items:', deduplicatedPdfLogicItems.length, deduplicatedPdfLogicItems);
   } catch (e) {
     console.warn('[PDF LOGIC] error computing matches:', e);
+    // Ensure deduplicatedPdfLogicItems is always an array even if there's an error
+    deduplicatedPdfLogicItems = [];
   }
 
   // 5) Preferred path: site cart manager
@@ -3134,12 +3383,8 @@ window.addFormToCart = function (priceId) {
           }).join('\\n');
           console.log('✅ Cart Debug: Successfully added ' + allItems.length + ' items to cart:\\n' + itemList);
           
-          // Show debugging alert with cart data
-          const debugInfo = 'Cart Debug: Successfully added ' + allItems.length + ' items to cart:\\n\\n' + itemList;
-          alert(debugInfo);
-          
-          // Show cart page requested alert
-          alert('Cart page requested');
+          // Navigate to cart page
+          window.location.href = '../Pages/cart.html';
         }
       }, index * 200); // 200ms delay between each item
     });
@@ -3151,7 +3396,7 @@ window.addFormToCart = function (priceId) {
   // 6) Fallback: localStorage + cookie (fresh array due to clearCartState)
   console.log('🛒 [CART DEBUG] Firebase not available, using fallback localStorage/cookie');
   
-  const cart = [];
+  let cart = [];
   const mainCartItem = {
     formId: originalFormId, title: formTitle, priceId,
     pdfName: (window.pdfFileName || ''),
@@ -3164,6 +3409,11 @@ window.addFormToCart = function (priceId) {
     cart.push(item);
     console.log('🛒 [CART DEBUG] PDF logic cart item:', item.title, 'with priceId:', item.priceId);
   }
+
+  // Final deduplication of the entire cart to prevent any duplicates
+  const originalCartCount = cart.length;
+  cart = deduplicatePdfs(cart);
+  console.log('🛒 [CART DEBUG] Final cart deduplication: Original count:', originalCartCount, 'After deduplication:', cart.length);
 
   console.log('🛒 [CART DEBUG] Total items in fallback cart:', cart.length, cart);
 
@@ -3179,12 +3429,8 @@ window.addFormToCart = function (priceId) {
   }).join('\\n');
   console.log('✅ Cart Debug: Added ' + cart.length + ' items to local storage:\\n' + itemList);
   
-  // Show debugging alert with cart data
-  const debugInfo = 'Cart Debug: Added ' + cart.length + ' items to local storage:\\n\\n' + itemList;
-  alert(debugInfo);
-  
-  // Show cart page requested alert
-  alert('Cart page requested');
+  // Navigate to cart page
+  window.location.href = '../Pages/cart.html';
 };
 
 
@@ -5016,11 +5262,14 @@ async function downloadAllPdfs() {
 /*──── build FormData with **everything inside the form** ────*/
 async function editAndDownloadPDF (pdfName) {
     try {
+        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Starting manual PDF download for:', pdfName);
         
         /* this grabs every control that belongs to <form id="customForm">,
            including those specified with form="customForm" attributes   */
         const form = document.getElementById('customForm');
         const fd = new FormData();
+        
+        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Form element found:', !!form);
         
         // Manually collect form data to format dates
         // Include both elements inside the form AND elements with form="customForm" attribute
@@ -5028,12 +5277,26 @@ async function editAndDownloadPDF (pdfName) {
         const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
         const allFormElements = [...formElements, ...externalFormElements];
         
+        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Form elements found:');
+        console.log('  - Elements inside form:', formElements.length);
+        console.log('  - External elements with form="customForm":', externalFormElements.length);
+        console.log('  - Total elements to process:', allFormElements.length);
+        
+        // Log all elements we're about to process
+        console.log('🔍 [MANUAL DOWNLOAD DEBUG] All form elements:');
+        allFormElements.forEach((element, index) => {
+            console.log('  ' + (index + 1) + '. ' + element.tagName + ' - id: "' + element.id + '" - name: "' + element.name + '" - type: "' + element.type + '" - value: "' + element.value + '" - disabled: ' + element.disabled);
+        });
+        
         allFormElements.forEach(element => {
             if (element.name && !element.disabled) {
                 // For checkboxes and radios, only include if checked
                 if (element.type === 'checkbox' || element.type === 'radio') {
                     if (element.checked) {
                         fd.append(element.name, 'on'); // Send 'on' for checked checkboxes (standard HTML form behavior)
+                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Added checked ' + element.type + ' - name: "' + element.name + '" - value: "on"');
+                    } else {
+                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Skipping unchecked ' + element.type + ' - name: "' + element.name + '"');
                     }
                     // Skip unchecked checkboxes entirely - don't send them to server
                 } else {
@@ -5041,13 +5304,25 @@ async function editAndDownloadPDF (pdfName) {
                     
                     // Format date inputs to mm/dd/yyyy
                     if (element.type === 'date' && value) {
+                        const originalValue = value;
                         value = formatDateForServer(value);
+                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Formatted date - name: "' + element.name + '" - original: "' + originalValue + '" - formatted: "' + value + '"');
                     }
                     
-                    fd.append(element.name, value);
+                    // Include ALL fields with values, including hidden ones
+                    if (value && value.trim() !== '') {
+                        fd.append(element.name, value);
+                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Added field - name: "' + element.name + '" - value: "' + value + '" - type: "' + element.type + '"');
+                    } else {
+                        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Skipping empty field - name: "' + element.name + '" - value: "' + value + '" - type: "' + element.type + '"');
+                    }
                 }
+            } else {
+                console.log('🔍 [MANUAL DOWNLOAD DEBUG] Skipping element - id: "' + element.id + '" - name: "' + element.name + '" - disabled: ' + element.disabled);
             }
         });
+        
+        console.log('🔍 [MANUAL DOWNLOAD DEBUG] Manual download form data collection complete');
 
         // Use the /edit_pdf endpoint with the PDF name as a query parameter
         // Remove the .pdf extension if present since server adds it automatically
@@ -6656,6 +6931,7 @@ if (typeof handleNext === 'function') {
             const cartCloseBtn = document.getElementById('cart-close-btn');
 
             function openCart() {
+                console.log('🛒 [CART MENU DEBUG] openCart called');
                 cartOverlay.classList.add('active');
                 cartSideMenu.classList.add('active');
                 document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
@@ -6673,6 +6949,7 @@ if (typeof handleNext === 'function') {
             if (cartIconLink) {
                 cartIconLink.addEventListener('click', function(e) {
                     e.preventDefault();
+                    console.log('🛒 [CART MENU DEBUG] Cart icon clicked');
                     openCart();
                 });
             }
@@ -6690,6 +6967,7 @@ if (typeof handleNext === 'function') {
 
             // Update cart content based on authentication state
             function updateCartContent() {
+                console.log('🛒 [CART MENU DEBUG] updateCartContent called');
                 const cartMessage = document.getElementById('cart-message');
                 const cartDescription = document.getElementById('cart-description');
                 const cartSignupBtn = document.getElementById('cart-signup-btn');
@@ -6697,8 +6975,11 @@ if (typeof handleNext === 'function') {
                 const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
                 const cartIconLarge = document.querySelector('.cart-icon-large');
                 
+                console.log('🛒 [CART MENU DEBUG] auth.currentUser:', auth.currentUser);
+                
                 if (auth.currentUser) {
                     // User is signed in - show cart items
+                    console.log('🛒 [CART MENU DEBUG] User is signed in, loading cart items');
                     if (cartMessage) cartMessage.textContent = 'Your Cart';
                     if (cartDescription) cartDescription.textContent = 'Review your selected forms and proceed to checkout.';
                     if (cartSignupBtn) cartSignupBtn.style.display = 'none';
@@ -6708,6 +6989,7 @@ if (typeof handleNext === 'function') {
                     loadCartItems();
                 } else {
                     // User is not signed in - show signup message
+                    console.log('🛒 [CART MENU DEBUG] User is not signed in, showing signup message');
                     if (cartMessage) cartMessage.textContent = 'Create an account to start shopping!';
                     if (cartDescription) cartDescription.textContent = 'To add forms to your cart and make purchases, you\\'ll need to create a FormWiz account. Sign up now to access our complete library of legal forms and start simplifying your paperwork.';
                     if (cartSignupBtn) cartSignupBtn.style.display = 'inline-block';
@@ -6719,10 +7001,14 @@ if (typeof handleNext === 'function') {
             
             // Load cart items for logged-in users
             async function loadCartItems() {
+                console.log('🛒 [CART MENU DEBUG] loadCartItems called');
                 const cartItemsList = document.getElementById('cart-items-list');
                 const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
                 
-                if (!cartItemsList || !auth.currentUser) return;
+                if (!cartItemsList || !auth.currentUser) {
+                    console.log('🛒 [CART MENU DEBUG] Missing cartItemsList or user not authenticated');
+                    return;
+                }
                 
                 try {
                     // Get cart data from cookies or localStorage
@@ -6734,17 +7020,26 @@ if (typeof handleNext === 'function') {
                     }
                     
                     const cartData = getCookie('formwiz_cart') || localStorage.getItem('formwiz_cart');
+                    console.log('🛒 [CART MENU DEBUG] Raw cart data:', cartData);
                     let cart = [];
                     
                     if (cartData) {
                         try {
-                            cart = JSON.parse(cartData);
+                            // Decode URL-encoded cart data if it comes from cookie
+                            let decodedCartData = cartData;
+                            if (cartData.startsWith('%')) {
+                                decodedCartData = decodeURIComponent(cartData);
+                                console.log('🛒 [CART MENU DEBUG] Decoded cart data:', decodedCartData);
+                            }
+                            cart = JSON.parse(decodedCartData);
+                            console.log('🛒 [CART MENU DEBUG] Parsed cart:', cart);
                         } catch (e) {
                             console.error('Error parsing cart data:', e);
                         }
                     }
                     
                     if (cart.length === 0) {
+                        console.log('🛒 [CART MENU DEBUG] Cart is empty, showing empty message');
                         cartItemsList.innerHTML = '<p style="color:#7f8c8d;font-style:italic;">Your cart is empty</p>';
                         cartItemsList.style.display = 'block';
                         if (cartCheckoutBtn) cartCheckoutBtn.style.display = 'none';
@@ -6801,7 +7096,7 @@ if (typeof handleNext === 'function') {
          defendantHtml +
          countyHtml +
        '</div>' +
-       '<div class="cart-item-price">$' + itemPrice.toFixed(2) + '</div>' +
+       '<div class="cart-item-price" style="margin-right: 12px;">$' + itemPrice.toFixed(2) + '</div>' +
        '<button class="remove-item" title="Remove" data-cart-index="' + itemIndex + '">' +
          '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-2 14H7L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"></path></svg>' +
        '</button>' +
@@ -7730,14 +8025,34 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
 
 // Function to update user full name
 function updateUserFullName() {
-  const firstName = document.getElementById('user_firstname')?.value || '';
-  const lastName = document.getElementById('user_lastname')?.value || '';
+  console.log('🔍 [UPDATE FULL NAME DEBUG] updateUserFullName() called');
+  
+  const firstNameField = document.getElementById('user_firstname');
+  const lastNameField = document.getElementById('user_lastname');
   const fullNameField = document.getElementById('user_fullname');
+  
+  console.log('🔍 [UPDATE FULL NAME DEBUG] Field elements found:');
+  console.log('  - firstNameField:', !!firstNameField, firstNameField ? 'value: "' + firstNameField.value + '"' : 'not found');
+  console.log('  - lastNameField:', !!lastNameField, lastNameField ? 'value: "' + lastNameField.value + '"' : 'not found');
+  console.log('  - fullNameField:', !!fullNameField, fullNameField ? 'current value: "' + fullNameField.value + '"' : 'not found');
+  
+  const firstName = firstNameField?.value || '';
+  const lastName = lastNameField?.value || '';
+  
+  console.log('🔍 [UPDATE FULL NAME DEBUG] Extracted values:');
+  console.log('  - firstName:', '"' + firstName + '"');
+  console.log('  - lastName:', '"' + lastName + '"');
   
   if (fullNameField) {
     // Simply combine first and last name with a space
     const fullName = (firstName + ' ' + lastName).trim();
+    console.log('🔍 [UPDATE FULL NAME DEBUG] Setting fullName to:', '"' + fullName + '"');
     fullNameField.value = fullName;
+    
+    // Verify the value was set
+    console.log('🔍 [UPDATE FULL NAME DEBUG] fullNameField.value after setting:', '"' + fullNameField.value + '"');
+  } else {
+    console.log('🔍 [UPDATE FULL NAME DEBUG] fullNameField not found - cannot update');
   }
 }
 

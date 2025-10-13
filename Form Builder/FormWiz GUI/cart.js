@@ -87,13 +87,6 @@ class CartManager {
         console.log('📦 Cart item portfolioId field:', cartItem.portfolioId);
         console.log('🆔 Generated cartItemId:', cartItemId);
         
-        // Debug: Check if portfolioId is being properly extracted
-        if (formData && formData.portfolioId) {
-            console.log('✅ [CART DEBUG] Portfolio ID found in formData:', formData.portfolioId);
-        } else {
-            console.log('⚠️ [CART DEBUG] No portfolio ID found in formData');
-        }
-        
         this.cart.push(cartItem);
         this.saveCart();
         await this.updateCartDisplay();
@@ -204,60 +197,12 @@ class CartManager {
         try {
             await this.saveAllFormData();
             const total = await this.getCartTotal();
-            
-            // Debug: Check payload size
-            const payload = { cartItems: this.cart, totalAmount: total };
-            const payloadString = JSON.stringify(payload);
-            const payloadSize = new Blob([payloadString]).size;
-            console.log('📦 [CHECKOUT DEBUG] Payload size:', payloadSize, 'bytes (', (payloadSize / 1024).toFixed(2), 'KB)');
-            console.log('📦 [CHECKOUT DEBUG] Cart items count:', this.cart.length);
-            
-            // Log cart item sizes
-            this.cart.forEach((item, index) => {
-                const itemSize = new Blob([JSON.stringify(item)]).size;
-                console.log(`📦 [CHECKOUT DEBUG] Item ${index + 1} (${item.title}) size:`, itemSize, 'bytes');
-                if (item.formData) {
-                    const formDataSize = new Blob([JSON.stringify(item.formData)]).size;
-                    console.log(`📦 [CHECKOUT DEBUG] Item ${index + 1} formData size:`, formDataSize, 'bytes');
-                }
+            const res = await fetch('/create-cart-checkout-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cartItems: this.cart, totalAmount: total }),
+                mode: 'cors'
             });
-            
-            // If payload is too large, optimize it
-            if (payloadSize > 100000) { // 100KB limit
-                console.log('⚠️ [CHECKOUT DEBUG] Payload too large, optimizing...');
-                const optimizedCartItems = this.cart.map(item => ({
-                    cartItemId: item.cartItemId,
-                    formId: item.formId,
-                    title: item.title,
-                    priceId: item.priceId,
-                    countyName: item.countyName,
-                    defendantName: item.defendantName,
-                    pdfName: item.pdfName,
-                    originalFormId: item.originalFormId,
-                    portfolioId: item.portfolioId,
-                    timestamp: item.timestamp
-                    // Remove formData to reduce size - it's already saved to Firebase
-                }));
-                
-                const optimizedPayload = { cartItems: optimizedCartItems, totalAmount: total };
-                const optimizedPayloadString = JSON.stringify(optimizedPayload);
-                const optimizedPayloadSize = new Blob([optimizedPayloadString]).size;
-                console.log('📦 [CHECKOUT DEBUG] Optimized payload size:', optimizedPayloadSize, 'bytes (', (optimizedPayloadSize / 1024).toFixed(2), 'KB)');
-                
-                var res = await fetch('/create-cart-checkout-session', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: optimizedPayloadString,
-                    mode: 'cors'
-                });
-            } else {
-                var res = await fetch('/create-cart-checkout-session', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: payloadString,
-                    mode: 'cors'
-                });
-            }
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             if (data.sessionId) {
@@ -317,102 +262,7 @@ class CartManager {
         if (checkoutBtn) checkoutBtn.addEventListener('click', () => this.processCheckout());
 
         const params = new URLSearchParams(window.location.search);
-        if (params.get('payment') === 'success' && this.cart.length > 0) {
-            console.log('🎉 [PAYMENT DEBUG] Payment success detected with cart items, processing...');
-            this.showPaymentProcessingScreen();
-            this.handlePaymentSuccess();
-        } else if (params.get('payment') === 'success' && this.cart.length === 0) {
-            console.log('⚠️ [PAYMENT DEBUG] Payment success detected but cart is empty, skipping processing');
-        }
-    }
-
-    showPaymentProcessingScreen() {
-        // Create loading overlay if it doesn't exist
-        let loadingOverlay = document.getElementById('payment-processing-overlay');
-        if (!loadingOverlay) {
-            loadingOverlay = document.createElement('div');
-            loadingOverlay.id = 'payment-processing-overlay';
-            loadingOverlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.8);
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                z-index: 10000;
-                color: white;
-                font-family: 'Montserrat', sans-serif;
-            `;
-            
-            const loadingContent = document.createElement('div');
-            loadingContent.style.cssText = `
-                text-align: center;
-                background-color: #2c3e50;
-                padding: 40px;
-                border-radius: 20px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-                max-width: 400px;
-                width: 90%;
-            `;
-            
-            const spinner = document.createElement('div');
-            spinner.style.cssText = `
-                width: 50px;
-                height: 50px;
-                border: 4px solid #f3f3f3;
-                border-top: 4px solid #2980b9;
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
-                margin: 0 auto 20px auto;
-            `;
-            
-            const title = document.createElement('h2');
-            title.textContent = 'Processing Payment...';
-            title.style.cssText = `
-                margin: 0 0 10px 0;
-                color: #ffffff;
-                font-size: 24px;
-                font-weight: 700;
-            `;
-            
-            const message = document.createElement('p');
-            message.textContent = 'Please wait while we process your documents and save them to your account.';
-            message.style.cssText = `
-                margin: 0;
-                color: #ecf0f1;
-                font-size: 16px;
-                line-height: 1.5;
-            `;
-            
-            // Add CSS animation for spinner
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            loadingContent.appendChild(spinner);
-            loadingContent.appendChild(title);
-            loadingContent.appendChild(message);
-            loadingOverlay.appendChild(loadingContent);
-            document.body.appendChild(loadingOverlay);
-        } else {
-            loadingOverlay.style.display = 'flex';
-        }
-    }
-
-    hidePaymentProcessingScreen() {
-        const loadingOverlay = document.getElementById('payment-processing-overlay');
-        if (loadingOverlay) {
-            loadingOverlay.style.display = 'none';
-        }
+        if (params.get('payment') === 'success') this.handlePaymentSuccess();
     }
 
     async handlePaymentSuccess() {
@@ -440,9 +290,7 @@ class CartManager {
         console.log('❌ [PAYMENT DEBUG] Failed items:', failedItems.length, failedItems.map(item => item.title));
         
         // Remove portfolio entries after successful payment
-        console.log('🗑️ [PAYMENT DEBUG] Starting portfolio removal process...');
         await this.removePortfolioEntries();
-        console.log('🗑️ [PAYMENT DEBUG] Portfolio removal process completed');
         
         await this.clearCart();
         
@@ -464,16 +312,8 @@ Forms page requested.`;
         alert(debugInfo);
         */
         
-        // Hide the loading screen
-        this.hidePaymentProcessingScreen();
-        
-        // Show success message and redirect to forms page
+        // Show success message and redirect to forms.html
         alert('Payment successful! Your documents have been saved to My Documents.');
-        
-        // Clear the URL parameters to prevent re-triggering on page reload
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        // Redirect to forms page
         window.location.href = 'forms.html';
     }
 
@@ -482,7 +322,7 @@ Forms page requested.`;
             // Get the current user
             const user = firebase.auth().currentUser;
             if (!user) {
-                console.log('❌ No user logged in, skipping portfolio removal');
+                console.log('No user logged in, skipping portfolio removal');
                 return;
             }
 
@@ -491,83 +331,20 @@ Forms page requested.`;
             // Get unique portfolio IDs from cart items
             const portfolioIds = [...new Set(this.cart.map(item => item.portfolioId).filter(id => id))];
             
-            console.log('🗑️ [PORTFOLIO DEBUG] Cart items:', this.cart.map(item => ({
-                title: item.title,
-                formId: item.formId,
-                portfolioId: item.portfolioId,
-                originalFormId: item.originalFormId
-            })));
-            console.log('🗑️ [PORTFOLIO DEBUG] Unique portfolio IDs to remove:', portfolioIds);
-            
-            if (portfolioIds.length === 0) {
-                console.log('⚠️ [PORTFOLIO DEBUG] No portfolio IDs found in cart items');
-                return;
-            }
-            
-            // Debug: Let's see what's actually in the user's forms collection
-            console.log('🔍 [PORTFOLIO DEBUG] Checking what forms exist in user collection...');
-            const formsSnapshot = await db.collection('users').doc(user.uid).collection('forms').get();
-            console.log('🔍 [PORTFOLIO DEBUG] Total forms in collection:', formsSnapshot.size);
-            
-            formsSnapshot.forEach(doc => {
-                console.log('🔍 [PORTFOLIO DEBUG] Form document ID:', doc.id, 'Data:', doc.data());
-            });
+            console.log('🗑️ Removing portfolio entries for portfolioIds:', portfolioIds);
             
             // Remove each portfolio entry
             for (const portfolioId of portfolioIds) {
                 try {
-                    console.log('🗑️ [PORTFOLIO DEBUG] Attempting to remove portfolio entry with portfolio ID:', portfolioId);
-                    
-                    // Search for documents that contain this portfolio ID in their data
-                    let documentToDelete = null;
-                    formsSnapshot.forEach(doc => {
-                        const data = doc.data();
-                        console.log('🔍 [PORTFOLIO DEBUG] Checking document:', doc.id, 'portfolioId in data:', data.portfolioId, 'vs looking for:', portfolioId);
-                        
-                        // Check if this document has the portfolio ID we're looking for
-                        if (data.portfolioId === portfolioId) {
-                            console.log('🔍 [PORTFOLIO DEBUG] Found matching portfolio ID in document:', doc.id, 'with data:', data);
-                            documentToDelete = doc;
-                        }
-                    });
-                    
-                    // If not found by portfolio ID, try to match by other fields from the cart item
-                    if (!documentToDelete) {
-                        console.log('🔍 [PORTFOLIO DEBUG] Portfolio ID not found in form data, trying to match by cart item details...');
-                        const cartItem = this.cart.find(item => item.portfolioId === portfolioId);
-                        if (cartItem) {
-                            console.log('🔍 [PORTFOLIO DEBUG] Cart item details:', cartItem);
-                            formsSnapshot.forEach(doc => {
-                                const data = doc.data();
-                                // Try to match by originalFormId, formId, or other identifying fields
-                                if (data.originalFormId === cartItem.originalFormId || 
-                                    data.formId === cartItem.formId ||
-                                    doc.id === cartItem.originalFormId ||
-                                    (data.name === cartItem.title && data.countyName === cartItem.countyName)) {
-                                    console.log('🔍 [PORTFOLIO DEBUG] Found matching document by other fields:', doc.id, 'with data:', data);
-                                    documentToDelete = doc;
-                                }
-                            });
-                        }
-                    }
-                    
-                    // Delete the document if found
-                    if (documentToDelete) {
-                        await documentToDelete.ref.delete();
-                        console.log('✅ [PORTFOLIO DEBUG] Successfully removed portfolio entry:', documentToDelete.id, 'that contained portfolio ID:', portfolioId);
-                    } else {
-                        console.log('⚠️ [PORTFOLIO DEBUG] No document found containing portfolio ID:', portfolioId);
-                        console.log('🔍 [PORTFOLIO DEBUG] Available document IDs:', formsSnapshot.docs.map(doc => doc.id));
-                        console.log('🔍 [PORTFOLIO DEBUG] Available portfolio IDs in documents:', formsSnapshot.docs.map(doc => ({ id: doc.id, portfolioId: doc.data().portfolioId })));
-                    }
+                    await db.collection('users').doc(user.uid)
+                        .collection('forms').doc(portfolioId).delete();
+                    console.log('✅ Removed portfolio entry:', portfolioId);
                 } catch (err) {
-                    console.error('❌ [PORTFOLIO DEBUG] Failed to remove portfolio entry:', portfolioId, err);
+                    console.error('❌ Failed to remove portfolio entry:', portfolioId, err);
                 }
             }
-            
-            console.log('✅ [PORTFOLIO DEBUG] Portfolio removal process completed');
         } catch (err) {
-            console.error('❌ [PORTFOLIO DEBUG] Error removing portfolio entries:', err);
+            console.error('❌ Error removing portfolio entries:', err);
         }
     }
 
@@ -640,19 +417,12 @@ Forms page requested.`;
                     let docName = cartItem.title || cartItem.formId;
                     let docCounty = null;
                     let docDefendant = null;
-                    
-                    console.log('🔍 [DEFENDANT DEBUG] Cart item defendantName:', cartItem.defendantName);
-                    console.log('🔍 [DEFENDANT DEBUG] Cart item originalFormId:', cartItem.originalFormId);
-                    console.log('🔍 [DEFENDANT DEBUG] Cart item formId:', cartItem.formId);
-                    
                     try {
                         // For conditional PDFs, try to get data from the original form first
                         const formIdToCheck = cartItem.originalFormId || cartItem.formId;
-                        console.log('🔍 [DEFENDANT DEBUG] Checking form document with ID:', formIdToCheck);
                         const formDoc = await db.collection('users').doc(user.uid).collection('forms').doc(formIdToCheck).get();
                         if (formDoc.exists) {
                             const formData = formDoc.data();
-                            console.log('🔍 [DEFENDANT DEBUG] Form document data:', formData);
                             if (formData && formData.name) {
                                 // For conditional PDFs, use the conditional PDF name but keep the main form context
                                 if (cartItem.originalFormId && cartItem.originalFormId !== cartItem.formId) {
@@ -663,23 +433,15 @@ Forms page requested.`;
                             }
                             if (formData && formData.countyName) docCounty = formData.countyName;
                             if (formData && formData.defendantName) docDefendant = formData.defendantName;
-                            console.log('🔍 [DEFENDANT DEBUG] Defendant name from form data:', docDefendant);
-                        } else {
-                            console.log('⚠️ [DEFENDANT DEBUG] Form document does not exist:', formIdToCheck);
                         }
                     } catch (e) {
                         // fallback: use cartItem data
-                        console.log('⚠️ [DEFENDANT DEBUG] Could not fetch form data from Firebase, using cart item data:', e);
+                        console.log('⚠️ Could not fetch form data from Firebase, using cart item data');
                     }
                     
                     // Fallback to cart item data if Firebase data is not available
                     if (!docCounty && cartItem.countyName) docCounty = cartItem.countyName;
-                    if (!docDefendant && cartItem.defendantName) {
-                        docDefendant = cartItem.defendantName;
-                        console.log('🔍 [DEFENDANT DEBUG] Using defendant name from cart item:', docDefendant);
-                    }
-                    
-                    console.log('🔍 [DEFENDANT DEBUG] Final defendant name for document:', docDefendant);
+                    if (!docDefendant && cartItem.defendantName) docDefendant = cartItem.defendantName;
 
                     const documentData = {
                         name: docName,
