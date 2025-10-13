@@ -87,6 +87,13 @@ class CartManager {
         console.log('📦 Cart item portfolioId field:', cartItem.portfolioId);
         console.log('🆔 Generated cartItemId:', cartItemId);
         
+        // Debug: Check if portfolioId is being properly extracted
+        if (formData && formData.portfolioId) {
+            console.log('✅ [CART DEBUG] Portfolio ID found in formData:', formData.portfolioId);
+        } else {
+            console.log('⚠️ [CART DEBUG] No portfolio ID found in formData');
+        }
+        
         this.cart.push(cartItem);
         this.saveCart();
         await this.updateCartDisplay();
@@ -262,7 +269,12 @@ class CartManager {
         if (checkoutBtn) checkoutBtn.addEventListener('click', () => this.processCheckout());
 
         const params = new URLSearchParams(window.location.search);
-        if (params.get('payment') === 'success') this.handlePaymentSuccess();
+        if (params.get('payment') === 'success' && this.cart.length > 0) {
+            console.log('🎉 [PAYMENT DEBUG] Payment success detected with cart items, processing...');
+            this.handlePaymentSuccess();
+        } else if (params.get('payment') === 'success' && this.cart.length === 0) {
+            console.log('⚠️ [PAYMENT DEBUG] Payment success detected but cart is empty, skipping processing');
+        }
     }
 
     async handlePaymentSuccess() {
@@ -290,7 +302,9 @@ class CartManager {
         console.log('❌ [PAYMENT DEBUG] Failed items:', failedItems.length, failedItems.map(item => item.title));
         
         // Remove portfolio entries after successful payment
+        console.log('🗑️ [PAYMENT DEBUG] Starting portfolio removal process...');
         await this.removePortfolioEntries();
+        console.log('🗑️ [PAYMENT DEBUG] Portfolio removal process completed');
         
         await this.clearCart();
         
@@ -312,9 +326,12 @@ Forms page requested.`;
         alert(debugInfo);
         */
         
-        // Show success message and redirect to forms.html
+        // Show success message and alert for troubleshooting
         alert('Payment successful! Your documents have been saved to My Documents.');
-        window.location.href = 'forms.html';
+        alert('Forms page requested');
+        
+        // Clear the URL parameters to prevent re-triggering on page reload
+        window.history.replaceState({}, document.title, window.location.pathname);
     }
 
     async removePortfolioEntries() {
@@ -322,7 +339,7 @@ Forms page requested.`;
             // Get the current user
             const user = firebase.auth().currentUser;
             if (!user) {
-                console.log('No user logged in, skipping portfolio removal');
+                console.log('❌ No user logged in, skipping portfolio removal');
                 return;
             }
 
@@ -331,20 +348,83 @@ Forms page requested.`;
             // Get unique portfolio IDs from cart items
             const portfolioIds = [...new Set(this.cart.map(item => item.portfolioId).filter(id => id))];
             
-            console.log('🗑️ Removing portfolio entries for portfolioIds:', portfolioIds);
+            console.log('🗑️ [PORTFOLIO DEBUG] Cart items:', this.cart.map(item => ({
+                title: item.title,
+                formId: item.formId,
+                portfolioId: item.portfolioId,
+                originalFormId: item.originalFormId
+            })));
+            console.log('🗑️ [PORTFOLIO DEBUG] Unique portfolio IDs to remove:', portfolioIds);
+            
+            if (portfolioIds.length === 0) {
+                console.log('⚠️ [PORTFOLIO DEBUG] No portfolio IDs found in cart items');
+                return;
+            }
+            
+            // Debug: Let's see what's actually in the user's forms collection
+            console.log('🔍 [PORTFOLIO DEBUG] Checking what forms exist in user collection...');
+            const formsSnapshot = await db.collection('users').doc(user.uid).collection('forms').get();
+            console.log('🔍 [PORTFOLIO DEBUG] Total forms in collection:', formsSnapshot.size);
+            
+            formsSnapshot.forEach(doc => {
+                console.log('🔍 [PORTFOLIO DEBUG] Form document ID:', doc.id, 'Data:', doc.data());
+            });
             
             // Remove each portfolio entry
             for (const portfolioId of portfolioIds) {
                 try {
-                    await db.collection('users').doc(user.uid)
-                        .collection('forms').doc(portfolioId).delete();
-                    console.log('✅ Removed portfolio entry:', portfolioId);
+                    console.log('🗑️ [PORTFOLIO DEBUG] Attempting to remove portfolio entry with portfolio ID:', portfolioId);
+                    
+                    // Search for documents that contain this portfolio ID in their data
+                    let documentToDelete = null;
+                    formsSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        console.log('🔍 [PORTFOLIO DEBUG] Checking document:', doc.id, 'portfolioId in data:', data.portfolioId, 'vs looking for:', portfolioId);
+                        
+                        // Check if this document has the portfolio ID we're looking for
+                        if (data.portfolioId === portfolioId) {
+                            console.log('🔍 [PORTFOLIO DEBUG] Found matching portfolio ID in document:', doc.id, 'with data:', data);
+                            documentToDelete = doc;
+                        }
+                    });
+                    
+                    // If not found by portfolio ID, try to match by other fields from the cart item
+                    if (!documentToDelete) {
+                        console.log('🔍 [PORTFOLIO DEBUG] Portfolio ID not found in form data, trying to match by cart item details...');
+                        const cartItem = this.cart.find(item => item.portfolioId === portfolioId);
+                        if (cartItem) {
+                            console.log('🔍 [PORTFOLIO DEBUG] Cart item details:', cartItem);
+                            formsSnapshot.forEach(doc => {
+                                const data = doc.data();
+                                // Try to match by originalFormId, formId, or other identifying fields
+                                if (data.originalFormId === cartItem.originalFormId || 
+                                    data.formId === cartItem.formId ||
+                                    doc.id === cartItem.originalFormId ||
+                                    (data.name === cartItem.title && data.countyName === cartItem.countyName)) {
+                                    console.log('🔍 [PORTFOLIO DEBUG] Found matching document by other fields:', doc.id, 'with data:', data);
+                                    documentToDelete = doc;
+                                }
+                            });
+                        }
+                    }
+                    
+                    // Delete the document if found
+                    if (documentToDelete) {
+                        await documentToDelete.ref.delete();
+                        console.log('✅ [PORTFOLIO DEBUG] Successfully removed portfolio entry:', documentToDelete.id, 'that contained portfolio ID:', portfolioId);
+                    } else {
+                        console.log('⚠️ [PORTFOLIO DEBUG] No document found containing portfolio ID:', portfolioId);
+                        console.log('🔍 [PORTFOLIO DEBUG] Available document IDs:', formsSnapshot.docs.map(doc => doc.id));
+                        console.log('🔍 [PORTFOLIO DEBUG] Available portfolio IDs in documents:', formsSnapshot.docs.map(doc => ({ id: doc.id, portfolioId: doc.data().portfolioId })));
+                    }
                 } catch (err) {
-                    console.error('❌ Failed to remove portfolio entry:', portfolioId, err);
+                    console.error('❌ [PORTFOLIO DEBUG] Failed to remove portfolio entry:', portfolioId, err);
                 }
             }
+            
+            console.log('✅ [PORTFOLIO DEBUG] Portfolio removal process completed');
         } catch (err) {
-            console.error('❌ Error removing portfolio entries:', err);
+            console.error('❌ [PORTFOLIO DEBUG] Error removing portfolio entries:', err);
         }
     }
 
