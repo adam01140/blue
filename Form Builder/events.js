@@ -137,33 +137,7 @@ function setupMouseEventListeners(graph) {
     }
   });
   
-  // Zoom with mouse wheel
-  mxEvent.addMouseWheelListener(function(evt, up) {
-    if (!mxEvent.isConsumed(evt)) {
-      // Get zoom sensitivity from settings (default to 0.01 if not set)
-      const sensitivity = window.userSettings?.zoomSensitivity || 0.01;
-      
-      // Apply custom zoom based on sensitivity
-      const currentScale = graph.view.scale;
-      const baseZoomFactor = 1.02; // Much smaller base zoom factor
-      const sensitivityFactor = sensitivity * 50; // Scale up the sensitivity value
-      const zoomFactor = 1 + (baseZoomFactor - 1) * sensitivityFactor;
-      
-      let newScale;
-      if (up) {
-        newScale = currentScale * zoomFactor;
-      } else {
-        newScale = currentScale / zoomFactor;
-      }
-      
-      // Limit zoom range
-      if (newScale >= 0.1 && newScale <= 3.0) {
-        graph.view.setScale(newScale);
-      }
-      
-      mxEvent.consume(evt);
-    }
-  }, graph.container);
+  // Mouse wheel zoom is handled in script.js with proper directional zoom logic
   
   // Add global event listeners to prevent graph interference with dropdowns
   document.addEventListener('mousedown', function(e) {
@@ -311,16 +285,67 @@ function setupGraphEventListeners(graph) {
     }
   });
   
-  // Move cells event - nodes now move independently without dragging connected nodes
+  // Move cells event - implement hierarchical dragging for dropdown nodes
   graph.addListener(mxEvent.MOVE_CELLS, function(sender, evt) {
     const movedCells = evt.getProperty('cells');
     const dx = evt.getProperty('dx');
     const dy = evt.getProperty('dy');
     
     if (!movedCells || movedCells.length === 0) return;
+
+    const movedIds = new Set(movedCells.map(c => c.id));
     
-    // All nodes now move independently - no connected node dragging
-    console.log('Nodes moved independently - no connected nodes dragged along');
+    // Function to get all connected descendants
+    const getConnectedDescendants = (cell) => {
+      const descendants = new Set();
+      const queue = [cell];
+      
+      while (queue.length > 0) {
+        const current = queue.shift();
+        const edges = graph.getOutgoingEdges(current) || [];
+        
+        edges.forEach(edge => {
+          const target = edge.target;
+          if (!descendants.has(target) && !movedIds.has(target.id)) {
+            descendants.add(target);
+            queue.push(target);
+          }
+        });
+      }
+      return Array.from(descendants);
+    };
+
+    movedCells.forEach(cell => {
+      // Check if it's a dropdown, checkbox, multiple dropdown, or multiple textbox question node
+      const isDropdownQuestion = cell.style && cell.style.includes('questionType=dropdown') && cell.style.includes('nodeType=question');
+      const isCheckboxQuestion = cell.style && cell.style.includes('questionType=checkbox') && cell.style.includes('nodeType=question');
+      const isMultipleDropdownQuestion = cell.style && cell.style.includes('questionType=multipleDropdown') && cell.style.includes('nodeType=question');
+      const isMultipleTextboxQuestion = cell.style && cell.style.includes('questionType=multipleTextboxes') && cell.style.includes('nodeType=question');
+      
+      if (isDropdownQuestion || isCheckboxQuestion || isMultipleDropdownQuestion || isMultipleTextboxQuestion) {
+        let questionType = 'unknown';
+        if (isDropdownQuestion) questionType = 'dropdown';
+        else if (isCheckboxQuestion) questionType = 'checkbox';
+        else if (isMultipleDropdownQuestion) questionType = 'multipleDropdown';
+        else if (isMultipleTextboxQuestion) questionType = 'multipleTextboxes';
+        
+        console.log('🎯 [HIERARCHICAL DRAG]', questionType, 'question node detected');
+        
+        // When dragging a question node, move all connected descendants
+        const descendants = getConnectedDescendants(cell);
+        console.log('🎯 [HIERARCHICAL DRAG] Moving', descendants.length, 'connected descendants');
+        
+        descendants.forEach(descendant => {
+          const geo = descendant.geometry;
+          if (geo) {
+            const newGeo = geo.clone();
+            newGeo.x += dx;
+            newGeo.y += dy;
+            graph.getModel().setGeometry(descendant, newGeo);
+          }
+        });
+      }
+    });
     
     // Renumber question IDs based on new Y positions
     if (typeof window.renumberQuestionIds === 'function') {
@@ -328,6 +353,7 @@ function setupGraphEventListeners(graph) {
     }
   });
 }
+
 
 // Setup Keyboard Event Listeners
 function setupKeyboardEventListeners(graph) {

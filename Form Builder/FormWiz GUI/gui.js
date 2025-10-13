@@ -743,14 +743,56 @@ function addQuestion(sectionId, questionId = null) {
             <div id="pdfLogicConditions${currentQuestionId}"></div>
             <button type="button" onclick="addPdfLogicCondition(${currentQuestionId})">+ Add OR Condition</button>
             <br><br>
-            <label>PDF Name (for cart display):</label>
-            <input type="text" id="pdfLogicPdfDisplayName${currentQuestionId}" placeholder="Enter custom PDF name (e.g., Small Claims 500A)">
-            <br><br>
-            <label>Additional PDF to download:</label>
-            <input type="text" id="pdfLogicPdfName${currentQuestionId}" placeholder="Enter PDF name (e.g., additional_form.pdf)">
-            <br><br>
-            <label>Choose your Price ID:</label>
-            <input type="text" id="pdfLogicStripePriceId${currentQuestionId}" placeholder="Enter Stripe Price ID (e.g., price_12345)">
+            
+            <!-- Trigger Option for Numbered Dropdown -->
+            <div id="triggerOptionBlock${currentQuestionId}" style="display: none;">
+                <label>Trigger option:</label>
+                <select id="pdfLogicTriggerOption${currentQuestionId}">
+                    <option value="">Select trigger option</option>
+                </select>
+                <br><br>
+            </div>
+            
+            <!-- Trigger Option for Number Questions -->
+            <div id="numberTriggerBlock${currentQuestionId}" style="display: none;">
+                <label>Trigger:</label>
+                <select id="pdfLogicNumberTrigger${currentQuestionId}">
+                    <option value="">Select trigger</option>
+                    <option value="=">=</option>
+                    <option value=">">></option>
+                    <option value="<"><</option>
+                </select>
+                <br><br>
+                <label>Number:</label>
+                <input type="number" id="pdfLogicNumberValue${currentQuestionId}" placeholder="Enter number">
+                <br><br>
+            </div>
+            
+                <!-- PDF Details Container -->
+                <div id="pdfDetailsContainer${currentQuestionId}">
+                    <div class="pdf-detail-group" data-pdf-index="1" style="border: 2px solid #007bff; border-radius: 8px; padding: 15px; margin: 10px 0; background: #f8f9ff;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h4 style="margin: 0; color: #007bff;">PDF 1</h4>
+                        </div>
+                        
+                        <label>PDF Name (for cart display):</label>
+                        <input type="text" id="pdfLogicPdfDisplayName${currentQuestionId}_1" placeholder="Enter custom PDF name (e.g., Small Claims 500A)">
+                        <br><br>
+                        <label>Additional PDF to download:</label>
+                        <input type="text" id="pdfLogicPdfName${currentQuestionId}_1" placeholder="Enter PDF name (e.g., additional_form.pdf)">
+                        <br><br>
+                        <label>Choose your Price ID:</label>
+                        <input type="text" id="pdfLogicStripePriceId${currentQuestionId}_1" placeholder="Enter Stripe Price ID (e.g., price_12345)">
+                        <br><br>
+                        
+                        <div style="text-align: center; margin-top: 15px;">
+                            <button type="button" onclick="removePdf(${currentQuestionId}, 1)" style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">Remove PDF</button>
+                        </div>
+                    </div>
+                </div>
+            
+            <!-- Add Another PDF Button -->
+            <button type="button" onclick="addAnotherPdf(${currentQuestionId})" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 10px;">+ Add Another PDF</button>
         </div><br>
 
         <!-- Alert Logic -->
@@ -1072,9 +1114,20 @@ function toggleOptions(questionId) {
                 const conditionId = condition.id.split('_')[1];
                 updateJumpOptionsForNumberedDropdown(questionId, conditionId);
             });
+            // Update PDF logic trigger options if PDF logic is enabled
+            const pdfLogicEnabled = document.getElementById(`pdfLogic${questionId}`)?.checked;
+            if (pdfLogicEnabled) {
+                updatePdfLogicTriggerOptions(questionId);
+            }
             break;
 
         case 'money':
+            textboxOptionsBlock.style.display = 'block';
+            // Update existing jump conditions to use simplified format for textbox questions
+            updateJumpConditionsForTextbox(questionId);
+            break;
+            
+        case 'number':
             textboxOptionsBlock.style.display = 'block';
             // Update existing jump conditions to use simplified format for textbox questions
             updateJumpConditionsForTextbox(questionId);
@@ -1094,10 +1147,14 @@ function toggleOptions(questionId) {
         pdfBlock.style.display = 'none';
     }
 
-    // Handle hidden logic visibility - show only for dropdown questions
+    // Handle hidden logic visibility - show for dropdown and numbered dropdown questions
     const hiddenLogicBlock = document.getElementById(`hiddenLogic${questionId}`);
-    if (questionType === 'dropdown') {
+    if (questionType === 'dropdown' || questionType === 'numberedDropdown') {
         hiddenLogicBlock.style.display = 'block';
+        // Update hidden logic trigger options for numbered dropdown
+        if (questionType === 'numberedDropdown') {
+            updateHiddenLogicTriggerOptionsForNumberedDropdown(questionId);
+        }
     } else {
         hiddenLogicBlock.style.display = 'none';
     }
@@ -1116,6 +1173,26 @@ function toggleOptions(questionId) {
                 pdfLogicConditionsDiv.innerHTML = '';
                 // Add a default character limit condition for Big Paragraph
                 addPdfLogicCondition(questionId);
+            }
+        }
+    }
+    
+    // Handle number trigger block visibility for PDF Logic
+    const numberTriggerBlock = document.getElementById(`numberTriggerBlock${questionId}`);
+    const triggerOptionBlock = document.getElementById(`triggerOptionBlock${questionId}`);
+    if (numberTriggerBlock && triggerOptionBlock) {
+        // Reset both blocks
+        numberTriggerBlock.style.display = 'none';
+        triggerOptionBlock.style.display = 'none';
+        
+        // Show appropriate block based on question type and PDF Logic status
+        const pdfLogicEnabled = document.getElementById(`pdfLogic${questionId}`)?.checked;
+        if (pdfLogicEnabled) {
+            if (questionType === 'number') {
+                numberTriggerBlock.style.display = 'block';
+            } else if (questionType === 'numberedDropdown') {
+                triggerOptionBlock.style.display = 'block';
+                updatePdfLogicTriggerOptions(questionId);
             }
         }
     }
@@ -1581,14 +1658,20 @@ function toggleConditionalPDFLogic(questionId) {
 
 // Hidden logic toggling
 function toggleHiddenLogic(questionId) {
+    console.log('🔧 [HIDDEN LOGIC DEBUG] toggleHiddenLogic called for question:', questionId);
     const hiddenLogicEnabled = document.getElementById(`enableHiddenLogic${questionId}`).checked;
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Hidden logic enabled:', hiddenLogicEnabled);
+    
     const hiddenLogicBlock = document.getElementById(`hiddenLogicBlock${questionId}`);
     hiddenLogicBlock.style.display = hiddenLogicEnabled ? 'block' : 'none';
     
     // Create first configuration when enabling
     if (hiddenLogicEnabled) {
         const configsContainer = document.getElementById(`hiddenLogicConfigs${questionId}`);
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Configs container found:', !!configsContainer, 'Children count:', configsContainer ? configsContainer.children.length : 0);
+        
         if (configsContainer && configsContainer.children.length === 0) {
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Adding first hidden logic config for question:', questionId);
             addHiddenLogicConfig(questionId);
         }
     }
@@ -1650,14 +1733,68 @@ function updateHiddenLogicTriggerOptions(questionId) {
     });
 }
 
+// Update hidden logic trigger options for numbered dropdown questions
+function updateHiddenLogicTriggerOptionsForNumberedDropdown(questionId) {
+    console.log('🔧 [HIDDEN LOGIC DEBUG] updateHiddenLogicTriggerOptionsForNumberedDropdown called for question:', questionId);
+    
+    // Update all trigger selects for this question
+    const triggerSelects = document.querySelectorAll(`[id^="hiddenLogicTrigger${questionId}_"]`);
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Found trigger selects:', triggerSelects.length);
+    
+    triggerSelects.forEach((triggerSelect, index) => {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Processing trigger select', index, ':', triggerSelect.id);
+        
+        // Save current value
+        const currentValue = triggerSelect.value;
+        
+        // Clear existing options except the first one
+        triggerSelect.innerHTML = '<option value="">Select Trigger</option>';
+        
+        // Get the number range from the numbered dropdown
+        const startInput = document.getElementById(`numberRangeStart${questionId}`);
+        const endInput = document.getElementById(`numberRangeEnd${questionId}`);
+        
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Start input found:', !!startInput, 'End input found:', !!endInput);
+        
+        if (startInput && endInput) {
+            const start = parseInt(startInput.value) || 1;
+            const end = parseInt(endInput.value) || 1;
+            
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Range:', start, 'to', end);
+            
+            // Add options for each number in the range
+            for (let i = start; i <= end; i++) {
+                const opt = document.createElement('option');
+                opt.value = i.toString();
+                opt.textContent = i.toString();
+                triggerSelect.appendChild(opt);
+                console.log('🔧 [HIDDEN LOGIC DEBUG] Added option:', i);
+            }
+            
+            // Restore the current value if it's still valid
+            if (currentValue && parseInt(currentValue) >= start && parseInt(currentValue) <= end) {
+                triggerSelect.value = currentValue;
+                console.log('🔧 [HIDDEN LOGIC DEBUG] Restored value:', currentValue);
+            }
+        } else {
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Start or end input not found for question:', questionId);
+        }
+    });
+}
+
 // Add a new hidden logic configuration
 function addHiddenLogicConfig(questionId) {
+    console.log('🔧 [HIDDEN LOGIC DEBUG] addHiddenLogicConfig called for question:', questionId);
     const configsContainer = document.getElementById(`hiddenLogicConfigs${questionId}`);
-    if (!configsContainer) return;
+    if (!configsContainer) {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Configs container not found for question:', questionId);
+        return;
+    }
     
     // Get the next config index
     const existingConfigs = configsContainer.querySelectorAll('.hidden-logic-config');
     const configIndex = existingConfigs.length;
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Creating config with index:', configIndex);
     
     // Create the configuration HTML
     const configHtml = `
@@ -1691,7 +1828,16 @@ function addHiddenLogicConfig(questionId) {
     configsContainer.insertAdjacentHTML('beforeend', configHtml);
     
     // Populate trigger options for the new configuration
-    updateHiddenLogicTriggerOptions(questionId);
+    const questionType = document.getElementById(`questionType${questionId}`).value;
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Question type for trigger options:', questionType);
+    
+    if (questionType === 'numberedDropdown') {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Calling updateHiddenLogicTriggerOptionsForNumberedDropdown');
+        updateHiddenLogicTriggerOptionsForNumberedDropdown(questionId);
+    } else {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Calling updateHiddenLogicTriggerOptions');
+        updateHiddenLogicTriggerOptions(questionId);
+    }
 }
 
 // Remove a hidden logic configuration
@@ -1749,18 +1895,189 @@ function renumberHiddenLogicConfigs(questionId) {
     });
 }
 
+// Add another PDF to the PDF logic
+function addAnotherPdf(questionId) {
+    const pdfDetailsContainer = document.getElementById(`pdfDetailsContainer${questionId}`);
+    const existingPdfs = pdfDetailsContainer.querySelectorAll('.pdf-detail-group');
+    const nextIndex = existingPdfs.length + 1;
+    
+    const newPdfGroup = document.createElement('div');
+    newPdfGroup.className = 'pdf-detail-group';
+    newPdfGroup.setAttribute('data-pdf-index', nextIndex);
+    newPdfGroup.innerHTML = `
+        <div style="border: 2px solid #007bff; border-radius: 8px; padding: 15px; margin: 10px 0; background: #f8f9ff;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h4 style="margin: 0; color: #007bff;">PDF ${nextIndex}</h4>
+            </div>
+            
+            <!-- Trigger Option for Numbered Dropdown -->
+            <div id="triggerOptionBlock${questionId}_${nextIndex}" style="display: none;">
+                <label>Trigger option:</label>
+                <select id="pdfLogicTriggerOption${questionId}_${nextIndex}">
+                    <option value="">Select trigger option</option>
+                </select>
+                <br><br>
+            </div>
+            
+            <label>PDF Name (for cart display):</label>
+            <input type="text" id="pdfLogicPdfDisplayName${questionId}_${nextIndex}" placeholder="Enter custom PDF name (e.g., Small Claims 500A)">
+            <br><br>
+            <label>Additional PDF to download:</label>
+            <input type="text" id="pdfLogicPdfName${questionId}_${nextIndex}" placeholder="Enter PDF name (e.g., additional_form.pdf)">
+            <br><br>
+            <label>Choose your Price ID:</label>
+            <input type="text" id="pdfLogicStripePriceId${questionId}_${nextIndex}" placeholder="Enter Stripe Price ID (e.g., price_12345)">
+            <br><br>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <button type="button" onclick="removePdf(${questionId}, ${nextIndex})" style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">Remove PDF</button>
+            </div>
+        </div>
+    `;
+    
+    pdfDetailsContainer.appendChild(newPdfGroup);
+    
+    // Update trigger options for the new PDF if it's a numbered dropdown
+    const questionBlock = document.getElementById(`questionBlock${questionId}`);
+    const questionTypeSelect = questionBlock.querySelector(`#questionType${questionId}`);
+    const questionType = questionTypeSelect ? questionTypeSelect.value : '';
+    
+    if (questionType === 'numberedDropdown') {
+        const triggerOptionBlock = newPdfGroup.querySelector(`#triggerOptionBlock${questionId}_${nextIndex}`);
+        triggerOptionBlock.style.display = 'block';
+        updatePdfLogicTriggerOptions(questionId);
+    }
+}
+
+// Remove a PDF from the PDF logic
+function removePdf(questionId, pdfIndex) {
+    const pdfDetailsContainer = document.getElementById(`pdfDetailsContainer${questionId}`);
+    const pdfGroup = pdfDetailsContainer.querySelector(`[data-pdf-index="${pdfIndex}"]`);
+    if (pdfGroup) {
+        pdfGroup.remove();
+    }
+}
+
+// Add extra PDF inputs to an existing PDF group
+function addExtraPdf(questionId, pdfIndex) {
+    const pdfGroup = document.getElementById(`pdfDetailsContainer${questionId}`).querySelector(`[data-pdf-index="${pdfIndex}"]`);
+    if (!pdfGroup) return;
+    
+    // Count existing extra PDFs in this group
+    const existingExtraPdfs = pdfGroup.querySelectorAll('.extra-pdf-inputs');
+    const extraPdfIndex = existingExtraPdfs.length + 1;
+    
+    // Create the extra PDF inputs container
+    const extraPdfContainer = document.createElement('div');
+    extraPdfContainer.className = 'extra-pdf-inputs';
+    extraPdfContainer.style.cssText = 'border: 1px solid #28a745; border-radius: 6px; padding: 12px; margin: 10px 0; background: #f8fff8;';
+    
+    extraPdfContainer.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h5 style="margin: 0; color: #28a745;">Extra PDF ${extraPdfIndex}</h5>
+            <button type="button" onclick="removeExtraPdf(this)" style="background: #dc3545; color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-size: 0.8em;">Remove</button>
+        </div>
+        
+        <label>PDF Name (for cart display):</label>
+        <input type="text" id="pdfLogicPdfDisplayName${questionId}_${pdfIndex}_extra${extraPdfIndex}" placeholder="Enter custom PDF name (e.g., Small Claims 500A)">
+        <br><br>
+        <label>Additional PDF to download:</label>
+        <input type="text" id="pdfLogicPdfName${questionId}_${pdfIndex}_extra${extraPdfIndex}" placeholder="Enter PDF name (e.g., additional_form.pdf)">
+        <br><br>
+        <label>Choose your Price ID:</label>
+        <input type="text" id="pdfLogicStripePriceId${questionId}_${pdfIndex}_extra${extraPdfIndex}" placeholder="Enter Stripe Price ID (e.g., price_12345)">
+    `;
+    
+    // Insert the extra PDF container after the trigger option block (if it exists) or after the main PDF inputs
+    const triggerOptionBlock = pdfGroup.querySelector(`#triggerOptionBlock${questionId}_${pdfIndex}`);
+    if (triggerOptionBlock && triggerOptionBlock.style.display !== 'none') {
+        triggerOptionBlock.insertAdjacentElement('afterend', extraPdfContainer);
+    } else {
+        // Find the last input in the main PDF group and insert after it
+        const lastInput = pdfGroup.querySelector('input:last-of-type');
+        if (lastInput) {
+            lastInput.parentNode.insertBefore(extraPdfContainer, lastInput.nextSibling);
+        } else {
+            pdfGroup.appendChild(extraPdfContainer);
+        }
+    }
+}
+
+// Remove an extra PDF input container
+function removeExtraPdf(button) {
+    const extraPdfContainer = button.closest('.extra-pdf-inputs');
+    if (extraPdfContainer) {
+        extraPdfContainer.remove();
+    }
+}
+
+// Update PDF Logic trigger options for numbered dropdown
+function updatePdfLogicTriggerOptions(questionId) {
+    const questionBlock = document.getElementById(`questionBlock${questionId}`);
+    const questionTypeSelect = questionBlock.querySelector(`#questionType${questionId}`);
+    const questionType = questionTypeSelect ? questionTypeSelect.value : '';
+    
+    if (questionType === 'numberedDropdown') {
+        const rangeStartEl = questionBlock.querySelector(`#numberRangeStart${questionId}`);
+        const rangeEndEl = questionBlock.querySelector(`#numberRangeEnd${questionId}`);
+        
+        if (rangeStartEl && rangeEndEl) {
+            const min = parseInt(rangeStartEl.value) || 1;
+            const max = parseInt(rangeEndEl.value) || min;
+            
+            // Update all trigger selects for all PDFs
+            const allTriggerSelects = document.querySelectorAll(`[id^="pdfLogicTriggerOption${questionId}"]`);
+            allTriggerSelects.forEach(triggerSelect => {
+                // Save the currently selected value
+                const currentValue = triggerSelect.value;
+                
+                // Clear existing options except the first one
+                triggerSelect.innerHTML = '<option value="">Select trigger option</option>';
+                
+                // Add each number in the range as an option
+                for (let i = min; i <= max; i++) {
+                    const optionEl = document.createElement('option');
+                    optionEl.value = i.toString();
+                    optionEl.textContent = i.toString();
+                    triggerSelect.appendChild(optionEl);
+                }
+                
+                // Restore the selected value if it's still valid
+                if (currentValue && parseInt(currentValue) >= min && parseInt(currentValue) <= max) {
+                    triggerSelect.value = currentValue;
+                }
+            });
+        }
+    }
+}
+
 // PDF Logic toggling
 function togglePdfLogic(questionId) {
     const pdfLogicEnabled = document.getElementById(`pdfLogic${questionId}`).checked;
     const pdfLogicBlock = document.getElementById(`pdfLogicBlock${questionId}`);
     pdfLogicBlock.style.display = pdfLogicEnabled ? 'block' : 'none';
     
+    // Show/hide trigger option for numbered dropdown questions
+    const questionBlock = document.getElementById(`questionBlock${questionId}`);
+    const questionTypeSelect = questionBlock.querySelector(`#questionType${questionId}`);
+    const questionType = questionTypeSelect ? questionTypeSelect.value : '';
+    const triggerOptionBlock = document.getElementById(`triggerOptionBlock${questionId}`);
+    const numberTriggerBlock = document.getElementById(`numberTriggerBlock${questionId}`);
+    
+    if (pdfLogicEnabled && questionType === 'numberedDropdown') {
+        triggerOptionBlock.style.display = 'block';
+        updatePdfLogicTriggerOptions(questionId);
+        if (numberTriggerBlock) numberTriggerBlock.style.display = 'none';
+    } else if (pdfLogicEnabled && questionType === 'number') {
+        if (numberTriggerBlock) numberTriggerBlock.style.display = 'block';
+        triggerOptionBlock.style.display = 'none';
+    } else {
+        triggerOptionBlock.style.display = 'none';
+        if (numberTriggerBlock) numberTriggerBlock.style.display = 'none';
+    }
+    
     // If enabling PDF logic for a Big Paragraph question, clear any existing conditions
     if (pdfLogicEnabled) {
-        const questionBlock = document.getElementById(`questionBlock${questionId}`);
-        const questionTypeSelect = questionBlock.querySelector(`#questionType${questionId}`);
-        const questionType = questionTypeSelect ? questionTypeSelect.value : '';
-        
         if (questionType === 'bigParagraph') {
             const pdfLogicConditionsDiv = document.getElementById(`pdfLogicConditions${questionId}`);
             if (pdfLogicConditionsDiv) {
@@ -2397,6 +2714,18 @@ function updateNumberedDropdownEvents(questionId) {
         
         // 3. Update any hidden field conditional logic that might reference this question
         updateHiddenFieldConditionsForNumberedDropdown(questionId);
+        
+        // 4. Update PDF logic trigger options if PDF logic is enabled
+        const pdfLogicEnabled = document.getElementById(`pdfLogic${questionId}`)?.checked;
+        if (pdfLogicEnabled) {
+            updatePdfLogicTriggerOptions(questionId);
+        }
+        
+        // 5. Update hidden logic trigger options if hidden logic is enabled
+        const hiddenLogicEnabled = document.getElementById(`enableHiddenLogic${questionId}`)?.checked;
+        if (hiddenLogicEnabled) {
+            updateHiddenLogicTriggerOptionsForNumberedDropdown(questionId);
+        }
     }
 }
 
@@ -2750,8 +3079,8 @@ function removeUnifiedField(questionId, fieldOrder) {
             field.setAttribute('data-order', newOrder);
             field.className = `unified-field field-${newOrder}`;
             
-            // Update the order display
-            const orderDisplay = field.querySelector('div:last-of-type');
+            // Update the order display - find the div that contains "Order:"
+            const orderDisplay = field.querySelector('div[style*="font-size: 0.8em"]');
             if (orderDisplay && orderDisplay.textContent.includes('Order:')) {
                 orderDisplay.textContent = orderDisplay.textContent.replace(/Order: \d+/, `Order: ${newOrder}`);
             }
@@ -2762,19 +3091,19 @@ function removeUnifiedField(questionId, fieldOrder) {
                 removeButton.setAttribute('onclick', `removeUnifiedField(${questionId}, ${newOrder})`);
             }
             
-            // Update double-click event
-            const displayDiv = field.querySelector('div');
+            // Update double-click event - find the container div with cursor pointer
+            const displayDiv = field.querySelector('div[style*="cursor: pointer"]');
             if (displayDiv) {
-            // Remove any existing event listeners to prevent duplicates
-            if (displayDiv._dblclickHandler) {
-                displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
-            }
-            
-            // Add event listener for double-click editing
-            displayDiv._dblclickHandler = function() {
-                editUnifiedField(questionId, newOrder);
-            };
-            displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
+                // Remove any existing event listeners to prevent duplicates
+                if (displayDiv._dblclickHandler) {
+                    displayDiv.removeEventListener('dblclick', displayDiv._dblclickHandler);
+                }
+                
+                // Add event listener for double-click editing
+                displayDiv._dblclickHandler = function() {
+                    editUnifiedField(questionId, newOrder);
+                };
+                displayDiv.addEventListener('dblclick', displayDiv._dblclickHandler);
             }
         });
         
@@ -3042,9 +3371,41 @@ function openLinkedFieldModal() {
     document.getElementById('linkedFieldModal').style.display = 'block';
     console.log('🔍 [DEBUG] Modal displayed');
     
-    // Initialize with two dropdowns
-    addLinkedFieldDropdown();
-    addLinkedFieldDropdown();
+    // Check if we have a stored configuration to restore
+    if (window.lastLinkedFieldConfig && !window.editingLinkedFieldId) {
+        console.log('🔍 [DEBUG] Restoring last configuration:', window.lastLinkedFieldConfig);
+        
+        // Restore the linked field ID
+        const linkedFieldIdInput = document.getElementById('linkedFieldIdInput');
+        if (linkedFieldIdInput) {
+            linkedFieldIdInput.value = window.lastLinkedFieldConfig.linkedFieldId || '';
+        }
+        
+        // Create dropdowns for each stored field
+        window.lastLinkedFieldConfig.selectedFields.forEach(fieldId => {
+            addLinkedFieldDropdown();
+            const dropdownIndex = currentLinkedFieldConfig.length - 1;
+            const select = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
+            const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+            
+            if (select) {
+                select.value = fieldId;
+                currentLinkedFieldConfig[dropdownIndex].selectedValue = fieldId;
+                
+                // Also update the search input field with the selected option text
+                if (searchInput) {
+                    const selectedOption = select.querySelector(`option[value="${fieldId}"]`);
+                    if (selectedOption) {
+                        searchInput.value = selectedOption.textContent;
+                    }
+                }
+            }
+        });
+    } else {
+        // Initialize with two dropdowns (default behavior)
+        addLinkedFieldDropdown();
+        addLinkedFieldDropdown();
+    }
 }
 
 // Create the linked field modal
@@ -3140,7 +3501,16 @@ function addLinkedFieldDropdown() {
     dropdownDiv.innerHTML = `
         <div style="flex: 1; margin-right: 10px;">
             <label style="display: block; margin-bottom: 5px; font-weight: bold;">Text Question ${dropdownIndex + 1}:</label>
-            <select id="linkedFieldSelect${dropdownIndex}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            <div style="position: relative;">
+                <input type="text" id="linkedFieldSearch${dropdownIndex}" placeholder="Search for a text question..." 
+                       style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
+                       onkeyup="filterLinkedFieldOptions(${dropdownIndex})" 
+                       onfocus="showLinkedFieldOptions(${dropdownIndex})"
+                       onblur="hideLinkedFieldOptions(${dropdownIndex})">
+                <div id="linkedFieldOptions${dropdownIndex}" style="display: none; position: absolute; top: 100%; left: 0; min-width: 400px; background: white; border: 1px solid #ccc; border-top: none; border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"></div>
+            </div>
+            <!-- Hidden select for form submission -->
+            <select id="linkedFieldSelect${dropdownIndex}" style="display: none;">
                 <option value="">Select a text question...</option>
             </select>
         </div>
@@ -3271,6 +3641,20 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                                         nodeId: numberedNodeId,
                                         questionText: questionTextWithNumber
                                     });
+                                    
+                                    // For state fields, also add the short version
+                                    if (fieldLabel.toLowerCase() === 'state') {
+                                        const shortNodeId = `${fieldNodeId}_short_${i}`;
+                                        const questionTextWithShort = `${questionText} - ${fieldLabel} Short ${i}`;
+                                        
+                                        console.log(`✅ [DEBUG] Adding short state field: ${questionTextWithShort} (${shortNodeId})`);
+                                        
+                                        textQuestions.push({
+                                            questionId: questionId,
+                                            nodeId: shortNodeId,
+                                            questionText: questionTextWithShort
+                                        });
+                                    }
                                 }
                             }
                         } else {
@@ -3330,18 +3714,31 @@ function populateLinkedFieldDropdown(dropdownIndex) {
                             if (fieldLabel && fieldNodeId) {
                                 console.log(`✅ [DEBUG] Valid field found: ${fieldLabel} (${fieldNodeId})`);
                                 
-                                // For multipleTextboxes, we only need the first numbered field (_1)
-                                // because only one field is actually generated
-                                const numberedNodeId = `${fieldNodeId}_1`;
-                                const questionTextWithNumber = `${questionText} - ${fieldLabel}`;
+                                // For multipleTextboxes, use the base nodeId without numbering
+                                // because the actual generated fields use the base nodeId
+                                const questionTextWithField = `${questionText} - ${fieldLabel}`;
                                 
-                                console.log(`✅ [DEBUG] Adding multiple textbox field: ${questionTextWithNumber} (${numberedNodeId})`);
+                                console.log(`✅ [DEBUG] Adding multiple textbox field: ${questionTextWithField} (${fieldNodeId})`);
                                 
                                 textQuestions.push({
                                     questionId: questionId,
-                                    nodeId: numberedNodeId,
-                                    questionText: questionTextWithNumber
+                                    nodeId: fieldNodeId,
+                                    questionText: questionTextWithField
                                 });
+                                
+                                // For state fields, also add the short version
+                                if (fieldLabel.toLowerCase() === 'state') {
+                                    const shortNodeId = `${fieldNodeId}_short`;
+                                    const questionTextWithShort = `${questionText} - ${fieldLabel} Short`;
+                                    
+                                    console.log(`✅ [DEBUG] Adding short state field: ${questionTextWithShort} (${shortNodeId})`);
+                                    
+                                    textQuestions.push({
+                                        questionId: questionId,
+                                        nodeId: shortNodeId,
+                                        questionText: questionTextWithShort
+                                    });
+                                }
                             }
                         } else {
                             console.log(`❌ [DEBUG] Field ${fieldIndex} missing spans - fieldLabelSpan: ${!!fieldLabelSpan}, fieldNodeIdSpan: ${!!fieldNodeIdSpan}`);
@@ -3362,7 +3759,9 @@ function populateLinkedFieldDropdown(dropdownIndex) {
     textQuestions.forEach(question => {
         const option = document.createElement('option');
         option.value = question.nodeId;
-        option.textContent = `${question.questionText} (${question.nodeId})`;
+        // Remove "Question X -" prefix and just show the field name
+        const displayText = question.questionText.replace(/^Question \d+ - /, '');
+        option.textContent = `${displayText} (${question.nodeId})`;
         select.appendChild(option);
         console.log(`✅ [DEBUG] Added option: ${option.textContent}`);
     });
@@ -3373,6 +3772,9 @@ function populateLinkedFieldDropdown(dropdownIndex) {
     select.addEventListener('change', function() {
         currentLinkedFieldConfig[dropdownIndex].selectedValue = this.value;
     });
+    
+    // Initialize search functionality
+    initializeLinkedFieldSearch(dropdownIndex);
 }
 
 // Remove a linked field dropdown
@@ -3472,6 +3874,12 @@ function finalizeLinkedField() {
         // Create the linked field display
         createLinkedFieldDisplay(selectedFields, linkedFieldId);
     }
+    
+    // Store the configuration for future autofill
+    window.lastLinkedFieldConfig = {
+        linkedFieldId: linkedFieldId,
+        selectedFields: selectedFields.map(field => field.selectedValue)
+    };
     
     // Close modal
     closeLinkedFieldModal();
@@ -3590,6 +3998,9 @@ function editLinkedFieldDisplay(displayId) {
     // Store the display ID we're editing
     window.editingLinkedFieldId = displayId;
     
+    // Clear any stored configuration since we're editing
+    window.lastLinkedFieldConfig = null;
+    
     // Create modal if it doesn't exist
     if (!document.getElementById('linkedFieldModal')) {
         console.log('🔍 [DEBUG] Creating linked field modal');
@@ -3610,9 +4021,19 @@ function editLinkedFieldDisplay(displayId) {
         addLinkedFieldDropdown();
         const dropdownIndex = currentLinkedFieldConfig.length - 1;
         const select = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
+        const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+        
         if (select) {
             select.value = fieldId;
             currentLinkedFieldConfig[dropdownIndex].selectedValue = fieldId;
+            
+            // Also update the search input field with the selected option text
+            if (searchInput) {
+                const selectedOption = select.querySelector(`option[value="${fieldId}"]`);
+                if (selectedOption) {
+                    searchInput.value = selectedOption.textContent;
+                }
+            }
         }
     });
     
@@ -3720,5 +4141,163 @@ function createLinkedFieldDisplayFromImport(linkedFieldData) {
         id: displayId,
         linkedFieldId: linkedFieldId,
         fields: linkedFieldData.fields
+    });
+}
+
+// Search functionality for linked field dropdowns
+function filterLinkedFieldOptions(dropdownIndex) {
+    const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+    const optionsContainer = document.getElementById(`linkedFieldOptions${dropdownIndex}`);
+    const selectElement = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    // Clear previous options
+    optionsContainer.innerHTML = '';
+    
+    // Get all options from the select element
+    const options = Array.from(selectElement.options).filter(option => option.value !== '');
+    
+    // Smart search function that converts natural language to snake_case for matching
+    function smartSearch(searchTerm, optionText) {
+        const lowerOptionText = optionText.toLowerCase();
+        
+        // Direct text match
+        if (lowerOptionText.includes(searchTerm)) {
+            return true;
+        }
+        
+        // Convert search term to snake_case pattern
+        const snakeCasePattern = searchTerm.replace(/\s+/g, '_');
+        if (lowerOptionText.includes(snakeCasePattern)) {
+            return true;
+        }
+        
+        // Convert search term to camelCase pattern
+        const camelCasePattern = searchTerm.replace(/\s+(\w)/g, (match, letter) => letter.toUpperCase());
+        if (lowerOptionText.includes(camelCasePattern)) {
+            return true;
+        }
+        
+        // Split search term into words and check if all words appear
+        const searchWords = searchTerm.split(/\s+/);
+        const allWordsMatch = searchWords.every(word => 
+            lowerOptionText.includes(word) || 
+            lowerOptionText.includes(word.replace(/\s+/g, '_'))
+        );
+        
+        return allWordsMatch;
+    }
+    
+    // Filter options based on smart search
+    const filteredOptions = options.filter(option => 
+        smartSearch(searchTerm, option.textContent)
+    );
+    
+    // Display filtered options
+    if (filteredOptions.length > 0) {
+        optionsContainer.style.display = 'block';
+        filteredOptions.forEach(option => {
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'linked-field-option';
+            optionDiv.style.cssText = 'padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background-color 0.2s; white-space: nowrap; overflow: visible;';
+            optionDiv.textContent = option.textContent;
+            optionDiv.onmouseover = function() { this.style.backgroundColor = '#f8f9fa'; };
+            optionDiv.onmouseout = function() { this.style.backgroundColor = 'white'; };
+            optionDiv.onclick = function() {
+                selectLinkedFieldOption(dropdownIndex, option.value, option.textContent);
+            };
+            optionsContainer.appendChild(optionDiv);
+        });
+    } else {
+        optionsContainer.style.display = 'none';
+    }
+}
+
+function showLinkedFieldOptions(dropdownIndex) {
+    const optionsContainer = document.getElementById(`linkedFieldOptions${dropdownIndex}`);
+    const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+    
+    // If search input is empty, show all options
+    if (searchInput.value === '') {
+        filterLinkedFieldOptions(dropdownIndex);
+    }
+}
+
+function hideLinkedFieldOptions(dropdownIndex) {
+    // Add a small delay to allow clicks on options to register
+    setTimeout(() => {
+        const optionsContainer = document.getElementById(`linkedFieldOptions${dropdownIndex}`);
+        optionsContainer.style.display = 'none';
+    }, 200);
+}
+
+function selectLinkedFieldOption(dropdownIndex, value, text) {
+    const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+    const selectElement = document.getElementById(`linkedFieldSelect${dropdownIndex}`);
+    const optionsContainer = document.getElementById(`linkedFieldOptions${dropdownIndex}`);
+    
+    // Update search input with selected text
+    searchInput.value = text;
+    
+    // Update hidden select element
+    selectElement.value = value;
+    
+    // Hide options
+    optionsContainer.style.display = 'none';
+    
+    // Update the current configuration
+    if (currentLinkedFieldConfig[dropdownIndex]) {
+        currentLinkedFieldConfig[dropdownIndex].selectedValue = value;
+    }
+    
+    console.log(`🔍 [DEBUG] Selected linked field option: ${text} (${value}) for dropdown ${dropdownIndex}`);
+}
+
+// Initialize search functionality for a linked field dropdown
+function initializeLinkedFieldSearch(dropdownIndex) {
+    const searchInput = document.getElementById(`linkedFieldSearch${dropdownIndex}`);
+    if (!searchInput) return;
+    
+    // Add keyboard navigation support
+    searchInput.addEventListener('keydown', function(e) {
+        const optionsContainer = document.getElementById(`linkedFieldOptions${dropdownIndex}`);
+        const options = optionsContainer.querySelectorAll('.linked-field-option');
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const currentActive = optionsContainer.querySelector('.linked-field-option.active');
+            if (currentActive) {
+                currentActive.classList.remove('active');
+                const next = currentActive.nextElementSibling;
+                if (next) {
+                    next.classList.add('active');
+                    next.scrollIntoView({ block: 'nearest' });
+                }
+            } else if (options.length > 0) {
+                options[0].classList.add('active');
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const currentActive = optionsContainer.querySelector('.linked-field-option.active');
+            if (currentActive) {
+                currentActive.classList.remove('active');
+                const prev = currentActive.previousElementSibling;
+                if (prev) {
+                    prev.classList.add('active');
+                    prev.scrollIntoView({ block: 'nearest' });
+                }
+            } else if (options.length > 0) {
+                options[options.length - 1].classList.add('active');
+            }
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            const activeOption = optionsContainer.querySelector('.linked-field-option.active');
+            if (activeOption) {
+                activeOption.click();
+            }
+        } else if (e.key === 'Escape') {
+            optionsContainer.style.display = 'none';
+            searchInput.blur();
+        }
     });
 }

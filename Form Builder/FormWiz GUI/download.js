@@ -62,11 +62,19 @@ function findCheckboxOptionsByQuestionId(questionId) {
 }
 
 function generateAndDownloadForm() {
+    console.log('🔧 [EXPORT DEBUG] generateAndDownloadForm() called');
+    try {
+        console.log('🔧 [EXPORT DEBUG] Calling getFormHTML()...');
     const formHTML = getFormHTML();
+        console.log('🔧 [EXPORT DEBUG] getFormHTML() completed successfully, HTML length:', formHTML ? formHTML.length : 'null');
     navigator.clipboard.writeText(formHTML).then(() => {
         alert("HTML code has been copied to the clipboard.");
     });
     downloadHTML(formHTML, "custom_form.html");
+    } catch (error) {
+        console.error('🔧 [EXPORT DEBUG] Error in generateAndDownloadForm():', error);
+        alert('Error generating form: ' + error.message);
+    }
 }
 
 function showPreview() {
@@ -848,6 +856,15 @@ function loadFormData(formData) {
                     if (hiddenLogicCbox) {
                         hiddenLogicCbox.checked = true;
                         toggleHiddenLogic(question.questionId);
+                        
+                        // Update hidden logic trigger options for numbered dropdown
+                        if (question.type === 'numberedDropdown') {
+                            console.log('🔧 [HIDDEN LOGIC DEBUG] Updating trigger options for numbered dropdown question:', question.questionId);
+                            setTimeout(() => {
+                                console.log('🔧 [HIDDEN LOGIC DEBUG] Calling updateHiddenLogicTriggerOptionsForNumberedDropdown for question:', question.questionId);
+                                updateHiddenLogicTriggerOptionsForNumberedDropdown(question.questionId);
+                            }, 100);
+                        }
                     }
                     
                     // Clear existing configurations
@@ -862,7 +879,7 @@ function loadFormData(formData) {
                             // Add configuration
                             addHiddenLogicConfig(question.questionId);
                             
-                            // Wait a moment for DOM to update, then set values
+                            // Wait for DOM to update, then set values
                             setTimeout(() => {
                                 const triggerSelect = questionBlock.querySelector(`#hiddenLogicTrigger${question.questionId}_${index}`);
                                 const typeSelect = questionBlock.querySelector(`#hiddenLogicType${question.questionId}_${index}`);
@@ -882,8 +899,17 @@ function loadFormData(formData) {
                                 if (textboxTextInput) {
                                     textboxTextInput.value = config.textboxText;
                                 }
-                            }, 10);
+                            }, 50); // Increased timeout to ensure DOM is ready
                         });
+                    }
+                    
+                    // Update hidden logic trigger options for numbered dropdown
+                    if (question.type === 'numberedDropdown') {
+                        console.log('🔧 [HIDDEN LOGIC DEBUG] Second update for numbered dropdown question:', question.questionId);
+                        setTimeout(() => {
+                            console.log('🔧 [HIDDEN LOGIC DEBUG] Second call to updateHiddenLogicTriggerOptionsForNumberedDropdown for question:', question.questionId);
+                            updateHiddenLogicTriggerOptionsForNumberedDropdown(question.questionId);
+                        }, 50);
                     }
                 }
 
@@ -894,17 +920,107 @@ function loadFormData(formData) {
                         pdfLogicCbox.checked = true;
                         togglePdfLogic(question.questionId);
                     }
-                    const pdfLogicPdfNameInput = questionBlock.querySelector(`#pdfLogicPdfName${question.questionId}`);
+                    
+                    // Load multiple PDFs with trigger options
+                    if (question.pdfLogic.pdfs && question.pdfLogic.pdfs.length > 0) {
+                        const pdfDetailsContainer = questionBlock.querySelector(`#pdfDetailsContainer${question.questionId}`);
+                        if (pdfDetailsContainer) {
+                            // Clear existing PDF groups except the first one
+                            const existingPdfGroups = pdfDetailsContainer.querySelectorAll('.pdf-detail-group');
+                            for (let i = 1; i < existingPdfGroups.length; i++) {
+                                existingPdfGroups[i].remove();
+                            }
+                            
+                            // Load each PDF
+                            question.pdfLogic.pdfs.forEach((pdf, pdfIndex) => {
+                                const pdfIndexNum = pdfIndex + 1;
+                                
+                                if (pdfIndexNum === 1) {
+                                    // Update the first PDF group
+                                    const pdfLogicPdfNameInput = questionBlock.querySelector(`#pdfLogicPdfName${question.questionId}_1`);
                     if (pdfLogicPdfNameInput) {
+                                        pdfLogicPdfNameInput.value = pdf.pdfName || "";
+                                    }
+                                    const pdfLogicPdfDisplayNameInput = questionBlock.querySelector(`#pdfLogicPdfDisplayName${question.questionId}_1`);
+                                    if (pdfLogicPdfDisplayNameInput) {
+                                        pdfLogicPdfDisplayNameInput.value = pdf.pdfDisplayName || "";
+                                    }
+                                    const pdfLogicStripePriceIdInput = questionBlock.querySelector(`#pdfLogicStripePriceId${question.questionId}_1`);
+                                    if (pdfLogicStripePriceIdInput) {
+                                        pdfLogicStripePriceIdInput.value = pdf.stripePriceId || "";
+                                    }
+                                const triggerOptionSelect = questionBlock.querySelector(`#pdfLogicTriggerOption${question.questionId}`);
+                                if (triggerOptionSelect && pdf.triggerOption) {
+                                    triggerOptionSelect.value = pdf.triggerOption;
+                                }
+                                
+                                // Load number trigger fields for number questions
+                                if (question.type === 'number') {
+                                    const numberTriggerSelect = questionBlock.querySelector(`#pdfLogicNumberTrigger${question.questionId}`);
+                                    const numberValueInput = questionBlock.querySelector(`#pdfLogicNumberValue${question.questionId}`);
+                                    if (numberTriggerSelect && pdf.numberTrigger) {
+                                        numberTriggerSelect.value = pdf.numberTrigger;
+                                    }
+                                    if (numberValueInput && pdf.numberValue) {
+                                        numberValueInput.value = pdf.numberValue;
+                                    }
+                                }
+                                
+                                // Load extra PDFs for this PDF group
+                                // Note: We'll need to handle this differently since extra PDFs are added dynamically
+                                // For now, we'll store them and add them after the main PDF is loaded
+                                } else {
+                                    // Add additional PDF groups
+                                    addAnotherPdf(question.questionId);
+                                    
+                                    // Set the values for the new PDF group
+                                    setTimeout(() => {
+                                        const pdfLogicPdfNameInput = questionBlock.querySelector(`#pdfLogicPdfName${question.questionId}_${pdfIndexNum}`);
+                                        if (pdfLogicPdfNameInput) {
+                                            pdfLogicPdfNameInput.value = pdf.pdfName || "";
+                                        }
+                                        const pdfLogicPdfDisplayNameInput = questionBlock.querySelector(`#pdfLogicPdfDisplayName${question.questionId}_${pdfIndexNum}`);
+                                        if (pdfLogicPdfDisplayNameInput) {
+                                            pdfLogicPdfDisplayNameInput.value = pdf.pdfDisplayName || "";
+                                        }
+                                        const pdfLogicStripePriceIdInput = questionBlock.querySelector(`#pdfLogicStripePriceId${question.questionId}_${pdfIndexNum}`);
+                                        if (pdfLogicStripePriceIdInput) {
+                                            pdfLogicStripePriceIdInput.value = pdf.stripePriceId || "";
+                                        }
+                                        const triggerOptionSelect = questionBlock.querySelector(`#pdfLogicTriggerOption${question.questionId}_${pdfIndexNum}`);
+                                        if (triggerOptionSelect && pdf.triggerOption) {
+                                            triggerOptionSelect.value = pdf.triggerOption;
+                                        }
+                                        
+                                        // Load number trigger fields for number questions (additional PDFs)
+                                        if (question.type === 'number') {
+                                            const numberTriggerSelect = questionBlock.querySelector(`#pdfLogicNumberTrigger${question.questionId}`);
+                                            const numberValueInput = questionBlock.querySelector(`#pdfLogicNumberValue${question.questionId}`);
+                                            if (numberTriggerSelect && pdf.numberTrigger) {
+                                                numberTriggerSelect.value = pdf.numberTrigger;
+                                            }
+                                            if (numberValueInput && pdf.numberValue) {
+                                                numberValueInput.value = pdf.numberValue;
+                                            }
+                                        }
+                                    }, 100);
+                                }
+                            });
+                        }
+                    } else {
+                        // Handle legacy single PDF structure
+                        const pdfLogicPdfNameInput = questionBlock.querySelector(`#pdfLogicPdfName${question.questionId}_1`);
+                        if (pdfLogicPdfNameInput && question.pdfLogic.pdfName) {
                         pdfLogicPdfNameInput.value = question.pdfLogic.pdfName;
                     }
-                    const pdfLogicPdfDisplayNameInput = questionBlock.querySelector(`#pdfLogicPdfDisplayName${question.questionId}`);
+                        const pdfLogicPdfDisplayNameInput = questionBlock.querySelector(`#pdfLogicPdfDisplayName${question.questionId}_1`);
                     if (pdfLogicPdfDisplayNameInput && question.pdfLogic.pdfDisplayName) {
                         pdfLogicPdfDisplayNameInput.value = question.pdfLogic.pdfDisplayName;
                     }
-                    const pdfLogicStripePriceIdInput = questionBlock.querySelector(`#pdfLogicStripePriceId${question.questionId}`);
-                    if (pdfLogicStripePriceIdInput) {
-                        pdfLogicStripePriceIdInput.value = question.pdfLogic.stripePriceId || "";
+                        const pdfLogicStripePriceIdInput = questionBlock.querySelector(`#pdfLogicStripePriceId${question.questionId}_1`);
+                        if (pdfLogicStripePriceIdInput && question.pdfLogic.stripePriceId) {
+                            pdfLogicStripePriceIdInput.value = question.pdfLogic.stripePriceId;
+                        }
                     }
                     
                     // Load PDF Logic conditions
@@ -1283,9 +1399,9 @@ function exportForm() {
 
             // ---------- PDF Logic ----------
             const pdfLogicEnabled = questionBlock.querySelector(`#pdfLogic${questionId}`)?.checked || false;
-            const pdfLogicPdfName = questionBlock.querySelector(`#pdfLogicPdfName${questionId}`)?.value || "";
-            const pdfLogicPdfDisplayName = questionBlock.querySelector(`#pdfLogicPdfDisplayName${questionId}`)?.value || "";
-            const pdfLogicStripePriceId = questionBlock.querySelector(`#pdfLogicStripePriceId${questionId}`)?.value || "";
+            
+            // Debug logging for PDF logic
+            console.log(`🔧 [EXPORT DEBUG] Question ${questionId} (${questionType}): PDF Logic enabled: ${pdfLogicEnabled}`);
             
             // Collect PDF Logic conditions
             const pdfLogicConditionsArray = [];
@@ -1324,6 +1440,128 @@ function exportForm() {
                                 });
                             }
                         }
+                    });
+                }
+            }
+            
+            // Collect multiple PDFs with trigger options
+            const pdfLogicPdfs = [];
+            if (pdfLogicEnabled) {
+                const pdfDetailsContainer = questionBlock.querySelector(`#pdfDetailsContainer${questionId}`);
+                if (pdfDetailsContainer) {
+                    const pdfGroups = pdfDetailsContainer.querySelectorAll('.pdf-detail-group');
+                    console.log(`🔧 [EXPORT DEBUG] Found ${pdfGroups.length} PDF groups for question ${questionId}`);
+                    pdfGroups.forEach((pdfGroup, pdfIndex) => {
+                        const pdfIndexNum = pdfIndex + 1;
+                        const pdfLogicPdfName = pdfGroup.querySelector(`#pdfLogicPdfName${questionId}_${pdfIndexNum}`)?.value || "";
+                        const pdfLogicPdfDisplayName = pdfGroup.querySelector(`#pdfLogicPdfDisplayName${questionId}_${pdfIndexNum}`)?.value || "";
+                        const pdfLogicStripePriceId = pdfGroup.querySelector(`#pdfLogicStripePriceId${questionId}_${pdfIndexNum}`)?.value || "";
+                        // For the first PDF, look for the main trigger option dropdown
+                        // For additional PDFs, look for the PDF-specific trigger option dropdown
+                        let triggerOption = "";
+                        if (pdfIndexNum === 1) {
+                            // First PDF uses the main trigger option dropdown
+                            const mainTriggerSelect = questionBlock.querySelector(`#pdfLogicTriggerOption${questionId}`);
+                            triggerOption = mainTriggerSelect?.value || "";
+                        } else {
+                            // Additional PDFs use PDF-specific trigger option dropdowns
+                            const pdfTriggerSelect = pdfGroup.querySelector(`#pdfLogicTriggerOption${questionId}_${pdfIndexNum}`);
+                            triggerOption = pdfTriggerSelect?.value || "";
+                        }
+                        
+                        // Debug logging
+                        console.log(`🔧 [EXPORT DEBUG] PDF ${pdfIndexNum} for question ${questionId}:`);
+                        console.log(`  - PDF Name: ${pdfLogicPdfName}`);
+                        console.log(`  - Question Type: ${questionType}`);
+                        if (pdfIndexNum === 1) {
+                            console.log(`  - Main Trigger Option Element:`, questionBlock.querySelector(`#pdfLogicTriggerOption${questionId}`));
+                        } else {
+                            console.log(`  - PDF Trigger Option Element:`, pdfGroup.querySelector(`#pdfLogicTriggerOption${questionId}_${pdfIndexNum}`));
+                        }
+                        console.log(`  - Trigger Option Value: "${triggerOption}"`);
+                        
+                        // Check if trigger option block is visible
+                        let triggerOptionBlock = null;
+                        if (pdfIndexNum === 1) {
+                            triggerOptionBlock = questionBlock.querySelector(`#triggerOptionBlock${questionId}`);
+                        } else {
+                            triggerOptionBlock = pdfGroup.querySelector(`#triggerOptionBlock${questionId}_${pdfIndexNum}`);
+                        }
+                        
+                        if (triggerOptionBlock) {
+                            console.log(`  - Trigger Option Block Display: ${triggerOptionBlock.style.display}`);
+                        } else {
+                            console.log(`  - Trigger Option Block: Not found`);
+                        }
+                        
+                        // Check if this is a numbered dropdown and trigger options should be available
+                        if (questionType === 'numberedDropdown') {
+                            console.log(`  - This is a numbered dropdown, trigger options should be available`);
+                        } else {
+                            console.log(`  - This is not a numbered dropdown (${questionType}), trigger options may not be available`);
+                        }
+                        
+                        // Check if the trigger option dropdown has options
+                        let triggerSelect = null;
+                        if (pdfIndexNum === 1) {
+                            triggerSelect = questionBlock.querySelector(`#pdfLogicTriggerOption${questionId}`);
+                        } else {
+                            triggerSelect = pdfGroup.querySelector(`#pdfLogicTriggerOption${questionId}_${pdfIndexNum}`);
+                        }
+                        
+                        if (triggerSelect) {
+                            console.log(`  - Trigger Select Options:`, triggerSelect.options.length);
+                            for (let i = 0; i < triggerSelect.options.length; i++) {
+                                console.log(`    Option ${i}: "${triggerSelect.options[i].value}" - "${triggerSelect.options[i].text}"`);
+                            }
+                            console.log(`  - Trigger Select Display: ${triggerSelect.style.display}`);
+                            console.log(`  - Trigger Select Parent Display: ${triggerSelect.parentElement.style.display}`);
+                        }
+                        
+                        // Get number trigger fields for number questions
+                        let numberTrigger = "";
+                        let numberValue = "";
+                        if (questionType === 'number') {
+                            const numberTriggerSelect = questionBlock.querySelector(`#pdfLogicNumberTrigger${questionId}`);
+                            const numberValueInput = questionBlock.querySelector(`#pdfLogicNumberValue${questionId}`);
+                            numberTrigger = numberTriggerSelect?.value || "";
+                            numberValue = numberValueInput?.value || "";
+                        }
+                        
+                        if (pdfLogicPdfName || numberTrigger || numberValue) {
+                            const pdfData = {
+                                pdfName: pdfLogicPdfName,
+                                pdfDisplayName: pdfLogicPdfDisplayName,
+                                stripePriceId: pdfLogicStripePriceId,
+                                triggerOption: triggerOption
+                            };
+                            
+                            // Add number trigger fields for number questions
+                            if (questionType === 'number') {
+                                pdfData.numberTrigger = numberTrigger;
+                                pdfData.numberValue = numberValue;
+                            }
+                            
+                            pdfLogicPdfs.push(pdfData);
+                        }
+                        
+                        // Collect extra PDFs for this PDF group
+                        const extraPdfContainers = pdfGroup.querySelectorAll('.extra-pdf-inputs');
+                        extraPdfContainers.forEach((extraContainer, extraIndex) => {
+                            const extraPdfIndex = extraIndex + 1;
+                            const extraPdfName = extraContainer.querySelector(`#pdfLogicPdfName${questionId}_${pdfIndexNum}_extra${extraPdfIndex}`)?.value || "";
+                            const extraPdfDisplayName = extraContainer.querySelector(`#pdfLogicPdfDisplayName${questionId}_${pdfIndexNum}_extra${extraPdfIndex}`)?.value || "";
+                            const extraStripePriceId = extraContainer.querySelector(`#pdfLogicStripePriceId${questionId}_${pdfIndexNum}_extra${extraPdfIndex}`)?.value || "";
+                            
+                            if (extraPdfName) {
+                                pdfLogicPdfs.push({
+                                    pdfName: extraPdfName,
+                                    pdfDisplayName: extraPdfDisplayName,
+                                    stripePriceId: extraStripePriceId,
+                                    triggerOption: triggerOption // Same trigger option as the main PDF
+                                });
+                            }
+                        });
                     });
                 }
             }
@@ -1413,10 +1651,8 @@ function exportForm() {
                 },
                 pdfLogic: {
                     enabled: pdfLogicEnabled,
-                    pdfName: pdfLogicPdfName,
-                    pdfDisplayName: pdfLogicPdfDisplayName,
-                    stripePriceId: pdfLogicStripePriceId,
-                    conditions: pdfLogicConditionsArray
+                    conditions: pdfLogicConditionsArray,
+                    pdfs: pdfLogicPdfs
                 },
                 alertLogic: {
                     enabled: alertLogicEnabled,

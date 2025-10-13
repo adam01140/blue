@@ -270,8 +270,8 @@ document.addEventListener("DOMContentLoaded", function() {
             if (window.updatePdfNodeCell) window.updatePdfNodeCell(cell);
           }
           
-          // If it's a text2 node, make sure we update _questionText from value
-          if (isQuestion(cell) && getQuestionType(cell) === "text2") {
+          // If it's a dropdown node, make sure we update _questionText from value
+          if (isQuestion(cell) && getQuestionType(cell) === "dropdown") {
             // Extract text from HTML value if present
             if (cell.value) {
               const cleanValue = cell.value.replace(/<[^>]+>/g, "").trim();
@@ -293,7 +293,7 @@ document.addEventListener("DOMContentLoaded", function() {
                   onchange="window.pickTypeForCell('${cell.id}', this.value)">
                   <option value="">-- Choose Question Type --</option>
                   <option value="text">Text</option>
-                  <option value="text2">Dropdown</option>
+                  <option value="dropdown">Dropdown</option>
                   <option value="checkbox">Checkbox</option>
                   <option value="number">Number</option>
                   <option value="date">Date</option>
@@ -428,8 +428,8 @@ graph.isCellEditable = function (cell) {
   if (isAlertNode(cell)) {
     return false;
   }
-  // Allow text2 to be edited directly with double-click
-  if (qt === 'text2') {
+  // Allow dropdown to be edited directly with double-click
+  if (qt === 'dropdown') {
     return true;
   }
   // Allow option nodes to be edited directly with double-click
@@ -795,23 +795,55 @@ graph.isCellEditable = function (cell) {
 /**************************************************
  *              KEYBOARD  SHORTCUTS               *
  **************************************************/
-const keyHandler = new mxKeyHandler(graph);
-
-/* DELETE & BACKSPACE you already handled elsewhere ------------------- */
-
-/* Ctrl + C  â€“ copy node (ONLY when not typing) */
-keyHandler.bindControlKey(67, () => {
-  if (isUserTyping()) return;                  // NEW / CHANGED
-  copySelectedNodeAsJson();
-});
-
-/* Ctrl + V  â€“ paste node (ONLY when not typing) */
-keyHandler.bindControlKey(86, () => {
-  if (isUserTyping()) return;                  // NEW / CHANGED
-  const mousePos = graph.getPointForEvent(graph.lastEvent);
-  window.pasteNodeFromJson(mousePos ? mousePos.x : undefined,
-                    mousePos ? mousePos.y : undefined);
-});
+// Use document event listener instead of mxKeyHandler to avoid duplicate bindings
+if (!window.flowchartKeyboardInitialized) {
+  console.log('🔍 [KEYHANDLER DEBUG] Setting up keyboard shortcuts');
+  
+  document.addEventListener('keydown', function(event) {
+    // Handle Ctrl+C
+    if ((event.key === 'c' || event.key === 'C') && (event.ctrlKey || event.metaKey)) {
+      console.log('🔍 [KEY DEBUG] Ctrl+C document listener triggered');
+      if (isUserTyping(event)) return;
+      event.preventDefault();
+      copySelectedNodeAsJson();
+    }
+    
+    // Handle Ctrl+V
+    if ((event.key === 'v' || event.key === 'V') && (event.ctrlKey || event.metaKey)) {
+      console.log('🔍 [KEY DEBUG] Ctrl+V document listener triggered');
+      if (isUserTyping(event)) return;
+      event.preventDefault();
+      const mousePos = graph.getPointForEvent(graph.lastEvent);
+      window.pasteNodeFromJson(mousePos ? mousePos.x : undefined,
+                        mousePos ? mousePos.y : undefined);
+    }
+    
+    // Handle Ctrl+S
+    if ((event.key === 's' || event.key === 'S') && (event.ctrlKey || event.metaKey)) {
+      console.log('🔍 [KEY DEBUG] Ctrl+S document listener triggered');
+      if (isUserTyping(event)) return;
+      event.preventDefault();
+      // Call saveFlowchart function directly if it exists
+      if (typeof window.saveFlowchart === 'function') {
+        console.log('🔍 [KEY DEBUG] Calling saveFlowchart function directly');
+        window.saveFlowchart();
+      } else {
+        // Fallback: try to find and click save button
+        const saveButton = document.getElementById('saveFlowchartButton');
+        if (saveButton) {
+          saveButton.click();
+        } else {
+          console.log('🔍 [KEY DEBUG] No save functionality found');
+        }
+      }
+    }
+  });
+  
+  // Mark that keyboard shortcuts have been initialized
+  window.flowchartKeyboardInitialized = true;
+} else {
+  console.log('🔍 [KEYHANDLER DEBUG] Keyboard shortcuts already initialized, skipping');
+}
 
 /* Ctrl + Shift – reset all PDF and node IDs */
 document.addEventListener('keydown', function(event) {
@@ -848,6 +880,7 @@ document.addEventListener('keydown', function(event) {
   
   // Add listener for copy button
   document.getElementById('copyNodeButton').addEventListener('click', function() {
+    console.log('🔍 [BUTTON DEBUG] Copy button clicked');
     copySelectedNodeAsJson();
     hideContextMenu();
   });
@@ -1684,74 +1717,6 @@ window.removeMultipleDropdownLocationHandler = function(cellId) {
   }
 };
 
-window.copyMultipleDropdownId = function(cellId, index) {
-  const cell = graph.getModel().getCell(cellId);
-  if (!cell || getQuestionType(cell) !== "multipleDropdownType" || !cell._textboxes || !cell._textboxes[index]) {
-    return;
-  }
-  
-  // Get the question text and entry text
-  const questionText = cell._questionText || '';
-  const entryText = cell._textboxes[index].nameId || '';
-  
-  // Check if this question has a PDF property (only for nodes that should have PDF properties)
-  const pdfName = window.findPdfNameForQuestion ? window.findPdfNameForQuestion(cell) : null;
-  const sanitizedPdfName = pdfName && window.sanitizePdfName ? window.sanitizePdfName(pdfName) : '';
-  
-  // Create the ID string with default number "1" first
-  const sanitizedQuestionText = questionText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
-  const sanitizedEntryText = entryText.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
-  
-  // Build the default ID with PDF name if available
-  let defaultTextToCopy;
-  if (sanitizedPdfName) {
-    defaultTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_1_${sanitizedEntryText}`;
-  } else {
-    defaultTextToCopy = `${sanitizedQuestionText}_1_${sanitizedEntryText}`;
-  }
-  
-  // Copy the default ID to clipboard immediately
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(defaultTextToCopy).catch(() => {
-      // Fallback for older browsers
-      fallbackCopyToClipboard(defaultTextToCopy);
-    });
-  } else {
-    // Fallback for older browsers
-    fallbackCopyToClipboard(defaultTextToCopy);
-  }
-  
-  // Prompt user for number with default value of "1"
-  const number = prompt('Enter a number for this ID:', '1');
-  if (number === null) {
-    return; // User cancelled, but ID was already copied with default value
-  }
-  const finalNumber = number.trim() || '1'; // Use "1" as default if empty
-  
-  // If user entered a different number, copy the updated ID
-  if (finalNumber !== '1') {
-    const sanitizedNumber = finalNumber;
-    
-    // Build the updated ID with PDF name if available
-    let updatedTextToCopy;
-    if (sanitizedPdfName) {
-      updatedTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
-    } else {
-      updatedTextToCopy = `${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
-    }
-    
-    // Copy the updated ID to clipboard
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(updatedTextToCopy).catch(() => {
-        // Fallback for older browsers
-        fallbackCopyToClipboard(updatedTextToCopy);
-      });
-    } else {
-      // Fallback for older browsers
-      fallbackCopyToClipboard(updatedTextToCopy);
-    }
-  }
-};
 
 function fallbackCopyToClipboard(text) {
   const textArea = document.createElement('textarea');
@@ -2936,7 +2901,6 @@ function colorCell(cell) {
       case "text":         fillColor = colorPreferences.text; break;
       case "checkbox":     fillColor = colorPreferences.checkbox; break;
       case "dropdown":     fillColor = colorPreferences.dropdown; break;
-      case "text2":        fillColor = colorPreferences.dropdown; break; // Text2 uses dropdown color
       case "number":       fillColor = colorPreferences.money; break;
       case "date":         fillColor = colorPreferences.date; break;
       case "dateRange":    fillColor = colorPreferences.date; break; // Use date color for dateRange
@@ -3600,7 +3564,7 @@ function sanitizeNameId(str) {
  **************************************************/
 
 /**
- * Create a cell for text2 - a textbox that functions like a dropdown but 
+ * Create a cell for dropdown - a textbox that functions like a dropdown but 
  * has better text editing capabilities
  */
 function updateText2Cell(cell) {
@@ -3618,11 +3582,11 @@ function updateText2Cell(cell) {
 }
 
 /**
- * Handler for text2 question text changes
+ * Handler for dropdown question text changes
  */
 window.updateText2Handler = function(cellId, text) {
   const cell = graph.getModel().getCell(cellId);
-  if (!cell || getQuestionType(cell) !== "text2") return;
+  if (!cell || getQuestionType(cell) !== "dropdown") return;
   
       graph.getModel().beginUpdate();
       try {
@@ -4253,6 +4217,8 @@ function autosaveFlowchartToLocalStorage() {
       if (cell._pdfName !== undefined) cellData._pdfName = cell._pdfName;
       if (cell._pdfFile !== undefined) cellData._pdfFile = cell._pdfFile;
       if (cell._pdfPrice !== undefined) cellData._pdfPrice = cell._pdfPrice;
+      if (cell._pdfLogicEnabled !== undefined) cellData._pdfLogicEnabled = cell._pdfLogicEnabled;
+      if (cell._pdfTriggerLimit !== undefined) cellData._pdfTriggerLimit = cell._pdfTriggerLimit;
       
       // Notes node properties
       if (cell._notesText !== undefined) cellData._notesText = cell._notesText;
@@ -4268,6 +4234,14 @@ function autosaveFlowchartToLocalStorage() {
       // Hidden node properties - always save these if they exist on the cell
       if (cell.hasOwnProperty('_hiddenNodeId')) cellData._hiddenNodeId = cell._hiddenNodeId;
       if (cell.hasOwnProperty('_defaultText')) cellData._defaultText = cell._defaultText;
+      
+      // Linked logic node properties - always save these if they exist on the cell
+      if (cell.hasOwnProperty('_linkedLogicNodeId')) {
+        cellData._linkedLogicNodeId = cell._linkedLogicNodeId;
+      }
+      if (cell.hasOwnProperty('_linkedFields')) {
+        cellData._linkedFields = cell._linkedFields;
+      }
       
       // Special handling for hidden textbox nodes - always save _defaultText even if empty
       if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
@@ -4643,6 +4617,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // flowchartClipboard, FLOWCHART_CLIPBOARD_KEY, and FLOWCHART_CLIPBOARD_TIMESTAMP_KEY moved to config.js module
 
 function copySelectedNodeAsJson() {
+  // Add debugging to track duplicate calls
+  const stack = new Error().stack;
+  console.log('🔍 [COPY DEBUG] copySelectedNodeAsJson called from:', stack.split('\n')[1]);
+  
   try {
     const cells = graph.getSelectionCells();
     if (!cells || cells.length === 0) {
@@ -4727,7 +4705,7 @@ function copySelectedNodeAsJson() {
         '_nameId', '_placeholder', '_questionId', '_image', '_calcTitle', '_calcAmountLabel',
         '_calcOperator', '_calcThreshold', '_calcFinalText', '_calcTerms', '_subtitleText',
               '_infoText', '_amountName', '_amountPlaceholder', '_notesText', '_notesBold', '_notesFontSize',
-      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText'
+      '_checklistText', '_alertText', '_pdfName', '_pdfFile', '_pdfPrice', '_hiddenNodeId', '_defaultText', '_linkedLogicNodeId', '_linkedFields', '_pdfLogicEnabled', '_pdfTriggerLimit', '_bigParagraphPdfName', '_bigParagraphPdfFile', '_bigParagraphPdfPrice'
       ];
       
       safeProperties.forEach(prop => {
@@ -4839,7 +4817,6 @@ function copySelectedNodeAsJson() {
 window.pasteNodeFromJson = function(x, y) {
   // Prevent multiple simultaneous paste operations
   if (window._isPasting) {
-    console.log('Paste operation already in progress, ignoring duplicate call');
     return;
   }
   window._isPasting = true;
@@ -4914,7 +4891,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         newCell.id = nodeData.newId;
         
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice"].forEach(k => {
           if (nodeData[k] !== undefined) newCell[k] = nodeData[k];
         });
         
@@ -4953,6 +4930,11 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           // Update hidden textbox node display
           if (typeof window.updateHiddenTextboxNodeCell === 'function') {
             window.updateHiddenTextboxNodeCell(newCell);
+          }
+        } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(newCell)) {
+          // Update linked logic node display
+          if (typeof window.updateLinkedLogicNodeCell === 'function') {
+            window.updateLinkedLogicNodeCell(newCell);
           }
         }
       });
@@ -5047,7 +5029,7 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
         const newCell = new mxCell(cellData.value, geo, cellData.style);
         newCell.vertex = true;
         // Copy custom fields
-        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText"].forEach(k => {
+        ["_textboxes","_questionText","_twoNumbers","_nameId","_placeholder","_questionId","_image","_pdfName","_pdfFile","_pdfPrice","_notesText","_notesBold","_notesFontSize","_checklistText","_alertText","_calcTitle","_calcAmountLabel","_calcOperator","_calcThreshold","_calcFinalText","_calcTerms","_subtitleText","_infoText","_amountName","_amountPlaceholder","_hiddenNodeId","_defaultText","_linkedLogicNodeId","_linkedFields","_pdfLogicEnabled","_pdfTriggerLimit","_bigParagraphPdfName","_bigParagraphPdfFile","_bigParagraphPdfPrice"].forEach(k => {
           if (cellData[k] !== undefined) newCell[k] = cellData[k];
         });
         // Section
@@ -5085,6 +5067,11 @@ function pasteNodeFromJsonData(clipboardData, x, y) {
           // Update hidden textbox node display
           if (typeof window.updateHiddenTextboxNodeCell === 'function') {
             window.updateHiddenTextboxNodeCell(newCell);
+          }
+        } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(newCell)) {
+          // Update linked logic node display
+          if (typeof window.updateLinkedLogicNodeCell === 'function') {
+            window.updateLinkedLogicNodeCell(newCell);
           }
         }
       });
@@ -5643,6 +5630,9 @@ function resetAllNodeIds() {
     }
     if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
       return; // Skip hidden textbox nodes
+    }
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      return; // Skip linked logic nodes
     }
     
     if (typeof window.generateCorrectNodeId === 'function') {

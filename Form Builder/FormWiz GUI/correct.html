@@ -8,15 +8,15 @@
     <link rel="stylesheet" href="generate.css">
     <link rel="stylesheet" href="generate2.css">
     <style>
-        .entry-container { border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; }
-        .entry-container .address-field { margin: 8px 0; }
-        .entry-container .address-input, .entry-container .address-select { width: 100%; max-width: 400px; padding: 12px 16px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff; transition: all 0.2s ease; box-sizing: border-box; }
-        .entry-container .address-select { text-align: center; }
-        .entry-container .address-input:focus, .entry-container .address-select:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1); }
-        .entry-container .address-input::placeholder { color: #6c757d; opacity: 1; }
-        .entry-container .address-select { cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; appearance: none; }
-        .entry-container .address-field:first-child { margin-top: 0; }
-        .entry-container .address-field:last-child { margin-bottom: 0; }
+        .entry-container { border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }
+        .address-field { margin: 8px 0; }
+        .address-input, .address-select { width: 100%; max-width: 400px; padding: 12px 16px; border: 1px solid #e1e5e9 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; }
+        .address-input:focus, .address-select:focus { outline: none; box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.1); }
+        .address-input::placeholder { color: #6c757d; opacity: 1; }
+        .address-select { cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; appearance: none; text-align: center; }
+        .address-field:first-child { margin-top: 0; }
+        .address-field:last-child { margin-bottom: 0; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -90,7 +90,6 @@
 <div id="pdfPreview" style="display:none;">
     <iframe id="pdfFrame" style="display:none"></iframe>
 </div>
-<input type="text" id="current_date" name="current_date" placeholder="current_date" style="display:none">
 
 <!-- Firebase includes -->
 <script src="https://js.stripe.com/v3/"></script>
@@ -126,7 +125,6 @@ if (typeof firebase !== "undefined" && firebase.apps.length > 0) {
     });
 } else {
     // Fallback for when Firebase is not available
-    console.log("Firebase not available, using fallback authentication");
 }
 
 // Function to update button display based on auth state
@@ -232,8 +230,9 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_zip" name="form_zip" value="">
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
-        <input type="hidden" id="form_ID" name="form_ID" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3>How many</h3></label><select id="how_many" name="how_many" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+        <input type="hidden" id="form_ID" name="form_ID" value="">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">SC-100</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">SC-100</h1><div id="question-container-1" class="question-container"><label><h3>How many people are suing with you?</h3></label><select id="how_many_people_are_suing_with_you" name="how_many_people_are_suing_with_you" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_people_are_suing_with_you', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer1"></div></div><br><br><div class="navigation-buttons"><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -243,7 +242,8 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_city_hidden"      name="user_city_hidden">
 <input type="hidden" id="user_state_hidden"     name="user_state_hidden">
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
-</div><input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;"></form>
+<input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
+</div></form>
 <div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
 </div>
 </section>
@@ -360,6 +360,105 @@ document.addEventListener("DOMContentLoaded", function() {
 <script>
 window.formId = '';
 
+(function injectAddressHelpersOnce() {
+  if (window.__addressHelpersInjected) return;
+  window.__addressHelpersInjected = true;
+
+  // Create stylized address <input>
+  window.createAddressInput = function(id, label, index, type = 'text') {
+    const inputType = (type === 'number') ? 'number' : 'text';
+    const placeholder = label;
+    return (
+      '<div class="address-field">' +
+      '<input type="' + inputType + '" ' +
+      'id="' + id + '" ' +
+      'name="' + id + '" ' +
+      'placeholder="' + placeholder + '" ' +
+      'class="address-input">' +
+      '</div>'
+    );
+  };
+
+  // Create US state dropdown + the two hidden fields (full name + short)
+  window.createStateDropdown = function(id, index) {
+    const states = [
+      'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware',
+      'Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky',
+      'Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri',
+      'Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York',
+      'North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island',
+      'South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia',
+      'Washington','West Virginia','Wisconsin','Wyoming'
+    ];
+
+    let options = '<option value="">Select State</option>';
+    states.forEach(state => {
+      options += '<option value="' + state + '">' + state + '</option>';
+    });
+
+    // Hidden full-state input id (always different from the <select> id)
+    const hiddenFullId = id + '_hidden';
+
+    // Hidden short-state input id:
+    // transform "how_many_state_1" -> "how_many_state_short_1" (note the d)
+    let shortId;
+    if (id.includes('_') && /\d+$/.test(id)) {
+      const match = id.match(/^(.+)_(\d+)$/);
+      if (match) {
+        const basePart = match[1];
+        const number = match[2];
+        shortId = basePart + '_short_' + number;
+      } else {
+        shortId = id + '_short';
+      }
+    } else {
+      shortId = id + '_short';
+    }
+
+    // Keep both text inputs hidden — they're for PDF mapping
+    return (
+      '<div class="address-field">' +
+        '<select id="' + id + '" name="' + id + '" class="address-select" ' +
+        'onchange="if (window.updateStateHiddenFields) updateStateHiddenFields(this, \'' + hiddenFullId + '\', \'' + shortId + '\');">' +
+          options +
+        '</select>' +
+        '<input type="text" id="' + hiddenFullId + '" name="' + hiddenFullId + '" style="display:none" />' +
+        '<input type="text" id="' + shortId + '" name="' + shortId + '" style="display:none" />' +
+      '</div>'
+    );
+  };
+
+  // Derive "..._short_N" from a base id like "how_many_state_N"
+  window.toShortIdFromBase = function(baseId){
+    const m = baseId.match(/^(.+)_(\d+)$/);
+    return m ? m[1] + '_short_' + m[2] : baseId + '_short';
+  };
+
+  // Keep these helpers global too (they may be called by onchange/autofill)
+  window.updateStateHiddenFields = function(selectEl, fullId, shortId) {
+    const fullField  = document.getElementById(fullId);
+    const shortField = document.getElementById(shortId);
+    if (!fullField || !shortField) return;
+
+    const full = (selectEl.value || '').trim();
+    // Map full -> short (two-letter)
+    const map = {
+      'Alabama': 'AL','Alaska': 'AK','Arizona': 'AZ','Arkansas': 'AR','California': 'CA','Colorado': 'CO',
+      'Connecticut': 'CT','Delaware': 'DE','Florida': 'FL','Georgia': 'GA','Hawaii': 'HI','Idaho': 'ID',
+      'Illinois': 'IL','Indiana': 'IN','Iowa': 'IA','Kansas': 'KS','Kentucky': 'KY','Louisiana': 'LA',
+      'Maine': 'ME','Maryland': 'MD','Massachusetts': 'MA','Michigan': 'MI','Minnesota': 'MN','Mississippi': 'MS',
+      'Missouri': 'MO','Montana': 'MT','Nebraska': 'NE','Nevada': 'NV','New Hampshire': 'NH','New Jersey': 'NJ',
+      'New Mexico': 'NM','New York': 'NY','North Carolina': 'NC','North Dakota': 'ND','Ohio': 'OH','Oklahoma': 'OK',
+      'Oregon': 'OR','Pennsylvania': 'PA','Rhode Island': 'RI','South Carolina': 'SC','South Dakota': 'SD',
+      'Tennessee': 'TN','Texas': 'TX','Utah': 'UT','Vermont': 'VT','Virginia': 'VA','Washington': 'WA',
+      'West Virginia': 'WV','Wisconsin': 'WI','Wyoming': 'WY'
+    };
+    const short = map[full] || '';
+    fullField.value  = full;
+    shortField.value = short;
+  };
+})();
+
 /*───────────────────────────────*
  * return the true checkbox prefix
  *───────────────────────────────*/
@@ -385,8 +484,8 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var questionSlugMap       = {"1":"how_many"};
-var questionNameIds = {"1":"how_many"};
+    var questionSlugMap       = {"1":"how_many_people_are_suing_with_you"};
+var questionNameIds = {"1":"how_many_people_are_suing_with_you"};
 var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
@@ -394,12 +493,49 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"1":["Name","Street","City","State"],"length":0};
-var amountMap = {"1":["Zip"],"length":0};
-var labelNodeIdsMap = {"1":["how_many_name","street","city","state"]};
-var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_name","order":1},{"type":"label","label":"Street","nodeId":"street","order":2},{"type":"label","label":"City","nodeId":"city","order":3},{"type":"label","label":"State","nodeId":"state","order":4},{"type":"amount","label":"Zip","nodeId":"amount_5","order":5}]};
+var labelMap = {"1":["Name"],"length":0};
+var amountMap = {"1":[],"length":0};
+var labelNodeIdsMap = {"1":["how_many_people_are_suing_with_you_name"]};
+var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_people_are_suing_with_you_name","order":1}]};
 var linkedDropdowns = [];
+var hiddenLogicConfigs = [{"questionNameId":"how_many_people_are_suing_with_you","trigger":"1","type":"checkbox","nodeId":"test","textboxText":""}];
+var linkedFields = [];
 var isHandlingLink = false;
+
+// Dynamic conditional logic for business type question to show county question
+function setupBusinessTypeConditionalLogic() {
+  
+  // Use dynamic approach - find question 11's name from questionNameIds
+  const businessTypeQuestionName = questionNameIds['11'] || 'what_are_you_doing_business_as';
+  
+  // Find all radio buttons for the business type question
+  const businessTypeRadios = document.querySelectorAll('input[name="' + businessTypeQuestionName + '"]');
+  
+  businessTypeRadios.forEach(radio => {
+    radio.addEventListener('change', function() {
+      if (this.checked) {
+        // Show county question (question-container-16) when any business type is selected
+        const countyQuestion = document.getElementById('question-container-16');
+        if (countyQuestion) {
+          countyQuestion.classList.remove('hidden');
+        } else {
+        }
+      }
+    });
+  });
+}
+
+// Set up the conditional logic when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+  setupBusinessTypeConditionalLogic();
+});
+
+// Also set it up immediately in case DOMContentLoaded already fired
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupBusinessTypeConditionalLogic);
+} else {
+  setupBusinessTypeConditionalLogic();
+}
 // Function to get URL parameters
 function getUrlParameter(name) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -438,6 +574,7 @@ function populateHiddenFieldsFromUrl() {
 // Auto-populate on page load
 document.addEventListener("DOMContentLoaded", function() {
     populateHiddenFieldsFromUrl();
+    setupLinkedFields();
 });
 
 // Function to check paragraph limit and create hidden checkbox
@@ -478,7 +615,7 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 var sectionStack = [];
 var currentSectionNumber = 1;
 var pdfFileName = "";
-var pdfOutputFileName = "example.html";
+var pdfOutputFileName = "";
 var stripePriceId = "";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["example.html", ];
@@ -486,6 +623,80 @@ var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
 
+
+/*──────────────────────────────────────────────────────────────*
+ * Handle "Mark only one" selection functionality
+ *──────────────────────────────────────────────────────────────*/
+function handleMarkOnlyOneSelection(selectedInput, questionId) {
+    if (!selectedInput.checked) return;
+    
+    // Find all radio buttons in this question group
+    const container = document.querySelector('.checkbox-group-' + questionId);
+    if (!container) return;
+    
+    const allInputs = container.querySelectorAll('input[type="radio"]');
+    allInputs.forEach(input => {
+        if (input !== selectedInput) {
+            input.checked = false;
+            // Update styling for unchecked inputs
+            updateCheckboxStyle(input);
+            // Remove hidden checkbox for unchecked inputs
+            removeHiddenCheckbox(input.id);
+        }
+    });
+    
+    // Update styling for the selected input
+    updateCheckboxStyle(selectedInput);
+    
+    // Create hidden checkbox for the selected input
+    createHiddenCheckboxForRadio(selectedInput.id, selectedInput.name, selectedInput.value);
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Create hidden checkbox for radio button selection
+ *──────────────────────────────────────────────────────────────*/
+function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
+    // Remove any existing hidden checkbox with the same ID
+    removeHiddenCheckbox(radioId);
+    
+    // Find the hidden fields container
+    let hiddenContainer = document.getElementById('hidden_pdf_fields');
+    if (!hiddenContainer) {
+        // Create the hidden fields container if it doesn't exist
+        hiddenContainer = document.createElement('div');
+        hiddenContainer.id = 'hidden_pdf_fields';
+        hiddenContainer.style.display = 'none';
+        
+        // Find the form and append the hidden container
+        const form = document.querySelector('form') || document.body;
+        form.appendChild(hiddenContainer);
+    }
+    
+    // Create the hidden checkbox
+    const hiddenCheckbox = document.createElement('input');
+    hiddenCheckbox.type = 'checkbox';
+    hiddenCheckbox.id = radioId;
+    hiddenCheckbox.name = radioId; // Use the same name as the radio button ID
+    hiddenCheckbox.value = radioValue;
+    hiddenCheckbox.checked = true;
+    hiddenCheckbox.style.display = 'none';
+    
+    // Add to hidden container
+    hiddenContainer.appendChild(hiddenCheckbox);
+    
+    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId, 'for radio:', radioId);
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Remove hidden checkbox for radio button
+ *──────────────────────────────────────────────────────────────*/
+function removeHiddenCheckbox(radioId) {
+    const hiddenCheckbox = document.getElementById(radioId);
+    if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
+        hiddenCheckbox.remove();
+        console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
+    }
+}
 
 // Alert Logic Functions
 // Track page load time to prevent alerts in first 3 seconds
@@ -499,7 +710,6 @@ function showAlert(message) {
     
     if (timeSinceLoad < ALERT_DELAY_MS) {
         // If less than 3 seconds have passed, don't show the alert
-        console.log('Alert blocked: Page loaded less than 3 seconds ago');
         return;
     }
     
@@ -741,28 +951,57 @@ window.addFormToCart = function (priceId) {
         console.log('🛒 [CART DEBUG] Checking PDF logic for:', pdfLogic.pdfDisplayName || pdfLogic.pdfName);
 
         let matched = false;
-        const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
-        for (const c of conds) {
-          const prevId = c?.prevQuestion;
-          const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
-          if (!prevId) continue;
-
-          const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
-                     document.getElementById('answer' + prevId);
-          if (!el) {
-            console.log('🛒 [CART DEBUG] Element not found for question', prevId);
-            continue;
+        
+        // Check if this is a numbered dropdown with trigger option
+        if (pdfLogic.triggerOption) {
+          // For numbered dropdown with trigger option, check if the selected value matches the trigger
+          const el = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
+                     document.getElementById('answer' + pdfLogic.questionId);
+          
+          console.log('🔧 [PDF LOGIC DEBUG] Checking numbered dropdown trigger:');
+          console.log('  - Question ID:', pdfLogic.questionId);
+          console.log('  - Trigger Option:', pdfLogic.triggerOption);
+          console.log('  - Element found:', el);
+          console.log('  - Question Name IDs:', window.questionNameIds);
+          
+          if (el) {
+            const val = el.value || '';
+            console.log('🔧 [PDF LOGIC DEBUG] Numbered dropdown question', pdfLogic.questionId, 'value:', val, 'trigger:', pdfLogic.triggerOption);
+            
+            if (val === pdfLogic.triggerOption) {
+              matched = true;
+              console.log('🔧 [PDF LOGIC DEBUG] ✅ PDF logic matched for numbered dropdown:', pdfLogic.pdfDisplayName);
+            } else {
+              console.log('🔧 [PDF LOGIC DEBUG] ❌ PDF logic NOT matched - value:', val, 'expected:', pdfLogic.triggerOption);
+            }
+          } else {
+            console.log('🔧 [PDF LOGIC DEBUG] ❌ Element not found for numbered dropdown question', pdfLogic.questionId);
           }
+        } else {
+          // For regular conditions, check previous question logic
+          const conds = Array.isArray(pdfLogic.conditions) ? pdfLogic.conditions : [];
+          for (const c of conds) {
+            const prevId = c?.prevQuestion;
+            const expect = (c?.prevAnswer ?? '').toString().toLowerCase();
+            if (!prevId) continue;
 
-          let val = '';
-          if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
-          else                        { val = el.value || ''; }
+            const el = document.getElementById((window.questionNameIds || {})[prevId]) ||
+                       document.getElementById('answer' + prevId);
+            if (!el) {
+              console.log('🛒 [CART DEBUG] Element not found for question', prevId);
+              continue;
+            }
 
-          console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+            let val = '';
+            if (el.type === 'checkbox') { val = el.checked ? (el.value || 'true') : ''; }
+            else                        { val = el.value || ''; }
 
-          if (val.toString().toLowerCase() === expect) {
-            matched = true; // any condition match includes the PDF
-            console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
+            console.log('🛒 [CART DEBUG] Question', prevId, 'value:', val, 'expected:', expect);
+
+            if (val.toString().toLowerCase() === expect) {
+              matched = true; // any condition match includes the PDF
+              console.log('🛒 [CART DEBUG] ✅ PDF logic matched for:', pdfLogic.pdfDisplayName);
+            }
           }
         }
 
@@ -956,7 +1195,7 @@ let staticChecklistItems = [];
   function sanitizeQuestionText (str){
     return String(str)
        .toLowerCase()
-        .replace(/\W+/g, "_")   // ← double "\" so the HTML gets "\W"
+        .replace(/\W+/g, "_")
         .replace(/^_+|_+$/g, "");
 }
 
@@ -1007,6 +1246,16 @@ function toggleAmountField(amountFieldId, show) {
 }
 
 /*──────────────────────────────────────────────────────────────*
+ * Extract question ID from onchange attribute
+ *──────────────────────────────────────────────────────────────*/
+function extractQuestionIdFromOnchange(fn) {
+    if (!fn) return null;
+    const s = fn.toString();
+    const m = s.match(/showTextboxLabels\s*\(\s*(\d+)\s*,/);
+    return m ? m[1] : null;
+}
+
+/*──────────────────────────────────────────────────────────────*
  * Handle "Mark only one" selection functionality
  *──────────────────────────────────────────────────────────────*/
 function handleMarkOnlyOneSelection(selectedInput, questionId) {
@@ -1022,11 +1271,62 @@ function handleMarkOnlyOneSelection(selectedInput, questionId) {
             input.checked = false;
             // Update styling for unchecked inputs
             updateCheckboxStyle(input);
+            // Remove hidden checkbox for unchecked inputs
+            removeHiddenCheckbox(input.id);
         }
     });
     
     // Update styling for the selected input
     updateCheckboxStyle(selectedInput);
+    
+    // Create hidden checkbox for the selected input
+    createHiddenCheckboxForRadio(selectedInput.id, selectedInput.name, selectedInput.value);
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Create hidden checkbox for radio button selection
+ *──────────────────────────────────────────────────────────────*/
+function createHiddenCheckboxForRadio(radioId, radioName, radioValue) {
+    // Remove any existing hidden checkbox with the same ID
+    removeHiddenCheckbox(radioId);
+    
+    // Find the hidden fields container
+    let hiddenContainer = document.getElementById('hidden_pdf_fields');
+    if (!hiddenContainer) {
+        // Create the hidden fields container if it doesn't exist
+        hiddenContainer = document.createElement('div');
+        hiddenContainer.id = 'hidden_pdf_fields';
+        hiddenContainer.style.display = 'none';
+        
+        // Find the form and append the hidden container
+        const form = document.querySelector('form') || document.body;
+        form.appendChild(hiddenContainer);
+    }
+    
+    // Create the hidden checkbox
+    const hiddenCheckbox = document.createElement('input');
+    hiddenCheckbox.type = 'checkbox';
+    hiddenCheckbox.id = radioId;
+    hiddenCheckbox.name = radioId; // Use the same name as the radio button ID
+    hiddenCheckbox.value = radioValue;
+    hiddenCheckbox.checked = true;
+    hiddenCheckbox.style.display = 'none';
+    
+    // Add to hidden container
+    hiddenContainer.appendChild(hiddenCheckbox);
+    
+    console.log('🔧 [HIDDEN CHECKBOX] Created hidden checkbox:', radioId, 'for radio:', radioId);
+}
+
+/*──────────────────────────────────────────────────────────────*
+ * Remove hidden checkbox for radio button
+ *──────────────────────────────────────────────────────────────*/
+function removeHiddenCheckbox(radioId) {
+    const hiddenCheckbox = document.getElementById(radioId);
+    if (hiddenCheckbox && hiddenCheckbox.type === 'checkbox' && hiddenCheckbox.style.display === 'none') {
+        hiddenCheckbox.remove();
+        console.log('🔧 [HIDDEN CHECKBOX] Removed hidden checkbox:', radioId);
+    }
 }
 
 /*──────────────────────────────────────────────────────────────*
@@ -1127,31 +1427,24 @@ function triggerVisibilityUpdates() {
                               document.getElementById('answer' + questionId);
         
         if (questionElement) {
-                console.log('🔧 [VISIBILITY DEBUG] Found question element for', questionId, ':', questionElement.id);
             // Trigger change event to update visibility
             const event = new Event('change', { bubbles: true });
             questionElement.dispatchEvent(event);
-                console.log('🔧 [VISIBILITY DEBUG] Dispatched change event for', questionId);
             } else {
-                console.log('🔧 [VISIBILITY DEBUG] No question element found for', questionId);
             }
         } catch (error) {
-            console.log('🔧 [VISIBILITY DEBUG] Error processing question', questionId, ':', error);
         }
     });
 }
 
 // Fallback function to manually check and update visibility without relying on generated scripts
 function triggerVisibilityUpdatesFallback() {
-    console.log('🔧 [VISIBILITY FALLBACK DEBUG] triggerVisibilityUpdatesFallback() called');
     
     // Find all question containers
     const questionContainers = document.querySelectorAll('[id^="question-container-"]');
-    console.log('🔧 [VISIBILITY FALLBACK DEBUG] Found', questionContainers.length, 'question containers');
     
     questionContainers.forEach(container => {
         const questionId = container.id.replace('question-container-', '');
-        console.log('🔧 [VISIBILITY FALLBACK DEBUG] Processing question container:', questionId);
         
         // Check if this question has conditional logic by looking for data attributes or other indicators
         // For now, we'll manually check common conditional logic patterns
@@ -1167,7 +1460,6 @@ function triggerVisibilityUpdatesFallback() {
                 // Check if this input's value should affect the visibility of the current question
                 // This is a simplified check - in a real implementation, you'd need to parse the actual conditional logic
                 if (input.value && input.value.trim() !== '') {
-                    console.log('🔧 [VISIBILITY FALLBACK DEBUG] Found input with value:', input.id, '=', input.value);
                     // For now, we'll just log this - the actual conditional logic would be more complex
                 }
             }
@@ -1177,10 +1469,8 @@ function triggerVisibilityUpdatesFallback() {
         // In a real implementation, you'd implement the actual conditional logic here
         if (shouldBeVisible) {
             container.classList.remove('hidden');
-            console.log('🔧 [VISIBILITY FALLBACK DEBUG] Made question', questionId, 'visible');
         } else {
             container.classList.add('hidden');
-            console.log('🔧 [VISIBILITY FALLBACK DEBUG] Made question', questionId, 'hidden');
         }
     });
 }
@@ -1365,50 +1655,59 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-
-// Helper function to create styled address input
-function createAddressInput(id, label, index, type = 'text') {
-    const inputType = type === 'number' ? 'number' : 'text';
-    const placeholder = label + ' ' + index;
-    
-    return '<div class="address-field">' +
-           '<input type="' + inputType + '" ' +
-           'id="' + id + '" ' +
-           'name="' + id + '" ' +
-           'placeholder="' + placeholder + '" ' +
-           'class="address-input">' +
-           '</div>';
-}
-
-// Helper function to create US states dropdown
-function createStateDropdown(id, index) {
-    const states = [
-        'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
-        'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
-        'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
-        'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina',
-        'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina',
-        'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
-        'Wisconsin', 'Wyoming'
-    ];
-    
-    let options = '<option value="">Select State</option>';
-    states.forEach(state => {
-        options += '<option value="' + state + '">' + state + '</option>';
-    });
-    
-    return '<div class="address-field">' +
-           '<select id="' + id + '" name="' + id + '" class="address-select">' +
-           options +
-           '</select>' +
-           '</div>';
-}
+// 🔧 NEW: Global flag to prevent duplicate function calls
+let isCreatingFields = false;
 
 function showTextboxLabels(questionId, count){
+    
+    // 🔧 NEW: Check if we're already creating fields
+    if (isCreatingFields) {
+        return;
+    }
+    
     const container = document.getElementById("labelContainer" + questionId);
-    if(!container) return;
+    if(!container) {
+        return;
+    }
 
-    container.innerHTML = "<br>";
+    // 🔧 NEW: Check if we already have fields with values (more flexible than exact count match)
+    const existingFields = container.querySelectorAll('input, select, textarea');
+    const expectedCount = parseInt(count) || 0;
+    
+    // Check if we have the correct number of fields already
+    if (existingFields.length > 0) {
+        const currentCount = existingFields.length / (labelMap[questionId]?.length || 1); // Calculate how many entries we currently have
+        
+        // Only skip if we have the exact right number of fields AND they have values
+        if (currentCount === expectedCount) {
+            let hasValues = false;
+            existingFields.forEach(field => {
+                if (field.value && field.value.trim() !== '') {
+                    hasValues = true;
+                }
+            });
+            
+            // If we have the right count and values, only skip during initial autofill
+            if (hasValues && window.isInitialAutofill) {
+                return;
+            }
+        }
+        
+        // 🔧 NEW: If fields exist but have no values, check if we're in the middle of autofill
+        
+        // Check if autofill is currently running
+        if (window.isInitialAutofill) {
+            return;
+        }
+        
+        // Check if there are any pending autofill operations
+        const autofillInProgress = document.querySelector('[data-autofill-pending]');
+        if (autofillInProgress) {
+            return;
+        }
+    }
+
+    container.innerHTML = "";
     
     // Try to get unified fields first, fallback to old arrays
     const qBlock = document.querySelector('#question-container-' + questionId)?.closest('.question-block') || 
@@ -1450,7 +1749,6 @@ function showTextboxLabels(questionId, count){
         // Try unified fields map first
         if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
             allFieldsInOrder = window.unifiedFieldsMap[questionId];
-            console.log('🔧 [UNIFIED FIELDS DEBUG] Using unifiedFieldsMap with', allFieldsInOrder.length, 'fields');
         } else {
             // Fallback to old arrays
             const theseLabels = labelMap[questionId] || [];
@@ -1470,7 +1768,6 @@ function showTextboxLabels(questionId, count){
                     order: index
                 }))
             ];
-            console.log('🔧 [UNIFIED FIELDS DEBUG] Using fallback arrays with', allFieldsInOrder.length, 'fields');
         }
     }
 
@@ -1483,67 +1780,74 @@ function showTextboxLabels(questionId, count){
     // Generate hidden checkboxes for the selected count
     generateHiddenCheckboxes(questionId, qSafe, count);
 
+    // Generate hidden address textboxes for location fields
+    generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder);
+
     // Define location field names for visual separation
     const locationFields = ['Street', 'City', 'State', 'Zip'];
-    
-    console.log('🔧 [UNIFIED FIELDS DEBUG] Using allFieldsInOrder with', allFieldsInOrder.length, 'fields');
 
     for(let j = 1; j <= count; j++){
         let lastWasLocation = false;
         let firstField = true;
         
-        console.log('🔧 [FIELD PROCESSING DEBUG] Processing count', j, 'with', allFieldsInOrder.length, 'fields');
+        // Create entry container div
+        const entryContainer = document.createElement('div');
+        entryContainer.className = 'entry-container';
+        entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box;';
         
         // Process all fields in creation order
         for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
             const field = allFieldsInOrder[fieldIndex];
             const isLocationField = locationFields.includes(field.label);
             
-            console.log('🔧 [FIELD PROCESSING DEBUG] Processing field', fieldIndex, ':', {
-                type: field.type,
-                label: field.label,
-                nodeId: field.nodeId,
-                isLocationField,
-                order: field.order
-            });
-            
-            // Add visual separation for location fields
+            // Add <br> before first location field in each count
             if (isLocationField && !lastWasLocation && !firstField) {
-                // First location field in a group
-                container.innerHTML += "<br>";
-                console.log('🔧 [FIELD PROCESSING DEBUG] Added <br> before location field group');
-            } else if (!isLocationField && lastWasLocation) {
-                // First non-location field after location fields
-                container.innerHTML += "<br>";
-                console.log('🔧 [FIELD PROCESSING DEBUG] Added <br> after location field group');
+                const br = document.createElement('br');
+                entryContainer.appendChild(br);
             }
             
             if (field.type === 'label') {
-                // Use label node ID if provided, otherwise fallback to the original pattern
-                const id = field.nodeId ? 
-                  field.nodeId + "_" + j : 
-                  qSafe + "_" + j + "_" + sanitizeQuestionText(field.label);
-                
-                // Special handling for State field - create dropdown
+                const fieldId = field.nodeId + "_" + j;
                 if (field.label === 'State') {
-                    container.innerHTML += createStateDropdown(id, j);
+                    // Use dropdown for State field
+                    const dropdownDiv = document.createElement('div');
+                    dropdownDiv.innerHTML = createStateDropdown(fieldId, j);
+                    entryContainer.appendChild(dropdownDiv.firstElementChild);
                 } else {
-                    // Regular text input with enhanced styling
-                    container.innerHTML += createAddressInput(id, field.label, j);
+                    // Use regular input for other fields
+                    const inputDiv = document.createElement('div');
+                    inputDiv.innerHTML = createAddressInput(fieldId, field.label, j);
+                    entryContainer.appendChild(inputDiv.firstElementChild);
                 }
-                console.log('🔧 [TEXTBOX GENERATION DEBUG] Created textbox input with ID:', id, 'name:', id);
             } else if (field.type === 'amount') {
-                const id = qSafe + "_" + j + "_" + sanitizeQuestionText(field.label);
-                container.innerHTML += createAddressInput(id, field.label, j, 'number');
-                console.log('🔧 [AMOUNT GENERATION DEBUG] Created amount input with ID:', id, 'name:', id);
+                const fieldId = field.nodeId + "_" + j;
+                const inputDiv = document.createElement('div');
+                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
+                entryContainer.appendChild(inputDiv.firstElementChild);
+                
+                // Add a <br> after the Zip input only if there are more fields after it
+                const remainingFields = allFieldsInOrder.slice(fieldIndex + 1);
+                if (remainingFields.length > 0) {
+                  const brElement = document.createElement('br');
+                  entryContainer.appendChild(brElement);
+                }
             }
             
             lastWasLocation = isLocationField;
             firstField = false;
         }
-        container.innerHTML += "<br>";
+        
+        // Append the entry container to the main container
+        container.appendChild(entryContainer);
+        
+        // Add 1 <br> tag after each entry for better visual separation
+        const br = document.createElement('br');
+        container.appendChild(br);
     }
     attachCalculationListeners();   // keep this
+    
+    // Update linked fields after creating new textboxes
+    updateLinkedFields();
     
     // Attach autosave listeners to newly generated textbox inputs
     const newInputs = container.querySelectorAll('input[type="text"], input[type="number"]');
@@ -1577,6 +1881,9 @@ function showTextboxLabels(questionId, count){
             }, 100); // 100ms delay to ensure value is set
         });
     });
+    
+    // 🔧 NEW: Clear flag after function completes
+    isCreatingFields = false;
 }
 
 // Generate hidden checkboxes for numbered dropdown questions
@@ -1615,6 +1922,74 @@ function generateHiddenCheckboxes(questionId, questionSafe, selectedCount) {
         const form = document.querySelector('form') || document.body;
         form.appendChild(checkbox);
     }
+}
+
+
+// Helper function to get fields in order for a question
+function getFieldsInOrderForQuestion(questionId) {
+    // Try to get unified fields first, fallback to old arrays
+    const qBlock = document.querySelector('#question-container-' + questionId)?.closest('.question-block') || 
+                   document.querySelector('[id*="' + questionId + '"]')?.closest('.question-block');
+    
+    let allFieldsInOrder = [];
+    
+    if (qBlock) {
+        const unifiedFields = Array.from(qBlock.querySelectorAll('#unifiedFields' + questionId + ' .unified-field'));
+        
+        if (unifiedFields.length > 0) {
+            // Use unified container data
+            const allElements = [];
+            
+            unifiedFields.forEach((el) => {
+                const fieldType = el.getAttribute('data-type');
+                const fieldOrder = parseInt(el.getAttribute('data-order'));
+                const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
+                const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
+                
+                if (labelTextEl && nodeIdTextEl) {
+                    allElements.push({
+                        type: fieldType,
+                        label: labelTextEl.textContent.trim(),
+                        nodeId: nodeIdTextEl.textContent.trim(),
+                        order: fieldOrder
+                    });
+                }
+            });
+            
+            // Sort by data-order attribute (creation order)
+            allElements.sort((a, b) => a.order - b.order);
+            allFieldsInOrder = allElements;
+        }
+    }
+    
+    // Fallback to unified fields map or old arrays if no unified fields found
+    if (allFieldsInOrder.length === 0) {
+        // Try unified fields map first
+        if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
+            allFieldsInOrder = window.unifiedFieldsMap[questionId];
+        } else {
+            // Fallback to old arrays
+            const theseLabels = labelMap[questionId] || [];
+            const theseAmounts = amountMap[questionId] || [];
+            
+            allFieldsInOrder = [
+                ...theseLabels.map((lbl, index) => ({
+                    type: 'label',
+                    label: lbl,
+                    nodeId: (window.labelNodeIdsMap && window.labelNodeIdsMap[questionId] ? window.labelNodeIdsMap[questionId] : [])[index] || "",
+                    order: index
+                })),
+                ...theseAmounts.map((amt, index) => ({
+                    type: 'amount',
+                    label: amt,
+                    nodeId: "",
+                    order: index
+                }))
+            ];
+        }
+    }
+    
+    return allFieldsInOrder;
 }
 
 // Update hidden checkboxes when dropdown selection changes
@@ -1658,6 +2033,15 @@ function updateHiddenCheckboxes(questionId, selectedCount) {
         
         // Update the checked state based on the selected count
         checkbox.checked = i <= selectedCount;
+    }
+    
+    // Also update hidden address textboxes if this question has location fields
+    const questionContainer = document.getElementById('question-container-' + questionId);
+    if (questionContainer) {
+        const allFieldsInOrder = getFieldsInOrderForQuestion(questionId);
+        if (allFieldsInOrder && allFieldsInOrder.length > 0) {
+            generateHiddenAddressTextboxes(questionId, selectedCount, allFieldsInOrder);
+        }
     }
 }
 
@@ -1747,6 +2131,219 @@ function dropdownMirror(selectEl, baseName){
     
     wrap.appendChild(checkboxDiv);
     handleLinkedDropdowns(baseName, val);
+}
+
+// Function to handle hidden logic for dropdowns
+function updateHiddenLogic(dropdownName, selectedValue) {
+    console.log('🔧 [HIDDEN LOGIC DEBUG] updateHiddenLogic called with dropdownName:', dropdownName, 'selectedValue:', selectedValue);
+    console.log('🔧 [HIDDEN LOGIC DEBUG] hiddenLogicConfigs:', hiddenLogicConfigs);
+    
+    // Find the hidden logic configuration for this dropdown
+    const config = hiddenLogicConfigs.find(c => c.questionNameId === dropdownName);
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Found config:', config);
+    
+    if (!config || config.trigger !== selectedValue) {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] No matching config or trigger mismatch. Config exists:', !!config, 'Trigger match:', config ? config.trigger === selectedValue : false);
+        return;
+    }
+    
+    // Check if the hidden element already exists
+    let hiddenElement = document.getElementById(config.nodeId);
+    console.log('🔧 [HIDDEN LOGIC DEBUG] Hidden element exists:', !!hiddenElement);
+    
+    if (!hiddenElement) {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Creating hidden element of type:', config.type, 'with nodeId:', config.nodeId);
+        // Create the hidden element based on type
+        if (config.type === 'checkbox') {
+            hiddenElement = document.createElement('input');
+            hiddenElement.type = 'checkbox';
+            hiddenElement.id = config.nodeId;
+            hiddenElement.name = config.nodeId;
+            hiddenElement.checked = true;
+            hiddenElement.style.display = 'none';
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Created checkbox element:', hiddenElement);
+        } else if (config.type === 'textbox') {
+            hiddenElement = document.createElement('input');
+            hiddenElement.type = 'text';
+            hiddenElement.id = config.nodeId;
+            hiddenElement.name = config.nodeId;
+            hiddenElement.value = config.textboxText || '';
+            hiddenElement.style.display = 'none';
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Created textbox element:', hiddenElement);
+        }
+        
+        // Add the hidden element to the form
+        const form = document.getElementById('customForm');
+        if (form) {
+            form.appendChild(hiddenElement);
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to form');
+        } else {
+            document.body.appendChild(hiddenElement);
+            console.log('🔧 [HIDDEN LOGIC DEBUG] Added hidden element to body');
+        }
+    } else {
+        console.log('🔧 [HIDDEN LOGIC DEBUG] Updating existing hidden element');
+        // Update existing element
+        if (config.type === 'checkbox') {
+            hiddenElement.checked = true;
+        } else if (config.type === 'textbox') {
+            hiddenElement.value = config.textboxText || '';
+        }
+    }
+}
+
+// Function to show/hide questions based on conditional logic
+function updateQuestionVisibility(questionId, shouldShow) {
+    const questionContainer = document.getElementById('question-container-' + questionId);
+    if (questionContainer) {
+        if (shouldShow) {
+            questionContainer.classList.remove('hidden');
+        } else {
+            questionContainer.classList.add('hidden');
+        }
+    } else {
+    }
+}
+
+// Function to handle business type selection and show county question
+function handleBusinessTypeSelection() {
+    // Show the county question (question-container-16) when any business type is selected
+    updateQuestionVisibility(16, true);
+}
+
+// Function to handle linked fields synchronization
+function updateLinkedFields() {
+    if (!linkedFields || linkedFields.length === 0) return;
+    
+    linkedFields.forEach(linkedField => {
+        const { linkedFieldId, fields } = linkedField;
+        
+        // Find the hidden textbox for this linked field
+        let hiddenField = document.getElementById(linkedFieldId);
+        if (!hiddenField) {
+            // Create the hidden textbox if it doesn't exist
+            hiddenField = document.createElement('input');
+            hiddenField.type = 'text';
+            hiddenField.id = linkedFieldId;
+            hiddenField.name = linkedFieldId;
+            hiddenField.style.display = 'none';
+            // Append to the form instead of document.body so it gets submitted
+            const form = document.getElementById('customForm');
+            if (form) {
+                form.appendChild(hiddenField);
+            } else {
+                document.body.appendChild(hiddenField);
+            }
+        }
+        
+        // Get all the linked textboxes
+        const linkedTextboxes = fields.map(fieldId => document.getElementById(fieldId)).filter(el => el);
+        
+        if (linkedTextboxes.length === 0) return;
+        
+        // Find which textbox has content
+        const textboxesWithContent = linkedTextboxes.filter(tb => tb.value.trim() !== '');
+        
+        if (textboxesWithContent.length === 0) {
+            // No textboxes have content, clear the hidden field
+            hiddenField.value = '';
+        } else if (textboxesWithContent.length === 1) {
+            // Only one textbox has content, use its value
+            hiddenField.value = textboxesWithContent[0].value;
+        } else {
+            // Multiple textboxes have content, use the one with the longest text
+            const longestTextbox = textboxesWithContent.reduce((longest, current) => 
+                current.value.length > longest.value.length ? current : longest
+            );
+            hiddenField.value = longestTextbox.value;
+        }
+    });
+}
+
+// Function to clear inactive linked textboxes (with delay to avoid interfering with typing)
+function clearInactiveLinkedFields() {
+    if (!linkedFields || linkedFields.length === 0) return;
+    
+    // Use setTimeout to avoid interfering with user typing
+    setTimeout(() => {
+        linkedFields.forEach(linkedField => {
+            const { fields } = linkedField;
+            
+            // Get all the linked textboxes
+            const linkedTextboxes = fields.map(fieldId => document.getElementById(fieldId)).filter(el => el);
+            
+            if (linkedTextboxes.length === 0) return;
+            
+            // Find which textboxes are currently visible (not hidden by conditional logic)
+            const visibleTextboxes = linkedTextboxes.filter(tb => {
+                const container = tb.closest('.question-container');
+                return container && !container.classList.contains('hidden');
+            });
+            
+            // Find which textboxes have content
+            const textboxesWithContent = linkedTextboxes.filter(tb => tb.value.trim() !== '');
+            
+            // Clear all hidden textboxes that have content
+            linkedTextboxes.forEach(tb => {
+                const container = tb.closest('.question-container');
+                if (container && container.classList.contains('hidden') && tb.value.trim() !== '') {
+                    tb.value = '';
+                }
+            });
+            
+            // If multiple visible textboxes have content, keep only the longest one
+            const visibleTextboxesWithContent = visibleTextboxes.filter(tb => tb.value.trim() !== '');
+            if (visibleTextboxesWithContent.length > 1) {
+                const longestTextbox = visibleTextboxesWithContent.reduce((longest, current) => 
+                    current.value.length > longest.value.length ? current : longest
+                );
+                
+                // Clear all other visible textboxes that aren't the longest
+                visibleTextboxes.forEach(tb => {
+                    if (tb !== longestTextbox && tb.value.trim() !== '') {
+                        tb.value = '';
+                    }
+                });
+            }
+        });
+    }, 100); // 100ms delay to avoid interfering with typing
+}
+
+// Function to set up linked fields event listeners
+function setupLinkedFields() {
+    if (!linkedFields || linkedFields.length === 0) return;
+    
+    // Use event delegation to handle dynamically created textboxes
+    document.addEventListener('input', function(event) {
+        if (event.target.tagName === 'INPUT' && event.target.type === 'text') {
+            // Check if this input is part of any linked field
+            const fieldId = event.target.id;
+            const isLinkedField = linkedFields.some(linkedField => 
+                linkedField.fields.includes(fieldId)
+            );
+            
+            if (isLinkedField) {
+                updateLinkedFields();
+            }
+        }
+    });
+    
+    document.addEventListener('change', function(event) {
+        if (event.target.tagName === 'INPUT' && event.target.type === 'text') {
+            // Check if this input is part of any linked field
+            const fieldId = event.target.id;
+            const isLinkedField = linkedFields.some(linkedField => 
+                linkedField.fields.includes(fieldId)
+            );
+            
+            if (isLinkedField) {
+                updateLinkedFields();
+            }
+        }
+    });
+    
+    // Initial update
+    updateLinkedFields();
 }
 
 function getQuestionInputs (questionId, type = null) {
@@ -1909,7 +2506,10 @@ function navigateSection(sectionNumber){
     currentSectionNumber = sectionNumber;
     
     // Reset hidden questions to default values after Firebase autosave
+    // BUT NOT during initial autofill to preserve autofilled values
+    if (!window.isInitialAutofill) {
     resetHiddenQuestionsToDefaults(sectionNumber);
+    }
     
     updateProgressBar();
 }
@@ -2015,24 +2615,18 @@ function showThankYouMessage (event) {
 
 /*──── process all PDFs sequentially ────*/
 async function processAllPdfs() {
-    console.log('🔧 [PDF DEBUG] processAllPdfs() called');
-    console.log('🔧 [PDF DEBUG] pdfOutputFileName:', pdfOutputFileName);
-    console.log('🔧 [PDF DEBUG] conditionalPDFs:', conditionalPDFs);
-    console.log('🔧 [PDF DEBUG] pdfLogicPDFs:', pdfLogicPDFs);
     
     // Track processed PDFs to prevent duplicates
     const processedPdfs = new Set();
     
     // Process main PDFs - use the actual PDF filename, not the form name
     if (pdfOutputFileName) {
-        console.log('🔧 [PDF DEBUG] Processing main PDF:', pdfOutputFileName);
         // Remove .pdf extension if present since server adds it automatically
         const baseName = pdfOutputFileName.replace(/.pdf$/i, '');
         if (!processedPdfs.has(baseName)) {
             processedPdfs.add(baseName);
         await editAndDownloadPDF(baseName);
         } else {
-            console.log('🔧 [PDF DEBUG] Skipping duplicate main PDF:', baseName);
         }
     }
     
@@ -2069,7 +2663,6 @@ async function processAllPdfs() {
                         processedPdfs.add(baseName);
                         await editAndDownloadPDF(baseName);
                     } else {
-                        console.log('🔧 [PDF DEBUG] Skipping duplicate conditional PDF:', baseName);
                     }
                 }
             }
@@ -2077,8 +2670,10 @@ async function processAllPdfs() {
     }
     
     // Process PDF Logic PDFs
+    console.log('🔧 [PDF DOWNLOAD DEBUG] Processing PDF Logic PDFs:', pdfLogicPDFs);
     if (pdfLogicPDFs && pdfLogicPDFs.length > 0) {
         for (const pdfLogic of pdfLogicPDFs) {
+            console.log('🔧 [PDF DOWNLOAD DEBUG] Processing PDF Logic:', pdfLogic);
             if (pdfLogic.pdfName) {
                 // Check if conditions are met
                 let shouldDownload = false;
@@ -2103,29 +2698,58 @@ async function processAllPdfs() {
                     });
                 } else {
                     // For other question types, check previous question conditions
-                pdfLogic.conditions.forEach(condition => {
-                    const prevQuestionId = condition.prevQuestion;
-                    const prevAnswer = condition.prevAnswer;
+                // First check if this is a numbered dropdown with trigger option
+                if (pdfLogic.triggerOption) {
+                    // For numbered dropdown with trigger option, check if the selected value matches the trigger
+                    const questionElement = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
+                                          document.getElementById('answer' + pdfLogic.questionId);
                     
-                    // Get the previous question's value
-                    const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
-                                              document.getElementById('answer' + prevQuestionId);
+                    console.log('🔧 [PDF DOWNLOAD DEBUG] Checking trigger option:');
+                    console.log('  - Question ID:', pdfLogic.questionId);
+                    console.log('  - Trigger Option:', pdfLogic.triggerOption);
+                    console.log('  - Question Element:', questionElement);
+                    console.log('  - Question Name IDs:', questionNameIds);
                     
-                    if (prevQuestionElement) {
-                        let prevValue = '';
+                    if (questionElement) {
+                        const selectedValue = questionElement.value;
+                        console.log('  - Selected Value:', selectedValue);
                         
-                        if (prevQuestionElement.type === 'checkbox') {
-                            prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
-                        } else {
-                            prevValue = prevQuestionElement.value;
-                        }
-                        
-                        // Check if the condition matches
-                        if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                        // Check if the selected value matches the trigger option
+                        if (selectedValue === pdfLogic.triggerOption) {
                             shouldDownload = true;
+                            console.log('🔧 [PDF DOWNLOAD DEBUG] ✅ Trigger option matched - will download PDF');
+                        } else {
+                            console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Trigger option NOT matched');
                         }
+                    } else {
+                        console.log('🔧 [PDF DOWNLOAD DEBUG] ❌ Question element not found');
                     }
-                });
+                } else {
+                        // For regular conditions, check previous question logic
+                        pdfLogic.conditions.forEach(condition => {
+                            const prevQuestionId = condition.prevQuestion;
+                            const prevAnswer = condition.prevAnswer;
+                            
+                            // Get the previous question's value
+                            const prevQuestionElement = document.getElementById(questionNameIds[prevQuestionId]) || 
+                                                      document.getElementById('answer' + prevQuestionId);
+                            
+                            if (prevQuestionElement) {
+                                let prevValue = '';
+                                
+                                if (prevQuestionElement.type === 'checkbox') {
+                                    prevValue = prevQuestionElement.checked ? prevQuestionElement.value : '';
+                                } else {
+                                    prevValue = prevQuestionElement.value;
+                                }
+                                
+                                // Check if the condition matches
+                                if (prevValue.toString().toLowerCase() === prevAnswer.toLowerCase()) {
+                                    shouldDownload = true;
+                                }
+                            }
+                        });
+                    }
                 }
                 
                 // Download PDF if conditions are met
@@ -2135,7 +2759,6 @@ async function processAllPdfs() {
                         processedPdfs.add(baseName);
                         await editAndDownloadPDF(baseName);
                     } else {
-                        console.log('🔧 [PDF DEBUG] Skipping duplicate PDF logic PDF:', baseName);
                     }
                 }
             }
@@ -2145,7 +2768,6 @@ async function processAllPdfs() {
 
 // Function to go back to the form from the thank you screen
 function goBackToForm() {
-    console.log('🔧 [BACK BUTTON] Going back to form');
     
     // Hide the thank you message
     const thankYouMessage = document.getElementById('thankYouMessage');
@@ -2165,19 +2787,15 @@ function goBackToForm() {
 
 // Manual PDF download function (called when user clicks "Download PDF" button)
 async function downloadAllPdfs() {
-    console.log('🔧 [PDF DEBUG] downloadAllPdfs() called');
     try {
         // Show loading state
         const downloadButton = document.querySelector('button[onclick="downloadAllPdfs()"]');
-        console.log('🔧 [PDF DEBUG] Download button found:', !!downloadButton);
         if (downloadButton) {
             downloadButton.textContent = 'Processing...';
             downloadButton.disabled = true;
         }
         
-        console.log('🔧 [PDF DEBUG] Calling processAllPdfs()...');
         await processAllPdfs();
-        console.log('🔧 [PDF DEBUG] processAllPdfs() completed successfully');
         
         // Reset button
         if (downloadButton) {
@@ -2198,48 +2816,39 @@ async function downloadAllPdfs() {
 /*──── build FormData with **everything inside the form** ────*/
 async function editAndDownloadPDF (pdfName) {
     try {
-        console.log('🔧 [PDF DEBUG] Starting PDF processing for:', pdfName);
         
         /* this grabs every control that belongs to <form id="customForm">,
            including those specified with form="customForm" attributes   */
         const fd = new FormData(document.getElementById('customForm'));
-        console.log('🔧 [PDF DEBUG] FormData created with', fd.entries().length, 'entries');
 
         // Use the /edit_pdf endpoint with the PDF name as a query parameter
         // Remove the .pdf extension if present since server adds it automatically
         const baseName = pdfName.replace(/.pdf$/i, '');
         const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(baseName);
-        console.log('🔧 [PDF DEBUG] Making request to:', endpoint);
         
         const res = await fetch(endpoint, { 
             method: 'POST', 
             body: fd 
         });
         
-        console.log('🔧 [PDF DEBUG] Response status:', res.status, 'OK:', res.ok);
-        console.log('🔧 [PDF DEBUG] Response headers:', Object.fromEntries(res.headers.entries()));
         
         if (!res.ok) {
             const errorText = await res.text();
-            console.error('🔧 [PDF DEBUG] Server error response:', errorText);
             throw new Error("HTTP error! status: " + res.status + " - " + errorText);
         }
         
         const blob = await res.blob();
-        console.log('🔧 [PDF DEBUG] Blob created, size:', blob.size, 'type:', blob.type);
         
         if (blob.size === 0) {
             throw new Error("Received empty PDF blob from server");
         }
         
         const url = URL.createObjectURL(blob);
-        console.log('🔧 [PDF DEBUG] Object URL created:', url);
 
         // Trigger download
         const a = document.createElement('a');
         a.href = url;
         a.download = 'Edited_' + pdfName;
-        console.log('🔧 [PDF DEBUG] Triggering download for:', a.download);
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -2247,7 +2856,6 @@ async function editAndDownloadPDF (pdfName) {
         // Clean up the object URL after a delay
         setTimeout(() => {
             URL.revokeObjectURL(url);
-            console.log('🔧 [PDF DEBUG] Object URL cleaned up');
         }, 1000);
 
         // inline preview - only show the last one
@@ -2283,7 +2891,8 @@ function runSingleHiddenCheckboxCalculation(calcObj){
     var cbox = document.getElementById(calcObj.hiddenFieldName);
     if(!cbox) return;  // hidden field not found
 
-    var finalState = cbox.checked;  // start with default
+    var finalState = false;  // start with unchecked, only check if calculation conditions are met
+    console.log('🔧 [CALC DEBUG] Running calculation for checkbox:', calcObj.hiddenFieldName);
 
     // Evaluate each multi-term condition in 'calculations'
     for(var c=0; c<calcObj.calculations.length; c++){
@@ -2293,6 +2902,7 @@ function runSingleHiddenCheckboxCalculation(calcObj){
         // Sum up the terms
         if(oneCalc.terms && oneCalc.terms.length>0){
             val = parseFloat( getMoneyValue(oneCalc.terms[0].questionNameId) )||0;
+            console.log('🔧 [CALC DEBUG] First term value for', oneCalc.terms[0].questionNameId, ':', val);
             for(var t=1; t<oneCalc.terms.length; t++){
                 var term = oneCalc.terms[t];
                 var op   = term.operator||'';
@@ -2315,14 +2925,18 @@ function runSingleHiddenCheckboxCalculation(calcObj){
         else if(oneCalc.compareOperator==='<') matched = (val<thr);
         else if(oneCalc.compareOperator==='>') matched = (val>thr);
 
+        console.log('🔧 [CALC DEBUG] Comparison:', val, oneCalc.compareOperator, thr, '=', matched);
+
         // If matched, set final state
         if(matched){
             finalState = (oneCalc.result==='checked');
+            console.log('🔧 [CALC DEBUG] Condition matched, setting finalState to:', finalState);
         }
     }
 
     // Set the hidden checkbox state
     cbox.checked = finalState;
+    console.log('🔧 [CALC DEBUG] Final result for', calcObj.hiddenFieldName, ':', finalState);
 }
 
 
@@ -2746,7 +3360,9 @@ if (typeof handleNext === 'function') {
                 el.name &&
                 !el.disabled &&
                 ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) &&
-                !['hidden', 'button', 'submit', 'reset'].includes(el.type)
+                !['button', 'submit', 'reset'].includes(el.type) &&
+                // Include hidden fields except for specific ones we don't want to send
+                (el.type !== 'hidden' || el.id === 'current_date' || el.id === 'form_zip' || el.id === 'form_county' || el.id === 'form_defendant' || el.id === 'form_ID')
             );
             return fields;
         }
@@ -2757,9 +3373,15 @@ if (typeof handleNext === 'function') {
             const fields = getFormFields();
             const answers = {};
             fields.forEach(el => {
-                if (el.type === 'checkbox' || el.type === 'radio') {
+                if (el.type === 'checkbox') {
+                    // For checkboxes, save true/false
                     answers[el.name] = el.checked;
+                } else if (el.type === 'radio') {
+                    // For radio buttons, save the selected value or null if none selected
+                    const selectedRadio = document.querySelector('input[name="' + el.name + '"]:checked');
+                    answers[el.name] = selectedRadio ? selectedRadio.value : null;
                 } else {
+                    // For other fields, save the value
                     answers[el.name] = el.value;
                 }
             });
@@ -2804,7 +3426,6 @@ if (typeof handleNext === 'function') {
                         const totalChars = text.length;
                         const linesNeeded = Math.ceil(totalChars / lineLimit);
                         
-                        console.log('🔧 [LINE SPLITTING DEBUG] Creating', linesNeeded, 'hidden textboxes for textarea:', textarea.id);
                         
                         // Create or update hidden textboxes for each line
                         for (let i = 1; i <= linesNeeded; i++) {
@@ -2822,11 +3443,9 @@ if (typeof handleNext === 'function') {
                                 hiddenInput.id = hiddenInputId;
                                 hiddenInput.name = hiddenInputId;
                                 textarea.parentNode.appendChild(hiddenInput);
-                                console.log('🔧 [LINE SPLITTING DEBUG] Created hidden input:', hiddenInputId);
                             }
                             
                             hiddenInput.value = lineText;
-                            console.log('🔧 [LINE SPLITTING DEBUG] Set value for', hiddenInputId, 'to:', lineText);
                         }
                         
                         // Remove any extra hidden inputs that are no longer needed
@@ -2835,7 +3454,6 @@ if (typeof handleNext === 'function') {
                             const extraInput = document.getElementById(textarea.id + '_line' + lineNum);
                             if (extraInput) {
                                 extraInput.remove();
-                                console.log('🔧 [LINE SPLITTING DEBUG] Removed extra hidden input:', textarea.id + '_line' + lineNum);
                                 lineNum++;
                             } else {
                                 break;
@@ -2848,37 +3466,28 @@ if (typeof handleNext === 'function') {
 
         // Helper: load answers
         async function loadAnswers() {
-            console.log('🔧 [AUTOFILL DEBUG] loadAnswers() called - isUserLoggedIn:', isUserLoggedIn, 'userId:', userId, 'formId:', formId);
             if (!isUserLoggedIn || !userId) {
-                console.log('🔧 [AUTOFILL DEBUG] Skipping loadAnswers - user not logged in or no userId');
                 return;
             }
             try {
                 // First, try to load user profile data from a user profile document
-                console.log('🔧 [AUTOFILL DEBUG] Attempting to fetch user profile data...');
                 const userProfileDoc = await db.collection('users').doc(userId).get();
-                console.log('🔧 [AUTOFILL DEBUG] User profile document exists:', userProfileDoc.exists);
                 
                 let userProfileData = {};
                 if (userProfileDoc.exists) {
                     userProfileData = userProfileDoc.data();
-                    console.log('🔧 [AUTOFILL DEBUG] User profile data loaded:', userProfileData);
                 }
                 
                 // Then, try to load form-specific data
-                console.log('🔧 [AUTOFILL DEBUG] Attempting to fetch Firebase document for formId:', formId);
                 const doc = await db.collection('users').doc(userId).collection('formAnswers').doc(formId).get();
-                console.log('🔧 [AUTOFILL DEBUG] Firebase document exists:', doc.exists);
                 
                 let formData = {};
                 if (doc.exists) {
                     formData = doc.data();
-                    console.log('🔧 [AUTOFILL DEBUG] Form data loaded:', formData);
                 }
                 
                 // Combine user profile data with form data
                 const data = { ...userProfileData, ...formData };
-                console.log('🔧 [AUTOFILL DEBUG] Combined data (user profile + form):', data);
                 
                 // Helper function to map Firebase data to form field names
                 function mapFirebaseDataToFormFields(firebaseData) {
@@ -2898,26 +3507,49 @@ if (typeof handleNext === 'function') {
                         if (firebaseData.address.zip) mappedData.user_zip = firebaseData.address.zip;
                     }
                     
-                    console.log('🔧 [AUTOFILL DEBUG] Mapped data for form fields:', mappedData);
                     return mappedData;
                 }
                 
                 const mappedData = mapFirebaseDataToFormFields(data);
+                
+                // 🔧 NEW: Debug all radio buttons in the form
+                const allRadioButtons = document.querySelectorAll('input[type="radio"]');
+                
+                // 🔧 NEW: Add flag to prevent autosave during initial load
+                window.isInitialAutofill = true;
+                
                     const fields = getFormFields();
                     fields.forEach(el => {
+                    // Check both by name and by ID for autofill
+                    let autofillValue = null;
                     if (mappedData.hasOwnProperty(el.name)) {
+                        autofillValue = mappedData[el.name];
+                    } else if (el.id && mappedData.hasOwnProperty(el.id)) {
+                        autofillValue = mappedData[el.id];
+                    }
+                    
+                    if (autofillValue !== null) {
                             // Check if this answer would trigger a jump to the end
-                        if (wouldTriggerJumpToEnd(el, mappedData[el.name])) {
+                        if (wouldTriggerJumpToEnd(el, autofillValue)) {
                                 // Don't autofill this answer - keep it as default
                                 console.log('Skipping autofill for ' + el.name + ' as it would trigger jump to end');
                                 return;
                             }
                             
-                        console.log('🔧 [AUTOFILL DEBUG] Autofilling field:', el.name, 'with value:', mappedData[el.name]);
                             if (el.type === 'checkbox' || el.type === 'radio') {
-                            el.checked = !!mappedData[el.name];
+                            if (el.type === 'radio') {
+                                // For radio buttons, we need to check if this specific radio button should be selected
+                                if (el.value === autofillValue) {
+                                    el.checked = true;
                             } else {
-                            el.value = mappedData[el.name];
+                                    el.checked = false;
+                                }
+                            } else {
+                                // For checkboxes, use the boolean value
+                                el.checked = !!autofillValue;
+                            }
+                        } else {
+                            el.value = autofillValue;
                             }
                         }
                     });
@@ -2925,12 +3557,9 @@ if (typeof handleNext === 'function') {
                     // After autofilling, trigger visibility updates for dependent questions
                     // Use a longer delay to ensure conditional logic scripts are fully loaded and executed
                     setTimeout(() => {
-                        console.log('🔧 [VISIBILITY DEBUG] Starting visibility updates after autofill...');
-                        
                         // Trigger change events on all autofilled elements to ensure conditional logic runs
                         fields.forEach(el => {
                             if (el.value || el.checked) {
-                                console.log('🔧 [VISIBILITY DEBUG] Triggering change event on autofilled element:', el.id || el.name);
                                 const event = new Event('change', { bubbles: true });
                                 el.dispatchEvent(event);
                             }
@@ -2944,8 +3573,29 @@ if (typeof handleNext === 'function') {
                     
                     // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled
                     fields.forEach(el => {
-                        if (el.tagName === 'SELECT' && el.id.startsWith('answer') && el.value) {
-                            const questionId = el.id.replace('answer', '');
+                    if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id.startsWith('how_many')) && el.value) {
+                        let questionId;
+                        // First, try to get questionId from data attribute
+                        if (el.dataset && el.dataset.questionId) {
+                            questionId = el.dataset.questionId;
+                        } else if (el.id.startsWith('answer')) {
+                            questionId = el.id.replace('answer', '');
+                        } else if (el.id.startsWith('how_many')) {
+                            // For how_many dropdowns, use the helper function to extract from onchange
+                            const dropdownElement = document.getElementById(el.id);
+                            const qFromOnchange = extractQuestionIdFromOnchange(dropdownElement && dropdownElement.onchange);
+                            if (qFromOnchange) {
+                                questionId = qFromOnchange;
+                            } else {
+                                // Final fallback: try to find the container by checking which labelContainer exists
+                                for (let i = 1; i <= 10; i++) {
+                                    if (document.getElementById('labelContainer' + i)) {
+                                        questionId = i.toString();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                             if (typeof showTextboxLabels === 'function') {
                                 showTextboxLabels(questionId, el.value);
                             }
@@ -2954,13 +3604,28 @@ if (typeof handleNext === 'function') {
                             }
                         }
                     });
+                
+                // Trigger state hidden field updates for any state dropdowns that were autofilled
+                fields.forEach(el => {
+                    if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
+                        // This is a state dropdown that was autofilled
+                        const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
+                        const hiddenShortId = window.toShortIdFromBase(el.id);
+                        if (typeof updateStateHiddenFields === 'function') {
+                            updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
+                            }
+                        }
+                    });
                     
                     // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
                     fields.forEach(el => {
                         if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
-                            console.log('🔧 [AUTOFILL DEBUG] Triggering dropdownMirror for regular dropdown:', el.id, 'with value:', el.value);
                             if (typeof dropdownMirror === 'function') {
                                 dropdownMirror(el, el.id);
+                            }
+                        // Trigger hidden logic for autofilled dropdowns
+                        if (typeof updateHiddenLogic === 'function') {
+                            updateHiddenLogic(el.id, el.value);
                             }
                         }
                     });
@@ -2969,19 +3634,17 @@ if (typeof handleNext === 'function') {
                     if (typeof createHiddenCheckboxesForAutofilledDropdowns === 'function') {
                         createHiddenCheckboxesForAutofilledDropdowns();
                     }
-                    
-                    // Trigger line splitting for autofilled textareas
-                    triggerLineSplittingForAutofilledTextareas();
-                    
-                    // Trigger paragraph limit checking for autofilled textareas
-                    triggerParagraphLimitCheckForAutofilledTextareas();
+                
+                // Trigger line splitting for autofilled textareas
+                triggerLineSplittingForAutofilledTextareas();
+                
+                // Trigger paragraph limit checking for autofilled textareas
+                triggerParagraphLimitCheckForAutofilledTextareas();
                     
                     // Second autofill pass for dynamically generated textbox inputs
                     // Use a longer delay to ensure textbox inputs are fully generated
                     setTimeout(() => {
-                        console.log('🔧 [AUTOFILL DEBUG] Starting second autofill pass for dynamically generated inputs');
                         const allFields = getFormFields();
-                        console.log('🔧 [AUTOFILL DEBUG] Found', allFields.length, 'total form fields');
                         
                         // Also try to find fields by ID directly as a fallback
                         const fieldsById = {};
@@ -2993,12 +3656,17 @@ if (typeof handleNext === 'function') {
                         
                         allFields.forEach(el => {
                             if (mappedData.hasOwnProperty(el.name)) {
-                                console.log('🔧 [AUTOFILL DEBUG] Autofilling field:', el.name, 'with value:', mappedData[el.name]);
-                                if (el.type === 'checkbox' || el.type === 'radio') {
+                                if (el.type === 'checkbox') {
                                     el.checked = !!mappedData[el.name];
+                                } else if (el.type === 'radio') {
+                                    // For radio buttons, only check the one that matches the value
+                                    if (el.value === mappedData[el.name]) {
+                                        el.checked = true;
+                                    } else {
+                                        el.checked = false;
+                                    }
                                 } else {
                                     el.value = mappedData[el.name];
-                                    console.log('🔧 [AUTOFILL DEBUG] Set value for', el.name, 'to:', el.value);
                                 }
                             }
                         });
@@ -3006,13 +3674,28 @@ if (typeof handleNext === 'function') {
                         // Additional pass: try to autofill by ID for any fields that might have been missed
                         Object.keys(mappedData).forEach(fieldName => {
                             const fieldById = fieldsById[fieldName];
-                            if (fieldById && !fieldById.value && mappedData[fieldName]) {
-                                console.log('🔧 [AUTOFILL DEBUG] Additional autofill by ID for:', fieldName, 'with value:', mappedData[fieldName]);
+                            if (fieldById && mappedData[fieldName]) {
+                                // Check if field needs autofilling (different logic for different field types)
+                                const needsAutofill = (fieldById.type === 'checkbox' || fieldById.type === 'radio') 
+                                    ? !fieldById.checked 
+                                    : !fieldById.value;
+                                
+                                if (needsAutofill) {
                                 if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
+                                        if (fieldById.type === 'radio') {
+                                            // For radio buttons, check if this specific radio should be selected
+                                            if (fieldById.value === mappedData[fieldName]) {
+                                                fieldById.checked = true;
+                                            } else {
+                                                fieldById.checked = false;
+                                            }
+                                        } else {
+                                            // For checkboxes, use boolean value
                                     fieldById.checked = !!mappedData[fieldName];
+                                        }
                                 } else {
                                     fieldById.value = mappedData[fieldName];
-                                    console.log('🔧 [AUTOFILL DEBUG] Set value by ID for', fieldName, 'to:', fieldById.value);
+                                    }
                                 }
                             }
                         });
@@ -3022,14 +3705,177 @@ if (typeof handleNext === 'function') {
                         
                         // Trigger paragraph limit checking again after the second autofill pass
                         triggerParagraphLimitCheckForAutofilledTextareas();
+                        
+                        // Trigger numbered dropdown textbox generation for any numbered dropdowns that were autofilled in second pass
+                        allFields.forEach(el => {
+                            if (el.tagName === 'SELECT' && (el.id.startsWith('answer') || el.id.startsWith('how_many')) && el.value) {
+                                let questionId;
+                                // First, try to get questionId from data attribute
+                                if (el.dataset && el.dataset.questionId) {
+                                    questionId = el.dataset.questionId;
+                                } else if (el.id.startsWith('answer')) {
+                                    questionId = el.id.replace('answer', '');
+                                } else if (el.id.startsWith('how_many')) {
+                                    // For how_many dropdowns, use the helper function to extract from onchange
+                                    const dropdownElement = document.getElementById(el.id);
+                                    const qFromOnchange = extractQuestionIdFromOnchange(dropdownElement && dropdownElement.onchange);
+                                    if (qFromOnchange) {
+                                        questionId = qFromOnchange;
+                                    } else {
+                                        // Final fallback: try to find the container by checking which labelContainer exists
+                                        for (let i = 1; i <= 10; i++) {
+                                            if (document.getElementById('labelContainer' + i)) {
+                                                questionId = i.toString();
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                if (typeof showTextboxLabels === 'function') {
+                                    showTextboxLabels(questionId, el.value);
+                                    
+                                    // After creating numbered fields, autofill them with Firebase data
+                                    setTimeout(() => {
+                                        const count = parseInt(el.value);
+                                        if (count > 0) {
+                                            // Get the base field name from the dropdown
+                                            const baseFieldName = el.id;
+                                            
+                                            
+                                            // Try to autofill numbered fields for each count
+                                            for (let i = 1; i <= count; i++) {
+                                                // Common field patterns to check - using the actual Firebase naming pattern
+                                                const fieldPatterns = [
+                                                    'name', 
+                                                    'phone_number', 
+                                                    'mailing_address',
+                                                    'street',
+                                                    'city', 
+                                                    'state', 
+                                                    'zip'
+                                                ];
+                                                
+                                                fieldPatterns.forEach(pattern => {
+                                                    // Try both naming patterns: sc100_how_many_people_are_suing_with_you_1_name and how_many_people_are_suing_with_you_name_1
+                                                    const fieldId1 = 'sc100_' + baseFieldName + '_' + i + '_' + pattern;
+                                                    const fieldId2 = baseFieldName + '_' + pattern + '_' + i;
+                                                    
+                                                    
+                                                    // Check first pattern
+                                                    let fieldElement = document.getElementById(fieldId1);
+                                                    if (fieldElement && mappedData[fieldId1]) {
+                                                        fieldElement.value = mappedData[fieldId1];
+                                                    }
+                                                    
+                                                    // Check second pattern
+                                                    fieldElement = document.getElementById(fieldId2);
+                                                    if (fieldElement && mappedData[fieldId2]) {
+                                                        fieldElement.value = mappedData[fieldId2];
+                                                    }
+                                                });
+                                            }
+                                        } else {
+                                        }
+                                    }, 500); // Increased delay to ensure fields are created and DOM is updated
+                                }
+                                if (typeof updateHiddenCheckboxes === 'function') {
+                                    updateHiddenCheckboxes(questionId, el.value);
+                                }
+                            }
+                        });
+                        
+                        // Trigger state hidden field updates for any state dropdowns that were autofilled in second pass
+                        allFields.forEach(el => {
+                            if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
+                                // This is a state dropdown that was autofilled
+                                const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
+                                const hiddenShortId = window.toShortIdFromBase(el.id);
+                                if (typeof updateStateHiddenFields === 'function') {
+                                    updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
+                                }
+                            }
+                        });
                     }, 1500);
                     
                         // Reset hidden questions to defaults after autofill and visibility updates
-                        if (typeof currentSectionNumber === 'number') {
+                        // BUT NOT during initial autofill to preserve autofilled values
+                        if (typeof currentSectionNumber === 'number' && !window.isInitialAutofill) {
                             resetHiddenQuestionsToDefaults(currentSectionNumber);
-                }
+                        }
+                
+                // 🔧 NEW: Additional fallback for numbered dropdown autofill - try again after a longer delay
+                setTimeout(() => {
+                    const numberedDropdowns = document.querySelectorAll('select[id*="how_many"], select[id*="answer"]');
+                    numberedDropdowns.forEach(dropdown => {
+                        if (dropdown.value && parseInt(dropdown.value) > 0) {
+                            // Trigger the autofill logic again for any missed dropdowns
+                            const questionId = dropdown.dataset.questionId || dropdown.id.replace(/^(answer|how_many)/, '');
+                            if (typeof showTextboxLabels === 'function') {
+                                showTextboxLabels(questionId, dropdown.value);
+                                
+                                // 🔧 NEW: Add the missing autofill logic for numbered fields
+                                setTimeout(() => {
+                                    const count = parseInt(dropdown.value);
+                                    if (count > 0) {
+                                        // Get the base field name from the dropdown
+                                        const baseFieldName = dropdown.id;
+                                        
+                                        
+                                        // Try to autofill numbered fields for each count
+                                        for (let i = 1; i <= count; i++) {
+                                            // Common field patterns to check - using the actual Firebase naming pattern
+                                            const fieldPatterns = [
+                                                'name', 
+                                                'phone_number', 
+                                                'mailing_address',
+                                                'street',
+                                                'city', 
+                                                'state',
+                                                'zip',
+                                                'zip_code',
+                                                'email',
+                                                'address'
+                                            ];
+                                            
+                                            fieldPatterns.forEach(pattern => {
+                                                // Try both naming patterns: sc100_how_many_people_are_suing_with_you_1_name and how_many_people_are_suing_with_you_name_1
+                                                const fieldId1 = 'sc100_' + baseFieldName + '_' + i + '_' + pattern;
+                                                const fieldId2 = baseFieldName + '_' + pattern + '_' + i;
+                                                
+                                                
+                                                // Check first pattern
+                                                let fieldElement = document.getElementById(fieldId1);
+                                                if (fieldElement && mappedData[fieldId1]) {
+                                                    fieldElement.value = mappedData[fieldId1];
+                                                }
+                                                
+                                                // Check second pattern
+                                                fieldElement = document.getElementById(fieldId2);
+                                                if (fieldElement && mappedData[fieldId2]) {
+                                                    fieldElement.value = mappedData[fieldId2];
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                    }
+                                }, 500); // 500ms delay to ensure fields are created
+                            }
+                        }
+                    });
+                }, 1000); // 1 second delay for fallback
+                
+        // 🔧 NEW: Clear autofill flag after fallback autofill is complete
+        setTimeout(() => {
+            window.isInitialAutofill = false;
+            
+            // 🔧 NEW: Update all hidden address fields after autofill completes
+            if (typeof updateAllHiddenAddressFields === 'function') {
+                updateAllHiddenAddressFields();
+            }
+        }, 2000); // 2 second delay to ensure fallback autofill completes
+                
             } catch (e) {
-                console.log('🔧 [AUTOFILL DEBUG] Error in loadAnswers:', e);
+                console.log('Error loading answers:', e);
             }
         }
         
@@ -3154,9 +4000,15 @@ if (typeof handleNext === 'function') {
                 const fields = getFormFields();
                 const answers = {};
                 fields.forEach(el => {
-                    if (el.type === 'checkbox' || el.type === 'radio') {
+                    if (el.type === 'checkbox') {
+                        // For checkboxes, save true/false
                         answers[el.name] = el.checked;
+                    } else if (el.type === 'radio') {
+                        // For radio buttons, save the selected value or null if none selected
+                        const selectedRadio = document.querySelector('input[name="' + el.name + '"]:checked');
+                        answers[el.name] = selectedRadio ? selectedRadio.value : null;
                     } else {
+                        // For other fields, save the value
                         answers[el.name] = el.value;
                     }
                 });
@@ -3176,8 +4028,15 @@ if (typeof handleNext === 'function') {
                     const fields = getFormFields();
                     fields.forEach(el => {
                         if (data.hasOwnProperty(el.name)) {
-                            if (el.type === 'checkbox' || el.type === 'radio') {
+                            if (el.type === 'checkbox') {
                                 el.checked = !!data[el.name];
+                            } else if (el.type === 'radio') {
+                                // For radio buttons, set the value and check the matching radio button
+                                if (data[el.name] && el.value === data[el.name]) {
+                                    el.checked = true;
+                                } else {
+                                    el.checked = false;
+                                }
                             } else {
                                 el.value = data[el.name];
                             }
@@ -3221,11 +4080,27 @@ if (typeof handleNext === 'function') {
                             }
                         });
                         
+                        // Trigger state hidden field updates for any state dropdowns that were autofilled
+                        fields.forEach(el => {
+                            if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
+                                // This is a state dropdown that was autofilled
+                                const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
+                                const hiddenShortId = window.toShortIdFromBase(el.id);
+                                if (typeof updateStateHiddenFields === 'function') {
+                                    updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
+                                }
+                            }
+                        });
+                        
                         // Trigger hidden checkbox generation for any regular dropdowns that were autofilled
                         fields.forEach(el => {
                             if (el.tagName === 'SELECT' && el.id && !el.id.startsWith('answer') && el.value) {
                                 if (typeof dropdownMirror === 'function') {
                                     dropdownMirror(el, el.id);
+                                }
+                                // Trigger hidden logic for autofilled dropdowns
+                                if (typeof updateHiddenLogic === 'function') {
+                                    updateHiddenLogic(el.id, el.value);
                                 }
                             }
                         });
@@ -3260,7 +4135,6 @@ if (typeof handleNext === 'function') {
                                         el.checked = !!data[el.name];
                                     } else {
                                         el.value = data[el.name];
-                                        console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Set value for', el.name, 'to:', el.value);
                                     }
                                 }
                             });
@@ -3269,12 +4143,10 @@ if (typeof handleNext === 'function') {
                             Object.keys(data).forEach(fieldName => {
                                 const fieldById = fieldsById[fieldName];
                                 if (fieldById && !fieldById.value && data[fieldName]) {
-                                    console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Additional autofill by ID for:', fieldName, 'with value:', data[fieldName]);
                                     if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
                                         fieldById.checked = !!data[fieldName];
                                     } else {
                                         fieldById.value = data[fieldName];
-                                        console.log('🔧 [LOCALSTORAGE AUTOFILL DEBUG] Set value by ID for', fieldName, 'to:', fieldById.value);
                                     }
                                 }
                             });
@@ -3284,6 +4156,18 @@ if (typeof handleNext === 'function') {
                             
                             // Trigger paragraph limit checking again after the second autofill pass
                             triggerParagraphLimitCheckForAutofilledTextareas();
+                            
+                            // Trigger state hidden field updates for any state dropdowns that were autofilled in second pass
+                            allFields.forEach(el => {
+                                if (el.tagName === 'SELECT' && el.id && el.value && el.classList.contains('address-select')) {
+                                    // This is a state dropdown that was autofilled
+                                    const hiddenFullId = el.id + '_hidden'; // Add _hidden suffix to avoid conflict with dropdown
+                                    const hiddenShortId = window.toShortIdFromBase(el.id);
+                                    if (typeof updateStateHiddenFields === 'function') {
+                                        updateStateHiddenFields(el, hiddenFullId, hiddenShortId);
+                                    }
+                                }
+                            });
                         }, 1500);
                     }, 2000);
                 }
@@ -3666,6 +4550,20 @@ if (typeof handleNext === 'function') {
         }
     });
 
+// Helper function to create styled address input
+function createAddressInput(id, label, index, type = 'text') {
+    const inputType = type === 'number' ? 'number' : 'text';
+    const placeholder = label; // Remove the index number from placeholder
+    
+    return '<div class="address-field">' +
+           '<input type="' + inputType + '" ' +
+           'id="' + id + '" ' +
+           'name="' + id + '" ' +
+           'placeholder="' + placeholder + '" ' +
+           'class="address-input">' +
+           '</div>';
+}
+
 </script>
 
 <!-- Debug Menu -->
@@ -3679,11 +4577,30 @@ if (typeof handleNext === 'function') {
     
     <!-- Search Bar -->
     <div style="padding: 20px; border-bottom: 1px solid #eee;">
-      <input type="text" id="debugSearch" placeholder="Search inputs by name, ID, or value..." style="width: 100%; padding: 12px 16px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
-      <div style="text-align: center; margin-top: 10px;">
+      <input type="text" id="debugSearch" placeholder="Search inputs by name, ID, or value... (supports partial word matching)" style="width: 100%; padding: 12px 16px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+      
+      <!-- Filter Controls -->
+      <div style="display: flex; gap: 15px; margin-top: 15px; align-items: center; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px;">
+          <label for="debugTypeFilter" style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50; font-size: 14px;">Filter by Type:</label>
+          <select id="debugTypeFilter" style="width: 100%; padding: 10px 12px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; background: white; cursor: pointer;">
+            <option value="">All Types</option>
+            <option value="text">📝 Text Inputs</option>
+            <option value="email">📧 Email Inputs</option>
+            <option value="tel">📞 Phone Inputs</option>
+            <option value="number">🔢 Number Inputs</option>
+            <option value="date">📅 Date Inputs</option>
+            <option value="textarea">📄 Text Areas</option>
+            <option value="checkbox">☑️ Checkboxes</option>
+            <option value="radio">🔘 Radio Buttons</option>
+            <option value="hidden">🔒 Hidden Fields</option>
+          </select>
+        </div>
+        <div style="flex-shrink: 0;">
         <button id="exportNamesIdsBtn" style="background: linear-gradient(90deg, #4f8cff 0%, #38d39f 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3);">
           📋 Export Names/IDs
         </button>
+        </div>
       </div>
     </div>
     
@@ -3764,11 +4681,21 @@ document.addEventListener('keydown', function(e) {
       return;
     }
     
-    console.log('🔧 [TAB NAVIGATION] No suitable button found to press');
   }
 });
 
-// Removed click-outside-to-close functionality - user must use X button
+// Click-outside-to-close functionality
+document.addEventListener('click', function(event) {
+  const debugMenu = document.getElementById('debugMenu');
+  
+  // If debug menu is visible
+  if (debugMenuVisible) {
+    // Check if click is on the overlay background (not on the content area)
+    if (event.target === debugMenu) {
+      hideDebugMenu();
+    }
+  }
+});
 
 function showDebugMenu() {
   debugMenuVisible = true;
@@ -3789,6 +4716,9 @@ function addVirtualDropdownCheckboxes(inputData) {
   
   dropdowns.forEach(dropdown => {
     if (!dropdown.id) return;
+    
+    // Skip debug-related dropdowns
+    if (dropdown.id.startsWith('debug')) return;
     
     // Check if this is a numbered dropdown
     const isNumberedDropdown = dropdown.id.startsWith('answer') && dropdown.querySelector('option[value="1"]');
@@ -3855,6 +4785,9 @@ function createHiddenCheckboxesForAutofilledDropdowns() {
       if (!existingCheckbox) {
         createHiddenCheckbox(checkboxId, checkboxName, baseName);
       }
+      
+      // Handle custom hidden logic for this dropdown
+      updateHiddenLogic(baseName, selectedValue);
     }
   });
 }
@@ -3995,6 +4928,7 @@ function addNumberedDropdownVirtualEntries(inputData, dropdown) {
 function populateDebugContent() {
   const content = document.getElementById('debugContent');
   const searchTerm = document.getElementById('debugSearch').value.toLowerCase();
+  const typeFilter = document.getElementById('debugTypeFilter').value;
   
   // Get all form inputs
   const inputs = document.querySelectorAll('input, select, textarea');
@@ -4002,7 +4936,8 @@ function populateDebugContent() {
   
   inputs.forEach(input => {
     // Include all inputs that have either an ID or a name (or both)
-    if (input.id || input.name) {
+    // Exclude debugTypeFilter_* fields
+    if ((input.id || input.name) && !input.id.startsWith('debugTypeFilter_')) {
       const value = input.type === 'checkbox' ? input.checked : input.value;
       const type = input.tagName.toLowerCase();
       const inputType = input.type || 'text';
@@ -4026,7 +4961,8 @@ function populateDebugContent() {
   const updatedInputs = document.querySelectorAll('input, select, textarea');
   updatedInputs.forEach(input => {
     // Include all inputs that have either an ID or a name (or both)
-    if (input.id || input.name) {
+    // Exclude debugTypeFilter_* fields
+    if ((input.id || input.name) && !input.id.startsWith('debugTypeFilter_')) {
       // Check if this input is already in inputData
       const exists = inputData.some(item => item.id === input.id && item.name === input.name);
       if (!exists) {
@@ -4047,45 +4983,70 @@ function populateDebugContent() {
     }
   });
   
-  // Filter by search term with bidirectional space/underscore normalization
-  const normalizedSearchTermUnderscore = searchTerm.replace(/[_s]/g, '_');
-  const normalizedSearchTermSpace = searchTerm.replace(/[_s]/g, ' ');
+  // Filter by search term and type
   
   const filteredData = inputData.filter(item => {
-    const normalizedIdUnderscore = item.id.toLowerCase().replace(/[_s]/g, '_');
-    const normalizedNameUnderscore = item.name.toLowerCase().replace(/[_s]/g, '_');
-    const normalizedValueUnderscore = String(item.value).toLowerCase().replace(/[_s]/g, '_');
-    const normalizedPlaceholderUnderscore = item.placeholder.toLowerCase().replace(/[_s]/g, '_');
+    // First check type filter
+    if (typeFilter) {
+      let itemType = '';
+      if (item.inputType === 'text' || item.inputType === 'email' || item.inputType === 'tel' || item.inputType === 'number' || item.inputType === 'date') {
+        itemType = item.inputType;
+      } else if (item.type === 'select') {
+        itemType = 'text'; // Classify dropdowns as text inputs
+      } else if (item.type === 'textarea') {
+        itemType = 'textarea';
+      } else if (item.inputType === 'checkbox') {
+        itemType = 'checkbox';
+      } else if (item.inputType === 'radio') {
+        itemType = 'radio';
+      } else if (item.inputType === 'hidden') {
+        // Check if this is a state-related hidden field that should be grouped with text inputs
+        if (item.id && (item.id.includes('_state') || item.id.includes('_state_short') || item.id.includes('_short_'))) {
+          itemType = 'text'; // Classify state-related hidden fields as text inputs
+        } else {
+          itemType = 'hidden';
+        }
+      } else {
+        itemType = 'text'; // Classify other inputs as text inputs
+      }
+      
+      if (itemType !== typeFilter) {
+        return false;
+      }
+    }
     
-    const normalizedIdSpace = item.id.toLowerCase().replace(/[_s]/g, ' ');
-    const normalizedNameSpace = item.name.toLowerCase().replace(/[_s]/g, ' ');
-    const normalizedValueSpace = String(item.value).toLowerCase().replace(/[_s]/g, ' ');
-    const normalizedPlaceholderSpace = item.placeholder.toLowerCase().replace(/[_s]/g, ' ');
+    // If no search term, return true (type filter already applied)
+    if (!searchTerm) {
+      return true;
+    }
     
-    // Check all combinations: underscore search vs underscore data, space search vs space data, and cross-matches
-    return normalizedIdUnderscore.includes(normalizedSearchTermUnderscore) ||
-           normalizedNameUnderscore.includes(normalizedSearchTermUnderscore) ||
-           normalizedValueUnderscore.includes(normalizedSearchTermUnderscore) ||
-           normalizedPlaceholderUnderscore.includes(normalizedSearchTermUnderscore) ||
-           normalizedIdSpace.includes(normalizedSearchTermSpace) ||
-           normalizedNameSpace.includes(normalizedSearchTermSpace) ||
-           normalizedValueSpace.includes(normalizedSearchTermSpace) ||
-           normalizedPlaceholderSpace.includes(normalizedSearchTermSpace) ||
-           // Cross-matches: underscore search vs space data
-           normalizedIdSpace.includes(normalizedSearchTermUnderscore) ||
-           normalizedNameSpace.includes(normalizedSearchTermUnderscore) ||
-           normalizedValueSpace.includes(normalizedSearchTermUnderscore) ||
-           normalizedPlaceholderSpace.includes(normalizedSearchTermUnderscore) ||
-           // Cross-matches: space search vs underscore data
-           normalizedIdUnderscore.includes(normalizedSearchTermSpace) ||
-           normalizedNameUnderscore.includes(normalizedSearchTermSpace) ||
-           normalizedValueUnderscore.includes(normalizedSearchTermSpace) ||
-           normalizedPlaceholderUnderscore.includes(normalizedSearchTermSpace) ||
-           // Original exact matches for backward compatibility
-    item.id.toLowerCase().includes(searchTerm) ||
-    item.name.toLowerCase().includes(searchTerm) ||
-    String(item.value).toLowerCase().includes(searchTerm) ||
-           item.placeholder.toLowerCase().includes(searchTerm);
+    // Helper function to check if all search words are found in text (partial word matching)
+    function matchesPartialWords(searchWords, text) {
+      if (!text || !searchWords.length) return false;
+      
+      const normalizedText = text.toLowerCase().replace(/[_s]/g, ' ');
+      const originalText = text.toLowerCase();
+      
+      return searchWords.every(word => {
+        const normalizedWord = word.toLowerCase().replace(/[_s]/g, ' ');
+        // Check both normalized text (spaces) and original text (underscores)
+        return normalizedText.includes(normalizedWord) || originalText.includes(word.toLowerCase());
+      });
+    }
+    
+    // Split search term into individual words for partial matching
+    const searchWords = searchTerm.trim().split(/s+/).filter(word => word.length > 0);
+    
+    // Get all text fields to search in
+    const searchableTexts = [
+      item.id,
+      item.name,
+      String(item.value),
+      item.placeholder
+    ].filter(text => text && text.length > 0);
+    
+    // Check if all search words are found in any of the searchable texts
+    return searchableTexts.some(text => matchesPartialWords(searchWords, text));
   });
   
   // Group by type
@@ -4099,26 +5060,49 @@ function populateDebugContent() {
     textarea: [],
     checkbox: [],
     radio: [],
+    hidden: [],
     other: []
   };
   
+  // First pass: collect all visible field names to identify duplicates
+  const visibleFieldNames = new Set();
   filteredData.forEach(item => {
-    if (item.inputType === 'text' || item.inputType === 'email' || item.inputType === 'tel' || item.inputType === 'number' || item.inputType === 'date') {
-      grouped[item.inputType].push(item);
-    } else if (item.type === 'select') {
-      grouped.select.push(item);
-    } else if (item.type === 'textarea') {
-      grouped.textarea.push(item);
-    } else if (item.inputType === 'checkbox') {
-      grouped.checkbox.push(item);
-    } else if (item.inputType === 'radio') {
-      grouped.radio.push(item);
-    } else if (item.inputType === 'hidden' && item.name.includes('_line')) {
-      // Hidden textboxes created by line splitting should be categorized as text inputs
-      grouped.text.push(item);
-    } else {
-      grouped.other.push(item);
+    if (item.inputType !== 'hidden' && item.type !== 'hidden') {
+      visibleFieldNames.add(item.name);
     }
+  });
+
+  filteredData.forEach(item => {
+    // Skip hidden fields that have a corresponding visible field with the same name
+    if (item.inputType === 'hidden' && visibleFieldNames.has(item.name)) {
+      return; // Skip this hidden field
+    }
+    
+    // Use the same logic as the filtering to determine the final itemType
+    let itemType = '';
+    if (item.inputType === 'text' || item.inputType === 'email' || item.inputType === 'tel' || item.inputType === 'number' || item.inputType === 'date') {
+      itemType = item.inputType;
+    } else if (item.type === 'select') {
+      itemType = 'text'; // Classify dropdowns as text inputs
+    } else if (item.type === 'textarea') {
+      itemType = 'textarea';
+    } else if (item.inputType === 'checkbox') {
+      itemType = 'checkbox';
+    } else if (item.inputType === 'radio') {
+      itemType = 'radio';
+    } else if (item.inputType === 'hidden') {
+      // Check if this is a state-related hidden field that should be grouped with text inputs
+      if (item.id && (item.id.includes('_state') || item.id.includes('_state_short'))) {
+        itemType = 'text'; // Classify state-related hidden fields as text inputs
+    } else {
+        itemType = 'hidden';
+      }
+    } else {
+      itemType = 'text'; // Classify other inputs as text inputs
+    }
+    
+    // Group by the final itemType
+    grouped[itemType].push(item);
   });
   
   // Generate HTML
@@ -4130,11 +5114,12 @@ function populateDebugContent() {
     tel: '📞 Phone Inputs',
     number: '🔢 Number Inputs',
     date: '📅 Date Inputs',
-    select: '📋 Dropdowns',
+    select: '📝 Text Inputs',
     textarea: '📄 Text Areas',
     checkbox: '☑️ Checkboxes',
     radio: '🔘 Radio Buttons',
-    other: '❓ Other Inputs'
+    hidden: '🔒 Hidden Fields',
+    other: '📝 Text Inputs'
   };
   
   Object.keys(grouped).forEach(type => {
@@ -4340,6 +5325,9 @@ function exportNamesAndIds() {
 // Search functionality
 document.getElementById('debugSearch').addEventListener('input', populateDebugContent);
 
+// Type filter functionality
+document.getElementById('debugTypeFilter').addEventListener('change', populateDebugContent);
+
 // Export Names/IDs functionality
 document.getElementById('exportNamesIdsBtn').addEventListener('click', exportNamesAndIds);
 
@@ -4405,6 +5393,41 @@ document.addEventListener('change', function() {
   }
 });
 
+// Function to update hidden state fields when dropdown selection changes
+function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
+    
+    const selectedState = dropdown.value;
+    
+    const fullField = document.getElementById(hiddenFullId);
+    const shortField = document.getElementById(hiddenShortId);
+    
+    
+    // State abbreviation mapping
+    const stateAbbreviations = {
+        'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
+        'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA', 'Hawaii': 'HI', 'Idaho': 'ID',
+        'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA', 'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA',
+        'Maine': 'ME', 'Maryland': 'MD', 'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS',
+        'Missouri': 'MO', 'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+        'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH', 'Oklahoma': 'OK',
+        'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC', 'South Dakota': 'SD',
+        'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA',
+        'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
+    };
+    
+    if (fullField && shortField) {
+        if (selectedState) {
+            const abbreviation = stateAbbreviations[selectedState] || '';
+            fullField.value = selectedState;
+            shortField.value = abbreviation;
+        } else {
+            fullField.value = '';
+            shortField.value = '';
+        }
+    } else {
+    }
+}
+
 // Function to update user full name
 function updateUserFullName() {
   const firstName = document.getElementById('user_firstname')?.value || '';
@@ -4438,180 +5461,204 @@ document.addEventListener('DOMContentLoaded', function() {
     updateUserFullName();
   }, 2000);
 });
-
-// Helper function to create styled address input
-function createAddressInput(id, label, index, type = 'text') {
-    const inputType = type === 'number' ? 'number' : 'text';
-    const placeholder = label + ' ' + index;
-    
-    return '<div class="address-field">' +
-           '<input type="' + inputType + '" ' +
-           'id="' + id + '" ' +
-           'name="' + id + '" ' +
-           'placeholder="' + placeholder + '" ' +
-           'class="address-input">' +
-           '</div>';
-}
-
-// Helper function to create US states dropdown
-function createStateDropdown(id, index) {
-    const states = [
-        'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
-        'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
-        'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
-        'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina',
-        'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina',
-        'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
-        'Wisconsin', 'Wyoming'
-    ];
-    
-    let options = '<option value="">Select State</option>';
-    states.forEach(state => {
-        options += '<option value="' + state + '">' + state + '</option>';
-    });
-    
-    return '<div class="address-field">' +
-           '<select id="' + id + '" name="' + id + '" class="address-select">' +
-           options +
-           '</select>' +
-           '</div>';
-}
-
-function showTextboxLabels(questionId, count){
-    const container = document.getElementById("labelContainer" + questionId);
-    if(!container) return;
-
-    container.innerHTML = "<br>";
-    
-    // Try to get unified fields first, fallback to old arrays
-    const qBlock = document.querySelector('#question-container-' + questionId)?.closest('.question-block') || 
-                   document.querySelector('[id*="' + questionId + '"]')?.closest('.question-block');
-    
-    let allFieldsInOrder = [];
-    
-    if (qBlock) {
-        const unifiedFields = Array.from(qBlock.querySelectorAll('#unifiedFields' + questionId + ' .unified-field'));
-        
-        if (unifiedFields.length > 0) {
-            // Use unified container data
-            const allElements = [];
-            
-            unifiedFields.forEach((el) => {
-                const fieldType = el.getAttribute('data-type');
-                const fieldOrder = parseInt(el.getAttribute('data-order'));
-                const labelTextEl = el.querySelector('#labelText' + questionId + '_' + fieldOrder);
-                const nodeIdTextEl = el.querySelector('#nodeIdText' + questionId + '_' + fieldOrder);
-                
-                if (labelTextEl && nodeIdTextEl) {
-                    allElements.push({
-                        type: fieldType,
-                        label: labelTextEl.textContent.trim(),
-                        nodeId: nodeIdTextEl.textContent.trim(),
-                        order: fieldOrder
-                    });
-                }
-            });
-            
-            // Sort by data-order attribute (creation order)
-            allElements.sort((a, b) => a.order - b.order);
-            allFieldsInOrder = allElements;
-        }
-    }
-    
-    // Fallback to unified fields map or old arrays if no unified fields found
-    if (allFieldsInOrder.length === 0) {
-        // Try unified fields map first
-        if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
-            allFieldsInOrder = window.unifiedFieldsMap[questionId];
-        } else {
-            // Fallback to old arrays
-            const theseLabels = labelMap[questionId] || [];
-            const theseAmounts = amountMap[questionId] || [];
-            
-            allFieldsInOrder = [
-                ...theseLabels.map((lbl, index) => ({
-                    type: 'label',
-                    label: lbl,
-                    nodeId: (window.labelNodeIdsMap && window.labelNodeIdsMap[questionId] ? window.labelNodeIdsMap[questionId] : [])[index] || "",
-                    order: index
-                })),
-                ...theseAmounts.map((amt, index) => ({
-                    type: 'amount',
-                    label: amt,
-                    nodeId: "",
-                    order: index
-                }))
-            ];
-        }
-    }
-
-    /* get and sanitise the question's visible text exactly once */
-    const questionH3   = document
-        .getElementById("question-container-" + questionId)
-        ?.querySelector("h3")?.textContent || ("answer" + questionId);
-    const qSafe = sanitizeQuestionText(questionH3);
-
-    // Generate hidden checkboxes for the selected count
-    generateHiddenCheckboxes(questionId, qSafe, count);
-
-    // Define location field names for visual separation
-    const locationFields = ['Street', 'City', 'State', 'Zip'];
-
-    for(let j = 1; j <= count; j++){
-        let lastWasLocation = false;
-        let firstField = true;
-        
-        // Create entry container div
-        const entryContainer = document.createElement('div');
-        entryContainer.className = 'entry-container';
-        entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box;';
-        
-        // Process all fields in creation order
-        for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
-            const field = allFieldsInOrder[fieldIndex];
-            const isLocationField = locationFields.includes(field.label);
-            
-            // Add <br> before first location field in each count
-            if (isLocationField && !lastWasLocation && !firstField) {
-                const br = document.createElement('br');
-                entryContainer.appendChild(br);
-            }
-            
-            if (field.type === 'label') {
-                const fieldId = field.nodeId + j;
-                if (field.label === 'State') {
-                    // Use dropdown for State field
-                    const dropdownDiv = document.createElement('div');
-                    dropdownDiv.innerHTML = createStateDropdown(fieldId, j);
-                    entryContainer.appendChild(dropdownDiv.firstElementChild);
-                } else {
-                    // Use regular input for other fields
-                    const inputDiv = document.createElement('div');
-                    inputDiv.innerHTML = createAddressInput(fieldId, field.label, j);
-                    entryContainer.appendChild(inputDiv.firstElementChild);
-                }
-            } else if (field.type === 'amount') {
-                const fieldId = field.nodeId + j;
-                const inputDiv = document.createElement('div');
-                inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number');
-                entryContainer.appendChild(inputDiv.firstElementChild);
-            }
-            
-            lastWasLocation = isLocationField;
-            firstField = false;
-        }
-        
-        // Append the entry container to the main container
-        container.appendChild(entryContainer);
-        
-        // Add 2 <br> tags after each entry for better visual separation
-        const br1 = document.createElement('br');
-        const br2 = document.createElement('br');
-        container.appendChild(br1);
-        container.appendChild(br2);
-    }
-}
+           
 </script>
 
 </body>
 </html>
+
+  <script>
+  // Include the generateHiddenAddressTextboxes function and helpers in the runtime
+  function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
+      console.log('🔧 [HIDDEN ADDRESS DEBUG] generateHiddenAddressTextboxes called with questionId:', questionId, 'count:', count);
+      console.log('🔧 [HIDDEN ADDRESS DEBUG] allFieldsInOrder:', allFieldsInOrder);
+      
+      // Check if this question has location fields (Street, City, State, Zip)
+      const hasLocationFields = allFieldsInOrder.some(field => 
+          ['Street', 'City', 'State', 'Zip'].includes(field.label)
+      );
+      
+      console.log('🔧 [HIDDEN ADDRESS DEBUG] hasLocationFields:', hasLocationFields);
+      
+      if (!hasLocationFields) {
+          console.log('🔧 [HIDDEN ADDRESS] No location fields found for question', questionId);
+          return;
+      }
+      
+      // Get the base field name from the question
+      const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
+      
+      // Remove existing hidden address textboxes for this question
+      for (let i = 1; i <= 10; i++) { // Check up to 10 entries
+          const existingAddress = document.getElementById(baseFieldName + '_address_' + i);
+          if (existingAddress && existingAddress.type === 'text' && existingAddress.style.display === 'none') {
+              existingAddress.remove();
+          }
+      }
+      
+      // Generate hidden address textboxes for the selected count
+      for (let i = 1; i <= count; i++) {
+          // For single-entry questions (like multipleTextboxes), don't add number suffix
+          const addressId = count === 1 ? baseFieldName + '_address' : baseFieldName + '_address_' + i;
+          const addressInput = document.createElement('input');
+          addressInput.type = 'text';
+          addressInput.id = addressId;
+          addressInput.name = addressId;
+          addressInput.style.display = 'none';
+          
+          // Add to hidden fields container
+          const hiddenContainer = document.getElementById('hidden_pdf_fields');
+          if (hiddenContainer) {
+              hiddenContainer.appendChild(addressInput);
+          }
+          
+          // Set up event listeners to update the address when location fields change
+          // Delay this to ensure location fields are created first
+          setTimeout(() => {
+              setupAddressUpdateListeners(questionId, i, baseFieldName, allFieldsInOrder, count);
+          }, 1000); // 1 second delay to ensure fields are created
+      }
+  }
+
+  function setupAddressUpdateListeners(questionId, entryNumber, baseFieldName, allFieldsInOrder, count = 1) {
+      // For single-entry questions (like multipleTextboxes), don't add number suffix
+      const addressId = count === 1 ? baseFieldName + '_address' : baseFieldName + '_address_' + entryNumber;
+      const addressInput = document.getElementById(addressId);
+      
+      if (!addressInput) return;
+      
+      // Function to update the address field
+      const updateAddress = () => {
+          // For single-entry questions, don't add number suffix to field IDs
+          const streetFieldId = count === 1 ? baseFieldName + '_street' : baseFieldName + '_street_' + entryNumber;
+          const cityFieldId = count === 1 ? baseFieldName + '_city' : baseFieldName + '_city_' + entryNumber;
+          const stateFieldId = count === 1 ? baseFieldName + '_state' : baseFieldName + '_state_' + entryNumber;
+          const zipFieldId = count === 1 ? baseFieldName + '_zip' : baseFieldName + '_zip_' + entryNumber;
+          const stateShortFieldId = count === 1 ? baseFieldName + '_state_short' : baseFieldName + '_state_short_' + entryNumber;
+          
+          const streetField = document.getElementById(streetFieldId);
+          const cityField = document.getElementById(cityFieldId);
+          const stateField = document.getElementById(stateFieldId);
+          const zipField = document.getElementById(zipFieldId);
+          const stateShortField = document.getElementById(stateShortFieldId);
+          
+          // Debug: Log what fields we're looking for and what we found
+          console.log('🔧 [HIDDEN ADDRESS DEBUG] Looking for fields:');
+          console.log('  - Street field ID:', streetFieldId, 'Found:', !!streetField, 'Value:', streetField ? streetField.value : 'N/A');
+          console.log('  - City field ID:', cityFieldId, 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
+          console.log('  - State field ID:', stateFieldId, 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
+          console.log('  - Zip field ID:', zipFieldId, 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
+          console.log('  - State Short field ID:', stateShortFieldId, 'Found:', !!stateShortField, 'Value:', stateShortField ? stateShortField.value : 'N/A');
+          
+          const street = streetField ? streetField.value.trim() : '';
+          const city = cityField ? cityField.value.trim() : '';
+          const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
+          const zip = zipField ? zipField.value.trim() : '';
+          
+          // Build the full address
+          const addressParts = [street, city, state, zip].filter(part => part !== '');
+          const fullAddress = addressParts.join(', ');
+          
+          addressInput.value = fullAddress;
+      };
+      
+      // Set up listeners for all location fields
+      const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
+      
+      locationFields.forEach(fieldType => {
+          // For single-entry questions, don't add number suffix to field IDs
+          const fieldId = count === 1 ? baseFieldName + '_' + fieldType : baseFieldName + '_' + fieldType + '_' + entryNumber;
+          const field = document.getElementById(fieldId);
+          
+          
+          if (field) {
+              // Listen for input changes
+              field.addEventListener('input', updateAddress);
+              field.addEventListener('change', updateAddress);
+          } else {
+              console.log('🔧 [HIDDEN ADDRESS DEBUG] Field not found:', fieldId);
+          }
+      });
+      
+      // Initial update with longer delay to ensure fields are created
+      setTimeout(updateAddress, 500);
+      
+      // Also trigger update after autofill completes (additional safety)
+      setTimeout(updateAddress, 2000);
+  }
+
+  // Set up address listeners for multipleTextboxes questions after DOM loads
+  document.addEventListener('DOMContentLoaded', function() {
+    // Find all multipleTextboxes questions with location fields
+    const multipleTextboxesQuestions = document.querySelectorAll('[id*="labelContainer"]');
+    multipleTextboxesQuestions.forEach(container => {
+      const questionId = container.id.replace('labelContainer', '');
+      const baseFieldName = questionNameIds[questionId] || 'answer' + questionId;
+      const addressField = document.getElementById(baseFieldName + '_address');
+      
+      if (addressField) {
+        console.log('🔧 [HIDDEN ADDRESS] Setting up listeners for multipleTextboxes question:', questionId);
+        
+        // Set up listeners for location fields
+        const locationFields = ['street', 'city', 'state', 'zip', 'state_short'];
+        locationFields.forEach(fieldType => {
+          const fieldId = baseFieldName + '_' + fieldType;
+          const field = document.getElementById(fieldId);
+          
+          if (field) {
+            const updateAddress = () => {
+              const streetField = document.getElementById(baseFieldName + '_street');
+              const cityField = document.getElementById(baseFieldName + '_city');
+              const stateField = document.getElementById(baseFieldName + '_state');
+              const zipField = document.getElementById(baseFieldName + '_zip');
+              const stateShortField = document.getElementById(baseFieldName + '_state_short');
+              
+              console.log('🔧 [HIDDEN ADDRESS DEBUG] Looking for fields:');
+              console.log('  - Street field ID:', baseFieldName + '_street', 'Found:', !!streetField, 'Value:', streetField ? streetField.value : 'N/A');
+              console.log('  - City field ID:', baseFieldName + '_city', 'Found:', !!cityField, 'Value:', cityField ? cityField.value : 'N/A');
+              console.log('  - State field ID:', baseFieldName + '_state', 'Found:', !!stateField, 'Value:', stateField ? stateField.value : 'N/A');
+              console.log('  - Zip field ID:', baseFieldName + '_zip', 'Found:', !!zipField, 'Value:', zipField ? zipField.value : 'N/A');
+              console.log('  - State Short field ID:', baseFieldName + '_state_short', 'Found:', !!stateShortField, 'Value:', stateShortField ? stateShortField.value : 'N/A');
+              
+              const street = streetField ? streetField.value.trim() : '';
+              const city = cityField ? cityField.value.trim() : '';
+              const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
+              const zip = zipField ? zipField.value.trim() : '';
+              
+              const addressParts = [street, city, state, zip].filter(part => part !== '');
+              const fullAddress = addressParts.join(', ');
+              
+              addressField.value = fullAddress;
+              console.log('🔧 [HIDDEN ADDRESS] Updated address for', baseFieldName + '_address', ':', fullAddress);
+            };
+            
+            field.addEventListener('input', updateAddress);
+            field.addEventListener('change', updateAddress);
+          } else {
+            console.log('🔧 [HIDDEN ADDRESS DEBUG] Field not found:', fieldId);
+          }
+        });
+        
+        // Initial update
+        setTimeout(() => {
+          const streetField = document.getElementById(baseFieldName + '_street');
+          const cityField = document.getElementById(baseFieldName + '_city');
+          const stateField = document.getElementById(baseFieldName + '_state');
+          const zipField = document.getElementById(baseFieldName + '_zip');
+          const stateShortField = document.getElementById(baseFieldName + '_state_short');
+          
+          const street = streetField ? streetField.value.trim() : '';
+          const city = cityField ? cityField.value.trim() : '';
+          const state = stateShortField ? stateShortField.value.trim() : (stateField ? stateField.value.trim() : '');
+          const zip = zipField ? zipField.value.trim() : '';
+          
+          const addressParts = [street, city, state, zip].filter(part => part !== '');
+          const fullAddress = addressParts.join(', ');
+          
+          addressField.value = fullAddress;
+          console.log('🔧 [HIDDEN ADDRESS] Initial address update for', baseFieldName + '_address', ':', fullAddress);
+        }, 1000);
+      }
+    });
+  });
+  </script>

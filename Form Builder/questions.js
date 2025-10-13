@@ -38,8 +38,8 @@ function setQuestionType(cell, newType) {
   let st = (cell.style || '').replace(/questionType=[^;]+/, '');
   st += `;questionType=${newType};align=center;verticalAlign=middle;spacing=12;`;
   
-  // For text2, allow double-click editing directly
-  if (newType === 'text2') {
+  // For dropdown, allow double-click editing directly
+  if (newType === 'dropdown') {
     st += 'editable=1;';
   } else if (!/pointerEvents=/.test(st)) {
     st += 'pointerEvents=1;overflow=fill;';
@@ -64,7 +64,7 @@ function setQuestionType(cell, newType) {
         cell._checkboxAvailability = cell._checkboxAvailability || 'markAll';
         updateSimpleQuestionCell(cell);
         break;
-      case 'text2':
+      case 'dropdown':
         cell._questionText = preservedText || '';
         updateText2Cell(cell);
         break;
@@ -181,8 +181,8 @@ function updateSimpleQuestionCell(cell) {
   // If the cell doesn't have a question type yet, show the dropdown
   if (!cell._questionType || cell._questionType === '') {
     const html = `
-      <div style="display: flex; justify-content: center; align-items: center; height:100%;">
-        <select class="question-type-dropdown" data-cell-id="${cell.id}" style="margin:auto; font-size: 1.1em; padding: 10px 18px; border-radius: 8px; border: 1px solid #b0b8c9; box-shadow: 0 2px 8px rgba(0,0,0,0.07); background: #f8faff; color: #222; transition: border-color 0.2s, box-shadow 0.2s; outline: none; min-width: 220px; cursor:pointer;"
+      <div style="display: flex; justify-content: center; align-items: flex-start; height:100%; padding-top: 4px;">
+        <select class="question-type-dropdown" data-cell-id="${cell.id}" style="margin:auto; font-size: 1.2em; padding: 12px 20px; border-radius: 8px; border: 1px solid #b0b8c9; box-shadow: 0 2px 8px rgba(0,0,0,0.07); background: #f8faff; color: #222; transition: border-color 0.2s, box-shadow 0.2s; outline: none; min-width: 240px; height: 44px; cursor:pointer;"
           onfocus="this.style.borderColor='#4a90e2'; this.style.boxShadow='0 0 0 2px #b3d4fc';"
           onblur="this.style.borderColor='#b0b8c9'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.07)';"
           onmouseover="this.style.borderColor='#4a90e2';"
@@ -192,7 +192,7 @@ function updateSimpleQuestionCell(cell) {
           onchange="window.pickTypeForCell('${cell.id}', this.value)">
           <option value="">-- Choose Question Type --</option>
           <option value="text">Text</option>
-          <option value="text2">Dropdown</option>
+          <option value="dropdown">Dropdown</option>
           <option value="checkbox">Checkbox</option>
           <option value="number">Number</option>
           <option value="date">Date</option>
@@ -998,7 +998,7 @@ function setupQuestionTypeEventListeners() {
   if (text2TypeBtn) {
     text2TypeBtn.addEventListener("click", () => {
       if (window.selectedCell && isQuestion(window.selectedCell)) {
-        setQuestionType(window.selectedCell, "text2");
+        setQuestionType(window.selectedCell, "dropdown");
         getRefreshAllCells()();
       }
       if (typeof window.hideContextMenu === 'function') {
@@ -1431,9 +1431,9 @@ window.copyMultipleDropdownId = function(cellId, index) {
   // Build the default ID with PDF name if available
   let defaultTextToCopy;
   if (sanitizedPdfName) {
-    defaultTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_1_${sanitizedEntryText}`;
+    defaultTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_${sanitizedEntryText}_1`;
   } else {
-    defaultTextToCopy = `${sanitizedQuestionText}_1_${sanitizedEntryText}`;
+    defaultTextToCopy = `${sanitizedQuestionText}_${sanitizedEntryText}_1`;
   }
   
   // Copy the default ID to clipboard immediately
@@ -1454,28 +1454,27 @@ window.copyMultipleDropdownId = function(cellId, index) {
   }
   const finalNumber = number.trim() || '1'; // Use "1" as default if empty
   
-  // If user entered a different number, copy the updated ID
-  if (finalNumber !== '1') {
-    const sanitizedNumber = finalNumber;
-    
-    // Build the updated ID with PDF name if available
-    let updatedTextToCopy;
-    if (sanitizedPdfName) {
-      updatedTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
-    } else {
-      updatedTextToCopy = `${sanitizedQuestionText}_${sanitizedNumber}_${sanitizedEntryText}`;
-    }
-    
-    // Copy the updated ID to clipboard
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(updatedTextToCopy).catch(() => {
-        // Fallback for older browsers
-        fallbackCopyToClipboard(updatedTextToCopy);
-      });
-    } else {
+  // Always copy the final ID with the user's number (even if it's "1")
+  const sanitizedNumber = finalNumber;
+  
+  // Build the final ID with PDF name if available
+  let finalTextToCopy;
+  if (sanitizedPdfName) {
+    finalTextToCopy = `${sanitizedPdfName}_${sanitizedQuestionText}_${sanitizedEntryText}_${sanitizedNumber}`;
+  } else {
+    finalTextToCopy = `${sanitizedQuestionText}_${sanitizedEntryText}_${sanitizedNumber}`;
+  }
+  
+  
+  // Copy the final ID to clipboard
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(finalTextToCopy).catch(() => {
       // Fallback for older browsers
-      fallbackCopyToClipboard(updatedTextToCopy);
-    }
+      fallbackCopyToClipboard(finalTextToCopy);
+    });
+  } else {
+    // Fallback for older browsers
+    fallbackCopyToClipboard(finalTextToCopy);
   }
 };
 

@@ -229,10 +229,8 @@ window.exportGuiJson = function(download = true) {
       },
       pdfLogic: {
         enabled: false,
-        pdfName: "",
-        pdfDisplayName: "",
-        stripePriceId: "",
-        conditions: []
+        conditions: [],
+        pdfs: []
       },
       alertLogic: {
         enabled: false,
@@ -265,7 +263,7 @@ window.exportGuiJson = function(download = true) {
     if (questionType !== "multipleTextboxes") {
       question.nameId = sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(cell) : '') || cell._nameId || cell._questionText || cell.value || "unnamed");
       question.placeholder = cell._placeholder || "";
-      }
+    }
       
       // Add line limit and character limit for big paragraph questions
       if (questionType === "bigParagraph") {
@@ -278,7 +276,21 @@ window.exportGuiJson = function(download = true) {
         if (cell._paragraphLimit !== undefined && cell._paragraphLimit !== '') {
           question.paragraphLimit = parseInt(cell._paragraphLimit) || 0;
         }
-      }
+        
+        // Add Big Paragraph PDF Logic if enabled
+        if (cell._pdfLogicEnabled) {
+          question.pdfLogic.enabled = true;
+          question.pdfLogic.conditions = [{
+            characterLimit: parseInt(cell._pdfTriggerLimit) || 0
+          }];
+          question.pdfLogic.pdfs = [{
+            pdfName: cell._bigParagraphPdfFile || "",
+            pdfDisplayName: cell._bigParagraphPdfName || "",
+            stripePriceId: cell._bigParagraphPdfPrice || "",
+            triggerOption: ""
+          }];
+        }
+    }
     
     // For text2, clean the text from HTML
     if (questionType === "text2" && question.text) {
@@ -309,7 +321,8 @@ window.exportGuiJson = function(download = true) {
     if (questionType === "multipleTextboxes" && cell._textboxes) {
       // Get PDF name if available
       const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
-      const sanitizedPdfName = pdfName ? sanitizeNameId(pdfName) : '';
+      // Process PDF name to remove .pdf extension and clean up formatting
+      const sanitizedPdfName = pdfName ? pdfName.replace(/\.pdf$/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase() : '';
       
       // Build base name components
       const baseQuestionName = sanitizeNameId(cell._questionText || cell.value || "unnamed");
@@ -322,20 +335,25 @@ window.exportGuiJson = function(download = true) {
       const locationIndex = cell._locationIndex !== undefined ? cell._locationIndex : -1;
       
       // Process each textbox in order
-      cell._textboxes.forEach((tb, index) => {
-        const labelName = tb.nameId || "";
-        const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
-        
-        allFieldsInOrder.push({
-          type: "label",
-          label: labelName,
-          nodeId: fieldNodeId,
-          order: index + 1
+      if (cell._textboxes && cell._textboxes.length > 0) {
+        cell._textboxes.forEach((tb, index) => {
+          const labelName = tb.nameId || "";
+          const fieldNodeId = sanitizedPdfName ? `${nodeId}_${sanitizeNameId(labelName)}` : `${baseQuestionName}_${sanitizeNameId(labelName)}`;
+          
+          allFieldsInOrder.push({
+            type: "label",
+            label: labelName,
+            nodeId: fieldNodeId,
+            order: index + 1
+          });
         });
-      });
+      }
       
       // Insert location fields at the correct position if locationIndex is set
-      if (locationIndex >= 0 && locationIndex <= cell._textboxes.length) {
+      // For multiple textbox questions, location data is indicated by _locationIndex property
+      const shouldIncludeLocationFields = locationIndex >= 0;
+      
+      if (shouldIncludeLocationFields) {
         const locationFields = [
           { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
           { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
@@ -343,20 +361,32 @@ window.exportGuiJson = function(download = true) {
           { label: "Zip", nodeId: sanitizedPdfName ? `${nodeId}_zip` : `${baseQuestionName}_zip` }
         ];
         
-        // Insert location fields at the specified position
-        locationFields.forEach((field, fieldIndex) => {
-          allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
-            type: field.label === "Zip" ? "amount" : "label",
-            label: field.label,
-            nodeId: field.nodeId,
-            order: locationIndex + fieldIndex + 1
+        // If there are no existing fields, just add location fields directly
+        if (allFieldsInOrder.length === 0) {
+          locationFields.forEach((field, fieldIndex) => {
+            allFieldsInOrder.push({
+              type: field.label === "Zip" ? "amount" : "label",
+              label: field.label,
+              nodeId: field.nodeId,
+              order: fieldIndex + 1
+            });
           });
-        });
-        
-        // Update order numbers for all fields after insertion
-        allFieldsInOrder.forEach((field, index) => {
-          field.order = index + 1;
-        });
+        } else {
+          // Insert location fields at the specified position
+          locationFields.forEach((field, fieldIndex) => {
+            allFieldsInOrder.splice(locationIndex + fieldIndex, 0, {
+              type: field.label === "Zip" ? "amount" : "label",
+              label: field.label,
+              nodeId: field.nodeId,
+              order: locationIndex + fieldIndex + 1
+            });
+          });
+          
+          // Update order numbers for all fields after insertion
+          allFieldsInOrder.forEach((field, index) => {
+            field.order = index + 1;
+          });
+        }
       }
       
       // Set the allFieldsInOrder array
@@ -755,7 +785,8 @@ window.exportGuiJson = function(download = true) {
       
       // Get PDF name if available
       const pdfName = typeof window.getPdfNameForNode === 'function' ? window.getPdfNameForNode(cell) : null;
-      const sanitizedPdfName = pdfName ? sanitizeNameId(pdfName) : '';
+      // Process PDF name to remove .pdf extension and clean up formatting
+      const sanitizedPdfName = pdfName ? pdfName.replace(/\.pdf$/i, '').replace(/[^a-z0-9]/gi, '').toLowerCase() : '';
       
       // Build base name components
       const baseQuestionName = sanitizeNameId(cell._questionText || cell.value || "unnamed");
@@ -784,7 +815,18 @@ window.exportGuiJson = function(download = true) {
         });
         
         // Insert location fields at the correct position if locationIndex is set
-        if (locationIndex >= 0 && locationIndex <= cell._textboxes.length) {
+        // For multiple dropdown questions, location data is indicated by _locationIndex property
+        // For multiple textbox questions, we check if location fields exist in _textboxes
+        const hasLocationFieldsInUI = cell._textboxes && cell._textboxes.some(tb => 
+          ['Street', 'City', 'State', 'Zip'].includes(tb.nameId || tb.placeholder || '')
+        );
+        
+        // For multiple dropdown questions, if _locationIndex is set, we should include location fields
+        // For multiple textbox questions, we need both _locationIndex and actual location fields in UI
+        const shouldIncludeLocationFields = (exportType === "multipleDropdownType" && locationIndex >= 0) || 
+                                          (exportType === "multipleTextboxes" && locationIndex >= 0 && hasLocationFieldsInUI);
+        
+        if (shouldIncludeLocationFields && locationIndex <= cell._textboxes.length) {
           const locationFields = [
             { label: "Street", nodeId: sanitizedPdfName ? `${nodeId}_street` : `${baseQuestionName}_street` },
             { label: "City", nodeId: sanitizedPdfName ? `${nodeId}_city` : `${baseQuestionName}_city` },
@@ -956,7 +998,10 @@ window.exportGuiJson = function(download = true) {
     // --- END PATCH ---
     
     // --- PATCH: Add PDF Logic detection ---
-    // Check if this question is connected to a PDF node (directly or through options)
+    // Check if this question is connected to PDF nodes (directly or through options)
+    const pdfs = [];
+    const pdfConditions = [];
+    
     if (outgoingEdges) {
       for (const edge of outgoingEdges) {
         const targetCell = edge.target;
@@ -964,27 +1009,29 @@ window.exportGuiJson = function(download = true) {
         // Check for direct connection to PDF node
         if (targetCell && isPdfNode(targetCell)) {
           // This question is directly connected to a PDF node
-          question.pdfLogic.enabled = true;
-          question.pdfLogic.pdfName = targetCell._pdfFile || targetCell._pdfUrl || "";
-          question.pdfLogic.pdfDisplayName = targetCell._pdfName || "";
-          question.pdfLogic.stripePriceId = targetCell._pdfPrice || targetCell._priceId || "";
+          const pdfEntry = {
+            pdfName: targetCell._pdfFile || targetCell._pdfUrl || "",
+            pdfDisplayName: targetCell._pdfName || "",
+            stripePriceId: targetCell._pdfPrice || targetCell._priceId || "",
+            triggerOption: "" // For direct connections
+          };
+          pdfs.push(pdfEntry);
           
           // If this is a Big Paragraph question and the PDF node has a character limit
           if (questionType === "bigParagraph" && targetCell._characterLimit) {
-            question.pdfLogic.conditions = [{
+            pdfConditions.push({
               characterLimit: parseInt(targetCell._characterLimit) || 0
-            }];
+            });
           } else {
             // For regular questions, use the same logic conditions as the question logic
             if (directParentCondition) {
               if (Array.isArray(directParentCondition)) {
-                question.pdfLogic.conditions = directParentCondition;
+                pdfConditions.push(...directParentCondition);
               } else {
-                question.pdfLogic.conditions = [directParentCondition];
+                pdfConditions.push(directParentCondition);
               }
             }
           }
-          break; // Only process the first PDF connection
         }
         
         // Check for connection through options
@@ -996,10 +1043,12 @@ window.exportGuiJson = function(download = true) {
               const pdfCell = optionEdge.target;
               if (pdfCell && isPdfNode(pdfCell)) {
                 // This question's option leads to a PDF node
-                question.pdfLogic.enabled = true;
-                question.pdfLogic.pdfName = pdfCell._pdfFile || pdfCell._pdfUrl || "";
-                question.pdfLogic.pdfDisplayName = pdfCell._pdfName || "";
-                question.pdfLogic.stripePriceId = pdfCell._pdfPrice || pdfCell._priceId || "";
+                const pdfEntry = {
+                  pdfName: pdfCell._pdfFile || pdfCell._pdfUrl || "",
+                  pdfDisplayName: pdfCell._pdfName || "",
+                  stripePriceId: pdfCell._pdfPrice || pdfCell._priceId || "",
+                  triggerOption: "" // Will be set below
+                };
                 
                 // Extract the option text
                 let optionText = targetCell.value || "";
@@ -1011,17 +1060,26 @@ window.exportGuiJson = function(download = true) {
                   optionText = optionText.trim();
                 }
                 
-                // Set the conditions based on the option
-                question.pdfLogic.conditions = [{
+                pdfEntry.triggerOption = optionText;
+                pdfs.push(pdfEntry);
+                
+                // Add condition for this option
+                pdfConditions.push({
                   prevQuestion: String(cell._questionId || ""),
                   prevAnswer: optionText
-                }];
-                break; // Only process the first PDF connection
+                });
               }
             }
           }
         }
       }
+    }
+    
+    // Set up the PDF logic structure
+    if (pdfs.length > 0) {
+      question.pdfLogic.enabled = true;
+      question.pdfLogic.conditions = pdfConditions;
+      question.pdfLogic.pdfs = pdfs;
     }
     // --- END PDF Logic PATCH ---
     
@@ -1099,6 +1157,16 @@ window.exportGuiJson = function(download = true) {
     sectionMap[section].questions.push(question);
   }
   
+  // Create a map of questions by their clean names for calculation lookups
+  const questionNameMap = new Map();
+  questions.forEach(questionCell => {
+    const cleanName = questionCell._questionText || questionCell.value || "";
+    const nodeId = sanitizeNameId((typeof window.getNodeId === 'function' ? window.getNodeId(questionCell) : '') || questionCell._nameId || questionCell._questionText || questionCell.value || "unnamed");
+    // Use the sanitized version of the clean name as the key to match calculation term processing
+    const sanitizedCleanName = sanitizeNameId(cleanName);
+    questionNameMap.set(sanitizedCleanName.toLowerCase().trim(), nodeId);
+  });
+
   // Process calculation nodes and convert them to hidden fields
   const calculationNodes = vertices.filter(cell => typeof window.isCalculationNode === 'function' && window.isCalculationNode(cell));
   for (const cell of calculationNodes) {
@@ -1117,54 +1185,53 @@ window.exportGuiJson = function(download = true) {
       calculations: []
     };
     
-    // For checkbox type, don't add calculations - just add the hidden field
-    if (cell._calcFinalOutputType === "checkbox") {
+    // Convert calculation terms to the expected format for both checkbox and text types
+    const calculation = {
+      terms: [],
+      compareOperator: cell._calcOperator || "=",
+      threshold: cell._calcThreshold || "0",
+      result: cell._calcFinalOutputType === "checkbox" ? 
+        "checked" : 
+        cell._calcFinalText || ""
+    };
+    
+    // Process each calculation term
+    for (const term of cell._calcTerms) {
+      if (term.amountLabel) {
+        // Extract the question name from the amount label
+        let cleanQuestionName = term.amountLabel;
+        
+        // If it's in the format "question_value:answer1:how_much (answer1)", extract the clean name
+        if (term.amountLabel.startsWith('question_value:')) {
+          const parts = term.amountLabel.split(':');
+          if (parts.length >= 3) {
+            // Extract the clean question name from the display part
+            // Format: "question_value:answer1:how_much (answer1)"
+            // We want "how_much" from the third part
+            const displayPart = parts[2];
+            // Remove the "(answer1)" part if it exists
+            cleanQuestionName = displayPart.replace(/\s*\([^)]*\)$/, '');
+          }
+        } else {
+          // For regular labels, use as-is
+          cleanQuestionName = term.amountLabel;
+        }
+        
+        // Look up the actual nodeId from the question name map
+        const questionNameId = questionNameMap.get(cleanQuestionName.toLowerCase().trim()) || cleanQuestionName;
+        
+        calculation.terms.push({
+          operator: term.mathOperator || "",
+          questionNameId: questionNameId
+        });
+      }
+    }
+    
+    // Only add the calculation if it has terms
+    if (calculation.terms.length > 0) {
+      hiddenField.calculations.push(calculation);
       hiddenFields.push(hiddenField);
       hiddenFieldCounter++;
-    } else {
-      // For text type, convert calculation terms to the expected format
-      const calculation = {
-        terms: [],
-        compareOperator: cell._calcOperator || "=",
-        threshold: cell._calcThreshold || "0",
-        fillValue: cell._calcFinalText || ""
-      };
-      
-      // Process each calculation term
-      for (const term of cell._calcTerms) {
-        if (term.amountLabel) {
-          // Extract the question name from the amount label
-          let questionNameId = term.amountLabel;
-          
-          // If it's in the format "question_value:answer1:how_much (answer1)", extract the clean name
-          if (term.amountLabel.startsWith('question_value:')) {
-            const parts = term.amountLabel.split(':');
-            if (parts.length >= 3) {
-              // Extract the clean question name from the display part
-              // Format: "question_value:answer1:how_much (answer1)"
-              // We want "how_much" from the third part
-              const displayPart = parts[2];
-              // Remove the "(answer1)" part if it exists
-              questionNameId = displayPart.replace(/\s*\([^)]*\)$/, '');
-            }
-          } else {
-            // For regular labels, use as-is
-            questionNameId = term.amountLabel;
-          }
-          
-          calculation.terms.push({
-            operator: term.mathOperator || "",
-            questionNameId: questionNameId
-          });
-        }
-      }
-      
-      // Only add the calculation if it has terms
-      if (calculation.terms.length > 0) {
-        hiddenField.calculations.push(calculation);
-        hiddenFields.push(hiddenField);
-        hiddenFieldCounter++;
-      }
     }
   }
   
@@ -1204,6 +1271,48 @@ window.exportGuiJson = function(download = true) {
   // Get form name
   const formName = document.getElementById('formNameInput')?.value || 'Example Form';
   
+  // Process Linked Logic nodes for linkedFields
+  const linkedFields = [];
+  const linkedLogicNodes = vertices.filter(cell => 
+    typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)
+  );
+  
+  console.log('🔍 [GUI JSON DEBUG] Found linked logic nodes:', linkedLogicNodes.length);
+  
+  linkedLogicNodes.forEach((cell, index) => {
+    console.log(`🔍 [GUI JSON DEBUG] Linked Logic node ${index}:`, {
+      cellId: cell.id,
+      _linkedLogicNodeId: cell._linkedLogicNodeId,
+      _linkedFields: cell._linkedFields,
+      hasNodeId: !!cell._linkedLogicNodeId,
+      hasFields: !!(cell._linkedFields && cell._linkedFields.length > 0)
+    });
+    
+    if (cell._linkedLogicNodeId && cell._linkedFields && cell._linkedFields.length > 0) {
+      // Process linked fields to convert spaces to underscores while preserving PDF prefix
+      const processedFields = cell._linkedFields.map(field => {
+        // Convert all spaces to underscores in the field name
+        return field.replace(/\s+/g, '_');
+      });
+      
+      const linkedFieldEntry = {
+        id: `linkedField${index}`,
+        linkedFieldId: cell._linkedLogicNodeId,
+        fields: processedFields
+      };
+      
+      console.log('✅ [GUI JSON DEBUG] Adding linked field entry:', linkedFieldEntry);
+      linkedFields.push(linkedFieldEntry);
+    } else {
+      console.log('⚠️ [GUI JSON DEBUG] Skipping linked logic node due to missing data:', {
+        hasNodeId: !!cell._linkedLogicNodeId,
+        hasFields: !!(cell._linkedFields && cell._linkedFields.length > 0)
+      });
+    }
+  });
+  
+  console.log('🔍 [GUI JSON DEBUG] Final linkedFields array:', linkedFields);
+  
   // Create final output object
   const output = {
     sections: sections,
@@ -1218,7 +1327,8 @@ window.exportGuiJson = function(download = true) {
     pdfOutputName: defaultPdfProps.pdfFile || "",
     stripePriceId: defaultPdfProps.pdfPrice || "",
     additionalPDFs: [],
-    checklistItems: []
+    checklistItems: [],
+    linkedFields: linkedFields
   };
   
   // Convert to string and download
@@ -1311,6 +1421,11 @@ window.exportBothJson = function() {
       if (cell._pdfName !== undefined) cellData._pdfName = cell._pdfName;
       if (cell._pdfFile !== undefined) cellData._pdfFile = cell._pdfFile;
       if (cell._pdfPrice !== undefined) cellData._pdfPrice = cell._pdfPrice;
+      if (cell._pdfLogicEnabled !== undefined) cellData._pdfLogicEnabled = cell._pdfLogicEnabled;
+      if (cell._pdfTriggerLimit !== undefined) cellData._pdfTriggerLimit = cell._pdfTriggerLimit;
+      if (cell._bigParagraphPdfName !== undefined) cellData._bigParagraphPdfName = cell._bigParagraphPdfName;
+      if (cell._bigParagraphPdfFile !== undefined) cellData._bigParagraphPdfFile = cell._bigParagraphPdfFile;
+      if (cell._bigParagraphPdfPrice !== undefined) cellData._bigParagraphPdfPrice = cell._bigParagraphPdfPrice;
       
       // calculation node properties
       if (cell._calcTitle !== undefined) cellData._calcTitle = cell._calcTitle;
@@ -1337,6 +1452,20 @@ window.exportBothJson = function() {
       // Hidden node properties
       if (cell._hiddenNodeId !== undefined) cellData._hiddenNodeId = cell._hiddenNodeId;
       if (cell._defaultText !== undefined) cellData._defaultText = cell._defaultText;
+      
+      // Linked logic node properties
+      if (cell._linkedLogicNodeId !== undefined) {
+        cellData._linkedLogicNodeId = cell._linkedLogicNodeId;
+        console.log('💾 [LIBRARY SAVE] Saving _linkedLogicNodeId:', cell._linkedLogicNodeId, 'for cell:', cell.id);
+      } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+        console.log('⚠️ [LIBRARY SAVE] Linked Logic node found but _linkedLogicNodeId is undefined for cell:', cell.id);
+      }
+      if (cell._linkedFields !== undefined) {
+        cellData._linkedFields = cell._linkedFields;
+        console.log('💾 [LIBRARY SAVE] Saving _linkedFields:', cell._linkedFields, 'for cell:', cell.id);
+      } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+        console.log('⚠️ [LIBRARY SAVE] Linked Logic node found but _linkedFields is undefined for cell:', cell.id);
+      }
       
       // mult dropdown location indicator
       if (cell._locationIndex !== undefined) cellData._locationIndex = cell._locationIndex;
@@ -1397,10 +1526,22 @@ window.fixCapitalizationInJumps();
 
 // Save flowchart to Firebase
 window.saveFlowchart = function() {
+  console.log('💾 [LIBRARY SAVE] saveFlowchart function called');
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to save flowcharts. Guest users cannot save."); return;}  
   
   // Automatically reset PDF inheritance and Node IDs before saving
   // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
+  
+  // Check Linked Logic properties BEFORE reset
+  const graph = window.graph;
+  const parent = graph.getDefaultParent();
+  const allCells = graph.getChildVertices(parent);
+  allCells.forEach(cell => {
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      console.log('🔍 [BEFORE RESET] Linked Logic node cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+    }
+  });
+  
   // Reset PDF inheritance for all nodes FIRST
   if (typeof window.resetAllPdfInheritance === 'function') {
     window.resetAllPdfInheritance();
@@ -1410,6 +1551,13 @@ window.saveFlowchart = function() {
   if (typeof resetAllNodeIds === 'function') {
     resetAllNodeIds();
   }
+  
+  // Check Linked Logic properties AFTER reset
+  allCells.forEach(cell => {
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      console.log('🔍 [AFTER RESET] Linked Logic node cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+    }
+  });
   
   renumberQuestionIds();
   let flowchartName = currentFlowchartName;
@@ -1421,10 +1569,11 @@ window.saveFlowchart = function() {
     if (formName) {
       flowchartName = formName;
     } else {
-      flowchartName = prompt("Enter a name for this flowchart:");
-      if (!flowchartName || !flowchartName.trim()) return;
+    flowchartName = prompt("Enter a name for this flowchart:");
+    if (!flowchartName || !flowchartName.trim()) return;
     }
     currentFlowchartName = flowchartName;
+    window.currentFlowchartName = flowchartName;
   }
   // Gather data and save
   const data = { cells: [] };
@@ -1458,12 +1607,18 @@ window.saveFlowchart = function() {
       _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
       _image: cell._image||null,
       _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
-      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null,
+      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null, _pdfLogicEnabled: cell._pdfLogicEnabled||null, _pdfTriggerLimit: cell._pdfTriggerLimit||null, _bigParagraphPdfName: cell._bigParagraphPdfName||null, _bigParagraphPdfFile: cell._bigParagraphPdfFile||null, _bigParagraphPdfPrice: cell._bigParagraphPdfPrice||null,
       _checkboxAvailability: cell._checkboxAvailability||null,
       _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
       _locationIndex: cell._locationIndex||null,
-      _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null
+      _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
+      _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null
     };
+    
+    // Debug logging for Linked Logic properties
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      console.log('💾 [LIBRARY SAVE] Saving Linked Logic properties for cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+    }
     if (isCalculationNode(cell)) {
       cellData._calcTitle = cell._calcTitle || null;
       cellData._calcAmountLabel = cell._calcAmountLabel || null;
@@ -1493,7 +1648,145 @@ window.saveFlowchart = function() {
     flowchart: data,
     lastUsed: Date.now()
   })
-    .then(()=>alert("Flowchart saved as: " + flowchartName))
+    .then(()=>{
+      alert("Flowchart saved as: " + flowchartName);
+      // Trigger autosave to update the library flowchart name
+      if (typeof autosaveFlowchartToLocalStorage === 'function') {
+        autosaveFlowchartToLocalStorage();
+      }
+    })
+    .catch(err=>alert("Error saving: " + err));
+};
+
+// Save flowchart as a new flowchart (Save As functionality)
+window.saveAsFlowchart = function() {
+  console.log('💾 [LIBRARY SAVE AS] saveAsFlowchart function called');
+  if (!window.currentUser || window.currentUser.isGuest) { 
+    alert("Please log in with a real account to save flowcharts. Guest users cannot save."); 
+    return;
+  }  
+  
+  // Automatically reset PDF inheritance and Node IDs before saving
+  // CORRECT ORDER: PDF inheritance first, then Node IDs (so Node IDs can use correct PDF names)
+  
+  // Check Linked Logic properties BEFORE reset
+  const graph = window.graph;
+  const parent = graph.getDefaultParent();
+  const allCells = graph.getChildVertices(parent);
+  allCells.forEach(cell => {
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      console.log('🔍 [BEFORE RESET] Linked Logic node cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+    }
+  });
+  
+  // Reset PDF inheritance for all nodes FIRST
+  if (typeof window.resetAllPdfInheritance === 'function') {
+    window.resetAllPdfInheritance();
+  }
+  
+  // Reset all Node IDs SECOND (after PDF inheritance is fixed)
+  if (typeof resetAllNodeIds === 'function') {
+    resetAllNodeIds();
+  }
+  
+  // Check Linked Logic properties AFTER reset
+  allCells.forEach(cell => {
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      console.log('🔍 [AFTER RESET] Linked Logic node cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+    }
+  });
+  
+  renumberQuestionIds();
+  
+  // Always prompt for a new name for "Save As"
+  let flowchartName = prompt("Enter a name for this new flowchart:");
+  if (!flowchartName || !flowchartName.trim()) return;
+  
+  // Update the current flowchart name to the new name
+  currentFlowchartName = flowchartName;
+  window.currentFlowchartName = flowchartName;
+  
+  // Gather data and save (same logic as saveFlowchart)
+  const data = { cells: [] };
+  const cells = graph.getModel().cells;
+  for (let id in cells) {
+    if (id === "0" || id === "1") continue;
+    const cell = cells[id];
+    const cellData = {
+      id: cell.id, 
+      value: cell.value || "",
+      geometry: cell.geometry ? { 
+        x: cell.geometry.x, 
+        y: cell.geometry.y, 
+        width: cell.geometry.width, 
+        height: cell.geometry.height 
+      } : null,
+      style: cleanStyle(cell.style || ""),
+      vertex: !!cell.vertex, 
+      edge: !!cell.edge,
+      source: cell.edge ? (cell.source? cell.source.id:null) : null,
+      target: cell.edge ? (cell.target? cell.target.id:null) : null,
+      // Save edge geometry (articulation points) if it exists
+      edgeGeometry: cell.edge && cell.geometry && cell.geometry.points && cell.geometry.points.length > 0 ? {
+        points: cell.geometry.points.map(point => ({
+          x: point.x,
+          y: point.y
+        }))
+      } : null,
+      _textboxes: cell._textboxes||null, _questionText: cell._questionText||null,
+      _twoNumbers: cell._twoNumbers||null, _nameId: cell._nameId||null,
+      _placeholder: cell._placeholder||"", _questionId: cell._questionId||null,
+      _image: cell._image||null,
+      _notesText: cell._notesText||null, _notesBold: cell._notesBold||null, _notesFontSize: cell._notesFontSize||null,
+      _checklistText: cell._checklistText||null, _alertText: cell._alertText||null, _pdfName: cell._pdfName||null, _pdfFile: cell._pdfFile||null, _pdfPrice: cell._pdfPrice||null, _pdfUrl: cell._pdfUrl||null, _priceId: cell._priceId||null, _pdfLogicEnabled: cell._pdfLogicEnabled||null, _pdfTriggerLimit: cell._pdfTriggerLimit||null, _bigParagraphPdfName: cell._bigParagraphPdfName||null, _bigParagraphPdfFile: cell._bigParagraphPdfFile||null, _bigParagraphPdfPrice: cell._bigParagraphPdfPrice||null,
+      _checkboxAvailability: cell._checkboxAvailability||null,
+      _lineLimit: cell._lineLimit||null, _characterLimit: cell._characterLimit||null, _paragraphLimit: cell._paragraphLimit||null,
+      _locationIndex: cell._locationIndex||null,
+      _hiddenNodeId: cell._hiddenNodeId||null, _defaultText: cell._defaultText||null,
+      _linkedLogicNodeId: cell._linkedLogicNodeId||null, _linkedFields: cell._linkedFields||null
+    };
+    
+    // Debug logging for Linked Logic properties
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      console.log('💾 [LIBRARY SAVE AS] Saving Linked Logic properties for cell:', cell.id, '_linkedLogicNodeId:', cell._linkedLogicNodeId, '_linkedFields:', cell._linkedFields);
+    }
+    if (isCalculationNode(cell)) {
+      cellData._calcTitle = cell._calcTitle || null;
+      cellData._calcAmountLabel = cell._calcAmountLabel || null;
+      cellData._calcOperator = cell._calcOperator || null;
+      cellData._calcThreshold = cell._calcThreshold || null;
+      cellData._calcFinalText = cell._calcFinalText || null;
+      cellData._calcTerms = cell._calcTerms || null;
+      cellData._calcFinalOutputType = cell._calcFinalOutputType || null;
+      cellData._calcFinalCheckboxChecked = cell._calcFinalCheckboxChecked || null;
+    }
+    data.cells.push(cellData);
+  }
+  // Get current section preferences using the proper function
+  const currentSectionPrefs = window.getSectionPrefs ? window.getSectionPrefs() : (window.flowchartConfig?.sectionPrefs || window.sectionPrefs || {});
+  data.sectionPrefs = currentSectionPrefs;
+  data.groups = getGroupsData();
+  
+  // Get default PDF properties
+  const defaultPdfProps = typeof window.getDefaultPdfProperties === 'function' ? 
+    window.getDefaultPdfProperties() : { pdfName: "", pdfFile: "", pdfPrice: "" };
+  data.defaultPdfProperties = defaultPdfProps;
+  
+  // Get form name
+  const formName = document.getElementById('formNameInput')?.value || '';
+  data.formName = formName;
+  
+  db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(flowchartName).set({ 
+    flowchart: data,
+    lastUsed: Date.now()
+  })
+    .then(()=>{
+      alert("Flowchart saved as: " + flowchartName);
+      // Trigger autosave to update the library flowchart name
+      if (typeof autosaveFlowchartToLocalStorage === 'function') {
+        autosaveFlowchartToLocalStorage();
+      }
+    })
     .catch(err=>alert("Error saving: " + err));
 };
 
@@ -1571,6 +1864,7 @@ window.openSavedFlowchart = function(name) {
       
       console.log('📚 [LIBRARY LOAD] Flowchart data retrieved, calling loadFlowchartData');
       currentFlowchartName = name;
+      window.currentFlowchartName = name;
       loadFlowchartData(docSnap.data().flowchart, name);
       
       // Update last used timestamp
@@ -1592,7 +1886,19 @@ window.renameFlowchart = function(oldName, element) {
   docRef.get().then(docSnap=>{
     if (docSnap.exists) {
       db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(newName).set(docSnap.data())
-        .then(()=>{ docRef.delete(); element.textContent=newName; if(currentFlowchartName===oldName) currentFlowchartName=newName; alert("Renamed to: " + newName); })
+        .then(()=>{ 
+          docRef.delete(); 
+          element.textContent=newName; 
+          if(currentFlowchartName===oldName) {
+            currentFlowchartName=newName;
+            window.currentFlowchartName=newName;
+          } 
+          alert("Renamed to: " + newName);
+          // Trigger autosave to update the library flowchart name
+          if (typeof autosaveFlowchartToLocalStorage === 'function') {
+            autosaveFlowchartToLocalStorage();
+          }
+        })
         .catch(err=>alert("Error renaming: " + err));
     }
   });
@@ -1602,7 +1908,10 @@ window.deleteSavedFlowchart = function(name) {
   if (!window.currentUser || window.currentUser.isGuest) { alert("Please log in with a real account to delete flowcharts. Guest users cannot delete."); return; }
   if (!confirm("Delete '"+name+"'?")) return;
   db.collection("users").doc(window.currentUser.uid).collection("flowcharts").doc(name).delete()
-    .then(()=>{ alert("Deleted: " + name); if(currentFlowchartName===name) currentFlowchartName=null; window.viewSavedFlowcharts(); })
+    .then(()=>{ alert("Deleted: " + name); if(currentFlowchartName===name) {
+      currentFlowchartName=null;
+      window.currentFlowchartName=null;
+    } window.viewSavedFlowcharts(); })
     .catch(err=>alert("Error deleting: " + err));
 };
 
@@ -2103,6 +2412,9 @@ window.resetAllPdfInheritance = function() {
     if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
       return; // Skip hidden textbox nodes
     }
+    if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+      return; // Skip linked logic nodes
+    }
     
     // Check if this cell has PDF inheritance
     const currentPdfName = window.getPdfNameForNode(cell);
@@ -2284,22 +2596,18 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
     const createdCells = {};
 
     if (data.sectionPrefs) {
-      console.log('🔍 [SECTION LOAD DEBUG] Loading section preferences:', JSON.stringify(data.sectionPrefs, null, 2));
       
       // Update section preferences through the proper accessor
       
       if (window.flowchartConfig && window.flowchartConfig.sectionPrefs) {
         window.flowchartConfig.sectionPrefs = data.sectionPrefs;
-        console.log('🔍 [SECTION LOAD DEBUG] Set window.flowchartConfig.sectionPrefs');
       } else {
         window.sectionPrefs = data.sectionPrefs;
-        console.log('🔍 [SECTION LOAD DEBUG] Set window.sectionPrefs');
       }
       
       // Test the getSectionPrefs function immediately after setting
       if (typeof getSectionPrefs === 'function') {
         const testResult = getSectionPrefs();
-        console.log('🔍 [SECTION LOAD DEBUG] getSectionPrefs() result:', JSON.stringify(testResult, null, 2));
       }
       
       // Add a watcher to detect if section preferences are modified after this point
@@ -2313,7 +2621,6 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
         const currentSectionPrefs = window.flowchartConfig?.sectionPrefs || window.sectionPrefs;
         
         if (typeof updateSectionLegend === 'function') {
-          console.log('🔍 [SECTION LOAD DEBUG] Calling updateSectionLegend()');
           updateSectionLegend();
         } else {
           console.error('❌ [SECTION IMPORT DEBUG] updateSectionLegend function not available!');
@@ -2372,6 +2679,21 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
       }
     }, 100);
 
+    // Convert text2 nodes to dropdown nodes before processing
+    let text2ConversionCount = 0;
+    data.cells.forEach(item => {
+      if (item.vertex && item.style && item.style.includes('questionType=text2')) {
+        // Replace text2 with dropdown in the style
+        item.style = item.style.replace(/questionType=text2/g, 'questionType=dropdown');
+        text2ConversionCount++;
+      }
+    });
+    
+    // Show conversion alert if any text2 nodes were converted
+    if (text2ConversionCount > 0) {
+      alert(`${text2ConversionCount} text2 nodes converted into dropdowns`);
+    }
+
     // First pass: Create all cells
     data.cells.forEach(item => {
       if (item.vertex) {
@@ -2425,6 +2747,13 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
         // Legacy PDF properties for backward compatibility
         if (item._pdfUrl !== undefined) newCell._pdfUrl = item._pdfUrl;
         if (item._priceId !== undefined) newCell._priceId = item._priceId;
+        
+        // Big Paragraph PDF Logic properties
+        if (item._pdfLogicEnabled !== undefined) newCell._pdfLogicEnabled = item._pdfLogicEnabled;
+        if (item._pdfTriggerLimit !== undefined) newCell._pdfTriggerLimit = item._pdfTriggerLimit;
+        if (item._bigParagraphPdfName !== undefined) newCell._bigParagraphPdfName = item._bigParagraphPdfName;
+        if (item._bigParagraphPdfFile !== undefined) newCell._bigParagraphPdfFile = item._bigParagraphPdfFile;
+        if (item._bigParagraphPdfPrice !== undefined) newCell._bigParagraphPdfPrice = item._bigParagraphPdfPrice;
         if (item._characterLimit !== undefined) newCell._characterLimit = item._characterLimit;
         
         // Notes node properties
@@ -2472,9 +2801,15 @@ window.loadFlowchartData = function(data, libraryFlowchartName) {
             defaultText = tempDiv.textContent || tempDiv.innerText || defaultText;
           }
           newCell._defaultText = defaultText;
-          console.log('🔍 [LOAD DEBUG] Loaded _defaultText for cell:', item.id, 'value:', defaultText);
         } else {
-          console.log('🔍 [LOAD DEBUG] No _defaultText found for cell:', item.id);
+        }
+        
+        // Linked logic node properties
+        if (item._linkedLogicNodeId !== undefined) {
+          newCell._linkedLogicNodeId = item._linkedLogicNodeId;
+        }
+        if (item._linkedFields !== undefined) {
+          newCell._linkedFields = item._linkedFields;
         }
         
         // Calculation properties

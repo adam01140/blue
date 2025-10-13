@@ -342,6 +342,17 @@ function setupCustomDoubleClickBehavior(graph) {
           return;
         }
         
+        // Show properties popup for linked logic nodes
+        if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+          console.log("🎯 Linked logic node detected, showing properties popup");
+          if (typeof window.showPropertiesPopup === 'function') {
+            window.showPropertiesPopup(cell);
+          }
+          return;
+        }
+        
+        // For all other nodes, do nothing on double-click
+        
         // Reset the tracking
         lastClickTime = 0;
         lastClickedCell = null;
@@ -355,6 +366,52 @@ function setupCustomDoubleClickBehavior(graph) {
   
   // Double-click behavior is now handled in events.js module
   
+}
+
+/**
+ * Zoom into a specific node
+ */
+function zoomIntoNode(cell) {
+  if (!cell || !cell.geometry) {
+    console.warn('Cannot zoom: cell or geometry not available');
+    return;
+  }
+  
+  const graph = window.graph;
+  if (!graph) {
+    console.warn('Cannot zoom: graph not available');
+    return;
+  }
+  
+  // Get the cell's center position
+  const cellX = cell.geometry.x + (cell.geometry.width / 2);
+  const cellY = cell.geometry.y + (cell.geometry.height / 2);
+  
+  // Set a zoom level that makes the node clearly visible
+  const targetScale = 1.5; // Zoom to 150%
+  
+  // Get current view state
+  const currentScale = graph.view.scale;
+  const currentTranslate = graph.view.translate;
+  
+  // Calculate the new translation to center the node
+  const container = graph.container;
+  const containerRect = container.getBoundingClientRect();
+  const containerCenterX = containerRect.width / 2;
+  const containerCenterY = containerRect.height / 2;
+  
+  // Calculate where the cell center should be in screen coordinates
+  const newTranslateX = (containerCenterX / targetScale) - cellX;
+  const newTranslateY = (containerCenterY / targetScale) - cellY;
+  
+  // Apply the zoom and translation
+  graph.view.setScale(targetScale);
+  graph.view.setTranslate(newTranslateX, newTranslateY);
+  
+  // Refresh the graph to show the changes
+  graph.view.refresh();
+  
+  console.log(`🔍 [ZOOM] Zoomed into node at (${cellX}, ${cellY}) with scale ${targetScale}`);
 }
 
 /**
@@ -424,6 +481,8 @@ function showPropertiesPopup(cell) {
     title.textContent = 'Hidden Checkbox Properties';
   } else if (typeof window.isHiddenTextbox === 'function' && window.isHiddenTextbox(cell)) {
     title.textContent = 'Hidden Textbox Properties';
+  } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+    title.textContent = 'Linked Logic Properties';
   } else {
     title.textContent = 'Node Properties';
   }
@@ -749,6 +808,15 @@ function showPropertiesPopup(cell) {
       { label: 'Node ID', value: cell._hiddenNodeId || 'hidden_textbox', id: 'propHiddenNodeId', editable: true },
       { label: 'Default Text', value: cell._defaultText || '', id: 'propDefaultText', editable: true }
     ];
+  } else if (typeof window.isLinkedLogicNode === 'function' && window.isLinkedLogicNode(cell)) {
+    // For linked logic nodes, show special properties with dropdowns
+    console.log('🔍 [PROPERTIES] Loading Linked Logic properties for cell:', cell.id);
+    console.log('🔍 [PROPERTIES] _linkedLogicNodeId:', cell._linkedLogicNodeId);
+    console.log('🔍 [PROPERTIES] _linkedFields:', cell._linkedFields);
+    properties = [
+      { label: 'Node ID', value: cell._linkedLogicNodeId || 'linked_logic', id: 'propLinkedLogicNodeId', editable: true },
+      { label: 'Linked Fields', value: 'linkedFields', id: 'propLinkedFields', editable: false, special: 'linkedFields' }
+    ];
   } else {
     // For all other nodes, show the standard properties
     properties = [
@@ -826,6 +894,116 @@ function showPropertiesPopup(cell) {
       editable: true,
       inputType: 'number'
     });
+    
+    // Add Copy ID button for Big Paragraph nodes
+    properties.push({
+      label: '',
+      value: '',
+      id: 'propCopyId',
+      editable: false,
+      isButton: true,
+      buttonText: 'Copy ID',
+      buttonAction: () => {
+        const nodeId = cell._nodeId || cell.id || 'node';
+        const copyText = `${nodeId}_overlimit`;
+        navigator.clipboard.writeText(copyText).then(() => {
+          // Show a brief success message
+          const button = document.getElementById('propCopyId');
+          if (button) {
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            button.style.backgroundColor = '#4CAF50';
+            setTimeout(() => {
+              button.textContent = originalText;
+              button.style.backgroundColor = '#1976d2';
+            }, 1000);
+          }
+        }).catch(err => {
+          console.error('Failed to copy text: ', err);
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = copyText;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+        });
+      }
+    });
+    
+    // Add Enable PDF Logic button for Big Paragraph nodes
+    properties.push({
+      label: '',
+      value: '',
+      id: 'propEnablePdfLogic',
+      editable: false,
+      isButton: true,
+      buttonText: 'Enable PDF Logic',
+      buttonAction: () => {
+        // Toggle PDF Logic enabled state
+        cell._pdfLogicEnabled = !cell._pdfLogicEnabled;
+        // Close the current popup and reopen it to refresh the fields
+        window.__propertiesPopupOpen = false;
+        setTimeout(() => {
+          window.showPropertiesPopup(cell);
+        }, 100);
+      }
+    });
+    
+    // Add PDF Logic fields (only shown when enabled)
+    if (cell._pdfLogicEnabled) {
+      // Debug logging for PDF Logic values
+      console.log('🔍 [PDF LOGIC LOAD] Loading PDF Logic values:');
+      console.log('cell._pdfTriggerLimit:', cell._pdfTriggerLimit);
+      console.log('cell._bigParagraphPdfName:', cell._bigParagraphPdfName);
+      console.log('cell._bigParagraphPdfFile:', cell._bigParagraphPdfFile);
+      console.log('cell._bigParagraphPdfPrice:', cell._bigParagraphPdfPrice);
+      
+      properties.push({
+        label: 'PDF Trigger Limit',
+        value: cell._pdfTriggerLimit || '',
+        id: 'propPdfTriggerLimit',
+        editable: true,
+        inputType: 'number'
+      });
+      
+      properties.push({
+        label: 'PDF Name',
+        value: cell._bigParagraphPdfName || '',
+        id: 'propBigParagraphPdfName',
+        editable: true,
+        inputType: 'text'
+      });
+      
+      properties.push({
+        label: 'PDF Filename',
+        value: cell._bigParagraphPdfFile || '',
+        id: 'propBigParagraphPdfFile',
+        editable: true,
+        inputType: 'text'
+      });
+      
+      properties.push({
+        label: 'PDF Price',
+        value: cell._bigParagraphPdfPrice || '',
+        id: 'propBigParagraphPdfPrice',
+        editable: true,
+        inputType: 'text'
+      });
+      
+      // Add Save button for PDF Logic
+      properties.push({
+        label: '',
+        value: '',
+        id: 'propSavePdfLogic',
+        editable: false,
+        isButton: true,
+        buttonText: 'Save PDF Logic',
+        buttonAction: () => {
+          window.saveBigParagraphPdfLogic(cell);
+        }
+      });
+    }
   }
   
   // PDF Name field will be added later in the unified section
@@ -966,6 +1144,436 @@ function showPropertiesPopup(cell) {
   
   
   properties.forEach((prop, index) => {
+    // Special handling for linked logic fields
+    if (prop.special === 'linkedFields') {
+      const fieldDiv = document.createElement('div');
+      fieldDiv.style.cssText = `
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+      `;
+      
+      const label = document.createElement('label');
+      label.textContent = prop.label ? prop.label + (prop.isInherited ? ' (inherited):' : ':') : '';
+      label.style.cssText = `
+        font-weight: 600;
+        color: #333;
+        min-width: 120px;
+        margin-right: 12px;
+        ${prop.isInherited ? 'color: #4caf50;' : ''}
+      `;
+      
+      const linkedFieldsContainer = document.createElement('div');
+      linkedFieldsContainer.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      `;
+      
+      // Create initial dropdowns (minimum 2)
+      const linkedFields = cell._linkedFields || [];
+      const minDropdowns = Math.max(2, linkedFields.length);
+      
+      for (let i = 0; i < minDropdowns; i++) {
+        const dropdownContainer = document.createElement('div');
+        dropdownContainer.style.cssText = `
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 8px;
+        `;
+        
+        // Create search bar
+        const searchBar = document.createElement('input');
+        searchBar.type = 'text';
+        searchBar.placeholder = 'Search for a field...';
+        searchBar.style.cssText = `
+          width: 100%;
+          padding: 6px 8px;
+          margin-bottom: 4px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 12px;
+          background-color: #f9f9f9;
+        `;
+        
+        const controlsContainer = document.createElement('div');
+        controlsContainer.style.cssText = `
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        `;
+        
+        // Create custom dropdown container
+        const newDropdownContainer = document.createElement('div');
+        newDropdownContainer.style.cssText = `
+          flex: 1;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+        `;
+        
+        // Create the visible dropdown display
+        const dropdownDisplay = document.createElement('div');
+        dropdownDisplay.style.cssText = `
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 14px;
+          background-color: white;
+          cursor: pointer;
+          min-height: 20px;
+          display: flex;
+          align-items: center;
+        `;
+        dropdownDisplay.textContent = 'Select a textbox question...';
+        
+        // Create the options container (initially hidden)
+        const optionsContainer = document.createElement('div');
+        optionsContainer.style.cssText = `
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: white;
+          border: 1px solid #ddd;
+          border-top: none;
+          border-radius: 0 0 4px 4px;
+          max-height: 200px;
+          overflow-y: auto;
+          z-index: 1000;
+          display: none;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        `;
+        
+        // Create hidden select for form compatibility
+        const hiddenSelect = document.createElement('select');
+        hiddenSelect.style.display = 'none';
+        
+        // Populate options
+        populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell);
+        
+        // Set selected value if it exists
+        if (linkedFields[i]) {
+          const selectedOption = optionsContainer.querySelector(`[data-value="${linkedFields[i]}"]`);
+          if (selectedOption) {
+            dropdownDisplay.textContent = selectedOption.textContent;
+            hiddenSelect.value = linkedFields[i];
+          }
+        }
+        
+        dropdownContainer.appendChild(dropdownDisplay);
+        dropdownContainer.appendChild(hiddenSelect);
+        
+        // Setup search functionality
+        setupLinkedLogicCustomSearch(optionsContainer, hiddenSelect, dropdownDisplay, searchBar);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.style.cssText = `
+          padding: 4px 8px;
+          background-color: #f44336;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 12px;
+        `;
+        deleteBtn.onclick = () => {
+          mainContainer.remove();
+          updateLinkedFields(cell);
+        };
+        
+        // Create the main container for this dropdown
+        const mainContainer = document.createElement('div');
+        mainContainer.setAttribute('data-dropdown-container', 'true');
+        mainContainer.style.cssText = `
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 8px;
+          position: relative;
+        `;
+        
+        // Add search bar to main container
+        mainContainer.appendChild(searchBar);
+        
+        // Add options container to main container (positioned relative to search bar)
+        mainContainer.appendChild(optionsContainer);
+        
+        // Add dropdown and delete button to controls container
+        controlsContainer.appendChild(dropdownContainer);
+        controlsContainer.appendChild(deleteBtn);
+        
+        // Add controls container to main container
+        mainContainer.appendChild(controlsContainer);
+        
+        // Add main container to linked fields container
+        linkedFieldsContainer.appendChild(mainContainer);
+      }
+      
+      // Add "Link Another" button
+      const linkAnotherBtn = document.createElement('button');
+      linkAnotherBtn.textContent = 'Link Another';
+      linkAnotherBtn.style.cssText = `
+        padding: 8px 16px;
+        background-color: #2196f3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 8px;
+      `;
+      linkAnotherBtn.onclick = () => {
+        const linkDropdownContainer = document.createElement('div');
+        linkDropdownContainer.style.cssText = `
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 8px;
+        `;
+        
+        // Create search bar
+        const searchBar = document.createElement('input');
+        searchBar.type = 'text';
+        searchBar.placeholder = 'Search for a field...';
+        searchBar.style.cssText = `
+          width: 100%;
+          padding: 6px 8px;
+          margin-bottom: 4px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 12px;
+          background-color: #f9f9f9;
+        `;
+        
+        const controlsContainer = document.createElement('div');
+        controlsContainer.style.cssText = `
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        `;
+        
+        // Create custom dropdown container
+        const linkNewDropdownContainer = document.createElement('div');
+        linkNewDropdownContainer.style.cssText = `
+          flex: 1;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+        `;
+        
+        // Create the visible dropdown display
+        const dropdownDisplay = document.createElement('div');
+        dropdownDisplay.style.cssText = `
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 14px;
+          background-color: white;
+          cursor: pointer;
+          min-height: 20px;
+          display: flex;
+          align-items: center;
+        `;
+        dropdownDisplay.textContent = 'Select a textbox question...';
+        
+        // Create the options container (initially hidden)
+        const optionsContainer = document.createElement('div');
+        optionsContainer.style.cssText = `
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: white;
+          border: 1px solid #ddd;
+          border-top: none;
+          border-radius: 0 0 4px 4px;
+          max-height: 200px;
+          overflow-y: auto;
+          z-index: 1000;
+          display: none;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        `;
+        
+        // Create hidden select for form compatibility
+        const hiddenSelect = document.createElement('select');
+        hiddenSelect.style.display = 'none';
+        
+        // Populate options
+        populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell);
+        
+        linkNewDropdownContainer.appendChild(dropdownDisplay);
+        linkNewDropdownContainer.appendChild(hiddenSelect);
+        
+        // Setup search functionality
+        setupLinkedLogicCustomSearch(optionsContainer, hiddenSelect, dropdownDisplay, searchBar);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.style.cssText = `
+          padding: 4px 8px;
+          background-color: #f44336;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 12px;
+        `;
+        deleteBtn.onclick = () => {
+          linkMainContainer.remove();
+          updateLinkedFields(cell);
+        };
+        
+        // Create the main container for this dropdown
+        const linkMainContainer = document.createElement('div');
+        linkMainContainer.setAttribute('data-dropdown-container', 'true');
+        linkMainContainer.style.cssText = `
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 8px;
+          position: relative;
+        `;
+        
+        // Add search bar to main container
+        linkMainContainer.appendChild(searchBar);
+        
+        // Add options container to main container (positioned relative to search bar)
+        linkMainContainer.appendChild(optionsContainer);
+        
+        // Add dropdown and delete button to controls container
+        controlsContainer.appendChild(linkNewDropdownContainer);
+        controlsContainer.appendChild(deleteBtn);
+        
+        // Add controls container to main container
+        linkMainContainer.appendChild(controlsContainer);
+        
+        // Add main container to linked fields container
+        linkedFieldsContainer.insertBefore(linkMainContainer, linkAnotherBtn);
+        updateLinkedFields(cell);
+      };
+      
+      linkedFieldsContainer.appendChild(linkAnotherBtn);
+      
+      // Add Save button
+      const saveBtn = document.createElement('button');
+      saveBtn.textContent = 'Save';
+      saveBtn.style.cssText = `
+        padding: 8px 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 8px;
+        width: 100%;
+      `;
+      
+      saveBtn.onclick = () => {
+        // Collect all current linked field values
+        const newLinkedFields = [];
+        const dropdownContainers = linkedFieldsContainer.querySelectorAll('[data-dropdown-container]');
+        
+        console.log('🔍 [SAVE DEBUG] Found dropdown containers:', dropdownContainers.length);
+        
+        dropdownContainers.forEach((container, index) => {
+          // Try multiple selectors to find the hidden select
+          let hiddenSelect = container.querySelector('select[style*="display: none"]');
+          if (!hiddenSelect) {
+            hiddenSelect = container.querySelector('select[style*="display:none"]');
+          }
+          if (!hiddenSelect) {
+            // Fallback: find any select element in the container
+            hiddenSelect = container.querySelector('select');
+          }
+          
+          console.log(`🔍 [SAVE DEBUG] Container ${index}:`, {
+            hasHiddenSelect: !!hiddenSelect,
+            selectValue: hiddenSelect ? hiddenSelect.value : 'none',
+            selectStyle: hiddenSelect ? hiddenSelect.style.display : 'none'
+          });
+          
+          if (hiddenSelect && hiddenSelect.value) {
+            newLinkedFields.push(hiddenSelect.value);
+          }
+        });
+        
+        // Update the cell's linked fields
+        cell._linkedFields = newLinkedFields;
+        
+        // Update the cell's linked logic node ID
+        const nodeIdElement = document.getElementById('propLinkedLogicNodeId');
+        console.log('🔍 [SAVE DEBUG] Node ID element:', nodeIdElement);
+        if (nodeIdElement) {
+          // Check if it's an input element or a span element
+          let nodeIdValue;
+          if (nodeIdElement.tagName === 'INPUT') {
+            nodeIdValue = nodeIdElement.value;
+          } else {
+            // It's a span element, get the text content
+            nodeIdValue = nodeIdElement.textContent || nodeIdElement.innerText;
+          }
+          console.log('🔍 [SAVE DEBUG] Node ID value:', nodeIdValue);
+          cell._linkedLogicNodeId = nodeIdValue;
+        } else {
+          console.log('⚠️ [SAVE DEBUG] Node ID element not found!');
+        }
+        
+        // Show success message
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = 'Saved!';
+        saveBtn.style.backgroundColor = '#45a049';
+        setTimeout(() => {
+          saveBtn.textContent = originalText;
+          saveBtn.style.backgroundColor = '#4CAF50';
+        }, 1000);
+        
+        console.log('✅ [SAVE SUCCESS] Linked Logic Properties saved:', {
+          nodeId: cell._linkedLogicNodeId,
+          linkedFields: cell._linkedFields,
+          cellId: cell.id
+        });
+        
+        // Verify the properties were actually set on the cell
+        console.log('🔍 [SAVE VERIFY] Cell properties after save:', {
+          _linkedLogicNodeId: cell._linkedLogicNodeId,
+          _linkedFields: cell._linkedFields
+        });
+      };
+      
+      linkedFieldsContainer.appendChild(saveBtn);
+      
+      fieldDiv.appendChild(label);
+      fieldDiv.appendChild(linkedFieldsContainer);
+      content.appendChild(fieldDiv);
+      
+      // Helper function to update linked fields
+      function updateLinkedFields(cell) {
+        const dropdowns = linkedFieldsContainer.querySelectorAll('select');
+        const newLinkedFields = Array.from(dropdowns).map(dropdown => dropdown.value).filter(value => value);
+        console.log('💾 [UPDATE LINKED FIELDS] Updating _linkedFields from', cell._linkedFields, 'to', newLinkedFields);
+        cell._linkedFields = newLinkedFields;
+        
+        // Trigger autosave
+        if (typeof window.requestAutosave === 'function') {
+          window.requestAutosave();
+        }
+      }
+      
+      // Add change listeners to all dropdowns
+      linkedFieldsContainer.addEventListener('change', (e) => {
+        if (e.target.tagName === 'SELECT') {
+          updateLinkedFields(cell);
+        }
+      });
+      
+      return; // Skip the normal property creation
+    }
+    
     const fieldDiv = document.createElement('div');
     fieldDiv.style.cssText = `
       margin-bottom: 16px;
@@ -1246,7 +1854,7 @@ function showPropertiesPopup(cell) {
         font-size: 14px;
         cursor: pointer;
         transition: all 0.2s ease;
-        display: ${prop.initiallyHidden ? 'none' : 'block'};
+        display: ${prop.initiallyHidden ? 'none' : 'inline-block'};
       `;
       
       button.addEventListener('click', () => {
@@ -1267,6 +1875,10 @@ function showPropertiesPopup(cell) {
       if (!prop.label) {
         fieldDiv.style.justifyContent = 'center';
         fieldDiv.style.width = '100%';
+        fieldDiv.style.padding = '0';
+        fieldDiv.style.margin = '0 0 16px 0';
+        // Add left margin to center the 200px button
+        button.style.marginLeft = 'calc(50% - 100px)';
         fieldDiv.appendChild(button);
       } else {
         fieldDiv.appendChild(label);
@@ -1461,6 +2073,10 @@ function showPropertiesPopup(cell) {
             input.type = prop.inputType || 'text';
           }
           input.value = prop.value;
+          input.id = prop.id + '_input'; // Set a unique ID on the input element
+          
+          // Debug logging for input creation
+          console.log('🔍 [INPUT CREATION] Created input element with ID:', input.id, 'Value:', prop.value);
           
           if (isNodeText) {
             input.style.cssText = `
@@ -1496,8 +2112,9 @@ function showPropertiesPopup(cell) {
             valueSpan.textContent = newValue;
             valueSpan.style.display = 'block';
             
-            // Safely remove input element if it still exists
-            if (input && input.parentNode) {
+            // For PDF Logic fields, keep the input element so it can be found by the save function
+            const isPdfLogicField = prop.id && prop.id.startsWith('propPdf');
+            if (!isPdfLogicField && input && input.parentNode) {
               input.remove();
             }
             
@@ -1576,53 +2193,31 @@ function showPropertiesPopup(cell) {
                   }
                 }
                 break;
-              case 'propPdfName':
-                // Update the PDF name property
-                const oldPdfName = cell._pdfName;
-                cell._pdfName = newValue;
-                
-                // Update all Node IDs that use this PDF name
-                if (oldPdfName && oldPdfName !== newValue && typeof window.updateAllNodeIdsForPdfChange === 'function') {
-                  window.updateAllNodeIdsForPdfChange(oldPdfName, newValue);
-                }
-                
-                // Apply PDF naming convention to the current Node ID
-                if (typeof window.setNodeId === 'function') {
-                  // Get the current Node ID without PDF prefix
-                  const currentNodeId = document.getElementById('propNodeId');
-                  const baseNodeId = currentNodeId ? currentNodeId.textContent.trim() : cell._nameId || cell.id;
-                  
-                  // Remove any existing PDF prefix from the base Node ID
-                  const cleanNodeId = baseNodeId.replace(/^[^_]+_/, '');
-                  
-                  // Apply the PDF naming convention
-                  window.setNodeId(cell, cleanNodeId);
-                  
-                  // Update the Node ID field in the popup to show the new ID with PDF prefix
-                  if (currentNodeId) {
-                    const nodeIdSpan = currentNodeId.querySelector('span');
-                    if (nodeIdSpan) {
-                      const newNodeId = window.getNodeId ? window.getNodeId(cell) : cleanNodeId;
-                      nodeIdSpan.textContent = newNodeId;
-                    }
-                  }
+              case 'propBigParagraphPdfName':
+                // Update the Big Paragraph PDF name property
+                if (newValue !== '') {
+                  cell._bigParagraphPdfName = newValue;
                 }
                 // Trigger autosave
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
                 }
                 break;
-              case 'propPdfFile':
-                // Update the PDF file property
-                cell._pdfFile = newValue;
+              case 'propBigParagraphPdfFile':
+                // Update the Big Paragraph PDF file property
+                if (newValue !== '') {
+                  cell._bigParagraphPdfFile = newValue;
+                }
                 // Trigger autosave
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
                 }
                 break;
-              case 'propPdfPrice':
-                // Update the PDF price property
-                cell._pdfPrice = newValue;
+              case 'propBigParagraphPdfPrice':
+                // Update the Big Paragraph PDF price property
+                if (newValue !== '') {
+                  cell._bigParagraphPdfPrice = newValue;
+                }
                 // Trigger autosave
                 if (typeof window.requestAutosave === 'function') {
                   window.requestAutosave();
@@ -1643,6 +2238,21 @@ function showPropertiesPopup(cell) {
                   if (typeof window.updateHiddenTextboxNodeCell === 'function') {
                     window.updateHiddenTextboxNodeCell(cell);
                   }
+                }
+                
+                // Trigger autosave
+                if (typeof window.requestAutosave === 'function') {
+                  window.requestAutosave();
+                }
+                break;
+              case 'propLinkedLogicNodeId':
+                // Update the linked logic node ID property
+                console.log('💾 [SAVE VALUE] Updating _linkedLogicNodeId from', cell._linkedLogicNodeId, 'to', newValue);
+                cell._linkedLogicNodeId = newValue;
+                
+                // Update the node text to match the Node ID for linked logic nodes
+                if (typeof window.updateLinkedLogicNodeCell === 'function') {
+                  window.updateLinkedLogicNodeCell(cell);
                 }
                 
                 // Trigger autosave
@@ -1888,6 +2498,11 @@ function showPropertiesPopup(cell) {
   // Clean up event listeners when popup closes
   const originalClosePopup = closePopup;
   const newClosePopup = () => {
+    // Auto-save Big Paragraph PDF Logic if enabled
+    if (cell._pdfLogicEnabled && typeof window.saveBigParagraphPdfLogic === 'function') {
+      window.saveBigParagraphPdfLogic(cell);
+    }
+    
     if (outsideClickHandler) {
       document.removeEventListener('click', outsideClickHandler, true);
       outsideClickHandler = null;
@@ -2343,15 +2958,17 @@ function setupKeyboardNavigation(graph) {
         
       case 'c':
         if (ctrl) {
-          copySelectedCells(graph);
-          evt.preventDefault();
+          // Copy handling moved to script.js to avoid duplicate calls
+          // copySelectedCells(graph);
+          // evt.preventDefault();
         }
         break;
         
       case 'v':
         if (ctrl) {
-          pasteCells(graph);
-          evt.preventDefault();
+          // Paste handling moved to script.js to avoid duplicate calls
+          // pasteCells(graph);
+          // evt.preventDefault();
         }
         break;
         
@@ -2417,7 +3034,6 @@ function setupPanningAndZooming(graph) {
       
       // Get zoom sensitivity from settings (default to 0.01 if not set)
       const sensitivity = window.userSettings?.zoomSensitivity || 0.01;
-      console.log('🔧 [ZOOM DEBUG] Ctrl+Wheel zoom - sensitivity:', sensitivity, 'userSettings:', window.userSettings);
       
       // Calculate zoom delta based on sensitivity
       // Much smaller zoom increments for better control
@@ -2426,8 +3042,6 @@ function setupPanningAndZooming(graph) {
       const delta = evt.deltaY > 0 ? 
         (1 - (1 - baseDelta) * sensitivityFactor) : 
         (1 + (baseDelta - 1) * sensitivityFactor);
-      
-      console.log('🔧 [ZOOM DEBUG] Ctrl+Wheel zoom - baseDelta:', baseDelta, 'sensitivityFactor:', sensitivityFactor, 'delta:', delta);
       
       const scale = graph.view.scale * delta;
       
@@ -2649,6 +3263,111 @@ window.setupKeyboardNavigation = setupKeyboardNavigation;
 window.setupPanningAndZooming = setupPanningAndZooming;
 window.showQuestionTextPopup = showQuestionTextPopup;
 window.showPropertiesPopup = showPropertiesPopup;
+window.zoomIntoNode = zoomIntoNode;
+
+// Save Big Paragraph PDF Logic function
+window.saveBigParagraphPdfLogic = function(cell) {
+  // Try multiple approaches to find the input elements
+  let triggerLimitInput = document.getElementById('propPdfTriggerLimit_input');
+  let pdfNameInput = document.getElementById('propBigParagraphPdfName_input');
+  let pdfFileInput = document.getElementById('propBigParagraphPdfFile_input');
+  let pdfPriceInput = document.getElementById('propBigParagraphPdfPrice_input');
+  
+  // If not found by ID, try to find by looking for input elements near the spans
+  if (!triggerLimitInput) {
+    const triggerLimitSpan = document.getElementById('propPdfTriggerLimit');
+    if (triggerLimitSpan) {
+      triggerLimitInput = triggerLimitSpan.parentNode.querySelector('input');
+    }
+  }
+  
+  if (!pdfNameInput) {
+    const pdfNameSpan = document.getElementById('propBigParagraphPdfName');
+    if (pdfNameSpan) {
+      pdfNameInput = pdfNameSpan.parentNode.querySelector('input');
+    }
+  }
+  
+  if (!pdfFileInput) {
+    const pdfFileSpan = document.getElementById('propBigParagraphPdfFile');
+    if (pdfFileSpan) {
+      pdfFileInput = pdfFileSpan.parentNode.querySelector('input');
+    }
+  }
+  
+  if (!pdfPriceInput) {
+    const pdfPriceSpan = document.getElementById('propBigParagraphPdfPrice');
+    if (pdfPriceSpan) {
+      pdfPriceInput = pdfPriceSpan.parentNode.querySelector('input');
+    }
+  }
+  
+  // Debug logging - check if elements exist
+  console.log('🔍 [PDF LOGIC SAVE] Saving PDF Logic values:');
+  console.log('Trigger Limit Element:', triggerLimitInput);
+  console.log('PDF Name Element:', pdfNameInput);
+  console.log('PDF File Element:', pdfFileInput);
+  console.log('PDF Price Element:', pdfPriceInput);
+  
+  // Debug logging - check values
+  console.log('Trigger Limit Input Value:', triggerLimitInput?.value);
+  console.log('PDF Name Input Value:', pdfNameInput?.value);
+  console.log('PDF File Input Value:', pdfFileInput?.value);
+  console.log('PDF Price Input Value:', pdfPriceInput?.value);
+  
+  // Also check if there are any input elements with these IDs in the DOM
+  console.log('All elements with propPdfTriggerLimit ID:', document.querySelectorAll('#propPdfTriggerLimit'));
+  console.log('All elements with propBigParagraphPdfName ID:', document.querySelectorAll('#propBigParagraphPdfName'));
+  console.log('All elements with propBigParagraphPdfFile ID:', document.querySelectorAll('#propBigParagraphPdfFile'));
+  console.log('All elements with propBigParagraphPdfPrice ID:', document.querySelectorAll('#propBigParagraphPdfPrice'));
+  
+  // Check for input elements with the new IDs
+  console.log('All input elements with _input suffix:', document.querySelectorAll('[id$="_input"]'));
+  console.log('All input elements in the document:', document.querySelectorAll('input'));
+  
+  // Save values to cell properties
+  if (triggerLimitInput) {
+    cell._pdfTriggerLimit = triggerLimitInput.value;
+    console.log('Saved _pdfTriggerLimit:', cell._pdfTriggerLimit);
+  }
+  if (pdfNameInput) {
+    cell._bigParagraphPdfName = pdfNameInput.value;
+    console.log('Saved _bigParagraphPdfName:', cell._bigParagraphPdfName);
+  }
+  if (pdfFileInput) {
+    cell._bigParagraphPdfFile = pdfFileInput.value;
+    console.log('Saved _bigParagraphPdfFile:', cell._bigParagraphPdfFile);
+  }
+  if (pdfPriceInput) {
+    cell._bigParagraphPdfPrice = pdfPriceInput.value;
+    console.log('Saved _bigParagraphPdfPrice:', cell._bigParagraphPdfPrice);
+  }
+  
+  // Debug: Check all cell properties after saving
+  console.log('🔍 [CELL DEBUG] All cell properties after saving:');
+  console.log('cell._pdfLogicEnabled:', cell._pdfLogicEnabled);
+  console.log('cell._pdfTriggerLimit:', cell._pdfTriggerLimit);
+  console.log('cell._bigParagraphPdfName:', cell._bigParagraphPdfName);
+  console.log('cell._bigParagraphPdfFile:', cell._bigParagraphPdfFile);
+  console.log('cell._bigParagraphPdfPrice:', cell._bigParagraphPdfPrice);
+  
+  // Show success message
+  const saveButton = document.getElementById('propSavePdfLogic');
+  if (saveButton) {
+    const originalText = saveButton.textContent;
+    saveButton.textContent = 'Saved!';
+    saveButton.style.backgroundColor = '#4CAF50';
+    setTimeout(() => {
+      saveButton.textContent = originalText;
+      saveButton.style.backgroundColor = '#1976d2';
+    }, 1000);
+  }
+  
+  // Trigger autosave
+  if (typeof window.requestAutosave === 'function') {
+    window.requestAutosave();
+  }
+};
 
 // Test function for debugging properties popup
 window.testPropertiesPopup = function() {
@@ -2675,4 +3394,658 @@ window.testPropertiesPopup = function() {
     showPropertiesPopup(selectedCells[0]);
   }
 };
+
+/**
+ * Populate custom dropdown with textbox question Node IDs from flowchart
+ */
+function populateLinkedLogicCustomDropdown(optionsContainer, hiddenSelect, cell) {
+  // Clear existing options
+  optionsContainer.innerHTML = '';
+  hiddenSelect.innerHTML = '';
+  
+  // Add default option
+  const defaultOption = document.createElement('div');
+  defaultOption.textContent = 'Select a textbox question...';
+  defaultOption.style.cssText = `
+    padding: 8px;
+    color: #666;
+    cursor: pointer;
+  `;
+  defaultOption.setAttribute('data-value', '');
+  optionsContainer.appendChild(defaultOption);
+  
+  const defaultSelectOption = document.createElement('option');
+  defaultSelectOption.value = '';
+  defaultSelectOption.textContent = 'Select a textbox question...';
+  hiddenSelect.appendChild(defaultSelectOption);
+  
+  // Get all cells in the graph
+  const graph = window.graph;
+  if (!graph) return;
+  
+  const allCells = graph.getChildVertices(graph.getDefaultParent());
+  
+  // Find all textbox question nodes and multiple dropdown question labels
+  const textboxNodes = allCells.filter(cell => {
+    // Check if it's a question node with textbox type
+    if (cell.style && cell.style.includes('nodeType=question')) {
+      // Check if it has textbox question type (exclude dropdown types)
+      const isTextbox = cell.style.includes('questionType=text') || 
+                       cell.style.includes('questionType=multipleTextboxes');
+      
+      // Make sure it's NOT a dropdown question (including text2 which is dropdown type)
+      const isDropdown = cell.style.includes('questionType=dropdown') ||
+                        cell.style.includes('questionType=text2') ||
+                        cell.style.includes('questionType=yesNo') ||
+                        cell.style.includes('questionType=multipleChoice') ||
+                        cell.style.includes('questionType=multipleDropdownType');
+      
+      return isTextbox && !isDropdown;
+    }
+    return false;
+  });
+  
+  // Find all multiple dropdown question nodes to extract their labels
+  const multipleDropdownNodes = allCells.filter(cell => {
+    return cell.style && cell.style.includes('nodeType=question') && 
+           cell.style.includes('questionType=multipleDropdownType');
+  });
+  
+  // Add options for each textbox question
+  textboxNodes.forEach(node => {
+    // Check if it's a multiple textbox question
+    if (node.style && node.style.includes('questionType=multipleTextboxes') && 
+        node._textboxes && Array.isArray(node._textboxes)) {
+      // Add individual textbox entries
+      const baseNodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      
+      node._textboxes.forEach((textbox, index) => {
+        if (textbox.nameId) {
+          const option = document.createElement('div');
+          // Convert nameId to lowercase to match the Copy ID format
+          const lowercaseNameId = textbox.nameId.toLowerCase();
+          const labelId = `${baseNodeId}_${lowercaseNameId}`;
+          option.textContent = labelId;
+          option.style.cssText = `
+            padding: 8px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+          `;
+          option.setAttribute('data-value', labelId);
+          optionsContainer.appendChild(option);
+          
+          const selectOption = document.createElement('option');
+          selectOption.value = labelId;
+          selectOption.textContent = labelId;
+          hiddenSelect.appendChild(selectOption);
+        }
+      });
+      
+      // Add location data options if location index is set
+      if (node._locationIndex !== undefined) {
+        const locationFields = ['street', 'city', 'state', 'zip'];
+        
+        locationFields.forEach(locationField => {
+          const option = document.createElement('div');
+          const labelId = `${baseNodeId}_${locationField}`;
+          option.textContent = labelId;
+          option.style.cssText = `
+            padding: 8px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+          `;
+          option.setAttribute('data-value', labelId);
+          optionsContainer.appendChild(option);
+          
+          const selectOption = document.createElement('option');
+          selectOption.value = labelId;
+          selectOption.textContent = labelId;
+          hiddenSelect.appendChild(selectOption);
+          
+          // Add short state field for state location field
+          if (locationField === 'state') {
+            const shortOption = document.createElement('div');
+            const shortLabelId = `${baseNodeId}_${locationField}_short`;
+            shortOption.textContent = shortLabelId;
+            shortOption.style.cssText = `
+              padding: 8px;
+              cursor: pointer;
+              border-bottom: 1px solid #eee;
+            `;
+            shortOption.setAttribute('data-value', shortLabelId);
+            optionsContainer.appendChild(shortOption);
+            
+            const shortSelectOption = document.createElement('option');
+            shortSelectOption.value = shortLabelId;
+            shortSelectOption.textContent = shortLabelId;
+            hiddenSelect.appendChild(shortSelectOption);
+          }
+        });
+      }
+    } else {
+      // Regular textbox question - add the base node ID
+      const option = document.createElement('div');
+      const nodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      option.textContent = nodeId || `Node ${node.id}`;
+      option.style.cssText = `
+        padding: 8px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+      `;
+      option.setAttribute('data-value', nodeId);
+      optionsContainer.appendChild(option);
+      
+      const selectOption = document.createElement('option');
+      selectOption.value = nodeId;
+      selectOption.textContent = nodeId || `Node ${node.id}`;
+      hiddenSelect.appendChild(selectOption);
+    }
+  });
+  
+  // Add options for each multiple dropdown question label
+  multipleDropdownNodes.forEach(node => {
+    if (node._textboxes && Array.isArray(node._textboxes)) {
+      const baseNodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      
+      // Get the number range from _twoNumbers
+      const firstNumber = parseInt(node._twoNumbers?.first) || 1;
+      const secondNumber = parseInt(node._twoNumbers?.second) || 1;
+      
+      node._textboxes.forEach((textbox, index) => {
+        if (textbox.nameId) {
+          const lowercaseNameId = textbox.nameId.toLowerCase();
+          
+          // Generate options for each number in the range
+          for (let num = firstNumber; num <= secondNumber; num++) {
+            const option = document.createElement('div');
+            const labelId = `${baseNodeId}_${lowercaseNameId}_${num}`;
+            option.textContent = labelId;
+            option.style.cssText = `
+              padding: 8px;
+              cursor: pointer;
+              border-bottom: 1px solid #eee;
+            `;
+            option.setAttribute('data-value', labelId);
+            optionsContainer.appendChild(option);
+            
+            const selectOption = document.createElement('option');
+            selectOption.value = labelId;
+            selectOption.textContent = labelId;
+            hiddenSelect.appendChild(selectOption);
+          }
+        }
+      });
+      
+      // Add location data options if location index is set
+      if (node._locationIndex !== undefined) {
+        const locationFields = ['street', 'city', 'state', 'zip'];
+        
+        locationFields.forEach(locationField => {
+          // Generate options for each number in the range for each location field
+          for (let num = firstNumber; num <= secondNumber; num++) {
+            const option = document.createElement('div');
+            const labelId = `${baseNodeId}_${locationField}_${num}`;
+            option.textContent = labelId;
+            option.style.cssText = `
+              padding: 8px;
+              cursor: pointer;
+              border-bottom: 1px solid #eee;
+            `;
+            option.setAttribute('data-value', labelId);
+            optionsContainer.appendChild(option);
+            
+            const selectOption = document.createElement('option');
+            selectOption.value = labelId;
+            selectOption.textContent = labelId;
+            hiddenSelect.appendChild(selectOption);
+            
+            // Add short state field for state location field
+            if (locationField === 'state') {
+              const shortOption = document.createElement('div');
+              const shortLabelId = `${baseNodeId}_${locationField}_short_${num}`;
+              shortOption.textContent = shortLabelId;
+              shortOption.style.cssText = `
+                padding: 8px;
+                cursor: pointer;
+                border-bottom: 1px solid #eee;
+              `;
+              shortOption.setAttribute('data-value', shortLabelId);
+              optionsContainer.appendChild(shortOption);
+              
+              const shortSelectOption = document.createElement('option');
+              shortSelectOption.value = shortLabelId;
+              shortSelectOption.textContent = shortLabelId;
+              hiddenSelect.appendChild(shortSelectOption);
+            }
+          }
+        });
+      }
+    }
+  });
+  
+  // If no questions found, add a placeholder
+  if (textboxNodes.length === 0 && multipleDropdownNodes.length === 0) {
+    const noOptions = document.createElement('div');
+    noOptions.textContent = 'No textbox questions found';
+    noOptions.style.cssText = `
+      padding: 8px;
+      color: #666;
+      font-style: italic;
+    `;
+    optionsContainer.appendChild(noOptions);
+  }
+}
+
+/**
+ * Setup custom search functionality for Linked Logic dropdowns
+ */
+function setupLinkedLogicCustomSearch(optionsContainer, hiddenSelect, dropdownDisplay, searchBar) {
+  // Store original options for filtering
+  let originalOptions = Array.from(optionsContainer.children);
+  
+  // Function to extract keywords from search term
+  const extractKeywords = (term) => {
+    return term.toLowerCase()
+      .split(/[\s_]+/)  // Split on spaces and underscores
+      .filter(keyword => keyword.length > 0);  // Remove empty strings
+  };
+  
+  // Function to normalize option text for comparison
+  const normalizeOptionText = (text) => {
+    return text.toLowerCase().replace(/[\s_]+/g, ' ');
+  };
+  
+  // Function to check if option matches all keywords
+  const matchesAllKeywords = (optionText, keywords) => {
+    const normalizedText = normalizeOptionText(optionText);
+    return keywords.every(keyword => normalizedText.includes(keyword));
+  };
+  
+  // Function to filter and update options
+  const updateOptions = (searchTerm) => {
+    // Clear options
+    optionsContainer.innerHTML = '';
+    
+    if (searchTerm.length === 0) {
+      // Show all options when search is empty
+      originalOptions.forEach(option => {
+        const newOption = option.cloneNode(true);
+        optionsContainer.appendChild(newOption);
+      });
+    } else {
+      // Extract keywords from search term
+      const keywords = extractKeywords(searchTerm);
+      console.log('🔍 [SEARCH DEBUG] Search keywords:', keywords);
+      
+      // Filter and add matching options
+      const filteredOptions = originalOptions.filter(option => {
+        const text = option.textContent;
+        return matchesAllKeywords(text, keywords);
+      });
+      
+      console.log('🔍 [SEARCH DEBUG] Filtered options:', filteredOptions.length);
+      
+      filteredOptions.forEach(option => {
+        const newOption = option.cloneNode(true);
+        optionsContainer.appendChild(newOption);
+      });
+      
+      // If no results, show a message
+      if (filteredOptions.length === 0) {
+        const noResultsOption = document.createElement('div');
+        noResultsOption.textContent = 'No matching fields found';
+        noResultsOption.style.cssText = `
+          padding: 8px;
+          color: #666;
+          font-style: italic;
+        `;
+        optionsContainer.appendChild(noResultsOption);
+      }
+    }
+  };
+  
+  // Add search functionality
+  searchBar.addEventListener('input', function() {
+    const searchTerm = this.value;
+    console.log('🔍 [SEARCH DEBUG] Searching for:', searchTerm);
+    updateOptions(searchTerm);
+    optionsContainer.style.display = 'block'; // Show options when typing
+  });
+  
+  // Show options when search bar is focused
+  searchBar.addEventListener('focus', function() {
+    this.style.borderColor = '#2196f3';
+    this.style.backgroundColor = 'white';
+    updateOptions(this.value);
+    optionsContainer.style.display = 'block';
+  });
+  
+  // Handle option selection
+  optionsContainer.addEventListener('click', function(e) {
+    const option = e.target;
+    if (option.getAttribute('data-value') !== null) {
+      const value = option.getAttribute('data-value');
+      const text = option.textContent;
+      
+      if (value) {
+        dropdownDisplay.textContent = text;
+        hiddenSelect.value = value;
+        searchBar.value = ''; // Clear search
+        optionsContainer.style.display = 'none'; // Hide options
+      }
+    }
+  });
+  
+  // Hide options when search bar loses focus
+  searchBar.addEventListener('blur', function() {
+    this.style.borderColor = '#ddd';
+    this.style.backgroundColor = '#f9f9f9';
+    
+    // Hide options after a short delay to allow for selection
+    setTimeout(() => {
+      optionsContainer.style.display = 'none';
+    }, 200);
+  });
+}
+
+/**
+ * Setup search functionality for Linked Logic dropdowns
+ */
+function setupLinkedLogicSearch(dropdown, searchBar) {
+  // Store original options for filtering - wait for dropdown to be populated
+  let originalOptions = [];
+  
+  // Function to update original options
+  const updateOriginalOptions = () => {
+    originalOptions = Array.from(dropdown.options);
+    console.log('🔍 [SEARCH DEBUG] Original options stored:', originalOptions.length);
+  };
+  
+  // Wait a bit for dropdown to be populated, then store options
+  setTimeout(updateOriginalOptions, 100);
+  
+  // Function to extract keywords from search term
+  const extractKeywords = (term) => {
+    return term.toLowerCase()
+      .split(/[\s_]+/)  // Split on spaces and underscores
+      .filter(keyword => keyword.length > 0);  // Remove empty strings
+  };
+  
+  // Function to normalize option text for comparison
+  const normalizeOptionText = (text) => {
+    return text.toLowerCase().replace(/[\s_]+/g, ' ');
+  };
+  
+  // Function to check if option matches all keywords
+  const matchesAllKeywords = (optionText, keywords) => {
+    const normalizedText = normalizeOptionText(optionText);
+    return keywords.every(keyword => normalizedText.includes(keyword));
+  };
+  
+  // Function to filter and update dropdown
+  const updateDropdown = (searchTerm) => {
+    // Clear dropdown
+    dropdown.innerHTML = '';
+    
+    // Add default option
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Select a textbox question...';
+    dropdown.appendChild(defaultOption);
+    
+    if (searchTerm.length === 0) {
+      // Show all options when search is empty
+      originalOptions.forEach(option => {
+        if (option.value) {
+          const newOption = document.createElement('option');
+          newOption.value = option.value;
+          newOption.textContent = option.textContent;
+          dropdown.appendChild(newOption);
+        }
+      });
+    } else {
+      // Extract keywords from search term
+      const keywords = extractKeywords(searchTerm);
+      console.log('🔍 [SEARCH DEBUG] Search keywords:', keywords);
+      
+      // Filter and add matching options
+      const filteredOptions = originalOptions.filter(option => {
+        if (!option.value) return false;
+        const text = option.textContent;
+        return matchesAllKeywords(text, keywords);
+      });
+      
+      console.log('🔍 [SEARCH DEBUG] Filtered options:', filteredOptions.length);
+      
+      filteredOptions.forEach(option => {
+        const newOption = document.createElement('option');
+        newOption.value = option.value;
+        newOption.textContent = option.textContent;
+        dropdown.appendChild(newOption);
+      });
+      
+      // If no results, show a message
+      if (filteredOptions.length === 0) {
+        const noResultsOption = document.createElement('option');
+        noResultsOption.value = '';
+        noResultsOption.textContent = 'No matching fields found';
+        noResultsOption.disabled = true;
+        dropdown.appendChild(noResultsOption);
+      }
+    }
+    
+    // Force dropdown to stay open by setting size attribute and multiple attribute
+    const optionCount = dropdown.options.length;
+    dropdown.size = Math.min(optionCount, 8); // Show up to 8 options
+    dropdown.multiple = true; // This forces the dropdown to stay open
+    dropdown.style.height = 'auto';
+    dropdown.style.minHeight = '120px'; // Ensure minimum height
+  };
+  
+  // Add search functionality
+  searchBar.addEventListener('input', function() {
+    const searchTerm = this.value;
+    console.log('🔍 [SEARCH DEBUG] Searching for:', searchTerm);
+    
+    // Update original options if not set yet
+    if (originalOptions.length === 0) {
+      updateOriginalOptions();
+    }
+    
+    updateDropdown(searchTerm);
+  });
+  
+  // Keep dropdown open when search bar is focused
+  searchBar.addEventListener('focus', function() {
+    this.style.borderColor = '#2196f3';
+    this.style.backgroundColor = 'white';
+    updateDropdown(this.value);
+  });
+  
+  // Auto-select when user clicks a filtered option
+  dropdown.addEventListener('change', function() {
+    // Get the selected option (for multiple select, get the first selected)
+    const selectedOptions = Array.from(this.selectedOptions);
+    if (selectedOptions.length > 0) {
+      const selectedValue = selectedOptions[0].value;
+      if (selectedValue) {
+        searchBar.value = ''; // Clear search
+        // Restore all options
+        updateDropdown('');
+        dropdown.value = selectedValue; // Set selected value
+        dropdown.size = 1; // Close dropdown
+        dropdown.multiple = false; // Reset to single select
+      }
+    }
+  });
+  
+  // Handle search bar blur - close dropdown after a delay
+  searchBar.addEventListener('blur', function() {
+    this.style.borderColor = '#ddd';
+    this.style.backgroundColor = '#f9f9f9';
+    
+    // Close dropdown after a short delay to allow for selection
+    setTimeout(() => {
+      dropdown.size = 1;
+      dropdown.multiple = false; // Reset to single select
+    }, 200);
+  });
+}
+
+/**
+ * Populate dropdown with textbox question Node IDs from flowchart
+ */
+function populateLinkedLogicDropdown(dropdown, cell) {
+  // Clear existing options
+  dropdown.innerHTML = '';
+  
+  // Add default option
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = 'Select a textbox question...';
+  dropdown.appendChild(defaultOption);
+  
+  // Get all cells in the graph
+  const graph = window.graph;
+  if (!graph) return;
+  
+  const allCells = graph.getChildVertices(graph.getDefaultParent());
+  
+  // Find all textbox question nodes and multiple dropdown question labels
+  const textboxNodes = allCells.filter(cell => {
+    // Check if it's a question node with textbox type
+    if (cell.style && cell.style.includes('nodeType=question')) {
+      // Check if it has textbox question type (exclude dropdown types)
+      const isTextbox = cell.style.includes('questionType=text') || 
+                       cell.style.includes('questionType=multipleTextboxes');
+      
+      // Make sure it's NOT a dropdown question (including text2 which is dropdown type)
+      const isDropdown = cell.style.includes('questionType=dropdown') ||
+                        cell.style.includes('questionType=text2') ||
+                        cell.style.includes('questionType=yesNo') ||
+                        cell.style.includes('questionType=multipleChoice') ||
+                        cell.style.includes('questionType=multipleDropdownType');
+      
+      return isTextbox && !isDropdown;
+    }
+    return false;
+  });
+  
+  // Find all multiple dropdown question nodes to extract their labels
+  const multipleDropdownNodes = allCells.filter(cell => {
+    return cell.style && cell.style.includes('nodeType=question') && 
+           cell.style.includes('questionType=multipleDropdownType');
+  });
+  
+  // Add options for each textbox question
+  textboxNodes.forEach(node => {
+    // Check if it's a multiple textbox question
+    if (node.style && node.style.includes('questionType=multipleTextboxes') && 
+        node._textboxes && Array.isArray(node._textboxes)) {
+      // Add individual textbox entries
+      const baseNodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      
+      node._textboxes.forEach((textbox, index) => {
+        if (textbox.nameId) {
+          const option = document.createElement('option');
+          // Convert nameId to lowercase to match the Copy ID format
+          const lowercaseNameId = textbox.nameId.toLowerCase();
+          const labelId = `${baseNodeId}_${lowercaseNameId}`;
+          option.value = labelId;
+          option.textContent = labelId;
+          dropdown.appendChild(option);
+        }
+      });
+      
+      // Add location data options if location index is set
+      if (node._locationIndex !== undefined) {
+        const locationFields = ['street', 'city', 'state', 'zip'];
+        
+        locationFields.forEach(locationField => {
+          const option = document.createElement('option');
+          const labelId = `${baseNodeId}_${locationField}`;
+          option.value = labelId;
+          option.textContent = labelId;
+          dropdown.appendChild(option);
+          
+          // Add short state field for state location field
+          if (locationField === 'state') {
+            const shortOption = document.createElement('option');
+            const shortLabelId = `${baseNodeId}_${locationField}_short`;
+            shortOption.value = shortLabelId;
+            shortOption.textContent = shortLabelId;
+            dropdown.appendChild(shortOption);
+          }
+        });
+      }
+    } else {
+      // Regular textbox question - add the base node ID
+      const option = document.createElement('option');
+      const nodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      option.value = nodeId;
+      option.textContent = nodeId || `Node ${node.id}`;
+      dropdown.appendChild(option);
+    }
+  });
+  
+  // Add options for each multiple dropdown question label
+  multipleDropdownNodes.forEach(node => {
+    if (node._textboxes && Array.isArray(node._textboxes)) {
+      const baseNodeId = window.getNodeId ? window.getNodeId(node) : node.id;
+      
+      // Get the number range from _twoNumbers
+      const firstNumber = parseInt(node._twoNumbers?.first) || 1;
+      const secondNumber = parseInt(node._twoNumbers?.second) || 1;
+      
+      node._textboxes.forEach((textbox, index) => {
+        if (textbox.nameId) {
+          const lowercaseNameId = textbox.nameId.toLowerCase();
+          
+          // Generate options for each number in the range
+          for (let num = firstNumber; num <= secondNumber; num++) {
+            const option = document.createElement('option');
+            const labelId = `${baseNodeId}_${lowercaseNameId}_${num}`;
+            option.value = labelId;
+            option.textContent = labelId;
+            dropdown.appendChild(option);
+          }
+        }
+      });
+      
+      // Add location data options if location index is set
+      if (node._locationIndex !== undefined) {
+        const locationFields = ['street', 'city', 'state', 'zip'];
+        
+        locationFields.forEach(locationField => {
+          // Generate options for each number in the range for each location field
+          for (let num = firstNumber; num <= secondNumber; num++) {
+            const option = document.createElement('option');
+            const labelId = `${baseNodeId}_${locationField}_${num}`;
+            option.value = labelId;
+            option.textContent = labelId;
+            dropdown.appendChild(option);
+            
+            // Add short state field for state location field
+            if (locationField === 'state') {
+              const shortOption = document.createElement('option');
+              const shortLabelId = `${baseNodeId}_${locationField}_short_${num}`;
+              shortOption.value = shortLabelId;
+              shortOption.textContent = shortLabelId;
+              dropdown.appendChild(shortOption);
+            }
+          }
+        });
+      }
+    }
+  });
+  
+  // If no questions found, add a placeholder
+  if (textboxNodes.length === 0 && multipleDropdownNodes.length === 0) {
+    const noOptions = document.createElement('option');
+    noOptions.value = '';
+    noOptions.textContent = 'No textbox questions found';
+    noOptions.disabled = true;
+    dropdown.appendChild(noOptions);
+  }
+}
 

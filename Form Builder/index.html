@@ -129,6 +129,13 @@
   >
     Hidden Textbox
   </div>
+  <div
+    class="shape"
+    data-type="linkedLogic"
+    data-style="shape=roundRect;rounded=1;arcSize=20;whiteSpace=wrap;html=1;nodeType=linkedLogic;spacing=12;fontSize=16;fillColor=#DDA0DD;strokeColor=#9370DB;"
+  >
+    Linked Logic
+  </div>
 
   <div class="button-bar">
     <button onclick="previewForm()">Preview Form</button><br>
@@ -141,8 +148,10 @@
     />
     <button onclick="exportFlowchartJson()">Export Flowchart JSON</button>
     <button onclick="exportGuiJson(true)">Export GUI JSON</button><br>
-    <button onclick="exportBothJson()">Export Both</button>
-    <button onclick="generateShareableUrl()">Share Flowchart URL</button>
+    <button id="saveFlowchartBtn" onclick="saveFlowchart()">Save</button>
+    <button id="saveAsFlowchartBtn" onclick="saveAsFlowchart()">Save As</button>
+    <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">Library</button>
+    <button id="settingsBtn" onclick="showSettingsMenu()">Settings</button><br>
   </div>
 
   <!-- Form Name -->
@@ -237,9 +246,6 @@
 
   <!-- Below the legends -->
   <br>
-  <button id="saveFlowchartBtn" onclick="saveFlowchart()">Save</button>
-  <button id="viewFlowchartBtn" onclick="viewSavedFlowcharts()">Library</button>
-  <button id="settingsBtn" onclick="showSettingsMenu()">Settings</button>
   <button id="downloadSvgBtn" onclick="downloadFlowchartSvg()">Download SVG</button>
   <button id="uploadFlowchartDetailsBtn" onclick="showFlowchartDetailsModal()">Upload flowchart details</button>
   <button id="uploadDocumentPdfBtn" onclick="showDocumentPdfModal()">Upload Document PDF</button>
@@ -287,17 +293,8 @@
   <button id="pasteHereButton">Paste</button>
   <button id="placeQuestionNode">Question Node</button>
   <button id="placeOptionNode">Option Node</button>
-  <button id="placeCalcNode">Calc Node</button>
-  <button id="placeNotesNode">Notes Node</button>
-  <button id="placeChecklistNode">Checklist Node</button>
-  <button id="placeSubtitleNode">Subtitle Node</button>
-  <button id="placeInfoNode">Info Node</button>
-  <button id="placeImageNode">Image Node</button>
-  <button id="placePdfNode">PDF Node</button>
-  <button id="placeAmountNode">Amount Option Node</button>
-  <button id="placeEndNode">End Node</button>
-  <button id="placeHiddenCheckboxNode">Hidden Checkbox Node</button>
-  <button id="placeHiddenTextboxNode">Hidden Textbox Node</button>
+  <button id="placeMiscellaneousNode">Miscellaneous Node</button>
+  <button id="placeSampleQuestionNode">Sample Question</button>
 </div>
 
 <!-- Type Submenu -->
