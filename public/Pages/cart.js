@@ -604,34 +604,8 @@ class CartManager {
             a.click();
             document.body.removeChild(a);
 
-            let userEmail = null;
-            if (typeof firebase !== 'undefined' && firebase.auth) {
-                const user = firebase.auth().currentUser;
-                if (user && user.email) userEmail = user.email;
-            }
-            if (!userEmail) userEmail = prompt('Enter your email to receive a copy of your PDF');
-            if (userEmail) {
-                try {
-                    console.log('📧 Attempting to email PDF to:', userEmail);
-                    const emailData = new FormData();
-                    emailData.append('to', userEmail);
-                    emailData.append('filename', `Edited_${cartItem.formId}`);
-                    emailData.append('subject', 'Your Completed Form from FormWiz');
-                    emailData.append('text', 'Attached is your completed PDF form from FormWiz.');
-                    emailData.append('pdf', blob, `Edited_${cartItem.formId}`);
-                    
-                    const emailResponse = await fetch('/email-pdf', { method: 'POST', body: emailData, mode: 'cors' });
-                    if (!emailResponse.ok) {
-                        console.error('❌ Email failed with status:', emailResponse.status, emailResponse.statusText);
-                        const errorText = await emailResponse.text();
-                        console.error('❌ Email error details:', errorText);
-                    } else {
-                        console.log('✅ Email sent successfully');
-                    }
-                } catch (emailError) {
-                    console.error('❌ Email error:', emailError);
-                }
-            }
+            // Email functionality temporarily disabled
+            console.log('📧 Email functionality temporarily disabled - PDF will be saved to Firebase only');
 
             if (typeof firebase !== 'undefined' && firebase.auth && firebase.firestore && firebase.storage) {
                 const user = firebase.auth().currentUser;
