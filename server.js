@@ -735,7 +735,13 @@ app.post('/edit_pdf', async (req, res) => {
 // Add a new route for creating a Stripe Checkout Session
 app.post('/create-checkout-session', async (req, res) => {
     const { priceId, formId } = req.body;
-    const YOUR_DOMAIN = 'http://localhost:3000'; // Replace with your domain
+    
+    // Get the domain dynamically from the request
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+    const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
+    const YOUR_DOMAIN = `${protocol}://${host}`;
+    
+    console.log('Using domain for Stripe redirect:', YOUR_DOMAIN);
 
     if (!priceId || !formId) {
         return res.status(400).send({ error: 'Price ID and Form ID are required.' });
@@ -765,7 +771,13 @@ app.post('/create-cart-checkout-session', async (req, res) => {
     console.log('Request body:', req.body);
     
     const { cartItems, totalAmount } = req.body;
-    const YOUR_DOMAIN = 'http://localhost:3000'; // Replace with your domain
+    
+    // Get the domain dynamically from the request
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+    const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
+    const YOUR_DOMAIN = `${protocol}://${host}`;
+    
+    console.log('Using domain for Stripe redirect:', YOUR_DOMAIN);
 
     if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
         console.log('Error: No cart items provided');
