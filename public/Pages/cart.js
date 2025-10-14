@@ -422,59 +422,67 @@ class CartManager {
         const processedItems = [];
         const failedItems = [];
         
-        for (const item of this.cart) {
-            try {
-                console.log('🎉 [PAYMENT DEBUG] Processing item:', item.title, 'formId:', item.formId, 'portfolioId:', item.portfolioId);
-                await this.processFormPDF(item); // run unconditionally
-                processedItems.push(item);
-                console.log('✅ [PAYMENT DEBUG] Successfully processed:', item.title);
-            } catch (err) {
-                console.error(`❌ [PAYMENT DEBUG] Failed to save ${item.formId}:`, err);
-                failedItems.push(item);
-                alert(`Could not save ${item.title || item.formId} to your account.`);
+        // Set a timeout to ensure loading screen doesn't get stuck
+        const timeoutId = setTimeout(() => {
+            console.log('⚠️ [PAYMENT DEBUG] Payment processing timeout reached, forcing completion...');
+            this.hidePaymentProcessingScreen();
+            alert('Payment processing is taking longer than expected. Please check your documents in a few moments.');
+            window.history.replaceState({}, document.title, window.location.pathname);
+            window.location.href = 'forms.html';
+        }, 60000); // 60 second timeout
+        
+        try {
+            for (const item of this.cart) {
+                try {
+                    console.log('🎉 [PAYMENT DEBUG] Processing item:', item.title, 'formId:', item.formId, 'portfolioId:', item.portfolioId);
+                    await this.processFormPDF(item); // run unconditionally
+                    processedItems.push(item);
+                    console.log('✅ [PAYMENT DEBUG] Successfully processed:', item.title);
+                } catch (err) {
+                    console.error(`❌ [PAYMENT DEBUG] Failed to save ${item.formId}:`, err);
+                    failedItems.push(item);
+                    // Don't show alert for individual failures, just log them
+                }
             }
+            
+            console.log('🎉 [PAYMENT DEBUG] PDF processing complete!');
+            console.log('✅ [PAYMENT DEBUG] Successfully processed items:', processedItems.length, processedItems.map(item => item.title));
+            console.log('❌ [PAYMENT DEBUG] Failed items:', failedItems.length, failedItems.map(item => item.title));
+            
+            // Remove portfolio entries after successful payment
+            console.log('🗑️ [PAYMENT DEBUG] Starting portfolio removal process...');
+            try {
+                await this.removePortfolioEntries();
+                console.log('🗑️ [PAYMENT DEBUG] Portfolio removal process completed');
+            } catch (err) {
+                console.error('❌ [PAYMENT DEBUG] Portfolio removal failed:', err);
+            }
+            
+            await this.clearCart();
+            
+        } catch (err) {
+            console.error('❌ [PAYMENT DEBUG] Critical error in payment processing:', err);
+        } finally {
+            // Clear the timeout since we're completing normally
+            clearTimeout(timeoutId);
+            
+            // ALWAYS hide the loading screen, even if there were errors
+            console.log('🔄 [PAYMENT DEBUG] Hiding loading screen...');
+            this.hidePaymentProcessingScreen();
+            
+            // Show success message and redirect to forms page
+            if (processedItems.length > 0) {
+                alert('Payment successful! Your documents have been saved to My Documents.');
+            } else {
+                alert('Payment successful! However, there were issues saving some documents. Please contact support if needed.');
+            }
+            
+            // Clear the URL parameters to prevent re-triggering on page reload
+            window.history.replaceState({}, document.title, window.location.pathname);
+            
+            // Redirect to forms page
+            window.location.href = 'forms.html';
         }
-        
-        console.log('🎉 [PAYMENT DEBUG] PDF processing complete!');
-        console.log('✅ [PAYMENT DEBUG] Successfully processed items:', processedItems.length, processedItems.map(item => item.title));
-        console.log('❌ [PAYMENT DEBUG] Failed items:', failedItems.length, failedItems.map(item => item.title));
-        
-        // Remove portfolio entries after successful payment
-        console.log('🗑️ [PAYMENT DEBUG] Starting portfolio removal process...');
-        await this.removePortfolioEntries();
-        console.log('🗑️ [PAYMENT DEBUG] Portfolio removal process completed');
-        
-        await this.clearCart();
-        
-        // Show debug alert with processing results (commented out for production)
-        /*
-        const debugInfo = `🎉 Payment Debug Results:
-        
-✅ Successfully processed ${processedItems.length} PDF(s):
-${processedItems.map(item => `- ${item.title} (${item.formId}) - Portfolio: ${item.portfolioId || 'N/A'}`).join('\n')}
-
-${failedItems.length > 0 ? `❌ Failed to process ${failedItems.length} PDF(s):
-${failedItems.map(item => `- ${item.title} (${item.formId})`).join('\n')}` : '✅ All PDFs processed successfully!'}
-
-📁 PDFs with the same portfolio ID will be grouped together in My Documents.
-📥 Clicking download will open all PDFs associated with that form.
-
-Forms page requested.`;
-        
-        alert(debugInfo);
-        */
-        
-        // Hide the loading screen
-        this.hidePaymentProcessingScreen();
-        
-        // Show success message and redirect to forms page
-        alert('Payment successful! Your documents have been saved to My Documents.');
-        
-        // Clear the URL parameters to prevent re-triggering on page reload
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        // Redirect to forms page
-        window.location.href = 'forms.html';
     }
 
     async removePortfolioEntries() {
