@@ -741,6 +741,14 @@
             padding-left: 0;
             padding-right: 0;
         }
+        .hero-content.hero-content-gridfit h1 {
+            text-align: center;
+            width: 100%;
+        }
+        .hero-content.hero-content-gridfit p {
+            text-align: center;
+            width: 100%;
+        }
         .hero-services-row.hero-services-row-gridfit{
   display:grid;
   /* smaller min and smaller gap = more columns before wrapping */
@@ -1613,10 +1621,13 @@
             <div class="hero-container hero-gridfit">
                 <img src="Images/home1.png" alt="FormWiz user" class="hero-img hero-img-left">
                 <div class="hero-content hero-content-gridfit">
-                    <h1><center>
-                        FormWiz: Simplifying Legal Paperwork <span class="hero-highlight-orange">for You</span>
-                    </h1><center>
+                    <h1>
+                        Simplifying Legal Paperwork <span class="hero-highlight-orange">For You</span>
+                    </h1>
                     <p>Automate your forms required for filing with a court with confidence.</p></center><br>
+                    <a href="Pages/forms.html" class="btn hero-btn" id="get-started-btn" style="display: none;">Get Started
+                        <div class="tiny-click-here"></div>
+                    </a><br>
                     <a href="Bot/index.html" class="btn hero-btn">How can we help?
                         <div class="tiny-click-here"></div>
                     </a>
@@ -1788,6 +1799,7 @@
             }
             const auth = firebase.auth();
             const signInButton = document.querySelector('.sign-in-btn');
+            const getStartedBtn = document.getElementById('get-started-btn');
 
             auth.onAuthStateChanged(function(user) {
                 console.log('Auth state changed. User:', user);
@@ -1806,6 +1818,10 @@
                             });
                         };
                     }
+                    // Show Get Started button
+                    if (getStartedBtn) {
+                        getStartedBtn.style.display = 'inline-flex';
+                    }
                     // Redirect to forms.html if on index.html (commented out for now)
                     if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '/public/' || window.location.pathname === '/public/index.html') {
                         //window.location.href = 'Pages/forms.html';
@@ -1818,6 +1834,10 @@
                         signInButton.textContent = 'Sign In';
                         signInButton.href = 'Pages/account.html';
                         signInButton.onclick = null;
+                    }
+                    // Hide Get Started button
+                    if (getStartedBtn) {
+                        getStartedBtn.style.display = 'none';
                     }
                 }
             });

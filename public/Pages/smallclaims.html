@@ -289,8 +289,17 @@
         .pro-footer, footer {
             flex-shrink: 0;
         }
+        .forms-container {
+            width: 100%;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(44,62,80,0.08);
+            padding: 40px;
+        }
+
         .freeform-card {
             background: #fff;
+            border: 2px solid #b8dce8;
             border-radius: 18px;
             box-shadow: 0 2px 12px rgba(44,62,80,0.08);
             padding: 32px 28px 28px 28px;
@@ -746,6 +755,244 @@
         #defendant-modal-submit:hover {
             background-color: #1c598a;
         }
+
+        /* Guided Module Styles */
+        .guided-module {
+            width: 100%;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(44,62,80,0.08);
+            padding: 40px;
+        }
+
+        .guided-module-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .guided-step {
+            display: none;
+        }
+
+        .guided-step.active {
+            display: block;
+        }
+
+        .step-question {
+            font-size: 1.3em;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .step-options {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .step-option-btn {
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px 24px;
+            font-size: 1.1em;
+            font-weight: 500;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .step-option-btn:hover {
+            border-color: #2980b9;
+            background: #f8fbff;
+            transform: translateX(4px);
+        }
+
+        .step-option-btn .option-icon {
+            font-size: 1.2em;
+        }
+
+        .step-examples {
+            background: #f8fafc;
+            border-left: 4px solid #2980b9;
+            padding: 16px 20px;
+            margin-top: 16px;
+            border-radius: 8px;
+        }
+
+        .step-examples-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .step-examples-list {
+            color: #555;
+            line-height: 1.8;
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        /* Form Recommendation Module Styles (exact copy from Bot/index.html) */
+        .form-recommendation-module {
+            background: linear-gradient(135deg, #f8fbff 0%, #e8f4fd 100%);
+            border: 2px solid #2980b9;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 16px 0;
+            box-shadow: 0 8px 32px rgba(41, 128, 185, 0.15);
+            position: relative;
+            overflow: hidden;
+            display: none;
+        }
+
+        .form-recommendation-module.show {
+            display: block;
+            animation: formModuleSlideIn 0.5s ease-out;
+        }
+
+        .form-recommendation-module::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2980b9 0%, #4f8cff 100%);
+        }
+
+        .form-module-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .form-module-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #2980b9 0%, #4f8cff 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            box-shadow: 0 4px 12px rgba(41, 128, 185, 0.3);
+        }
+
+        .form-module-icon svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        .form-module-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .form-module-subtitle {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin: 4px 0 0 0;
+        }
+
+        .form-module-description {
+            color: #555;
+            font-size: 1.05em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .form-module-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .form-get-started-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 28px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .form-get-started-btn:hover {
+            background: linear-gradient(135deg, #219150 0%, #27ae60 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+
+        .form-get-started-btn:active {
+            transform: translateY(0);
+        }
+
+        .form-module-info {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        /* Animation for module appearance */
+        @keyframes formModuleSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-navigation {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .step-back-btn {
+            background: #95a5a6;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .step-back-btn:hover {
+            background: #7f8c8d;
+        }
+
+        .step-back-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -797,20 +1044,104 @@
 
     <main style="min-height:60vh;background:#eaf1f8;flex:1 0 auto;">
         <!-- Banner Section -->
-        <section style="width:100%;background:#fff;border-radius:0 0 32px 32px;box-shadow:0 4px 32px rgba(44,62,80,0.07);margin-bottom:40px;padding:48px 0 32px 0;display:flex;flex-direction:column;align-items:center;">
+        <section style="width:100%;background:#fff;border-radius:0 0 32px 32px;box-shadow:0 4px 32px rgba(44,62,80,0.07);margin-bottom:24px;padding:48px 0 32px 0;display:flex;flex-direction:column;align-items:center;">
             <div style="display:flex;flex-direction:row;align-items:center;gap:48px;max-width:1100px;width:95vw;">
                 <div style="flex:1;min-width:260px;max-width:420px;display:flex;align-items:center;justify-content:center;">
                     <img src="../Images/smallclaims.jpg" alt="Small Claims Banner" style="width:100%;max-width:340px;height:auto;border-radius:18px;box-shadow:0 2px 12px rgba(44,62,80,0.10);object-fit:cover;background:#eaf1f8;" />
                 </div>
                 <div style="flex:2;min-width:260px;">
                     <h1 style="font-size:2.6em;color:#2c3e50;font-family:'Montserrat',serif;font-weight:700;margin-bottom:18px;">Small Claims</h1>
-                    <p style="font-size:1.35em;color:#444;margin-bottom:0;font-weight:500;">Small Claims Forms: Need to resolve a minor dispute quickly and affordably? Fill out the paperwork fast and hassle-free — we’ve got you covered!</p>
+                    <p style="font-size:1.35em;color:#444;margin-bottom:0;font-weight:500;">Small Claims Forms: Need to resolve a minor dispute quickly and affordably? Fill out the paperwork fast and hassle-free — we've got you covered!</p>
                 </div>
-            </div><br><br>
+            </div>
         </section>
+
         <!-- Forms Collection Section -->
         <section style="width:100%;max-width:1200px;margin:0 auto 80px auto;display:flex;flex-direction:column;align-items:center;">
-            <h2 style="font-size:2em;color:#2c3e50;font-family:'Montserrat',serif;font-weight:700;margin-bottom:32px;text-align:center;">Choose a Small Claims Form</h2>
+            <!-- Guided Module Section -->
+            <div class="guided-module" style="margin-bottom:0;">
+                <h2 class="guided-module-title">
+                    <span>⚖️</span>
+                    <span>Which Small Claims Form Do I Use?</span>
+                    <br><br>
+                </h2>
+                
+                <!-- Step 1: Starting or Responding -->
+                <div class="guided-step active" id="step1">
+                    <div class="step-question">1️⃣ Are you starting a case or responding to one?</div>
+                    <div class="step-options">
+                        <button class="step-option-btn" onclick="handleStep1Answer('starting')">
+                            <span class="option-icon">🧾</span>
+                            <span>Starting a case</span>
+                        </button>
+                        <button class="step-option-btn" onclick="handleStep1Answer('responding')">
+                            <span class="option-icon">✉️</span>
+                            <span>Responding to a case someone filed against you</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: COVID-19 Related -->
+                <div class="guided-step" id="step2">
+                    <div class="step-question">2️⃣ Is your problem related to COVID-19?</div>
+                    <div class="step-examples">
+                        <div class="step-examples-title">Examples:</div>
+                        <ul class="step-examples-list">
+                            <li>Missed rent or payments during shutdowns</li>
+                            <li>Canceled services or refunds from the pandemic</li>
+                            <li>Business losses caused by COVID rules</li>
+                        </ul>
+                    </div><br>
+                    <div class="step-options">
+                        <button class="step-option-btn" onclick="handleStep2Answer('yes')">
+                            <span class="option-icon">✓</span>
+                            <span>Yes</span>
+                        </button>
+                        <button class="step-option-btn" onclick="handleStep2Answer('no')">
+                            <span class="option-icon">✗</span>
+                            <span>No</span>
+                        </button>
+                    </div>
+                    <div class="step-navigation">
+                        <button class="step-back-btn" onclick="goToStep(1)">← Back</button>
+                    </div>
+                </div>
+
+                <!-- Form Recommendation Module -->
+                <div class="form-recommendation-module" id="form-recommendation-module">
+                    <div class="form-module-header">
+                        <div class="form-module-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 21H21V19H3V21ZM5 17H19V15H5V17ZM7 13H17V11H7V13ZM9 9H15V7H9V9ZM11 5H13V3H11V5Z" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="form-module-title" id="form-module-title">SC-100</h3>
+                            <p class="form-module-subtitle">Recommended Form</p>
+                        </div>
+                    </div>
+                    <div class="form-module-description" id="form-module-description">
+                        Plaintiff's Claim form for suing a defendant
+                    </div>
+                    <div class="form-module-actions">
+                        <button class="form-get-started-btn" id="form-get-started-btn" onclick="handleFormCardClick()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10 6H6C4.9 6 4 6.9 4 8V18C4 19.1 4.9 20 6 20H16C17.1 20 18 19.1 18 18V14M14 4H20M20 4V10M20 4L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Get Started
+                        </button>
+                        <span class="form-module-info">Click to start the form process</span>
+                    </div>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button class="step-back-btn" onclick="resetGuidedModule()" style="background: #95a5a6;">Start Over</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Forms Container -->
+            <div class="forms-container" style="margin-top:24px;">
+                <h2 style="font-size:2em;color:#2c3e50;font-family:'Montserrat',serif;font-weight:700;margin-bottom:32px;text-align:center;margin-top:0;">Choose a Small Claims Form</h2>
+                
             <div style="display:grid;grid-template-columns:repeat(3,minmax(380px,1fr));gap:32px;width:100%;">
                 <!-- SC-100 Card -->
                 <div class="freeform-card" style="cursor: pointer;" onclick="showCountyModal('sc100', 'SC-100 Plaintiff\'s Claim and ORDER to Go to Small Claims Court'); return false;">
@@ -844,6 +1175,7 @@
                     <div style="font-size:1.05em;color:#555;margin-bottom:16px;">Resolve disputes related to COVID-19 through small claims court procedures.</div>
                     <div style="font-size:1.1em;color:#2980b9;font-weight:700;margin-bottom:10px;">Free</div>
                     <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;" onclick="showCountyModal('sc500', 'SC-500 COVID-19 Small Claims Dispute Resolution'); return false;">Get Started</a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1605,6 +1937,84 @@
             document.getElementById('defendant-modal-submit').addEventListener('click', handleDefendantSubmit);
             document.getElementById('defendant-modal-cancel').addEventListener('click', closeDefendantModal);
             document.getElementById('defendant-modal-close').addEventListener('click', closeDefendantModal);
+        }
+
+        // Guided Module JavaScript
+        let selectedFormId = null;
+        let selectedFormName = null;
+
+        function handleStep1Answer(answer) {
+            if (answer === 'responding') {
+                // Show SC-120 recommendation
+                showFormRecommendation('sc120', 'SC-120', 'Defendant\'s Claim and ORDER to Go to Small Claims Court', 'File a counterclaim as a defendant in response to a small claims case.');
+            } else if (answer === 'starting') {
+                // Go to Step 2
+                goToStep(2);
+            }
+        }
+
+        function handleStep2Answer(answer) {
+            if (answer === 'yes') {
+                // Show SC-500 recommendation
+                showFormRecommendation('sc500', 'SC-500', 'COVID-19 Small Claims Dispute Resolution', 'Resolve disputes related to COVID-19 through small claims court procedures.');
+            } else if (answer === 'no') {
+                // Show SC-100 recommendation
+                showFormRecommendation('sc100', 'SC-100', 'Plaintiff\'s Claim and ORDER to Go to Small Claims Court', 'Start your small claims case as a plaintiff and notify the defendant of your claim.');
+            }
+        }
+
+        function goToStep(stepNumber) {
+            // Hide all steps
+            document.querySelectorAll('.guided-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Hide recommendation module
+            const recommendationModule = document.getElementById('form-recommendation-module');
+            if (recommendationModule) {
+                recommendationModule.classList.remove('show');
+            }
+            
+            // Show the requested step
+            const step = document.getElementById('step' + stepNumber);
+            if (step) {
+                step.classList.add('active');
+            }
+        }
+
+        function showFormRecommendation(formId, formNumber, formName, description) {
+            selectedFormId = formId;
+            selectedFormName = formNumber + ' ' + formName;
+            
+            // Hide all steps
+            document.querySelectorAll('.guided-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Update recommendation module
+            document.getElementById('form-module-title').textContent = formNumber;
+            document.getElementById('form-module-description').textContent = description;
+            
+            // Show recommendation module
+            const recommendationModule = document.getElementById('form-recommendation-module');
+            if (recommendationModule) {
+                recommendationModule.classList.add('show');
+            }
+        }
+
+        function handleFormCardClick() {
+            if (selectedFormId && selectedFormName) {
+                // Use the existing showCountyModal function
+                showCountyModal(selectedFormId, selectedFormName);
+            }
+        }
+
+        function resetGuidedModule() {
+            // Reset to step 1
+            goToStep(1);
+            // Clear selected form
+            selectedFormId = null;
+            selectedFormName = null;
         }
 
         // Initialize popup system
