@@ -1066,17 +1066,17 @@
                     <br><br>
                 </h2>
                 
-                <!-- Step 1: Starting or Responding -->
+                <!-- Step 1: Counterclaim Question -->
                 <div class="guided-step active" id="step1">
-                    <div class="step-question">1️⃣ Are you starting a case or responding to one?</div>
+                    <div class="step-question">1️⃣ Do you have a claim against someone who has already filed a small claims case against you?</div>
                     <div class="step-options">
-                        <button class="step-option-btn" onclick="handleStep1Answer('starting')">
-                            <span class="option-icon">🧾</span>
-                            <span>Starting a case</span>
+                        <button class="step-option-btn" onclick="handleStep1Answer('yes')">
+                            <span class="option-icon">✓</span>
+                            <span>Yes</span>
                         </button>
-                        <button class="step-option-btn" onclick="handleStep1Answer('responding')">
-                            <span class="option-icon">✉️</span>
-                            <span>Responding to a case someone filed against you</span>
+                        <button class="step-option-btn" onclick="handleStep1Answer('no')">
+                            <span class="option-icon">✗</span>
+                            <span>No</span>
                         </button>
                     </div>
                 </div>
@@ -1944,11 +1944,11 @@
         let selectedFormName = null;
 
         function handleStep1Answer(answer) {
-            if (answer === 'responding') {
-                // Show SC-120 recommendation
+            if (answer === 'yes') {
+                // Show SC-120 recommendation (counterclaim)
                 showFormRecommendation('sc120', 'SC-120', 'Defendant\'s Claim and ORDER to Go to Small Claims Court', 'File a counterclaim as a defendant in response to a small claims case.');
-            } else if (answer === 'starting') {
-                // Go to Step 2
+            } else if (answer === 'no') {
+                // Go to Step 2 (COVID-19 question)
                 goToStep(2);
             }
         }
