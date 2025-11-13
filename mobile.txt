@@ -1,0 +1,1338 @@
+================================================================================
+MOBILE UI/UX DESIGN PRACTICES - FormStar Mobile Optimization Guide
+================================================================================
+
+This document outlines best practices for optimizing FormStar pages for mobile devices.
+Use this guide when converting desktop pages to mobile-friendly versions.
+
+NOTE: All references to "FormWiz" have been rebranded to "FormStar" throughout
+the codebase. When applying these practices to new pages, use "FormStar" as the
+brand name.
+
+GOLDEN STANDARD: The file `public/Pages/forms.html` serves as our golden standard
+for mobile optimization. All measurements, spacing, and patterns documented here
+are based on the implementation in forms.html. When in doubt, refer to forms.html
+as the reference implementation.
+
+================================================================================
+1. HEADER TRANSFORMATION: Desktop Navigation → Mobile Hamburger Menu
+================================================================================
+
+OVERVIEW:
+Transform the desktop horizontal navigation menu into a mobile hamburger menu that
+slides in from the left. The desktop navigation should be completely hidden on mobile,
+and only the hamburger menu button should be visible.
+
+-------------------------------------------------------------------------------
+STEP 1: HTML Structure
+-------------------------------------------------------------------------------
+
+Add the following HTML elements to your header:
+
+1. Mobile Hamburger Menu Button (place BEFORE the logo):
+   ```html
+   <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
+       <span></span>
+       <span></span>
+       <span></span>
+   </button>
+   ```
+
+2. Desktop Navigation (add class "desktop-nav" to existing nav):
+   ```html
+   <nav class="desktop-nav">
+       <!-- Your existing navigation links -->
+   </nav>
+   ```
+
+3. Mobile Navigation Menu (add AFTER desktop nav):
+   ```html
+   <nav class="mobile-nav" id="mobile-nav">
+       <a href="../index.html">Home</a>
+       <div class="mobile-nav-section">
+           <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
+           <div class="mobile-nav-submenu" id="mobile-forms-menu">
+               <a href="forms.html">My Forms</a>
+               <a href="FreeForm.html">Free Form</a>
+               <!-- Add other submenu items -->
+           </div>
+       </div>
+       <a href="about.html">About Us</a>
+       <a href="contact.html">Contact Us</a>
+       <a href="FAQ.html">FAQ</a>
+       <!-- Logout option (shown when user is logged in) -->
+       <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
+           <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
+       </div>
+   </nav>
+   ```
+   
+   NOTE: The logout button should be placed in the hamburger menu, not in the header.
+   It appears at the bottom of the mobile menu when the user is logged in.
+
+-------------------------------------------------------------------------------
+STEP 2: CSS Styles - Base Styles (Desktop)
+-------------------------------------------------------------------------------
+
+Add these base styles to your CSS:
+
+1. Desktop Navigation Styles:
+   ```css
+   nav.desktop-nav {
+       position: absolute;
+       left: 50%;
+       transform: translateX(-50%);
+       display: flex;
+       gap: 38px;
+       z-index: 2;
+   }
+   
+   nav.desktop-nav a {
+       color: #fff;
+       text-decoration: none;
+       font-weight: 700;
+       font-size: 1.18em;
+       letter-spacing: 0.02em;
+       padding: 2px 8px;
+       transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+       border-radius: 6px;
+       display: flex;
+       align-items: center;
+   }
+   
+   nav.desktop-nav a:hover {
+       color: #ff7043;
+       background: rgba(255,255,255,0.08);
+       box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+   }
+   ```
+
+2. Mobile Hamburger Menu Button (hidden by default):
+   ```css
+   .mobile-menu-toggle {
+       display: none;
+       flex-direction: column;
+       justify-content: space-around;
+       width: 30px;
+       height: 30px;
+       background: transparent;
+       border: none;
+       cursor: pointer;
+       padding: 0;
+       z-index: 1001;
+       position: absolute;
+       left: 15px;
+       top: 50%;
+       transform: translateY(-50%);
+   }
+   
+   .mobile-menu-toggle span {
+       width: 25px;
+       height: 3px;
+       background: #fff;
+       border-radius: 3px;
+       transition: all 0.3s ease;
+       transform-origin: 1px;
+   }
+   
+   .mobile-menu-toggle.active span:first-child {
+       transform: rotate(45deg);
+   }
+   
+   .mobile-menu-toggle.active span:nth-child(2) {
+       opacity: 0;
+   }
+   
+   .mobile-menu-toggle.active span:last-child {
+       transform: rotate(-45deg);
+   }
+   ```
+
+3. Mobile Navigation Menu (hidden by default):
+   ```css
+   .mobile-nav {
+       display: none;
+       position: fixed;
+       top: 0;
+       left: -100%;
+       width: 80%;
+       max-width: 300px;
+       height: 100vh;
+       background: #2c3e50;
+       flex-direction: column;
+       padding: 80px 20px 20px 20px;
+       transition: left 0.3s ease;
+       z-index: 1000;
+       box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+   }
+   
+   .mobile-nav.active {
+       left: 0;
+   }
+   
+   .mobile-nav a {
+       color: #fff;
+       text-decoration: none;
+       padding: 15px 0;
+       border-bottom: 1px solid #34495e;
+       font-size: 1.1em;
+       font-weight: 600;
+   }
+   
+   .mobile-nav-section {
+       border-bottom: 1px solid #34495e;
+   }
+   
+   .mobile-nav-toggle {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       color: #fff;
+       text-decoration: none;
+       padding: 15px 0;
+       font-size: 1.1em;
+       font-weight: 600;
+       cursor: pointer;
+   }
+   
+   .mobile-nav-submenu {
+       display: none;
+       padding-left: 20px;
+   }
+   
+   .mobile-nav-submenu.active {
+       display: block;
+   }
+   
+   .mobile-nav-submenu a {
+       padding: 10px 0;
+       font-size: 1em;
+       border-bottom: 1px solid #34495e;
+   }
+   
+   .mobile-nav-toggle span {
+       transition: transform 0.3s ease;
+   }
+   
+   .mobile-nav-toggle.active span {
+       transform: rotate(180deg);
+   }
+   
+   /* Logout button styling (orange color to distinguish) */
+   .mobile-nav-logout {
+       color: #ff7043 !important;
+       font-weight: 700;
+   }
+   ```
+
+-------------------------------------------------------------------------------
+STEP 3: CSS Styles - Mobile Media Query (@media max-width: 768px)
+-------------------------------------------------------------------------------
+
+Add these styles inside your mobile media query:
+
+```css
+@media (max-width: 768px) {
+    /* Show hamburger menu, hide desktop nav */
+    .mobile-menu-toggle {
+        display: flex;
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .desktop-nav {
+        display: none !important;
+    }
+    
+    .mobile-nav {
+        display: flex;
+    }
+    
+    /* Header adjustments */
+    header {
+        padding: 15px 15px;
+        flex-wrap: wrap;
+        gap: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        position: relative;
+    }
+    
+    header img {
+        width: 100px;
+        height: 60px;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .header-actions {
+        gap: 10px;
+        margin-left: 0;
+    }
+    
+    .sign-in-btn {
+        font-size: 0.9em;
+        padding: 6px 20px;
+        margin-left: 0;
+    }
+}
+```
+
+KEY POINTS:
+- Use `display: none !important;` on `.desktop-nav` to ensure it's completely hidden
+- Position hamburger button absolutely on the left side
+- Center the logo absolutely
+- Mobile nav slides in from left (-100% to 0)
+
+-------------------------------------------------------------------------------
+STEP 4: JavaScript Functionality
+-------------------------------------------------------------------------------
+
+Add this JavaScript to handle mobile menu interactions:
+
+```javascript
+document.addEventListener('DOMContentLoaded', function() {
+    // Mobile menu functionality
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const mobileNav = document.getElementById('mobile-nav');
+    const mobileFormsToggle = document.getElementById('mobile-forms-toggle');
+    const mobileFormsMenu = document.getElementById('mobile-forms-menu');
+    const body = document.body;
+
+    function toggleMobileMenu() {
+        if (mobileMenuToggle && mobileNav) {
+            mobileMenuToggle.classList.toggle('active');
+            mobileNav.classList.toggle('active');
+            body.classList.toggle('menu-open');
+        }
+    }
+
+    function closeMobileMenu() {
+        if (mobileMenuToggle && mobileNav) {
+            mobileMenuToggle.classList.remove('active');
+            mobileNav.classList.remove('active');
+            body.classList.remove('menu-open');
+        }
+    }
+
+    // Toggle mobile menu
+    if (mobileMenuToggle) {
+        mobileMenuToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleMobileMenu();
+        });
+    }
+
+    // Toggle mobile forms submenu
+    if (mobileFormsToggle) {
+        mobileFormsToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            mobileFormsToggle.classList.toggle('active');
+            if (mobileFormsMenu) {
+                mobileFormsMenu.classList.toggle('active');
+            }
+        });
+    }
+
+    // Close mobile menu when clicking on links
+    if (mobileNav) {
+        mobileNav.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' && !e.target.classList.contains('mobile-nav-toggle')) {
+                closeMobileMenu();
+            }
+        });
+    }
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (mobileNav && !mobileNav.contains(e.target) && mobileMenuToggle && !mobileMenuToggle.contains(e.target)) {
+            closeMobileMenu();
+        }
+    });
+
+    // Close mobile menu on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && mobileNav && mobileNav.classList.contains('active')) {
+            closeMobileMenu();
+        }
+    });
+
+    // Prevent body scroll when menu is open
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+                if (body.classList.contains('menu-open')) {
+                    body.style.overflow = 'hidden';
+                } else {
+                    body.style.overflow = '';
+                }
+            }
+        });
+    });
+    observer.observe(body, { attributes: true });
+});
+```
+
+FUNCTIONALITY INCLUDES:
+- Toggle menu on hamburger click
+- Close menu when clicking navigation links
+- Close menu when clicking outside
+- Close menu on Escape key
+- Prevent body scroll when menu is open
+- Toggle submenus (like Forms dropdown)
+- Show/hide logout button based on authentication state
+- Handle logout action when logout button is clicked
+
+AUTHENTICATION STATE HANDLING:
+```javascript
+const signInBtn = document.getElementById('sign-in-btn');
+const mobileAuthSection = document.getElementById('mobile-auth-section');
+const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+
+auth.onAuthStateChanged(function(user) {
+    if (user) {
+        if (signInBtn) signInBtn.style.display = 'none';
+        if (mobileAuthSection) mobileAuthSection.style.display = 'block';
+    } else {
+        if (signInBtn) signInBtn.style.display = 'inline-block';
+        if (mobileAuthSection) mobileAuthSection.style.display = 'none';
+    }
+});
+
+if (mobileLogoutBtn) {
+    mobileLogoutBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        auth.signOut().then(() => {
+            window.location.href = '../index.html';
+        }).catch((error) => {
+            alert('Sign Out Error: ' + error.message);
+        });
+    });
+}
+```
+
+-------------------------------------------------------------------------------
+CHECKLIST FOR HEADER TRANSFORMATION:
+-------------------------------------------------------------------------------
+
+[ ] Added hamburger menu button HTML
+[ ] Added "desktop-nav" class to existing nav element
+[ ] Added mobile navigation menu HTML
+[ ] Added base CSS for hamburger menu (hidden by default)
+[ ] Added base CSS for mobile nav menu (hidden by default)
+[ ] Added mobile media query with display: none !important for desktop-nav
+[ ] Added mobile media query to show hamburger and mobile nav
+[ ] Added JavaScript for menu toggle functionality
+[ ] Tested hamburger menu opens/closes correctly
+[ ] Tested desktop nav is completely hidden on mobile
+[ ] Tested logo is centered on mobile
+[ ] Tested menu closes when clicking links
+[ ] Tested menu closes when clicking outside
+[ ] Tested body scroll is prevented when menu is open
+[ ] Tested all menu items are centered horizontally
+[ ] Tested logout button appears in menu when user is logged in
+[ ] Tested logout button is hidden when user is not logged in
+[ ] Tested logout functionality works correctly
+
+================================================================================
+2. MOBILE HEADER ELEMENT SIZING
+================================================================================
+
+PRINCIPLE: Header elements (logo, cart icon) should be appropriately sized for
+mobile devices to ensure visibility and touch-friendliness while maintaining
+visual balance.
+
+-------------------------------------------------------------------------------
+MOBILE LOGO SIZING
+-------------------------------------------------------------------------------
+
+The header logo should be larger on mobile than typical desktop sizes to ensure
+brand visibility. Based on forms.html (our golden standard):
+
+```css
+@media (max-width: 768px) {
+    header {
+        padding: 16px 15px;
+        min-height: 80px;
+        position: relative;
+    }
+    
+    header img {
+        width: 119px;
+        height: 73px;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+```
+
+KEY POINTS:
+- Logo size: 119px × 73px (maintains aspect ratio similar to desktop 130px × 80px)
+- Header padding: 16px vertical, 15px horizontal
+- Header min-height: 80px to accommodate larger logo
+- Logo is absolutely positioned and centered horizontally
+- Hamburger menu button positioned on left, logo centered, cart/actions on right
+
+-------------------------------------------------------------------------------
+MOBILE CART ICON SIZING
+-------------------------------------------------------------------------------
+
+The cart icon should be larger on mobile for better touch targets and visibility:
+
+```css
+@media (max-width: 768px) {
+    #cart-icon-link .cart-circle {
+        width: 55px !important;
+        height: 55px !important;
+    }
+    
+    #cart-icon {
+        width: 30px !important;
+        height: 30px !important;
+    }
+}
+```
+
+KEY POINTS:
+- Cart circle: 55px × 55px (touch-friendly, larger than desktop)
+- Cart icon SVG: 30px × 30px (proportional to circle)
+- Use `!important` to override desktop styles
+- Ensures cart icon is easily tappable on mobile devices
+
+-------------------------------------------------------------------------------
+MOBILE SIGN-IN BUTTON SIZING
+-------------------------------------------------------------------------------
+
+```css
+@media (max-width: 768px) {
+    .sign-in-btn {
+        font-size: 0.9em;
+        padding: 6px 20px;
+        margin-left: 0;
+    }
+    
+    .header-actions {
+        gap: 10px;
+        margin-left: auto;
+        margin-right: 15px;
+    }
+}
+```
+
+KEY POINTS:
+- Sign-in button font size reduced slightly for mobile
+- Padding adjusted for mobile touch targets
+- Header actions (cart + sign-in) positioned on right side
+- Gap between header action elements: 10px
+
+-------------------------------------------------------------------------------
+CHECKLIST FOR MOBILE HEADER ELEMENT SIZING:
+-------------------------------------------------------------------------------
+
+[ ] Logo is 119px × 73px on mobile
+[ ] Header has min-height: 80px
+[ ] Header padding is 16px vertical, 15px horizontal
+[ ] Cart circle is 55px × 55px on mobile
+[ ] Cart icon SVG is 30px × 30px on mobile
+[ ] Sign-in button is appropriately sized for mobile
+[ ] All header elements are properly spaced and aligned
+[ ] Logo is centered, hamburger on left, actions on right
+
+================================================================================
+3. WELCOME HEADER MOBILE OPTIMIZATION
+================================================================================
+
+PRINCIPLE: Welcome headers should be optimized for mobile with appropriate
+spacing, typography, and layout adjustments.
+
+-------------------------------------------------------------------------------
+WELCOME HEADER MOBILE STYLES
+-------------------------------------------------------------------------------
+
+Based on forms.html (our golden standard):
+
+```css
+@media (max-width: 768px) {
+    .welcome-header {
+        padding: 24px 15px 18px 15px;
+    }
+    
+    .welcome-header-title {
+        font-size: 1.6em;
+        margin-bottom: 15px;
+    }
+    
+    .welcome-header-option-icon {
+        font-size: 1.8em;
+        margin-bottom: 8px;
+    }
+    
+    .welcome-header-option-label {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-header-title {
+        font-size: 1.4em;
+    }
+    
+    .welcome-header-option-icon {
+        font-size: 1.6em;
+    }
+    
+    .welcome-header-option-label {
+        font-size: 0.9em;
+    }
+}
+```
+
+KEY POINTS:
+- Reduced padding on mobile (24px top, 15px sides, 18px bottom)
+- Title font size: 1.6em (mobile), 1.4em (small mobile)
+- Icon and label sizes adjusted proportionally
+- Welcome header options use 2x2 grid (see Section 6)
+
+-------------------------------------------------------------------------------
+CHECKLIST FOR WELCOME HEADER MOBILE:
+-------------------------------------------------------------------------------
+
+[ ] Welcome header has reduced padding on mobile
+[ ] Title font size is appropriately scaled (1.6em on mobile, 1.4em on small mobile)
+[ ] Icons and labels are proportionally sized
+[ ] Options are arranged in 2x2 grid (see Section 6)
+[ ] Spacing is consistent and visually balanced
+
+================================================================================
+4. RESPONSIVE TYPOGRAPHY
+================================================================================
+
+PRINCIPLE: Scale font sizes appropriately for mobile screens
+
+MOBILE TYPOGRAPHY ADJUSTMENTS:
+```css
+@media (max-width: 768px) {
+    html {
+        font-size: 14px; /* Base font size reduction */
+    }
+    
+    h1 {
+        font-size: 1.6em; /* Reduced from 2.2em */
+    }
+    
+    h2 {
+        font-size: 1.4em; /* Reduced from 1.8em */
+    }
+    
+    p {
+        font-size: 0.95em; /* Slightly reduced */
+    }
+}
+```
+
+SMALL MOBILE (320px - 480px):
+```css
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.4em;
+    }
+    
+    h2 {
+        font-size: 1.2em;
+    }
+}
+```
+
+================================================================================
+5. TOUCH-FRIENDLY INTERACTIVE ELEMENTS
+================================================================================
+
+PRINCIPLE: All interactive elements must be at least 44x44px for comfortable tapping
+
+TOUCH TARGET SIZES:
+```css
+@media (hover: none) and (pointer: coarse) {
+    /* Buttons */
+    .btn, .sign-in-btn, .cart-signup-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Navigation links */
+    nav a {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Cards and clickable elements */
+    .clickable-card {
+        min-height: 120px;
+    }
+}
+```
+
+================================================================================
+6. RESPONSIVE GRID LAYOUTS
+================================================================================
+
+PRINCIPLE: Convert multi-column grids to appropriate layouts for mobile. Some
+elements use 2x2 grids on mobile for better visual organization.
+
+-------------------------------------------------------------------------------
+2X2 GRID PATTERN FOR MOBILE (Welcome Header Options & Available Forms)
+-------------------------------------------------------------------------------
+
+Based on forms.html (our golden standard), certain card-based elements should
+use a 2x2 grid layout on mobile instead of a single column:
+
+```css
+@media (max-width: 768px) {
+    /* Welcome header options (New Form, My Forms, My Documents, Settings) */
+    .welcome-header-options {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        column-gap: 40px !important;
+        row-gap: 32px !important;
+        justify-items: center;
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 0 20px;
+        flex-direction: unset !important;
+        flex-wrap: unset !important;
+        gap: 32px 40px !important;
+    }
+    
+    .welcome-header-option {
+        width: auto !important;
+        max-width: 200px;
+        min-width: 160px;
+        padding: 24px 18px 18px 18px;
+    }
+    
+    /* Available forms list - also uses 2x2 grid */
+    #available-forms-list {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        column-gap: 40px !important;
+        row-gap: 32px !important;
+        gap: 32px 40px !important;
+        justify-items: center;
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 0 20px;
+        flex-direction: unset !important;
+        flex-wrap: unset !important;
+    }
+    
+    #available-forms-list li {
+        width: auto !important;
+        max-width: 200px;
+        min-width: 160px;
+        padding: 24px 18px 18px 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Slightly reduced spacing on small mobile */
+    .welcome-header-options {
+        column-gap: 32px !important;
+        row-gap: 28px !important;
+        gap: 28px 32px !important;
+        max-width: 100%;
+        padding: 0 15px;
+    }
+    
+    .welcome-header-option {
+        width: auto !important;
+        max-width: 100%;
+        min-width: 140px;
+        padding: 20px 14px 16px 14px;
+    }
+    
+    #available-forms-list {
+        column-gap: 32px !important;
+        row-gap: 28px !important;
+        gap: 28px 32px !important;
+        padding: 0 15px;
+    }
+    
+    #available-forms-list li {
+        max-width: 100%;
+        min-width: 140px;
+        padding: 20px 14px 16px 14px;
+    }
+}
+```
+
+KEY POINTS:
+- Use `display: grid !important` to override flexbox layouts
+- 2x2 grid pattern: `grid-template-columns: repeat(2, 1fr)`
+- Generous spacing: 40px horizontal gap, 32px vertical gap (768px+)
+- Reduced spacing on small mobile: 32px horizontal, 28px vertical (480px-)
+- Cards have `width: auto` with min/max constraints to prevent stretching
+- Container has `max-width: 500px` and is centered with `margin: 0 auto`
+- Use `!important` flags to ensure mobile styles override desktop
+
+ELEMENTS THAT USE 2X2 GRID ON MOBILE:
+- Welcome header options (New Form, My Forms, My Documents, Settings)
+- Available forms list items
+- Any card-based navigation or selection interfaces
+
+-------------------------------------------------------------------------------
+SINGLE COLUMN GRID PATTERN (Portfolio & Documents Lists)
+-------------------------------------------------------------------------------
+
+Some lists should remain single column on mobile for better readability:
+
+```css
+@media (max-width: 768px) {
+    /* Portfolio and Documents sections remain single column */
+    #portfolio-section .forms-list,
+    #documents-section .forms-list {
+        flex-direction: column !important;
+        display: flex !important;
+        align-items: center;
+        gap: 32px;
+        width: 100%;
+    }
+    
+    #portfolio-section .forms-list li,
+    #documents-section .forms-list li {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: unset !important;
+        padding: 16px 20px 14px 20px !important;
+        box-sizing: border-box !important;
+        margin: 0 auto !important;
+    }
+}
+```
+
+KEY POINTS:
+- Full-width cards for detailed content
+- Centered with `margin: 0 auto`
+- `box-sizing: border-box` for proper width calculation
+- Equal padding on left and right
+
+-------------------------------------------------------------------------------
+STANDARD GRID TRANSFORMATION PATTERN (Multi-column to Single)
+-------------------------------------------------------------------------------
+
+For general content grids that should become single column on mobile:
+
+```css
+/* Desktop: 3 columns */
+.forms-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .forms-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile: 1 column */
+@media (max-width: 768px) {
+    .forms-list {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+}
+```
+
+================================================================================
+7. MODAL DIALOGS ON MOBILE
+================================================================================
+
+PRINCIPLE: Modals should be nearly full-width on mobile for better usability
+
+MODAL MOBILE STYLES:
+```css
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95% !important;
+        margin: 10% auto !important;
+        padding: 24px 20px !important;
+        max-width: 95% !important;
+    }
+    
+    /* Form grids inside modals should stack */
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .city-state-zip {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+```
+
+================================================================================
+8. CARDS AND CONTENT CONTAINERS
+================================================================================
+
+PRINCIPLE: Cards should be full-width on mobile with appropriate padding
+
+CARD MOBILE STYLES:
+```css
+@media (max-width: 768px) {
+    .forms-card {
+        padding: 24px 20px 20px 20px;
+        margin: 0 15px;
+        border-radius: 18px;
+    }
+    
+    .forms-card h1 {
+        font-size: 1.6em;
+    }
+    
+    .forms-card .subtitle {
+        font-size: 0.95em;
+        margin-bottom: 20px;
+    }
+}
+```
+
+================================================================================
+9. FOOTER RESPONSIVE DESIGN
+================================================================================
+
+PRINCIPLE: Footer should stack vertically on mobile, be centered, and have
+optimized spacing. Logo should be larger on mobile, and the "About FormStar"
+section should have minimal vertical spacing.
+
+-------------------------------------------------------------------------------
+FOOTER MOBILE STYLES - Complete Implementation
+-------------------------------------------------------------------------------
+
+```css
+@media (max-width: 768px) {
+    .pro-footer {
+        flex-direction: column;
+        gap: 20px; /* Reduced gap */
+        padding: 30px 20px 15px 20px; /* Reduced bottom padding */
+        text-align: center;
+        box-sizing: border-box;
+        width: 100%;
+        align-items: center; /* Center all columns */
+    }
+    
+    .pro-footer-col {
+        min-width: unset !important;
+        max-width: unset !important;
+        padding: 0 !important;
+        border: none !important;
+        width: 100% !important;
+        align-items: center !important;
+        display: flex !important;
+        flex-direction: column !important;
+        text-align: center !important;
+    }
+    
+    .address-col, .nav-col, .company-col {
+        border: none !important;
+        padding: 0 !important;
+        padding-right: 0 !important; /* Ensure no right padding */
+        padding-left: 0 !important;  /* Ensure no left padding */
+        align-items: center !important;
+    }
+    
+    /* Logo - Make it twice as big on mobile */
+    .pro-footer-logo img {
+        max-width: 280px; /* Doubled from 140px */
+        max-height: 180px; /* Doubled from 90px */
+    }
+    
+    .pro-footer-title {
+        font-size: 1.3em;
+        margin-bottom: 15px;
+        text-align: center;
+        width: 100%;
+    }
+    
+    .pro-footer-desc {
+        font-size: 0.95em;
+        line-height: 1.6;
+        text-align: center;
+        max-width: 100%;
+    }
+    
+    /* Drastically reduce vertical spacing in "About FormStar" section */
+    .pro-footer-col.company-col {
+        gap: 0px !important; /* No gap between title and description */
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+    
+    .pro-footer-col.company-col .pro-footer-title {
+        margin-bottom: 3px !important; /* Minimal margin (max 5px total) */
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        font-size: 1.05em !important; /* Smaller font */
+        line-height: 1.2 !important; /* Tighter line height */
+    }
+    
+    .pro-footer-col.company-col .pro-footer-desc {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        line-height: 1.2 !important; /* Tighter line height */
+        font-size: 0.8em !important; /* Smaller font */
+    }
+    
+    footer {
+        padding: 15px; /* Reduced padding */
+    }
+}
+
+@media (max-width: 480px) {
+    .pro-footer {
+        padding: 25px 15px 15px 15px; /* Further reduced padding */
+        gap: 20px; /* Reduced gap */
+    }
+}
+
+/* Desktop footer - reduce bottom padding */
+.pro-footer {
+    padding: 48px 10vw 20px 10vw; /* Reduced bottom padding */
+}
+```
+
+KEY POINTS:
+- Use `align-items: center` and `text-align: center` to center all footer content
+- Remove navigation column (nav-col) from HTML on mobile-optimized pages
+- Logo should be twice as large on mobile (280px max-width vs 140px desktop)
+- "About FormStar" section should have maximum 5px vertical spacing total
+- Use `!important` flags to override conflicting desktop styles
+- Reduce all gaps, margins, and paddings to minimize empty space
+- Use smaller font sizes and tighter line heights for compact appearance
+
+-------------------------------------------------------------------------------
+FOOTER HTML STRUCTURE (Mobile-Optimized)
+-------------------------------------------------------------------------------
+
+Remove the navigation column for cleaner mobile layout:
+
+```html
+<div class="pro-footer">
+    <div class="pro-footer-col address-col">
+        <div class="pro-footer-logo">
+            <img src="logo.png" alt="FormStar Logo" style="max-width:120px;max-height:80px;">
+        </div>
+        <div class="pro-footer-title">FormStar</div>
+        <div class="pro-footer-contact">
+            <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
+            <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
+        </div>
+    </div>
+    <!-- Removed Navigation Column -->
+    <div class="pro-footer-col company-col">
+        <div class="pro-footer-title company-title">About FormStar</div>
+        <div class="pro-footer-desc">FormStar consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
+    </div>
+</div>
+<footer>
+    &copy; 2024 FormStar. All rights reserved.
+</footer>
+```
+
+-------------------------------------------------------------------------------
+CHECKLIST FOR FOOTER MOBILE OPTIMIZATION:
+-------------------------------------------------------------------------------
+
+[ ] Footer stacks vertically on mobile
+[ ] All footer content is centered (align-items: center, text-align: center)
+[ ] Logo is twice as big on mobile (280px max-width)
+[ ] Navigation column removed from HTML
+[ ] "About FormStar" section has maximum 5px vertical spacing
+[ ] All gaps, margins, and paddings are minimized
+[ ] Footer has reduced bottom padding
+[ ] No horizontal overflow or scrolling
+[ ] Footer text is readable and appropriately sized
+
+================================================================================
+10. VIEWPORT META TAG
+================================================================================
+
+REQUIRED: Every HTML page must include this in the <head>:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+```
+
+This ensures proper scaling on mobile devices.
+
+================================================================================
+11. MOBILE-FIRST BREAKPOINTS
+================================================================================
+
+STANDARD BREAKPOINTS:
+- Mobile: @media (max-width: 768px)
+- Small Mobile: @media (max-width: 480px)
+- Tablet: @media (min-width: 769px) and (max-width: 1024px)
+- Desktop: Default styles (no media query)
+
+================================================================================
+12. LOGOUT BUTTON IN HAMBURGER MENU
+================================================================================
+
+PRINCIPLE: Move authentication actions (like logout) into the mobile hamburger menu
+for better mobile UX and cleaner header design.
+
+-------------------------------------------------------------------------------
+STEP 1: HTML Structure
+-------------------------------------------------------------------------------
+
+Add logout option to mobile navigation menu:
+
+```html
+<nav class="mobile-nav" id="mobile-nav">
+    <a href="../index.html">Home</a>
+    <!-- ... other nav items ... -->
+    <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
+        <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
+    </div>
+</nav>
+```
+
+Remove logout button from header-actions (keep only Sign In button and cart icon).
+
+-------------------------------------------------------------------------------
+STEP 2: CSS Styles
+-------------------------------------------------------------------------------
+
+Style the logout link to stand out:
+
+```css
+.mobile-nav-logout {
+    color: #ff7043 !important;
+    font-weight: 700;
+}
+```
+
+-------------------------------------------------------------------------------
+STEP 3: JavaScript Functionality
+-------------------------------------------------------------------------------
+
+Update authentication state handling:
+
+```javascript
+document.addEventListener('DOMContentLoaded', function() {
+    const signInBtn = document.getElementById('sign-in-btn');
+    const mobileAuthSection = document.getElementById('mobile-auth-section');
+    const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+    
+    auth.onAuthStateChanged(function(user) {
+        if (user) {
+            if (signInBtn) signInBtn.style.display = 'none';
+            if (mobileAuthSection) mobileAuthSection.style.display = 'block';
+        } else {
+            if (signInBtn) signInBtn.style.display = 'inline-block';
+            if (mobileAuthSection) mobileAuthSection.style.display = 'none';
+        }
+    });
+    
+    if (mobileLogoutBtn) {
+        mobileLogoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            auth.signOut().then(() => {
+                window.location.href = '../index.html';
+            }).catch((error) => {
+                alert('Sign Out Error: ' + error.message);
+            });
+        });
+    }
+});
+```
+
+KEY POINTS:
+- Logout appears at bottom of mobile menu when user is logged in
+- Styled in orange (#ff7043) to distinguish from regular nav items
+- Menu automatically closes when logout is clicked
+- Sign In button remains in header for non-authenticated users
+
+================================================================================
+13. CARD AND CONTENT CONTAINER CENTERING
+================================================================================
+
+PRINCIPLE: Ensure cards and content containers are properly centered with equal
+padding on both sides to prevent overflow and maintain visual balance.
+
+-------------------------------------------------------------------------------
+PROBLEM:
+Cards appear to have padding on the left but overflow on the right, causing
+asymmetric appearance and potential horizontal scrolling issues.
+
+-------------------------------------------------------------------------------
+SOLUTION: Forms Card Centering
+-------------------------------------------------------------------------------
+
+For main content cards (like "My Form Portfolio"):
+
+```css
+@media (max-width: 768px) {
+    .forms-card {
+        padding: 24px 20px 20px 20px;
+        margin: 0 auto;  /* Changed from margin: 0 15px */
+        border-radius: 18px;
+        box-sizing: border-box;  /* Critical for proper width calculation */
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .main-forms-wrapper {
+        margin: 8px auto 32px auto;
+        gap: 32px;
+        padding: 0 15px;  /* Add padding to wrapper instead */
+        box-sizing: border-box;
+        width: 100%;
+    }
+}
+```
+
+KEY POINTS:
+- Use `margin: 0 auto` instead of `margin: 0 15px` for proper centering
+- Add `box-sizing: border-box` to include padding in width calculation
+- Add padding to the wrapper container, not the card itself
+- Set `width: 100%` to ensure cards fill available space properly
+
+-------------------------------------------------------------------------------
+SOLUTION: Form Entry Cards Centering
+-------------------------------------------------------------------------------
+
+For individual form entry cards within lists:
+
+```css
+@media (max-width: 768px) {
+    #portfolio-section .forms-list li {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: unset !important;
+        padding: 16px 20px 14px 20px !important;
+        box-sizing: border-box !important;  /* Critical */
+        margin: 0 auto !important;  /* Ensure centering */
+    }
+}
+
+@media (max-width: 480px) {
+    #portfolio-section .forms-list li {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: unset !important;
+        padding: 14px 16px 12px 16px !important;
+        box-sizing: border-box !important;
+        margin: 0 auto !important;
+    }
+}
+```
+
+KEY POINTS:
+- Avoid using viewport units (vw) for width as they can cause overflow
+- Use `box-sizing: border-box` to include padding in width calculations
+- Use `margin: 0 auto` for proper centering
+- Ensure equal padding on left and right sides
+- Use percentage-based widths (100%) instead of viewport units
+
+-------------------------------------------------------------------------------
+CHECKLIST:
+-------------------------------------------------------------------------------
+
+[ ] Cards use `margin: 0 auto` for centering
+[ ] `box-sizing: border-box` is applied to all cards
+[ ] Padding is equal on left and right sides
+[ ] No viewport units (vw) used for widths that could cause overflow
+[ ] Wrapper containers have padding, not individual cards
+[ ] Cards have `width: 100%` and `max-width: 100%` on mobile
+[ ] No horizontal scrolling occurs
+
+================================================================================
+14. TESTING CHECKLIST
+================================================================================
+
+Before considering a page mobile-friendly, verify:
+
+[ ] Viewport meta tag is present
+[ ] Desktop navigation is hidden on mobile (display: none !important)
+[ ] Hamburger menu is visible and functional
+[ ] All text is readable without zooming
+[ ] All buttons/links are at least 44x44px
+[ ] Forms stack vertically on mobile
+[ ] Modals are nearly full-width on mobile
+[ ] Cards are full-width or appropriately sized
+[ ] Footer stacks vertically
+[ ] No horizontal scrolling
+[ ] Images scale appropriately
+[ ] Touch interactions work smoothly
+[ ] Menu closes on link click
+[ ] Body scroll is prevented when menu is open
+
+================================================================================
+15. FORMSTAR REBRANDING
+================================================================================
+
+PRINCIPLE: All user-facing references to "FormWiz" have been rebranded to "FormStar"
+throughout the codebase. When creating new pages or updating existing ones, always
+use "FormStar" as the brand name.
+
+-------------------------------------------------------------------------------
+REBRANDING CHECKLIST:
+-------------------------------------------------------------------------------
+
+When updating or creating new pages, ensure all instances are updated:
+
+[ ] Page titles: `<title>Page Name - FormStar</title>`
+[ ] Logo alt text: `alt="FormStar Logo"`
+[ ] Footer company name: `<div class="pro-footer-title">FormStar</div>`
+[ ] Footer "About" section: `<div class="pro-footer-title company-title">About FormStar</div>`
+[ ] Footer description: "FormStar consists of..."
+[ ] Copyright notice: `&copy; 2024 FormStar. All rights reserved.`
+[ ] Welcome messages: "Welcome To FormStar!"
+[ ] Account creation messages: "create a FormStar account"
+[ ] Console log messages: `console.log('[FormStar] ...')`
+
+-------------------------------------------------------------------------------
+TECHNICAL REFERENCES TO KEEP:
+-------------------------------------------------------------------------------
+
+DO NOT change these technical identifiers (they are backend/config values):
+- Firebase project IDs: `formwiz-3f4fd` (keep as-is)
+- Cookie names: `formwiz_cart` (keep as-is)
+- JavaScript variable names that reference internal systems
+- Database collection names
+- API endpoint paths
+
+These are technical identifiers and should remain unchanged to maintain
+system functionality.
+
+-------------------------------------------------------------------------------
+SEARCH AND REPLACE PATTERNS:
+-------------------------------------------------------------------------------
+
+When rebranding a new file, search for:
+- "FormWiz" (case-sensitive) → Replace with "FormStar"
+- "formwiz" (lowercase in user-facing text) → Replace with "FormStar"
+- Check alt attributes: `alt="FormWiz Logo"` → `alt="FormStar Logo"`
+- Check title tags: `<title>...FormWiz</title>` → `<title>...FormStar</title>`
+
+Use case-sensitive search to avoid changing technical identifiers that use
+lowercase "formwiz" (like Firebase config).
+
+================================================================================
+END OF DOCUMENT
+================================================================================
+

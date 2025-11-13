@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forms - FormWiz</title>
+    <title>Forms - FormStar</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link href="cart.css" rel="stylesheet">
     <style>
@@ -40,10 +40,18 @@
             justify-content: space-between;
             position: relative;
         }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-left: auto;
+            order: 3;
+        }
         header img {
             cursor: pointer;
         }
-        nav {
+        nav.desktop-nav {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
@@ -51,7 +59,7 @@
             gap: 38px;
             z-index: 2;
         }
-        nav a {
+        nav.desktop-nav a {
             color: #fff;
             text-decoration: none;
             font-weight: 700;
@@ -63,7 +71,7 @@
             display: flex;
             align-items: center;
         }
-        nav a:hover {
+        nav.desktop-nav a:hover {
             color: #ff7043;
             background: rgba(255,255,255,0.08);
             box-shadow: 0 2px 8px rgba(44,62,80,0.10);
@@ -125,18 +133,23 @@
             gap: 0;
         }
         .dropdown-menu a {
-            color: #222;
-            padding: 12px 28px;
-            text-decoration: none;
-            display: block;
-            font-weight: 600;
-            font-size: 1.08em;
-            border-radius: 0;
-            transition: background 0.18s, color 0.18s;
+            color: #222 !important;
+            padding: 12px 28px !important;
+            text-decoration: none !important;
+            display: block !important;
+            font-weight: 600 !important;
+            font-size: 1.08em !important;
+            border-radius: 0 !important;
+            transition: background 0.18s, color 0.18s !important;
+        }
+        .dropdown-menu a:link,
+        .dropdown-menu a:visited,
+        .dropdown-menu a:active {
+            color: #222 !important;
         }
         .dropdown-menu a:hover {
-            background: #eaf1f8;
-            color: #2980b9;
+            background: #eaf1f8 !important;
+            color: #2980b9 !important;
         }
         .nav-dropdown-wrapper.open .dropdown-menu {
             display: flex;
@@ -152,15 +165,638 @@
         .nav-dropdown-wrapper.open .forms-chevron {
             transform: rotate(-90deg);
         }
+        /* Mobile hamburger menu styles */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .mobile-menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            transform-origin: 1px;
+        }
+        
+        .mobile-menu-toggle.active span:first-child {
+            transform: rotate(45deg);
+        }
+        
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .mobile-menu-toggle.active span:last-child {
+            transform: rotate(-45deg);
+        }
+        
+        .desktop-nav {
+            display: flex;
+        }
+        
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background: #2c3e50;
+            flex-direction: column;
+            padding: 80px 20px 20px 20px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .mobile-nav.active {
+            left: 0;
+        }
+        
+        .mobile-nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 18px 0;
+            border-bottom: 1px solid #34495e;
+            font-size: 1.1em;
+            font-weight: 600;
+            line-height: 1.1;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .mobile-nav-section {
+            border-bottom: 1px solid #34495e;
+        }
+        
+        .mobile-nav-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            padding: 15px 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .mobile-nav-submenu {
+            display: none;
+            padding-left: 20px;
+        }
+        
+        .mobile-nav-submenu.active {
+            display: block;
+        }
+        
+        .mobile-nav-submenu a {
+            padding: 15px 0;
+            font-size: 1em;
+            border-bottom: 1px solid #34495e;
+            line-height: 1.1;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .mobile-nav-logout {
+            color: #ff7043 !important;
+            font-weight: 700;
+        }
+        
+        .mobile-nav-toggle span {
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-nav-toggle.active span {
+            transform: rotate(180deg);
+        }
+        
+        /* Mobile overlay for menu */
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        
+        .mobile-nav-overlay.active {
+            display: block;
+        }
+
+        /* Cart Icon Styles */
+        #cart-icon-link .cart-circle {
+            width: 54px !important;
+            height: 54px !important;
+            background: #2980b9;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        #cart-icon {
+            width: 32px !important;
+            height: 32px !important;
+            display: block;
+        }
+
+        /* Sliding Cart Menu Styles */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .cart-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .cart-side-menu {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+            z-index: 10000;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-side-menu.active {
+            right: 0;
+        }
+        .cart-header {
+            background: #2c3e50;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cart-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+        .cart-close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        .cart-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .cart-content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .cart-icon-large {
+            font-size: 4em;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+        .cart-message {
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        .cart-description {
+            font-size: 1em;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .cart-signup-btn {
+            background: #2980b9;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .cart-signup-btn:hover {
+            background: #1c598a;
+        }
+
+        /* Mobile Base Styles (320px+) */
         @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                padding: 10px;
+            .mobile-menu-toggle {
+                display: flex;
             }
-            nav {
-                position: static;
-                transform: none;
-                margin-top: 10px;
+            
+            .desktop-nav {
+                display: none;
+            }
+            
+            .mobile-nav {
+                display: flex;
+            }
+            
+            /* Typography adjustments */
+            html {
+                font-size: 14px;
+            }
+            
+            body {
+                overflow-x: hidden;
+            }
+            
+            /* Header mobile optimization */
+            header {
+                padding: 16px 15px;
+                min-height: 80px;
+                flex-wrap: wrap;
+                gap: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                position: relative;
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+            
+            header img {
+                width: 119px;
+                height: 73px;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            /* Hide desktop nav completely on mobile */
+            nav.desktop-nav {
+                display: none !important;
+            }
+            
+            .header-actions {
+                gap: 10px;
+                margin-left: auto;
+                margin-right: 15px;
+            }
+            
+            .sign-in-btn {
+                font-size: 0.9em;
+                padding: 6px 20px;
+                margin-left: 0;
+            }
+            
+            #cart-icon-link .cart-circle {
+                width: 55px !important;
+                height: 55px !important;
+            }
+            
+            #cart-icon {
+                width: 30px !important;
+                height: 30px !important;
+            }
+
+            /* Welcome header mobile */
+            .welcome-header {
+                padding: 24px 15px 18px 15px;
+            }
+
+            .welcome-header-title {
+                font-size: 1.6em;
+                margin-bottom: 15px;
+            }
+
+            .welcome-header-options {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                column-gap: 40px !important;
+                row-gap: 32px !important;
+                justify-items: center;
+                max-width: 500px;
+                margin: 0 auto;
+                padding: 0 20px;
+                flex-direction: unset !important;
+                flex-wrap: unset !important;
+                gap: 32px 40px !important;
+            }
+
+            .welcome-header-option {
+                width: auto !important;
+                max-width: 200px;
+                min-width: 160px;
+                padding: 24px 18px 18px 18px;
+            }
+
+            .welcome-header-option-icon {
+                font-size: 1.8em;
+                margin-bottom: 8px;
+            }
+
+            .welcome-header-option-label {
+                font-size: 1em;
+            }
+
+            /* Forms card mobile */
+            .forms-card {
+                padding: 24px 20px 20px 20px;
+                margin: 0 auto;
+                border-radius: 18px;
+                box-sizing: border-box;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .forms-card h1 {
+                font-size: 1.6em;
+            }
+
+            .forms-card .subtitle {
+                font-size: 0.95em;
+                margin-bottom: 20px;
+            }
+
+            /* Forms list mobile - Available Forms 2x2 grid */
+            #available-forms-list {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                column-gap: 40px !important;
+                row-gap: 32px !important;
+                gap: 32px 40px !important;
+                justify-items: center;
+                max-width: 500px;
+                margin: 0 auto;
+                padding: 0 20px;
+                flex-direction: unset !important;
+                flex-wrap: unset !important;
+            }
+
+            #available-forms-list li {
+                width: auto !important;
+                max-width: 200px;
+                min-width: 160px;
+                padding: 24px 18px 18px 18px;
+            }
+
+            /* Portfolio and Documents sections remain single column */
+            #portfolio-section .forms-list,
+            #documents-section .forms-list {
+                flex-direction: column !important;
+                display: flex !important;
+            }
+
+            /* Portfolio section mobile */
+            #portfolio-section .forms-list li {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: unset !important;
+                padding: 16px 20px 14px 20px !important;
+                box-sizing: border-box !important;
+                margin: 0 auto !important;
+            }
+            
+            /* Documents section mobile - match portfolio styling */
+            #documents-section .forms-list li {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: unset !important;
+                padding: 16px 20px 14px 20px !important;
+                box-sizing: border-box !important;
+                margin: 0 auto !important;
+            }
+
+            /* Available forms search mobile */
+            #available-forms-search {
+                width: 100%;
+                max-width: 100%;
+                padding: 14px;
+                font-size: 1em;
+            }
+
+            /* Pagination mobile */
+            .forms-pagination {
+                gap: 24px;
+                margin-top: 28px;
+            }
+
+            .circle-arrow-btn {
+                width: 44px;
+                height: 44px;
+            }
+
+            .circle-arrow-btn svg {
+                width: 24px;
+                height: 24px;
+            }
+
+            /* Modal mobile */
+            .modal-content {
+                width: 95% !important;
+                margin: 10% auto !important;
+                padding: 24px 20px !important;
+                max-width: 95% !important;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .city-state-zip {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            /* User actions mobile */
+            .user-actions-row {
+                max-width: 100%;
+            }
+
+            .settings-button, .logout-button, .delete-account-button {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            /* Footer - keep desktop layout on mobile */
+
+            /* Cart menu mobile */
+            .cart-side-menu {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .cart-content {
+                padding: 20px;
+            }
+            
+            .cart-message {
+                font-size: 1.1em;
+            }
+
+            /* Main forms wrapper mobile */
+            .main-forms-wrapper {
+                margin: 8px auto 32px auto;
+                gap: 32px;
+                padding: 0 15px;
+                box-sizing: border-box;
+                width: 100%;
+            }
+        }
+        
+        /* Small mobile devices (320px - 480px) */
+        @media (max-width: 480px) {
+            .welcome-header-title {
+                font-size: 1.4em;
+            }
+
+            .welcome-header-options {
+                column-gap: 32px !important;
+                row-gap: 28px !important;
+                gap: 28px 32px !important;
+                max-width: 100%;
+                padding: 0 15px;
+            }
+
+            .welcome-header-option {
+                width: auto !important;
+                max-width: 100%;
+                min-width: 140px;
+                padding: 20px 14px 16px 14px;
+            }
+
+            .welcome-header-option-icon {
+                font-size: 1.6em;
+            }
+
+            .welcome-header-option-label {
+                font-size: 0.9em;
+            }
+
+            .forms-card h1 {
+                font-size: 1.4em;
+            }
+
+            .forms-card .subtitle {
+                font-size: 0.9em;
+            }
+
+            /* Available Forms small mobile - keep 2x2 */
+            #available-forms-list {
+                column-gap: 32px !important;
+                row-gap: 28px !important;
+                gap: 28px 32px !important;
+                padding: 0 15px;
+            }
+
+            #available-forms-list li {
+                max-width: 100%;
+                min-width: 140px;
+                padding: 20px 14px 16px 14px;
+            }
+
+            /* Other forms list items */
+            .forms-list li {
+                padding: 16px 12px 12px 12px;
+            }
+
+            #portfolio-section .forms-list li {
+                padding: 14px 16px 12px 16px !important;
+            }
+
+            .modal-content {
+                padding: 20px 16px !important;
+            }
+
+            .form-group input, 
+            .form-group select {
+                padding: 10px;
+                font-size: 0.95em;
+            }
+        }
+        
+        /* Tablet optimization (768px - 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .forms-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .forms-card {
+                padding: 32px 28px 28px 28px;
+            }
+        }
+        
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .forms-list li {
+                min-height: 120px;
+            }
+            
+            .btn, .sign-in-btn, .cart-signup-btn, .circle-arrow-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            nav.desktop-nav a {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .welcome-header-option {
+                min-height: 100px;
             }
         }
         main {
@@ -607,7 +1243,7 @@
             justify-content: center;
             align-items: flex-start;
             gap: 60px;
-            padding: 48px 10vw 32px 10vw;
+            padding: 48px 10vw 20px 10vw;
             border-top: 2px solid #2c3e50;
             font-family: 'Montserrat', sans-serif;
             font-size: 1.18em;
@@ -677,7 +1313,7 @@
         .pro-footer-col.nav-col a:not(:last-child) {
             margin-bottom: 8px;
         }
-        @media (max-width: 900px) {
+        @media (max-width: 900px) and (min-width: 769px) {
             .pro-footer {
                 flex-direction: column;
                 gap: 32px;
@@ -798,10 +1434,21 @@
         }
         @media (max-width: 700px) {
             #portfolio-section .forms-list li {
-                width: 98% !important;
-                max-width: 98vw !important;
+                width: 100% !important;
+                max-width: 100% !important;
                 min-width: unset !important;
-                padding: 12px 6vw 10px 6vw !important;
+                padding: 14px 16px 12px 16px !important;
+                box-sizing: border-box !important;
+                margin: 0 auto !important;
+            }
+            
+            #documents-section .forms-list li {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: unset !important;
+                padding: 14px 16px 12px 16px !important;
+                box-sizing: border-box !important;
+                margin: 0 auto !important;
             }
         }
         #portfolio-section .form-action-button {
@@ -874,9 +1521,10 @@
             color: #2c3e50;
             text-align: center;
         }
-        @media (max-width: 900px) {
+        @media (max-width: 900px) and (min-width: 769px) {
             .welcome-header-options {
-                flex-direction: column;
+                flex-direction: row;
+                flex-wrap: wrap;
                 gap: 18px;
             }
             .welcome-header {
@@ -998,10 +1646,29 @@
             background-color: #7f8c8d;
         }
 
-        /* ───────── My Documents timestamp (matches My Form Portfolio) ───────── */
-#documents-section .forms-list li {         /* make the card a positioning context   */
-    position: relative;                     /* so the timestamp can sit top-right    */
-}
+        /* ───────── My Documents (matches My Form Portfolio) ───────── */
+        #documents-section .forms-list {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center;
+            gap: 32px;
+            width: 100%;
+        }
+        #documents-section .forms-list li {
+            width: 90% !important;
+            max-width: 600px !important;
+            min-width: 320px !important;
+            padding: 18px 32px 14px 32px !important;
+            border-radius: 18px !important;
+            box-shadow: 0 2px 16px rgba(44,62,80,0.10) !important;
+            margin: 0 auto !important;
+            height: auto !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box !important;
+            position: relative;                     /* so the timestamp can sit top-right    */
+        }
 
 #documents-section .last-opened {           /* copy of #portfolio-section rule       */
     position: absolute;
@@ -1067,8 +1734,15 @@
 </head>
 <body>
     <header>
-        <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='../index.html';">
-        <nav>
+        <!-- Mobile hamburger menu button -->
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <img src="logo.png" alt="FormStar Logo" width="130" height="80" onclick="location.href='../index.html';">
+        <nav class="desktop-nav">
             <a href="../index.html">Home
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
@@ -1096,9 +1770,32 @@
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
         </nav>
+        
+        <!-- Mobile navigation menu -->
+        <nav class="mobile-nav" id="mobile-nav">
+            <a href="../index.html">Home</a>
+            <div class="mobile-nav-section">
+                <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
+                <div class="mobile-nav-submenu" id="mobile-forms-menu">
+                    <a href="forms.html">My Forms</a>
+                    <a href="FreeForm.html">Free Form</a>
+                    <a href="Family.html">Family</a>
+                    <a href="Property.html">Property</a>
+                    <a href="Immigration.html">Immigration</a>
+                    <a href="smallclaims.html">Small Claims</a>
+                    <a href="Other.html">Other</a>
+                </div>
+            </div>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="FAQ.html">FAQ</a>
+            <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
+                <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
+            </div>
+        </nav>
+        
         <div class="header-actions">
             <a href="account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
-            <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
             <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
                 <span class="cart-circle">
                     <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1112,7 +1809,7 @@
         </div>
     </header>
     <div class="welcome-header">
-        <div class="welcome-header-title">Welcome To FormWiz!</div>
+        <div class="welcome-header-title">Welcome To FormStar!</div>
         <div class="welcome-header-options">
             <div class="welcome-header-option" id="new-form-btn" tabindex="0">
                 <span class="welcome-header-option-icon">📄</span>
@@ -1310,29 +2007,21 @@
     <div class="pro-footer">
         <div class="pro-footer-col address-col">
             <div class="pro-footer-logo">
-                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
+                <img src="logo.png" alt="FormStar Logo" style="max-width:120px;max-height:80px;">
             </div>
-            <div class="pro-footer-title">FormWiz</div>
+            <div class="pro-footer-title">FormStar</div>
             <div class="pro-footer-contact">
                 <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
                 <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
             </div>
         </div>
-        <div class="pro-footer-col nav-col">
-            <div class="pro-footer-title">Navigation</div>
-            <a href="../index.html">Home</a>
-            <a href="FreeForm.html">Forms</a>
-            <a href="FAQ.html">FAQ</a>
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact Us</a>
-        </div>
         <div class="pro-footer-col company-col">
-            <div class="pro-footer-title company-title">About FormWiz</div>
-            <div class="pro-footer-desc">FormWiz consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
+            <div class="pro-footer-title company-title">About FormStar</div>
+            <div class="pro-footer-desc">FormStar consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
         </div>
     </div>
     <footer>
-        &copy; 2024 FormWiz. All rights reserved.
+        &copy; 2024 FormStar. All rights reserved.
     </footer>
 
     <!-- Firebase SDKs -->
@@ -1356,7 +2045,7 @@
             <div class="cart-icon-large">🛒</div>
             <div class="cart-message" id="cart-message">Create an account to start shopping!</div>
             <div class="cart-description" id="cart-description">
-                To add forms to your cart and make purchases, you'll need to create a FormWiz account. 
+                To add forms to your cart and make purchases, you'll need to create a FormStar account. 
                 Sign up now to access our complete library of legal forms and start simplifying your paperwork.
             </div>
             <a href="account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
@@ -1370,18 +2059,21 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const signInBtn = document.getElementById('sign-in-btn');
-            const logoutBtn = document.getElementById('logout-btn');
+            const mobileAuthSection = document.getElementById('mobile-auth-section');
+            const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+            
             auth.onAuthStateChanged(function(user) {
                 if (user) {
                     if (signInBtn) signInBtn.style.display = 'none';
-                    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+                    if (mobileAuthSection) mobileAuthSection.style.display = 'block';
                 } else {
                     if (signInBtn) signInBtn.style.display = 'inline-block';
-                    if (logoutBtn) logoutBtn.style.display = 'none';
+                    if (mobileAuthSection) mobileAuthSection.style.display = 'none';
                 }
             });
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function(e) {
+            
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     auth.signOut().then(() => {
                         window.location.href = '../index.html';
@@ -1390,6 +2082,85 @@
                     });
                 });
             }
+
+            // Mobile menu functionality
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileNav = document.getElementById('mobile-nav');
+            const mobileFormsToggle = document.getElementById('mobile-forms-toggle');
+            const mobileFormsMenu = document.getElementById('mobile-forms-menu');
+            const body = document.body;
+
+            function toggleMobileMenu() {
+                if (mobileMenuToggle && mobileNav) {
+                    mobileMenuToggle.classList.toggle('active');
+                    mobileNav.classList.toggle('active');
+                    body.classList.toggle('menu-open');
+                }
+            }
+
+            function closeMobileMenu() {
+                if (mobileMenuToggle && mobileNav) {
+                    mobileMenuToggle.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                    body.classList.remove('menu-open');
+                }
+            }
+
+            // Toggle mobile menu
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleMobileMenu();
+                });
+            }
+
+            // Toggle mobile forms submenu
+            if (mobileFormsToggle) {
+                mobileFormsToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    mobileFormsToggle.classList.toggle('active');
+                    if (mobileFormsMenu) {
+                        mobileFormsMenu.classList.toggle('active');
+                    }
+                });
+            }
+
+            // Close mobile menu when clicking on links
+            if (mobileNav) {
+                mobileNav.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'A' && !e.target.classList.contains('mobile-nav-toggle')) {
+                        closeMobileMenu();
+                    }
+                });
+            }
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (mobileNav && !mobileNav.contains(e.target) && mobileMenuToggle && !mobileMenuToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
+
+            // Close mobile menu on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && mobileNav && mobileNav.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+            });
+
+            // Prevent body scroll when menu is open
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        if (body.classList.contains('menu-open')) {
+                            body.style.overflow = 'hidden';
+                        } else {
+                            body.style.overflow = '';
+                        }
+                    }
+                });
+            });
+            observer.observe(body, { attributes: true });
         });
     </script>
 
