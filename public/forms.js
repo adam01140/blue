@@ -216,10 +216,15 @@ function renderMyForms(forms) {
                     hideSavingOverlay();
                     // Append county and portfolioId to the URL for autosave separation
                     const separator = form.url.includes('?') ? '&' : '?';
-                    // Fix URL path by removing Pages/ prefix if present
+                    // Fix URL path to always point to ../Forms/ directory
                     let correctedUrl = form.url;
                     if (correctedUrl.includes('Pages/Forms/')) {
                         correctedUrl = correctedUrl.replace('Pages/Forms/', '../Forms/');
+                    } else if (correctedUrl.startsWith('Pages/')) {
+                        correctedUrl = correctedUrl.replace('Pages/', '../Forms/');
+                    } else if (!correctedUrl.startsWith('../') && !correctedUrl.startsWith('http')) {
+                        // If URL is just a filename or relative path, prefix with ../Forms/
+                        correctedUrl = '../Forms/' + correctedUrl;
                     }
                     let url = correctedUrl + separator + 'county=' + encodeURIComponent(form.countyName || '') + '&portfolioId=' + encodeURIComponent(form.id);
                     if (form.defendantName) url += '&defendantName=' + encodeURIComponent(form.defendantName);
@@ -841,10 +846,15 @@ renderMyForms = function(forms) {
                     }
                     hideSavingOverlay();
                     const separator = form.url.includes('?') ? '&' : '?';
-                    // Fix URL path by removing Pages/ prefix if present
+                    // Fix URL path to always point to ../Forms/ directory
                     let correctedUrl = form.url;
                     if (correctedUrl.includes('Pages/Forms/')) {
                         correctedUrl = correctedUrl.replace('Pages/Forms/', '../Forms/');
+                    } else if (correctedUrl.startsWith('Pages/')) {
+                        correctedUrl = correctedUrl.replace('Pages/', '../Forms/');
+                    } else if (!correctedUrl.startsWith('../') && !correctedUrl.startsWith('http')) {
+                        // If URL is just a filename or relative path, prefix with ../Forms/
+                        correctedUrl = '../Forms/' + correctedUrl;
                     }
                     let url = correctedUrl + separator + 'county=' + encodeURIComponent(form.countyName || '') + '&portfolioId=' + encodeURIComponent(form.id);
                     if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);

@@ -33,7 +33,7 @@
         header img {
             cursor: pointer;
         }
-        nav {
+        nav.desktop-nav {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
@@ -41,7 +41,7 @@
             gap: 38px;
             z-index: 2;
         }
-        nav a {
+        nav.desktop-nav a {
             color: #fff;
             text-decoration: none;
             font-weight: 700;
@@ -53,7 +53,7 @@
             display: flex;
             align-items: center;
         }
-        nav a:hover {
+        nav.desktop-nav a:hover {
             color: #ff7043;
             background: rgba(255,255,255,0.08);
             box-shadow: 0 2px 8px rgba(44,62,80,0.10);
@@ -175,22 +175,276 @@
         .nav-dropdown-wrapper.open .forms-chevron {
             transform: rotate(-90deg);
         }
+        
+        /* Mobile hamburger menu styles */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .mobile-menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            transform-origin: 1px;
+        }
+        
+        .mobile-menu-toggle.active span:first-child {
+            transform: rotate(45deg);
+        }
+        
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .mobile-menu-toggle.active span:last-child {
+            transform: rotate(-45deg);
+        }
+        
+        .desktop-nav {
+            display: flex;
+        }
+        
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background: #2c3e50;
+            flex-direction: column;
+            padding: 80px 20px 20px 20px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .mobile-nav.active {
+            left: 0;
+        }
+        
+        .mobile-nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 18px 0;
+            border-bottom: 1px solid #34495e;
+            font-size: 1.1em;
+            font-weight: 600;
+            line-height: 1.1;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .mobile-nav-section {
+            border-bottom: 1px solid #34495e;
+        }
+        
+        .mobile-nav-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            padding: 15px 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .mobile-nav-submenu {
+            display: none;
+            padding-left: 20px;
+        }
+        
+        .mobile-nav-submenu.active {
+            display: block;
+        }
+        
+        .mobile-nav-submenu a {
+            padding: 15px 0;
+            font-size: 1em;
+            border-bottom: 1px solid #34495e;
+            line-height: 1.1;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .mobile-nav-logout {
+            color: #ff7043 !important;
+            font-weight: 700;
+        }
+        
+        .mobile-nav-toggle span {
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-nav-toggle.active span {
+            transform: rotate(180deg);
+        }
+        
+        /* Mobile overlay for menu */
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        
+        .mobile-nav-overlay.active {
+            display: block;
+        }
+        
         @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: flex;
+            }
+            
+            .desktop-nav {
+                display: none !important;
+            }
+            
+            .mobile-nav {
+                display: flex;
+            }
+            
             header {
-                flex-direction: column;
-                padding: 10px;
+                padding: 16px 15px;
+                min-height: 80px;
             }
-            nav {
-                position: static;
-                transform: none;
-                margin-top: 10px;
+            
+            .mobile-menu-toggle {
+                display: flex;
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
             }
-            .dropdown-menu {
-                left: 0;
-                right: 0;
-                min-width: unset;
-                width: 100vw;
-                border-radius: 0 0 10px 10px;
+            
+            header img {
+                width: 119px;
+                height: 73px;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .header-actions {
+                margin-left: auto;
+                margin-right: 15px;
+            }
+            
+            #sign-in-btn {
+                display: none;
+            }
+            
+            #cart-icon-link .cart-circle {
+                width: 55px !important;
+                height: 55px !important;
+            }
+            
+            #cart-icon-link svg {
+                width: 30px !important;
+                height: 30px !important;
+            }
+            
+            .guided-module {
+                margin: 0 20px !important;
+                padding: 25px 20px !important;
+                max-width: calc(100% - 100px) !important;
+            }
+            
+            .forms-container {
+                margin: 24px 20px 0 20px !important;
+                padding: 25px 20px !important;
+                max-width: calc(100% - 100px) !important;
+            }
+            
+            .forms-container h2 {
+                font-size: 1.5em !important;
+                margin-bottom: 20px !important;
+            }
+            
+            .forms-container > div[style*="display:grid"],
+            .forms-container div[style*="grid-template-columns"] {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 15px !important;
+                width: 100% !important;
+            }
+            
+            .freeform-card {
+                padding: 20px 15px !important;
+                min-width: auto !important;
+            }
+            
+            .freeform-card svg {
+                width: 70px !important;
+                height: 70px !important;
+                margin-bottom: 12px !important;
+            }
+            
+            .freeform-card > div:nth-child(2) {
+                font-size: 1em !important;
+            }
+            
+            .freeform-card > div:nth-child(3) {
+                font-size: 0.9em !important;
+            }
+            
+            .freeform-card .btn {
+                padding: 8px 20px !important;
+                font-size: 0.95em !important;
+                max-width: 140px !important;
+            }
+            
+            /* Banner section */
+            main > section:first-child {
+                margin: 0 20px 24px 20px !important;
+                padding: 25px 20px !important;
+                max-width: calc(100% - 100px) !important;
+                border-radius: 20px !important;
+                margin-left: 30px !important;
+                margin-right: 17px !important;
+            }
+            
+            main > section:first-child > div {
+                flex-direction: column !important;
+                gap: 20px !important;
+                width: 100% !important;
+            }
+            
+            main > section:first-child h1 {
+                font-size: 1.8em !important;
+                text-align: center !important;
+            }
+            
+            main > section:first-child p {
+                font-size: 1.1em !important;
+                text-align: center !important;
             }
         }
         .pro-footer {
@@ -219,12 +473,6 @@
             padding-right: 48px;
             align-items: flex-start;
         }
-        .nav-col {
-            align-items: flex-start;
-            padding-left: 32px;
-            padding-right: 32px;
-            border-right: 1.5px solid #2c7a7d;
-        }
         .company-col {
             align-items: flex-start;
             padding-left: 48px;
@@ -247,7 +495,7 @@
             margin-right: 18px;
             transition: color 0.2s;
         }
-        .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
+        .pro-footer-contact a:hover {
             color: #ff7043;
         }
         .pro-footer-logo {
@@ -259,30 +507,19 @@
             margin-top: 0;
             line-height: 1.5;
         }
-        .pro-footer-col.nav-col a {
-            color: #b6e2e6;
-            text-decoration: none;
-            font-weight: 500;
-            margin-bottom: 6px;
-            transition: color 0.2s;
-            font-size: 1em;
-        }
-        .pro-footer-col.nav-col a:not(:last-child) {
-            margin-bottom: 8px;
-        }
-        @media (max-width: 900px) {
+        @media (max-width: 900px) and (min-width: 769px) {
             .pro-footer {
                 flex-direction: column;
                 gap: 32px;
                 padding: 32px 4vw 18px 4vw;
             }
-            .address-col, .company-col, .nav-col {
+            .address-col, .company-col {
                 border: none;
                 padding: 0;
                 min-width: unset;
                 max-width: unset;
             }
-            .company-col, .nav-col {
+            .company-col {
                 align-items: flex-start;
             }
         }
@@ -997,8 +1234,15 @@
 </head>
 <body>
     <header>
+        <!-- Mobile hamburger menu button -->
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
         <img src="../Images/logo.png" alt="FormStar Logo" width="130" height="80" onclick="location.href='../index.html';">
-        <nav>
+        <nav class="desktop-nav">
             <a href="../index.html">Home
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
@@ -1026,9 +1270,32 @@
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
         </nav>
+        
+        <!-- Mobile navigation menu -->
+        <nav class="mobile-nav" id="mobile-nav">
+            <a href="../index.html">Home</a>
+            <div class="mobile-nav-section">
+                <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
+                <div class="mobile-nav-submenu" id="mobile-forms-menu">
+                    <a href="forms.html">My Forms</a>
+                    <a href="FreeForm.html">Free Form</a>
+                    <a href="Family.html">Family</a>
+                    <a href="Property.html">Property</a>
+                    <a href="Immigration.html">Immigration</a>
+                    <a href="smallclaims.html">Small Claims</a>
+                    <a href="Other.html">Other</a>
+                </div>
+            </div>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="FAQ.html">FAQ</a>
+            <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
+                <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
+            </div>
+        </nav>
+        
         <div class="header-actions">
             <a href="account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
-            <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
             <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
                 <span class="cart-circle">
                     <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1188,21 +1455,13 @@
             </div>
             <div class="pro-footer-title">FormStar</div>
             <div class="pro-footer-contact">
-                <a href="tel:18008508370">1-800-850-8370</a> &nbsp; 
+                <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
                 <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
             </div>
         </div>
-        <div class="pro-footer-col nav-col">
-            <div class="pro-footer-title">Navigation</div>
-            <a href="../index.html">Home</a>
-            <a href="FreeForm.html">Forms</a>
-            <a href="FAQ.html">FAQ</a>
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact Us</a>
-        </div>
         <div class="pro-footer-col company-col">
             <div class="pro-footer-title company-title">About FormStar</div>
-            <div class="pro-footer-desc">FormStar consists of a group of proven professionals with over 70 years of combined <strong>legal</strong>, technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
+            <div class="pro-footer-desc">FormStar consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
         </div>
     </div>
     <footer>
@@ -1272,29 +1531,18 @@
             }
             const auth = firebase.auth();
             const signInBtn = document.getElementById('sign-in-btn');
-            const logoutBtn = document.getElementById('logout-btn');
             
             // Auth state management - match forms.html exactly
             auth.onAuthStateChanged(function(user) {
+                const mobileAuthSection = document.getElementById('mobile-auth-section');
                 if (user) {
                     if (signInBtn) signInBtn.style.display = 'none';
-                    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+                    if (mobileAuthSection) mobileAuthSection.style.display = 'block';
                 } else {
                     if (signInBtn) signInBtn.style.display = 'inline-block';
-                    if (logoutBtn) logoutBtn.style.display = 'none';
+                    if (mobileAuthSection) mobileAuthSection.style.display = 'none';
                 }
             });
-            
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    auth.signOut().then(() => {
-                        window.location.href = '../index.html';
-                    }).catch((error) => {
-                        alert('Sign Out Error: ' + error.message);
-                    });
-                });
-            }
 
             // Dropdown for Forms nav
             const formsWrapper = document.getElementById('forms-dropdown-wrapper');
@@ -1326,6 +1574,85 @@
                     dropdownOpen ? closeDropdown() : openDropdown();
                 }
             });
+
+            // Mobile menu functionality
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileNav = document.getElementById('mobile-nav');
+            const mobileFormsToggle = document.getElementById('mobile-forms-toggle');
+            const mobileFormsMenu = document.getElementById('mobile-forms-menu');
+            const mobileAuthSection = document.getElementById('mobile-auth-section');
+            const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+            const body = document.body;
+
+            function toggleMobileMenu() {
+                if (mobileMenuToggle && mobileNav) {
+                    mobileMenuToggle.classList.toggle('active');
+                    mobileNav.classList.toggle('active');
+                    body.classList.toggle('menu-open');
+                }
+            }
+
+            function closeMobileMenu() {
+                if (mobileMenuToggle && mobileNav) {
+                    mobileMenuToggle.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                    body.classList.remove('menu-open');
+                }
+            }
+
+            // Toggle mobile menu
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleMobileMenu();
+                });
+            }
+
+            // Toggle mobile forms submenu
+            if (mobileFormsToggle) {
+                mobileFormsToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    mobileFormsToggle.classList.toggle('active');
+                    if (mobileFormsMenu) {
+                        mobileFormsMenu.classList.toggle('active');
+                    }
+                });
+            }
+
+            // Close mobile menu when clicking on links
+            if (mobileNav) {
+                mobileNav.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'A' && !e.target.classList.contains('mobile-nav-toggle')) {
+                        closeMobileMenu();
+                    }
+                });
+            }
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (mobileNav && !mobileNav.contains(e.target) && mobileMenuToggle && !mobileMenuToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
+
+            // Close mobile menu on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeMobileMenu();
+                }
+            });
+
+            // Mobile logout button
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    auth.signOut().then(() => {
+                        window.location.href = '../index.html';
+                    }).catch((error) => {
+                        alert('Sign Out Error: ' + error.message);
+                    });
+                });
+            }
 
             // Cart side menu functionality
             const cartIconLink = document.getElementById('cart-icon-link');

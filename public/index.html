@@ -816,7 +816,7 @@
             justify-content: center;
             align-items: flex-start;
             gap: 60px;
-            padding: 48px 10vw 32px 10vw;
+            padding: 48px 10vw 20px 10vw;
             border-top: 2px solid #2c3e50;
             font-family: 'Montserrat', sans-serif;
             font-size: 1.18em;
@@ -1028,6 +1028,10 @@
             cursor: pointer;
             padding: 0;
             z-index: 1001;
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
         }
         
         .mobile-menu-toggle span {
@@ -1060,28 +1064,35 @@
             position: fixed;
             top: 0;
             left: -100%;
-            width: 80%;
+            width: 85%;
             max-width: 300px;
             height: 100vh;
             background: #2c3e50;
             flex-direction: column;
-            padding: 80px 20px 20px 20px;
+            padding: 100px 20px 20px 20px;
             transition: left 0.3s ease;
             z-index: 1000;
             box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         .mobile-nav.active {
-            left: 0;
+            left: 150px;
         }
         
         .mobile-nav a {
             color: #fff;
             text-decoration: none;
-            padding: 15px 0;
+            padding: 12px 0 12px 25px;
             border-bottom: 1px solid #34495e;
             font-size: 1.1em;
             font-weight: 600;
+            line-height: 1.1;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            margin-top: -20px;
         }
         
         .mobile-nav-section {
@@ -1094,7 +1105,7 @@
             align-items: center;
             color: #fff;
             text-decoration: none;
-            padding: 15px 0;
+            padding: 12px 0 12px 25px;
             font-size: 1.1em;
             font-weight: 600;
             cursor: pointer;
@@ -1110,9 +1121,18 @@
         }
         
         .mobile-nav-submenu a {
-            padding: 10px 0;
+            padding: 10px 0 10px 45px;
             font-size: 1em;
             border-bottom: 1px solid #34495e;
+            line-height: 1.1;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .mobile-nav-logout {
+            color: #ff7043 !important;
+            font-weight: 700;
         }
         
         .mobile-nav-toggle span {
@@ -1163,37 +1183,31 @@
             
             /* Header mobile optimization */
             header {
-                padding: 15px 15px;
+                padding: 16px 15px;
+                min-height: 80px;
                 flex-wrap: wrap;
                 gap: 12px;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                position: relative;
             }
             
             header img {
-                width: 100px;
-                height: 60px;
+                width: 119px;
+                height: 73px;
                 position: absolute;
                 left: 50%;
                 transform: translateX(-50%);
             }
             
-            nav {
-                position: static;
-                transform: none;
-                flex-wrap: wrap;
-                gap: 15px;
-                justify-content: center;
-                margin-top: 10px;
-            }
-            
-            nav a {
-                font-size: 1em;
-                padding: 8px 12px;
+            /* Hide desktop nav completely on mobile */
+            nav.desktop-nav {
+                display: none !important;
             }
             
             .header-actions {
                 gap: 10px;
-                margin-left: 0;
+                margin-left: auto;
+                margin-right: 15px;
             }
             
             .sign-in-btn {
@@ -1203,19 +1217,19 @@
             }
             
             #cart-icon-link .cart-circle {
-                width: 45px !important;
-                height: 45px !important;
+                width: 55px !important;
+                height: 55px !important;
             }
             
             #cart-icon {
-                width: 24px !important;
-                height: 24px !important;
+                width: 30px !important;
+                height: 30px !important;
             }
             
             /* Hero section mobile optimization */
             .hero-container.hero-gridfit {
                 flex-direction: column;
-                padding: 15px 20px;
+                padding: 5px 20px 15px 20px;
                 gap: 15px;
                 max-width: 100%;
                 margin: 0 47px;
@@ -1271,13 +1285,20 @@
                 padding: 24px 16px;
                 min-height: 160px;
                 min-width: unset;
-                max-width: 280px;
+                max-width: 180px !important;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
                 text-align: center;
                 margin: 0 auto;
+            }
+            
+            .hero-service-card.free-forms-card {
+                min-width: unset !important;
+                max-width: 180px !important;
+                min-height: 160px !important;
+                padding: 24px 16px !important;
             }
             
             .hero-service-icon {
@@ -1335,7 +1356,7 @@
             }
             
             .hiw-step {
-                padding: 15px 10px;
+                padding: 20px 25px;
                 min-height: auto;
                 margin-bottom: 15px;
                 width: 100%;
@@ -1401,33 +1422,13 @@
                 font-size: 0.9em;
             }
             
-            /* Footer mobile */
-            .pro-footer {
-                flex-direction: column;
-                gap: 25px;
-                padding: 30px 15px 20px 15px;
-                text-align: center;
+            /* Footer mobile - hide navigation column */
+            .pro-footer-col.nav-col {
+                display: none !important;
             }
             
-            .pro-footer-col {
-                min-width: unset;
-                max-width: unset;
-                padding: 0;
-                border: none;
-            }
-            
-            .pro-footer-title {
-                font-size: 1.1em;
-                margin-bottom: 10px;
-            }
-            
-            .pro-footer-desc {
-                font-size: 0.9em;
-            }
-            
-            .pro-footer-contact a {
-                display: block;
-                margin: 5px 0;
+            footer {
+                padding-bottom: 30px !important;
             }
             
             /* Cart menu mobile */
@@ -1457,7 +1458,13 @@
             .hero-service-card {
                 min-height: 110px;
                 padding: 14px 8px;
-                max-width: 250px;
+                max-width: 160px !important;
+            }
+            
+            .hero-service-card.free-forms-card {
+                min-height: 110px !important;
+                padding: 14px 8px !important;
+                max-width: 160px !important;
             }
             
             .hero-content h1 {
@@ -1586,10 +1593,13 @@
             <a href="Pages/about.html">About Us</a>
             <a href="Pages/contact.html">Contact Us</a>
             <a href="Pages/FAQ.html">FAQ</a>
+            <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
+                <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
+            </div>
         </nav>
         
         <div class="header-actions">
-            <a href="Pages/account.html" class="sign-in-btn">Sign In</a>
+            <a href="Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
             <a href="#" id="cart-icon-link" style="display: inline-flex; align-items: center; text-decoration: none; position: relative;">
                 <span class="cart-circle">
                     <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1805,49 +1815,59 @@
                 firebase.initializeApp(firebaseConfig);
             }
             const auth = firebase.auth();
-            const signInButton = document.querySelector('.sign-in-btn');
+            const signInButton = document.getElementById('sign-in-btn');
             const getStartedBtn = document.getElementById('get-started-btn');
+            const mobileAuthSection = document.getElementById('mobile-auth-section');
+            const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
 
             auth.onAuthStateChanged(function(user) {
                 console.log('Auth state changed. User:', user);
                 if (user) {
                     // User is signed in.
-                    console.log('User is signed in. Changing to logout button.');
+                    console.log('User is signed in. Showing mobile logout button.');
+                    
+                    // Hide sign-in button, show logout in hamburger menu
                     if (signInButton) {
-                        signInButton.textContent = 'Log Out';
-                        signInButton.href = '#';
-                        signInButton.onclick = function(e) {
-                            e.preventDefault();
-                            auth.signOut().then(() => {
-                                window.location.reload();
-                            }).catch((error) => {
-                                console.error('Error signing out:', error);
-                            });
-                        };
+                        signInButton.style.display = 'none';
                     }
+                    if (mobileAuthSection) {
+                        mobileAuthSection.style.display = 'block';
+                    }
+                    
                     // Show Get Started button
                     if (getStartedBtn) {
                         getStartedBtn.style.display = 'inline-flex';
                     }
-                    // Redirect to forms.html if on index.html (commented out for now)
-                    if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '/public/' || window.location.pathname === '/public/index.html') {
-                        //window.location.href = 'Pages/forms.html';
-                        // return; // Removed this return to allow button update
-                    }
                 } else {
                     // No user is signed in.
                     console.log('User is not signed in. Showing sign-in button.');
+                    
+                    // Show sign-in button, hide mobile logout
                     if (signInButton) {
-                        signInButton.textContent = 'Sign In';
-                        signInButton.href = 'Pages/account.html';
-                        signInButton.onclick = null;
+                        signInButton.style.display = 'inline-block';
                     }
+                    if (mobileAuthSection) {
+                        mobileAuthSection.style.display = 'none';
+                    }
+                    
                     // Hide Get Started button
                     if (getStartedBtn) {
                         getStartedBtn.style.display = 'none';
                     }
                 }
             });
+
+            // Handle mobile logout button click
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    auth.signOut().then(() => {
+                        window.location.reload();
+                    }).catch((error) => {
+                        console.error('Error signing out:', error);
+                    });
+                });
+            }
 
             // Dynamic How It Works image switching (hover and click)
             const steps = document.querySelectorAll('.hiw-step');
