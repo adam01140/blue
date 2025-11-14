@@ -9,6 +9,23 @@
     <link rel="stylesheet" href="generate2.css">
     <style>
         .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }
+        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 567px; width: 100%; }
+        .question-container .question-text { margin-top: 0; }
+        .question-container .question-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .question-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 56px auto 0; max-width: 567px; }
+        .question-nav-btn { width: 48px; height: 55px; border-radius: 50%; border: none; background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(30,73,150,0.22); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; line-height: 1; padding-top: 1px; }
+        .question-nav-btn.submit-mode { background: linear-gradient(135deg, #0acffe, #495aff); box-shadow: 0 10px 24px rgba(9, 132, 227, 0.35); }
+        .question-nav-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(28,126,214,0.25); }
+        .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; }
+        .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }
+        .question-step-hidden { display: none !important; }
+        #box { padding-top: 100px; margin: 50px; }
+        @media (max-width: 600px) {
+            body { padding: 0 !important; }
+            #box { margin: 12px !important; max-width: none !important; }
+            .question-container { margin: 6px auto !important; padding: 20px 18px !important; }
+            .question-nav { margin: 40px auto 0 !important; }
+        }
         .address-field { margin: 4px auto; }
         .address-input { width: 80%; max-width: 400px; padding: 12px 16px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; height: 44px; line-height: 20px; }
         .address-input:focus, .address-select:focus, .address-select-main:focus, .address-select-trigger:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
@@ -233,7 +250,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_county" name="form_county" value="">
         <input type="hidden" id="form_defendant" name="form_defendant" value="">
         <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">SC-103</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">SC-100</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container"><label><h3 class="question-text">Please explain why you are suing at this location</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
+        <input type="hidden" id="current_date" name="current_date" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">SC-103</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">SC-100</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Please explain why you are suing at this location</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
       <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged.">
         <label class="checkbox-label">
           <input type="radio" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged." name="please_explain_why_you_are_suing_at_this_location" value="Where the plaintiff’s property was damaged." 
@@ -268,7 +285,7 @@ document.addEventListener("DOMContentLoaded", function() {
                  onchange="handleMarkOnlyOneSelection(this, 1);  updateCheckboxStyle(this);">
           Other
         </label>
-      </span></div><br></div></div><div id="question-container-2" class="question-container hidden"><label><h3 class="question-text">Please explain why you're filing at this courthouse?</h3></label>
+      </span></div><br></div></div><div id="question-container-2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Please explain why you're filing at this courthouse?</h3></label>
             <div class="text-input-container">
               <textarea id="please_explain_why_youre_filing_at_this_courthouse" name="please_explain_why_youre_filing_at_this_courthouse" rows="5" cols="50" placeholder="" data-line-limit="80" oninput="handleLineSplitting('please_explain_why_youre_filing_at_this_courthouse', 80); checkParagraphLimit('please_explain_why_youre_filing_at_this_courthouse', null);"></textarea>
             </div>
@@ -315,47 +332,52 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
               }
             </script>
-          </div><div id="question-container-3" class="question-container hidden"><label><h3 class="question-text">Is your claim about an agreement or contract for personal, family, or household goods, services, or loans?</h3></label><select id="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans" name="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans"
+          </div><div id="question-container-3" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="3"><label><h3 class="question-text">Is your claim about an agreement or contract for personal, family, or household goods, services, or loans?</h3></label><select id="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans" name="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans"
                       onchange="dropdownMirror(this, 'is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans'); updateHiddenLogic('is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans"></div>
               <input type="text" id="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans_dropdown" name="is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-4" class="question-container hidden"><label><h3 class="question-text">Is your claim related to a retail dispute, such as a credit card or retail installment contract?</h3></label><select id="is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract" name="is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract"
+                   readonly style="display:none;"></div><div id="question-container-4" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="4"><label><h3 class="question-text">Is your claim related to a retail dispute, such as a credit card or retail installment contract?</h3></label><select id="is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract" name="is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract"
                       onchange="dropdownMirror(this, 'is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract'); updateHiddenLogic('is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract"></div>
               <input type="text" id="is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract_dropdown" name="is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-5" class="question-container hidden"><label><h3 class="question-text">Is your claim related to a vehicle dispute, such as a car purchase, financing, or lease?</h3></label><select id="is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease" name="is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease"
+                   readonly style="display:none;"></div><div id="question-container-5" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="5"><label><h3 class="question-text">Is your claim related to a vehicle dispute, such as a car purchase, financing, or lease?</h3></label><select id="is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease" name="is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease"
                       onchange="dropdownMirror(this, 'is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease'); updateHiddenLogic('is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease"></div>
               <input type="text" id="is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease_dropdown" name="is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-6" class="question-container hidden"><label><h3 class="question-text">Have you filed more than twelve other small claims w/in the last twelve months</h3></label><select id="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months" name="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months"
+                   readonly style="display:none;"></div><div id="question-container-6" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="6"><label><h3 class="question-text">Have you filed more than twelve other small claims w/in the last twelve months</h3></label><select id="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months" name="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months"
                       onchange="dropdownMirror(this, 'have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months'); updateHiddenLogic('have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months"></div>
               <input type="text" id="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months_dropdown" name="have_you_filed_more_than_twelve_other_small_claims_win_the_last_twelve_months_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-7" class="question-container hidden"><label><h3 class="question-text">Were 2 or more of those small claims cases more than $2,500?</h3></label><select id="were_2_or_more_of_those_small_claims_cases_more_than_2500" name="were_2_or_more_of_those_small_claims_cases_more_than_2500"
+                   readonly style="display:none;"></div><div id="question-container-7" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="7"><label><h3 class="question-text">Were 2 or more of those small claims cases more than $2,500?</h3></label><select id="were_2_or_more_of_those_small_claims_cases_more_than_2500" name="were_2_or_more_of_those_small_claims_cases_more_than_2500"
                       onchange="dropdownMirror(this, 'were_2_or_more_of_those_small_claims_cases_more_than_2500'); updateHiddenLogic('were_2_or_more_of_those_small_claims_cases_more_than_2500', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_were_2_or_more_of_those_small_claims_cases_more_than_2500"></div>
               <input type="text" id="were_2_or_more_of_those_small_claims_cases_more_than_2500_dropdown" name="were_2_or_more_of_those_small_claims_cases_more_than_2500_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-9" class="question-container hidden"><label><h3 class="question-text">Are you suing an attorney?</h3></label><select id="are_you_suing_an_attorney" name="are_you_suing_an_attorney"
+                   readonly style="display:none;"></div><div id="question-container-9" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="8"><label><h3 class="question-text">Are you suing an attorney?</h3></label><select id="are_you_suing_an_attorney" name="are_you_suing_an_attorney"
                       onchange="dropdownMirror(this, 'are_you_suing_an_attorney'); updateHiddenLogic('are_you_suing_an_attorney', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_are_you_suing_an_attorney"></div>
               <input type="text" id="are_you_suing_an_attorney_dropdown" name="are_you_suing_an_attorney_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-10" class="question-container hidden"><label><h3 class="question-text">Are you doing business under a fictious business name</h3></label><select id="are_you_doing_business_under_a_fictious_business_name" name="are_you_doing_business_under_a_fictious_business_name"
+                   readonly style="display:none;"></div><div id="question-container-10" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="9"><label><h3 class="question-text">Are you doing business under a fictious business name</h3></label><select id="are_you_doing_business_under_a_fictious_business_name" name="are_you_doing_business_under_a_fictious_business_name"
                       onchange="dropdownMirror(this, 'are_you_doing_business_under_a_fictious_business_name'); updateHiddenLogic('are_you_doing_business_under_a_fictious_business_name', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_are_you_doing_business_under_a_fictious_business_name"></div>
               <input type="text" id="are_you_doing_business_under_a_fictious_business_name_dropdown" name="are_you_doing_business_under_a_fictious_business_name_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-12" class="question-container hidden"><label><h3 class="question-text">Are you suing for more than $10,000?</h3></label><select id="are_you_suing_for_more_than_10000" name="are_you_suing_for_more_than_10000"
+                   readonly style="display:none;"></div><div id="question-container-12" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="10"><label><h3 class="question-text">Are you suing for more than $10,000?</h3></label><select id="are_you_suing_for_more_than_10000" name="are_you_suing_for_more_than_10000"
                       onchange="dropdownMirror(this, 'are_you_suing_for_more_than_10000'); updateHiddenLogic('are_you_suing_for_more_than_10000', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_are_you_suing_for_more_than_10000"></div>
               <input type="text" id="are_you_suing_for_more_than_10000_dropdown" name="are_you_suing_for_more_than_10000_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" class="next-button" onclick="validateAndProceed(1)" id="next-button-1">Next</button></div></div><div id="section2" class="section"><center><h1 class="section-title">SC-103</h1><div id="question-container-8" class="question-container"><label><h3 class="question-text">Please enter your business details</h3></label><div id="labelContainer8"></div><input type="text" id="sc103_please_enter_your_business_details_address" name="sc103_please_enter_your_business_details_address" style="display: none;"><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="sc103_please_enter_your_business_details_name" name="sc103_please_enter_your_business_details_name" placeholder="Name" class="address-input"></div><br><div style="margin: 10px 0px; padding: 12px; background-color: rgb(255, 255, 255); border: 1px solid rgb(225, 229, 233); border-radius: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 6px;"><label style="display: block; margin-bottom: 8px; font-weight: 600; color: rgb(51, 51, 51); font-size: 15px; text-align: center;">Location Data:</label><input type="text" id="sc103_please_enter_your_business_details_location_data_street" name="sc103_please_enter_your_business_details_location_data_street" placeholder="Street" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><input type="text" id="sc103_please_enter_your_business_details_location_data_city" name="sc103_please_enter_your_business_details_location_data_city" placeholder="City" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><select id="sc103_please_enter_your_business_details_location_data_state" name="sc103_please_enter_your_business_details_location_data_state" class="address-select-trigger" style="width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><option value="">Select State</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option></select><input type="text" id="sc103_please_enter_your_business_details_location_data_state_short" name="sc103_please_enter_your_business_details_location_data_state_short" style="display: none;"><input type="text" id="sc103_please_enter_your_business_details_location_data_zip" name="sc103_please_enter_your_business_details_location_data_zip" placeholder="Zip" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"></div></div><br></div><div id="question-container-11" class="question-container"><label><h3 class="question-text">What do you do business as?</h3></label><div><center><div id="checkmark" class="checkbox-group-11">
+                   readonly style="display:none;"></div>
+      <div class="question-nav" data-section-index="1">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons"></div></div><div id="section2" class="section"><center><h1 class="section-title">SC-103</h1><div id="question-container-8" class="question-container question-item" data-section="2" data-question-index="1"><label><h3 class="question-text">Please enter your business details</h3></label><div id="labelContainer8"></div><input type="text" id="sc103_please_enter_your_business_details_address" name="sc103_please_enter_your_business_details_address" style="display: none;"><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="sc103_please_enter_your_business_details_name" name="sc103_please_enter_your_business_details_name" placeholder="Name" class="address-input"></div><br><div style="margin: 10px 0px; padding: 12px; background-color: rgb(255, 255, 255); border: 1px solid rgb(225, 229, 233); border-radius: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 6px;"><label style="display: block; margin-bottom: 8px; font-weight: 600; color: rgb(51, 51, 51); font-size: 15px; text-align: center;">Location Data:</label><input type="text" id="sc103_please_enter_your_business_details_location_data_street" name="sc103_please_enter_your_business_details_location_data_street" placeholder="Street" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><input type="text" id="sc103_please_enter_your_business_details_location_data_city" name="sc103_please_enter_your_business_details_location_data_city" placeholder="City" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><select id="sc103_please_enter_your_business_details_location_data_state" name="sc103_please_enter_your_business_details_location_data_state" class="address-select-trigger" style="width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><option value="">Select State</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option></select><input type="text" id="sc103_please_enter_your_business_details_location_data_state_short" name="sc103_please_enter_your_business_details_location_data_state_short" style="display: none;"><input type="text" id="sc103_please_enter_your_business_details_location_data_zip" name="sc103_please_enter_your_business_details_location_data_zip" placeholder="Zip" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"></div></div><br></div><div id="question-container-11" class="question-container question-item question-step-hidden" data-section="2" data-question-index="2"><label><h3 class="question-text">What do you do business as?</h3></label><div><center><div id="checkmark" class="checkbox-group-11">
       <span class="checkbox-inline" id="checkbox-container-sc103_what_do_you_do_business_as_an_individual">
         <label class="checkbox-label">
           <input type="radio" id="sc103_what_do_you_do_business_as_an_individual" name="what_do_you_do_business_as" value="An Individual" 
@@ -397,7 +419,7 @@ document.addEventListener("DOMContentLoaded", function() {
                  onchange="handleMarkOnlyOneSelection(this, 11);  updateCheckboxStyle(this);">
           Other
         </label>
-      </span></div><br></div></div><div id="question-container-14" class="question-container hidden"><label><h3 class="question-text">Please explain what you do business as</h3></label>
+      </span></div><br></div></div><div id="question-container-14" class="question-container question-item hidden question-step-hidden" data-section="2" data-question-index="3"><label><h3 class="question-text">Please explain what you do business as</h3></label>
             <div class="text-input-container">
               <textarea id="sc103_please_explain_what_you_do_business_as" name="sc103_please_explain_what_you_do_business_as" rows="5" cols="50" placeholder="" oninput="checkParagraphLimit('sc103_please_explain_what_you_do_business_as', null);"></textarea>
             </div>
@@ -444,23 +466,28 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
               }
             </script>
-          </div><div id="question-container-16" class="question-container hidden"><label><h3 class="question-text">What county did you file your Fictious Business Name Statement</h3></label><div class="text-input-container"><input type="text" id="sc103_what_county_did_you_file_your_fictious_business_name_statement" name="sc103_what_county_did_you_file_your_fictious_business_name_statement" placeholder=""></div></div><div id="question-container-17" class="question-container"><label><h3 class="question-text">What is your fictious business name statement number</h3></label><div class="text-input-container"><input type="number" id="sc103_what_is_your_fictious_business_name_statement_number" name="sc103_what_is_your_fictious_business_name_statement_number" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-18" class="question-container"><label><h3 class="question-text">What is the date that your fictious businesses name statement expires</h3></label><div class="date-input-container" style="position: relative; cursor: pointer;" onclick="document.getElementById('sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires').showPicker()"><input type="date" id="sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires" name="sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires" style="width: 100%; padding: 12px 16px; border: 1px solid #e1e5e9; border-radius: 8px; font-size: 16px; cursor: pointer; background-color: #ffffff; transition: all 0.2s ease; box-sizing: border-box;"></div></div><div id="question-container-19" class="question-container"><label><h3 class="question-text">Are you suing for more than $12,500?</h3></label><select id="sc103_are_you_suing_for_more_than_12500" name="sc103_are_you_suing_for_more_than_12500"
+          </div><div id="question-container-16" class="question-container question-item hidden question-step-hidden" data-section="2" data-question-index="4"><label><h3 class="question-text">What county did you file your Fictious Business Name Statement</h3></label><div class="text-input-container"><input type="text" id="sc103_what_county_did_you_file_your_fictious_business_name_statement" name="sc103_what_county_did_you_file_your_fictious_business_name_statement" placeholder=""></div></div><div id="question-container-17" class="question-container question-item question-step-hidden" data-section="2" data-question-index="5"><label><h3 class="question-text">What is your fictious business name statement number</h3></label><div class="text-input-container"><input type="number" id="sc103_what_is_your_fictious_business_name_statement_number" name="sc103_what_is_your_fictious_business_name_statement_number" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-18" class="question-container question-item question-step-hidden" data-section="2" data-question-index="6"><label><h3 class="question-text">What is the date that your fictious businesses name statement expires</h3></label><div class="date-input-container" style="position: relative; cursor: pointer;" onclick="document.getElementById('sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires').showPicker()"><input type="date" id="sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires" name="sc103_what_is_the_date_that_your_fictious_businesses_name_statement_expires" style="width: 100%; padding: 12px 16px; border: 1px solid #e1e5e9; border-radius: 8px; font-size: 16px; cursor: pointer; background-color: #ffffff; transition: all 0.2s ease; box-sizing: border-box;"></div></div><div id="question-container-19" class="question-container question-item question-step-hidden" data-section="2" data-question-index="7"><label><h3 class="question-text">Are you suing for more than $12,500?</h3></label><select id="sc103_are_you_suing_for_more_than_12500" name="sc103_are_you_suing_for_more_than_12500"
                       onchange="dropdownMirror(this, 'sc103_are_you_suing_for_more_than_12500'); updateHiddenLogic('sc103_are_you_suing_for_more_than_12500', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_sc103_are_you_suing_for_more_than_12500"></div>
               <input type="text" id="sc103_are_you_suing_for_more_than_12500_dropdown" name="sc103_are_you_suing_for_more_than_12500_dropdown"
-                   readonly style="display:none;"></div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="button" class="next-button" onclick="validateAndProceed(2)" id="next-button-2">Next</button></div></div><div id="section3" class="section"><center><h1 class="section-title">SC-100</h1><div id="question-container-13" class="question-container"><label><h3 class="question-text">Are you suing by yourself?</h3></label><select id="sc100_are_you_suing_by_yourself" name="sc100_are_you_suing_by_yourself"
+                   readonly style="display:none;"></div>
+      <div class="question-nav" data-section-index="2">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="2">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="2">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button></div></div><div id="section3" class="section"><center><h1 class="section-title">SC-100</h1><div id="question-container-13" class="question-container question-item" data-section="3" data-question-index="1"><label><h3 class="question-text">Are you suing by yourself?</h3></label><select id="sc100_are_you_suing_by_yourself" name="sc100_are_you_suing_by_yourself"
                       onchange="dropdownMirror(this, 'sc100_are_you_suing_by_yourself'); updateHiddenLogic('sc100_are_you_suing_by_yourself', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_sc100_are_you_suing_by_yourself"></div>
               <input type="text" id="sc100_are_you_suing_by_yourself_dropdown" name="sc100_are_you_suing_by_yourself_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-15" class="question-container hidden" data-question-type="numberedDropdown"><label><h3 class="question-text">How many extra plantiffs are there</h3></label><p class="subtitle-text question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">Not including yourself</p><select id="sc100_how_many_extra_plantiffs_are_there" name="sc100_how_many_extra_plantiffs_are_there" data-question-id="15" onchange="showTextboxLabels(15, this.value); updateHiddenCheckboxes(15, this.value); updateHiddenLogic('sc100_how_many_extra_plantiffs_are_there', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select><br><div id="labelContainer15"></div></div><div id="question-container-20" class="question-container hidden"><label><h3 class="question-text">Are you suing more than one person?</h3></label><select id="sc100_are_you_suing_more_than_one_person" name="sc100_are_you_suing_more_than_one_person"
+                   readonly style="display:none;"></div><div id="question-container-15" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many extra plantiffs are there</h3></label><p class="subtitle-text question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">Not including yourself</p><select id="sc100_how_many_extra_plantiffs_are_there" name="sc100_how_many_extra_plantiffs_are_there" data-question-id="15" onchange="showTextboxLabels(15, this.value); updateHiddenCheckboxes(15, this.value); updateHiddenLogic('sc100_how_many_extra_plantiffs_are_there', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select><br><div id="labelContainer15"></div></div><div id="question-container-20" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="3"><label><h3 class="question-text">Are you suing more than one person?</h3></label><select id="sc100_are_you_suing_more_than_one_person" name="sc100_are_you_suing_more_than_one_person"
                       onchange="dropdownMirror(this, 'sc100_are_you_suing_more_than_one_person'); updateHiddenLogic('sc100_are_you_suing_more_than_one_person', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_sc100_are_you_suing_more_than_one_person"></div>
               <input type="text" id="sc100_are_you_suing_more_than_one_person_dropdown" name="sc100_are_you_suing_more_than_one_person_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-21" class="question-container hidden"><label><h3 class="question-text">Who are you suing?</h3></label><div id="labelContainer21"></div><input type="text" id="sc100_who_are_you_suing_address" name="sc100_who_are_you_suing_address" style="display: none;"><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="sc100_who_are_you_suing_name" name="sc100_who_are_you_suing_name" placeholder="Name" class="address-input"></div><div class="address-field"><input type="number" id="sc100_who_are_you_suing_phone_number" name="sc100_who_are_you_suing_phone_number" placeholder="Phone Number" class="address-input"></div><br><br><div style="margin: 10px 0px; padding: 12px; background-color: rgb(255, 255, 255); border: 1px solid rgb(225, 229, 233); border-radius: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 6px;"><label style="display: block; margin-bottom: 8px; font-weight: 600; color: rgb(51, 51, 51); font-size: 15px; text-align: center;">Please enter their address:</label><input type="text" id="sc100_who_are_you_suing_please_enter_their_address_street" name="sc100_who_are_you_suing_please_enter_their_address_street" placeholder="Street" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><input type="text" id="sc100_who_are_you_suing_please_enter_their_address_city" name="sc100_who_are_you_suing_please_enter_their_address_city" placeholder="City" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><select id="sc100_who_are_you_suing_please_enter_their_address_state" name="sc100_who_are_you_suing_please_enter_their_address_state" class="address-select-trigger" style="width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><option value="">Select State</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option></select><input type="text" id="sc100_who_are_you_suing_please_enter_their_address_state_short" name="sc100_who_are_you_suing_please_enter_their_address_state_short" style="display: none;"><input type="text" id="sc100_who_are_you_suing_please_enter_their_address_zip" name="sc100_who_are_you_suing_please_enter_their_address_zip" placeholder="Zip" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"></div><br><div style="margin: 15px 0px; padding: 20px; border: 2px solid rgb(135, 206, 235); border-radius: 12px; background: linear-gradient(135deg, rgb(240, 248, 255) 0%, rgb(230, 243, 255) 100%); box-shadow: rgba(135, 206, 235, 0.15) 0px 2px 8px;"><h4 style="margin: 0px 0px 15px; color: rgb(41, 128, 185); font-size: 18px; font-weight: 600; text-align: center;">Military Status</h4><div style="margin: 12px 0px; padding: 10px; background-color: rgba(255, 255, 255, 0.7); border-radius: 8px; border: 1px solid rgba(135, 206, 235, 0.3); display: flex; align-items: center; transition: 0.2s;"><input type="checkbox" id="sc_100_who_are_you_suing_military_status_is_this_defendant_on_active_military_duty" name="sc_100_who_are_you_suing_military_status_is_this_defendant_on_active_military_duty" value="Is this defendant on active military duty?" onchange="
+                   readonly style="display:none;"></div><div id="question-container-21" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="4"><label><h3 class="question-text">Who are you suing?</h3></label><div id="labelContainer21"></div><input type="text" id="sc100_who_are_you_suing_address" name="sc100_who_are_you_suing_address" style="display: none;"><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="sc100_who_are_you_suing_name" name="sc100_who_are_you_suing_name" placeholder="Name" class="address-input"></div><div class="address-field"><input type="number" id="sc100_who_are_you_suing_phone_number" name="sc100_who_are_you_suing_phone_number" placeholder="Phone Number" class="address-input"></div><br><br><div style="margin: 10px 0px; padding: 12px; background-color: rgb(255, 255, 255); border: 1px solid rgb(225, 229, 233); border-radius: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 6px;"><label style="display: block; margin-bottom: 8px; font-weight: 600; color: rgb(51, 51, 51); font-size: 15px; text-align: center;">Please enter their address:</label><input type="text" id="sc100_who_are_you_suing_please_enter_their_address_street" name="sc100_who_are_you_suing_please_enter_their_address_street" placeholder="Street" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><input type="text" id="sc100_who_are_you_suing_please_enter_their_address_city" name="sc100_who_are_you_suing_please_enter_their_address_city" placeholder="City" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><select id="sc100_who_are_you_suing_please_enter_their_address_state" name="sc100_who_are_you_suing_please_enter_their_address_state" class="address-select-trigger" style="width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><option value="">Select State</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option></select><input type="text" id="sc100_who_are_you_suing_please_enter_their_address_state_short" name="sc100_who_are_you_suing_please_enter_their_address_state_short" style="display: none;"><input type="text" id="sc100_who_are_you_suing_please_enter_their_address_zip" name="sc100_who_are_you_suing_please_enter_their_address_zip" placeholder="Zip" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"></div><br><div style="margin: 15px 0px; padding: 20px; border: 2px solid rgb(135, 206, 235); border-radius: 12px; background: linear-gradient(135deg, rgb(240, 248, 255) 0%, rgb(230, 243, 255) 100%); box-shadow: rgba(135, 206, 235, 0.15) 0px 2px 8px;"><h4 style="margin: 0px 0px 15px; color: rgb(41, 128, 185); font-size: 18px; font-weight: 600; text-align: center;">Military Status</h4><div style="margin: 12px 0px; padding: 10px; background-color: rgba(255, 255, 255, 0.7); border-radius: 8px; border: 1px solid rgba(135, 206, 235, 0.3); display: flex; align-items: center; transition: 0.2s;"><input type="checkbox" id="sc_100_who_are_you_suing_military_status_is_this_defendant_on_active_military_duty" name="sc_100_who_are_you_suing_military_status_is_this_defendant_on_active_military_duty" value="Is this defendant on active military duty?" onchange="
                         var self = this; (function() {
                             const linkedFields = [];
                             const pdfEntries = [];
@@ -697,13 +724,13 @@ document.addEventListener("DOMContentLoaded", function() {
                       handleMultipleTextboxesDropdown_21_5(select);
                     }
                   }, 1000);
-                </script><h4 style="margin: 0px 0px 15px; color: rgb(25, 118, 210); font-size: 18px; font-weight: 600; text-align: center;">Are they a business or public entity??</h4><select id="are_they_a_business_or_public_entity" name="are_they_a_business_or_public_entity" data-field-data="{&quot;questionId&quot;:&quot;21&quot;,&quot;fieldName&quot;:&quot;Are they a business or public entity??&quot;,&quot;triggerSequences&quot;:[{&quot;condition&quot;:&quot;Yes&quot;,&quot;title&quot;:&quot;Additional Information&quot;,&quot;fields&quot;:[{&quot;type&quot;:&quot;label&quot;,&quot;label&quot;:&quot;Name&quot;,&quot;nodeId&quot;:&quot;sc100_who_are_you_suing_are_they_a_business_or_public_entity_yes_name&quot;},{&quot;type&quot;:&quot;label&quot;,&quot;label&quot;:&quot;Job Title&quot;,&quot;nodeId&quot;:&quot;sc100_who_are_you_suing_are_they_a_business_or_public_entity_yes_job_title&quot;},{&quot;type&quot;:&quot;location&quot;,&quot;fieldName&quot;:&quot;Work Address&quot;,&quot;nodeId&quot;:&quot;location_data&quot;},{&quot;type&quot;:&quot;dropdown&quot;,&quot;fieldName&quot;:&quot;Are they a public entity?&quot;,&quot;options&quot;:[{&quot;text&quot;:&quot;Yes&quot;},{&quot;text&quot;:&quot;No&quot;}]},{&quot;type&quot;:&quot;dropdown&quot;,&quot;fieldName&quot;:&quot;Have you filed a written claim against them?&quot;,&quot;options&quot;:[{&quot;text&quot;:&quot;Yes&quot;},{&quot;text&quot;:&quot;No&quot;}]},{&quot;type&quot;:&quot;date&quot;,&quot;label&quot;:&quot;When did you file it?&quot;,&quot;nodeId&quot;:&quot;sc100_who_are_you_suing_are_they_a_business_or_public_entity_yes_when_did_you_file_it&quot;}]}],&quot;options&quot;:[{&quot;text&quot;:&quot;Yes&quot;,&quot;nodeId&quot;:&quot;are_they_a_business_or_public_entity_yes&quot;},{&quot;text&quot;:&quot;No&quot;,&quot;nodeId&quot;:&quot;are_they_a_business_or_public_entity_no&quot;}]}" data-question-id="21" data-entry-number="1" onchange="handleMultipleTextboxesDropdown_21_5(this)" style="width: 100%; padding: 12px; border: 1px solid rgb(33, 150, 243); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); cursor: pointer; transition: 0.2s;"><option value="" disabled="">Select an option...</option><option value="Yes" data-node-id="are_they_a_business_or_public_entity_yes">Yes</option><option value="No" data-node-id="are_they_a_business_or_public_entity_no">No</option></select><div id="dropdowntext_are_they_a_business_or_public_entity" style="display: none;"><input type="text" id="are_they_a_business_or_public_entity_dropdown" name="are_they_a_business_or_public_entity_dropdown" style="display: none;"></div></div></div><br></div><div id="question-container-22" class="question-container hidden" data-question-type="numberedDropdown"><label><h3 class="question-text">How many people are you suing in total?</h3></label><select id="sc100_how_many_people_are_you_suing_in_total" name="sc100_how_many_people_are_you_suing_in_total" data-question-id="22" onchange="showTextboxLabels(22, this.value); updateHiddenCheckboxes(22, this.value); updateHiddenLogic('sc100_how_many_people_are_you_suing_in_total', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer22"></div></div><div id="question-container-23" class="question-container hidden"><label><h3 class="question-text">Are you a “licensee” or “deferred deposit originator” (payday lender)</h3></label><select id="sc100_are_you_a_licensee_or_deferred_deposit_originator_payday_lender" name="sc100_are_you_a_licensee_or_deferred_deposit_originator_payday_lender"
+                </script><h4 style="margin: 0px 0px 15px; color: rgb(25, 118, 210); font-size: 18px; font-weight: 600; text-align: center;">Are they a business or public entity??</h4><select id="are_they_a_business_or_public_entity" name="are_they_a_business_or_public_entity" data-field-data="{&quot;questionId&quot;:&quot;21&quot;,&quot;fieldName&quot;:&quot;Are they a business or public entity??&quot;,&quot;triggerSequences&quot;:[{&quot;condition&quot;:&quot;Yes&quot;,&quot;title&quot;:&quot;Additional Information&quot;,&quot;fields&quot;:[{&quot;type&quot;:&quot;label&quot;,&quot;label&quot;:&quot;Name&quot;,&quot;nodeId&quot;:&quot;sc100_who_are_you_suing_are_they_a_business_or_public_entity_yes_name&quot;},{&quot;type&quot;:&quot;label&quot;,&quot;label&quot;:&quot;Job Title&quot;,&quot;nodeId&quot;:&quot;sc100_who_are_you_suing_are_they_a_business_or_public_entity_yes_job_title&quot;},{&quot;type&quot;:&quot;location&quot;,&quot;fieldName&quot;:&quot;Work Address&quot;,&quot;nodeId&quot;:&quot;location_data&quot;},{&quot;type&quot;:&quot;dropdown&quot;,&quot;fieldName&quot;:&quot;Are they a public entity?&quot;,&quot;options&quot;:[{&quot;text&quot;:&quot;Yes&quot;},{&quot;text&quot;:&quot;No&quot;}]},{&quot;type&quot;:&quot;dropdown&quot;,&quot;fieldName&quot;:&quot;Have you filed a written claim against them?&quot;,&quot;options&quot;:[{&quot;text&quot;:&quot;Yes&quot;},{&quot;text&quot;:&quot;No&quot;}]},{&quot;type&quot;:&quot;date&quot;,&quot;label&quot;:&quot;When did you file it?&quot;,&quot;nodeId&quot;:&quot;sc100_who_are_you_suing_are_they_a_business_or_public_entity_yes_when_did_you_file_it&quot;}]}],&quot;options&quot;:[{&quot;text&quot;:&quot;Yes&quot;,&quot;nodeId&quot;:&quot;are_they_a_business_or_public_entity_yes&quot;},{&quot;text&quot;:&quot;No&quot;,&quot;nodeId&quot;:&quot;are_they_a_business_or_public_entity_no&quot;}]}" data-question-id="21" data-entry-number="1" onchange="handleMultipleTextboxesDropdown_21_5(this)" style="width: 100%; padding: 12px; border: 1px solid rgb(33, 150, 243); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); cursor: pointer; transition: 0.2s;"><option value="" disabled="">Select an option...</option><option value="Yes" data-node-id="are_they_a_business_or_public_entity_yes">Yes</option><option value="No" data-node-id="are_they_a_business_or_public_entity_no">No</option></select><div id="dropdowntext_are_they_a_business_or_public_entity" style="display: none;"><input type="text" id="are_they_a_business_or_public_entity_dropdown" name="are_they_a_business_or_public_entity_dropdown" style="display: none;"></div></div></div><br></div><div id="question-container-22" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="5" data-question-type="numberedDropdown"><label><h3 class="question-text">How many people are you suing in total?</h3></label><select id="sc100_how_many_people_are_you_suing_in_total" name="sc100_how_many_people_are_you_suing_in_total" data-question-id="22" onchange="showTextboxLabels(22, this.value); updateHiddenCheckboxes(22, this.value); updateHiddenLogic('sc100_how_many_people_are_you_suing_in_total', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer22"></div></div><div id="question-container-23" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="6"><label><h3 class="question-text">Are you a “licensee” or “deferred deposit originator” (payday lender)</h3></label><select id="sc100_are_you_a_licensee_or_deferred_deposit_originator_payday_lender" name="sc100_are_you_a_licensee_or_deferred_deposit_originator_payday_lender"
                       onchange="dropdownMirror(this, 'sc100_are_you_a_licensee_or_deferred_deposit_originator_payday_lender'); updateHiddenLogic('sc100_are_you_a_licensee_or_deferred_deposit_originator_payday_lender', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_sc100_are_you_a_licensee_or_deferred_deposit_originator_payday_lender"></div>
               <input type="text" id="sc100_are_you_a_licensee_or_deferred_deposit_originator_payday_lender_dropdown" name="sc100_are_you_a_licensee_or_deferred_deposit_originator_payday_lender_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-24" class="question-container hidden"><label><h3 class="question-text">How much are you suing for?</h3></label><div class="text-input-container"><input type="number" id="sc100_how_much_are_you_suing_for" name="sc100_how_much_are_you_suing_for" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-25" class="question-container hidden"><label><h3 class="question-text">Explain why they owe you that money</h3></label>
+                   readonly style="display:none;"></div><div id="question-container-24" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="7"><label><h3 class="question-text">How much are you suing for?</h3></label><div class="text-input-container"><input type="number" id="sc100_how_much_are_you_suing_for" name="sc100_how_much_are_you_suing_for" min="0" step="0.01" placeholder="Enter amount"></div></div><div id="question-container-25" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="8"><label><h3 class="question-text">Explain why they owe you that money</h3></label>
             <div class="text-input-container">
               <textarea id="sc100_explain_why_they_owe_you_that_money" name="sc100_explain_why_they_owe_you_that_money" rows="5" cols="50" placeholder="" data-line-limit="80" oninput="handleLineSplitting('sc100_explain_why_they_owe_you_that_money', 80); checkParagraphLimit('sc100_explain_why_they_owe_you_that_money', null);"></textarea>
             </div>
@@ -750,17 +777,17 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
               }
             </script>
-          </div><div id="question-container-26" class="question-container"><label><h3 class="question-text">Do you know the date of the incident?</h3></label><select id="sc100_do_you_know_the_date_of_the_incident" name="sc100_do_you_know_the_date_of_the_incident"
+          </div><div id="question-container-26" class="question-container question-item question-step-hidden" data-section="3" data-question-index="9"><label><h3 class="question-text">Do you know the date of the incident?</h3></label><select id="sc100_do_you_know_the_date_of_the_incident" name="sc100_do_you_know_the_date_of_the_incident"
                       onchange="dropdownMirror(this, 'sc100_do_you_know_the_date_of_the_incident'); updateHiddenLogic('sc100_do_you_know_the_date_of_the_incident', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_sc100_do_you_know_the_date_of_the_incident"></div>
               <input type="text" id="sc100_do_you_know_the_date_of_the_incident_dropdown" name="sc100_do_you_know_the_date_of_the_incident_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-27" class="question-container hidden"><label><h3 class="question-text">When did the incident occur</h3></label><div class="date-input-container" style="position: relative; cursor: pointer;" onclick="document.getElementById('sc100_when_did_the_incident_occur').showPicker()"><input type="date" id="sc100_when_did_the_incident_occur" name="sc100_when_did_the_incident_occur" style="width: 100%; padding: 12px 16px; border: 1px solid #e1e5e9; border-radius: 8px; font-size: 16px; cursor: pointer; background-color: #ffffff; transition: all 0.2s ease; box-sizing: border-box;"></div></div><div id="question-container-28" class="question-container hidden"><label><h3 class="question-text">Do you know the date range that it occured?</h3></label><select id="sc100_do_you_know_the_date_range_that_it_occured" name="sc100_do_you_know_the_date_range_that_it_occured"
+                   readonly style="display:none;"></div><div id="question-container-27" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="10"><label><h3 class="question-text">When did the incident occur</h3></label><div class="date-input-container" style="position: relative; cursor: pointer;" onclick="document.getElementById('sc100_when_did_the_incident_occur').showPicker()"><input type="date" id="sc100_when_did_the_incident_occur" name="sc100_when_did_the_incident_occur" style="width: 100%; padding: 12px 16px; border: 1px solid #e1e5e9; border-radius: 8px; font-size: 16px; cursor: pointer; background-color: #ffffff; transition: all 0.2s ease; box-sizing: border-box;"></div></div><div id="question-container-28" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="11"><label><h3 class="question-text">Do you know the date range that it occured?</h3></label><select id="sc100_do_you_know_the_date_range_that_it_occured" name="sc100_do_you_know_the_date_range_that_it_occured"
                       onchange="dropdownMirror(this, 'sc100_do_you_know_the_date_range_that_it_occured'); updateHiddenLogic('sc100_do_you_know_the_date_range_that_it_occured', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_sc100_do_you_know_the_date_range_that_it_occured"></div>
               <input type="text" id="sc100_do_you_know_the_date_range_that_it_occured_dropdown" name="sc100_do_you_know_the_date_range_that_it_occured_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-29" class="question-container hidden"><label><h3 class="question-text">When did this happen?</h3></label>
+                   readonly style="display:none;"></div><div id="question-container-29" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="12"><label><h3 class="question-text">When did this happen?</h3></label>
           <div style="display: flex; gap: 20px; justify-content: center; align-items: center; margin: 8px auto; width: 80%; max-width: 400px;">
             <div class="date-input-container" style="flex: 1; position: relative; cursor: pointer;" onclick="document.getElementById('sc100_when_did_this_happen_1').showPicker()">
               <label for="sc100_when_did_this_happen_1" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Start Date</label>
@@ -797,7 +824,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
               }
             });
-          </script></div><div id="question-container-30" class="question-container hidden"><label><h3 class="question-text">How did you calculate the money owed to you?</h3></label>
+          </script></div><div id="question-container-30" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="13"><label><h3 class="question-text">How did you calculate the money owed to you?</h3></label>
             <div class="text-input-container">
               <textarea id="sc100_how_did_you_calculate_the_money_owed_to_you" name="sc100_how_did_you_calculate_the_money_owed_to_you" rows="5" cols="50" placeholder="" data-line-limit="80" oninput="handleLineSplitting('sc100_how_did_you_calculate_the_money_owed_to_you', 80); checkParagraphLimit('sc100_how_did_you_calculate_the_money_owed_to_you', null);"></textarea>
             </div>
@@ -844,12 +871,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
               }
             </script>
-          </div><div id="question-container-31" class="question-container"><label><h3 class="question-text">Have you sent a demand letter to D?</h3></label><select id="sc100_have_you_sent_a_demand_letter_to_d" name="sc100_have_you_sent_a_demand_letter_to_d"
+          </div><div id="question-container-31" class="question-container question-item question-step-hidden" data-section="3" data-question-index="14"><label><h3 class="question-text">Have you sent a demand letter to D?</h3></label><select id="sc100_have_you_sent_a_demand_letter_to_d" name="sc100_have_you_sent_a_demand_letter_to_d"
                       onchange="dropdownMirror(this, 'sc100_have_you_sent_a_demand_letter_to_d'); updateHiddenLogic('sc100_have_you_sent_a_demand_letter_to_d', this.value); updateLinkedFields(); clearInactiveLinkedFields()">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_sc100_have_you_sent_a_demand_letter_to_d"></div>
               <input type="text" id="sc100_have_you_sent_a_demand_letter_to_d_dropdown" name="sc100_have_you_sent_a_demand_letter_to_d_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-32" class="question-container hidden"><label><h3 class="question-text">Explain why not</h3></label>
+                   readonly style="display:none;"></div><div id="question-container-32" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="15"><label><h3 class="question-text">Explain why not</h3></label>
             <div class="text-input-container">
               <textarea id="sc100_explain_why_not" name="sc100_explain_why_not" rows="5" cols="50" placeholder="" data-line-limit="90" oninput="handleLineSplitting('sc100_explain_why_not', 90); checkParagraphLimit('sc100_explain_why_not', null);"></textarea>
             </div>
@@ -896,7 +923,461 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
               }
             </script>
-          </div><br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div><div id="hidden_pdf_fields">
+          </div>
+      <div class="question-nav" data-section-index="3">
+        <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="3">&larr;</button>
+        <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="3">&rarr;</button>
+      </div>
+    <br><br><div class="navigation-buttons"><button type="button" onclick="goBack()">Back</button><button type="submit" class="next-button">Submit</button></div></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const sectionNodeList = document.querySelectorAll('[id^="section"]');
+      const sectionElements = Array.from(sectionNodeList);
+      const sectionNumbers = sectionElements.map(sectionEl => {
+        const match = sectionEl.id && sectionEl.id.match(/^section(\d+)$/);
+        return match ? parseInt(match[1], 10) : null;
+      });
+      if (!window.questionNavControllers) {
+        window.questionNavControllers = {};
+      }
+
+      sectionElements.forEach(function(sectionEl, sectionIdx) {
+        const questionItems = Array.from(sectionEl.querySelectorAll('.question-container.question-item'));
+        const navWrapper = sectionEl.querySelector('.question-nav');
+        if (!questionItems.length || !navWrapper) {
+          return;
+        }
+
+        const sectionId = sectionEl.id;
+        const currentSectionNumber = sectionNumbers[sectionIdx] || (sectionIdx + 1);
+        const prevBtn = navWrapper.querySelector('.question-prev');
+        const nextBtn = navWrapper.querySelector('.question-next');
+        const progressCurrent = navWrapper.querySelector('.question-current');
+        const progressTotal = navWrapper.querySelector('.question-total');
+
+        function getVisibleIndices() {
+          const indices = [];
+          questionItems.forEach(function(item, idx) {
+            if (!item.classList.contains('hidden')) {
+              indices.push(idx);
+            }
+          });
+          return indices;
+        }
+
+        function getVisibleIndicesForSectionElement(targetSectionEl) {
+          const items = Array.from(targetSectionEl.querySelectorAll('.question-container.question-item'));
+          const indices = [];
+          items.forEach(function(item, idx) {
+            if (!item.classList.contains('hidden')) {
+              indices.push(idx);
+            }
+          });
+          return { indices, items };
+        }
+
+        function findNextSectionWithVisibleQuestions() {
+          for (let nextIdx = sectionIdx + 1; nextIdx < sectionElements.length; nextIdx++) {
+            const candidateSection = sectionElements[nextIdx];
+            const visibleInfo = getVisibleIndicesForSectionElement(candidateSection);
+            if (visibleInfo.indices.length) {
+              return {
+                sectionEl: candidateSection,
+                sectionId: candidateSection.id,
+                sectionNumber: sectionNumbers[nextIdx] || (nextIdx + 1),
+                firstVisibleIndex: visibleInfo.indices[0]
+              };
+            }
+          }
+          return null;
+        }
+
+        function findPrevSectionWithVisibleQuestions() {
+          for (let prevIdx = sectionIdx - 1; prevIdx >= 0; prevIdx--) {
+            const candidateSection = sectionElements[prevIdx];
+            const visibleInfo = getVisibleIndicesForSectionElement(candidateSection);
+            if (visibleInfo.indices.length) {
+              return {
+                sectionEl: candidateSection,
+                sectionId: candidateSection.id,
+                sectionNumber: sectionNumbers[prevIdx] || (prevIdx + 1),
+                lastVisibleIndex: visibleInfo.indices[visibleInfo.indices.length - 1]
+              };
+            }
+          }
+          return null;
+        }
+
+        let activeIndex = -1;
+        let isUpdating = false;
+        let cachedNextSectionInfo = null;
+        let cachedPrevSectionInfo = null;
+
+        function answerTriggersEnd(container) {
+          console.log('[Nav] answerTriggersEnd: evaluating container', container && container.id);
+          if (!container || !Array.isArray(jumpLogics) || !jumpLogics.length) {
+            console.log('[Nav] answerTriggersEnd: missing container or jumpLogics');
+            return false;
+          }
+          const containerId = ((container.id || '') + '').trim();
+          let questionId = null;
+          if (containerId.startsWith('question-container-')) {
+            questionId = containerId.substring('question-container-'.length).trim();
+          }
+          console.log('[Nav] answerTriggersEnd: resolved container/question ids', { containerId, questionId });
+          if (!questionId) {
+            console.log('[Nav] answerTriggersEnd: unable to resolve questionId from container id', { containerId });
+            return false;
+          }
+
+          const relevantJumps = jumpLogics.filter(jl => jl.questionId === questionId && typeof jl.jumpTo === 'string' && jl.jumpTo.toLowerCase() === 'end');
+          console.log('[Nav] answerTriggersEnd: relevant jumps', relevantJumps);
+          if (!relevantJumps.length) return false;
+
+          const interactiveElements = container.querySelectorAll('select, input[type="radio"], input[type="checkbox"]');
+          const currentAnswers = [];
+          interactiveElements.forEach(el => {
+            if (el.tagName === 'SELECT') {
+              if (el.value) currentAnswers.push(el.value);
+            } else if (el.type === 'radio') {
+              if (el.checked) currentAnswers.push(el.value || 'true');
+            } else if (el.type === 'checkbox') {
+              if (el.checked) currentAnswers.push(el.value || 'true');
+            }
+          });
+
+          if (!currentAnswers.length) {
+            console.log('[Nav] answerTriggersEnd: no current answers found');
+            return false;
+          }
+
+          const normalizedAnswers = currentAnswers.map(val => String(val).trim().toLowerCase());
+          console.log('[Nav] answerTriggersEnd: normalized answers', normalizedAnswers);
+          for (const jl of relevantJumps) {
+            const jumpOption = String(jl.jumpOption || '').trim().toLowerCase();
+            if (jumpOption && normalizedAnswers.includes(jumpOption)) {
+              console.log('[Nav] answerTriggersEnd: match found', { questionId, jumpOption });
+              return true;
+            }
+          }
+
+          console.log('[Nav] answerTriggersEnd: no jump-to-end match');
+          return false;
+        }
+
+        function attachSubmitModeListeners(container, containerIdx) {
+          if (!container || container.dataset.submitModeListenersAttached === 'true') return;
+          const interactiveElements = container.querySelectorAll('select, input[type="radio"], input[type="checkbox"]');
+          interactiveElements.forEach(el => {
+            el.addEventListener('change', function() {
+              console.log('[Nav] change detected -> refreshing nav', { field: el.name || el.id, value: el.value, checked: el.checked });
+              refreshNav(containerIdx);
+            });
+          });
+          container.dataset.submitModeListenersAttached = 'true';
+          console.log('[Nav] attachSubmitModeListeners: attached', container.id);
+        }
+
+        function updateButtons(hasPrevQuestion, canAdvanceWithinSection, canAdvanceAcrossSection, nextSectionInfo, prevSectionInfo, submitConfig) {
+          const shouldSubmit = submitConfig && submitConfig.shouldSubmit;
+          console.log('[Nav] updateButtons', {
+            hasPrevQuestion,
+            canAdvanceWithinSection,
+            canAdvanceAcrossSection,
+            nextSectionInfo,
+            prevSectionInfo,
+            submitConfig
+          });
+          if (prevBtn) {
+            const canGoBack = !!(hasPrevQuestion || prevSectionInfo);
+            prevBtn.disabled = !canGoBack;
+            if (!canGoBack) {
+              prevBtn.dataset.advanceMode = '';
+              delete prevBtn.dataset.prevSectionNumber;
+              delete prevBtn.dataset.prevSectionId;
+            } else if (hasPrevQuestion) {
+              prevBtn.dataset.advanceMode = 'question';
+              delete prevBtn.dataset.prevSectionNumber;
+              delete prevBtn.dataset.prevSectionId;
+            } else {
+              prevBtn.dataset.advanceMode = 'section';
+              if (prevSectionInfo) {
+                prevBtn.dataset.prevSectionNumber = String(prevSectionInfo.sectionNumber);
+                prevBtn.dataset.prevSectionId = prevSectionInfo.sectionId;
+              }
+            }
+          }
+          if (nextBtn) {
+            if (shouldSubmit) {
+              nextBtn.disabled = false;
+              nextBtn.dataset.advanceMode = 'submit';
+              delete nextBtn.dataset.nextSectionNumber;
+              delete nextBtn.dataset.nextSectionId;
+              nextBtn.classList.add('submit-mode');
+              console.log('[Nav] updateButtons: next button now in submit mode');
+            } else {
+              nextBtn.classList.remove('submit-mode');
+              const canAdvance = !!(canAdvanceWithinSection || canAdvanceAcrossSection);
+              nextBtn.disabled = !canAdvance;
+              if (!canAdvance) {
+                nextBtn.dataset.advanceMode = '';
+                delete nextBtn.dataset.nextSectionNumber;
+                delete nextBtn.dataset.nextSectionId;
+              } else if (canAdvanceWithinSection) {
+                nextBtn.dataset.advanceMode = 'question';
+                delete nextBtn.dataset.nextSectionNumber;
+                delete nextBtn.dataset.nextSectionId;
+              } else {
+                nextBtn.dataset.advanceMode = 'section';
+                if (nextSectionInfo) {
+                  nextBtn.dataset.nextSectionNumber = String(nextSectionInfo.sectionNumber);
+                  nextBtn.dataset.nextSectionId = nextSectionInfo.sectionId;
+                }
+              }
+            }
+          }
+        }
+
+        function activateIndex(targetIdx) {
+          if (isUpdating) return;
+          isUpdating = true;
+          
+          const visibleIndices = getVisibleIndices();
+          if (!visibleIndices.length) {
+            questionItems.forEach(function(item) {
+              item.classList.add('question-step-hidden');
+            });
+            if (progressCurrent) {
+              progressCurrent.textContent = '0';
+            }
+            if (progressTotal) {
+              progressTotal.textContent = String(questionItems.length);
+            }
+            if (prevBtn) {
+              prevBtn.disabled = true;
+            }
+            if (nextBtn) {
+              nextBtn.disabled = true;
+            }
+            activeIndex = -1;
+            isUpdating = false;
+            return;
+          }
+
+          if (visibleIndices.indexOf(targetIdx) === -1) {
+            targetIdx = visibleIndices[0];
+          }
+
+          questionItems.forEach(function(item, idx) {
+            if (idx === targetIdx && !item.classList.contains('hidden')) {
+              item.classList.remove('question-step-hidden');
+            } else {
+              item.classList.add('question-step-hidden');
+            }
+          });
+
+          const currentPos = visibleIndices.indexOf(targetIdx);
+          const position = currentPos + 1;
+          const visibleTotal = visibleIndices.length;
+          const displayTotal = questionItems.length;
+
+          if (progressCurrent) {
+            progressCurrent.textContent = String(position > 0 ? position : 0);
+          }
+          if (progressTotal) {
+            progressTotal.textContent = String(displayTotal);
+          }
+
+          const activeContainer = questionItems[targetIdx];
+          attachSubmitModeListeners(activeContainer, targetIdx);
+          const shouldSubmit = answerTriggersEnd(activeContainer);
+          console.log('[Nav] activateIndex', {
+            sectionId,
+            targetIdx,
+            questionId: activeContainer && activeContainer.id,
+            shouldSubmit,
+            visibleIndices,
+            cachedNextSectionInfo,
+            cachedPrevSectionInfo
+          });
+
+          const hasPrevQuestion = currentPos > 0;
+          const canAdvanceWithinSection = (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
+          cachedNextSectionInfo = shouldSubmit ? null : findNextSectionWithVisibleQuestions();
+          cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
+          const canAdvanceAcrossSection = shouldSubmit ? false : !!cachedNextSectionInfo;
+
+          updateButtons(
+            hasPrevQuestion,
+            canAdvanceWithinSection,
+            canAdvanceAcrossSection,
+            cachedNextSectionInfo,
+            cachedPrevSectionInfo,
+            { shouldSubmit }
+          );
+          activeIndex = targetIdx;
+          isUpdating = false;
+        }
+
+        function goToNextSection() {
+          if (!cachedNextSectionInfo) {
+            return;
+          }
+          const targetSectionId = cachedNextSectionInfo.sectionId;
+          const targetSectionNumber = cachedNextSectionInfo.sectionNumber;
+          const triggerNavigation = () => {
+            if (typeof validateAndProceed === 'function') {
+              validateAndProceed(currentSectionNumber);
+            } else if (typeof navigateSection === 'function') {
+              navigateSection(targetSectionNumber);
+            }
+          };
+          const updateTargetNav = () => {
+            const activeSection = document.querySelector('.section.active');
+            if (activeSection && activeSection.id === targetSectionId) {
+              if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                window.questionNavControllers[targetSectionId]();
+              }
+            }
+          };
+          triggerNavigation();
+          setTimeout(updateTargetNav, 0);
+        }
+
+        function goToPrevSection() {
+          if (!cachedPrevSectionInfo) {
+            return;
+          }
+          const targetSectionId = cachedPrevSectionInfo.sectionId;
+          const targetSectionNumber = cachedPrevSectionInfo.sectionNumber;
+          const targetQuestionIndex = cachedPrevSectionInfo.lastVisibleIndex;
+          const triggerNavigation = () => {
+            if (typeof navigateSection === 'function') {
+              navigateSection(targetSectionNumber);
+            } else if (typeof validateAndProceed === 'function') {
+              navigateSection(targetSectionNumber);
+            }
+          };
+          const updateTargetNav = () => {
+            const activeSection = document.querySelector('.section.active');
+            if (activeSection && activeSection.id === targetSectionId) {
+              if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+                window.questionNavControllers[targetSectionId](targetQuestionIndex);
+              }
+            }
+          };
+          triggerNavigation();
+          setTimeout(updateTargetNav, 0);
+        }
+
+        function shiftQuestion(direction) {
+          const visibleIndices = getVisibleIndices();
+          if (!visibleIndices.length || activeIndex === -1) {
+            if (direction > 0 && cachedNextSectionInfo) {
+              goToNextSection();
+            } else if (direction < 0 && cachedPrevSectionInfo) {
+              goToPrevSection();
+            }
+            return;
+          }
+          const currentPos = visibleIndices.indexOf(activeIndex);
+          const nextPos = currentPos + direction;
+          if (nextPos < 0 || nextPos >= visibleIndices.length) {
+            if (direction > 0 && cachedNextSectionInfo) {
+              goToNextSection();
+            } else if (direction < 0 && cachedPrevSectionInfo) {
+              goToPrevSection();
+            }
+            return;
+          }
+          activateIndex(visibleIndices[nextPos]);
+        }
+
+        function refreshNav(targetIdx) {
+          const visibleIndices = getVisibleIndices();
+          if (!visibleIndices.length) {
+            activateIndex(0);
+            return;
+          }
+
+          if (typeof targetIdx !== 'number' || visibleIndices.indexOf(targetIdx) === -1) {
+            const currentVisibleIdx = visibleIndices.indexOf(activeIndex);
+            if (currentVisibleIdx === -1) {
+              activateIndex(visibleIndices[0]);
+            } else {
+              activateIndex(activeIndex);
+            }
+            return;
+          }
+
+          activateIndex(targetIdx);
+        }
+
+        if (prevBtn) {
+          prevBtn.addEventListener('click', function() {
+            shiftQuestion(-1);
+          });
+        }
+
+        if (nextBtn) {
+          nextBtn.addEventListener('click', function() {
+            if (nextBtn.dataset.advanceMode === 'submit') {
+              console.log('[Nav] next button click → submit mode');
+              const formEl = document.getElementById('customForm');
+              if (formEl) {
+                if (typeof formEl.requestSubmit === 'function') {
+                  formEl.requestSubmit();
+                } else {
+                  formEl.submit();
+                }
+              }
+              return;
+            }
+            console.log('[Nav] next button click → navigate mode');
+            shiftQuestion(1);
+          });
+        }
+
+        const observer = new MutationObserver(function(mutations) {
+          if (isUpdating) return;
+          let shouldUpdate = false;
+          mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+              const oldClasses = mutation.oldValue || '';
+              const newClasses = mutation.target.className || '';
+              if (oldClasses.includes('hidden') !== newClasses.includes('hidden')) {
+                shouldUpdate = true;
+              }
+            }
+          });
+          if (shouldUpdate) {
+            refreshNav(activeIndex === -1 ? 0 : activeIndex);
+          }
+        });
+
+        questionItems.forEach(function(item) {
+          observer.observe(item, { 
+            attributes: true, 
+            attributeFilter: ['class'],
+            attributeOldValue: true
+          });
+        });
+
+        document.addEventListener('questionVisibilityChanged', function(evt) {
+          if (!evt || !evt.detail || !evt.detail.sectionId || evt.detail.sectionId === sectionId) {
+            refreshNav();
+          }
+        });
+
+        window.questionNavControllers[sectionId] = refreshNav;
+
+        const visibleIndices = getVisibleIndices();
+        const initialIndex = visibleIndices.length ? visibleIndices[0] : 0;
+        activateIndex(initialIndex);
+      });
+    });
+  </script>
+  <div id="hidden_pdf_fields">
 <input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
 <input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
 <input type="hidden" id="user_fullname"         name="user_fullname">
@@ -910,7 +1391,22 @@ document.addEventListener("DOMContentLoaded", function() {
 <div style="display:none;"><input type="checkbox" id="suing_over_2500" name="suing_over_2500" ></div>
 <div style="display:none;"><input type="checkbox" id="suing_under_2500" name="suing_under_2500" ></div>
 <input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
-</div></form>
+</div>
+  <script>
+    window.showLoginRequiredModal = function() {
+      const modal = document.getElementById('loginRequiredModal');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
+    };
+    window.hideLoginRequiredModal = function() {
+      const modal = document.getElementById('loginRequiredModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    };
+  </script>
+  </form>
 <div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
 </div>
 </section>
@@ -928,7 +1424,7 @@ document.addEventListener("DOMContentLoaded", function() {
         </div>
         <div class="pro-footer-col nav-col">
             <div class="pro-footer-title">Navigation</div>
-            <a href="../Pages/index.html">Home</a>
+            <a href="index.html">Home</a>
             <a href="../Pages/FreeForm.html">Forms</a>
             <a href="../Pages/FAQ.html">FAQ</a>
             <a href="../Pages/about.html">About Us</a>
@@ -2348,7 +2844,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
     return namePart;
 }
 
-      let isUserLoggedIn = false;
+      let isUserLoggedIn = true;
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
@@ -2493,53 +2989,18 @@ function replaceUrlParametersInForm() {
     });
 }
 
-// Function to apply prefill values from unifiedFieldsMap
-function applyPrefillValues() {
-    if (!window.unifiedFieldsMap) return;
-    
-    // Iterate through all questions in unifiedFieldsMap
-    for (const questionId in window.unifiedFieldsMap) {
-        const fields = window.unifiedFieldsMap[questionId];
-        if (!Array.isArray(fields)) continue;
-        
-        // Find each field with a prefill value
-        fields.forEach(field => {
-            if (field.prefill && field.nodeId) {
-                const input = document.getElementById(field.nodeId);
-                // Apply prefill even if container is hidden - the value should be set regardless
-                if (input && (input.type === 'text' || input.type === 'email' || input.type === 'tel' || input.type === 'number' || !input.type)) {
-                    // Always apply prefill value from unifiedFieldsMap (it's the source of truth)
-                    // Only set if the field is empty or if we're forcing an update
-                    if (!input.value || input.value.trim() === '' || input.value !== field.prefill) {
-                        input.value = field.prefill;
-                        // Also update the value attribute to ensure it persists
-                        input.setAttribute('value', field.prefill);
-                    }
-                }
-            }
-        });
-    }
-}
-
 // Auto-populate on page load
 if (document.readyState === 'loading') {
     document.addEventListener("DOMContentLoaded", function() {
         populateHiddenFieldsFromUrl();
         setupLinkedFields();
         replaceUrlParametersInForm();
-        // Apply prefill values after a short delay to ensure all elements are ready
-        // Use a longer delay to ensure visibility updates have run first
-        setTimeout(applyPrefillValues, 200);
-        // Also apply again after a bit more time to catch any late updates
-        setTimeout(applyPrefillValues, 400);
     });
 } else {
     // DOM already loaded, run immediately
     populateHiddenFieldsFromUrl();
     setupLinkedFields();
     replaceUrlParametersInForm();
-    // Apply prefill values after a short delay to ensure all elements are ready
-    setTimeout(applyPrefillValues, 100);
 }
 
 // Function to check paragraph limit and create hidden checkbox
@@ -2611,50 +3072,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -2667,6 +3085,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var checkQuestion = "1";
@@ -2757,50 +3179,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -2813,6 +3192,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var checkQuestion = "1";
@@ -2864,50 +3247,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -2920,6 +3260,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "3";
@@ -2952,50 +3296,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -3008,6 +3309,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "4";
@@ -3097,50 +3402,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -3153,6 +3415,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "5";
@@ -3200,50 +3466,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -3256,6 +3479,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "6";
@@ -3307,50 +3534,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -3363,6 +3547,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "7";
@@ -3400,50 +3588,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -3456,6 +3601,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "9";
@@ -3488,50 +3637,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -3544,6 +3650,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "10";
@@ -3576,50 +3686,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -3632,6 +3699,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var checkQuestion = "11";
@@ -3760,50 +3831,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -3816,6 +3844,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var checkQuestion = "11";
@@ -3879,50 +3911,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -3935,6 +3924,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "13";
@@ -3986,50 +3979,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -4042,6 +3992,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "13";
@@ -4079,50 +4033,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -4135,6 +4046,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "20";
@@ -4167,50 +4082,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -4223,6 +4095,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "20";
@@ -4274,50 +4150,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -4330,6 +4163,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "20";
@@ -4386,50 +4223,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -4442,6 +4236,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "23";
@@ -4498,50 +4296,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -4554,6 +4309,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "23";
@@ -4591,50 +4350,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -4647,6 +4363,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "26";
@@ -4679,50 +4399,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -4735,6 +4412,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "26";
@@ -4767,50 +4448,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -4823,6 +4461,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "28";
@@ -4893,50 +4535,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -4949,6 +4548,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "28";
@@ -4991,50 +4594,7 @@ var hiddenTextCalculations = [];
       if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
     }
   })();
- if(anyMatch){ 
-   thisQ.classList.remove("hidden");
-   // Restore prefill values when container becomes visible
-   // Use a longer delay to ensure it runs after clearInactiveLinkedFields (which uses 100ms)
-   setTimeout(function() {
-     var textInputs = thisQ.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-     for(var i = 0; i < textInputs.length; i++) {
-       var input = textInputs[i];
-       var prefillApplied = false;
-       
-       // Check unifiedFieldsMap for prefill value (this is the source of truth)
-       if(window.unifiedFieldsMap) {
-         for(var qId in window.unifiedFieldsMap) {
-           var fields = window.unifiedFieldsMap[qId];
-           if(Array.isArray(fields)) {
-             for(var j = 0; j < fields.length; j++) {
-               if(fields[j].nodeId === input.id && fields[j].prefill) {
-                 input.value = fields[j].prefill;
-                 input.setAttribute('value', fields[j].prefill); // Update attribute too
-                 prefillApplied = true;
-                 break;
-               }
-             }
-           }
-         }
-       }
-       
-       // Also check original value attribute if no prefill was found in unifiedFieldsMap
-       if(!prefillApplied) {
-         var originalValue = input.getAttribute('value');
-         if(originalValue && originalValue.trim() !== '') {
-           input.value = originalValue;
-         }
-       }
-     }
-   }, 150); // Increased delay to run after clearInactiveLinkedFields (100ms)
-   
-   // Also call applyPrefillValues to ensure all prefill values are applied
-   if(typeof applyPrefillValues === 'function') {
-     setTimeout(function() {
-       applyPrefillValues();
-     }, 200);
-   }
- } else { 
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
    var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
    var questionType = thisQ.getAttribute('data-question-type') || '';
    if(questionType === 'numberedDropdown' || hasNumberedDropdown){
@@ -5047,6 +4607,10 @@ var hiddenTextCalculations = [];
    }
    thisQ.classList.add("hidden");
  }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
 }
  (function(){
    var selectQuestion = "31";
@@ -7400,12 +6964,7 @@ function showTextboxLabels(questionId, count){
                     autofillValue = window.mappedData[fieldId];
                 }
                 
-                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
-                const isBlankValue = autofillValue === null || 
-                                   autofillValue === '' || 
-                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
-                
-                if (!isBlankValue) {
+                if (autofillValue !== null && autofillValue !== '') {
                     // Skip current_date field - it should be set dynamically
                     if (fieldId === 'current_date' || field.name === 'current_date') {
                         return;
@@ -9363,8 +8922,11 @@ if (typeof handleNext === 'function') {
   var originalHandleNext = handleNext;
   window.handleNext = function(currentSection) {
     if (!isUserLoggedIn) {
-      showLoginRequiredModal();
-      return;
+      var loginModal = document.getElementById('loginRequiredModal');
+      if (loginModal && typeof showLoginRequiredModal === 'function') {
+        showLoginRequiredModal();
+        return;
+      }
     }
     originalHandleNext(currentSection);
   };
@@ -9586,12 +9148,7 @@ if (typeof handleNext === 'function') {
                         autofillValue = mappedData[el.id];
                     }
                     
-                    // 🔧 NEW: Prevent autofilling with blank values - must have actual content
-                    const isBlankValue = autofillValue === null || 
-                                       autofillValue === '' || 
-                                       (typeof autofillValue === 'string' && autofillValue.trim() === '');
-                    
-                    if (!isBlankValue) {
+                    if (autofillValue !== null) {
                             // Skip current_date field - it should be set dynamically
                             if (el.id === 'current_date' || el.name === 'current_date') {
 
@@ -9754,27 +9311,17 @@ if (typeof handleNext === 'function') {
                                     return;
                                 }
                                 
-                                const autofillValue = mappedData[el.name];
-                                
-                                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
-                                const isBlankValue = autofillValue === null || 
-                                                   autofillValue === '' || 
-                                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
-                                
                                 if (el.type === 'checkbox') {
-                                    el.checked = !!autofillValue;
+                                    el.checked = !!mappedData[el.name];
                                 } else if (el.type === 'radio') {
                                     // For radio buttons, only check the one that matches the value
-                                    if (el.value === autofillValue) {
+                                    if (el.value === mappedData[el.name]) {
                                         el.checked = true;
                                     } else {
                                         el.checked = false;
                                     }
                                 } else {
-                                    // Only set value if it's not blank
-                                    if (!isBlankValue) {
-                                        el.value = autofillValue;
-                                    }
+                                    el.value = mappedData[el.name];
                                 }
                             }
                         });
@@ -9788,13 +9335,6 @@ if (typeof handleNext === 'function') {
                             
                             const fieldById = fieldsById[fieldName];
                             if (fieldById && mappedData[fieldName]) {
-                                const autofillValue = mappedData[fieldName];
-                                
-                                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
-                                const isBlankValue = autofillValue === null || 
-                                                   autofillValue === '' || 
-                                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
-                                
                                 // Check if field needs autofilling (different logic for different field types)
                                 const needsAutofill = (fieldById.type === 'checkbox' || fieldById.type === 'radio') 
                                     ? !fieldById.checked 
@@ -9804,20 +9344,17 @@ if (typeof handleNext === 'function') {
                                 if (fieldById.type === 'checkbox' || fieldById.type === 'radio') {
                                         if (fieldById.type === 'radio') {
                                             // For radio buttons, check if this specific radio should be selected
-                                            if (fieldById.value === autofillValue) {
+                                            if (fieldById.value === mappedData[fieldName]) {
                                                 fieldById.checked = true;
                                             } else {
                                                 fieldById.checked = false;
                                             }
                                         } else {
                                             // For checkboxes, use boolean value
-                                    fieldById.checked = !!autofillValue;
+                                    fieldById.checked = !!mappedData[fieldName];
                                         }
                                 } else {
-                                    // Only set value if it's not blank
-                                    if (!isBlankValue) {
-                                        fieldById.value = autofillValue;
-                                    }
+                                    fieldById.value = mappedData[fieldName];
                                     }
                                 }
                             }
@@ -9885,27 +9422,13 @@ if (typeof handleNext === 'function') {
                                                     // Check first pattern
                                                     let fieldElement = document.getElementById(fieldId1);
                                                     if (fieldElement && mappedData[fieldId1]) {
-                                                        // 🔧 NEW: Prevent autofilling with blank values
-                                                        const autofillValue1 = mappedData[fieldId1];
-                                                        const isBlank1 = autofillValue1 === null || 
-                                                                        autofillValue1 === '' || 
-                                                                        (typeof autofillValue1 === 'string' && autofillValue1.trim() === '');
-                                                        if (!isBlank1) {
-                                                            fieldElement.value = autofillValue1;
-                                                        }
+                                                        fieldElement.value = mappedData[fieldId1];
                                                     }
                                                     
                                                     // Check second pattern
                                                     fieldElement = document.getElementById(fieldId2);
                                                     if (fieldElement && mappedData[fieldId2]) {
-                                                        // 🔧 NEW: Prevent autofilling with blank values
-                                                        const autofillValue2 = mappedData[fieldId2];
-                                                        const isBlank2 = autofillValue2 === null || 
-                                                                        autofillValue2 === '' || 
-                                                                        (typeof autofillValue2 === 'string' && autofillValue2.trim() === '');
-                                                        if (!isBlank2) {
-                                                            fieldElement.value = autofillValue2;
-                                                        }
+                                                        fieldElement.value = mappedData[fieldId2];
                                                     }
                                                 });
                                             }
@@ -9979,27 +9502,13 @@ if (typeof handleNext === 'function') {
                                                 // Check first pattern
                                                 let fieldElement = document.getElementById(fieldId1);
                                                 if (fieldElement && mappedData[fieldId1]) {
-                                                    // 🔧 NEW: Prevent autofilling with blank values
-                                                    const autofillValue1 = mappedData[fieldId1];
-                                                    const isBlank1 = autofillValue1 === null || 
-                                                                    autofillValue1 === '' || 
-                                                                    (typeof autofillValue1 === 'string' && autofillValue1.trim() === '');
-                                                    if (!isBlank1) {
-                                                        fieldElement.value = autofillValue1;
-                                                    }
+                                                    fieldElement.value = mappedData[fieldId1];
                                                 }
                                                 
                                                 // Check second pattern
                                                 fieldElement = document.getElementById(fieldId2);
                                                 if (fieldElement && mappedData[fieldId2]) {
-                                                    // 🔧 NEW: Prevent autofilling with blank values
-                                                    const autofillValue2 = mappedData[fieldId2];
-                                                    const isBlank2 = autofillValue2 === null || 
-                                                                    autofillValue2 === '' || 
-                                                                    (typeof autofillValue2 === 'string' && autofillValue2.trim() === '');
-                                                    if (!isBlank2) {
-                                                        fieldElement.value = autofillValue2;
-                                                    }
+                                                    fieldElement.value = mappedData[fieldId2];
                                                 }
                                             });
                                         }
@@ -10031,12 +9540,7 @@ if (typeof handleNext === 'function') {
 
                 }
                 
-                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
-                const isBlankValue = autofillValue === null || 
-                                   autofillValue === '' || 
-                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
-                
-                if (!isBlankValue) {
+                if (autofillValue !== null) {
                     // Skip current_date field - it should be set dynamically
                     if (el.id === 'current_date' || el.name === 'current_date') {
                         return;
@@ -10102,13 +9606,8 @@ if (typeof handleNext === 'function') {
                         autofillValue = mappedData[el.id];
                     }
                     
-                    // 🔧 NEW: Prevent autofilling with blank values - must have actual content
-                    const isBlankValue = autofillValue === null || 
-                                       autofillValue === '' || 
-                                       (typeof autofillValue === 'string' && autofillValue.trim() === '');
-                    
-                    // Only process fields that have autofill data but are still empty, AND the autofill value is not blank
-                    if (!isBlankValue && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
+                    // Only process fields that have autofill data but are still empty
+                    if (autofillValue !== null && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
                         el.value = autofillValue;
                         
                         // Dispatch input and change events for text inputs to trigger linked textbox syncing
@@ -10563,13 +10062,8 @@ if (typeof handleNext === 'function') {
                                     autofillValue = data[el.id];
                                 }
                                 
-                                // 🔧 NEW: Prevent autofilling with blank values - must have actual content
-                                const isBlankValue = autofillValue === null || 
-                                                   autofillValue === '' || 
-                                                   (typeof autofillValue === 'string' && autofillValue.trim() === '');
-                                
-                                // Only process fields that have autofill data but are still empty, AND the autofill value is not blank
-                                if (!isBlankValue && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
+                                // Only process fields that have autofill data but are still empty
+                                if (autofillValue !== null && (!el.value || el.value === '') && el.type !== 'checkbox' && el.type !== 'radio') {
                                     el.value = autofillValue;
                                     
                                     // Dispatch input and change events for text inputs to trigger linked textbox syncing
@@ -10691,7 +10185,7 @@ if (typeof handleNext === 'function') {
                 logoutBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     auth.signOut().then(function() {
-                        window.location.href = '../Pages/index.html';
+                        window.location.href = 'index.html';
                     }).catch(function(error) {
 
                     });
