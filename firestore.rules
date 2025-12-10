@@ -14,9 +14,9 @@ service cloud.firestore {
       }
     }
 
-    // Allow all authenticated users to read the forms collection
+    // Allow public read access to the forms collection (for bot recommendations)
     match /forms/{formId} {
-      allow read: if request.auth != null;
+      allow read: if true; // Allow anyone to read forms
       allow write: if false; // Only allow writes through Admin Console or server
     }
 

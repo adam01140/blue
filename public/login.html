@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Form-Star</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .login-logo {
+            margin-bottom: 30px;
+        }
+        
+        .login-logo img {
+            max-width: 150px;
+            height: auto;
+        }
+        
+        .login-title {
+            font-size: 2em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .login-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+        
+        .login-form {
+            text-align: left;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Montserrat', sans-serif;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: none;
+            text-align: center;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 10px;
+        }
+        
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .login-button:active {
+            transform: translateY(0);
+        }
+        
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+            
+            .login-title {
+                font-size: 1.6em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-logo">
+            <img src="Images/logo.png" alt="Form-Star Logo" onerror="this.style.display='none'">
+        </div>
+        <h1 class="login-title">Form-Star</h1>
+        <p class="login-subtitle">Please enter the password to continue</p>
+        
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Enter password" 
+                    required 
+                    autofocus
+                    autocomplete="current-password"
+                >
+            </div>
+            
+            <div class="error-message" id="errorMessage"></div>
+            
+            <button type="submit" class="login-button" id="loginButton">
+                Login
+            </button>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+            </div>
+        </form>
+    </div>
+    
+    <script src="auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('loginForm');
+            const passwordInput = document.getElementById('password');
+            const errorMessage = document.getElementById('errorMessage');
+            const loginButton = document.getElementById('loginButton');
+            const loading = document.getElementById('loading');
+            
+            // Check if already authenticated
+            if (window.auth && typeof window.auth.checkPassword === 'function') {
+                // Check if we have a valid auth token (user might have navigated here directly)
+                const token = localStorage.getItem('formstar_auth_token');
+                const expiry = localStorage.getItem('formstar_auth_expiry');
+                if (token && expiry && new Date().getTime() < parseInt(expiry)) {
+                    // Already authenticated, redirect
+                    const redirectUrl = window.auth.getRedirectUrl() || '../index.html';
+                    window.location.href = redirectUrl;
+                    return;
+                }
+            }
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const password = passwordInput.value.trim();
+                
+                // Clear previous error
+                errorMessage.classList.remove('show');
+                errorMessage.textContent = '';
+                
+                // Show loading
+                loginButton.disabled = true;
+                loading.classList.add('show');
+                
+                // Check password with server (async)
+                if (window.auth && window.auth.checkPassword) {
+                    window.auth.checkPassword(password).then(function(isValid) {
+                        if (isValid) {
+                            // Password correct - set authentication
+                            window.auth.setAuthenticated();
+                            
+                            // Get redirect URL
+                            const redirectUrl = window.auth.getRedirectUrl() || '../index.html';
+                            
+                            // Redirect to original page or home
+                            window.location.href = redirectUrl;
+                        } else {
+                            // Password incorrect
+                            errorMessage.textContent = 'Incorrect password. Please try again.';
+                            errorMessage.classList.add('show');
+                            passwordInput.value = '';
+                            passwordInput.focus();
+                            loginButton.disabled = false;
+                            loading.classList.remove('show');
+                        }
+                    }).catch(function(error) {
+                        console.error('Password verification error:', error);
+                        errorMessage.textContent = 'Error verifying password. Please try again.';
+                        errorMessage.classList.add('show');
+                        loginButton.disabled = false;
+                        loading.classList.remove('show');
+                    });
+                } else {
+                    // Fallback if auth object not available
+                    errorMessage.textContent = 'Authentication system not available. Please refresh the page.';
+                    errorMessage.classList.add('show');
+                    loginButton.disabled = false;
+                    loading.classList.remove('show');
+                }
+            });
+            
+            // Allow Enter key to submit
+            passwordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    form.dispatchEvent(new Event('submit'));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+

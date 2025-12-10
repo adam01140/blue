@@ -89,6 +89,44 @@ app.get('/', (_, res) => {
   res.send('Welcome to the PDF Editing Server');
 });
 
+// Site-wide authentication endpoint (uses ADMIN_PASSWORD from env)
+app.post('/api/verify-password', (req, res) => {
+  try {
+    const { password } = req.body;
+    
+    if (!password) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Password is required' 
+      });
+    }
+
+    // Debug logging (remove in production)
+    console.log('Password verification attempt - Received:', password, 'Expected:', ADMIN_PASSWORD);
+    console.log('Password match:', password === ADMIN_PASSWORD);
+    console.log('Password lengths - Received:', password.length, 'Expected:', ADMIN_PASSWORD ? ADMIN_PASSWORD.length : 'undefined');
+
+    if (password === ADMIN_PASSWORD) {
+      res.json({ 
+        success: true, 
+        message: 'Authentication successful' 
+      });
+    } else {
+      res.status(401).json({ 
+        success: false, 
+        error: 'Invalid password' 
+      });
+    }
+
+  } catch (error) {
+    console.error('Password verification error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Server error during authentication' 
+    });
+  }
+});
+
 // Admin authentication endpoint
 app.post('/api/admin-login', (req, res) => {
   try {

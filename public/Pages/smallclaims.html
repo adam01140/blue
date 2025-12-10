@@ -1231,6 +1231,8 @@
             cursor: not-allowed;
         }
     </style>
+    <!-- Authentication Script - Must load first -->
+    <script src="../auth.js"></script>
 </head>
 <body>
     <header>
@@ -1253,8 +1255,6 @@
                 <div class="dropdown-menu" id="forms-dropdown-menu">
                     <a href="forms.html">My Forms</a>
                     <a href="FreeForm.html">Free Form</a>
-                    <a href="Family.html">Family</a>
-                    <a href="Property.html">Property</a>
                     <a href="Immigration.html">Immigration</a>
                     <a href="smallclaims.html">Small Claims</a>
                     <a href="Other.html">Other</a>
@@ -1279,8 +1279,6 @@
                 <div class="mobile-nav-submenu" id="mobile-forms-menu">
                     <a href="forms.html">My Forms</a>
                     <a href="FreeForm.html">Free Form</a>
-                    <a href="Family.html">Family</a>
-                    <a href="Property.html">Property</a>
                     <a href="Immigration.html">Immigration</a>
                     <a href="smallclaims.html">Small Claims</a>
                     <a href="Other.html">Other</a>
@@ -1333,9 +1331,9 @@
                     <br><br>
                 </h2>
                 
-                <!-- Step 1: Counterclaim Question -->
+                <!-- Step 1: Are you suing? -->
                 <div class="guided-step active" id="step1">
-                    <div class="step-question">1️⃣ Do you have a claim against someone who has already filed a small claims case against you?</div>
+                    <div class="step-question">1️⃣ Are you suing somebody?</div>
                     <div class="step-options">
                         <button class="step-option-btn" onclick="handleStep1Answer('yes')">
                             <span class="option-icon">✓</span>
@@ -1348,17 +1346,9 @@
                     </div>
                 </div>
 
-                <!-- Step 2: COVID-19 Related -->
+                <!-- Step 2: Filed against you? -->
                 <div class="guided-step" id="step2">
-                    <div class="step-question">2️⃣ Is your problem related to COVID-19?</div>
-                    <div class="step-examples">
-                        <div class="step-examples-title">Examples:</div>
-                        <ul class="step-examples-list">
-                            <li>Missed rent or payments during shutdowns</li>
-                            <li>Canceled services or refunds from the pandemic</li>
-                            <li>Business losses caused by COVID rules</li>
-                        </ul>
-                    </div><br>
+                    <div class="step-question">2️⃣ Has that person already filed a claim against you?</div>
                     <div class="step-options">
                         <button class="step-option-btn" onclick="handleStep2Answer('yes')">
                             <span class="option-icon">✓</span>
@@ -1371,6 +1361,40 @@
                     </div>
                     <div class="step-navigation">
                         <button class="step-back-btn" onclick="goToStep(1)">← Back</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: COVID-19 Related -->
+                <div class="guided-step" id="step3">
+                    <div class="step-question">3️⃣ Is this COVID-19 related?</div>
+                    <div class="step-examples">
+                        <div class="step-examples-title">Examples:</div>
+                        <ul class="step-examples-list">
+                            <li>Missed rent or payments during shutdowns</li>
+                            <li>Canceled services or refunds from the pandemic</li>
+                            <li>Business losses caused by COVID rules</li>
+                        </ul>
+                    </div><br>
+                    <div class="step-options">
+                        <button class="step-option-btn" onclick="handleStep3Answer('yes')">
+                            <span class="option-icon">✓</span>
+                            <span>Yes</span>
+                        </button>
+                        <button class="step-option-btn" onclick="handleStep3Answer('no')">
+                            <span class="option-icon">✗</span>
+                            <span>No</span>
+                        </button>
+                    </div>
+                    <div class="step-navigation">
+                        <button class="step-back-btn" onclick="goToStep(2)">← Back</button>
+                    </div>
+                </div>
+
+                <!-- No Need Message -->
+                <div class="guided-step" id="no-need-msg">
+                    <div class="step-question">There's no need for you to file a small claims form.</div>
+                    <div class="step-navigation">
+                        <button class="step-back-btn" onclick="resetGuidedModule()">Start Over</button>
                     </div>
                 </div>
 
@@ -1453,19 +1477,19 @@
             <div class="pro-footer-logo">
                 <img src="../Images/logo.png" alt="FormStar Logo" style="max-width:120px;max-height:80px;">
             </div>
-            <div class="pro-footer-title">FormStar</div>
+            <div class="pro-footer-title">Form-Star</div>
             <div class="pro-footer-contact">
-                <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
+                <a href="tel:18008508370">1-800-850-8370</a> &nbsp; 
                 <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
             </div>
         </div>
         <div class="pro-footer-col company-col">
-            <div class="pro-footer-title company-title">About FormStar</div>
-            <div class="pro-footer-desc">FormStar consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
+            <div class="pro-footer-title company-title">About Form-Star</div>
+            <div class="pro-footer-desc">Form-Star consists of a group of proven professionals with over 70 years of combined <strong>legal</strong>, technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify paperwork for everyone.</div>
         </div>
     </div>
     <footer>
-        &copy; 2024 FormStar. All rights reserved.
+        &copy; 2024 Form-Star. All rights reserved.
     </footer>
     <div class="cart-overlay" id="cart-overlay">
         <div class="cart-side-menu" id="cart-side-menu">
@@ -2272,15 +2296,25 @@
 
         function handleStep1Answer(answer) {
             if (answer === 'yes') {
-                // Show SC-120 recommendation (counterclaim)
-                showFormRecommendation('sc120', 'SC-120', 'Defendant\'s Claim and ORDER to Go to Small Claims Court', 'File a counterclaim as a defendant in response to a small claims case.');
-            } else if (answer === 'no') {
-                // Go to Step 2 (COVID-19 question)
+                // Go to Step 2 (Filed against you?)
                 goToStep(2);
+            } else if (answer === 'no') {
+                // Show "No need" message
+                goToStep('no-need-msg');
             }
         }
 
         function handleStep2Answer(answer) {
+            if (answer === 'yes') {
+                // Go to Step 3 (COVID?)
+                goToStep(3);
+            } else if (answer === 'no') {
+                // Show SC-120 recommendation
+                showFormRecommendation('sc120', 'SC-120', 'Defendant\'s Claim and ORDER to Go to Small Claims Court', 'File a counterclaim as a defendant in response to a small claims case.');
+            }
+        }
+
+        function handleStep3Answer(answer) {
             if (answer === 'yes') {
                 // Show SC-500 recommendation
                 showFormRecommendation('sc500', 'SC-500', 'COVID-19 Small Claims Dispute Resolution', 'Resolve disputes related to COVID-19 through small claims court procedures.');
@@ -2290,7 +2324,7 @@
             }
         }
 
-        function goToStep(stepNumber) {
+        function goToStep(stepIdentifier) {
             // Hide all steps
             document.querySelectorAll('.guided-step').forEach(step => {
                 step.classList.remove('active');
@@ -2303,7 +2337,13 @@
             }
             
             // Show the requested step
-            const step = document.getElementById('step' + stepNumber);
+            // Handle both number (e.g., 2) and string ID (e.g., 'no-need-msg')
+            let id = stepIdentifier;
+            if (typeof stepIdentifier === 'number' || (typeof stepIdentifier === 'string' && /^\d+$/.test(stepIdentifier))) {
+                id = 'step' + stepIdentifier;
+            }
+            
+            const step = document.getElementById(id);
             if (step) {
                 step.classList.add('active');
             }
@@ -2375,6 +2415,5 @@
             };
         });
     </script>
-
 </body>
 </html>

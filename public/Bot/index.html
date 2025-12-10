@@ -151,6 +151,7 @@
             font-size: 1.2em;
             text-decoration: none;
             font-weight: bold;
+            border: none;
             border-radius: 5px;
             transition: background-color 0.3s ease;
             display: inline-flex;
@@ -158,6 +159,7 @@
             justify-content: center;
             margin: 20px auto;
             flex-direction: column;
+            cursor: pointer;
         }
         .tiny-click-here {
             font-size: 0.8em;
@@ -1666,6 +1668,45 @@
             color: #e74c3c;
         }
 
+        /* County Modal Styles */
+        #county-modal .modal-content {
+            text-align: center;
+            max-width: 500px;
+        }
+        #county-modal h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        #county-modal p {
+            font-size: 1.1em;
+            margin: 20px 0;
+            line-height: 1.5;
+            color: #34495e;
+        }
+        #county-modal .btn {
+            width: auto;
+            padding: 12px 30px;
+            margin: 0;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+            color: white;
+        }
+        #county-modal-submit {
+            background-color: #2980b9;
+        }
+        #county-modal-submit:hover {
+            background-color: #1c598a;
+        }
+        #county-modal-cancel {
+            background-color: #95a5a6;
+        }
+        #county-modal-cancel:hover {
+            background-color: #7f8c8d;
+        }
+
         /* Defendant Modal Styles */
         #defendant-modal .modal-content {
             text-align: center;
@@ -1684,10 +1725,13 @@
         #defendant-modal .btn {
             width: auto;
             padding: 12px 30px;
-            margin: 0 10px;
+            margin: 0;
             font-weight: 600;
+            border: none;
             border-radius: 6px;
             transition: background-color 0.3s ease;
+            cursor: pointer;
+            color: white;
         }
         #defendant-modal-submit {
             background-color: #2980b9;
@@ -1717,8 +1761,6 @@
                 <div class="dropdown-menu" id="forms-dropdown-menu">
                     <a href="../Pages/forms.html">My Forms</a>
                     <a href="../Pages/FreeForm.html">Free Form</a>
-                    <a href="../Pages/Family.html">Family</a>
-                    <a href="../Pages/Property.html">Property</a>
                     <a href="../Pages/Immigration.html">Immigration</a>
                     <a href="../Pages/smallclaims.html">Small Claims</a>
                     <a href="../Pages/Other.html">Other</a>
@@ -1843,8 +1885,8 @@
             <input type="text" id="county-zip-input" placeholder="Enter zip code" maxlength="5" style="width: 90%; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0; margin-bottom: 18px; text-align: center;">
             <div id="county-modal-error" style="color: #e74c3c; font-size: 1em; margin-bottom: 10px; display: none;"></div>
               <div id="county-modal-buttons" style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
-                  <button type="button" id="county-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">Cancel</button>
-                  <button type="button" id="county-modal-submit" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9;">Submit</button>
+                  <button type="button" id="county-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6; border: none; color: white;">Cancel</button>
+                  <button type="button" id="county-modal-submit" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9; border: none; color: white;">Submit</button>
               </div>
         </div>
     </div>
@@ -1858,8 +1900,8 @@
             <input type="text" id="defendant-name-input" placeholder="Enter defendant's name" style="width: 90%; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0; margin-bottom: 18px;">
             <div id="defendant-modal-error" style="color: #e74c3c; font-size: 1em; margin-bottom: 10px; display: none;"></div>
               <div style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
-                  <button type="button" id="defendant-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">Cancel</button>
-                  <button type="button" id="defendant-modal-submit" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9;">Submit</button>
+                  <button type="button" id="defendant-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6; border: none; color: white;">Cancel</button>
+                  <button type="button" id="defendant-modal-submit" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9; border: none; color: white;">Submit</button>
               </div>
         </div>
     </div>
@@ -1900,8 +1942,37 @@
             document.body.style.overflow = '';
         }
 
-        // Forms data from Firebase
-        let availableForms = [];
+        // Forms data from Firebase (initialize with defaults for immediate availability)
+        let availableForms = [
+            {
+                id: 'sc100',
+                name: 'SC-100',
+                description: "Plaintiff's Claim form for suing a defendant",
+                url: '../Forms/sc-100.html?formId=sc100',
+                defendant: 'YES'
+            },
+            {
+                id: 'sc120',
+                name: 'SC-120',
+                description: "Defendant's Claim form for counter-suing",
+                url: '../Forms/sc-120.html?formId=sc120',
+                defendant: 'NO'
+            },
+            {
+                id: 'sc500',
+                name: 'SC-500',
+                description: 'COVID-19 related small claims form',
+                url: '../Forms/sc-500.html?formId=sc500',
+                defendant: 'NO'
+            },
+            {
+                id: 'fee-waiver',
+                name: 'Fee Waiver',
+                description: 'Request to waive court filing fees',
+                url: '../Forms/fee-waiver.html?formId=fee-waiver',
+                defendant: 'NO'
+            }
+        ];
 
         // AI configuration is now handled server-side
 
@@ -1917,6 +1988,40 @@
         const typingIndicator = document.getElementById('typingIndicator');
         const charCount = document.getElementById('charCount');
         const quickButtons = document.querySelectorAll('.quick-btn');
+
+        // Default forms fallback (used if Firebase fails)
+        function getDefaultForms() {
+            return [
+                {
+                    id: 'sc100',
+                    name: 'SC-100',
+                    description: "Plaintiff's Claim form for suing a defendant",
+                    url: '../Forms/sc-100.html?formId=sc100',
+                    defendant: 'YES'
+                },
+                {
+                    id: 'sc120',
+                    name: 'SC-120',
+                    description: "Defendant's Claim form for counter-suing",
+                    url: '../Forms/sc-120.html?formId=sc120',
+                    defendant: 'NO'
+                },
+                {
+                    id: 'sc500',
+                    name: 'SC-500',
+                    description: 'COVID-19 related small claims form',
+                    url: '../Forms/sc-500.html?formId=sc500',
+                    defendant: 'NO'
+                },
+                {
+                    id: 'fee-waiver',
+                    name: 'Fee Waiver',
+                    description: 'Request to waive court filing fees',
+                    url: '../Forms/fee-waiver.html?formId=fee-waiver',
+                    defendant: 'NO'
+                }
+            ];
+        }
 
         // Load forms from Firebase
         async function loadFormsFromFirebase() {
@@ -1945,8 +2050,17 @@
                 });
                 
                 console.log('Loaded forms from Firebase:', availableForms);
+                
+                // If no forms were loaded, use defaults
+                if (availableForms.length === 0) {
+                    console.warn('No forms loaded from Firebase, using default forms');
+                    availableForms = getDefaultForms();
+                }
             } catch (error) {
                 console.error('Error loading forms from Firebase:', error);
+                // Use default forms as fallback
+                console.log('Using default forms as fallback');
+                availableForms = getDefaultForms();
             }
         }
 
@@ -2737,76 +2851,74 @@ What specific legal topic would you like to know more about?
                     cancelBtn.textContent = 'No';
                     
                 } else {
-                    console.log('🔍 DEBUG: Second step - user confirmed county:', currentCounty);
                     // Second step: user confirmed county, proceed with form addition
                     modal.style.display = 'none';
                     
                     if (pendingCountyData) {
-                        console.log('🔍 DEBUG: Processing pending county data:', pendingCountyData);
-                        // Check for duplicates
+                        // Check for duplicates (only if user is logged in)
                         const user = auth.currentUser;
-                        console.log('🔍 DEBUG: Current user:', user);
                         
                         if (!user) {
-                            console.log('🔍 DEBUG: No user logged in, redirecting to form directly (no portfolio ID)');
-                            // If not logged in, redirect to form directly (like forms.js does)
-                            const separator = pendingCountyData.formUrl.includes('?') ? '&' : '?';
-                            const redirectUrl = pendingCountyData.formUrl + separator + 'county=' + encodeURIComponent(currentCounty);
-                            console.log('🔍 DEBUG: Redirecting to:', redirectUrl);
-                            window.location.href = redirectUrl;
+                            // If not logged in, check if form requires defendant first
+                            let formObj = availableForms.find(f => f.id === pendingCountyData.formId);
+                            
+                            if (formObj && formObj.defendant && formObj.defendant.toUpperCase() === 'YES') {
+                                // Show defendant modal
+                                showDefendantModal(formObj, pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty, pendingCountyData.zipCode);
+                            } else {
+                                // Redirect to form directly
+                                const separator = pendingCountyData.formUrl.includes('?') ? '&' : '?';
+                                const redirectUrl = pendingCountyData.formUrl + separator + 'county=' + encodeURIComponent(currentCounty);
+                                window.location.href = redirectUrl;
+                            }
+                            pendingCountyData = null;
+                            currentCounty = null;
                             return;
                         }
                         
                         const userId = user.uid;
                         try {
-                            console.log('🔍 DEBUG: About to check for duplicates');
                             const formsSnapshot = await db.collection('users').doc(userId).collection('forms').get();
-                            console.log('🔍 DEBUG: Forms snapshot retrieved, size:', formsSnapshot.size);
                             let duplicateFound = false;
                             
                             formsSnapshot.forEach(doc => {
                                 const formData = doc.data();
-                                console.log('🔍 DEBUG: Checking form:', { docId: doc.id, formData, pendingFormId: pendingCountyData.formId, currentCounty });
                                 if ((formData.originalFormId === pendingCountyData.formId || doc.id === pendingCountyData.formId) && formData.countyName === currentCounty) {
                                     duplicateFound = true;
-                                    console.log('🔍 DEBUG: Duplicate found!');
                                 }
                             });
                             
-                            console.log('🔍 DEBUG: Duplicate check complete, duplicateFound:', duplicateFound);
-                            
                             if (duplicateFound) {
-                                console.log('🔍 DEBUG: Processing duplicate form');
-                                // For now, just proceed with the form (you can add duplicate handling later)
-                                await addFormToPortfolioInternal(pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty);
+                                // Check if duplicate form modal exists and use it, otherwise proceed
+                                let formObj = availableForms.find(f => f.id === pendingCountyData.formId);
+                                if (formObj && formObj.defendant && formObj.defendant.toUpperCase() === 'YES') {
+                                    showDefendantModal(formObj, pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty, pendingCountyData.zipCode, true);
+                                } else {
+                                    await addFormToPortfolioInternal(pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty, true);
+                                }
                             } else {
-                                console.log('🔍 DEBUG: No duplicate found, checking if form requires defendant');
                                 // Check if form requires defendant
                                 let formObj = availableForms.find(f => f.id === pendingCountyData.formId);
-                                console.log('🔍 DEBUG: Form object found:', formObj);
                                 
                                 if (formObj && formObj.defendant && formObj.defendant.toUpperCase() === 'YES') {
-                                    console.log('🔍 DEBUG: Form requires defendant, showing defendant modal');
                                     showDefendantModal(formObj, pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty, pendingCountyData.zipCode);
                                 } else {
-                                    console.log('🔍 DEBUG: Form does not require defendant, adding to portfolio');
                                     await addFormToPortfolioInternal(pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty);
                                 }
                             }
                         } catch (error) {
-                            console.error('🔍 DEBUG: Error checking for duplicate form:', error);
-                            console.error('🔍 DEBUG: Error details:', {
-                                message: error.message,
-                                stack: error.stack,
-                                pendingCountyData,
-                                currentCounty,
-                                userId
-                            });
-                            // Show Form switch attempted alert
-                            alert("Form switch attempted");
+                            console.error('Error checking for duplicate form:', error);
+                            // On error, still check for defendant requirement
+                            let formObj = availableForms.find(f => f.id === pendingCountyData.formId);
+                            if (formObj && formObj.defendant && formObj.defendant.toUpperCase() === 'YES') {
+                                showDefendantModal(formObj, pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty, pendingCountyData.zipCode);
+                            } else {
+                                await addFormToPortfolioInternal(pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty);
+                            }
                         }
                         
-                        // Variables will be reset after URL construction in addFormToPortfolioInternal
+                        pendingCountyData = null;
+                        currentCounty = null;
                     }
                 }
             };
@@ -2831,7 +2943,7 @@ What specific legal topic would you like to know more about?
         }
 
         // Defendant Name Modal
-        function showDefendantModal(formObj, formId, formUrl, formName, countyName, zipCode = null) {
+        function showDefendantModal(formObj, formId, formUrl, formName, countyName, zipCode = null, isDuplicate = false) {
             const modal = document.getElementById('defendant-modal');
             const closeBtn = document.getElementById('defendant-modal-close');
             const submitBtn = document.getElementById('defendant-modal-submit');
@@ -2842,7 +2954,7 @@ What specific legal topic would you like to know more about?
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
             modal.style.display = 'block';
-            pendingDefendantData = { formObj, formId, formUrl, formName, countyName, zipCode };
+            pendingDefendantData = { formObj, formId, formUrl, formName, countyName, zipCode, isDuplicate };
             
             function closeModal() {
                 modal.style.display = 'none';
@@ -2870,24 +2982,19 @@ What specific legal topic would you like to know more about?
                         pendingDefendantData.formUrl,
                         pendingDefendantData.formName,
                         pendingDefendantData.countyName,
-                        false,
+                        pendingDefendantData.isDuplicate,
                         defendantName
                     );
-                    // Variables will be reset after URL construction in addFormToPortfolioInternal
+                    pendingDefendantData = null;
                 }
             };
         }
 
         // Add form to portfolio
         async function addFormToPortfolioInternal(formId, formUrl, formName, countyName, isDuplicate = false, defendantName = null) {
-            console.log('🔍 DEBUG: ===== addFormToPortfolioInternal START =====');
-            console.log('🔍 DEBUG: addFormToPortfolioInternal called with:', { formId, formUrl, formName, countyName, isDuplicate, defendantName });
-            
             const user = auth.currentUser;
-            console.log('🔍 DEBUG: Current user:', user);
             
             if (!user) {
-                console.log('🔍 DEBUG: No user logged in, redirecting to form directly (no portfolio ID)');
                 // If not logged in, redirect to form directly (like forms.js does)
                 const separator = formUrl.includes('?') ? '&' : '?';
                 let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
@@ -2897,7 +3004,6 @@ What specific legal topic would you like to know more about?
                 if (zipCode) {
                     url += '&zipCode=' + encodeURIComponent(zipCode);
                 }
-                console.log('🔍 DEBUG: Redirecting to form:', url);
                 window.location.href = url;
                 return;
             }
@@ -3361,5 +3467,7 @@ What specific legal topic would you like to know more about?
             </div>
         </div>
     </div>
+    <!-- Authentication Script -->
+    <script src="../auth.js"></script>
 </body>
 </html>
