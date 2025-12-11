@@ -32,24 +32,44 @@ class CartManager {
             source = 'localStorage';
         }
         
+        let cart = [];
         if (!cartData) {
             console.log('🛒 No cart data found in cookies or localStorage');
-            return [];
+        } else {
+            try {
+                // Decode URL-encoded data if needed
+                const decodedData = cartData.startsWith('%') ? decodeURIComponent(cartData) : cartData;
+                cart = JSON.parse(decodedData);
+                console.log(`🛒 Cart loaded from ${source}:`, cart);
+            } catch (e) {
+                console.error('Error parsing cart data', e);
+                // Clear the corrupted data
+                this.setCookie(this.cartCookieName, '', -1);
+                localStorage.removeItem(this.cartCookieName);
+                cart = [];
+            }
         }
-        
-        try {
-            // Decode URL-encoded data if needed
-            const decodedData = cartData.startsWith('%') ? decodeURIComponent(cartData) : cartData;
-            const cart = JSON.parse(decodedData);
-            console.log(`🛒 Cart loaded from ${source}:`, cart);
-            return cart;
-        } catch (e) {
-            console.error('Error parsing cart data', e);
-            // Clear the corrupted data
-            this.setCookie(this.cartCookieName, '', -1);
-            localStorage.removeItem(this.cartCookieName);
-            return [];
+
+        // Fix: Ensure all items have a cartItemId
+        let modified = false;
+        cart = cart.map((item, index) => {
+            if (!item.cartItemId) {
+                console.warn(`⚠️ Item at index ${index} missing cartItemId, generating one.`);
+                item.cartItemId = `${item.formId || 'unknown'}_${Date.now()}_${Math.floor(Math.random()*100000)}_${index}`;
+                modified = true;
+            }
+            return item;
+        });
+
+        if (modified) {
+            console.log('🛠️ Repaired cart items with missing IDs');
+            // Save immediately to fix storage
+            const savedData = JSON.stringify(cart);
+            this.setCookie(this.cartCookieName, savedData, 30);
+            localStorage.setItem(this.cartCookieName, savedData);
         }
+
+        return cart;
     }
 
     saveCart() {
@@ -58,6 +78,84 @@ class CartManager {
         // Also save to localStorage for compatibility with cart.html
         localStorage.setItem(this.cartCookieName, cartData);
         console.log('💾 Cart saved to both cookies and localStorage:', this.cart);
+
+        // Save to Firebase if user is logged in
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            const user = firebase.auth().currentUser;
+            if (user) {
+                this.saveToFirebase(user);
+            }
+        }
+    }
+
+    async saveToFirebase(user) {
+        if (!user) return;
+        try {
+            const db = firebase.firestore();
+            await db.collection('users').doc(user.uid).set({
+                cart: this.cart,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            console.log('☁️ Cart saved to Firebase for user:', user.uid);
+        } catch (error) {
+            console.error('❌ Error saving cart to Firebase:', error);
+        }
+    }
+
+    async mergeWithFirebaseCart(user) {
+        if (!user) return;
+        try {
+            const db = firebase.firestore();
+            const doc = await db.collection('users').doc(user.uid).get();
+            if (doc.exists) {
+                const data = doc.data();
+                const firebaseCart = data.cart || [];
+                
+                if (firebaseCart.length > 0) {
+                    console.log('☁️ Found remote cart items:', firebaseCart.length);
+                    
+                    // Merge strategy: Combine unique items based on cartItemId
+                    // If local cart has items that remote doesn't, add them.
+                    // If remote has items local doesn't, add them.
+                    
+                    const localIds = new Set(this.cart.map(i => i.cartItemId));
+                    const remoteIds = new Set(firebaseCart.map(i => i.cartItemId));
+                    
+                    // Add remote items not in local
+                    const newFromRemote = firebaseCart.filter(i => !localIds.has(i.cartItemId));
+                    
+                    // Add local items not in remote (already in this.cart)
+                    // ... actually, we want to keep all local items, effectively merging.
+                    
+                    // If we have local items that are NOT in remote, we should keep them (user added them while offline/logged out)
+                    // Then we save the merged result back to Firebase.
+                    
+                    if (newFromRemote.length > 0) {
+                        this.cart = [...this.cart, ...newFromRemote];
+                        console.log(`☁️ Merged ${newFromRemote.length} items from Firebase into local cart.`);
+                        
+                        // Save merged state everywhere
+                        this.saveCart(); 
+                        await this.updateCartDisplay();
+                    } else {
+                        console.log('☁️ Local cart already has all remote items.');
+                         // Ensure local cart is synced to Firebase in case local had extra items
+                         if (this.cart.length > firebaseCart.length) {
+                             this.saveToFirebase(user);
+                         }
+                    }
+                } else if (this.cart.length > 0) {
+                    // Remote has no cart, but local does. Push local to remote.
+                    console.log('☁️ Remote cart empty, pushing local cart to Firebase.');
+                    this.saveToFirebase(user);
+                }
+            } else if (this.cart.length > 0) {
+                 // No user doc or no cart in it, but local cart exists. Create/Update user doc.
+                 this.saveToFirebase(user);
+            }
+        } catch (error) {
+            console.error('❌ Error merging cart from Firebase:', error);
+        }
     }
 
     async addToCart(formId, formTitle, priceId, formData = null, countyName = '', defendantName = '', pdfName = null) {
@@ -313,6 +411,17 @@ class CartManager {
 
     async init() {
         await this.updateCartDisplay();
+        
+        // Listen for Auth changes to sync cart
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (user) {
+                    console.log('👤 User signed in, syncing cart...', user.uid);
+                    await this.mergeWithFirebaseCart(user);
+                }
+            });
+        }
+
         const checkoutBtn = document.getElementById('checkout-btn');
         if (checkoutBtn) checkoutBtn.addEventListener('click', () => this.processCheckout());
 
