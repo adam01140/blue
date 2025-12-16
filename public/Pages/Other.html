@@ -1401,7 +1401,7 @@
                     <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </a>
                 <div class="dropdown-menu" id="forms-dropdown-menu">
-                    <a href="forms.html">My Forms</a>
+                    <a href="forms.html" class="auth-required" style="display: none;">My Forms</a>
                     <a href="FreeForm.html">Free Form</a>
                     <a href="Immigration.html">Immigration</a>
                     <a href="smallclaims.html">Small Claims</a>
@@ -1578,6 +1578,9 @@
             const logoutBtn = document.getElementById('logout-btn');
 
             auth.onAuthStateChanged(function(user) {
+                // Get all "My Forms" links that require authentication
+                const myFormsLinks = document.querySelectorAll('.auth-required');
+                
                 if (user) {
                     if (signInButton) {
                         signInButton.style.display = 'none';
@@ -1585,6 +1588,11 @@
                     if (logoutBtn) {
                         logoutBtn.style.display = 'inline-block';
                     }
+                    
+                    // Show "My Forms" links
+                    myFormsLinks.forEach(link => {
+                        link.style.display = 'block';
+                    });
                 } else {
                     if (signInButton) {
                         signInButton.style.display = 'inline-block';
@@ -1592,6 +1600,11 @@
                     if (logoutBtn) {
                         logoutBtn.style.display = 'none';
                     }
+                    
+                    // Hide "My Forms" links
+                    myFormsLinks.forEach(link => {
+                        link.style.display = 'none';
+                    });
                 }
             });
 

@@ -468,7 +468,7 @@
                     <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </a>
                 <div class="dropdown-menu" id="forms-dropdown-menu">
-                    <a href="forms.html">My Forms</a>
+                    <a href="forms.html" class="auth-required" style="display: none;">My Forms</a>
                     <a href="FreeForm.html">Free Form</a>
                     <a href="Probate.html">Probate</a>
                     <a href="Immigration.html">Immigration</a>
@@ -803,9 +803,17 @@
         if (window.firebase && firebase.auth) {
             const auth = firebase.auth();
             auth.onAuthStateChanged(function(user) {
+                // Get all "My Forms" links that require authentication
+                const myFormsLinks = document.querySelectorAll('.auth-required');
+                
                 if (signInButton) {
                     signInButton.style.display = user ? 'none' : 'block';
                 }
+                
+                // Show/hide "My Forms" links based on auth state
+                myFormsLinks.forEach(link => {
+                    link.style.display = user ? 'block' : 'none';
+                });
             });
         }
         

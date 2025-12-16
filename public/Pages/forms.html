@@ -1751,7 +1751,7 @@
                     <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </a>
                 <div class="dropdown-menu" id="forms-dropdown-menu">
-                    <a href="forms.html">My Forms</a>
+                    <a href="forms.html" class="auth-required" style="display: none;">My Forms</a>
                     <a href="FreeForm.html">Free Form</a>
                     <a href="Immigration.html">Immigration</a>
                     <a href="smallclaims.html">Small Claims</a>
@@ -1775,7 +1775,7 @@
             <div class="mobile-nav-section">
                 <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
                 <div class="mobile-nav-submenu" id="mobile-forms-menu">
-                    <a href="forms.html">My Forms</a>
+                    <a href="forms.html" class="auth-required" style="display: none;">My Forms</a>
                     <a href="FreeForm.html">Free Form</a>
                     <a href="Immigration.html">Immigration</a>
                     <a href="smallclaims.html">Small Claims</a>
@@ -2070,12 +2070,25 @@
             const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
             
             auth.onAuthStateChanged(function(user) {
+                // Get all "My Forms" links that require authentication
+                const myFormsLinks = document.querySelectorAll('.auth-required');
+                
                 if (user) {
                     if (signInBtn) signInBtn.style.display = 'none';
                     if (mobileAuthSection) mobileAuthSection.style.display = 'block';
+                    
+                    // Show "My Forms" links
+                    myFormsLinks.forEach(link => {
+                        link.style.display = 'block';
+                    });
                 } else {
                     if (signInBtn) signInBtn.style.display = 'inline-block';
                     if (mobileAuthSection) mobileAuthSection.style.display = 'none';
+                    
+                    // Hide "My Forms" links
+                    myFormsLinks.forEach(link => {
+                        link.style.display = 'none';
+                    });
                 }
             });
             

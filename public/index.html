@@ -1555,7 +1555,7 @@
                     <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </a>
                 <div class="dropdown-menu" id="forms-dropdown-menu">
-                    <a href="Pages/forms.html">My Forms</a>
+                    <a href="Pages/forms.html" class="auth-required" style="display: none;">My Forms</a>
                     <a href="Pages/FreeForm.html">Free Form</a>
                     <a href="Pages/Immigration.html">Immigration</a>
                     <a href="Pages/smallclaims.html">Small Claims</a>
@@ -1579,7 +1579,7 @@
             <div class="mobile-nav-section">
                 <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
                 <div class="mobile-nav-submenu" id="mobile-forms-menu">
-                    <a href="Pages/forms.html">My Forms</a>
+                    <a href="Pages/forms.html" class="auth-required" style="display: none;">My Forms</a>
                     <a href="Pages/FreeForm.html">Free Form</a>
                     <a href="Pages/Immigration.html">Immigration</a>
                     <a href="Pages/smallclaims.html">Small Claims</a>
@@ -1818,6 +1818,10 @@
 
             auth.onAuthStateChanged(function(user) {
                 console.log('Auth state changed. User:', user);
+                
+                // Get all "My Forms" links that require authentication
+                const myFormsLinks = document.querySelectorAll('.auth-required');
+                
                 if (user) {
                     // User is signed in.
                     console.log('User is signed in. Showing mobile logout button.');
@@ -1834,6 +1838,11 @@
                     if (getStartedBtn) {
                         getStartedBtn.style.display = 'inline-flex';
                     }
+                    
+                    // Show "My Forms" links
+                    myFormsLinks.forEach(link => {
+                        link.style.display = 'block';
+                    });
                 } else {
                     // No user is signed in.
                     console.log('User is not signed in. Showing sign-in button.');
@@ -1850,6 +1859,11 @@
                     if (getStartedBtn) {
                         getStartedBtn.style.display = 'none';
                     }
+                    
+                    // Hide "My Forms" links
+                    myFormsLinks.forEach(link => {
+                        link.style.display = 'none';
+                    });
                 }
             });
 
@@ -2085,6 +2099,31 @@
                 });
             });
             observer.observe(body, { attributes: true });
+
+            // Keyboard shortcut: Ctrl+Shift (no letter key) to navigate to ticket submission page
+            let shortcutTriggered = false;
+
+            document.addEventListener('keydown', function(e) {
+                // Check if both Ctrl and Shift are pressed
+                // Only trigger if the key being pressed is a modifier key (Control, Shift, or Meta)
+                // This means user is holding Ctrl+Shift without pressing another letter/number key
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && 
+                    (e.key === 'Control' || e.key === 'Shift' || e.key === 'Meta')) {
+                    if (!shortcutTriggered) {
+                        shortcutTriggered = true;
+                        e.preventDefault();
+                        // Navigate to ticket submission page
+                        window.location.href = '/tickets/tickets.html';
+                    }
+                }
+            });
+
+            document.addEventListener('keyup', function(e) {
+                // Reset when either modifier is released
+                if (e.key === 'Control' || e.key === 'Shift' || e.key === 'Meta') {
+                    shortcutTriggered = false;
+                }
+            });
         });
     </script>
     <!-- Authentication Script -->

@@ -449,7 +449,7 @@
                     <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
                 </a>
                 <div class="dropdown-menu" id="forms-dropdown-menu">
-                    <a href="forms.html">My Forms</a>
+                    <a href="forms.html" class="auth-required" style="display: none;">My Forms</a>
                     <a href="FreeForm.html">Free Form</a>
                     <a href="Probate.html">Probate</a>
                     <a href="Immigration.html">Immigration</a>
@@ -597,6 +597,10 @@
 
             auth.onAuthStateChanged(function(user) {
                 console.log('Auth state changed on about.html. User:', user);
+                
+                // Get all "My Forms" links that require authentication
+                const myFormsLinks = document.querySelectorAll('.auth-required');
+                
                 if (user) {
                     // User is signed in.
                     if (signInButton) {
@@ -611,6 +615,11 @@
                             });
                         };
                     }
+                    
+                    // Show "My Forms" links
+                    myFormsLinks.forEach(link => {
+                        link.style.display = 'block';
+                    });
                 } else {
                     // No user is signed in.
                     if (signInButton) {
@@ -618,6 +627,11 @@
                         signInButton.href = 'account.html';
                         signInButton.onclick = null;
                     }
+                    
+                    // Hide "My Forms" links
+                    myFormsLinks.forEach(link => {
+                        link.style.display = 'none';
+                    });
                 }
             });
 

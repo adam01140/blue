@@ -468,6 +468,10 @@ function setupKeyboardEventListeners(graph) {
       if (typeof window.redo === 'function') {
         window.redo();
       }
+    } else if (event.ctrlKey && event.shiftKey && event.key === 'T') {
+      event.preventDefault();
+      // Navigate to ticket submission page
+      window.location.href = '/tickets';
     }
   });
 }
