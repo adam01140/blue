@@ -391,7 +391,166 @@ document.addEventListener("DOMContentLoaded", function() {
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
       </div>
-    <br><br><div class="navigation-buttons" style="display:none;"></div></div><div id="section2" class="section"><center><h1 class="section-title">SC-103</h1><div id="question-container-11" data-question-id="11" class="question-container question-item" data-section="2" data-question-index="1"><label><h3 class="question-text">Please enter your business details</h3></label><div id="labelContainer11"></div><input type="text" id="sc103_please_enter_your_business_details_address" name="sc103_please_enter_your_business_details_address" style="display: none;"><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="sc103_please_enter_your_business_details_name" name="sc103_please_enter_your_business_details_name" placeholder="Name" class="address-input"></div><br><div style="margin: 10px 0px; padding: 12px; background-color: rgb(255, 255, 255); border: 1px solid rgb(225, 229, 233); border-radius: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 6px;"><label style="display: block; margin-bottom: 8px; font-weight: 600; color: rgb(51, 51, 51); font-size: 15px; text-align: center;">Please enter your business address:</label><input type="text" id="sc103_please_enter_your_business_details_please_enter_your_business_address_street" name="sc103_please_enter_your_business_details_please_enter_your_business_address_street" placeholder="Street" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"><input type="text" id="sc103_please_enter_your_business_details_please_enter_your_business_address_city" name="sc103_please_enter_your_business_details_please_enter_your_business_address_city" placeholder="City" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"><select id="sc103_please_enter_your_business_details_please_enter_your_business_address_state" name="sc103_please_enter_your_business_details_please_enter_your_business_address_state" class="address-select-trigger" style="width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><option value="">Select State</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option></select><input type="text" id="sc103_please_enter_your_business_details_please_enter_your_business_address_state_short" name="sc103_please_enter_your_business_details_please_enter_your_business_address_state_short" style="display: none;"><input type="text" id="sc103_please_enter_your_business_details_please_enter_your_business_address_zip" name="sc103_please_enter_your_business_details_please_enter_your_business_address_zip" placeholder="Zip" style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"></div></div><br></div><div id="question-container-12" data-question-id="12" class="question-container question-item question-step-hidden" data-section="2" data-question-index="2"><label><h3 class="question-text">What do you do business as?</h3></label><div><center><div id="checkmark" class="checkbox-group-12">
+    <br><br><div class="navigation-buttons" style="display:none;"></div></div><div id="section2" class="section"><center><h1 class="section-title">SC-103</h1><div id="question-container-11" data-question-id="11" class="question-container question-item" data-section="2" data-question-index="1"><label><h3 class="question-text">Please enter your business details</h3></label><div id="labelContainer11"></div><input type="text" id="sc103_please_enter_your_business_details_address" name="sc103_please_enter_your_business_details_address" style="display: none;"><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="sc103_please_enter_your_business_details_name" name="sc103_please_enter_your_business_details_name" placeholder="Name" class="address-input"></div><br><div style="margin: 10px 0px; padding: 12px; background-color: rgb(255, 255, 255); border: 1px solid rgb(225, 229, 233); border-radius: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 6px;"><label style="display: block; margin-bottom: 8px; font-weight: 600; color: rgb(51, 51, 51); font-size: 15px; text-align: center;">Please enter your business address:</label><input type="text" id="sc103_please_enter_your_business_details_please_enter_your_business_address_street" name="sc103_please_enter_your_business_details_please_enter_your_business_address_street" placeholder="Street" oninput="
+                    (function() {
+                        var streetEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_street');
+                        var cityEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_city');
+                        var stateShortEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_state_short');
+                        var zipEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_zip');
+                        var fullAddressEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_full_address');
+                        if (!fullAddressEl) { console.error('[FULL_ADDRESS_DEBUG] fullAddressEl not found:', 'sc103_please_enter_your_business_details_please_enter_your_business_address_full_address'); return; }
+                        var street = streetEl ? streetEl.value.trim() : '';
+                        var city = cityEl ? cityEl.value.trim() : '';
+                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
+                        var zip = zipEl ? zipEl.value.trim() : '';
+                        console.log('[FULL_ADDRESS_DEBUG] Building full address - street:', street, 'city:', city, 'stateShort:', stateShort, 'zip:', zip);
+                        var parts = [];
+                        if (street) parts.push(street);
+                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
+                            parts.push(city + ', ' + stateShort + ' ' + zip);
+                        } else if (city &amp;&amp; stateShort) {
+                            parts.push(city + ', ' + stateShort);
+                        } else if (city &amp;&amp; zip) {
+                            parts.push(city + ' ' + zip);
+                        } else if (city) {
+                            parts.push(city);
+                        } else if (stateShort &amp;&amp; zip) {
+                            parts.push(stateShort + ' ' + zip);
+                        } else if (stateShort) {
+                            parts.push(stateShort);
+                        } else if (zip) {
+                            parts.push(zip);
+                        }
+                        var fullAddress = parts.join(', ');
+                        fullAddressEl.value = fullAddress;
+                        console.log('[FULL_ADDRESS_DEBUG] Full address set to:', fullAddress);
+                    })();
+                " style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"><input type="text" id="sc103_please_enter_your_business_details_please_enter_your_business_address_city" name="sc103_please_enter_your_business_details_please_enter_your_business_address_city" placeholder="City" oninput="
+                    (function() {
+                        var streetEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_street');
+                        var cityEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_city');
+                        var stateShortEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_state_short');
+                        var zipEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_zip');
+                        var fullAddressEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_full_address');
+                        if (!fullAddressEl) { console.error('[FULL_ADDRESS_DEBUG] fullAddressEl not found:', 'sc103_please_enter_your_business_details_please_enter_your_business_address_full_address'); return; }
+                        var street = streetEl ? streetEl.value.trim() : '';
+                        var city = cityEl ? cityEl.value.trim() : '';
+                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
+                        var zip = zipEl ? zipEl.value.trim() : '';
+                        console.log('[FULL_ADDRESS_DEBUG] Building full address - street:', street, 'city:', city, 'stateShort:', stateShort, 'zip:', zip);
+                        var parts = [];
+                        if (street) parts.push(street);
+                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
+                            parts.push(city + ', ' + stateShort + ' ' + zip);
+                        } else if (city &amp;&amp; stateShort) {
+                            parts.push(city + ', ' + stateShort);
+                        } else if (city &amp;&amp; zip) {
+                            parts.push(city + ' ' + zip);
+                        } else if (city) {
+                            parts.push(city);
+                        } else if (stateShort &amp;&amp; zip) {
+                            parts.push(stateShort + ' ' + zip);
+                        } else if (stateShort) {
+                            parts.push(stateShort);
+                        } else if (zip) {
+                            parts.push(zip);
+                        }
+                        var fullAddress = parts.join(', ');
+                        fullAddressEl.value = fullAddress;
+                        console.log('[FULL_ADDRESS_DEBUG] Full address set to:', fullAddress);
+                    })();
+                " style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"><select id="sc103_please_enter_your_business_details_please_enter_your_business_address_state" name="sc103_please_enter_your_business_details_please_enter_your_business_address_state" class="address-select-trigger" onchange="
+                            console.log('[STATE_SHORT_DEBUG] State dropdown changed!');
+                            console.log('[STATE_SHORT_DEBUG] Dropdown ID:', 'sc103_please_enter_your_business_details_please_enter_your_business_address_state');
+                            console.log('[STATE_SHORT_DEBUG] Selected value:', this.value);
+                            console.log('[STATE_SHORT_DEBUG] Full hidden field ID:', 'sc103_please_enter_your_business_details_please_enter_your_business_address_state_hidden');
+                            console.log('[STATE_SHORT_DEBUG] Short hidden field ID:', 'sc103_please_enter_your_business_details_please_enter_your_business_address_state_short');
+                            var fullField = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_state_hidden');
+                            var shortField = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_state_short');
+                            console.log('[STATE_SHORT_DEBUG] Full field found:', !!fullField, fullField);
+                            console.log('[STATE_SHORT_DEBUG] Short field found:', !!shortField, shortField);
+                            if (typeof updateStateHiddenFields === 'function') {
+                                console.log('[STATE_SHORT_DEBUG] Calling updateStateHiddenFields...');
+                                updateStateHiddenFields(this, 'sc103_please_enter_your_business_details_please_enter_your_business_address_state_hidden', 'sc103_please_enter_your_business_details_please_enter_your_business_address_state_short');
+                                console.log('[STATE_SHORT_DEBUG] After updateStateHiddenFields - fullField.value:', fullField ? fullField.value : 'N/A');
+                                console.log('[STATE_SHORT_DEBUG] After updateStateHiddenFields - shortField.value:', shortField ? shortField.value : 'N/A');
+                            } else {
+                                console.error('[STATE_SHORT_DEBUG] updateStateHiddenFields function NOT FOUND!');
+                            }
+                            if (typeof dropdownMirror === 'function') {
+                                dropdownMirror(this, 'sc103_please_enter_your_business_details_please_enter_your_business_address_state');
+                            }
+                            // Update full address after state change (with small delay to ensure state_short is updated)
+                            setTimeout(function() { 
+                    (function() {
+                        var streetEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_street');
+                        var cityEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_city');
+                        var stateShortEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_state_short');
+                        var zipEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_zip');
+                        var fullAddressEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_full_address');
+                        if (!fullAddressEl) { console.error('[FULL_ADDRESS_DEBUG] fullAddressEl not found:', 'sc103_please_enter_your_business_details_please_enter_your_business_address_full_address'); return; }
+                        var street = streetEl ? streetEl.value.trim() : '';
+                        var city = cityEl ? cityEl.value.trim() : '';
+                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
+                        var zip = zipEl ? zipEl.value.trim() : '';
+                        console.log('[FULL_ADDRESS_DEBUG] Building full address - street:', street, 'city:', city, 'stateShort:', stateShort, 'zip:', zip);
+                        var parts = [];
+                        if (street) parts.push(street);
+                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
+                            parts.push(city + ', ' + stateShort + ' ' + zip);
+                        } else if (city &amp;&amp; stateShort) {
+                            parts.push(city + ', ' + stateShort);
+                        } else if (city &amp;&amp; zip) {
+                            parts.push(city + ' ' + zip);
+                        } else if (city) {
+                            parts.push(city);
+                        } else if (stateShort &amp;&amp; zip) {
+                            parts.push(stateShort + ' ' + zip);
+                        } else if (stateShort) {
+                            parts.push(stateShort);
+                        } else if (zip) {
+                            parts.push(zip);
+                        }
+                        var fullAddress = parts.join(', ');
+                        fullAddressEl.value = fullAddress;
+                        console.log('[FULL_ADDRESS_DEBUG] Full address set to:', fullAddress);
+                    })();
+                 }, 50);
+                        " style="width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><option value="">Select State</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option></select><input type="text" id="sc103_please_enter_your_business_details_please_enter_your_business_address_state_hidden" name="sc103_please_enter_your_business_details_please_enter_your_business_address_state_hidden" style="display: none;"><input type="text" id="sc103_please_enter_your_business_details_please_enter_your_business_address_state_short" name="sc103_please_enter_your_business_details_please_enter_your_business_address_state_short" style="display: none;"><input type="text" id="sc103_please_enter_your_business_details_please_enter_your_business_address_zip" name="sc103_please_enter_your_business_details_please_enter_your_business_address_zip" placeholder="Zip" oninput="
+                    (function() {
+                        var streetEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_street');
+                        var cityEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_city');
+                        var stateShortEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_state_short');
+                        var zipEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_zip');
+                        var fullAddressEl = document.getElementById('sc103_please_enter_your_business_details_please_enter_your_business_address_full_address');
+                        if (!fullAddressEl) { console.error('[FULL_ADDRESS_DEBUG] fullAddressEl not found:', 'sc103_please_enter_your_business_details_please_enter_your_business_address_full_address'); return; }
+                        var street = streetEl ? streetEl.value.trim() : '';
+                        var city = cityEl ? cityEl.value.trim() : '';
+                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
+                        var zip = zipEl ? zipEl.value.trim() : '';
+                        console.log('[FULL_ADDRESS_DEBUG] Building full address - street:', street, 'city:', city, 'stateShort:', stateShort, 'zip:', zip);
+                        var parts = [];
+                        if (street) parts.push(street);
+                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
+                            parts.push(city + ', ' + stateShort + ' ' + zip);
+                        } else if (city &amp;&amp; stateShort) {
+                            parts.push(city + ', ' + stateShort);
+                        } else if (city &amp;&amp; zip) {
+                            parts.push(city + ' ' + zip);
+                        } else if (city) {
+                            parts.push(city);
+                        } else if (stateShort &amp;&amp; zip) {
+                            parts.push(stateShort + ' ' + zip);
+                        } else if (stateShort) {
+                            parts.push(stateShort);
+                        } else if (zip) {
+                            parts.push(zip);
+                        }
+                        var fullAddress = parts.join(', ');
+                        fullAddressEl.value = fullAddress;
+                        console.log('[FULL_ADDRESS_DEBUG] Full address set to:', fullAddress);
+                    })();
+                " style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"><input type="text" id="sc103_please_enter_your_business_details_please_enter_your_business_address_full_address" name="sc103_please_enter_your_business_details_please_enter_your_business_address_full_address" style="display: none;"></div></div><br></div><div id="question-container-12" data-question-id="12" class="question-container question-item question-step-hidden" data-section="2" data-question-index="2"><label><h3 class="question-text">What do you do business as?</h3></label><div><center><div id="checkmark" class="checkbox-group-12">
       <span class="checkbox-inline" id="checkbox-container-sc103_what_do_you_do_business_as_an_individual">
         <label class="checkbox-label">
           <input type="radio" id="sc103_what_do_you_do_business_as_an_individual" name="what_do_you_do_business_as" value="An Individual" 
@@ -1514,7 +1673,7 @@ var questionNameIds = {"1":"please_explain_why_you_are_suing_at_this_location","
 var linkedCheckboxes = [{"linkedCheckboxId":"military_check","checkboxes":["sc100a2_how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_1","sc100a2_how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_2","sc100a2_how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_3"]},{"linkedCheckboxId":"public_yes","checkboxes":["are_they_a_business_or_public_entity_are_they_a_public_entity_yes_1","are_they_a_business_or_public_entity_are_they_a_public_entity_yes_2","are_they_a_business_or_public_entity_are_they_a_public_entity_yes_3"]},{"linkedCheckboxId":"biz_check_100","checkboxes":["are_you_doing_business_under_a_fictious_business_name_yes","is_this_plaintiff_a_business_yes_1"]}];
 var inverseCheckboxes = [{"inverseCheckboxId":"public_no","targetCheckboxId":"public_yes"}];
 var checkboxRequiredMap = {"1":true,"12":true};
-var unifiedFieldsMap = {"11":[{"type":"label","label":"Name","nodeId":"sc103_please_enter_your_business_details_name","order":1,"prefill":""},{"type":"location","fieldName":"Please enter your business address","nodeId":"location_data","order":2}],"19":[{"type":"label","label":"Name","nodeId":"sc100_how_many_extra_plaintiffs_are_there_name","order":1,"prefill":""},{"type":"phone","label":"Phone Number","nodeId":"sc100_how_many_extra_plaintiffs_are_there_phone_number","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name?","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_business_name_statement_number"},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"single","options":[{"text":"An Individual","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire","conditionalLogic":{"enabled":true,"conditions":["sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"]}},{"type":"pdf","number":"1","pdfTitle":"SC-103 (1)","pdfName":"sc103(1).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":4}],"20":[{"type":"label","label":"Name","nodeId":"sc100a2_how_many_people_are_you_suing_name","order":1,"prefill":"","conditionalPrefills":[{"trigger":"1","value":"[defendantName]"}]},{"type":"phone","label":"Phone","nodeId":"sc100a2_how_many_people_are_you_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"sc100a2_how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"sc100a2_how_many_people_are_you_suing_name","title":"sc100a2_how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_sc100a2_how_many_people_are_you_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"sc100a2_how_many_people_are_you_suing_are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"sc100a2_how_many_people_are_you_suing_are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":[]}},{"type":"date","label":"When did you file the written claim?","nodeId":"sc100a2_how_many_people_are_you_suing_are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":[]}}]}],"order":5}]};
+var unifiedFieldsMap = {"11":[{"type":"label","label":"Name","nodeId":"sc103_please_enter_your_business_details_name","order":1,"prefill":""},{"type":"location","fieldName":"Please enter your business address","nodeId":"location_data","order":2}],"19":[{"type":"label","label":"Name","nodeId":"sc100_how_many_extra_plaintiffs_are_there_name","order":1,"prefill":""},{"type":"phone","label":"Phone Number","nodeId":"sc100_how_many_extra_plaintiffs_are_there_phone_number","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name?","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_business_name_statement_number"},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"single","options":[{"text":"An Individual","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire","conditionalLogic":{"enabled":true,"conditions":["sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"]}},{"type":"pdf","number":"1","pdfTitle":"SC-103 (1)","pdfName":"sc103(1).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":4}],"20":[{"type":"label","label":"Name","nodeId":"sc100a2_how_many_people_are_you_suing_name","order":1,"prefill":"","conditionalPrefills":[{"trigger":"1","value":"[defendantName]"}]},{"type":"phone","label":"Phone","nodeId":"sc100a2_how_many_people_are_you_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"sc100a2_how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"sc100a2_how_many_people_are_you_suing_name","title":"sc100a2_how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_sc100a2_how_many_people_are_you_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"sc100a2_how_many_people_are_you_suing_are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"sc100a2_how_many_people_are_you_suing_are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["are_they_a_business_or_public_entity_are_they_a_public_entity_yes"]}},{"type":"date","label":"When did you file the written claim?","nodeId":"sc100a2_how_many_people_are_you_suing_are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":["are_they_a_business_or_public_entity_have_you_filed_a_written_claim_against_them_yes"]}}]}],"order":5}]};
 
   // Address helper functions (must exist before conditional logic runs)
   function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
@@ -2894,6 +3053,52 @@ var unifiedFieldsMap = {"11":[{"type":"label","label":"Name","nodeId":"sc103_ple
         // For multipleTextboxes: {dropdownName}_{locationFieldName} (no entry number, no trigger condition)
         // For numberedDropdown: {dropdownName}_{locationFieldName} (entry number added per field)
         const locPrefix = sanitizedDropdownNameForLocation + '_' + sanitizedLocationName;
+        
+        // Create hidden full_address field (stores complete address like "921 Sloat Road, Salinas, CA 93907")
+        const fullAddressHidden = document.createElement('input');
+        fullAddressHidden.type = 'text';
+        if (isMultipleTextboxes) {
+          fullAddressHidden.id = locPrefix + '_full_address';
+        } else {
+          fullAddressHidden.id = locPrefix + '_full_address_' + entryNumber;
+        }
+        fullAddressHidden.name = fullAddressHidden.id;
+        fullAddressHidden.style.display = 'none';
+        const fullAddressId = fullAddressHidden.id;
+        
+        // Define field IDs for the update function (varies based on multipleTextboxes or numberedDropdown)
+        const triggerStreetFieldId = isMultipleTextboxes ? locPrefix + '_street' : locPrefix + '_street_' + entryNumber;
+        const triggerCityFieldId = isMultipleTextboxes ? locPrefix + '_city' : locPrefix + '_city_' + entryNumber;
+        const triggerStateShortFieldId = isMultipleTextboxes ? locPrefix + '_state_short' : locPrefix + '_state_short_' + entryNumber;
+        const triggerZipFieldId = isMultipleTextboxes ? locPrefix + '_zip' : locPrefix + '_zip_' + entryNumber;
+        
+        // Helper function code to update full address (using escaped backticks since we're inside formHTML template literal)
+        const triggerUpdateFullAddressCode = "(function() { " +
+            "var streetEl = document.getElementById('" + triggerStreetFieldId + "'); " +
+            "var cityEl = document.getElementById('" + triggerCityFieldId + "'); " +
+            "var stateShortEl = document.getElementById('" + triggerStateShortFieldId + "'); " +
+            "var zipEl = document.getElementById('" + triggerZipFieldId + "'); " +
+            "var fullAddressEl = document.getElementById('" + fullAddressId + "'); " +
+            "if (!fullAddressEl) { console.error('[FULL_ADDRESS_DEBUG - TRIGGER] fullAddressEl not found:', '" + fullAddressId + "'); return; } " +
+            "var street = streetEl ? streetEl.value.trim() : ''; " +
+            "var city = cityEl ? cityEl.value.trim() : ''; " +
+            "var stateShort = stateShortEl ? stateShortEl.value.trim() : ''; " +
+            "var zip = zipEl ? zipEl.value.trim() : ''; " +
+            "console.log('[FULL_ADDRESS_DEBUG - TRIGGER] Building full address - street:', street, 'city:', city, 'stateShort:', stateShort, 'zip:', zip); " +
+            "var parts = []; " +
+            "if (street) parts.push(street); " +
+            "if (city && stateShort && zip) { parts.push(city + ', ' + stateShort + ' ' + zip); } " +
+            "else if (city && stateShort) { parts.push(city + ', ' + stateShort); } " +
+            "else if (city && zip) { parts.push(city + ' ' + zip); } " +
+            "else if (city) { parts.push(city); } " +
+            "else if (stateShort && zip) { parts.push(stateShort + ' ' + zip); } " +
+            "else if (stateShort) { parts.push(stateShort); } " +
+            "else if (zip) { parts.push(zip); } " +
+            "var fullAddress = parts.join(', '); " +
+            "fullAddressEl.value = fullAddress; " +
+            "console.log('[FULL_ADDRESS_DEBUG - TRIGGER] Full address set to:', fullAddress); " +
+            "})();";
+        
         locationFields.forEach((field, fieldIndex) => {
           let input;
           if (field.label === 'State') {
@@ -2908,7 +3113,19 @@ var unifiedFieldsMap = {"11":[{"type":"label","label":"Name","nodeId":"sc103_ple
             }
             input.name = input.id;
             input.className = 'address-select-main';
-            // Hidden short code field
+            
+            // Create hidden full state field (stores full state name like "California")
+            const fullHidden = document.createElement('input');
+            fullHidden.type = 'text';
+            if (isMultipleTextboxes) {
+              fullHidden.id = locPrefix + '_state_hidden';
+            } else {
+              fullHidden.id = locPrefix + '_state_hidden_' + entryNumber;
+            }
+            fullHidden.name = fullHidden.id;
+            fullHidden.style.display = 'none';
+            
+            // Hidden short code field (stores "CA")
             const shortHidden = document.createElement('input');
             shortHidden.type = 'text';
             if (isMultipleTextboxes) {
@@ -2918,6 +3135,7 @@ var unifiedFieldsMap = {"11":[{"type":"label","label":"Name","nodeId":"sc103_ple
             }
             shortHidden.name = shortHidden.id;
             shortHidden.style.display = 'none';
+            
             // Add state options
             const states = [
               'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware',
@@ -2938,21 +3156,44 @@ var unifiedFieldsMap = {"11":[{"type":"label","label":"Name","nodeId":"sc103_ple
               option.textContent = state;
               input.appendChild(option);
             });
-            // Sync abbreviation and hidden checkbox on change
-            input.addEventListener('change', function(){
-              if (typeof updateStateHiddenFields === 'function') {
-                updateStateHiddenFields(this, input.id, shortHidden.id);
-              }
-              if (typeof dropdownMirror === 'function') {
-                dropdownMirror(this, input.id);
-              }
-              if (typeof updateHiddenLogic === 'function') {
-                updateHiddenLogic(input.id, this.value);
-              }
-            });
-            // Append hidden short field
+            
+            // CRITICAL FIX: Use inline onchange attribute instead of addEventListener
+            // addEventListener does NOT persist when DOM is serialized to HTML via outerHTML
+            const fullHiddenId = fullHidden.id;
+            const shortHiddenId = shortHidden.id;
+            const selectId = input.id;
+            // Build onchange handler using string concatenation to avoid nested template literal issues
+            input.setAttribute('onchange', 
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] State dropdown changed!');" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Dropdown ID:', '" + selectId + "');" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Selected value:', this.value);" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Full hidden field ID:', '" + fullHiddenId + "');" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Short hidden field ID:', '" + shortHiddenId + "');" +
+              "var fullField = document.getElementById('" + fullHiddenId + "');" +
+              "var shortField = document.getElementById('" + shortHiddenId + "');" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Full field found:', !!fullField, fullField);" +
+              "console.log('[STATE_SHORT_DEBUG - TRIGGER] Short field found:', !!shortField, shortField);" +
+              "if (typeof updateStateHiddenFields === 'function') {" +
+              "  console.log('[STATE_SHORT_DEBUG - TRIGGER] Calling updateStateHiddenFields...');" +
+              "  updateStateHiddenFields(this, '" + fullHiddenId + "', '" + shortHiddenId + "');" +
+              "  console.log('[STATE_SHORT_DEBUG - TRIGGER] After updateStateHiddenFields - fullField.value:', fullField ? fullField.value : 'N/A');" +
+              "  console.log('[STATE_SHORT_DEBUG - TRIGGER] After updateStateHiddenFields - shortField.value:', shortField ? shortField.value : 'N/A');" +
+              "} else {" +
+              "  console.error('[STATE_SHORT_DEBUG - TRIGGER] updateStateHiddenFields function NOT FOUND!');" +
+              "}" +
+              "if (typeof dropdownMirror === 'function') {" +
+              "  dropdownMirror(this, '" + selectId + "');" +
+              "}" +
+              "if (typeof updateHiddenLogic === 'function') {" +
+              "  updateHiddenLogic('" + selectId + "', this.value);" +
+              "}" +
+              "setTimeout(function() { " + triggerUpdateFullAddressCode + " }, 50);"
+            );
+            
+            // Append hidden fields
             const hiddenWrap = document.createElement('div');
             hiddenWrap.style.display = 'none';
+            hiddenWrap.appendChild(fullHidden);
             hiddenWrap.appendChild(shortHidden);
             locationFieldDiv.appendChild(hiddenWrap);
           } else {
@@ -2970,6 +3211,8 @@ var unifiedFieldsMap = {"11":[{"type":"label","label":"Name","nodeId":"sc103_ple
             input.placeholder = field.label; // e.g., Street, City, Zip
             input.className = 'address-input';
             input.style.textAlign = 'center'; // Ensure text is centered
+            // Add oninput handler to update full address when street, city, or zip changes
+            input.setAttribute('oninput', triggerUpdateFullAddressCode);
           }
           // Wrap each input in an .address-field div so margins apply
           const addrWrap = document.createElement('div');
@@ -2977,6 +3220,11 @@ var unifiedFieldsMap = {"11":[{"type":"label","label":"Name","nodeId":"sc103_ple
           addrWrap.appendChild(input);
           locationFieldDiv.appendChild(addrWrap);
         });
+        // Add the full_address hidden field to the location div
+        const fullAddressWrap = document.createElement('div');
+        fullAddressWrap.style.display = 'none';
+        fullAddressWrap.appendChild(fullAddressHidden);
+        locationFieldDiv.appendChild(fullAddressWrap);
         triggerContainer.appendChild(locationFieldDiv);
       } else if (triggerField.type === 'pdf') {
         // PDF fields are handled separately by PDF logic evaluation
@@ -3087,10 +3335,34 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
   };
   // Keep these helpers global too (they may be called by onchange/autofill)
   window.updateStateHiddenFields = function(selectEl, fullId, shortId) {
+    console.log('[STATE_SHORT_DEBUG] updateStateHiddenFields called');
+    console.log('[STATE_SHORT_DEBUG] selectEl:', selectEl);
+    console.log('[STATE_SHORT_DEBUG] selectEl.value:', selectEl ? selectEl.value : 'N/A');
+    console.log('[STATE_SHORT_DEBUG] fullId:', fullId);
+    console.log('[STATE_SHORT_DEBUG] shortId:', shortId);
+    
     const fullField  = document.getElementById(fullId);
     const shortField = document.getElementById(shortId);
-    if (!fullField || !shortField) return;
+    
+    console.log('[STATE_SHORT_DEBUG] fullField element:', fullField);
+    console.log('[STATE_SHORT_DEBUG] shortField element:', shortField);
+    
+    if (!fullField || !shortField) {
+      console.error('[STATE_SHORT_DEBUG] MISSING FIELD! fullField:', !!fullField, 'shortField:', !!shortField);
+      console.error('[STATE_SHORT_DEBUG] Looking for fullId:', fullId);
+      console.error('[STATE_SHORT_DEBUG] Looking for shortId:', shortId);
+      // List all hidden inputs to help debug
+      var allHiddenInputs = document.querySelectorAll('input[style*="display: none"], input[style*="display:none"]');
+      console.log('[STATE_SHORT_DEBUG] All hidden inputs on page:', allHiddenInputs.length);
+      allHiddenInputs.forEach(function(inp) {
+        console.log('[STATE_SHORT_DEBUG]   - Hidden input id:', inp.id, 'name:', inp.name);
+      });
+      return;
+    }
+    
     const full = (selectEl.value || '').trim();
+    console.log('[STATE_SHORT_DEBUG] Full state name:', full);
+    
     // Map full -> short (two-letter)
     const map = {
       'Alabama': 'AL','Alaska': 'AK','Arizona': 'AZ','Arkansas': 'AR','California': 'CA','Colorado': 'CO',
@@ -3104,8 +3376,13 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
       'West Virginia': 'WV','Wisconsin': 'WI','Wyoming': 'WY'
     };
     const short = map[full] || '';
+    console.log('[STATE_SHORT_DEBUG] Short state code:', short);
+    
     fullField.value  = full;
     shortField.value = short;
+    
+    console.log('[STATE_SHORT_DEBUG] SUCCESS! Set fullField.value to:', fullField.value);
+    console.log('[STATE_SHORT_DEBUG] SUCCESS! Set shortField.value to:', shortField.value);
   };
 })();
 
@@ -11700,9 +11977,20 @@ document.addEventListener('change', function() {
 });
 // Function to update hidden state fields when dropdown selection changes
 function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] updateStateHiddenFields called');
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] dropdown:', dropdown);
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] hiddenFullId:', hiddenFullId);
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] hiddenShortId:', hiddenShortId);
+    
     const selectedState = dropdown && dropdown.value ? dropdown.value : '';
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] selectedState:', selectedState);
+    
     const fullField = hiddenFullId ? document.getElementById(hiddenFullId) : null;
     const shortField = hiddenShortId ? document.getElementById(hiddenShortId) : null;
+    
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] fullField:', fullField);
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] shortField:', shortField);
+    
     // State abbreviation mapping
     const stateAbbreviations = {
         'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA', 'Colorado': 'CO',
@@ -11716,8 +12004,23 @@ function updateStateHiddenFields(dropdown, hiddenFullId, hiddenShortId) {
         'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
     };
     const abbreviation = selectedState ? (stateAbbreviations[selectedState] || '') : '';
-    if (shortField) shortField.value = abbreviation;
-    if (fullField && fullField.tagName !== 'SELECT') fullField.value = selectedState;
+    console.log('[STATE_SHORT_DEBUG - RUNTIME] abbreviation:', abbreviation);
+    
+    if (shortField) {
+        shortField.value = abbreviation;
+        console.log('[STATE_SHORT_DEBUG - RUNTIME] Set shortField.value to:', shortField.value);
+    } else {
+        console.error('[STATE_SHORT_DEBUG - RUNTIME] shortField NOT FOUND!');
+    }
+    
+    if (fullField && fullField.tagName !== 'SELECT') {
+        fullField.value = selectedState;
+        console.log('[STATE_SHORT_DEBUG - RUNTIME] Set fullField.value to:', fullField.value);
+    } else if (!fullField) {
+        console.error('[STATE_SHORT_DEBUG - RUNTIME] fullField NOT FOUND!');
+    } else {
+        console.log('[STATE_SHORT_DEBUG - RUNTIME] fullField is a SELECT, skipping value set');
+    }
 }
 // Function to update user full name
 function updateUserFullName() {
