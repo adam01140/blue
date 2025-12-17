@@ -786,6 +786,164 @@
             opacity: 0.3;
             pointer-events: none;
         }
+
+        .editable-badge {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .editable-badge:hover {
+            opacity: 0.8;
+            transform: translateY(-2px);
+        }
+
+        .editable-text {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin: -2px -4px;
+        }
+
+        .editable-text:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .ticket-description.empty-description {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .edit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .edit-modal.active {
+            display: flex;
+        }
+
+        .edit-modal-content {
+            background: var(--background-white);
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            max-width: 400px;
+            width: 100%;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-color);
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .edit-modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            color: var(--text-primary);
+        }
+
+        .edit-modal-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .edit-modal-option {
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: var(--background-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .edit-modal-option:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        .edit-modal-option.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .edit-modal-slider {
+            margin: 20px 0;
+        }
+
+        .edit-modal-slider input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .edit-modal-slider-value {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        .edit-modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .edit-modal-buttons button {
+            flex: 1;
+        }
+
+        .edit-modal-text-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 1em;
+            font-family: 'Montserrat', sans-serif;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .edit-modal-text-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .edit-modal-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 1em;
+            font-family: 'Montserrat', sans-serif;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        .edit-modal-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -865,6 +1023,18 @@
         <div id="tickets-container">
             <div class="empty-state">
                 <p>No tickets submitted yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="edit-modal" id="edit-modal">
+        <div class="edit-modal-content">
+            <h3 id="edit-modal-title">Edit</h3>
+            <div id="edit-modal-body"></div>
+            <div class="edit-modal-buttons">
+                <button type="button" class="btn btn-secondary" id="edit-modal-cancel">Cancel</button>
+                <button type="button" class="btn" id="edit-modal-save">Save</button>
             </div>
         </div>
     </div>

@@ -671,14 +671,14 @@ function createTicketElement(ticketId, ticket) {
   
   ticketItem.innerHTML = `
     <div class="ticket-header">
-      <div class="ticket-title">${escapeHtml(ticket.title)}</div>
+      <div class="ticket-title editable-text" data-field="title" data-ticket-id="${ticketId}" data-current-value="${escapeHtml(ticket.title)}" title="Double-click to edit">${escapeHtml(ticket.title)}</div>
       <button type="button" class="ticket-delete-btn" data-ticket-id="${ticketId}" title="Delete ticket">×</button>
     </div>
-    ${ticket.description ? `<div class="ticket-description">${escapeHtml(ticket.description)}</div>` : ''}
+    <div class="ticket-description ${ticket.description ? 'editable-text' : 'editable-text empty-description'}" data-field="description" data-ticket-id="${ticketId}" data-current-value="${ticket.description ? escapeHtml(ticket.description) : ''}" title="Double-click to edit">${ticket.description ? escapeHtml(ticket.description) : '<em style="color: #94a3b8;">No description (double-click to add)</em>'}</div>
     <div class="ticket-meta">
-      <span class="ticket-badge ${priorityClass}">Priority: ${ticket.priority.toUpperCase()}</span>
-      <span class="ticket-badge difficulty-badge">Difficulty: ${ticket.difficulty}/10</span>
-      ${categoryName ? `<span class="ticket-badge category-badge">${escapeHtml(categoryName)}</span>` : ''}
+      <span class="ticket-badge ${priorityClass} editable-badge" data-field="priority" data-ticket-id="${ticketId}" data-current-value="${ticket.priority}" title="Double-click to edit">Priority: ${ticket.priority.toUpperCase()}</span>
+      <span class="ticket-badge difficulty-badge editable-badge" data-field="difficulty" data-ticket-id="${ticketId}" data-current-value="${ticket.difficulty}" title="Double-click to edit">Difficulty: ${ticket.difficulty}/10</span>
+      ${categoryName ? `<span class="ticket-badge category-badge editable-badge" data-field="category" data-ticket-id="${ticketId}" data-category-id="${ticket.categoryId || ''}" data-current-value="${escapeHtml(categoryName)}" title="Double-click to edit">${escapeHtml(categoryName)}</span>` : ''}
     </div>
   `;
   
@@ -686,8 +686,383 @@ function createTicketElement(ticketId, ticket) {
   const deleteBtn = ticketItem.querySelector('.ticket-delete-btn');
   deleteBtn.addEventListener('click', () => deleteTicket(ticketId));
   
+  // Add double-click handlers for editable text (title and description)
+  const editableTexts = ticketItem.querySelectorAll('.editable-text');
+  editableTexts.forEach(element => {
+    element.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      const field = element.dataset.field;
+      const ticketId = element.dataset.ticketId;
+      const currentValue = element.dataset.currentValue;
+      
+      if (field === 'title') {
+        showTitleEditModal(ticketId, currentValue, element);
+      } else if (field === 'description') {
+        showDescriptionEditModal(ticketId, currentValue, element);
+      }
+    });
+  });
+  
+  // Add double-click handlers for editable badges
+  const editableBadges = ticketItem.querySelectorAll('.editable-badge');
+  editableBadges.forEach(badge => {
+    badge.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      const field = badge.dataset.field;
+      const ticketId = badge.dataset.ticketId;
+      const currentValue = badge.dataset.currentValue;
+      
+      if (field === 'priority') {
+        showPriorityEditModal(ticketId, currentValue, badge);
+      } else if (field === 'difficulty') {
+        showDifficultyEditModal(ticketId, parseInt(currentValue), badge);
+      } else if (field === 'category') {
+        showCategoryEditModal(ticketId, badge.dataset.categoryId, badge);
+      }
+    });
+  });
+  
   return ticketItem;
 }
+
+// Edit modal elements
+const editModal = document.getElementById('edit-modal');
+const editModalTitle = document.getElementById('edit-modal-title');
+const editModalBody = document.getElementById('edit-modal-body');
+const editModalCancel = document.getElementById('edit-modal-cancel');
+const editModalSave = document.getElementById('edit-modal-save');
+
+let currentEditContext = null;
+
+// Show title edit modal
+function showTitleEditModal(ticketId, currentTitle, element) {
+  currentEditContext = {
+    ticketId,
+    field: 'title',
+    element,
+    currentValue: currentTitle
+  };
+  
+  editModalTitle.textContent = 'Edit Title';
+  editModalBody.innerHTML = `
+    <div>
+      <input type="text" id="title-input" class="edit-modal-text-input" value="${escapeHtml(currentTitle)}" placeholder="Enter ticket title" maxlength="200">
+    </div>
+  `;
+  
+  const input = editModalBody.querySelector('#title-input');
+  input.focus();
+  input.select();
+  
+  input.addEventListener('input', (e) => {
+    currentEditContext.newValue = e.target.value.trim();
+  });
+  
+  // Allow Enter key to save, Escape to cancel
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      editModalSave.click();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      editModalCancel.click();
+    }
+  });
+  
+  // Set initial value
+  currentEditContext.newValue = currentTitle;
+  
+  editModal.classList.add('active');
+  document.body.classList.add('modal-open');
+}
+
+// Show description edit modal
+function showDescriptionEditModal(ticketId, currentDescription, element) {
+  currentEditContext = {
+    ticketId,
+    field: 'description',
+    element,
+    currentValue: currentDescription
+  };
+  
+  editModalTitle.textContent = 'Edit Description';
+  editModalBody.innerHTML = `
+    <div>
+      <textarea id="description-input" class="edit-modal-textarea" placeholder="Enter ticket description (optional)">${escapeHtml(currentDescription)}</textarea>
+    </div>
+  `;
+  
+  const textarea = editModalBody.querySelector('#description-input');
+  textarea.focus();
+  
+  textarea.addEventListener('input', (e) => {
+    currentEditContext.newValue = e.target.value.trim();
+  });
+  
+  // Allow Escape key to cancel
+  textarea.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      editModalCancel.click();
+    }
+  });
+  
+  // Set initial value
+  currentEditContext.newValue = currentDescription;
+  
+  editModal.classList.add('active');
+  document.body.classList.add('modal-open');
+}
+
+// Show priority edit modal
+function showPriorityEditModal(ticketId, currentPriority, badgeElement) {
+  currentEditContext = {
+    ticketId,
+    field: 'priority',
+    badgeElement,
+    currentValue: currentPriority
+  };
+  
+  editModalTitle.textContent = 'Edit Priority';
+  editModalBody.innerHTML = `
+    <div class="edit-modal-options">
+      <div class="edit-modal-option ${currentPriority === 'low' ? 'selected' : ''}" data-value="low">Low</div>
+      <div class="edit-modal-option ${currentPriority === 'medium' ? 'selected' : ''}" data-value="medium">Medium</div>
+      <div class="edit-modal-option ${currentPriority === 'high' ? 'selected' : ''}" data-value="high">High</div>
+    </div>
+  `;
+  
+  // Add click handlers for options
+  const options = editModalBody.querySelectorAll('.edit-modal-option');
+  options.forEach(option => {
+    option.addEventListener('click', () => {
+      options.forEach(opt => opt.classList.remove('selected'));
+      option.classList.add('selected');
+      currentEditContext.newValue = option.dataset.value;
+    });
+  });
+  
+  // Set initial value
+  currentEditContext.newValue = currentPriority;
+  
+  editModal.classList.add('active');
+  document.body.classList.add('modal-open');
+}
+
+// Show difficulty edit modal
+function showDifficultyEditModal(ticketId, currentDifficulty, badgeElement) {
+  currentEditContext = {
+    ticketId,
+    field: 'difficulty',
+    badgeElement,
+    currentValue: currentDifficulty
+  };
+  
+  editModalTitle.textContent = 'Edit Difficulty';
+  editModalBody.innerHTML = `
+    <div class="edit-modal-slider">
+      <input type="range" id="difficulty-slider" min="1" max="10" value="${currentDifficulty}" class="slider">
+      <div class="edit-modal-slider-value" id="difficulty-display">${currentDifficulty}</div>
+    </div>
+  `;
+  
+  const slider = editModalBody.querySelector('#difficulty-slider');
+  const display = editModalBody.querySelector('#difficulty-display');
+  
+  slider.addEventListener('input', (e) => {
+    const value = parseInt(e.target.value);
+    display.textContent = value;
+    currentEditContext.newValue = value;
+  });
+  
+  // Set initial value
+  currentEditContext.newValue = currentDifficulty;
+  
+  editModal.classList.add('active');
+  document.body.classList.add('modal-open');
+}
+
+// Show category edit modal
+function showCategoryEditModal(ticketId, currentCategoryId, badgeElement) {
+  currentEditContext = {
+    ticketId,
+    field: 'category',
+    badgeElement,
+    currentValue: currentCategoryId
+  };
+  
+  editModalTitle.textContent = 'Edit Category';
+  
+  // Sort categories by order
+  const sortedCategories = [...categories].sort((a, b) => {
+    const aOrder = a.order !== undefined ? a.order : 999;
+    const bOrder = b.order !== undefined ? b.order : 999;
+    return aOrder - bOrder;
+  });
+  
+  let optionsHTML = '<div class="edit-modal-options">';
+  optionsHTML += `<div class="edit-modal-option ${!currentCategoryId ? 'selected' : ''}" data-value="">No Category</div>`;
+  
+  sortedCategories.forEach(category => {
+    const isSelected = currentCategoryId === category.id;
+    optionsHTML += `<div class="edit-modal-option ${isSelected ? 'selected' : ''}" data-value="${category.id}">${escapeHtml(category.name)}</div>`;
+  });
+  
+  optionsHTML += '</div>';
+  editModalBody.innerHTML = optionsHTML;
+  
+  // Add click handlers for options
+  const options = editModalBody.querySelectorAll('.edit-modal-option');
+  options.forEach(option => {
+    option.addEventListener('click', () => {
+      options.forEach(opt => opt.classList.remove('selected'));
+      option.classList.add('selected');
+      currentEditContext.newValue = option.dataset.value;
+      currentEditContext.newCategoryName = option.textContent;
+    });
+  });
+  
+  // Set initial value
+  currentEditContext.newValue = currentCategoryId || '';
+  currentEditContext.newCategoryName = badgeElement.dataset.currentValue;
+  
+  editModal.classList.add('active');
+  document.body.classList.add('modal-open');
+}
+
+// Handle edit modal save
+editModalSave.addEventListener('click', async () => {
+  if (!currentEditContext) return;
+  
+  const { ticketId, field } = currentEditContext;
+  
+  // Get the new value from the input/textarea if it's title or description
+  let newValue = currentEditContext.newValue;
+  if (field === 'title') {
+    const input = editModalBody.querySelector('#title-input');
+    if (input) {
+      newValue = input.value.trim();
+    }
+  } else if (field === 'description') {
+    const textarea = editModalBody.querySelector('#description-input');
+    if (textarea) {
+      newValue = textarea.value.trim();
+    }
+  }
+  
+  // Validate title (required)
+  if (field === 'title' && !newValue) {
+    alert('Title cannot be empty.');
+    return;
+  }
+  
+  try {
+    // Update in Firebase - try both user-specific and global collections
+    const userDocRef = db.collection('users').doc(currentUser.uid).collection('tickets').doc(ticketId);
+    const globalDocRef = db.collection('tickets').doc(ticketId);
+    
+    const updateData = {
+      [field]: field === 'difficulty' ? parseInt(newValue) : newValue,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    // If updating category, also update categoryName
+    if (field === 'category') {
+      if (newValue) {
+        const category = categories.find(cat => cat.id === newValue);
+        updateData.categoryName = category ? category.name : currentEditContext.newCategoryName;
+        updateData.categoryId = newValue;
+      } else {
+        updateData.categoryName = null;
+        updateData.categoryId = null;
+      }
+    }
+    
+    // Try to update in user collection first
+    try {
+      const userDoc = await userDocRef.get();
+      if (userDoc.exists) {
+        await userDocRef.update(updateData);
+        console.log(`✓ Updated ${field} in users/{userId}/tickets`);
+      }
+    } catch (err) {
+      console.warn('Error updating in users/{userId}/tickets:', err.message);
+    }
+    
+    // Try to update in global collection
+    try {
+      const globalDoc = await globalDocRef.get();
+      if (globalDoc.exists) {
+        await globalDocRef.update(updateData);
+        console.log(`✓ Updated ${field} in tickets (global)`);
+      }
+    } catch (err) {
+      console.warn('Error updating in tickets (global):', err.message);
+    }
+    
+    // Update the display
+    const element = currentEditContext.element || currentEditContext.badgeElement;
+    
+    if (field === 'title') {
+      element.textContent = newValue || 'Untitled';
+      element.dataset.currentValue = newValue;
+    } else if (field === 'description') {
+      if (newValue) {
+        element.textContent = newValue;
+        element.classList.remove('empty-description');
+      } else {
+        element.innerHTML = '<em style="color: #94a3b8;">No description (double-click to add)</em>';
+        element.classList.add('empty-description');
+      }
+      element.dataset.currentValue = newValue;
+    } else if (field === 'priority') {
+      const priorityText = newValue.toUpperCase();
+      element.textContent = `Priority: ${priorityText}`;
+      element.className = `ticket-badge priority-${newValue} editable-badge`;
+      element.dataset.currentValue = newValue;
+    } else if (field === 'difficulty') {
+      element.textContent = `Difficulty: ${newValue}/10`;
+      element.dataset.currentValue = newValue;
+    } else if (field === 'category') {
+      if (newValue) {
+        const categoryName = currentEditContext.newCategoryName;
+        element.textContent = categoryName;
+        element.dataset.currentValue = categoryName;
+        element.dataset.categoryId = newValue;
+      } else {
+        // Remove category badge if no category selected
+        element.remove();
+      }
+    }
+    
+    // Close modal
+    editModal.classList.remove('active');
+    document.body.classList.remove('modal-open');
+    currentEditContext = null;
+    
+    // Reload tickets to ensure consistency
+    await loadTickets();
+  } catch (error) {
+    console.error('Error updating ticket:', error);
+    alert('Error updating ticket: ' + error.message);
+  }
+});
+
+// Handle edit modal cancel
+editModalCancel.addEventListener('click', () => {
+  editModal.classList.remove('active');
+  document.body.classList.remove('modal-open');
+  currentEditContext = null;
+});
+
+// Close edit modal when clicking outside
+editModal.addEventListener('click', (e) => {
+  if (e.target === editModal) {
+    editModal.classList.remove('active');
+    document.body.classList.remove('modal-open');
+    currentEditContext = null;
+  }
+});
 
 // Delete ticket
 async function deleteTicket(ticketId) {
