@@ -1673,7 +1673,8 @@ var questionNameIds = {"1":"please_explain_why_you_are_suing_at_this_location","
 var linkedCheckboxes = [{"linkedCheckboxId":"military_check","checkboxes":["sc100a2_how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_1","sc100a2_how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_2","sc100a2_how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_3"]},{"linkedCheckboxId":"public_yes","checkboxes":["are_they_a_business_or_public_entity_are_they_a_public_entity_yes_1","are_they_a_business_or_public_entity_are_they_a_public_entity_yes_2","are_they_a_business_or_public_entity_are_they_a_public_entity_yes_3"]},{"linkedCheckboxId":"biz_check_100","checkboxes":["are_you_doing_business_under_a_fictious_business_name_yes","is_this_plaintiff_a_business_yes_1"]}];
 var inverseCheckboxes = [{"inverseCheckboxId":"public_no","targetCheckboxId":"public_yes"}];
 var checkboxRequiredMap = {"1":true,"12":true};
-var unifiedFieldsMap = {"11":[{"type":"label","label":"Name","nodeId":"sc103_please_enter_your_business_details_name","order":1,"prefill":""},{"type":"location","fieldName":"Please enter your business address","nodeId":"location_data","order":2}],"19":[{"type":"label","label":"Name","nodeId":"sc100_how_many_extra_plaintiffs_are_there_name","order":1,"prefill":""},{"type":"phone","label":"Phone Number","nodeId":"sc100_how_many_extra_plaintiffs_are_there_phone_number","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name?","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_business_name_statement_number"},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"single","options":[{"text":"An Individual","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire","conditionalLogic":{"enabled":true,"conditions":["sc100_how_many_extra_plantiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"]}},{"type":"pdf","number":"1","pdfTitle":"SC-103 (1)","pdfName":"sc103(1).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":4}],"20":[{"type":"label","label":"Name","nodeId":"sc100a2_how_many_people_are_you_suing_name","order":1,"prefill":"","conditionalPrefills":[{"trigger":"1","value":"[defendantName]"}]},{"type":"phone","label":"Phone","nodeId":"sc100a2_how_many_people_are_you_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"sc100a2_how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"sc100a2_how_many_people_are_you_suing_name","title":"sc100a2_how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_sc100a2_how_many_people_are_you_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"sc100a2_how_many_people_are_you_suing_are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"sc100a2_how_many_people_are_you_suing_are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["are_they_a_business_or_public_entity_are_they_a_public_entity_yes"]}},{"type":"date","label":"When did you file the written claim?","nodeId":"sc100a2_how_many_people_are_you_suing_are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":["are_they_a_business_or_public_entity_have_you_filed_a_written_claim_against_them_yes"]}},{"type":"pdf","number":"1","pdfTitle":"SC-103 For Extra Plaintiff 1","pdfName":"sc103(1).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"3","pdfTitle":"SC-103 For Extra Plaintiff 3","pdfName":"sc103(3).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"5","pdfTitle":"SC-103 For Extra Plaintiff 5","pdfName":"sc103(5).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":5}]};
+var unifiedFieldsMap = {"11":[{"type":"label","label":"Name","nodeId":"sc103_please_enter_your_business_details_name","order":1,"prefill":""},{"type":"location","fieldName":"Please enter your business address","nodeId":"location_data","order":2}],"19":[{"type":"label","label":"Name","nodeId":"sc100_how_many_extra_plaintiffs_are_there_name","order":1,"prefill":""},{"type":"phone","label":"Phone Number","nodeId":"sc100_how_many_extra_plaintiffs_are_there_phone_number","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name?","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"sc100_how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"sc100_how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name_statement_number"},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"single","options":[{"text":"An Individual","nodeId":"sc100_how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"sc100_how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"sc100_how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"sc100_how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"sc100_how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"sc100_how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire","conditionalLogic":{"enabled":true,"conditions":["sc100_how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"]}},{"type":"pdf","number":"1","pdfTitle":"SC-103 For Extra Plaintiff 1","pdfName":"sc103(1).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"3","pdfTitle":"SC-103 For Extra Plaintiff 3","pdfName":"sc103(3).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"5","pdfTitle":"SC-103 For Extra Plaintiff 5","pdfName":"sc103(5).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":4}],"20":[{"type":"label","label":"Name","nodeId":"sc100a2_how_many_people_are_you_suing_name","order":1,"prefill":"","conditionalPrefills":[{"trigger":"1","value":"[defendantName]"}]},{"type":"phone","label":"Phone","nodeId":"sc100a2_how_many_people_are_you_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"sc100a2_how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"sc100a2_how_many_people_are_you_suing_name","title":"sc100a2_how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_sc100a2_how_many_people_are_you_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"sc100a2_how_many_people_are_you_suing_are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"sc100a2_how_many_people_are_you_suing_are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["are_they_a_business_or_public_entity_are_they_a_public_entity_yes"]}},{"type":"date","label":"When did you file the written claim?","nodeId":"sc100a2_how_many_people_are_you_suing_are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":["are_they_a_business_or_public_entity_have_you_filed_a_written_claim_against_them_yes"]}},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":5}]};
+var entryTitleMap = {"19":"Please enter the plaintiff's info","20":"Please enter the defendant's info"};
 
   // Address helper functions (must exist before conditional logic runs)
   function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
@@ -3412,7 +3413,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       const formId = urlParams.get("formId") || window.formId || 'default';
     var jumpLogics = [{"questionId":"7","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"8","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"10","questionType":"dropdown","jumpOption":"No","jumpTo":"3","section":1},{"questionId":"17","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":2},{"questionId":"29","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":3},{"questionId":"30","questionType":"bigParagraph","jumpOption":"Any Text","jumpTo":"end","section":3}];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"9","pdfName":"sc103.pdf","pdfDisplayName":"SC-103","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"9","prevAnswer":"Yes"}],"isBigParagraph":false},{"questionId":"10","pdfName":"sc100.pdf","pdfDisplayName":"SC-100","stripePriceId":"price_1SB7CbFJeSRMFQ8X2afGFckf","triggerOption":"","conditions":[{"prevQuestion":"10","prevAnswer":"No"}],"isBigParagraph":false},{"questionId":"17","pdfName":"sc100.pdf","pdfDisplayName":"SC-100","stripePriceId":"price_1SB7CbFJeSRMFQ8X2afGFckf","triggerOption":"","conditions":[{"prevQuestion":"17","prevAnswer":"No"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc103(1).pdf","pdfDisplayName":"SC-103 (1)","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"19","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"1"},{"questionId":"19","pdfName":"sc100a.pdf","pdfDisplayName":"SC-100A","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"2","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc100a.pdf","pdfDisplayName":"SC-100A","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"4","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc100a(2).pdf","pdfDisplayName":"SC-100A (2)","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"4","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc100a.pdf","pdfDisplayName":"SC-100A","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"3","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc100a(2).pdf","pdfDisplayName":"SC-100A (2)","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"5","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"20","pdfName":"sc103(1).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 1","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"20","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"1"},{"questionId":"20","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"20","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"20","pdfName":"sc103(3).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 3","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"20","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"3"},{"questionId":"20","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"20","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"},{"questionId":"20","pdfName":"sc103(5).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 5","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"20","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"5"},{"questionId":"20","pdfName":"sc100a.pdf","pdfDisplayName":"SC-100A","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"3","conditions":[{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"2"}],"isBigParagraph":false},{"questionId":"20","pdfName":"sc100a(2).pdf","pdfDisplayName":"SC-100A (2)","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"3","conditions":[{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"2"}],"isBigParagraph":false},{"questionId":"20","pdfName":"sc100a.pdf","pdfDisplayName":"SC-100A","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"2","conditions":[{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"2"}],"isBigParagraph":false},{"questionId":"28","pdfName":"mc031.pdf","pdfDisplayName":"MC-031","stripePriceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E","triggerOption":"","conditions":[{"characterLimit":320}],"isBigParagraph":true}];
+var pdfLogicPDFs = [{"questionId":"9","pdfName":"sc103.pdf","pdfDisplayName":"SC-103","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"9","prevAnswer":"Yes"}],"isBigParagraph":false},{"questionId":"10","pdfName":"sc100.pdf","pdfDisplayName":"SC-100","stripePriceId":"price_1SB7CbFJeSRMFQ8X2afGFckf","triggerOption":"","conditions":[{"prevQuestion":"10","prevAnswer":"No"}],"isBigParagraph":false},{"questionId":"17","pdfName":"sc100.pdf","pdfDisplayName":"SC-100","stripePriceId":"price_1SB7CbFJeSRMFQ8X2afGFckf","triggerOption":"","conditions":[{"prevQuestion":"17","prevAnswer":"No"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc103(1).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 1","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"19","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"1"},{"questionId":"19","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"19","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"19","pdfName":"sc103(3).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 3","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"19","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"3"},{"questionId":"19","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"19","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"},{"questionId":"19","pdfName":"sc103(5).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 5","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"19","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"5"},{"questionId":"19","pdfName":"sc100a.pdf","pdfDisplayName":"SC-100A","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"2","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc100a.pdf","pdfDisplayName":"SC-100A","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"4","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc100a(2).pdf","pdfDisplayName":"SC-100A (2)","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"4","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc100a.pdf","pdfDisplayName":"SC-100A","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"3","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc100a(2).pdf","pdfDisplayName":"SC-100A (2)","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"5","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"20","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"20","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"20","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"20","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"},{"questionId":"20","pdfName":"sc100a.pdf","pdfDisplayName":"SC-100A","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"3","conditions":[{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"2"}],"isBigParagraph":false},{"questionId":"20","pdfName":"sc100a(2).pdf","pdfDisplayName":"SC-100A (2)","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"3","conditions":[{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"2"}],"isBigParagraph":false},{"questionId":"20","pdfName":"sc100a.pdf","pdfDisplayName":"SC-100A","stripePriceId":"price_1SB6xDFJeSRMFQ8XPkKRmQqr","triggerOption":"2","conditions":[{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"2"}],"isBigParagraph":false},{"questionId":"28","pdfName":"mc031.pdf","pdfDisplayName":"MC-031","stripePriceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E","triggerOption":"","conditions":[{"characterLimit":320}],"isBigParagraph":true}];
 var checkboxPdfEntries = [];
 var alertLogics = [{"questionId":"7","message":"Sorry youre just not eligible","conditions":[{"prevQuestion":"7","prevAnswer":"Yes"}]},{"questionId":"8","message":"We cant take you on sorry","conditions":[{"prevQuestion":"8","prevAnswer":"Yes"}]},{"questionId":"10","message":"Sorry you cant sue for that much","conditions":[{"prevQuestion":"10","prevAnswer":"Yes"}]},{"questionId":"17","message":"Sorry you cant sue for that much","conditions":[{"prevQuestion":"17","prevAnswer":"Yes"}]}];
 var checklistLogics = [];
@@ -5950,33 +5951,55 @@ window.showCartModal = function () {
         }
       } else if (pdfLogic.isTriggerSequencePdf) {
         // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] === Processing Trigger Sequence PDF ===');
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] PDF:', pdfLogic.pdfName);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] triggerSequenceFieldName:', pdfLogic.triggerSequenceFieldName);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] triggerSequenceCondition:', pdfLogic.triggerSequenceCondition);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] pdfEntryNumber:', pdfLogic.pdfEntryNumber);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] questionId:', pdfLogic.questionId);
         // First, check that the numbered dropdown has a value (entries exist)
         const numberedDropdownEl = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                                     document.getElementById('answer' + pdfLogic.questionId);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] Looking for numbered dropdown with IDs:', (window.questionNameIds || {})[pdfLogic.questionId], 'or', 'answer' + pdfLogic.questionId);
+        console.log('[TRIGGER_SEQ_PDF_DEBUG] numberedDropdownEl found:', !!numberedDropdownEl, numberedDropdownEl);
         if (!numberedDropdownEl || !numberedDropdownEl.value) {
-          // No match
+          console.log('[TRIGGER_SEQ_PDF_DEBUG] No numbered dropdown or no value selected - NO MATCH');
         } else {
           const entryCount = parseInt(numberedDropdownEl.value) || 0;
           const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+          console.log('[TRIGGER_SEQ_PDF_DEBUG] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
           // Check if target entry exists
           if (targetEntryNumber > entryCount) {
-            // No match
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] Target entry', targetEntryNumber, 'exceeds entry count', entryCount, '- NO MATCH');
           } else {
             // Find the trigger sequence dropdown for this entry
             // The dropdown ID format: sanitizedFieldName_entryNumber
-            // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/W+/g, '_').toLowerCase() + "_" + j
+            // Must match the exact pattern used when creating the dropdown (uses character classes to avoid backslash escaping issues)
             const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
-              .replace(/W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
-              .toLowerCase();
+              .toLowerCase()
+              .replace(/[?]/g, '')  // Remove question marks
+              .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore (character class avoids escaping issues)
+              .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores (CRITICAL: must match ID generation)
             const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] Original field name:', pdfLogic.triggerSequenceFieldName);
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] Sanitized field name:', sanitizedFieldName);
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] Looking for trigger dropdown with ID:', triggerDropdownId);
             const triggerDropdownEl = document.getElementById(triggerDropdownId);
+            console.log('[TRIGGER_SEQ_PDF_DEBUG] triggerDropdownEl found:', !!triggerDropdownEl, triggerDropdownEl);
             if (triggerDropdownEl) {
               const selectedValue = triggerDropdownEl.value || '';
+              console.log('[TRIGGER_SEQ_PDF_DEBUG] Selected value:', selectedValue, 'Expected condition:', pdfLogic.triggerSequenceCondition);
               if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                console.log('[TRIGGER_SEQ_PDF_DEBUG] MATCH! Adding PDF:', pdfLogic.pdfName);
                 matched = true;
               } else {
+                console.log('[TRIGGER_SEQ_PDF_DEBUG] Value mismatch - NO MATCH');
               }
             } else {
+              console.log('[TRIGGER_SEQ_PDF_DEBUG] Trigger dropdown not found - listing all select elements:');
+              document.querySelectorAll('select').forEach(function(sel) {
+                console.log('[TRIGGER_SEQ_PDF_DEBUG]   Select ID:', sel.id, 'Value:', sel.value);
+              });
             }
           }
         }
@@ -6246,33 +6269,48 @@ window.addFormToCart = function (priceId) {
           }
         } else if (pdfLogic.isTriggerSequencePdf) {
           // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] === Processing Trigger Sequence PDF (Cart) ===');
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] PDF:', pdfLogic.pdfName);
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] triggerSequenceFieldName:', pdfLogic.triggerSequenceFieldName);
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] triggerSequenceCondition:', pdfLogic.triggerSequenceCondition);
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] pdfEntryNumber:', pdfLogic.pdfEntryNumber);
           // First, check that the numbered dropdown has a value (entries exist)
           const numberedDropdownEl = document.getElementById((window.questionNameIds || {})[pdfLogic.questionId]) ||
                                       document.getElementById('answer' + pdfLogic.questionId);
+          console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] numberedDropdownEl found:', !!numberedDropdownEl);
           if (!numberedDropdownEl || !numberedDropdownEl.value) {
-            // No match
+            console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] No numbered dropdown or no value - NO MATCH');
           } else {
             const entryCount = parseInt(numberedDropdownEl.value) || 0;
             const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+            console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
             // Check if target entry exists
             if (targetEntryNumber > entryCount) {
-              // No match
+              console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Target entry exceeds count - NO MATCH');
             } else {
               // Find the trigger sequence dropdown for this entry
-              // The dropdown ID format: sanitizedFieldName_entryNumber
-              // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/W+/g, '_').toLowerCase() + "_" + j
+              // The dropdown ID format: sanitizedFieldName_entryNumber (uses character classes to avoid backslash escaping issues)
               const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
-                .replace(/W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
-                .toLowerCase();
+                .toLowerCase()
+                .replace(/[?]/g, '')  // Remove question marks
+                .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore
+                .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
               const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+              console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Looking for trigger dropdown:', triggerDropdownId);
               const triggerDropdownEl = document.getElementById(triggerDropdownId);
+              console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] triggerDropdownEl found:', !!triggerDropdownEl);
               if (triggerDropdownEl) {
                 const selectedValue = triggerDropdownEl.value || '';
+                console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Selected value:', selectedValue, 'Expected:', pdfLogic.triggerSequenceCondition);
                 if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                  console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] MATCH! Adding PDF:', pdfLogic.pdfName);
                   matched = true;
                 } else {
+                  console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Value mismatch - NO MATCH');
                 }
               } else {
+                console.log('[TRIGGER_SEQ_PDF_DEBUG_CART] Dropdown not found - listing all selects:');
+                document.querySelectorAll('select').forEach(function(sel) { console.log('[TRIGGER_SEQ_PDF_DEBUG_CART]   ', sel.id, '=', sel.value); });
               }
             }
           }
@@ -7014,6 +7052,14 @@ function showTextboxLabels(questionId, count){
         const entryContainer = document.createElement('div');
         entryContainer.className = 'entry-container';
         entryContainer.style.cssText = 'border: 2px solid #2980b9 !important; border-radius: 12px; padding: 20px; margin: 20px auto; background-color: #f8f9ff; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.15); transition: all 0.3s ease; display: inline-block; width: auto; min-width: 450px; max-width: 100%; box-sizing: border-box;';
+        // Add entry title if configured
+        const entryTitle = (window.entryTitleMap && window.entryTitleMap[questionId]) ? window.entryTitleMap[questionId] : '';
+        if (entryTitle) {
+            const titleLabel = document.createElement('h4');
+            titleLabel.textContent = entryTitle;
+            titleLabel.style.cssText = 'margin: 0 0 15px 0; color: #2980b9; font-size: 16px; font-weight: 600; text-align: center; padding-bottom: 10px; border-bottom: 1px solid #e1e5e9;';
+            entryContainer.appendChild(titleLabel);
+        }
         // Process all fields in creation order
         for(let fieldIndex = 0; fieldIndex < allFieldsInOrder.length; fieldIndex++){
             const field = allFieldsInOrder[fieldIndex];
@@ -8854,28 +8900,48 @@ async function processAllPdfs() {
                     }
                 } else if (pdfLogic.isTriggerSequencePdf) {
                     // For trigger sequence PDFs, check if the trigger sequence condition is met for the specific entry
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] === Processing Trigger Sequence PDF (Download) ===');
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] PDF:', pdfLogic.pdfName);
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] triggerSequenceFieldName:', pdfLogic.triggerSequenceFieldName);
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] triggerSequenceCondition:', pdfLogic.triggerSequenceCondition);
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] pdfEntryNumber:', pdfLogic.pdfEntryNumber);
                     // First, check that the numbered dropdown has a value (entries exist)
                     const numberedDropdownEl = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
                                                 document.getElementById('answer' + pdfLogic.questionId);
+                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] numberedDropdownEl found:', !!numberedDropdownEl);
                     if (numberedDropdownEl && numberedDropdownEl.value) {
                         const entryCount = parseInt(numberedDropdownEl.value) || 0;
                         const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
                         // Check if target entry exists
                         if (targetEntryNumber <= entryCount) {
-                            // Find the trigger sequence dropdown for this entry
-                            // Must match the exact pattern used when creating the dropdown: field.fieldName.replace(/W+/g, '_').toLowerCase() + "_" + j
+                            // Find the trigger sequence dropdown for this entry (uses character classes to avoid backslash escaping issues)
                             const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
-                                .replace(/W+/g, '_')  // Replace all non-word characters with underscore (matches dropdown ID generation)
-                                .toLowerCase();
+                                .toLowerCase()
+                                .replace(/[?]/g, '')  // Remove question marks
+                                .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore
+                                .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
                             const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Looking for trigger dropdown:', triggerDropdownId);
                             const triggerDropdownEl = document.getElementById(triggerDropdownId);
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] triggerDropdownEl found:', !!triggerDropdownEl);
                             if (triggerDropdownEl) {
                                 const selectedValue = triggerDropdownEl.value || '';
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Selected value:', selectedValue, 'Expected:', pdfLogic.triggerSequenceCondition);
                                 if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] MATCH! PDF will be downloaded:', pdfLogic.pdfName);
                                     shouldDownload = true;
+                                } else {
+                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Value mismatch - NO MATCH');
                                 }
+                            } else {
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Dropdown not found');
                             }
+                        } else {
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] Target entry', targetEntryNumber, 'exceeds count', entryCount);
                         }
+                    } else {
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_DOWNLOAD] No numbered dropdown value - NO MATCH');
                     }
                 } else {
                         // For regular conditions, check previous question logic
@@ -9029,24 +9095,43 @@ async function getAllPdfsList() {
                             }
                         }
                     } else if (pdfLogic.isTriggerSequencePdf) {
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] === Processing Trigger Sequence PDF (Include Check) ===');
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] PDF:', pdfLogic.pdfName, 'Entry:', pdfLogic.pdfEntryNumber);
                         const numberedDropdownEl = document.getElementById(questionNameIds[pdfLogic.questionId]) || 
                                                     document.getElementById('answer' + pdfLogic.questionId);
+                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] numberedDropdownEl found:', !!numberedDropdownEl);
                         if (numberedDropdownEl && numberedDropdownEl.value) {
                             const entryCount = parseInt(numberedDropdownEl.value) || 0;
                             const targetEntryNumber = parseInt(pdfLogic.pdfEntryNumber) || 1;
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] entryCount:', entryCount, 'targetEntryNumber:', targetEntryNumber);
                             if (targetEntryNumber <= entryCount) {
+                                // Uses character classes to avoid backslash escaping issues
                                 const sanitizedFieldName = String(pdfLogic.triggerSequenceFieldName || 'dropdown')
-                                    .replace(/W+/g, '_')
-                                    .toLowerCase();
+                                    .toLowerCase()
+                                    .replace(/[?]/g, '')  // Remove question marks
+                                    .replace(/[^a-z0-9_]+/g, '_')  // Replace non-word characters with underscore
+                                    .replace(/^_+|_+$/g, '');  // Remove leading/trailing underscores
                                 const triggerDropdownId = sanitizedFieldName + '_' + targetEntryNumber;
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Looking for trigger dropdown:', triggerDropdownId);
                                 const triggerDropdownEl = document.getElementById(triggerDropdownId);
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] triggerDropdownEl found:', !!triggerDropdownEl);
                                 if (triggerDropdownEl) {
                                     const selectedValue = triggerDropdownEl.value || '';
+                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Selected value:', selectedValue, 'Expected:', pdfLogic.triggerSequenceCondition);
                                     if (selectedValue === pdfLogic.triggerSequenceCondition) {
+                                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] MATCH! Including PDF:', pdfLogic.pdfName);
                                         shouldInclude = true;
+                                    } else {
+                                        console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Value mismatch - NOT including');
                                     }
+                                } else {
+                                    console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Dropdown not found');
                                 }
+                            } else {
+                                console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] Target entry exceeds count');
                             }
+                        } else {
+                            console.log('[TRIGGER_SEQ_PDF_DEBUG_INCLUDE] No numbered dropdown value');
                         }
                     } else {
                         pdfLogic.conditions.forEach(condition => {
