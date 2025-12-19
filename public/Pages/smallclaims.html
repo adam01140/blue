@@ -2320,11 +2320,11 @@
 
         function handleStep2Answer(answer) {
             if (answer === 'yes') {
-                // Go to Step 3 (COVID?)
-                goToStep(3);
-            } else if (answer === 'no') {
-                // Show SC-120 recommendation
+                // Show SC-120 recommendation immediately (defendant's claim)
                 showFormRecommendation('sc120', 'SC-120', 'Defendant\'s Claim and ORDER to Go to Small Claims Court', 'File a counterclaim as a defendant in response to a small claims case.');
+            } else if (answer === 'no') {
+                // Go to Step 3 (COVID?) to determine which form to recommend
+                goToStep(3);
             }
         }
 
