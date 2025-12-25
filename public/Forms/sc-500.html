@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">SC-103</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">SC-100</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Please explain why you are suing at this location</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">SC-103</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">SC-500</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Please explain why you are suing at this location</h3></label><div><center><div id="checkmark" class="checkbox-group-1">
       <span class="checkbox-inline" id="checkbox-container-please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged.">
         <label class="checkbox-label">
           <input type="radio" id="please_explain_why_you_are_suing_at_this_location_where_the_plaintiff’s_property_was_damaged." name="please_explain_why_you_are_suing_at_this_location" value="Where the plaintiff’s property was damaged." 
@@ -388,246 +388,7 @@ document.addEventListener("DOMContentLoaded", function() {
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_are_you_suing_for_more_than_12500"></div>
               <input type="text" id="are_you_suing_for_more_than_12500_dropdown" name="are_you_suing_for_more_than_12500_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-24" data-question-id="24" class="question-container question-item question-step-hidden" data-section="1" data-question-index="11"><label><h3 class="question-text">List any unpaid charges other than rent that you say the tenant owes during the COVID-19 period. For each month, include how much was owed, when it was due, and what the charge was for, such as utilities or parking fees.</h3></label>
-            <div class="text-input-container">
-              <textarea id="sc100a_list_any_unpaid_charges_other_than_rent_that_you_say_the_tenant_owes_during_the_covid19_period_for_each_month_include_how_much_was_owed_when_it_was_due_and_what_the_charge_was_for_such_as_utilities_or_parking_fees" name="sc100a_list_any_unpaid_charges_other_than_rent_that_you_say_the_tenant_owes_during_the_covid19_period_for_each_month_include_how_much_was_owed_when_it_was_due_and_what_the_charge_was_for_such_as_utilities_or_parking_fees" rows="5" cols="50" placeholder="" oninput="checkParagraphLimit('sc100a_list_any_unpaid_charges_other_than_rent_that_you_say_the_tenant_owes_during_the_covid19_period_for_each_month_include_how_much_was_owed_when_it_was_due_and_what_the_charge_was_for_such_as_utilities_or_parking_fees', null);"></textarea>
-            </div>
-            <script>
-              function handleLineSplitting(textareaId, lineLimit) {
-                const textarea = document.getElementById(textareaId);
-                const text = textarea.value;
-                const totalChars = text.length;
-                // Calculate how many lines we need
-                const linesNeeded = Math.ceil(totalChars / lineLimit);
-                // Create or update hidden textboxes for each line
-                for (let i = 1; i <= linesNeeded; i++) {
-                  const startIndex = (i - 1) * lineLimit;
-                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
-                  const lineText = text.substring(startIndex, endIndex);
-                  const hiddenInputId = textareaId + '_line' + i;
-                  let hiddenInput = document.getElementById(hiddenInputId);
-                  if (!hiddenInput) {
-                    // Create new hidden input
-                    hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.id = hiddenInputId;
-                    hiddenInput.name = hiddenInputId;
-                    textarea.parentNode.appendChild(hiddenInput);
-                  }
-                  hiddenInput.value = lineText;
-                }
-                // Remove any extra hidden inputs that are no longer needed
-                let lineNum = linesNeeded + 1;
-                while (true) {
-                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
-                  if (extraInput) {
-                    extraInput.remove();
-                    lineNum++;
-                  } else {
-                    break;
-                  }
-                }
-              }
-            </script>
-          </div><div id="question-container-25" data-question-id="25" class="question-container question-item question-step-hidden" data-section="1" data-question-index="12"><label><h3 class="question-text">List any payments or credits you already received. This includes money from the tenant, rental assistance programs, or other sources that reduced what was owed between March 1, 2020, and September 30, 2021. For each one, include the amount, when it was paid or credited, and what it was for.</h3></label>
-            <div class="text-input-container">
-              <textarea id="sc100a_list_any_payments_or_credits_you_already_received_this_includes_money_from_the_tenant_rental_assistance_programs_or_other_sources_that_reduced_what_was_owed_between_march_1_2020_and_september_30_2021_for_each_one_include_the_amount_when_it_was_paid_or_credited_and_what_it_was_for" name="sc100a_list_any_payments_or_credits_you_already_received_this_includes_money_from_the_tenant_rental_assistance_programs_or_other_sources_that_reduced_what_was_owed_between_march_1_2020_and_september_30_2021_for_each_one_include_the_amount_when_it_was_paid_or_credited_and_what_it_was_for" rows="5" cols="50" placeholder="" oninput="checkParagraphLimit('sc100a_list_any_payments_or_credits_you_already_received_this_includes_money_from_the_tenant_rental_assistance_programs_or_other_sources_that_reduced_what_was_owed_between_march_1_2020_and_september_30_2021_for_each_one_include_the_amount_when_it_was_paid_or_credited_and_what_it_was_for', null);"></textarea>
-            </div>
-            <script>
-              function handleLineSplitting(textareaId, lineLimit) {
-                const textarea = document.getElementById(textareaId);
-                const text = textarea.value;
-                const totalChars = text.length;
-                // Calculate how many lines we need
-                const linesNeeded = Math.ceil(totalChars / lineLimit);
-                // Create or update hidden textboxes for each line
-                for (let i = 1; i <= linesNeeded; i++) {
-                  const startIndex = (i - 1) * lineLimit;
-                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
-                  const lineText = text.substring(startIndex, endIndex);
-                  const hiddenInputId = textareaId + '_line' + i;
-                  let hiddenInput = document.getElementById(hiddenInputId);
-                  if (!hiddenInput) {
-                    // Create new hidden input
-                    hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.id = hiddenInputId;
-                    hiddenInput.name = hiddenInputId;
-                    textarea.parentNode.appendChild(hiddenInput);
-                  }
-                  hiddenInput.value = lineText;
-                }
-                // Remove any extra hidden inputs that are no longer needed
-                let lineNum = linesNeeded + 1;
-                while (true) {
-                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
-                  if (extraInput) {
-                    extraInput.remove();
-                    lineNum++;
-                  } else {
-                    break;
-                  }
-                }
-              }
-            </script>
-          </div><div id="question-container-28" data-question-id="28" class="question-container question-item question-step-hidden" data-section="1" data-question-index="13"><label><h3 class="question-text">Before filing this case, you must show that you tried in good faith to help the tenant get rental assistance. Have you done any of these?</h3></label><div><center><div id="checkmark" class="checkbox-group-28">
-      <span class="checkbox-inline" id="checkbox-container-sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_checked_whether_the_tenant_qualified_for_a_government_rental_assistance_program">
-        <label class="checkbox-label">
-          <input type="checkbox" id="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_checked_whether_the_tenant_qualified_for_a_government_rental_assistance_program" name="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_checked_whether_the_tenant_qualified_for_a_government_rental_assistance_program" value="I checked whether the tenant qualified for a government rental assistance program" 
-                 onchange="toggleNoneOption(this, 28); updateCheckboxStyle(this);">
-          I checked whether the tenant qualified for a government rental assistance program
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_worked_with_the_tenant_to_help_them_apply_for_rental_assistance_from_a_government_program_or_another_organization">
-        <label class="checkbox-label">
-          <input type="checkbox" id="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_worked_with_the_tenant_to_help_them_apply_for_rental_assistance_from_a_government_program_or_another_organization" name="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_worked_with_the_tenant_to_help_them_apply_for_rental_assistance_from_a_government_program_or_another_organization" value="I worked with the tenant to help them apply for rental assistance from a government program or another organization" 
-                 onchange="toggleNoneOption(this, 28); updateCheckboxStyle(this);">
-          I worked with the tenant to help them apply for rental assistance from a government program or another organization
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_helped_the_tenant_apply_for_government_rental_assistance">
-        <label class="checkbox-label">
-          <input type="checkbox" id="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_helped_the_tenant_apply_for_government_rental_assistance" name="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_helped_the_tenant_apply_for_government_rental_assistance" value="I helped the tenant apply for government rental assistance" 
-                 onchange="toggleNoneOption(this, 28); updateCheckboxStyle(this);">
-          I helped the tenant apply for government rental assistance
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_helped_the_tenant_in_a_way_that_is_not_listed_here">
-        <label class="checkbox-label">
-          <input type="checkbox" id="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_helped_the_tenant_in_a_way_that_is_not_listed_here" name="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_helped_the_tenant_in_a_way_that_is_not_listed_here" value="I helped the tenant in a way that is not listed here" 
-                 onchange="toggleNoneOption(this, 28); updateCheckboxStyle(this);">
-          I helped the tenant in a way that is not listed here
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_did_not_make_an_effort_to_help_the_tenant">
-        <label class="checkbox-label">
-          <input type="checkbox" id="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_did_not_make_an_effort_to_help_the_tenant" name="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_did_not_make_an_effort_to_help_the_tenant" value="I did not make an effort to help the tenant" 
-                 onchange="toggleNoneOption(this, 28); updateCheckboxStyle(this);">
-          I did not make an effort to help the tenant
-        </label>
-      </span></div><br></div></div><div id="question-container-29" data-question-id="29" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="14"><label><h3 class="question-text">Do you have any documentation showing these efforts?</h3></label><select id="sc100a_do_you_have_any_documentation_showing_these_efforts" name="sc100a_do_you_have_any_documentation_showing_these_efforts"
-                      onchange="dropdownMirror(this, 'sc100a_do_you_have_any_documentation_showing_these_efforts'); updateHiddenLogic('sc100a_do_you_have_any_documentation_showing_these_efforts', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_sc100a_do_you_have_any_documentation_showing_these_efforts"></div>
-              <input type="text" id="sc100a_do_you_have_any_documentation_showing_these_efforts_dropdown" name="sc100a_do_you_have_any_documentation_showing_these_efforts_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-30" data-question-id="30" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="15"><label><h3 class="question-text">Please attach your documentation (this is a placeholder for now until i implement the file upload function)</h3></label>
-            <div class="text-input-container">
-              <textarea id="sc100a_please_attach_your_documentation_this_is_a_placeholder_for_now_until_i_implement_the_file_upload_function" name="sc100a_please_attach_your_documentation_this_is_a_placeholder_for_now_until_i_implement_the_file_upload_function" rows="5" cols="50" placeholder="" oninput="checkParagraphLimit('sc100a_please_attach_your_documentation_this_is_a_placeholder_for_now_until_i_implement_the_file_upload_function', null);"></textarea>
-            </div>
-            <script>
-              function handleLineSplitting(textareaId, lineLimit) {
-                const textarea = document.getElementById(textareaId);
-                const text = textarea.value;
-                const totalChars = text.length;
-                // Calculate how many lines we need
-                const linesNeeded = Math.ceil(totalChars / lineLimit);
-                // Create or update hidden textboxes for each line
-                for (let i = 1; i <= linesNeeded; i++) {
-                  const startIndex = (i - 1) * lineLimit;
-                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
-                  const lineText = text.substring(startIndex, endIndex);
-                  const hiddenInputId = textareaId + '_line' + i;
-                  let hiddenInput = document.getElementById(hiddenInputId);
-                  if (!hiddenInput) {
-                    // Create new hidden input
-                    hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.id = hiddenInputId;
-                    hiddenInput.name = hiddenInputId;
-                    textarea.parentNode.appendChild(hiddenInput);
-                  }
-                  hiddenInput.value = lineText;
-                }
-                // Remove any extra hidden inputs that are no longer needed
-                let lineNum = linesNeeded + 1;
-                while (true) {
-                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
-                  if (extraInput) {
-                    extraInput.remove();
-                    lineNum++;
-                  } else {
-                    break;
-                  }
-                }
-              }
-            </script>
-          </div><div id="question-container-31" data-question-id="31" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="16"><label><h3 class="question-text">Please explain your efforts</h3></label>
-            <div class="text-input-container">
-              <textarea id="sc100a_please_explain_your_efforts" name="sc100a_please_explain_your_efforts" rows="5" cols="50" placeholder="" oninput="checkParagraphLimit('sc100a_please_explain_your_efforts', null);"></textarea>
-            </div>
-            <script>
-              function handleLineSplitting(textareaId, lineLimit) {
-                const textarea = document.getElementById(textareaId);
-                const text = textarea.value;
-                const totalChars = text.length;
-                // Calculate how many lines we need
-                const linesNeeded = Math.ceil(totalChars / lineLimit);
-                // Create or update hidden textboxes for each line
-                for (let i = 1; i <= linesNeeded; i++) {
-                  const startIndex = (i - 1) * lineLimit;
-                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
-                  const lineText = text.substring(startIndex, endIndex);
-                  const hiddenInputId = textareaId + '_line' + i;
-                  let hiddenInput = document.getElementById(hiddenInputId);
-                  if (!hiddenInput) {
-                    // Create new hidden input
-                    hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.id = hiddenInputId;
-                    hiddenInput.name = hiddenInputId;
-                    textarea.parentNode.appendChild(hiddenInput);
-                  }
-                  hiddenInput.value = lineText;
-                }
-                // Remove any extra hidden inputs that are no longer needed
-                let lineNum = linesNeeded + 1;
-                while (true) {
-                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
-                  if (extraInput) {
-                    extraInput.remove();
-                    lineNum++;
-                  } else {
-                    break;
-                  }
-                }
-              }
-            </script>
-          </div><div id="question-container-32" data-question-id="32" class="question-container question-item question-step-hidden" data-section="1" data-question-index="17"><label><h3 class="question-text">Please acknowledge that the following is true:</h3></label><div><center><div id="checkmark" class="checkbox-group-32">
-      <span class="checkbox-inline" id="checkbox-container-sc100a_please_acknowledge_that_the_following_is_true_i_state_that_everything_on_this_form_and_any_attachments_is_true_and_correct_to_the_best_of_my_knowledge,_under_penalty_of_perjury.">
-        <label class="checkbox-label">
-          <input type="checkbox" id="sc100a_please_acknowledge_that_the_following_is_true_i_state_that_everything_on_this_form_and_any_attachments_is_true_and_correct_to_the_best_of_my_knowledge,_under_penalty_of_perjury." name="sc100a_please_acknowledge_that_the_following_is_true_i_state_that_everything_on_this_form_and_any_attachments_is_true_and_correct_to_the_best_of_my_knowledge,_under_penalty_of_perjury." value="I state that everything on this form and any attachments is true and correct to the best of my knowledge, under penalty of perjury." 
-                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
-          I state that everything on this form and any attachments is true and correct to the best of my knowledge, under penalty of perjury.
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-sc100a_please_acknowledge_that_the_following_is_true_i_understand_the_court_cannot_rule_in_my_favor_if_i_already_received_rental_assistance_for_the_money_i_am_asking_for.">
-        <label class="checkbox-label">
-          <input type="checkbox" id="sc100a_please_acknowledge_that_the_following_is_true_i_understand_the_court_cannot_rule_in_my_favor_if_i_already_received_rental_assistance_for_the_money_i_am_asking_for." name="sc100a_please_acknowledge_that_the_following_is_true_i_understand_the_court_cannot_rule_in_my_favor_if_i_already_received_rental_assistance_for_the_money_i_am_asking_for." value="I understand the court cannot rule in my favor if I already received rental assistance for the money I am asking for." 
-                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
-          I understand the court cannot rule in my favor if I already received rental assistance for the money I am asking for.
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-sc100a_please_acknowledge_that_the_following_is_true_i_have_not_received_rental_assistance_or_other_payments_from_any_source_for_the_amounts_i_am_claiming.">
-        <label class="checkbox-label">
-          <input type="checkbox" id="sc100a_please_acknowledge_that_the_following_is_true_i_have_not_received_rental_assistance_or_other_payments_from_any_source_for_the_amounts_i_am_claiming." name="sc100a_please_acknowledge_that_the_following_is_true_i_have_not_received_rental_assistance_or_other_payments_from_any_source_for_the_amounts_i_am_claiming." value="I have not received rental assistance or other payments from any source for the amounts I am claiming." 
-                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
-          I have not received rental assistance or other payments from any source for the amounts I am claiming.
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-sc100a_please_acknowledge_that_the_following_is_true_i_do_not_have_any_pending_applications_for_rental_assistance_or_other_payments_for_the_amounts_i_am_claiming.">
-        <label class="checkbox-label">
-          <input type="checkbox" id="sc100a_please_acknowledge_that_the_following_is_true_i_do_not_have_any_pending_applications_for_rental_assistance_or_other_payments_for_the_amounts_i_am_claiming." name="sc100a_please_acknowledge_that_the_following_is_true_i_do_not_have_any_pending_applications_for_rental_assistance_or_other_payments_for_the_amounts_i_am_claiming." value="I do not have any pending applications for rental assistance or other payments for the amounts I am claiming." 
-                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
-          I do not have any pending applications for rental assistance or other payments for the amounts I am claiming.
-        </label>
-      </span>
-      <span class="checkbox-inline" id="checkbox-container-sc100a_please_acknowledge_that_the_following_is_true_i_understand_that_if_i_file_this_case_in_small_claims_court,_i_cannot_appeal_the_decision.">
-        <label class="checkbox-label">
-          <input type="checkbox" id="sc100a_please_acknowledge_that_the_following_is_true_i_understand_that_if_i_file_this_case_in_small_claims_court,_i_cannot_appeal_the_decision." name="sc100a_please_acknowledge_that_the_following_is_true_i_understand_that_if_i_file_this_case_in_small_claims_court,_i_cannot_appeal_the_decision." value="I understand that if I file this case in small claims court, I cannot appeal the decision." 
-                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
-          I understand that if I file this case in small claims court, I cannot appeal the decision.
-        </label>
-      </span></div><br></div></div>
+                   readonly style="display:none;"></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
@@ -884,7 +645,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="2">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="2">&rarr;</button>
       </div>
-    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section3" class="section"><center><h1 class="section-title">SC-100</h1><div id="question-container-18" data-question-id="18" class="question-container question-item" data-section="3" data-question-index="1"><label><h3 class="question-text">Are you suing by yourself?</h3></label><select id="sc100_are_you_suing_by_yourself" name="sc100_are_you_suing_by_yourself"
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section3" class="section"><center><h1 class="section-title">SC-500</h1><div id="question-container-18" data-question-id="18" class="question-container question-item" data-section="3" data-question-index="1"><label><h3 class="question-text">Are you suing by yourself?</h3></label><select id="sc100_are_you_suing_by_yourself" name="sc100_are_you_suing_by_yourself"
                       onchange="dropdownMirror(this, 'sc100_are_you_suing_by_yourself'); updateHiddenLogic('sc100_are_you_suing_by_yourself', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="No">No</option><option value="Yes">Yes</option></select><br>
               <div id="dropdowntext_sc100_are_you_suing_by_yourself"></div>
@@ -951,7 +712,89 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
               }
             </script>
-          </div><div id="question-container-26" data-question-id="26" class="question-container question-item question-step-hidden" data-section="3" data-question-index="7"><label><h3 class="question-text">Have you sent a demand letter to the defendant?</h3></label><select id="sc100a_have_you_sent_a_demand_letter_to_the_defendant" name="sc100a_have_you_sent_a_demand_letter_to_the_defendant"
+          </div><div id="question-container-24" data-question-id="24" class="question-container question-item question-step-hidden" data-section="3" data-question-index="7"><label><h3 class="question-text">List any unpaid charges other than rent that you say the tenant owes during the COVID-19 period. For each month, include how much was owed, when it was due, and what the charge was for, such as utilities or parking fees.</h3></label>
+            <div class="text-input-container">
+              <textarea id="sc100a_list_any_unpaid_charges_other_than_rent_that_you_say_the_tenant_owes_during_the_covid19_period_for_each_month_include_how_much_was_owed_when_it_was_due_and_what_the_charge_was_for_such_as_utilities_or_parking_fees" name="sc100a_list_any_unpaid_charges_other_than_rent_that_you_say_the_tenant_owes_during_the_covid19_period_for_each_month_include_how_much_was_owed_when_it_was_due_and_what_the_charge_was_for_such_as_utilities_or_parking_fees" rows="5" cols="50" placeholder="" oninput="checkParagraphLimit('sc100a_list_any_unpaid_charges_other_than_rent_that_you_say_the_tenant_owes_during_the_covid19_period_for_each_month_include_how_much_was_owed_when_it_was_due_and_what_the_charge_was_for_such_as_utilities_or_parking_fees', null);"></textarea>
+            </div>
+            <script>
+              function handleLineSplitting(textareaId, lineLimit) {
+                const textarea = document.getElementById(textareaId);
+                const text = textarea.value;
+                const totalChars = text.length;
+                // Calculate how many lines we need
+                const linesNeeded = Math.ceil(totalChars / lineLimit);
+                // Create or update hidden textboxes for each line
+                for (let i = 1; i <= linesNeeded; i++) {
+                  const startIndex = (i - 1) * lineLimit;
+                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                  const lineText = text.substring(startIndex, endIndex);
+                  const hiddenInputId = textareaId + '_line' + i;
+                  let hiddenInput = document.getElementById(hiddenInputId);
+                  if (!hiddenInput) {
+                    // Create new hidden input
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = hiddenInputId;
+                    hiddenInput.name = hiddenInputId;
+                    textarea.parentNode.appendChild(hiddenInput);
+                  }
+                  hiddenInput.value = lineText;
+                }
+                // Remove any extra hidden inputs that are no longer needed
+                let lineNum = linesNeeded + 1;
+                while (true) {
+                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
+                  if (extraInput) {
+                    extraInput.remove();
+                    lineNum++;
+                  } else {
+                    break;
+                  }
+                }
+              }
+            </script>
+          </div><div id="question-container-25" data-question-id="25" class="question-container question-item question-step-hidden" data-section="3" data-question-index="8"><label><h3 class="question-text">List any payments or credits you already received. This includes money from the tenant, rental assistance programs, or other sources that reduced what was owed between March 1, 2020, and September 30, 2021. For each one, include the amount, when it was paid or credited, and what it was for.</h3></label>
+            <div class="text-input-container">
+              <textarea id="sc100a_list_any_payments_or_credits_you_already_received_this_includes_money_from_the_tenant_rental_assistance_programs_or_other_sources_that_reduced_what_was_owed_between_march_1_2020_and_september_30_2021_for_each_one_include_the_amount_when_it_was_paid_or_credited_and_what_it_was_for" name="sc100a_list_any_payments_or_credits_you_already_received_this_includes_money_from_the_tenant_rental_assistance_programs_or_other_sources_that_reduced_what_was_owed_between_march_1_2020_and_september_30_2021_for_each_one_include_the_amount_when_it_was_paid_or_credited_and_what_it_was_for" rows="5" cols="50" placeholder="" oninput="checkParagraphLimit('sc100a_list_any_payments_or_credits_you_already_received_this_includes_money_from_the_tenant_rental_assistance_programs_or_other_sources_that_reduced_what_was_owed_between_march_1_2020_and_september_30_2021_for_each_one_include_the_amount_when_it_was_paid_or_credited_and_what_it_was_for', null);"></textarea>
+            </div>
+            <script>
+              function handleLineSplitting(textareaId, lineLimit) {
+                const textarea = document.getElementById(textareaId);
+                const text = textarea.value;
+                const totalChars = text.length;
+                // Calculate how many lines we need
+                const linesNeeded = Math.ceil(totalChars / lineLimit);
+                // Create or update hidden textboxes for each line
+                for (let i = 1; i <= linesNeeded; i++) {
+                  const startIndex = (i - 1) * lineLimit;
+                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                  const lineText = text.substring(startIndex, endIndex);
+                  const hiddenInputId = textareaId + '_line' + i;
+                  let hiddenInput = document.getElementById(hiddenInputId);
+                  if (!hiddenInput) {
+                    // Create new hidden input
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = hiddenInputId;
+                    hiddenInput.name = hiddenInputId;
+                    textarea.parentNode.appendChild(hiddenInput);
+                  }
+                  hiddenInput.value = lineText;
+                }
+                // Remove any extra hidden inputs that are no longer needed
+                let lineNum = linesNeeded + 1;
+                while (true) {
+                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
+                  if (extraInput) {
+                    extraInput.remove();
+                    lineNum++;
+                  } else {
+                    break;
+                  }
+                }
+              }
+            </script>
+          </div><div id="question-container-26" data-question-id="26" class="question-container question-item question-step-hidden" data-section="3" data-question-index="9"><label><h3 class="question-text">Have you sent a demand letter to the defendant?</h3></label><select id="sc100a_have_you_sent_a_demand_letter_to_the_defendant" name="sc100a_have_you_sent_a_demand_letter_to_the_defendant"
                       onchange="dropdownMirror(this, 'sc100a_have_you_sent_a_demand_letter_to_the_defendant'); updateHiddenLogic('sc100a_have_you_sent_a_demand_letter_to_the_defendant', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handlePdfPreview26(this.value)">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_sc100a_have_you_sent_a_demand_letter_to_the_defendant"></div>
@@ -1033,7 +876,7 @@ document.addEventListener("DOMContentLoaded", function() {
                   }
                 }
               </script>
-            </div><div id="question-container-27" data-question-id="27" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="8"><label><h3 class="question-text">Explain why you have not sent a demand letter yet</h3></label>
+            </div><div id="question-container-27" data-question-id="27" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="10"><label><h3 class="question-text">Explain why you have not sent a demand letter yet</h3></label>
             <div class="text-input-container">
               <textarea id="sc100a_explain_why_you_have_not_sent_a_demand_letter_yet" name="sc100a_explain_why_you_have_not_sent_a_demand_letter_yet" rows="5" cols="50" placeholder="" data-line-limit="100" oninput="handleLineSplitting('sc100a_explain_why_you_have_not_sent_a_demand_letter_yet', 100); checkParagraphLimit('sc100a_explain_why_you_have_not_sent_a_demand_letter_yet', null);"></textarea>
             </div>
@@ -1074,7 +917,164 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
               }
             </script>
-          </div>
+          </div><div id="question-container-28" data-question-id="28" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="11"><label><h3 class="question-text">Before filing this case, you must show that you tried in good faith to help the tenant get rental assistance. Have you done any of these?</h3></label><div><center><div id="checkmark" class="checkbox-group-28">
+      <span class="checkbox-inline" id="checkbox-container-sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_checked_whether_the_tenant_qualified_for_a_government_rental_assistance_program">
+        <label class="checkbox-label">
+          <input type="checkbox" id="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_checked_whether_the_tenant_qualified_for_a_government_rental_assistance_program" name="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_checked_whether_the_tenant_qualified_for_a_government_rental_assistance_program" value="I checked whether the tenant qualified for a government rental assistance program" 
+                 onchange="toggleNoneOption(this, 28); updateCheckboxStyle(this);">
+          I checked whether the tenant qualified for a government rental assistance program
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_worked_with_the_tenant_to_help_them_apply_for_rental_assistance_from_a_government_program_or_another_organization">
+        <label class="checkbox-label">
+          <input type="checkbox" id="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_worked_with_the_tenant_to_help_them_apply_for_rental_assistance_from_a_government_program_or_another_organization" name="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_worked_with_the_tenant_to_help_them_apply_for_rental_assistance_from_a_government_program_or_another_organization" value="I worked with the tenant to help them apply for rental assistance from a government program or another organization" 
+                 onchange="toggleNoneOption(this, 28); updateCheckboxStyle(this);">
+          I worked with the tenant to help them apply for rental assistance from a government program or another organization
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_helped_the_tenant_apply_for_government_rental_assistance">
+        <label class="checkbox-label">
+          <input type="checkbox" id="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_helped_the_tenant_apply_for_government_rental_assistance" name="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_helped_the_tenant_apply_for_government_rental_assistance" value="I helped the tenant apply for government rental assistance" 
+                 onchange="toggleNoneOption(this, 28); updateCheckboxStyle(this);">
+          I helped the tenant apply for government rental assistance
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_helped_the_tenant_in_a_way_that_is_not_listed_here">
+        <label class="checkbox-label">
+          <input type="checkbox" id="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_helped_the_tenant_in_a_way_that_is_not_listed_here" name="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_helped_the_tenant_in_a_way_that_is_not_listed_here" value="I helped the tenant in a way that is not listed here" 
+                 onchange="toggleNoneOption(this, 28); updateCheckboxStyle(this);">
+          I helped the tenant in a way that is not listed here
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_did_not_make_an_effort_to_help_the_tenant">
+        <label class="checkbox-label">
+          <input type="checkbox" id="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_did_not_make_an_effort_to_help_the_tenant" name="sc100a_before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these_i_did_not_make_an_effort_to_help_the_tenant" value="I did not make an effort to help the tenant" 
+                 onchange="toggleNoneOption(this, 28); updateCheckboxStyle(this);">
+          I did not make an effort to help the tenant
+        </label>
+      </span></div><br></div></div><div id="question-container-29" data-question-id="29" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="12"><label><h3 class="question-text">Do you have any documentation showing these efforts?</h3></label><select id="sc100a_do_you_have_any_documentation_showing_these_efforts" name="sc100a_do_you_have_any_documentation_showing_these_efforts"
+                      onchange="dropdownMirror(this, 'sc100a_do_you_have_any_documentation_showing_these_efforts'); updateHiddenLogic('sc100a_do_you_have_any_documentation_showing_these_efforts', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_sc100a_do_you_have_any_documentation_showing_these_efforts"></div>
+              <input type="text" id="sc100a_do_you_have_any_documentation_showing_these_efforts_dropdown" name="sc100a_do_you_have_any_documentation_showing_these_efforts_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-30" data-question-id="30" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="13"><label><h3 class="question-text">Please attach your documentation (this is a placeholder for now until i implement the file upload function)</h3></label>
+            <div class="text-input-container">
+              <textarea id="sc100a_please_attach_your_documentation_this_is_a_placeholder_for_now_until_i_implement_the_file_upload_function" name="sc100a_please_attach_your_documentation_this_is_a_placeholder_for_now_until_i_implement_the_file_upload_function" rows="5" cols="50" placeholder="" oninput="checkParagraphLimit('sc100a_please_attach_your_documentation_this_is_a_placeholder_for_now_until_i_implement_the_file_upload_function', null);"></textarea>
+            </div>
+            <script>
+              function handleLineSplitting(textareaId, lineLimit) {
+                const textarea = document.getElementById(textareaId);
+                const text = textarea.value;
+                const totalChars = text.length;
+                // Calculate how many lines we need
+                const linesNeeded = Math.ceil(totalChars / lineLimit);
+                // Create or update hidden textboxes for each line
+                for (let i = 1; i <= linesNeeded; i++) {
+                  const startIndex = (i - 1) * lineLimit;
+                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                  const lineText = text.substring(startIndex, endIndex);
+                  const hiddenInputId = textareaId + '_line' + i;
+                  let hiddenInput = document.getElementById(hiddenInputId);
+                  if (!hiddenInput) {
+                    // Create new hidden input
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = hiddenInputId;
+                    hiddenInput.name = hiddenInputId;
+                    textarea.parentNode.appendChild(hiddenInput);
+                  }
+                  hiddenInput.value = lineText;
+                }
+                // Remove any extra hidden inputs that are no longer needed
+                let lineNum = linesNeeded + 1;
+                while (true) {
+                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
+                  if (extraInput) {
+                    extraInput.remove();
+                    lineNum++;
+                  } else {
+                    break;
+                  }
+                }
+              }
+            </script>
+          </div><div id="question-container-31" data-question-id="31" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="14"><label><h3 class="question-text">Please explain your efforts</h3></label>
+            <div class="text-input-container">
+              <textarea id="sc100a_please_explain_your_efforts" name="sc100a_please_explain_your_efforts" rows="5" cols="50" placeholder="" oninput="checkParagraphLimit('sc100a_please_explain_your_efforts', null);"></textarea>
+            </div>
+            <script>
+              function handleLineSplitting(textareaId, lineLimit) {
+                const textarea = document.getElementById(textareaId);
+                const text = textarea.value;
+                const totalChars = text.length;
+                // Calculate how many lines we need
+                const linesNeeded = Math.ceil(totalChars / lineLimit);
+                // Create or update hidden textboxes for each line
+                for (let i = 1; i <= linesNeeded; i++) {
+                  const startIndex = (i - 1) * lineLimit;
+                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
+                  const lineText = text.substring(startIndex, endIndex);
+                  const hiddenInputId = textareaId + '_line' + i;
+                  let hiddenInput = document.getElementById(hiddenInputId);
+                  if (!hiddenInput) {
+                    // Create new hidden input
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = hiddenInputId;
+                    hiddenInput.name = hiddenInputId;
+                    textarea.parentNode.appendChild(hiddenInput);
+                  }
+                  hiddenInput.value = lineText;
+                }
+                // Remove any extra hidden inputs that are no longer needed
+                let lineNum = linesNeeded + 1;
+                while (true) {
+                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
+                  if (extraInput) {
+                    extraInput.remove();
+                    lineNum++;
+                  } else {
+                    break;
+                  }
+                }
+              }
+            </script>
+          </div><div id="question-container-32" data-question-id="32" class="question-container question-item question-step-hidden" data-section="3" data-question-index="15"><label><h3 class="question-text">Please acknowledge that the following is true:</h3></label><div><center><div id="checkmark" class="checkbox-group-32">
+      <span class="checkbox-inline" id="checkbox-container-sc100a_please_acknowledge_that_the_following_is_true_i_state_that_everything_on_this_form_and_any_attachments_is_true_and_correct_to_the_best_of_my_knowledge,_under_penalty_of_perjury.">
+        <label class="checkbox-label">
+          <input type="checkbox" id="sc100a_please_acknowledge_that_the_following_is_true_i_state_that_everything_on_this_form_and_any_attachments_is_true_and_correct_to_the_best_of_my_knowledge,_under_penalty_of_perjury." name="sc100a_please_acknowledge_that_the_following_is_true_i_state_that_everything_on_this_form_and_any_attachments_is_true_and_correct_to_the_best_of_my_knowledge,_under_penalty_of_perjury." value="I state that everything on this form and any attachments is true and correct to the best of my knowledge, under penalty of perjury." 
+                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
+          I state that everything on this form and any attachments is true and correct to the best of my knowledge, under penalty of perjury.
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-sc100a_please_acknowledge_that_the_following_is_true_i_understand_the_court_cannot_rule_in_my_favor_if_i_already_received_rental_assistance_for_the_money_i_am_asking_for.">
+        <label class="checkbox-label">
+          <input type="checkbox" id="sc100a_please_acknowledge_that_the_following_is_true_i_understand_the_court_cannot_rule_in_my_favor_if_i_already_received_rental_assistance_for_the_money_i_am_asking_for." name="sc100a_please_acknowledge_that_the_following_is_true_i_understand_the_court_cannot_rule_in_my_favor_if_i_already_received_rental_assistance_for_the_money_i_am_asking_for." value="I understand the court cannot rule in my favor if I already received rental assistance for the money I am asking for." 
+                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
+          I understand the court cannot rule in my favor if I already received rental assistance for the money I am asking for.
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-sc100a_please_acknowledge_that_the_following_is_true_i_have_not_received_rental_assistance_or_other_payments_from_any_source_for_the_amounts_i_am_claiming.">
+        <label class="checkbox-label">
+          <input type="checkbox" id="sc100a_please_acknowledge_that_the_following_is_true_i_have_not_received_rental_assistance_or_other_payments_from_any_source_for_the_amounts_i_am_claiming." name="sc100a_please_acknowledge_that_the_following_is_true_i_have_not_received_rental_assistance_or_other_payments_from_any_source_for_the_amounts_i_am_claiming." value="I have not received rental assistance or other payments from any source for the amounts I am claiming." 
+                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
+          I have not received rental assistance or other payments from any source for the amounts I am claiming.
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-sc100a_please_acknowledge_that_the_following_is_true_i_do_not_have_any_pending_applications_for_rental_assistance_or_other_payments_for_the_amounts_i_am_claiming.">
+        <label class="checkbox-label">
+          <input type="checkbox" id="sc100a_please_acknowledge_that_the_following_is_true_i_do_not_have_any_pending_applications_for_rental_assistance_or_other_payments_for_the_amounts_i_am_claiming." name="sc100a_please_acknowledge_that_the_following_is_true_i_do_not_have_any_pending_applications_for_rental_assistance_or_other_payments_for_the_amounts_i_am_claiming." value="I do not have any pending applications for rental assistance or other payments for the amounts I am claiming." 
+                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
+          I do not have any pending applications for rental assistance or other payments for the amounts I am claiming.
+        </label>
+      </span>
+      <span class="checkbox-inline" id="checkbox-container-sc100a_please_acknowledge_that_the_following_is_true_i_understand_that_if_i_file_this_case_in_small_claims_court,_i_cannot_appeal_the_decision.">
+        <label class="checkbox-label">
+          <input type="checkbox" id="sc100a_please_acknowledge_that_the_following_is_true_i_understand_that_if_i_file_this_case_in_small_claims_court,_i_cannot_appeal_the_decision." name="sc100a_please_acknowledge_that_the_following_is_true_i_understand_that_if_i_file_this_case_in_small_claims_court,_i_cannot_appeal_the_decision." value="I understand that if I file this case in small claims court, I cannot appeal the decision." 
+                 onchange="toggleNoneOption(this, 32); updateCheckboxStyle(this);">
+          I understand that if I file this case in small claims court, I cannot appeal the decision.
+        </label>
+      </span></div><br></div></div>
       <div class="question-nav" data-section-index="3">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="3">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="3">&rarr;</button>
@@ -3568,11 +3568,11 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [{"questionId":"7","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"8","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"10","questionType":"dropdown","jumpOption":"No","jumpTo":"3","section":1},{"questionId":"25","questionType":"bigParagraph","jumpOption":"Any Text","jumpTo":"3","section":1},{"questionId":"28","questionType":"checkbox","jumpOption":"I did not make an effort to help the tenant","jumpTo":"end","section":1},{"questionId":"32","questionType":"checkbox","jumpOption":"I do not have any pending applications for rental assistance or other payments for the amounts I am claiming.","jumpTo":"end","section":1},{"questionId":"32","questionType":"checkbox","jumpOption":"I understand the court cannot rule in my favor if I already received rental assistance for the money I am asking for.","jumpTo":"end","section":1},{"questionId":"32","questionType":"checkbox","jumpOption":"I have not received rental assistance or other payments from any source for the amounts I am claiming.","jumpTo":"end","section":1},{"questionId":"32","questionType":"checkbox","jumpOption":"I understand that if I file this case in small claims court, I cannot appeal the decision.","jumpTo":"end","section":1},{"questionId":"32","questionType":"checkbox","jumpOption":"I state that everything on this form and any attachments is true and correct to the best of my knowledge, under penalty of perjury.","jumpTo":"end","section":1},{"questionId":"17","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":2},{"questionId":"23","questionType":"bigParagraph","jumpOption":"Any Text","jumpTo":"1","section":3},{"questionId":"26","questionType":"dropdown","jumpOption":"Yes","jumpTo":"1","section":3},{"questionId":"27","questionType":"bigParagraph","jumpOption":"Any Text","jumpTo":"1","section":3}];
+    var jumpLogics = [{"questionId":"7","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"8","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"10","questionType":"dropdown","jumpOption":"No","jumpTo":"3","section":1},{"questionId":"17","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":2},{"questionId":"28","questionType":"checkbox","jumpOption":"I did not make an effort to help the tenant","jumpTo":"end","section":3},{"questionId":"32","questionType":"checkbox","jumpOption":"I do not have any pending applications for rental assistance or other payments for the amounts I am claiming.","jumpTo":"end","section":3},{"questionId":"32","questionType":"checkbox","jumpOption":"I understand the court cannot rule in my favor if I already received rental assistance for the money I am asking for.","jumpTo":"end","section":3},{"questionId":"32","questionType":"checkbox","jumpOption":"I have not received rental assistance or other payments from any source for the amounts I am claiming.","jumpTo":"end","section":3},{"questionId":"32","questionType":"checkbox","jumpOption":"I understand that if I file this case in small claims court, I cannot appeal the decision.","jumpTo":"end","section":3},{"questionId":"32","questionType":"checkbox","jumpOption":"I state that everything on this form and any attachments is true and correct to the best of my knowledge, under penalty of perjury.","jumpTo":"end","section":3}];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [{"questionId":"9","pdfName":"sc103.pdf","pdfDisplayName":"SC-103","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"9","prevAnswer":"Yes"}],"isBigParagraph":false},{"questionId":"10","pdfName":"sc100.pdf","pdfDisplayName":"SC-100","stripePriceId":"price_1SB7CbFJeSRMFQ8X2afGFckf","triggerOption":"","conditions":[{"prevQuestion":"10","prevAnswer":"No"}],"isBigParagraph":false},{"questionId":"17","pdfName":"sc100.pdf","pdfDisplayName":"SC-100","stripePriceId":"price_1SB7CbFJeSRMFQ8X2afGFckf","triggerOption":"","conditions":[{"prevQuestion":"17","prevAnswer":"No"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc103(1).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 1","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"19","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"1"},{"questionId":"19","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"19","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"19","pdfName":"sc103(3).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 3","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"19","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"3"},{"questionId":"19","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"19","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"},{"questionId":"19","pdfName":"sc103(5).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 5","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"19","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this plaintiff a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"5"},{"questionId":"19","pdfName":"sc500a.pdf","pdfDisplayName":"SC-500A","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","triggerOption":"2","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc500a.pdf","pdfDisplayName":"SC-500A","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","triggerOption":"4","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc500a(2).pdf","pdfDisplayName":"SC-500A (2)","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","triggerOption":"4","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc500a.pdf","pdfDisplayName":"SC-500A","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","triggerOption":"3","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"19","pdfName":"sc500a(2).pdf","pdfDisplayName":"SC-500A (2)","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","triggerOption":"5","conditions":[{"prevQuestion":"19","prevAnswer":"2"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"4"},{"prevQuestion":"19","prevAnswer":"3"},{"prevQuestion":"19","prevAnswer":"5"}],"isBigParagraph":false},{"questionId":"20","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"20","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"20","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"20","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"},{"questionId":"20","pdfName":"sc500a.pdf","pdfDisplayName":"SC-100A","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","triggerOption":"3","conditions":[{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"2"}],"isBigParagraph":false},{"questionId":"20","pdfName":"sc500a(2).pdf","pdfDisplayName":"SC-500A (2)","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","triggerOption":"3","conditions":[{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"2"}],"isBigParagraph":false},{"questionId":"20","pdfName":"sc500a.pdf","pdfDisplayName":"SC-100A","stripePriceId":"price_1SB7DUFJeSRMFQ8X5tzen50D","triggerOption":"2","conditions":[{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"3"},{"prevQuestion":"20","prevAnswer":"2"}],"isBigParagraph":false}];
 var checkboxPdfEntries = [];
-var alertLogics = [{"questionId":"7","message":"Sorry youre just not eligible","conditions":[{"prevQuestion":"7","prevAnswer":"Yes"}]},{"questionId":"8","message":"We cant take you on sorry","conditions":[{"prevQuestion":"8","prevAnswer":"Yes"}]},{"questionId":"10","message":"Sorry you cant sue for that much","conditions":[{"prevQuestion":"10","prevAnswer":"Yes"}]},{"questionId":"28","message":"You are required to make a good faith effort to help the tenant, otherwise your case is not valid","conditions":[{"prevQuestion":"28","prevAnswer":"I did not make an effort to help the tenant"}]},{"questionId":"17","message":"Sorry you cant sue for that much","conditions":[{"prevQuestion":"17","prevAnswer":"Yes"}]}];
+var alertLogics = [{"questionId":"7","message":"Sorry youre just not eligible","conditions":[{"prevQuestion":"7","prevAnswer":"Yes"}]},{"questionId":"8","message":"We cant take you on sorry","conditions":[{"prevQuestion":"8","prevAnswer":"Yes"}]},{"questionId":"10","message":"Sorry you cant sue for that much","conditions":[{"prevQuestion":"10","prevAnswer":"Yes"}]},{"questionId":"17","message":"Sorry you cant sue for that much","conditions":[{"prevQuestion":"17","prevAnswer":"Yes"}]},{"questionId":"28","message":"You are required to make a good faith effort to help the tenant, otherwise your case is not valid","conditions":[{"prevQuestion":"28","prevAnswer":"I did not make an effort to help the tenant"}]}];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
@@ -4713,334 +4713,6 @@ checkboxRequiredMap[1] = true;
  })();
  updateVisibility();
 })();
-checkboxRequiredMap[28] = true; 
-
-(function(){
- var thisQ=document.getElementById("question-container-29");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="i checked whether the tenant qualified for a government rental assistance program";
-    var cPrevQNum="28";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="i worked with the tenant to help them apply for rental assistance from a government program or another organization";
-    var cPrevQNum="28";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="i helped the tenant apply for government rental assistance";
-    var cPrevQNum="28";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="i helped the tenant in a way that is not listed here";
-    var cPrevQNum="28";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("29");
-     } else {
-       
-     }
-   }
-   var allDropdowns = thisQ.querySelectorAll('select');
-   for(var d=0; d<allDropdowns.length; d++){
-     var dropdown = allDropdowns[d];
-     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
-     if(dropdown.closest('[id^="triggerFields"]')) continue;
-     // Reset to default "Select an option"
-     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
-     if(placeholderOption){
-       placeholderOption.selected = true;
-       dropdown.selectedIndex = 0;
-     } else if(dropdown.options.length > 0){
-       dropdown.selectedIndex = 0;
-     }
-     // Also reset any hidden dropdown inputs
-     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
-     if(hiddenDropdownInput){
-       hiddenDropdownInput.value = '';
-     }
-     // Clear hidden checkboxes created by dropdownMirror
-     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
-     if(dropdownWrapper){
-       dropdownWrapper.innerHTML = '';
-     }
-     // Trigger change event to update any dependent logic
-     dropdown.dispatchEvent(new Event('change'));
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var checkQuestion = "28";
-   var questionContainer = document.getElementById('question-container-' + checkQuestion);
-   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "28";
-   var questionContainer = document.getElementById('question-container-' + checkQuestion);
-   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "28";
-   var questionContainer = document.getElementById('question-container-' + checkQuestion);
-   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "28";
-   var questionContainer = document.getElementById('question-container-' + checkQuestion);
-   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-30");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="29";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("30");
-     } else {
-       
-     }
-   }
-   var allDropdowns = thisQ.querySelectorAll('select');
-   for(var d=0; d<allDropdowns.length; d++){
-     var dropdown = allDropdowns[d];
-     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
-     if(dropdown.closest('[id^="triggerFields"]')) continue;
-     // Reset to default "Select an option"
-     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
-     if(placeholderOption){
-       placeholderOption.selected = true;
-       dropdown.selectedIndex = 0;
-     } else if(dropdown.options.length > 0){
-       dropdown.selectedIndex = 0;
-     }
-     // Also reset any hidden dropdown inputs
-     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
-     if(hiddenDropdownInput){
-       hiddenDropdownInput.value = '';
-     }
-     // Clear hidden checkboxes created by dropdownMirror
-     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
-     if(dropdownWrapper){
-       dropdownWrapper.innerHTML = '';
-     }
-     // Trigger change event to update any dependent logic
-     dropdown.dispatchEvent(new Event('change'));
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var selectQuestion = "29";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-31");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="no";
-    var cPrevQNum="29";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
-  (function(){
-    var cPrevType="checkbox";
-    var cPrevAns="i helped the tenant in a way that is not listed here";
-    var cPrevQNum="28";
-    if(cPrevType==="checkbox"){
-      // For checkboxes, look for all checkboxes in the question container
-      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
-      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
-      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-      
-      var checkedVals=[];
-      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
-      
-      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
-    } else {
-      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
-    }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("31");
-     } else {
-       
-     }
-   }
-   var allDropdowns = thisQ.querySelectorAll('select');
-   for(var d=0; d<allDropdowns.length; d++){
-     var dropdown = allDropdowns[d];
-     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
-     if(dropdown.closest('[id^="triggerFields"]')) continue;
-     // Reset to default "Select an option"
-     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
-     if(placeholderOption){
-       placeholderOption.selected = true;
-       dropdown.selectedIndex = 0;
-     } else if(dropdown.options.length > 0){
-       dropdown.selectedIndex = 0;
-     }
-     // Also reset any hidden dropdown inputs
-     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
-     if(hiddenDropdownInput){
-       hiddenDropdownInput.value = '';
-     }
-     // Clear hidden checkboxes created by dropdownMirror
-     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
-     if(dropdownWrapper){
-       dropdownWrapper.innerHTML = '';
-     }
-     // Trigger change event to update any dependent logic
-     dropdown.dispatchEvent(new Event('change'));
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var selectQuestion = "29";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- (function(){
-   var checkQuestion = "28";
-   var questionContainer = document.getElementById('question-container-' + checkQuestion);
-   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
-   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
-checkboxRequiredMap[32] = true; 
 checkboxRequiredMap[12] = true; 
 
 (function(){
@@ -5886,6 +5558,409 @@ checkboxRequiredMap[12] = true;
  })();
  updateVisibility();
 })();
+checkboxRequiredMap[28] = true; 
+
+(function(){
+ var thisQ=document.getElementById("question-container-28");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="26";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("28");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "26";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-29");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="i checked whether the tenant qualified for a government rental assistance program";
+    var cPrevQNum="28";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="i worked with the tenant to help them apply for rental assistance from a government program or another organization";
+    var cPrevQNum="28";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="i helped the tenant apply for government rental assistance";
+    var cPrevQNum="28";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="i helped the tenant in a way that is not listed here";
+    var cPrevQNum="28";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("29");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var checkQuestion = "28";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "28";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "28";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "28";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-30");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="29";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("30");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "29";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-31");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="29";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="i helped the tenant in a way that is not listed here";
+    var cPrevQNum="28";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true;} }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("31");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "29";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "28";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+checkboxRequiredMap[32] = true; 
 
 
 /*──────────────────────────────────────────────────────────────*
