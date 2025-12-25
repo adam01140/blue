@@ -228,6 +228,7 @@ function renderMyForms(forms) {
                     }
                     let url = correctedUrl + separator + 'county=' + encodeURIComponent(form.countyName || '') + '&portfolioId=' + encodeURIComponent(form.id);
                     if (form.defendantName) url += '&defendantName=' + encodeURIComponent(form.defendantName);
+                    if (form.zipCode) url += '&zipCode=' + encodeURIComponent(form.zipCode);
                     window.location.href = url;
                 } catch (err) {
                     console.error('[FormWiz] Failed to update lastOpened:', err);
@@ -547,7 +548,7 @@ async function addFormToPortfolio(formId, formUrl, formName) {
 
 
 
-async function addFormToPortfolioInternal(formId, formUrl, formName, countyName, isDuplicate = false) {
+async function addFormToPortfolioInternal(formId, formUrl, formName, countyName, isDuplicate = false, defendantName = null, zipCode = null) {
     const user = auth.currentUser;
     if (!user) {
         window.location.href = formUrl;
@@ -559,7 +560,7 @@ async function addFormToPortfolioInternal(formId, formUrl, formName, countyName,
         if (isDuplicate) {
             // For duplicates, always create a new document with a unique ID
             const newFormRef = db.collection('users').doc(userId).collection('forms').doc();
-            await newFormRef.set({
+            const formData = {
                 originalFormId: formId, // Keep reference to original form ID
                 name: formName,
                 url: formUrl,
@@ -567,11 +568,17 @@ async function addFormToPortfolioInternal(formId, formUrl, formName, countyName,
                 lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
                 countyName: countyName,
                 isDuplicate: true
-            });
+            };
+            if (zipCode) formData.zipCode = zipCode;
+            if (defendantName) formData.defendantName = defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+            await newFormRef.set(formData);
             // No need to call fetchMyForms, real-time listener will update
             // Append county information to the URL for autosave separation
             const separator = formUrl.includes('?') ? '&' : '?';
-            window.location.href = formUrl + separator + 'county=' + encodeURIComponent(countyName);
+            let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
+            if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+            if (zipCode) url += '&zipCode=' + encodeURIComponent(zipCode);
+            window.location.href = url;
         } else {
             // For new forms, check if it already exists for the same county
             const formsSnapshot = await db.collection('users').doc(userId).collection('forms').get();
@@ -587,31 +594,39 @@ async function addFormToPortfolioInternal(formId, formUrl, formName, countyName,
             
             if (existingFormDoc) {
                 // Update lastOpened in Firestore for the existing form
-                await existingFormDoc.ref.update({
+                const updateData = {
                     lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
                     countyName: countyName
-                });
+                };
+                if (zipCode) updateData.zipCode = zipCode;
+                if (defendantName) updateData.defendantName = defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+                await existingFormDoc.ref.update(updateData);
                 // Append county information to the URL for autosave separation
                 const separator = formUrl.includes('?') ? '&' : '?';
                 let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
                 if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                if (zipCode) url += '&zipCode=' + encodeURIComponent(zipCode);
                 window.location.href = url;
             } else {
                 // Create a new form document with auto-generated ID
                 const newFormRef = db.collection('users').doc(userId).collection('forms').doc();
-                await newFormRef.set({
+                const formData = {
                     originalFormId: formId, // Keep reference to original form ID
                     name: formName,
                     url: formUrl,
                     addedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
                     countyName: countyName
-                });
+                };
+                if (zipCode) formData.zipCode = zipCode;
+                if (defendantName) formData.defendantName = defendantName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+                await newFormRef.set(formData);
                 // No need to call fetchMyForms, real-time listener will update
                 // Append county information to the URL for autosave separation
                 const separator = formUrl.includes('?') ? '&' : '?';
                 let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
                 if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                if (zipCode) url += '&zipCode=' + encodeURIComponent(zipCode);
                 window.location.href = url;
             }
         }
@@ -887,12 +902,13 @@ function showDuplicateFormModal(formName, countyName, formId, formUrl, newCounty
     // Set the message
     message.textContent = `You already have a ${formName} form for ${countyName} County in your portfolio, would you like to add another?`;
     
-    // Store the pending form data
+    // Store the pending form data (preserve zipCode from pendingCountyData if available)
     pendingFormData = {
         formId: formId,
         formUrl: formUrl,
         formName: formName,
-        countyName: newCountyName
+        countyName: newCountyName,
+        zipCode: pendingCountyData ? pendingCountyData.zipCode : null
     };
     
     // Show the modal
@@ -914,7 +930,7 @@ function showDuplicateFormModal(formName, countyName, formId, formUrl, newCounty
                 showDefendantModal(formObj, pendingFormData.formId, pendingFormData.formUrl, pendingFormData.formName, pendingFormData.countyName, true);
             } else {
                 // No defendant required, add directly
-                await addFormToPortfolioInternal(pendingFormData.formId, pendingFormData.formUrl, pendingFormData.formName, pendingFormData.countyName, true);
+                await addFormToPortfolioInternal(pendingFormData.formId, pendingFormData.formUrl, pendingFormData.formName, pendingFormData.countyName, true, null, pendingFormData.zipCode);
             }
             pendingFormData = null;
         }
@@ -2201,7 +2217,7 @@ function showCountyModal(formId, formUrl, formName) {
                         if (formObj && formObj.defendant && formObj.defendant.toUpperCase() === 'YES') {
                             showDefendantModal(formObj, pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty);
                         } else {
-                            await addFormToPortfolioInternal(pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty);
+                            await addFormToPortfolioInternal(pendingCountyData.formId, pendingCountyData.formUrl, pendingCountyData.formName, currentCounty, false, null, pendingCountyData.zipCode);
                         }
                     }
                 } catch (error) {
@@ -2247,7 +2263,9 @@ function showDefendantModal(formObj, formId, formUrl, formName, countyName, isDu
     errorDiv.style.display = 'none';
     errorDiv.textContent = '';
     modal.style.display = 'block';
-    pendingDefendantData = { formObj, formId, formUrl, formName, countyName, isDuplicate, zipCode: pendingCountyData ? pendingCountyData.zipCode : null };
+    // Get zipCode from pendingCountyData or pendingFormData
+    const zipCode = (pendingCountyData && pendingCountyData.zipCode) || (pendingFormData && pendingFormData.zipCode) || null;
+    pendingDefendantData = { formObj, formId, formUrl, formName, countyName, isDuplicate, zipCode: zipCode };
     function closeModal() {
         modal.style.display = 'none';
         pendingDefendantData = null;
@@ -2272,7 +2290,8 @@ function showDefendantModal(formObj, formId, formUrl, formName, countyName, isDu
                 pendingDefendantData.formName,
                 pendingDefendantData.countyName,
                 pendingDefendantData.isDuplicate,
-                defendantName
+                defendantName,
+                pendingDefendantData.zipCode
             );
             pendingDefendantData = null;
         }
