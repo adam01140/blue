@@ -532,7 +532,7 @@
                     </div>
                     <div class="form-group">
                         <label for="edit-url">🔗 URL Base</label>
-                        <input type="text" id="edit-url" placeholder="e.g., sc100">
+                        <input type="text" id="edit-url" placeholder="e.g., SC-100/sc-100">
                     </div>
                     <div class="form-group">
                         <label for="edit-counties">🗺️ Counties *</label>
@@ -932,7 +932,7 @@
                 formsData[currentEditIndex].name = name;
                 formsData[currentEditIndex].id = id;
                 formsData[currentEditIndex].description = description;
-                formsData[currentEditIndex].url = urlBase ? `${urlBase}.html?formId=${urlBase}` : '';
+                formsData[currentEditIndex].url = urlBase ? `${urlBase}.html?formId=${id}` : '';
                 formsData[currentEditIndex].counties = counties;
                 formsData[currentEditIndex].defendant = defendant;
                 

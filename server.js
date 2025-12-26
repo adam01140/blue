@@ -674,14 +674,39 @@ app.post('/edit_pdf', async (req, res) => {
     if (!pdfName) {
       return res.status(400).send('No PDF provided (upload a file or pass ?pdf=filename).');
     }
-    const sanitized = path.basename(pdfName) + '.pdf';
-    const pdfPath   = path.join(__dirname, 'public', 'Forms', sanitized);
-    if (!fs.existsSync(pdfPath)) {
+    // Normalize the name so passing "sc500.pdf" does NOT become "sc500.pdf.pdf"
+    const normalizedBase = path.basename(pdfName).replace(/\.pdf$/i, '');
+    const sanitized = normalizedBase + '.pdf';
+
+    // Helper: find the PDF in /public/Forms (including subfolders) case-insensitively
+    function findPdfInForms(targetFile) {
+      const formsRoot = path.join(__dirname, 'public', 'Forms');
+      const stack = [formsRoot];
+      const targetLower = targetFile.toLowerCase();
+      while (stack.length) {
+        const current = stack.pop();
+        const entries = fs.readdirSync(current, { withFileTypes: true });
+        for (const entry of entries) {
+          const fullPath = path.join(current, entry.name);
+          if (entry.isDirectory()) {
+            stack.push(fullPath);
+          } else if (entry.isFile()) {
+            if (entry.name.toLowerCase() === targetLower) {
+              return fullPath;
+            }
+          }
+        }
+      }
+      return null;
+    }
+
+    const pdfPath = findPdfInForms(sanitized);
+    if (!pdfPath) {
       return res.status(400).send('Requested PDF does not exist on the server.');
     }
     pdfBytes   = await fs.promises.readFile(pdfPath);
-    outputName = `Edited_${sanitized}`;
-    console.log(`Using server PDF: ${sanitized}`);
+    outputName = `Edited_${path.basename(pdfPath)}`;
+    console.log(`Using server PDF: ${path.relative(path.join(__dirname, 'public'), pdfPath)}`);
   }
 
   // ── Fill the form ─────────────────────────────────────────

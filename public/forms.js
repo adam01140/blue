@@ -306,19 +306,36 @@ async function loadAvailableForms() {
             formData.id = doc.id;
             
             // Transform URLs to use the correct format with Forms/ prefix and include portfolio ID
-            if (formData.url) {
-                // Generate a unique portfolio ID for this form session
                 const portfolioId = generatePortfolioId();
                 
-                if (formData.id === 'sc100') {
-                    formData.url = `../Forms/sc-100.html?formId=sc100&portfolioId=${portfolioId}`;
-                } else if (formData.id === 'sc120') {
-                    formData.url = `../Forms/sc-120.html?formId=sc120&portfolioId=${portfolioId}`;
-                } else if (formData.id === 'sc500') {
-                    formData.url = `../Forms/sc-500.html?formId=sc500&portfolioId=${portfolioId}`;
-                } else if (formData.id === 'fee-waiver') {
-                    formData.url = `../Forms/fee-waiver.html?formId=fee-waiver&portfolioId=${portfolioId}`;
+            if (formData.url) {
+                // Respect the admin-configured path but normalize it and inject a fresh portfolioId
+                let correctedUrl = formData.url;
+
+                if (correctedUrl.includes('Pages/Forms/')) {
+                    correctedUrl = correctedUrl.replace('Pages/Forms/', '../Forms/');
+                } else if (correctedUrl.startsWith('Pages/')) {
+                    correctedUrl = correctedUrl.replace('Pages/', '../Forms/');
+                } else if (!correctedUrl.startsWith('../') && !correctedUrl.startsWith('http')) {
+                    correctedUrl = '../Forms/' + correctedUrl;
                 }
+
+                // Ensure the URL has the current portfolioId
+                if (correctedUrl.includes('portfolioId=')) {
+                    correctedUrl = correctedUrl.replace(/portfolioId=[^&]*/i, `portfolioId=${portfolioId}`);
+                } else {
+                    const separator = correctedUrl.includes('?') ? '&' : '?';
+                    correctedUrl += `${separator}portfolioId=${portfolioId}`;
+                }
+
+                formData.url = correctedUrl;
+            } else {
+                // Fallback for legacy forms: infer folder/filename from ID (e.g., sc500 -> SC-500/sc-500.html)
+                const baseId = formData.id || '';
+                const lowerId = baseId.toLowerCase();
+                const hyphenated = lowerId.replace(/^([a-z]+)(\d+)$/, '$1-$2');
+                const folderName = baseId.replace(/^([a-zA-Z]+)(\d+)$/, (_, letters, numbers) => `${letters.toUpperCase()}-${numbers}`);
+                formData.url = `../Forms/${folderName}/${hyphenated}.html?formId=${lowerId}&portfolioId=${portfolioId}`;
             }
             
             forms.push(formData);

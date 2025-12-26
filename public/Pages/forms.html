@@ -2161,6 +2161,14 @@
                 }
             });
 
+            // Ctrl/Cmd + Shift quick access to Admin Console
+            document.addEventListener('keydown', function(e) {
+                const hasCtrlOrCmd = e.ctrlKey || e.metaKey;
+                if (hasCtrlOrCmd && e.shiftKey && !e.altKey) {
+                    window.location.href = '../Admin/AdminConsole.html';
+                }
+            });
+
             // Close mobile menu on escape key
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && mobileNav && mobileNav.classList.contains('active')) {
