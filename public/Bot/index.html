@@ -1943,36 +1943,7 @@
         }
 
         // Forms data from Firebase (initialize with defaults for immediate availability)
-        let availableForms = [
-            {
-                id: 'sc100',
-                name: 'SC-100',
-                description: "Plaintiff's Claim form for suing a defendant",
-                url: '../Forms/SC-100/sc-100.html?formId=sc100',
-                defendant: 'YES'
-            },
-            {
-                id: 'sc120',
-                name: 'SC-120',
-                description: "Defendant's Claim form for counter-suing",
-                url: '../Forms/SC-120/sc-120.html?formId=sc120',
-                defendant: 'NO'
-            },
-            {
-                id: 'sc500',
-                name: 'SC-500',
-                description: 'COVID-19 related small claims form',
-                url: '../Forms/SC-500/sc-500.html?formId=sc500',
-                defendant: 'NO'
-            },
-            {
-                id: 'fee-waiver',
-                name: 'Fee Waiver',
-                description: 'Request to waive court filing fees',
-                url: '../Forms/fee-waiver.html?formId=fee-waiver',
-                defendant: 'NO'
-            }
-        ];
+        let availableForms = [];
 
         // Normalize URLs from Firestore/admin so they point to the correct file
         function normalizeFormUrl(url, formId = null) {
@@ -2021,36 +1992,17 @@
 
         // Default forms fallback (used if Firebase fails)
         function getDefaultForms() {
-            return [
-                {
-                    id: 'sc100',
-                    name: 'SC-100',
-                    description: "Plaintiff's Claim form for suing a defendant",
-                    url: '../Forms/SC-100/sc-100.html?formId=sc100',
-                    defendant: 'YES'
-                },
-                {
-                    id: 'sc120',
-                    name: 'SC-120',
-                    description: "Defendant's Claim form for counter-suing",
-                    url: '../Forms/SC-120/sc-120.html?formId=sc120',
-                    defendant: 'NO'
-                },
-                {
-                    id: 'sc500',
-                    name: 'SC-500',
-                    description: 'COVID-19 related small claims form',
-                    url: '../Forms/SC-500/sc-500.html?formId=sc500',
-                    defendant: 'NO'
-                },
-                {
-                    id: 'fee-waiver',
-                    name: 'Fee Waiver',
-                    description: 'Request to waive court filing fees',
-                    url: '../Forms/fee-waiver.html?formId=fee-waiver',
-                    defendant: 'NO'
-                }
+            // Pure fallback when Firebase is unavailable; derive URLs from ids to avoid hardcoding paths.
+            const defaults = [
+                { id: 'sc100', name: 'SC-100', description: "Plaintiff's Claim form for suing a defendant", defendant: 'YES' },
+                { id: 'sc120', name: 'SC-120', description: "Defendant's Claim form for counter-suing", defendant: 'NO' },
+                { id: 'sc500', name: 'SC-500', description: 'COVID-19 related small claims form', defendant: 'NO' },
+                { id: 'fee-waiver', name: 'Fee Waiver', description: 'Request to waive court filing fees', defendant: 'NO' }
             ];
+            return defaults.map(f => ({
+                ...f,
+                url: normalizeFormUrl(f.url || `${f.id}.html`, f.id)
+            }));
         }
 
         // Load forms from Firebase
