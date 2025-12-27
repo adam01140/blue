@@ -2256,16 +2256,53 @@
             }
         }
         
+        // Normalize URLs from Firestore/admin so they point to the correct file
+        function normalizeFormUrl(url, formId = null) {
+            if (!url) return '';
+            let normalized = url.trim();
+
+            // Leave absolute URLs untouched
+            if (/^https?:\/\//i.test(normalized)) {
+                return normalized;
+            }
+
+            // Strip leading "Forms/" to avoid duplication
+            normalized = normalized.replace(/^\/?Forms\//i, '');
+
+            if (normalized.startsWith('../') || normalized.startsWith('/')) {
+                // Already relative or root-relative; keep after strip
+                normalized = normalized;
+            } else {
+                // Prefix with ../Forms/ for pages that live under /Pages
+                normalized = '../Forms/' + normalized.replace(/^\/+/, '');
+            }
+
+            // Append formId if missing
+            if (formId && !/formId=/i.test(normalized)) {
+                const separator = normalized.includes('?') ? '&' : '?';
+                normalized += `${separator}formId=${formId}`;
+            }
+
+            return normalized;
+        }
+
         // Helper function to get form URL
         function getFormUrl(formId) {
+            const formObj = availableFormsData.find(f => f.id === formId);
+            if (formObj && formObj.url) {
+                const normalized = normalizeFormUrl(formObj.url, formId);
+                if (normalized) return normalized;
+            }
+
+            // Fallbacks for known forms
             if (formId === 'sc100') {
-                return '../Forms/sc-100.html?formId=sc100';
+                return '../Forms/SC-100/sc-100.html?formId=sc100';
             } else if (formId === 'sc120') {
-                return '../Forms/sc-120.html?formId=sc120';
+                return '../Forms/SC-120/sc-120.html?formId=sc120';
             } else if (formId === 'sc500') {
-                return '../Forms/sc-500.html?formId=sc500';
+                return '../Forms/SC-500/sc-500.html?formId=sc500';
             } else {
-                return `../Forms/${formId}.html?formId=${formId}`;
+                return normalizeFormUrl(`${formId}.html`, formId);
             }
         }
 

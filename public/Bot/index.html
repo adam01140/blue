@@ -1948,21 +1948,21 @@
                 id: 'sc100',
                 name: 'SC-100',
                 description: "Plaintiff's Claim form for suing a defendant",
-                url: '../Forms/sc-100.html?formId=sc100',
+                url: '../Forms/SC-100/sc-100.html?formId=sc100',
                 defendant: 'YES'
             },
             {
                 id: 'sc120',
                 name: 'SC-120',
                 description: "Defendant's Claim form for counter-suing",
-                url: '../Forms/sc-120.html?formId=sc120',
+                url: '../Forms/SC-120/sc-120.html?formId=sc120',
                 defendant: 'NO'
             },
             {
                 id: 'sc500',
                 name: 'SC-500',
                 description: 'COVID-19 related small claims form',
-                url: '../Forms/sc-500.html?formId=sc500',
+                url: '../Forms/SC-500/sc-500.html?formId=sc500',
                 defendant: 'NO'
             },
             {
@@ -1973,6 +1973,36 @@
                 defendant: 'NO'
             }
         ];
+
+        // Normalize URLs from Firestore/admin so they point to the correct file
+        function normalizeFormUrl(url, formId = null) {
+            if (!url) return '';
+            let normalized = url.trim();
+
+            // Absolute URLs are left untouched
+            if (/^https?:\/\//i.test(normalized)) {
+                return normalized;
+            }
+
+            // Strip any leading "Forms/" so we can safely prefix
+            normalized = normalized.replace(/^\/?Forms\//i, '');
+
+            if (normalized.startsWith('../') || normalized.startsWith('/')) {
+                // Already relative or root-relative; keep as-is after Forms strip
+                normalized = normalized;
+            } else {
+                // Prefix with ../Forms/ for pages that live under /Pages or /Bot
+                normalized = '../Forms/' + normalized.replace(/^\/+/, '');
+            }
+
+            // Append formId if missing
+            if (formId && !/formId=/i.test(normalized)) {
+                const separator = normalized.includes('?') ? '&' : '?';
+                normalized += `${separator}formId=${formId}`;
+            }
+
+            return normalized;
+        }
 
         // AI configuration is now handled server-side
 
@@ -1996,21 +2026,21 @@
                     id: 'sc100',
                     name: 'SC-100',
                     description: "Plaintiff's Claim form for suing a defendant",
-                    url: '../Forms/sc-100.html?formId=sc100',
+                    url: '../Forms/SC-100/sc-100.html?formId=sc100',
                     defendant: 'YES'
                 },
                 {
                     id: 'sc120',
                     name: 'SC-120',
                     description: "Defendant's Claim form for counter-suing",
-                    url: '../Forms/sc-120.html?formId=sc120',
+                    url: '../Forms/SC-120/sc-120.html?formId=sc120',
                     defendant: 'NO'
                 },
                 {
                     id: 'sc500',
                     name: 'SC-500',
                     description: 'COVID-19 related small claims form',
-                    url: '../Forms/sc-500.html?formId=sc500',
+                    url: '../Forms/SC-500/sc-500.html?formId=sc500',
                     defendant: 'NO'
                 },
                 {
@@ -2032,19 +2062,7 @@
                 snapshot.forEach(doc => {
                     const formData = doc.data();
                     formData.id = doc.id;
-                    
-                    // Transform URLs to use the correct format
-                    if (formData.url) {
-                        if (formData.id === 'sc100') {
-                            formData.url = '../Forms/sc-100.html?formId=sc100';
-                        } else if (formData.id === 'sc120') {
-                            formData.url = '../Forms/sc-120.html?formId=sc120';
-                        } else if (formData.id === 'sc500') {
-                            formData.url = '../Forms/sc-500.html?formId=sc500';
-                        } else if (formData.id === 'fee-waiver') {
-                            formData.url = '../Forms/fee-waiver.html?formId=fee-waiver';
-                        }
-                    }
+                    formData.url = formData.url ? normalizeFormUrl(formData.url, formData.id) : normalizeFormUrl(`${formData.id}.html`, formData.id);
                     
                     availableForms.push(formData);
                 });

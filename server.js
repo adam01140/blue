@@ -589,6 +589,17 @@ function shouldCheck(v) {
   return s !== '' && s !== 'false' && s !== 'off' && s !== 'no';
 }
 
+// Normalize ISO date strings (yyyy-mm-dd) into mm/dd/yyyy for PDFs
+function normalizeDateValue(value) {
+  if (typeof value === 'string') {
+    const isoMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (isoMatch) {
+      return `${isoMatch[2]}/${isoMatch[3]}/${isoMatch[1]}`;
+    }
+  }
+  return value;
+}
+
 /**
  * Map HTML form values to PDF radio group options
  * @param {PDFRadioGroup} field - The PDF radio group field
@@ -728,7 +739,7 @@ app.post('/edit_pdf', async (req, res) => {
 
   form.getFields().forEach(field => {
     const key   = field.getName();
-    const value = req.body[key];
+    const value = normalizeDateValue(req.body[key]);
 
     if (value === undefined) {
       console.log(`No data for field: ${key}`);
