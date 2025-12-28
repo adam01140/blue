@@ -689,18 +689,29 @@ app.post('/edit_pdf', async (req, res) => {
     const normalizedBase = path.basename(pdfName).replace(/\.pdf$/i, '');
     const sanitized = normalizedBase + '.pdf';
 
-    // Helper: find the PDF in /public/Forms (including subfolders) case-insensitively
-    function findPdfInForms(targetFile) {
+    // Helper: find the PDF in /public/Forms (including subfolders) case-insensitively,
+    // preferring the form's own subfolder (derived from the Referer URL).
+    function findPdfInForms(targetFile, preferredFolder) {
       const formsRoot = path.join(__dirname, 'public', 'Forms');
-      const stack = [formsRoot];
+      const stack = [];
+      // If we know which form folder the request came from, search it first.
+      if (preferredFolder) {
+        const preferredPath = path.join(formsRoot, preferredFolder);
+        if (fs.existsSync(preferredPath) && fs.lstatSync(preferredPath).isDirectory()) {
+          stack.push(preferredPath);
+        }
+      }
+      // Then search all other folders (breadth-first).
+      stack.push(formsRoot);
       const targetLower = targetFile.toLowerCase();
-      while (stack.length) {
-        const current = stack.pop();
+      while (stack.length) { 
+        const current = stack.shift();
         const entries = fs.readdirSync(current, { withFileTypes: true });
         for (const entry of entries) {
           const fullPath = path.join(current, entry.name);
           if (entry.isDirectory()) {
-            stack.push(fullPath);
+            // Avoid re-adding the preferred folder if it was already searched
+            if (fullPath !== formsRoot) stack.push(fullPath);
           } else if (entry.isFile()) {
             if (entry.name.toLowerCase() === targetLower) {
               return fullPath;
@@ -711,7 +722,18 @@ app.post('/edit_pdf', async (req, res) => {
       return null;
     }
 
-    const pdfPath = findPdfInForms(sanitized);
+    // Try to infer the form folder from the Referer so we pull PDFs from the same form directory.
+    let preferredFolder = null;
+    try {
+      const ref = req.headers.referer || '';
+      // Example referer: https://site.com/Forms/SC-120/sc-120.html
+      const match = ref.match(/\/Forms\/([^/]+)\//i);
+      if (match && match[1]) preferredFolder = match[1];
+    } catch (e) {
+      // ignore parsing errors and fall back to global search
+    }
+
+    const pdfPath = findPdfInForms(sanitized, preferredFolder);
     if (!pdfPath) {
       return res.status(400).send('Requested PDF does not exist on the server.');
     }

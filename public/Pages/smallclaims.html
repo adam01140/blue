@@ -147,15 +147,25 @@
             flex-direction: column;
             gap: 0;
         }
+        /* Ensure dropdown items stay visible on white background (match forms.html) */
         .dropdown-menu a {
-            color: #222;
-            padding: 12px 28px;
-            text-decoration: none;
-            display: block;
-            font-weight: 600;
-            font-size: 1.08em;
-            border-radius: 0;
-            transition: background 0.18s, color 0.18s;
+            color: #222 !important;
+            padding: 12px 28px !important;
+            text-decoration: none !important;
+            display: block !important;
+            font-weight: 600 !important;
+            font-size: 1.08em !important;
+            border-radius: 0 !important;
+            transition: background 0.18s, color 0.18s !important;
+        }
+        .dropdown-menu a:link,
+        .dropdown-menu a:visited,
+        .dropdown-menu a:active {
+            color: #222 !important;
+        }
+        .dropdown-menu a:hover {
+            background: #eaf1f8 !important;
+            color: #2980b9 !important;
         }
         .dropdown-menu a:hover {
             background: #eaf1f8;
