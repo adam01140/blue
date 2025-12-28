@@ -1736,7 +1736,7 @@ var linkedCheckboxes = [{"linkedCheckboxId":"military_check","checkboxes":["how_
 var inverseCheckboxes = [{"inverseCheckboxId":"public_no","targetCheckboxId":"public_yes"}];
 var checkboxRequiredMap = {"1":true,"12":true};
 var unifiedFieldsMap = {"11":[{"type":"label","label":"Name","nodeId":"please_enter_your_business_details_name","order":1,"prefill":""},{"type":"location","fieldName":"Please enter your business address","nodeId":"location_data","order":2}],"19":[{"type":"label","label":"Name","nodeId":"how_many_people_are_counter_suing_with_you_name","order":1,"prefill":""},{"type":"phone","label":"Phone Number","nodeId":"how_many_people_are_counter_suing_with_you_phone_number","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this defendant a business?","options":[{"text":"Yes","nodeId":"is_this_defendant_a_business_yes"},{"text":"No","nodeId":"is_this_defendant_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name?","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"is_this_defendant_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"is_this_defendant_a_business_yes_business_name_statement_number","isAmountOption":true},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"single","options":[{"text":"An Individual","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"is_this_defendant_a_business_yes_when_does_their_business_statement_expire","conditionalLogic":{"enabled":true,"conditions":["is_this_defendant_a_business_yes_what_do_they_do_business_as_an_individual"]}},{"type":"pdf","number":"1","pdfTitle":"SC-103 For Extra Plaintiff 1","pdfName":"sc103(1).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"3","pdfTitle":"SC-103 For Extra Plaintiff 3","pdfName":"sc103(3).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"5","pdfTitle":"SC-103 For Extra Plaintiff 5","pdfName":"sc103(5).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":4}],"20":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_counter_suing_name","order":1,"prefill":"","conditionalPrefills":[{"value":"[defendantName]","trigger":"1"}]},{"type":"phone","label":"Phone","nodeId":"how_many_people_are_you_counter_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"how_many_people_are_you_counter_suing_name","title":"how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_counter_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["are_they_a_business_or_public_entity_are_they_a_public_entity_yes"]}},{"type":"date","label":"When did you file the written claim?","nodeId":"are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":["are_they_a_business_or_public_entity_have_you_filed_a_written_claim_against_them_yes"]}},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":5}]};
-var entryTitleMap = {};
+var entryTitleMap = {"19":"Please enter this defendant's info","20":"Please enter this plaintiff's info"};
 
   // Address helper functions (must exist before conditional logic runs)
   function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
@@ -6596,7 +6596,7 @@ window.showCartModal = function () {
     `;
     document.body.appendChild(modal);
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
-    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = '../Pages/cart.html'; };
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = '/Pages/cart.html'; };
     document.getElementById('addToCartBtn').onclick   = () => {
       window.addFormToCart(mainFormPriceId);
       modal.remove();
@@ -6929,7 +6929,7 @@ window.addFormToCart = function (priceId) {
             return itemInfo;
           }).join('\n');
           // Navigate to cart page
-          window.location.href = '../Pages/cart.html';
+          window.location.href = '/Pages/cart.html';
         }
       }, index * 200); // 200ms delay between each item
     });
@@ -6981,7 +6981,7 @@ window.addFormToCart = function (priceId) {
     return itemInfo;
   }).join('\n');
   // Navigate to cart page
-  window.location.href = '../Pages/cart.html';
+  window.location.href = '/Pages/cart.html';
 };
 // Fallback cart count function (global, no Firebase required)
 window.getCartCount = function() {
@@ -11847,7 +11847,7 @@ if (typeof handleNext === 'function') {
                         cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
                         cartCheckoutBtn.style.display = 'block';
                         cartCheckoutBtn.onclick = function() {
-                            window.location.href = '../Pages/cart.html';
+                            window.location.href = '/Pages/cart.html';
                         };
                     }
                 } catch (error) {

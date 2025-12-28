@@ -1864,10 +1864,10 @@ document.addEventListener("DOMContentLoaded", function() {
 window.formId = 'SC-500';
 var questionSlugMap = {"1":"please_explain_why_you_are_suing_at_this_location","2":"please_explain_why_you_re_filing_at_this_courthouse","3":"have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months","4":"have_you_filed_more_then_2_small_claims_cases_for_more_than_2_500_each_within_the_past_year","5":"are_you_doing_business_under_a_fictious_business_name","6":"are_you_suing_for_more_than_12_500","7":"please_enter_your_business_details","8":"what_do_you_do_business_as","9":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","10":"please_explain_what_you_do_business_as","11":"what_county_did_you_file_your_fictious_business_name_statement","12":"what_is_your_fictious_business_name_statement_number","13":"are_you_suing_for_more_than_6_250","14":"are_you_suing_by_yourself","15":"how_many_extra_plaintiffs_are_there","16":"how_many_people_are_you_suing","17":"are_you_a_licensee_or_deferred_deposit_originator_payday_lender","18":"how_much_are_you_suing_for","19":"list_every_rent_payment_you_say_the_tenant_owes_for_the_time_between_march_1_2020_and_september_30_2021_for_each_month_state_how_much_rent_was_due_and_the_exact_date_it_was_due","20":"list_any_unpaid_charges_other_than_rent_that_you_say_the_tenant_owes_during_the_covid_19_period_for_each_month_include_how_much_was_owed_when_it_was_due_and_what_the_charge_was_for_such_as_utilities_or_parking_fees","21":"list_any_payments_or_credits_you_already_received_this_includes_money_from_the_tenant_rental_assistance_programs_or_other_sources_that_reduced_what_was_owed_between_march_1_2020_and_september_30_2021_for_each_one_include_the_amount_when_it_was_paid_or_credited_and_what_it_was_for","22":"have_you_sent_a_demand_letter_to_the_defendant","23":"explain_why_you_have_not_sent_a_demand_letter_yet","24":"before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these","25":"do_you_have_any_documentation_showing_these_efforts","26":"please_attach_your_documentation_this_is_a_placeholder_for_now_until_i_implement_the_file_upload_function","27":"please_explain_your_efforts","28":"please_acknowledge_that_the_following_is_true"};
 var questionNameIds = {"1":"please_explain_why_you_are_suing_at_this_location","2":"please_explain_why_youre_filing_at_this_courthouse","3":"have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months","4":"have_you_filed_more_then_2_small_claims_cases_for_more_than_2500_each_within_the_past_year","5":"are_you_doing_business_under_a_fictious_business_name","6":"are_you_suing_for_more_than_12500","7":"please_enter_your_business_details","8":"what_do_you_do_business_as","9":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","10":"please_explain_what_you_do_business_as","11":"what_county_did_you_file_your_fictious_business_name_statement","12":"what_is_your_fictious_business_name_statement_number","13":"are_you_suing_for_more_than_6250","14":"are_you_suing_by_yourself","15":"how_many_extra_plaintiffs_are_there","16":"how_many_people_are_you_suing","17":"are_you_a_licensee_or_deferred_deposit_originator_payday_lender","18":"how_much_are_you_suing_for","19":"list_every_rent_payment_you_say_the_tenant_owes_for_the_time_between_march_1_2020_and_september_30_2021_for_each_month_state_how_much_rent_was_due_and_the_exact_date_it_was_due","20":"list_any_unpaid_charges_other_than_rent_that_you_say_the_tenant_owes_during_the_covid19_period_for_each_month_include_how_much_was_owed_when_it_was_due_and_what_the_charge_was_for_such_as_utilities_or_parking_fees","21":"list_any_payments_or_credits_you_already_received_this_includes_money_from_the_tenant_rental_assistance_programs_or_other_sources_that_reduced_what_was_owed_between_march_1_2020_and_september_30_2021_for_each_one_include_the_amount_when_it_was_paid_or_credited_and_what_it_was_for","22":"have_you_sent_a_demand_letter_to_the_defendant","23":"explain_why_you_have_not_sent_a_demand_letter_yet","24":"before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these","25":"do_you_have_any_documentation_showing_these_efforts","26":"please_attach_your_documentation_this_is_a_placeholder_for_now_until_i_implement_the_file_upload_function","27":"please_explain_your_efforts","28":"please_acknowledge_that_the_following_is_true"};
-var linkedCheckboxes = [{"linkedCheckboxId":"military_check","checkboxes":["how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_1","how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_2","how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_3"]},{"linkedCheckboxId":"public_yes","checkboxes":["are_they_a_public_entity_yes_1","are_they_a_public_entity_yes_2","are_they_a_public_entity_yes_3"]},{"linkedCheckboxId":"6b","checkboxes":["please_explain_why_you_are_suing_at_this_location_the_rental_agreement_or_contract_was_made_signed_carried_out_or_broken_here","please_explain_why_you_are_suing_at_this_location_the_defendant_lived_or_did_business_here_when_the_agreement_was_made"]},{"linkedCheckboxId":"biz_check_100","checkboxes":["are_you_doing_business_under_a_fictious_business_name_yes","is_this_plaintiff_a_business_yes_1"]}];
+var linkedCheckboxes = [{"linkedCheckboxId":"military_check","checkboxes":["how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_1","how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_2","how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_3"]},{"linkedCheckboxId":"public_yes","checkboxes":["are_they_a_business_or_public_entity_are_they_a_public_entity_yes_1","are_they_a_business_or_public_entity_are_they_a_public_entity_yes_2","are_they_a_business_or_public_entity_are_they_a_public_entity_yes_3"]},{"linkedCheckboxId":"6b","checkboxes":["please_explain_why_you_are_suing_at_this_location_the_rental_agreement_or_contract_was_made_signed_carried_out_or_broken_here","please_explain_why_you_are_suing_at_this_location_the_defendant_lived_or_did_business_here_when_the_agreement_was_made"]},{"linkedCheckboxId":"biz_check_100","checkboxes":["are_you_doing_business_under_a_fictious_business_name_yes","is_this_plaintiff_a_business_yes_1"]}];
 var inverseCheckboxes = [{"inverseCheckboxId":"public_no","targetCheckboxId":"public_yes"}];
 var checkboxRequiredMap = {"1":true,"8":true,"24":true,"28":true};
-var unifiedFieldsMap = {"7":[{"type":"label","label":"Name","nodeId":"please_enter_your_business_details_name","order":1,"prefill":""},{"type":"location","fieldName":"Please enter your business address","nodeId":"location_data","order":2}],"15":[{"type":"label","label":"Name","nodeId":"how_many_extra_plaintiffs_are_there_name","order":1,"prefill":""},{"type":"phone","label":"Phone Number","nodeId":"how_many_extra_plaintiffs_are_there_phone_number","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name?","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name_statement_number","isAmountOption":true},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"single","options":[{"text":"An Individual","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire","conditionalLogic":{"enabled":true,"conditions":["how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"]}},{"type":"pdf","number":"1","pdfTitle":"SC-103 For Extra Plaintiff 1","pdfName":"sc103(1).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"3","pdfTitle":"SC-103 For Extra Plaintiff 3","pdfName":"sc103(3).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"5","pdfTitle":"SC-103 For Extra Plaintiff 5","pdfName":"sc103(5).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":4}],"16":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_suing_name","order":1,"prefill":"","conditionalPrefills":[{"value":"[defendantName]","trigger":"1"}]},{"type":"phone","label":"Phone","nodeId":"how_many_people_are_you_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"how_many_people_are_you_suing_name","title":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_suing_are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"how_many_people_are_you_suing_are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["are_they_a_public_entity_yes"]}},{"type":"date","label":"When did you file the written claim?","nodeId":"when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":["have_you_filed_a_written_claim_against_them_yes"]}},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":5}]};
+var unifiedFieldsMap = {"7":[{"type":"label","label":"Name","nodeId":"please_enter_your_business_details_name","order":1,"prefill":""},{"type":"location","fieldName":"Please enter your business address","nodeId":"location_data","order":2}],"15":[{"type":"label","label":"Name","nodeId":"how_many_extra_plaintiffs_are_there_name","order":1,"prefill":""},{"type":"phone","label":"Phone Number","nodeId":"how_many_extra_plaintiffs_are_there_phone_number","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name?","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name_statement_number","isAmountOption":true},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"single","options":[{"text":"An Individual","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire","conditionalLogic":{"enabled":true,"conditions":["how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"]}},{"type":"pdf","number":"1","pdfTitle":"SC-103 For Extra Plaintiff 1","pdfName":"sc103(1).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"3","pdfTitle":"SC-103 For Extra Plaintiff 3","pdfName":"sc103(3).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"5","pdfTitle":"SC-103 For Extra Plaintiff 5","pdfName":"sc103(5).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":4}],"16":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_suing_name","order":1,"prefill":"","conditionalPrefills":[{"trigger":"1","value":"[defendantName]"}]},{"type":"phone","label":"Phone","nodeId":"how_many_people_are_you_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"how_many_people_are_you_suing_name","title":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["are_they_a_business_or_public_entity_are_they_a_public_entity_yes"]}},{"type":"date","label":"When did you file the written claim?","nodeId":"are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":["are_they_a_business_or_public_entity_have_you_filed_a_written_claim_against_them_yes"]}},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":5}]};
 var entryTitleMap = {"15":"Please enter the plaintiff's info"};
 
   // Address helper functions (must exist before conditional logic runs)
@@ -2830,6 +2830,8 @@ var entryTitleMap = {"15":"Please enter the plaintiff's info"};
             let anyMatch = false;
             // Use the parent dropdown's nodeId (same as the select.id base)
             const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+            const sanitizedDropdownName = sanitizeForId(dropdownFieldName || '');
+            const sanitizedTriggerCondition = triggerCondition ? sanitizeForId(triggerCondition) : '';
             conditionalConditions.forEach((conditionNodeId) => {
               if (!conditionNodeId) return;
               let checkboxId;
@@ -2845,8 +2847,10 @@ var entryTitleMap = {"15":"Please enter the plaintiff's info"};
                 // For numberedDropdown, use the standard format
                 const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
                 const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+                const noEntryCheckboxId = conditionNodeId;
                 checkboxId = fullCheckboxId; // Use the full pattern for dropdown hidden checkboxes
                 radioId = conditionNodeId + "_" + entryNumber + "_radio";
+                // We'll try fallbacks (simple/no-entry) below
               }
               // First try to find a radio button (for "Mark only one")
               const radio = document.getElementById(radioId);
@@ -2866,10 +2870,12 @@ var entryTitleMap = {"15":"Please enter the plaintiff's info"};
               }
               // Try to find a regular checkbox or hidden checkbox
               let checkbox = document.getElementById(checkboxId);
-              // For numberedDropdown, also try simple pattern as fallback
+              // For numberedDropdown, also try simple and no-entry fallbacks
               if (!checkbox && !isMultipleTextboxes) {
                 const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
+                const noEntryCheckboxId = conditionNodeId;
                 checkbox = document.getElementById(simpleCheckboxId);
+                if (!checkbox) checkbox = document.getElementById(noEntryCheckboxId);
               }
               if (checkbox && checkbox.type === 'checkbox') {
                 if (checkbox.checked === true) {
@@ -3055,17 +3061,28 @@ var entryTitleMap = {"15":"Please enter the plaintiff's info"};
           // Function to check if any condition is met
           const checkConditionalLogic = () => {
             let anyMatch = false;
-            // Get the question nodeId for this numbered dropdown
-            const questionNodeId = questionNameIds[questionId] || ('answer' + questionId);
+            // Prefer the parent dropdown's nodeId; fall back to question nodeId
+            const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
+            const sanitizedDropdownName = sanitizeForId(dropdownFieldName || '');
+            const sanitizedTriggerCondition = triggerCondition ? sanitizeForId(triggerCondition) : '';
             conditionalConditions.forEach((conditionNodeId) => {
               if (!conditionNodeId) return;
-              // For dropdown hidden checkboxes, the condition might be just the field name and option (e.g., "bruh_what")
-              // but the actual checkbox ID includes the question nodeId: {questionNodeId}_{condition}_{entryNumber}
-              // Try both patterns: the simple one first (for regular checkboxes), then the full one (for dropdown hidden checkboxes)
-              const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
-              const fullCheckboxId = questionNodeId + "_" + conditionNodeId + "_" + entryNumber;
-              const checkboxId = fullCheckboxId; // Use the full pattern for dropdown hidden checkboxes
-              const radioId = conditionNodeId + "_" + entryNumber + "_radio";
+              // Hidden checkboxes created by dropdownMirror in trigger sequences can be:
+              // 1) For numberedDropdown: questionNodeId_condition_entryNumber (full), condition_entryNumber (simple), condition (no entry)
+              // 2) For multipleTextboxes trigger dropdowns: dropdownName_triggerCondition_condition
+              let checkboxId;
+              let radioId;
+              if (isMultipleTextboxes) {
+                checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + conditionNodeId;
+                radioId = checkboxId + '_radio';
+              } else {
+                const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
+                const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
+                const noEntryCheckboxId = conditionNodeId;
+                checkboxId = fullCheckboxId; // primary
+                radioId = conditionNodeId + "_" + entryNumber + "_radio";
+                // We'll try full → simple → no-entry below
+              }
               // First try to find a radio button (for "Mark only one")
               const radio = document.getElementById(radioId);
               if (radio && radio.type === 'radio') {
@@ -3089,11 +3106,13 @@ var entryTitleMap = {"15":"Please enter the plaintiff's info"};
                 }
               }
               // Try to find a regular checkbox or hidden checkbox
-              // First try the full pattern (for dropdown hidden checkboxes), then the simple pattern (for regular checkboxes)
               let checkbox = document.getElementById(checkboxId);
-              // If not found with full pattern, try simple pattern
-              if (!checkbox) {
-                checkbox = document.getElementById(simpleCheckboxId);
+              if (!isMultipleTextboxes) {
+                // For numberedDropdown, also try simple and no-entry fallbacks
+                const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
+                const noEntryCheckboxId = conditionNodeId;
+                if (!checkbox) checkbox = document.getElementById(simpleCheckboxId);
+                if (!checkbox) checkbox = document.getElementById(noEntryCheckboxId);
               }
               if (checkbox && checkbox.type === 'checkbox') {
                 // For hidden checkboxes, verify they're actually checked
@@ -3157,11 +3176,11 @@ var entryTitleMap = {"15":"Please enter the plaintiff's info"};
           // Set up event listeners for each condition
           conditionalConditions.forEach((conditionNodeId) => {
             if (!conditionNodeId) return;
-            // Get the question nodeId for this numbered dropdown
-            const questionNodeId = questionNameIds[questionId] || ('answer' + questionId);
+            // Prefer the parent dropdown's nodeId; fall back to question nodeId
+            const baseNodeIdForCheck = parentDropdownNodeId || (questionNameIds[questionId] || ('answer' + questionId));
             // Try both patterns: full (for dropdown hidden checkboxes) and simple (for regular checkboxes)
             const simpleCheckboxId = conditionNodeId + "_" + entryNumber;
-            const fullCheckboxId = questionNodeId + "_" + conditionNodeId + "_" + entryNumber;
+            const fullCheckboxId = baseNodeIdForCheck + "_" + conditionNodeId + "_" + entryNumber;
             const checkboxId = fullCheckboxId; // Use full pattern for dropdown hidden checkboxes
             const radioId = conditionNodeId + "_" + entryNumber + "_radio";
             // Function to attach listener when element is created
@@ -6711,7 +6730,7 @@ window.showCartModal = function () {
     `;
     document.body.appendChild(modal);
     document.getElementById('cancelCartBtn').onclick = () => modal.remove();
-    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = '../Pages/cart.html'; };
+    document.getElementById('viewCartBtn').onclick   = () => { modal.remove(); window.location.href = '/Pages/cart.html'; };
     document.getElementById('addToCartBtn').onclick   = () => {
       window.addFormToCart(mainFormPriceId);
       modal.remove();
@@ -7044,7 +7063,7 @@ window.addFormToCart = function (priceId) {
             return itemInfo;
           }).join('\n');
           // Navigate to cart page
-          window.location.href = '../Pages/cart.html';
+          window.location.href = '/Pages/cart.html';
         }
       }, index * 200); // 200ms delay between each item
     });
@@ -7096,7 +7115,7 @@ window.addFormToCart = function (priceId) {
     return itemInfo;
   }).join('\n');
   // Navigate to cart page
-  window.location.href = '../Pages/cart.html';
+  window.location.href = '/Pages/cart.html';
 };
 // Fallback cart count function (global, no Firebase required)
 window.getCartCount = function() {
@@ -9120,13 +9139,43 @@ function updateLinkedFields() {
             hiddenField.value = '';
         } else if (textboxesWithContent.length === 1) {
             // Only one textbox has content, use its value
-            hiddenField.value = textboxesWithContent[0].value;
+            const val = textboxesWithContent[0].value.trim();
+            hiddenField.value = (textboxesWithContent[0].type === 'date') ? formatDateForServer(val) : val;
         } else {
-            // Multiple textboxes have content, use the one with the longest text
-            const longestTextbox = textboxesWithContent.reduce((longest, current) => 
-                current.value.length > longest.value.length ? current : longest
-            );
-            hiddenField.value = longestTextbox.value;
+            // Multiple textboxes have content
+            const allAreDates = textboxesWithContent.every(tb => tb.type === 'date' || /^d{2}[-/]d{2}[-/]d{4}$/.test(tb.value.trim()) || /^d{4}-d{2}-d{2}$/.test(tb.value.trim()));
+            if (allAreDates) {
+                // Choose the latest date
+                const parseDate = (val) => {
+                    const trimmed = val.trim();
+                    // If yyyy-mm-dd, convert to mm-dd-yyyy for comparison consistency
+                    const normalized = /^d{4}-d{2}-d{2}$/.test(trimmed) ? formatDateForServer(trimmed) : trimmed;
+                    const parts = normalized.split(/[-/]/);
+                    if (parts.length === 3) {
+                        return new Date(parts[2], parseInt(parts[0],10)-1, parseInt(parts[1],10));
+                    }
+                    return null;
+                };
+                let latest = textboxesWithContent[0];
+                let latestDate = parseDate(latest.value);
+                textboxesWithContent.slice(1).forEach(tb => {
+                    const d = parseDate(tb.value);
+                    if (d && (!latestDate || d > latestDate)) {
+                        latest = tb;
+                        latestDate = d;
+                    }
+                });
+                const chosenVal = latest.value.trim();
+                hiddenField.value = latest.type === 'date'
+                    ? formatDateForServer(chosenVal)
+                    : (/^d{4}-d{2}-d{2}$/.test(chosenVal) ? formatDateForServer(chosenVal) : chosenVal);
+            } else {
+                // Fall back to longest text
+                const longestTextbox = textboxesWithContent.reduce((longest, current) => 
+                    current.value.length > longest.value.length ? current : longest
+                );
+                hiddenField.value = longestTextbox.value.trim();
+            }
         }
     });
 }
@@ -9371,18 +9420,27 @@ function setCurrentDate () {
     const year = t.getFullYear();
     const currentDateElement = document.getElementById('current_date');
     if (currentDateElement) {
-        // Format as mm/dd/yyyy for server
-        currentDateElement.value = month + '/' + day + '/' + year;
+        // Format as mm-dd-yyyy for server
+        currentDateElement.value = month + '-' + day + '-' + year;
         // Mark this field as protected from autofill
         currentDateElement.setAttribute('data-protected', 'true');
     }
 }
-// Helper function to format date from yyyy-mm-dd to mm/dd/yyyy
+// Helper function to format date from yyyy-mm-dd to mm-dd-yyyy
 function formatDateForServer(dateString) {
     if (!dateString) return '';
     const parts = dateString.split('-');
     if (parts.length === 3) {
-        return parts[1] + '/' + parts[2] + '/' + parts[0];
+        return parts[1] + '-' + parts[2] + '-' + parts[0];
+    }
+    return dateString;
+}
+// Helper for displaying dates in the debug menu (yyyy-mm-dd → mm-dd-yyyy)
+function formatDateForDisplay(dateString) {
+    const parts = (dateString || '').split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+        // Avoid template literal to prevent parsing issues in generated output
+        return parts[1] + '-' + parts[2] + '-' + parts[0];
     }
     return dateString;
 }
@@ -11923,7 +11981,7 @@ if (typeof handleNext === 'function') {
                         cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
                         cartCheckoutBtn.style.display = 'block';
                         cartCheckoutBtn.onclick = function() {
-                            window.location.href = '../Pages/cart.html';
+                            window.location.href = '/Pages/cart.html';
                         };
                     }
                 } catch (error) {
@@ -12259,7 +12317,14 @@ function populateDebugContent() {
     // Exclude debug menu's own input fields (debugSearch, debugTypeFilter, and debugTypeFilter_* fields)
     const isDebugField = input.id === 'debugSearch' || input.id === 'debugTypeFilter' || input.id.startsWith('debugTypeFilter_');
     if ((input.id || input.name) && !isDebugField) {
-      const value = input.type === 'checkbox' ? input.checked : input.value;
+      let value;
+      if (input.type === 'checkbox') {
+        value = input.checked;
+      } else if (input.type === 'date') {
+        value = formatDateForDisplay(input.value);
+      } else {
+        value = input.value;
+      }
       const type = input.tagName.toLowerCase();
       const inputType = input.type || 'text';
       inputData.push({
