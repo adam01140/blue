@@ -693,25 +693,31 @@ app.post('/edit_pdf', async (req, res) => {
     // preferring the form's own subfolder (derived from the Referer URL).
     function findPdfInForms(targetFile, preferredFolder) {
       const formsRoot = path.join(__dirname, 'public', 'Forms');
-      const stack = [];
-      // If we know which form folder the request came from, search it first.
+      const targetLower = targetFile.toLowerCase();
+
+      // If we know the calling form folder, search ONLY that folder.
       if (preferredFolder) {
         const preferredPath = path.join(formsRoot, preferredFolder);
         if (fs.existsSync(preferredPath) && fs.lstatSync(preferredPath).isDirectory()) {
-          stack.push(preferredPath);
+          const entries = fs.readdirSync(preferredPath, { withFileTypes: true });
+          for (const entry of entries) {
+            if (entry.isFile() && entry.name.toLowerCase() === targetLower) {
+              return path.join(preferredPath, entry.name);
+            }
+          }
+          return null; // strictly scoped: do NOT fall back to other forms if caller folder is known
         }
       }
-      // Then search all other folders (breadth-first).
-      stack.push(formsRoot);
-      const targetLower = targetFile.toLowerCase();
+
+      // If no preferred folder inferred, search the whole tree (original behavior).
+      const stack = [formsRoot];
       while (stack.length) { 
         const current = stack.shift();
         const entries = fs.readdirSync(current, { withFileTypes: true });
         for (const entry of entries) {
           const fullPath = path.join(current, entry.name);
           if (entry.isDirectory()) {
-            // Avoid re-adding the preferred folder if it was already searched
-            if (fullPath !== formsRoot) stack.push(fullPath);
+            stack.push(fullPath);
           } else if (entry.isFile()) {
             if (entry.name.toLowerCase() === targetLower) {
               return fullPath;
