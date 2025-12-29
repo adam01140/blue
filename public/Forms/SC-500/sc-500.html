@@ -619,7 +619,7 @@ document.addEventListener("DOMContentLoaded", function() {
               <input type="text" id="are_you_suing_by_yourself_dropdown" name="are_you_suing_by_yourself_dropdown"
                    readonly style="display:none;"></div><div id="question-container-15" data-question-id="15" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many extra plaintiffs are there</h3></label><p class="subtitle-text question-subtitle" style="margin-top: -10px; font-size: 0.9em; color: #666;">Not including yourself</p><select id="how_many_extra_plaintiffs_are_there" name="how_many_extra_plaintiffs_are_there" data-question-id="15" onchange="showTextboxLabels(15, this.value); updateHiddenCheckboxes(15, this.value); updateHiddenLogic('how_many_extra_plaintiffs_are_there', this.value)">
                        <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select><br><div id="labelContainer15"></div></div><div id="question-container-16" data-question-id="16" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="3" data-question-type="numberedDropdown"><label><h3 class="question-text">How many people are you suing?</h3></label><select id="how_many_people_are_you_suing" name="how_many_people_are_you_suing" data-question-id="16" onchange="showTextboxLabels(16, this.value); updateHiddenCheckboxes(16, this.value); updateHiddenLogic('how_many_people_are_you_suing', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer16"></div></div><div id="question-container-17" data-question-id="17" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="4"><label><h3 class="question-text">Are you a “licensee” or “deferred deposit originator” (payday lender)</h3></label><select id="are_you_a_licensee_or_deferred_deposit_originator_payday_lender" name="are_you_a_licensee_or_deferred_deposit_originator_payday_lender"
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select><br><div id="labelContainer16"></div></div><div id="question-container-17" data-question-id="17" class="question-container question-item hidden question-step-hidden" data-section="3" data-question-index="4"><label><h3 class="question-text">Are you a “licensee” or “deferred deposit originator” (payday lender)</h3></label><select id="are_you_a_licensee_or_deferred_deposit_originator_payday_lender" name="are_you_a_licensee_or_deferred_deposit_originator_payday_lender"
                       onchange="dropdownMirror(this, 'are_you_a_licensee_or_deferred_deposit_originator_payday_lender'); updateHiddenLogic('are_you_a_licensee_or_deferred_deposit_originator_payday_lender', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_are_you_a_licensee_or_deferred_deposit_originator_payday_lender"></div>
@@ -1717,8 +1717,8 @@ document.addEventListener("DOMContentLoaded", function() {
 <div style="display:none;"><input type="checkbox" id="public_yes" name="public_yes"></div>
 <div style="display:none;"><input type="checkbox" id="6b" name="6b"></div>
 <div style="display:none;"><input type="checkbox" id="biz_check_100" name="biz_check_100"></div>
-<input type="text" id="suing_over_2500" name="suing_over_2500" style="display:none;">
-<input type="text" id="suing_under_2500" name="suing_under_2500" style="display:none;">
+<div style="display:none;"><input type="checkbox" id="suing_over_2500" name="suing_over_2500" ></div>
+<div style="display:none;"><input type="checkbox" id="suing_under_2500" name="suing_under_2500" ></div>
 <input type="checkbox" id="new_sc_500_default_checkbox" name="new_sc_500_default_checkbox" checked style="display: none;">
 </div>
   <script>
@@ -1864,10 +1864,10 @@ document.addEventListener("DOMContentLoaded", function() {
 window.formId = 'SC-500';
 var questionSlugMap = {"1":"please_explain_why_you_are_suing_at_this_location","2":"please_explain_why_you_re_filing_at_this_courthouse","3":"have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months","4":"have_you_filed_more_then_2_small_claims_cases_for_more_than_2_500_each_within_the_past_year","5":"are_you_doing_business_under_a_fictious_business_name","6":"are_you_suing_for_more_than_12_500","7":"please_enter_your_business_details","8":"what_do_you_do_business_as","9":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","10":"please_explain_what_you_do_business_as","11":"what_county_did_you_file_your_fictious_business_name_statement","12":"what_is_your_fictious_business_name_statement_number","13":"are_you_suing_for_more_than_6_250","14":"are_you_suing_by_yourself","15":"how_many_extra_plaintiffs_are_there","16":"how_many_people_are_you_suing","17":"are_you_a_licensee_or_deferred_deposit_originator_payday_lender","18":"how_much_are_you_suing_for","19":"list_every_rent_payment_you_say_the_tenant_owes_for_the_time_between_march_1_2020_and_september_30_2021_for_each_month_state_how_much_rent_was_due_and_the_exact_date_it_was_due","20":"list_any_unpaid_charges_other_than_rent_that_you_say_the_tenant_owes_during_the_covid_19_period_for_each_month_include_how_much_was_owed_when_it_was_due_and_what_the_charge_was_for_such_as_utilities_or_parking_fees","21":"list_any_payments_or_credits_you_already_received_this_includes_money_from_the_tenant_rental_assistance_programs_or_other_sources_that_reduced_what_was_owed_between_march_1_2020_and_september_30_2021_for_each_one_include_the_amount_when_it_was_paid_or_credited_and_what_it_was_for","22":"have_you_sent_a_demand_letter_to_the_defendant","23":"explain_why_you_have_not_sent_a_demand_letter_yet","24":"before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these","25":"do_you_have_any_documentation_showing_these_efforts","26":"please_attach_your_documentation_this_is_a_placeholder_for_now_until_i_implement_the_file_upload_function","27":"please_explain_your_efforts","28":"please_acknowledge_that_the_following_is_true"};
 var questionNameIds = {"1":"please_explain_why_you_are_suing_at_this_location","2":"please_explain_why_youre_filing_at_this_courthouse","3":"have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months","4":"have_you_filed_more_then_2_small_claims_cases_for_more_than_2500_each_within_the_past_year","5":"are_you_doing_business_under_a_fictious_business_name","6":"are_you_suing_for_more_than_12500","7":"please_enter_your_business_details","8":"what_do_you_do_business_as","9":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","10":"please_explain_what_you_do_business_as","11":"what_county_did_you_file_your_fictious_business_name_statement","12":"what_is_your_fictious_business_name_statement_number","13":"are_you_suing_for_more_than_6250","14":"are_you_suing_by_yourself","15":"how_many_extra_plaintiffs_are_there","16":"how_many_people_are_you_suing","17":"are_you_a_licensee_or_deferred_deposit_originator_payday_lender","18":"how_much_are_you_suing_for","19":"list_every_rent_payment_you_say_the_tenant_owes_for_the_time_between_march_1_2020_and_september_30_2021_for_each_month_state_how_much_rent_was_due_and_the_exact_date_it_was_due","20":"list_any_unpaid_charges_other_than_rent_that_you_say_the_tenant_owes_during_the_covid19_period_for_each_month_include_how_much_was_owed_when_it_was_due_and_what_the_charge_was_for_such_as_utilities_or_parking_fees","21":"list_any_payments_or_credits_you_already_received_this_includes_money_from_the_tenant_rental_assistance_programs_or_other_sources_that_reduced_what_was_owed_between_march_1_2020_and_september_30_2021_for_each_one_include_the_amount_when_it_was_paid_or_credited_and_what_it_was_for","22":"have_you_sent_a_demand_letter_to_the_defendant","23":"explain_why_you_have_not_sent_a_demand_letter_yet","24":"before_filing_this_case_you_must_show_that_you_tried_in_good_faith_to_help_the_tenant_get_rental_assistance_have_you_done_any_of_these","25":"do_you_have_any_documentation_showing_these_efforts","26":"please_attach_your_documentation_this_is_a_placeholder_for_now_until_i_implement_the_file_upload_function","27":"please_explain_your_efforts","28":"please_acknowledge_that_the_following_is_true"};
-var linkedCheckboxes = [{"linkedCheckboxId":"military_check","checkboxes":["how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_1","how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_2","how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_3"]},{"linkedCheckboxId":"public_yes","checkboxes":["are_they_a_business_or_public_entity_are_they_a_public_entity_yes_1","are_they_a_business_or_public_entity_are_they_a_public_entity_yes_2","are_they_a_business_or_public_entity_are_they_a_public_entity_yes_3"]},{"linkedCheckboxId":"6b","checkboxes":["please_explain_why_you_are_suing_at_this_location_the_rental_agreement_or_contract_was_made_signed_carried_out_or_broken_here","please_explain_why_you_are_suing_at_this_location_the_defendant_lived_or_did_business_here_when_the_agreement_was_made"]},{"linkedCheckboxId":"biz_check_100","checkboxes":["are_you_doing_business_under_a_fictious_business_name_yes","is_this_plaintiff_a_business_yes_1"]}];
+var linkedCheckboxes = [{"linkedCheckboxId":"military_check","checkboxes":["how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_1","how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_2","how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_3"]},{"linkedCheckboxId":"public_yes","checkboxes":["are_they_a_business_or_public_entity_are_they_a_public_entity_yes_1","are_they_a_business_or_public_entity_are_they_a_public_entity_yes_2","are_they_a_business_or_public_entity_are_they_a_public_entity_yes_3"]},{"linkedCheckboxId":"6b","checkboxes":["please_explain_why_you_are_suing_at_this_location_the_rental_agreement_or_contract_was_made_signed_carried_out_or_broken_here","please_explain_why_you_are_suing_at_this_location_the_defendant_lived_or_did_business_here_when_the_agreement_was_made"]},{"linkedCheckboxId":"biz_check_100","checkboxes":["are_you_doing_business_under_a_fictious_business_name_yes","is_this_plaintiff_a_business_1_yes"]}];
 var inverseCheckboxes = [{"inverseCheckboxId":"public_no","targetCheckboxId":"public_yes"}];
 var checkboxRequiredMap = {"1":true,"8":true,"24":true,"28":true};
-var unifiedFieldsMap = {"7":[{"type":"label","label":"Name","nodeId":"please_enter_your_business_details_name","order":1,"prefill":""},{"type":"location","fieldName":"Please enter your business address","nodeId":"location_data","order":2}],"15":[{"type":"label","label":"Name","nodeId":"how_many_extra_plaintiffs_are_there_name","order":1,"prefill":""},{"type":"phone","label":"Phone Number","nodeId":"how_many_extra_plaintiffs_are_there_phone_number","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name?","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name_statement_number","isAmountOption":true},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"single","options":[{"text":"An Individual","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire","conditionalLogic":{"enabled":true,"conditions":["how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"]}},{"type":"pdf","number":"1","pdfTitle":"SC-103 For Extra Plaintiff 1","pdfName":"sc103(1).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"3","pdfTitle":"SC-103 For Extra Plaintiff 3","pdfName":"sc103(3).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"5","pdfTitle":"SC-103 For Extra Plaintiff 5","pdfName":"sc103(5).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":4}],"16":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_suing_name","order":1,"prefill":"","conditionalPrefills":[{"trigger":"1","value":"[defendantName]"}]},{"type":"phone","label":"Phone","nodeId":"how_many_people_are_you_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"how_many_people_are_you_suing_name","title":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["are_they_a_business_or_public_entity_are_they_a_public_entity_yes"]}},{"type":"date","label":"When did you file the written claim?","nodeId":"are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":["are_they_a_business_or_public_entity_have_you_filed_a_written_claim_against_them_yes"]}},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":5}]};
+var unifiedFieldsMap = {"7":[{"type":"label","label":"Name","nodeId":"please_enter_your_business_details_name","order":1,"prefill":""},{"type":"location","fieldName":"Please enter your business address","nodeId":"location_data","order":2}],"15":[{"type":"label","label":"Name","nodeId":"how_many_extra_plaintiffs_are_there_name","order":1,"prefill":""},{"type":"phone","label":"Phone Number","nodeId":"how_many_extra_plaintiffs_are_there_phone_number","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this plaintiff a business?","options":[{"text":"Yes","nodeId":"is_this_plaintiff_a_business_yes"},{"text":"No","nodeId":"is_this_plaintiff_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name?","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_business_name_statement_number","isAmountOption":true},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"single","options":[{"text":"An Individual","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_when_does_their_business_statement_expire","conditionalLogic":{"enabled":true,"conditions":["how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_what_do_they_do_business_as_an_individual"]}},{"type":"pdf","number":"1","pdfTitle":"SC-103 For Extra Plaintiff 1","pdfName":"sc103(1).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"3","pdfTitle":"SC-103 For Extra Plaintiff 3","pdfName":"sc103(3).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"5","pdfTitle":"SC-103 For Extra Plaintiff 5","pdfName":"sc103(5).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":4}],"16":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_suing_name","order":1,"prefill":"","conditionalPrefills":[{"value":"[defendantName]","trigger":"1"}]},{"type":"phone","label":"Phone","nodeId":"how_many_people_are_you_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"how_many_people_are_you_suing_name","title":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":[]}},{"type":"date","label":"When did you file the written claim?","nodeId":"are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":[]}},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":5}]};
 var entryTitleMap = {"15":"Please enter the plaintiff's info"};
 
   // Address helper functions (must exist before conditional logic runs)
@@ -2019,6 +2019,44 @@ var entryTitleMap = {"15":"Please enter the plaintiff's info"};
     if (!linkedCheckboxesArray || linkedCheckboxesArray.length === 0) {
       return;
     }
+    // Helper function to find checkbox by trying multiple ID patterns
+    // Make it globally accessible so it can be used by other functions like updateAllLinkedCheckboxes
+    window.findCheckboxById = function(checkboxId) {
+      // First try exact match
+      let checkbox = document.getElementById(checkboxId);
+      if (checkbox) {
+        return checkbox;
+      }
+      // If not found, try to find by pattern matching
+      // Expected ID format: {fieldName}_{entryNumber}_{optionValue}
+      // Actual ID format (from dropdownMirror): {baseNodeId}_{fieldName}_{optionValue}_{entryNumber}
+      // Example: Expected "is_this_plaintiff_a_business_1_yes" 
+      //          Actual: "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_1"
+      const parts = checkboxId.split('_');
+      if (parts.length >= 3) {
+        // Parse expected ID: {fieldName}_{entryNumber}_{optionValue}
+        const optionValue = parts[parts.length - 1]; // last part: "yes"
+        const entryNumber = parts[parts.length - 2]; // second last: "1"
+        const fieldName = parts.slice(0, -2).join('_'); // everything before: "is_this_plaintiff_a_business"
+        
+        // Try to find checkbox with pattern: *{fieldName}_{optionValue}_{entryNumber}
+        // Or pattern: *{fieldName}*_{optionValue}_{entryNumber}
+        const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+        for (let cb of allCheckboxes) {
+          if (!cb.id) continue;
+          // Match if ID ends with: _{fieldName}_{optionValue}_{entryNumber} or just _{optionValue}_{entryNumber}
+          // and contains the field name somewhere
+          const endsWithPattern = cb.id.endsWith('_' + optionValue + '_' + entryNumber);
+          const containsFieldName = cb.id.includes(fieldName);
+          
+          if (endsWithPattern && containsFieldName) {
+            return cb;
+          }
+        }
+      }
+      return null;
+    };
+    const findCheckboxById = window.findCheckboxById;
     function updateLinkedCheckbox(linkedCheckboxId, checkboxIds) {
       const linkedCheckbox = document.getElementById(linkedCheckboxId);
       if (!linkedCheckbox) {
@@ -2026,7 +2064,7 @@ var entryTitleMap = {"15":"Please enter the plaintiff's info"};
       }
       let anyChecked = false;
       checkboxIds.forEach(checkboxId => {
-        const sourceCheckbox = document.getElementById(checkboxId);
+        const sourceCheckbox = findCheckboxById(checkboxId);
         if (sourceCheckbox && sourceCheckbox.checked) {
           anyChecked = true;
         }
@@ -2040,7 +2078,8 @@ var entryTitleMap = {"15":"Please enter the plaintiff's info"};
         return;
       }
       checkboxIds.forEach(checkboxId => {
-        const sourceCheckbox = document.getElementById(checkboxId);
+        // Try to find existing checkbox
+        let sourceCheckbox = findCheckboxById(checkboxId);
         if (sourceCheckbox) {
           sourceCheckbox.addEventListener('change', function() {
             updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
@@ -2050,6 +2089,28 @@ var entryTitleMap = {"15":"Please enter the plaintiff's info"};
               updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
             }, 0);
           });
+        } else {
+          // Checkbox doesn't exist yet (might be created dynamically), set up a watcher
+          const observer = new MutationObserver(function(mutations) {
+            const foundCheckbox = findCheckboxById(checkboxId);
+            if (foundCheckbox) {
+              foundCheckbox.addEventListener('change', function() {
+                updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+              });
+              foundCheckbox.addEventListener('click', function() {
+                setTimeout(() => {
+                  updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+                }, 0);
+              });
+              observer.disconnect();
+            }
+          });
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true
+          });
+          // Stop observing after 30 seconds to avoid memory leaks
+          setTimeout(() => observer.disconnect(), 30000);
         }
       });
       setTimeout(() => {
@@ -2073,7 +2134,7 @@ var entryTitleMap = {"15":"Please enter the plaintiff's info"};
         }
         let anyChecked = false;
         checkboxIds.forEach(checkboxId => {
-          const sourceCheckbox = document.getElementById(checkboxId);
+          const sourceCheckbox = findCheckboxById(checkboxId);
           if (sourceCheckbox && sourceCheckbox.checked) {
             anyChecked = true;
           }
@@ -3623,7 +3684,7 @@ var labelMap = {"15":["Name"],"16":["Name"],"length":0};
 var amountMap = {"15":[],"16":[],"length":0};
 var labelNodeIdsMap = {"15":["how_many_extra_plaintiffs_are_there_name"],"16":["how_many_people_are_you_suing_name"]};
 var linkedDropdowns = [];
-var hiddenLogicConfigs = [{"questionId":"14","questionNameId":"are_you_suing_by_yourself","trigger":"No","type":"checkbox","nodeId":"form","textboxText":""},{"questionId":"14","questionNameId":"are_you_suing_by_yourself","trigger":"Yes","type":"checkbox","nodeId":"form","textboxText":""},{"questionNameId":"how_many_extra_plaintiffs_are_there","trigger":"2","type":"checkbox","nodeId":"more_than_2_p","textboxText":""},{"questionNameId":"how_many_extra_plaintiffs_are_there","trigger":"4","type":"checkbox","nodeId":"more_than_4_p","textboxText":""},{"questionNameId":"how_many_extra_plaintiffs_are_there","trigger":"4","type":"checkbox","nodeId":"more_than_2_p","textboxText":""},{"questionNameId":"how_many_extra_plaintiffs_are_there","trigger":"3","type":"checkbox","nodeId":"more_than_2_p","textboxText":""},{"questionNameId":"how_many_extra_plaintiffs_are_there","trigger":"5","type":"checkbox","nodeId":"more_than_4_p","textboxText":""},{"questionNameId":"how_many_extra_plaintiffs_are_there","trigger":"5","type":"checkbox","nodeId":"more_than_2_p","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"4","type":"checkbox","nodeId":"more_than_1_d","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"4","type":"checkbox","nodeId":"more_than_2_d","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"4","type":"checkbox","nodeId":"more_than_4_d","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"3","type":"checkbox","nodeId":"more_than_1_d","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"3","type":"checkbox","nodeId":"more_than_2_d","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"2","type":"checkbox","nodeId":"more_than_1_d","textboxText":""}];
+var hiddenLogicConfigs = [{"questionId":"14","questionNameId":"are_you_suing_by_yourself","trigger":"No","type":"checkbox","nodeId":"form","textboxText":""},{"questionId":"14","questionNameId":"are_you_suing_by_yourself","trigger":"Yes","type":"checkbox","nodeId":"form","textboxText":""},{"questionNameId":"how_many_extra_plaintiffs_are_there","trigger":"2","type":"checkbox","nodeId":"more_than_2_p","textboxText":""},{"questionNameId":"how_many_extra_plaintiffs_are_there","trigger":"4","type":"checkbox","nodeId":"more_than_4_p","textboxText":""},{"questionNameId":"how_many_extra_plaintiffs_are_there","trigger":"4","type":"checkbox","nodeId":"more_than_2_p","textboxText":""},{"questionNameId":"how_many_extra_plaintiffs_are_there","trigger":"3","type":"checkbox","nodeId":"more_than_2_p","textboxText":""},{"questionNameId":"how_many_extra_plaintiffs_are_there","trigger":"5","type":"checkbox","nodeId":"more_than_4_p","textboxText":""},{"questionNameId":"how_many_extra_plaintiffs_are_there","trigger":"5","type":"checkbox","nodeId":"more_than_2_p","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"4","type":"checkbox","nodeId":"more_than_1_d","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"4","type":"checkbox","nodeId":"more_than_2_d","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"4","type":"checkbox","nodeId":"more_than_4_d","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"3","type":"checkbox","nodeId":"more_than_1_d","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"3","type":"checkbox","nodeId":"more_than_2_d","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"2","type":"checkbox","nodeId":"more_than_1_d","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"5","type":"checkbox","nodeId":"more_than_1_d","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"5","type":"checkbox","nodeId":"more_than_2_d","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"5","type":"checkbox","nodeId":"more_than_4_d","textboxText":""},{"questionNameId":"how_many_people_are_you_suing","trigger":"5","type":"checkbox","nodeId":"more_than_5_d","textboxText":""}];
 var linkedFields = [{"linkedFieldId":"military_name","fields":["how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_1","how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_2","how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_3"]}];
 var isHandlingLink = false;
 
@@ -3904,8 +3965,8 @@ var pdfOutputFileName = "sc500.pdf";
 var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["sc500", ];
-var hiddenCheckboxCalculations = [];
-var hiddenTextCalculations = [{"hiddenFieldName":"suing_over_2500","calculations":[{"terms":[{"operator":"","questionNameId":""}],"compareOperator":">","threshold":"2500","fillValue":""}]},{"hiddenFieldName":"suing_under_2500","calculations":[{"terms":[{"operator":"","questionNameId":""}],"compareOperator":"<","threshold":"2500","fillValue":""}]}];
+var hiddenCheckboxCalculations = [{"hiddenFieldName":"suing_over_2500","calculations":[{"terms":[{"operator":"","questionNameId":""}],"compareOperator":">","threshold":"2500","result":"checked"}]},{"hiddenFieldName":"suing_under_2500","calculations":[{"terms":[{"operator":"","questionNameId":""}],"compareOperator":"<","threshold":"2500","result":"checked"}]}];
+var hiddenTextCalculations = [];
 
 checkboxRequiredMap[1] = true; 
 
@@ -8560,7 +8621,7 @@ function showTextboxLabels(questionId, count){
             setTimeout(() => {
                 if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
                     if (typeof saveAnswers === 'function') {
-                        saveAnswers();
+                        saveAnswers(true); // Save immediately on change
                     }
                 } else {
                     if (typeof saveAnswersToLocalStorage === 'function') {
@@ -10614,29 +10675,119 @@ if (typeof handleNext === 'function') {
             );
             return fields;
         }
-        // Helper: save answers
-        async function saveAnswers() {
+        // Helper: quick visibility check for logging
+        function isElementActuallyVisible(el) {
+            return !!(el && (el.offsetParent || el.getClientRects().length));
+        }
+        // Debounce and queue management for saveAnswers
+        let saveAnswersTimeout = null;
+        let isSaving = false;
+        let pendingSave = false;
+        let saveRetryCount = 0;
+        const MAX_RETRIES = 3;
+        const DEBOUNCE_DELAY = 1000; // Wait 1 second after last change before saving
+        
+        // Helper: save answers (with debouncing, error handling, and visibility prioritization)
+        async function saveAnswers(immediate = false) {
             if (!isUserLoggedIn || !userId) return;
+            
+            // If immediate save requested, clear any pending debounced save
+            if (immediate && saveAnswersTimeout) {
+                clearTimeout(saveAnswersTimeout);
+                saveAnswersTimeout = null;
+            }
+            
+            // If already saving, mark that we need to save again after current save completes
+            if (isSaving) {
+                pendingSave = true;
+                return;
+            }
+            
+            // Debounce: wait for user to stop typing
+            if (!immediate) {
+                clearTimeout(saveAnswersTimeout);
+                saveAnswersTimeout = setTimeout(() => {
+                    saveAnswers(true);
+                }, DEBOUNCE_DELAY);
+                return;
+            }
+            
             // 🔧 NEW: Prevent blank values from being saved in first 3 seconds
             if (window.preventBlankSaves) {
                 return;
             }
-            const fields = getFormFields();
-            const answers = {};
-            fields.forEach(el => {
-                if (el.type === 'checkbox') {
-                    // For checkboxes, save true/false
-                    answers[el.name] = el.checked;
-                } else if (el.type === 'radio') {
-                    // For radio buttons, save the selected value or null if none selected
-                    const selectedRadio = document.querySelector('input[name="' + el.name + '"]:checked');
-                    answers[el.name] = selectedRadio ? selectedRadio.value : null;
+            
+            isSaving = true;
+            try {
+                const fields = getFormFields();
+                const answers = {};
+                const fieldVisibility = {}; // Track which fields are visible
+                
+                fields.forEach(el => {
+                    const isVisible = isElementActuallyVisible(el);
+                    const fieldName = el.name;
+                    
+                    // Skip if we already have a visible field's value and this field is hidden
+                    if (fieldVisibility[fieldName] === true && !isVisible) {
+                        return; // Skip this hidden field, we already have a visible one
+                    }
+                    
+                    // Store the value
+                    if (el.type === 'checkbox') {
+                        // For checkboxes, save true/false
+                        answers[fieldName] = el.checked;
+                    } else if (el.type === 'radio') {
+                        // For radio buttons, save the selected value or null if none selected
+                        const selectedRadio = document.querySelector('input[name="' + fieldName + '"]:checked');
+                        answers[fieldName] = selectedRadio ? selectedRadio.value : null;
+                    } else {
+                        // For other fields, save the value
+                        answers[fieldName] = el.value;
+                    }
+                    
+                    // Track visibility for this field name
+                    fieldVisibility[fieldName] = isVisible;
+                });
+                
+                // Write to Firestore with error handling and retry logic
+                await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
+                saveRetryCount = 0; // Reset retry count on success
+            } catch (error) {
+                console.error('[AUTOSAVE] error saving to Firestore:', error);
+                
+                // Handle resource-exhausted error specifically
+                if (error.code === 'resource-exhausted' || (error.message && error.message.includes('queued writes'))) {
+                    console.warn('[AUTOSAVE] Firestore write queue exhausted, will retry with backoff');
+                    
+                    // Retry with exponential backoff
+                    if (saveRetryCount < MAX_RETRIES) {
+                        saveRetryCount++;
+                        const backoffDelay = Math.min(1000 * Math.pow(2, saveRetryCount), 10000); // Max 10 seconds
+                        console.log('[AUTOSAVE] retrying in ' + backoffDelay + 'ms (attempt ' + saveRetryCount + '/' + MAX_RETRIES + ')');
+                        
+                        setTimeout(() => {
+                            saveAnswers(true); // Retry immediately
+                        }, backoffDelay);
+                    } else {
+                        console.error('[AUTOSAVE] max retries reached, giving up');
+                        saveRetryCount = 0;
+                    }
                 } else {
-                    // For other fields, save the value
-                    answers[el.name] = el.value;
+                    // For other errors, just log and reset
+                    console.error('[AUTOSAVE] non-retryable error:', error);
+                    saveRetryCount = 0;
                 }
-            });
-            await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
+            } finally {
+                isSaving = false;
+                
+                // If there's a pending save, trigger it after a short delay
+                if (pendingSave) {
+                    pendingSave = false;
+                    setTimeout(() => {
+                        saveAnswers(true);
+                    }, 500);
+                }
+            }
         }
         // Helper function to check paragraph limits for autofilled textareas
         function triggerParagraphLimitCheckForAutofilledTextareas() {
@@ -10748,7 +10899,19 @@ if (typeof handleNext === 'function') {
             window.preventBlankSaves = false;
         }, 3000);
                     const fields = getFormFields();
+                    // First pass: identify which field names have visible fields
+                    const visibleFieldNames = new Set();
                     fields.forEach(el => {
+                        if (isElementActuallyVisible(el) && el.name) {
+                            visibleFieldNames.add(el.name);
+                        }
+                    });
+                    fields.forEach(el => {
+                    // Skip hidden fields if there's a visible field with the same name
+                    const isVisible = isElementActuallyVisible(el);
+                    if (!isVisible && el.name && visibleFieldNames.has(el.name)) {
+                        return; // Skip this hidden field, there's a visible one
+                    }
                     // Check both by name and by ID for autofill
                     let autofillValue = null;
                     if (mappedData.hasOwnProperty(el.name)) {
@@ -11330,7 +11493,7 @@ if (typeof handleNext === 'function') {
             fields.forEach(el => {
                 el.addEventListener('input', function() {
                     if (isUserLoggedIn) {
-                        saveAnswers();
+                        saveAnswers(); // This is now debounced
                     } else {
                         saveAnswersToLocalStorage();
                     }
@@ -11349,7 +11512,7 @@ if (typeof handleNext === 'function') {
                 });
                 el.addEventListener('change', function() {
                     if (isUserLoggedIn) {
-                        saveAnswers();
+                        saveAnswers(true); // Save immediately on change (dropdowns, checkboxes, etc.)
                     } else {
                         saveAnswersToLocalStorage();
                     }
@@ -11367,14 +11530,8 @@ if (typeof handleNext === 'function') {
                     }
                 });
             });
-            // Set up periodic autosave every 1 second
-            setInterval(() => {
-                if (isUserLoggedIn) {
-                    saveAnswers();
-                } else {
-                    saveAnswersToLocalStorage();
-                }
-            }, 1000);
+            // 🔧 REMOVED: Periodic autosave interval - now using debounced saves on input/change events
+            // This prevents overwhelming Firestore with too many write requests
         }
         // Cart Modal Logic - now handled by global functions outside Firebase IIFE
         // Helper: save answers to localStorage for non-logged-in users
