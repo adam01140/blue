@@ -71,11 +71,25 @@ const serviceAccount = {
   client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${process.env.FIREBASE_CLIENT_EMAIL}`
 };
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`
-});
-const db = admin.firestore();
+// Initialize Firebase Admin (handle case where app might already be initialized)
+let db;
+try {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`
+  });
+  db = admin.firestore();
+  console.log('Firebase Admin initialized successfully');
+} catch (error) {
+  // If app already exists, use the existing app
+  if (error.code === 'app/already-exists') {
+    console.log('Firebase Admin app already initialized, using existing instance');
+    db = admin.firestore();
+  } else {
+    console.error('Error initializing Firebase Admin:', error);
+    throw error;
+  }
+}
 
 // ────────────────────────────────────────────────────────────
 // Static files
@@ -165,6 +179,11 @@ app.get('/api/admin-forms', async (req, res) => {
   try {
     console.log('Loading forms for admin console...');
     
+    // Check if db is initialized
+    if (!db) {
+      throw new Error('Firebase Firestore database is not initialized');
+    }
+    
     const formsRef = db.collection('forms');
     const snapshot = await formsRef.get();
     
@@ -185,9 +204,17 @@ app.get('/api/admin-forms', async (req, res) => {
 
   } catch (error) {
     console.error('Error loading admin forms:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      name: error.name
+    });
     res.status(500).json({ 
       success: false, 
-      error: 'Failed to load forms data' 
+      error: 'Failed to load forms data',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      code: error.code || undefined
     });
   }
 });

@@ -14,7 +14,7 @@
         .question-container .question-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
         .question-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 56px auto 0; max-width: 737px; }
         .question-nav-btn { width: 48px; height: 55px; border-radius: 50%; border: none; background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(30,73,150,0.22); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; line-height: 1; padding-top: 1px; }
-        .question-nav-btn.submit-mode { background: linear-gradient(135deg, #0acffe, #495aff); box-shadow: 0 10px 24px rgba(9, 132, 227, 0.35); }
+        .question-nav-btn.submit-mode { background: linear-(135deg, #0acffe, #495aff); box-shadow: 0 10px 24px rgba(9, 132, 227, 0.35); }
         .question-nav-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(28,126,214,0.25); }
         .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; }
         .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }
@@ -36,6 +36,610 @@
         .address-field:first-child { margin-top: 2px; }
         .address-field:last-child { margin-bottom: 2px; }
         .hidden { display: none !important; }
+        
+        /* ===== HEADER AND FOOTER STYLES ===== */
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            background-color: #eaf1f8;
+            zoom: 0.90;
+            min-height: 100vh;
+        }
+        /* Let the main question area grow so the footer stays flush to bottom */
+        #questions {
+            flex: 1 0 auto;
+        }
+        /* Header Base Styles */
+        header {
+            background-color: #2c3e50;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        
+        header img {
+            cursor: pointer;
+        }
+        
+        /* Desktop Navigation Base Styles */
+        nav {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 38px;
+            z-index: 2;
+        }
+        
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.18em;
+            letter-spacing: 0.02em;
+            padding: 2px 8px;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+        }
+        
+        nav a:hover {
+            color: #ff7043;
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+        }
+        
+        .nav-chevron {
+            display: inline-block;
+            margin-left: 6px;
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+        }
+        
+        .nav-chevron svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-left: auto;
+        }
+        
+        .sign-in-btn {
+            background: #fff;
+            color: #222;
+            font-weight: 700;
+            font-size: 1.08em;
+            border: none;
+            border-radius: 22px;
+            padding: 8px 28px;
+            margin-left: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            outline: none;
+        }
+        
+        .sign-in-btn:hover {
+            background: #f4f4f4;
+            color: #2980b9;
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+        }
+        
+        #cart-icon-link .cart-circle {
+            width: 54px !important;
+            height: 54px !important;
+            background: #2980b9;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        #cart-icon {
+            width: 32px !important;
+            height: 32px !important;
+            display: block;
+        }
+        
+        /* Desktop Dropdown Menu */
+        .nav-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 38px;
+            background: #fff;
+            min-width: 210px;
+            box-shadow: 0 4px 24px rgba(44,62,80,0.13);
+            border-radius: 10px;
+            z-index: 10;
+            padding: 12px 0;
+            flex-direction: column;
+            gap: 0;
+        }
+        
+        .dropdown-menu a {
+            color: #222;
+            padding: 12px 28px;
+            text-decoration: none;
+            display: block;
+            font-weight: 600;
+            font-size: 1.08em;
+            border-radius: 0;
+            transition: background 0.18s, color 0.18s;
+        }
+        
+        .dropdown-menu a:hover {
+            background: #eaf1f8;
+            color: #2980b9;
+        }
+        
+        .nav-dropdown-wrapper.open .dropdown-menu {
+            display: flex;
+            animation: dropdownFadeIn 0.22s cubic-bezier(0.4,0,0.2,1);
+        }
+        
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .forms-chevron {
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+        }
+        
+        .nav-dropdown-wrapper.open .forms-chevron {
+            transform: rotate(-90deg);
+        }
+        
+        .desktop-nav {
+            display: flex;
+        }
+        
+        /* Mobile Menu Toggle (Hamburger Button) */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .mobile-menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            transform-origin: 1px;
+        }
+        
+        .mobile-menu-toggle.active span:first-child {
+            transform: rotate(45deg);
+        }
+        
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .mobile-menu-toggle.active span:last-child {
+            transform: rotate(-45deg);
+        }
+        
+        /* Mobile Navigation Menu */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 85%;
+            max-width: 300px;
+            height: 100vh;
+            background: #2c3e50;
+            flex-direction: column;
+            padding: 100px 20px 20px 20px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .mobile-nav.active {
+            left: 150px;
+        }
+        
+        .mobile-nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 0 12px 25px;
+            border-bottom: 1px solid #34495e;
+            font-size: 1.1em;
+            font-weight: 600;
+            line-height: 1.1;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            margin-top: -20px;
+        }
+        
+        .mobile-nav-section {
+            border-bottom: 1px solid #34495e;
+        }
+        
+        .mobile-nav-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 0 12px 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .mobile-nav-submenu {
+            display: none;
+            padding-left: 20px;
+        }
+        
+        .mobile-nav-submenu.active {
+            display: block;
+        }
+        
+        .mobile-nav-submenu a {
+            padding: 10px 0 10px 45px;
+            font-size: 1em;
+            border-bottom: 1px solid #34495e;
+            line-height: 1.1;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .mobile-nav-logout {
+            color: #ff7043 !important;
+            font-weight: 700;
+        }
+        
+        .mobile-nav-toggle span {
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-nav-toggle.active span {
+            transform: rotate(180deg);
+        }
+        
+        /* Mobile Overlay */
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        
+        .mobile-nav-overlay.active {
+            display: block;
+        }
+        
+        /* Footer Base Styles - Override generate.css and generate2.css */
+        .pro-footer {
+            background: #2c3e50 !important;
+            color: #f3f7f8 !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: flex-start !important;
+            gap: 60px !important;
+            padding: 48px 10vw 20px 10vw !important;
+            border-top: 2px solid #2c3e50 !important;
+            font-family: 'Montserrat', sans-serif !important;
+            font-size: 1.18em !important;
+            margin-top: 0 !important;
+            flex-direction: row !important;
+        }
+        
+        .pro-footer-col {
+            flex: 1 1 320px !important;
+            min-width: 220px !important;
+            max-width: 420px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 18px !important;
+        }
+        
+        .address-col {
+            border-right: 1.5px solid #2c7a7d !important;
+            padding-right: 48px !important;
+            align-items: flex-start !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            padding-left: 0 !important;
+            min-width: 220px !important;
+            max-width: 420px !important;
+        }
+        
+        .nav-col {
+            align-items: flex-start !important;
+            padding-left: 32px !important;
+            padding-right: 32px !important;
+            border-right: 1.5px solid #2c7a7d !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            min-width: 220px !important;
+            max-width: 420px !important;
+        }
+        
+        .company-col {
+            align-items: flex-start !important;
+            padding-left: 48px !important;
+            padding-right: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            min-width: 220px !important;
+            max-width: 420px !important;
+        }
+        
+        .pro-footer-title {
+            font-weight: 700 !important;
+            font-size: 1.25em !important;
+            margin-bottom: 6px !important;
+            color: #fff !important;
+            letter-spacing: 0.02em !important;
+        }
+        
+        .company-title {
+            margin-top: 8px !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .pro-footer-contact a {
+            color: #b6e2e6 !important;
+            text-decoration: underline !important;
+            font-weight: 500 !important;
+            margin-right: 18px !important;
+            transition: color 0.2s !important;
+        }
+        
+        .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
+            color: #ff7043 !important;
+        }
+        
+        .pro-footer-logo {
+            margin-bottom: 8px !important;
+        }
+        
+        .pro-footer-desc {
+            color: #e0e6ea !important;
+            font-size: 1em !important;
+            margin-top: 0 !important;
+            line-height: 1.5 !important;
+        }
+        
+        .pro-footer-col.nav-col a {
+            color: #b6e2e6 !important;
+            text-decoration: none !important;
+            font-weight: 500 !important;
+            margin-bottom: 6px !important;
+            transition: color 0.2s !important;
+            font-size: 1em !important;
+        }
+        
+        .pro-footer-col.nav-col a:not(:last-child) {
+            margin-bottom: 8px !important;
+        }
+        
+        .pro-footer, footer {
+            flex-shrink: 0 !important;
+        }
+        
+        footer {
+            text-align: center !important;
+            padding: 20px !important;
+            background-color: #374656 !important;
+            color: white !important;
+        }
+        
+        /* Override generate.css @media (max-width: 900px) breakpoint */
+        @media (max-width: 900px) and (min-width: 769px) {
+            .pro-footer {
+                flex-direction: row !important;
+                gap: 60px !important;
+                padding: 48px 10vw 20px 10vw !important;
+            }
+            .address-col, .company-col, .nav-col {
+                border-right: 1.5px solid #2c7a7d !important;
+                padding-right: 48px !important;
+                padding-left: 48px !important;
+                min-width: 220px !important;
+                max-width: 420px !important;
+            }
+            .address-col {
+                padding-right: 48px !important;
+                padding-left: 0 !important;
+            }
+            .nav-col {
+                padding-left: 32px !important;
+                padding-right: 32px !important;
+            }
+            .company-col {
+                padding-left: 48px !important;
+                padding-right: 0 !important;
+            }
+        }
+        
+        /* Mobile Responsive Breakpoint */
+        @media (max-width: 768px) {
+            /* Typography adjustments */
+            html {
+                font-size: 14px !important;
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+            }
+            
+            .desktop-nav {
+                display: none !important;
+            }
+            
+            .mobile-nav {
+                display: flex;
+            }
+            
+            body {
+                overflow-x: hidden;
+            }
+            
+            header {
+                padding: 16px 15px;
+                min-height: 80px;
+                flex-wrap: wrap;
+                gap: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                position: relative;
+            }
+            
+            header img {
+                width: 119px;
+                height: 73px;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .header-actions {
+                gap: 10px;
+                margin-left: auto;
+                margin-right: 15px;
+            }
+            
+            .sign-in-btn {
+                font-size: 0.9em;
+                padding: 6px 20px;
+                margin-left: 0;
+            }
+            
+            #logout-btn {
+                display: none !important;
+            }
+            
+            #cart-icon-link .cart-circle {
+                width: 55px !important;
+                height: 55px !important;
+            }
+            
+            #cart-icon {
+                width: 30px !important;
+                height: 30px !important;
+            }
+            
+            /* Footer mobile - hide navigation column */
+            .pro-footer-col.nav-col {
+                display: none !important;
+            }
+            
+            /* Footer mobile - reduce spacing */
+            .pro-footer {
+                gap: 20px !important;
+                padding: 30px 20px 15px 20px !important;
+                flex-direction: row !important;
+            }
+            
+            .pro-footer-col.address-col {
+                padding-right: 0 !important;
+                border-right: 1.5px solid #2c7a7d !important;
+            }
+            
+            .pro-footer-col.company-col {
+                padding-left: 20px !important;
+                border-right: none !important;
+            }
+            
+            .pro-footer-contact {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            
+            .pro-footer-contact a {
+                margin-right: 0 !important;
+            }
+            
+            footer {
+                padding: 20px !important;
+                padding-bottom: 20px !important;
+                margin-bottom: 0 !important;
+            }
+            
+            html, body {
+                margin-bottom: 0 !important;
+                padding-bottom: 0 !important;
+            }
+            
+            /* Ensure footer extends to bottom with no white space */
+            footer {
+                position: relative !important;
+                margin-bottom: 0 !important;
+            }
+            
+            /* Remove any white space below footer */
+            body {
+                padding-bottom: 0 !important;
+            }
+            
+            /* Ensure footer background color extends fully */
+            .pro-footer, footer {
+                margin-bottom: 0 !important;
+            }
+        }
+        
+        @media (hover: none) and (pointer: coarse) {
+            nav a {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .sign-in-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
     </style>
     <script>
       // Phone formatter: Phone Number
@@ -59,8 +663,17 @@
 </head>
 <body>
 <header>
-    <img src="logo.png" alt="FormStar Logo" width="130" height="80" onclick="location.href='../../index.html';">
-    <nav>
+    <!-- Mobile hamburger menu button -->
+    <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <img src="../../Images/logo.png" alt="Form-Star Logo" width="130" height="80" onclick="location.href='../../index.html';">
+    
+    <!-- Desktop Navigation -->
+    <nav class="desktop-nav">
         <a href="../../index.html">Home
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </a>
@@ -69,10 +682,8 @@
                 <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
             <div class="dropdown-menu" id="forms-dropdown-menu">
-                <a href="../../Pages/forms.html">My Forms</a>
+                <a href="../../Pages/forms.html" class="auth-required" style="display: none;">My Forms</a>
                 <a href="../../Pages/FreeForm.html">Free Form</a>
-                <a href="../../Pages/Family.html">Family</a>
-                <a href="../../Pages/Property.html">Property</a>
                 <a href="../../Pages/Immigration.html">Immigration</a>
                 <a href="../../Pages/smallclaims.html">Small Claims</a>
                 <a href="../../Pages/Other.html">Other</a>
@@ -88,17 +699,40 @@
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </a>
     </nav>
+    
+    <!-- Mobile Navigation Menu -->
+    <nav class="mobile-nav" id="mobile-nav">
+        <a href="../../index.html">Home</a>
+        <div class="mobile-nav-section">
+            <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
+            <div class="mobile-nav-submenu" id="mobile-forms-menu">
+                <a href="../../Pages/forms.html" class="auth-required" style="display: none;">My Forms</a>
+                <a href="../../Pages/FreeForm.html">Free Form</a>
+                <a href="../../Pages/Immigration.html">Immigration</a>
+                <a href="../../Pages/smallclaims.html">Small Claims</a>
+                <a href="../../Pages/Other.html">Other</a>
+            </div>
+        </div>
+        <a href="../../Pages/about.html">About Us</a>
+        <a href="../../Pages/contact.html">Contact Us</a>
+        <a href="../../Pages/FAQ.html">FAQ</a>
+        <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
+            <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
+        </div>
+    </nav>
+    
+    <!-- Header Actions (Sign In Button and Cart) -->
     <div class="header-actions">
         <a href="../../Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
         <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
-        <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
+        <a href="#" id="cart-icon-link" style="display: inline-flex; align-items: center; text-decoration: none; position: relative;">
             <span class="cart-circle">
                 <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="10" cy="21" r="1.5"/>
                     <circle cx="18" cy="21" r="1.5"/>
                     <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
                 </svg>
-                <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
+                <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
             </span>
         </a>
     </div>
@@ -272,12 +906,7 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry"
-                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_hungry"></div>
-              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div>
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
@@ -920,15 +1549,25 @@ document.addEventListener("DOMContentLoaded", function() {
           }
         }
       });
-      // Global shortcut: Ctrl+CapsLock → click the visible "previous" arrow
+      // Global shortcut: Ctrl+CapsLock or Command+CapsLock → click the visible "previous" arrow
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'CapsLock' && e.ctrlKey) {
+        if (e.key === 'CapsLock' && (e.ctrlKey || e.metaKey)) {
           e.preventDefault();
           const activeSection = document.querySelector('.section.active');
           const prevBtn = activeSection ? activeSection.querySelector('.question-prev') : null;
 
           if (prevBtn) {
             prevBtn.click();
+          }
+        }
+      });
+      // Global shortcut: Ctrl+Enter or Command+Enter → submit the form
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          const submitBtn = document.querySelector('button[type="submit"]');
+          if (submitBtn && !submitBtn.disabled) {
+            submitBtn.click();
           }
         }
       });
@@ -987,32 +1626,33 @@ document.addEventListener("DOMContentLoaded", function() {
     <iframe id="previewPdfIframe" style="width: 100%; height: 98vh; border: none;"></iframe>
   </div>
 </div>
-<div class="pro-footer">
+      <!-- PROFESSIONAL FOOTER SECTION -->
+      <div class="pro-footer">
         <div class="pro-footer-col address-col">
             <div class="pro-footer-logo">
-                <img src="logo.png" alt="FormStar Logo" style="max-width:120px;max-height:80px;">
+                <img src="../../Images/logo.png" alt="Form-Star Logo" style="max-width:120px;max-height:80px;">
             </div>
-            <div class="pro-footer-title">FormStar</div>
+            <div class="pro-footer-title">Form-Star</div>
             <div class="pro-footer-contact">
-                <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
+                <a href="tel:18008508370">1-800-850-8370</a> &nbsp; 
                 <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
             </div>
         </div>
         <div class="pro-footer-col nav-col">
             <div class="pro-footer-title">Navigation</div>
-            <a href="index.html">Home</a>
-            <a href="../Pages/FreeForm.html">Forms</a>
-            <a href="../Pages/FAQ.html">FAQ</a>
-            <a href="../Pages/about.html">About Us</a>
-            <a href="../Pages/contact.html">Contact Us</a>
+            <a href="../../index.html">Home</a>
+            <a href="../../Pages/FreeForm.html">Forms</a>
+            <a href="../../Pages/FAQ.html">FAQ</a>
+            <a href="../../Pages/about.html">About Us</a>
+            <a href="../../Pages/contact.html">Contact Us</a>
         </div>
         <div class="pro-footer-col company-col">
-            <div class="pro-footer-title company-title">About FormStar</div>
-            <div class="pro-footer-desc">FormStar consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
+            <div class="pro-footer-title company-title">About Form-Star</div>
+            <div class="pro-footer-desc">Form-Star consists of a group of proven professionals with over 70 years of combined legal, technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify paperwork for everyone.</div>
         </div>
     </div>
     <footer>
-        &copy; 2024 FormStar. All rights reserved.
+        &copy; 2024 Form-Star. All rights reserved.
     </footer>
   <style>
   .alert-overlay {
@@ -1089,8 +1729,8 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"hungry"};
-var questionNameIds = {"1":"hungry"};
+var questionSlugMap = {};
+var questionNameIds = {};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {};
@@ -1246,6 +1886,44 @@ var entryTitleMap = {};
     if (!linkedCheckboxesArray || linkedCheckboxesArray.length === 0) {
       return;
     }
+    // Helper function to find checkbox by trying multiple ID patterns
+    // Make it globally accessible so it can be used by other functions like updateAllLinkedCheckboxes
+    window.findCheckboxById = function(checkboxId) {
+      // First try exact match
+      let checkbox = document.getElementById(checkboxId);
+      if (checkbox) {
+        return checkbox;
+      }
+      // If not found, try to find by pattern matching
+      // Expected ID format: {fieldName}_{entryNumber}_{optionValue}
+      // Actual ID format (from dropdownMirror): {baseNodeId}_{fieldName}_{optionValue}_{entryNumber}
+      // Example: Expected "is_this_plaintiff_a_business_1_yes" 
+      //          Actual: "how_many_extra_plaintiffs_are_there_is_this_plaintiff_a_business_yes_1"
+      const parts = checkboxId.split('_');
+      if (parts.length >= 3) {
+        // Parse expected ID: {fieldName}_{entryNumber}_{optionValue}
+        const optionValue = parts[parts.length - 1]; // last part: "yes"
+        const entryNumber = parts[parts.length - 2]; // second last: "1"
+        const fieldName = parts.slice(0, -2).join('_'); // everything before: "is_this_plaintiff_a_business"
+        
+        // Try to find checkbox with pattern: *{fieldName}_{optionValue}_{entryNumber}
+        // Or pattern: *{fieldName}*_{optionValue}_{entryNumber}
+        const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+        for (let cb of allCheckboxes) {
+          if (!cb.id) continue;
+          // Match if ID ends with: _{fieldName}_{optionValue}_{entryNumber} or just _{optionValue}_{entryNumber}
+          // and contains the field name somewhere
+          const endsWithPattern = cb.id.endsWith('_' + optionValue + '_' + entryNumber);
+          const containsFieldName = cb.id.includes(fieldName);
+          
+          if (endsWithPattern && containsFieldName) {
+            return cb;
+          }
+        }
+      }
+      return null;
+    };
+    const findCheckboxById = window.findCheckboxById;
     function updateLinkedCheckbox(linkedCheckboxId, checkboxIds) {
       const linkedCheckbox = document.getElementById(linkedCheckboxId);
       if (!linkedCheckbox) {
@@ -1253,7 +1931,7 @@ var entryTitleMap = {};
       }
       let anyChecked = false;
       checkboxIds.forEach(checkboxId => {
-        const sourceCheckbox = document.getElementById(checkboxId);
+        const sourceCheckbox = findCheckboxById(checkboxId);
         if (sourceCheckbox && sourceCheckbox.checked) {
           anyChecked = true;
         }
@@ -1267,7 +1945,8 @@ var entryTitleMap = {};
         return;
       }
       checkboxIds.forEach(checkboxId => {
-        const sourceCheckbox = document.getElementById(checkboxId);
+        // Try to find existing checkbox
+        let sourceCheckbox = findCheckboxById(checkboxId);
         if (sourceCheckbox) {
           sourceCheckbox.addEventListener('change', function() {
             updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
@@ -1277,6 +1956,28 @@ var entryTitleMap = {};
               updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
             }, 0);
           });
+        } else {
+          // Checkbox doesn't exist yet (might be created dynamically), set up a watcher
+          const observer = new MutationObserver(function(mutations) {
+            const foundCheckbox = findCheckboxById(checkboxId);
+            if (foundCheckbox) {
+              foundCheckbox.addEventListener('change', function() {
+                updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+              });
+              foundCheckbox.addEventListener('click', function() {
+                setTimeout(() => {
+                  updateLinkedCheckbox(linkedCheckboxId, checkboxIds);
+                }, 0);
+              });
+              observer.disconnect();
+            }
+          });
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true
+          });
+          // Stop observing after 30 seconds to avoid memory leaks
+          setTimeout(() => observer.disconnect(), 30000);
         }
       });
       setTimeout(() => {
@@ -1300,7 +2001,7 @@ var entryTitleMap = {};
         }
         let anyChecked = false;
         checkboxIds.forEach(checkboxId => {
-          const sourceCheckbox = document.getElementById(checkboxId);
+          const sourceCheckbox = findCheckboxById(checkboxId);
           if (sourceCheckbox && sourceCheckbox.checked) {
             anyChecked = true;
           }
@@ -2838,7 +3539,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [{"questionId":"1","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"1","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":1}];
+    var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
@@ -5320,7 +6021,7 @@ function showTextboxLabels(questionId, count){
             setTimeout(() => {
                 if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
                     if (typeof saveAnswers === 'function') {
-                        saveAnswers();
+                        saveAnswers(true); // Save immediately on change
                     }
                 } else {
                     if (typeof saveAnswersToLocalStorage === 'function') {
@@ -7374,29 +8075,119 @@ if (typeof handleNext === 'function') {
             );
             return fields;
         }
-        // Helper: save answers
-        async function saveAnswers() {
+        // Helper: quick visibility check for logging
+        function isElementActuallyVisible(el) {
+            return !!(el && (el.offsetParent || el.getClientRects().length));
+        }
+        // Debounce and queue management for saveAnswers
+        let saveAnswersTimeout = null;
+        let isSaving = false;
+        let pendingSave = false;
+        let saveRetryCount = 0;
+        const MAX_RETRIES = 3;
+        const DEBOUNCE_DELAY = 1000; // Wait 1 second after last change before saving
+        
+        // Helper: save answers (with debouncing, error handling, and visibility prioritization)
+        async function saveAnswers(immediate = false) {
             if (!isUserLoggedIn || !userId) return;
+            
+            // If immediate save requested, clear any pending debounced save
+            if (immediate && saveAnswersTimeout) {
+                clearTimeout(saveAnswersTimeout);
+                saveAnswersTimeout = null;
+            }
+            
+            // If already saving, mark that we need to save again after current save completes
+            if (isSaving) {
+                pendingSave = true;
+                return;
+            }
+            
+            // Debounce: wait for user to stop typing
+            if (!immediate) {
+                clearTimeout(saveAnswersTimeout);
+                saveAnswersTimeout = setTimeout(() => {
+                    saveAnswers(true);
+                }, DEBOUNCE_DELAY);
+                return;
+            }
+            
             // 🔧 NEW: Prevent blank values from being saved in first 3 seconds
             if (window.preventBlankSaves) {
                 return;
             }
-            const fields = getFormFields();
-            const answers = {};
-            fields.forEach(el => {
-                if (el.type === 'checkbox') {
-                    // For checkboxes, save true/false
-                    answers[el.name] = el.checked;
-                } else if (el.type === 'radio') {
-                    // For radio buttons, save the selected value or null if none selected
-                    const selectedRadio = document.querySelector('input[name="' + el.name + '"]:checked');
-                    answers[el.name] = selectedRadio ? selectedRadio.value : null;
+            
+            isSaving = true;
+            try {
+                const fields = getFormFields();
+                const answers = {};
+                const fieldVisibility = {}; // Track which fields are visible
+                
+                fields.forEach(el => {
+                    const isVisible = isElementActuallyVisible(el);
+                    const fieldName = el.name;
+                    
+                    // Skip if we already have a visible field's value and this field is hidden
+                    if (fieldVisibility[fieldName] === true && !isVisible) {
+                        return; // Skip this hidden field, we already have a visible one
+                    }
+                    
+                    // Store the value
+                    if (el.type === 'checkbox') {
+                        // For checkboxes, save true/false
+                        answers[fieldName] = el.checked;
+                    } else if (el.type === 'radio') {
+                        // For radio buttons, save the selected value or null if none selected
+                        const selectedRadio = document.querySelector('input[name="' + fieldName + '"]:checked');
+                        answers[fieldName] = selectedRadio ? selectedRadio.value : null;
+                    } else {
+                        // For other fields, save the value
+                        answers[fieldName] = el.value;
+                    }
+                    
+                    // Track visibility for this field name
+                    fieldVisibility[fieldName] = isVisible;
+                });
+                
+                // Write to Firestore with error handling and retry logic
+                await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
+                saveRetryCount = 0; // Reset retry count on success
+            } catch (error) {
+                console.error('[AUTOSAVE] error saving to Firestore:', error);
+                
+                // Handle resource-exhausted error specifically
+                if (error.code === 'resource-exhausted' || (error.message && error.message.includes('queued writes'))) {
+                    console.warn('[AUTOSAVE] Firestore write queue exhausted, will retry with backoff');
+                    
+                    // Retry with exponential backoff
+                    if (saveRetryCount < MAX_RETRIES) {
+                        saveRetryCount++;
+                        const backoffDelay = Math.min(1000 * Math.pow(2, saveRetryCount), 10000); // Max 10 seconds
+                        console.log('[AUTOSAVE] retrying in ' + backoffDelay + 'ms (attempt ' + saveRetryCount + '/' + MAX_RETRIES + ')');
+                        
+                        setTimeout(() => {
+                            saveAnswers(true); // Retry immediately
+                        }, backoffDelay);
+                    } else {
+                        console.error('[AUTOSAVE] max retries reached, giving up');
+                        saveRetryCount = 0;
+                    }
                 } else {
-                    // For other fields, save the value
-                    answers[el.name] = el.value;
+                    // For other errors, just log and reset
+                    console.error('[AUTOSAVE] non-retryable error:', error);
+                    saveRetryCount = 0;
                 }
-            });
-            await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
+            } finally {
+                isSaving = false;
+                
+                // If there's a pending save, trigger it after a short delay
+                if (pendingSave) {
+                    pendingSave = false;
+                    setTimeout(() => {
+                        saveAnswers(true);
+                    }, 500);
+                }
+            }
         }
         // Helper function to check paragraph limits for autofilled textareas
         function triggerParagraphLimitCheckForAutofilledTextareas() {
@@ -7508,7 +8299,19 @@ if (typeof handleNext === 'function') {
             window.preventBlankSaves = false;
         }, 3000);
                     const fields = getFormFields();
+                    // First pass: identify which field names have visible fields
+                    const visibleFieldNames = new Set();
                     fields.forEach(el => {
+                        if (isElementActuallyVisible(el) && el.name) {
+                            visibleFieldNames.add(el.name);
+                        }
+                    });
+                    fields.forEach(el => {
+                    // Skip hidden fields if there's a visible field with the same name
+                    const isVisible = isElementActuallyVisible(el);
+                    if (!isVisible && el.name && visibleFieldNames.has(el.name)) {
+                        return; // Skip this hidden field, there's a visible one
+                    }
                     // Check both by name and by ID for autofill
                     let autofillValue = null;
                     if (mappedData.hasOwnProperty(el.name)) {
@@ -8090,7 +8893,7 @@ if (typeof handleNext === 'function') {
             fields.forEach(el => {
                 el.addEventListener('input', function() {
                     if (isUserLoggedIn) {
-                        saveAnswers();
+                        saveAnswers(); // This is now debounced
                     } else {
                         saveAnswersToLocalStorage();
                     }
@@ -8109,7 +8912,7 @@ if (typeof handleNext === 'function') {
                 });
                 el.addEventListener('change', function() {
                     if (isUserLoggedIn) {
-                        saveAnswers();
+                        saveAnswers(true); // Save immediately on change (dropdowns, checkboxes, etc.)
                     } else {
                         saveAnswersToLocalStorage();
                     }
@@ -8127,14 +8930,8 @@ if (typeof handleNext === 'function') {
                     }
                 });
             });
-            // Set up periodic autosave every 1 second
-            setInterval(() => {
-                if (isUserLoggedIn) {
-                    saveAnswers();
-                } else {
-                    saveAnswersToLocalStorage();
-                }
-            }, 1000);
+            // 🔧 REMOVED: Periodic autosave interval - now using debounced saves on input/change events
+            // This prevents overwhelming Firestore with too many write requests
         }
         // Cart Modal Logic - now handled by global functions outside Firebase IIFE
         // Helper: save answers to localStorage for non-logged-in users
@@ -8469,14 +9266,27 @@ if (typeof handleNext === 'function') {
             function updateAuthButtons(user) {
                 const signInBtn = document.getElementById('sign-in-btn');
                 const logoutBtn = document.getElementById('logout-btn');
+                const mobileAuthSection = document.getElementById('mobile-auth-section');
+                const myFormsLinks = document.querySelectorAll('.auth-required');
+                
                 if (user) {
                     // User is signed in
                     if (signInBtn) signInBtn.style.display = 'none';
                     if (logoutBtn) logoutBtn.style.display = 'inline-block';
+                    if (mobileAuthSection) mobileAuthSection.style.display = 'block';
+                    // Show "My Forms" links
+                    myFormsLinks.forEach(link => {
+                        link.style.display = 'block';
+                    });
                 } else {
                     // User is signed out
                     if (signInBtn) signInBtn.style.display = 'inline-block';
                     if (logoutBtn) logoutBtn.style.display = 'none';
+                    if (mobileAuthSection) mobileAuthSection.style.display = 'none';
+                    // Hide "My Forms" links
+                    myFormsLinks.forEach(link => {
+                        link.style.display = 'none';
+                    });
                 }
             }
             // Authentication state observer
@@ -8532,6 +9342,107 @@ if (typeof handleNext === 'function') {
                     }
                 });
             }
+            
+            // Mobile menu functionality
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileNav = document.getElementById('mobile-nav');
+            const mobileFormsToggle = document.getElementById('mobile-forms-toggle');
+            const mobileFormsMenu = document.getElementById('mobile-forms-menu');
+            const body = document.body;
+
+            function toggleMobileMenu() {
+                mobileMenuToggle.classList.toggle('active');
+                mobileNav.classList.toggle('active');
+                body.classList.toggle('menu-open');
+            }
+
+            function closeMobileMenu() {
+                mobileMenuToggle.classList.remove('active');
+                mobileNav.classList.remove('active');
+                body.classList.remove('menu-open');
+            }
+
+            // Toggle mobile menu
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleMobileMenu();
+                });
+            }
+
+            // Toggle mobile forms submenu
+            if (mobileFormsToggle) {
+                mobileFormsToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    mobileFormsToggle.classList.toggle('active');
+                    mobileFormsMenu.classList.toggle('active');
+                });
+            }
+
+            // Close mobile menu when clicking on links
+            if (mobileNav) {
+                mobileNav.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'A' && !e.target.classList.contains('mobile-nav-toggle')) {
+                        closeMobileMenu();
+                    }
+                });
+            }
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (mobileNav && mobileMenuToggle && !mobileNav.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
+
+            // Close mobile menu on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && mobileNav && mobileNav.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+            });
+
+            // Prevent body scroll when menu is open
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        if (body.classList.contains('menu-open')) {
+                            body.style.overflow = 'hidden';
+                        } else {
+                            body.style.overflow = '';
+                        }
+                    }
+                });
+            });
+            if (body) {
+                observer.observe(body, { attributes: true });
+            }
+            
+            // Update mobile auth section based on Firebase auth state
+            const mobileAuthSection = document.getElementById('mobile-auth-section');
+            const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+            if (auth) {
+                auth.onAuthStateChanged(function(user) {
+                    if (user) {
+                        if (mobileAuthSection) mobileAuthSection.style.display = 'block';
+                    } else {
+                        if (mobileAuthSection) mobileAuthSection.style.display = 'none';
+                    }
+                });
+            }
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (auth) {
+                        auth.signOut().then(function() {
+                            window.location.reload();
+                        }).catch(function(error) {
+                            console.error('Error signing out:', error);
+                        });
+                    }
+                });
+            }
+            
             // Update cart count badge in header
             function updateCartCountBadge() {
                 const cartCountElement = document.getElementById('cart-count-badge');
@@ -8815,9 +9726,9 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
 <script>
 // Debug Menu Functionality
 let debugMenuVisible = false;
-// Show debug menu on Ctrl+Shift
+// Show debug menu on Ctrl+Shift or Command+Shift
 document.addEventListener('keydown', function(e) {
-  if (e.ctrlKey && e.shiftKey && !debugMenuVisible) {
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && !debugMenuVisible) {
     e.preventDefault();
     showDebugMenu();
   }

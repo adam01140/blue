@@ -483,8 +483,9 @@
         }
         @media (max-width: 480px) {
             .cart-side-menu {
-                width: 100%;
-                right: -100%;
+                width: 90% !important;
+                max-width: 380px !important;
+                right: -90% !important;
             }
             .cart-content {
                 padding: 20px;
@@ -1344,7 +1345,6 @@
                 <div class="dropdown-menu" id="forms-dropdown-menu">
                     <a href="forms.html" class="auth-required" style="display: none;">My Forms</a>
                     <a href="FreeForm.html">Free Form</a>
-                    <a href="Probate.html">Probate</a>
                     <a href="Immigration.html">Immigration</a>
                     <a href="smallclaims.html">Small Claims</a>
                     <a href="Other.html">Other</a>
@@ -1369,7 +1369,7 @@
                         <circle cx="18" cy="21" r="1.5"/>
                         <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
                     </svg>
-                    <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
+                    <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
                 </span>
             </a>
         </div>
@@ -1732,7 +1732,7 @@
             // Update cart count badge in header
             function updateCartCountBadge() {
                 const cartCountElement = document.getElementById('cart-count-badge');
-                if (cartCountElement && auth.currentUser && typeof getCartCount === 'function') {
+                if (cartCountElement && typeof getCartCount === 'function') {
                     const count = getCartCount();
                     if (count > 0) {
                         cartCountElement.textContent = count;

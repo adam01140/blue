@@ -1069,6 +1069,7 @@
             height: 100vh;
             background: #2c3e50;
             flex-direction: column;
+            gap: 0;
             padding: 100px 20px 20px 20px;
             transition: left 0.3s ease;
             z-index: 1000;
@@ -1084,15 +1085,14 @@
         .mobile-nav a {
             color: #fff;
             text-decoration: none;
-            padding: 12px 0 12px 25px;
+            padding: 10px 0 10px 25px;
             border-bottom: 1px solid #34495e;
             font-size: 1.1em;
             font-weight: 600;
             line-height: 1.1;
-            min-height: 50px;
+            min-height: 44px;
             display: flex;
             align-items: center;
-            margin-top: -20px;
         }
         
         .mobile-nav-section {
@@ -1129,6 +1129,12 @@
             display: flex;
             align-items: center;
         }
+        .mobile-nav-submenu a:first-child {
+            border-top: 1px solid #34495e;
+            margin-top: 0px;
+            padding-top: 30px;
+            padding-bottom: 0;
+        }
         
         .mobile-nav-logout {
             color: #ff7043 !important;
@@ -1141,6 +1147,18 @@
         
         .mobile-nav-toggle.active span {
             transform: rotate(180deg);
+        }
+
+        /* Cart side menu mobile width override (keep drawer narrower on phones) */
+        @media (max-width: 768px) {
+            .cart-side-menu {
+                width: 90% !important;
+                max-width: 380px !important;
+                right: -90% !important;
+            }
+            .cart-side-menu.active {
+                right: 0 !important;
+            }
         }
         
         /* Mobile overlay for menu */
@@ -1427,6 +1445,30 @@
                 display: none !important;
             }
             
+            /* Footer mobile - reduce spacing */
+            .pro-footer {
+                gap: 20px;
+                padding: 30px 20px 15px 20px;
+            }
+            
+            .pro-footer-col.address-col {
+                padding-right: 0;
+            }
+            
+            .pro-footer-col.company-col {
+                padding-left: 20px;
+            }
+            
+            .pro-footer-contact {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .pro-footer-contact a {
+                margin-right: 0;
+            }
+            
             footer {
                 padding-bottom: 30px !important;
             }
@@ -1603,7 +1645,7 @@
                         <circle cx="18" cy="21" r="1.5"/>
                         <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
                     </svg>
-                    <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
+                    <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
                 </span>
             </a>
         </div>
@@ -1973,7 +2015,7 @@
             // Update cart count badge in header
             function updateCartCountBadge() {
                 const cartCountElement = document.getElementById('cart-count-badge');
-                if (cartCountElement && auth.currentUser && typeof getCartCount === 'function') {
+                if (cartCountElement && typeof getCartCount === 'function') {
                     const count = getCartCount();
                     if (count > 0) {
                         cartCountElement.textContent = count;
@@ -1982,6 +2024,7 @@
                         cartCountElement.style.display = 'none';
                     }
                 } else if (cartCountElement) {
+                    // If getCartCount is not available, hide the badge
                     cartCountElement.style.display = 'none';
                 }
             }

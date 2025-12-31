@@ -470,7 +470,6 @@
                 <div class="dropdown-menu" id="forms-dropdown-menu">
                     <a href="forms.html" class="auth-required" style="display: none;">My Forms</a>
                     <a href="FreeForm.html">Free Form</a>
-                    <a href="Probate.html">Probate</a>
                     <a href="Immigration.html">Immigration</a>
                     <a href="smallclaims.html">Small Claims</a>
                     <a href="Other.html">Other</a>
@@ -820,7 +819,7 @@
         // Update cart count badge - only show when logged in
         function updateCartCountBadge() {
             const cartCountElement = document.getElementById('cart-count-badge');
-            if (cartCountElement && auth.currentUser && typeof getCartCount === 'function') {
+            if (cartCountElement && typeof getCartCount === 'function') {
                 const count = getCartCount();
                 if (count > 0) {
                     cartCountElement.textContent = count;
