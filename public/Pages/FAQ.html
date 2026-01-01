@@ -24,10 +24,8 @@
             justify-content: space-between;
             position: relative;
         }
-        header img {
-            cursor: pointer;
-        }
-        nav {
+        header img { cursor: pointer; }
+        nav.desktop-nav {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
@@ -35,7 +33,7 @@
             gap: 38px;
             z-index: 2;
         }
-        nav a {
+        nav.desktop-nav a {
             color: #fff;
             text-decoration: none;
             font-weight: 700;
@@ -47,29 +45,14 @@
             display: flex;
             align-items: center;
         }
-        nav a:hover {
+        nav.desktop-nav a:hover {
             color: #ff7043;
             background: rgba(255,255,255,0.08);
             box-shadow: 0 2px 8px rgba(44,62,80,0.10);
         }
-        .nav-chevron {
-            display: inline-block;
-            margin-left: 6px;
-            width: 14px;
-            height: 14px;
-            vertical-align: middle;
-        }
-        .nav-chevron svg {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            margin-left: auto;
-        }
+        .nav-chevron { display: inline-block; margin-left: 6px; width: 14px; height: 14px; vertical-align: middle; }
+        .nav-chevron svg { display: block; width: 100%; height: 100%; }
+        .header-actions { display: flex; align-items: center; gap: 18px; margin-left: auto; }
         .sign-in-btn {
             background: #fff;
             color: #222;
@@ -89,6 +72,134 @@
             background: #f4f4f4;
             color: #2980b9;
             box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+        }
+        /* Mobile hamburger menu styles */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .mobile-menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            transform-origin: 1px;
+        }
+        .mobile-menu-toggle.active span:first-child { transform: rotate(45deg); }
+        .mobile-menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .mobile-menu-toggle.active span:last-child { transform: rotate(-45deg); }
+        .desktop-nav { display: flex; }
+        /* Mobile nav */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 85%;
+            max-width: 300px;
+            height: 100vh;
+            background: #2c3e50;
+            flex-direction: column;
+            gap: 0;
+            padding: 140px 20px 20px 20px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .mobile-nav.active { left: 0; display: flex; }
+        .mobile-nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 0 12px 25px;
+            border-bottom: 1px solid #34495e;
+            font-size: 1.1em;
+            font-weight: 600;
+            line-height: 1.1;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+        }
+        .mobile-nav-section { border-bottom: 1px solid #34495e; }
+        .mobile-nav-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 0 12px 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .mobile-nav-submenu { display: none; padding-left: 20px; }
+        .mobile-nav-submenu.active { display: block; }
+        .mobile-nav-submenu a {
+            padding: 10px 0 10px 45px;
+            font-size: 1em;
+            border-bottom: 1px solid #34495e;
+            line-height: 1.1;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+        }
+        .mobile-nav-submenu a:first-child {
+            border-top: 1px solid #34495e;
+            padding-top: 30px;
+            padding-bottom: 0;
+        }
+        .mobile-nav-logout { color: #ff7043 !important; font-weight: 700; }
+        .mobile-nav-toggle span { transition: transform 0.3s ease; }
+        .mobile-nav-toggle.active span { transform: rotate(180deg); }
+        @media (max-width: 768px) {
+            .mobile-menu-toggle { display: flex; position: absolute; left: 15px; top: 50%; transform: translateY(-50%); z-index: 1001; }
+            .desktop-nav { display: none !important; }
+            nav:not(.mobile-nav) { display: none !important; }
+            .mobile-nav { display: none !important; }
+            .mobile-nav.active { left: 0 !important; display: flex !important; }
+            header {
+                padding: 16px 15px;
+                min-height: 80px;
+                flex-wrap: wrap;
+                gap: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                position: relative;
+            }
+            header img {
+                width: 119px;
+                height: 73px;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            .header-actions {
+                gap: 10px;
+                margin-left: auto;
+                margin-right: 15px;
+            }
+            .sign-in-btn {
+                font-size: 0.9em;
+                padding: 6px 20px;
+                margin-left: 0;
+            }
+            #logout-btn { display: none !important; }
+            .sign-in-btn { display: none !important; }
+            #cart-icon-link .cart-circle { width: 55px !important; height: 55px !important; }
+            #cart-icon { width: 30px !important; height: 30px !important; }
         }
         .btn {
             background-color: #2980b9;
@@ -131,25 +242,6 @@
             padding: 20px;
             background-color: #374656;
             color: white;
-        }
-        /* Media query for smaller screens */
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                padding: 10px;
-            }
-            nav {
-                position: static;
-                transform: none;
-                margin-top: 10px;
-            }
-            .steps {
-                grid-template-columns: 1fr;
-                max-width: 100%;
-            }
-            .faq-item h3 {
-                font-size: 1.2em;
-            }
         }
         /* Make main content flexible */
         main {
@@ -1329,12 +1421,58 @@
                 align-items: flex-start;
             }
         }
+        @media (max-width: 768px) {
+            .pro-footer {
+                gap: 20px !important;
+                padding: 30px 20px 15px 20px !important;
+                flex-direction: row !important;
+            }
+            .pro-footer-col.nav-col {
+                display: none !important;
+            }
+            .pro-footer-col.address-col {
+                padding-right: 0 !important;
+                border-right: 1.5px solid #2c7a7d !important;
+            }
+            .pro-footer-col.company-col {
+                padding-left: 20px !important;
+                border-right: none !important;
+            }
+            .pro-footer-contact {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .pro-footer-contact a {
+                margin-right: 0 !important;
+            }
+            footer {
+                padding: 20px !important;
+                padding-bottom: 20px !important;
+                margin-bottom: 0 !important;
+            }
+            html, body {
+                margin-bottom: 0 !important;
+                padding-bottom: 0 !important;
+            }
+            .pro-footer, footer {
+                margin-bottom: 0 !important;
+            }
+        }
     </style>
 </head>
 <body>
     <header>
-        <img src="logo.png" alt="FormStar Logo" width="130" height="80" onclick="location.href='../index.html';">
-        <nav>
+        <!-- Mobile hamburger menu button -->
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        <img src="../Images/logo.png" alt="Form-Star Logo" width="130" height="80" onclick="location.href='../index.html';">
+        
+        <nav class="desktop-nav">
             <a href="../index.html">Home
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
@@ -1360,8 +1498,30 @@
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
         </nav>
+        
+        <!-- Mobile navigation menu -->
+        <nav class="mobile-nav" id="mobile-nav">
+            <a href="../index.html">Home</a>
+            <div class="mobile-nav-section">
+                <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
+                <div class="mobile-nav-submenu" id="mobile-forms-menu">
+                    <a href="forms.html" class="auth-required" style="display: none;">My Forms</a>
+                    <a href="FreeForm.html">Free Form</a>
+                    <a href="Immigration.html">Immigration</a>
+                    <a href="smallclaims.html">Small Claims</a>
+                    <a href="Other.html">Other</a>
+                </div>
+            </div>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="FAQ.html">FAQ</a>
+            <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
+                <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
+            </div>
+        </nav>
+        
         <div class="header-actions">
-            <a href="account.html" class="sign-in-btn">Sign In</a>
+            <a href="account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
             <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
                 <span class="cart-circle">
                     <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1585,11 +1745,11 @@
     <div class="pro-footer">
         <div class="pro-footer-col address-col">
             <div class="pro-footer-logo">
-                <img src="logo.png" alt="FormStar Logo" style="max-width:120px;max-height:80px;">
+                <img src="../Images/logo.png" alt="Form-Star Logo" style="max-width:120px;max-height:80px;">
             </div>
             <div class="pro-footer-title">Form-Star</div>
             <div class="pro-footer-contact">
-                <a href="tel:18008508370">1-800-850-8370</a> &nbsp; 
+                <a href="tel:18008508370">1-800-850-8370</a>
                 <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
             </div>
         </div>
@@ -1634,6 +1794,8 @@
             }
             const auth = firebase.auth();
             const signInButton = document.querySelector('.sign-in-btn');
+            const mobileAuthSection = document.getElementById('mobile-auth-section');
+            const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
 
             auth.onAuthStateChanged(function(user) {
                 console.log('Auth state changed on FAQ.html. User:', user);
@@ -1655,6 +1817,7 @@
                             });
                         };
                     }
+                    if (mobileAuthSection) mobileAuthSection.style.display = 'block';
                     
                     // Show "My Forms" links
                     myFormsLinks.forEach(link => {
@@ -1667,6 +1830,7 @@
                         signInButton.href = 'account.html';
                         signInButton.onclick = null;
                     }
+                    if (mobileAuthSection) mobileAuthSection.style.display = 'none';
                     
                     // Hide "My Forms" links
                     myFormsLinks.forEach(link => {
@@ -1674,6 +1838,17 @@
                     });
                 }
             });
+
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    auth.signOut().then(() => {
+                        window.location.reload();
+                    }).catch((error) => {
+                        console.error('Error signing out:', error);
+                    });
+                });
+            }
 
             // Dropdown for Forms nav
             const formsWrapper = document.getElementById('forms-dropdown-wrapper');
@@ -1705,6 +1880,77 @@
                     dropdownOpen ? closeDropdown() : openDropdown();
                 }
             });
+
+            // Mobile menu functionality
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileNav = document.getElementById('mobile-nav');
+            const mobileFormsToggle = document.getElementById('mobile-forms-toggle');
+            const mobileFormsMenu = document.getElementById('mobile-forms-menu');
+            const body = document.body;
+
+            function toggleMobileMenu() {
+                if (mobileMenuToggle && mobileNav) {
+                    mobileMenuToggle.classList.toggle('active');
+                    mobileNav.classList.toggle('active');
+                    body.classList.toggle('menu-open');
+                }
+            }
+
+            function closeMobileMenu() {
+                if (mobileMenuToggle && mobileNav) {
+                    mobileMenuToggle.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                    body.classList.remove('menu-open');
+                }
+            }
+
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleMobileMenu();
+                });
+            }
+
+            if (mobileFormsToggle && mobileFormsMenu) {
+                mobileFormsToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    mobileFormsToggle.classList.toggle('active');
+                    mobileFormsMenu.classList.toggle('active');
+                });
+            }
+
+            if (mobileNav) {
+                mobileNav.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'A' && !e.target.classList.contains('mobile-nav-toggle')) {
+                        closeMobileMenu();
+                    }
+                });
+            }
+
+            document.addEventListener('click', function(e) {
+                if (mobileNav && mobileMenuToggle && !mobileNav.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && mobileNav && mobileNav.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+            });
+
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        if (body.classList.contains('menu-open')) {
+                            body.style.overflow = 'hidden';
+                        } else {
+                            body.style.overflow = '';
+                        }
+                    }
+                });
+            });
+            observer.observe(body, { attributes: true });
 
             // FAQ item click handling
             document.querySelectorAll('.faq-item h3').forEach(header => {

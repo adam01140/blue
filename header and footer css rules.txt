@@ -1324,6 +1324,22 @@ if (mobileMenuToggle) {
 
 **Why**: Setting `gap: 0` removes the inherited vertical spacing from the desktop nav. Then fine-tune padding/min-height for the visual alignment with divider lines.
 
+### Issue: Desktop logout/sign-in overlaps with hamburger logout on mobile
+
+**Symptom**: The white desktop logout/sign-in button shows at the same time as the hamburger menu on mobile.
+
+**Fix (CSS)**:
+```css
+@media (max-width: 768px) {
+    #logout-btn,
+    .sign-in-btn {
+        display: none !important; /* keep hamburger/mobile logout only */
+    }
+}
+```
+
+**Why**: Hides the desktop header button on small screens so only the hamburger menu and its logout entry are shown.
+
 ---
 
 ## QUICK REFERENCE: Mobile Menu Positioning Values

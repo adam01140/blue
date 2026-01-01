@@ -195,7 +195,8 @@
             height: 100vh;
             background: #2c3e50;
             flex-direction: column;
-            padding: 140px 20px 20px 20px;
+            gap: 0;
+            padding: 100px 20px 20px 20px;
             transition: left 0.3s ease;
             z-index: 1000;
             box-shadow: 2px 0 10px rgba(0,0,0,0.3);
@@ -204,22 +205,21 @@
         }
         
         .mobile-nav.active {
-            left: 0;
+            left: 150px;
             display: flex;
         }
         
         .mobile-nav a {
             color: #fff;
             text-decoration: none;
-            padding: 12px 0 12px 25px;
+            padding: 10px 0 10px 25px;
             border-bottom: 1px solid #34495e;
             font-size: 1.1em;
             font-weight: 600;
             line-height: 1.1;
-            min-height: 50px;
+            min-height: 44px;
             display: flex;
             align-items: center;
-            margin-top: 0;
         }
         
         .mobile-nav-section {
@@ -256,6 +256,11 @@
             display: flex;
             align-items: center;
         }
+        .mobile-nav-submenu a:first-child {
+            border-top: 1px solid #34495e;
+            padding-top: 30px;
+            padding-bottom: 0;
+        }
         
         .mobile-nav-logout,
         .mobile-nav-logout a,
@@ -270,6 +275,15 @@
         
         .mobile-nav-toggle.active span {
             transform: rotate(180deg);
+        }
+
+        @media (max-width: 768px) {
+            #logout-btn {
+                display: none !important;
+            }
+            .sign-in-btn {
+                display: none !important;
+            }
         }
         
         /* Mobile Overlay */
@@ -300,7 +314,7 @@
             background: #2c3e50;
             color: #fff;
             text-align: center;
-          
+            padding: 32px 20px;
         }
         .about-hero h1 {
             font-size: 2.8em;
