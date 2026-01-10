@@ -2015,13 +2015,8 @@
 
             cartIconLink.addEventListener('click', function(e) {
                 e.preventDefault();
-                if (auth.currentUser) {
-                    // User is signed in, redirect to cart.html
-                    window.location.href = 'cart.html';
-                } else {
-                    // User is not signed in, open the cart menu
-                    openCart();
-                }
+                // Always open the cart menu, regardless of mobile or auth state
+                openCart();
             });
 
             cartCloseBtn.addEventListener('click', closeCart);

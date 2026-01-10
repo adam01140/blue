@@ -1342,6 +1342,78 @@ if (mobileMenuToggle) {
 
 ---
 
+### Issue: Mobile Menu Doesn't Slide Out Fully to Left Edge
+
+**Symptom**: When the hamburger menu is opened, it doesn't slide all the way to the left edge of the screen, leaving a gap or not extending fully.
+
+**Causes**:
+1. External CSS files (like `generate.css`) overriding mobile menu positioning
+2. Conflicting `transform` properties moving the menu
+3. Missing `!important` flags on critical positioning properties
+4. Margin or padding on the menu or parent containers
+
+**Fix (CSS)**:
+```css
+.mobile-nav {
+    display: none !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 85% !important;
+    max-width: 300px !important;
+    height: 100vh !important;
+    background: #2c3e50 !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    padding: 140px 20px 20px 20px !important;
+    transition: left 0.3s ease !important;
+    z-index: 1000 !important;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    transform: none !important;
+    margin: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    right: auto !important;
+}
+
+.mobile-nav.active {
+    left: 0 !important;
+    display: flex !important;
+    right: auto !important;
+    transform: none !important;
+    margin-left: 0 !important;
+    position: fixed !important;
+}
+
+/* Also add override in mobile media query */
+@media (max-width: 768px) {
+    body .mobile-nav.active,
+    html .mobile-nav.active,
+    .mobile-nav.active {
+        left: 0 !important;
+        right: auto !important;
+        transform: none !important;
+        position: fixed !important;
+    }
+}
+```
+
+**Why**: 
+- Using `!important` on all positioning properties ensures external CSS can't override them
+- `transform: none !important` prevents any transform-based positioning from interfering
+- Explicit `margin: 0` and `margin-left: 0` ensures no gap between menu and screen edge
+- Higher specificity selectors (`body .mobile-nav.active`) ensure the rules take precedence
+- `position: fixed !important` ensures the menu is positioned relative to the viewport, not parent containers
+
+**Note**: If the menu still doesn't slide fully after applying these fixes, check for:
+- JavaScript errors preventing the `active` class from being added
+- Parent containers with `overflow: hidden` or `position: relative` that might clip the menu
+- Browser DevTools to inspect computed styles and see what's actually being applied
+
+---
+
 ## QUICK REFERENCE: Mobile Menu Positioning Values
 
 **Correct Values** (as of latest implementation):
@@ -1352,7 +1424,10 @@ if (mobileMenuToggle) {
 - Logout button color: `#ff7043` with `!important` and high specificity
 
 **Incorrect Values** (common mistakes):
-- ❌ `left: 150px` on `.mobile-nav.active` (causes gap on right)
+- ❌ `left: 150px` on `.mobile-nav.active` (causes gap on right, menu doesn't slide fully)
+- ❌ Missing `!important` flags on positioning properties (external CSS can override)
+- ❌ Missing `transform: none !important` (transform can interfere with positioning)
+- ❌ Missing explicit `margin: 0` and `margin-left: 0` (can create gap between menu and screen edge)
 - ❌ `padding: 100px 20px 20px 20px` (items too high, not aligned with dividers)
 - ❌ `margin-top: -20px` on `.mobile-nav a` (pulls items up, misaligns)
 - ❌ Missing `display: flex` on `.mobile-nav.active` (menu won't show)

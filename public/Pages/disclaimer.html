@@ -596,6 +596,13 @@
 
             cartIconLink.addEventListener('click', function(e) {
                 e.preventDefault();
+                // On mobile, always navigate to cart.html
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) {
+                    window.location.href = 'cart.html';
+                    return;
+                }
+                // On desktop, check auth state
                 if (auth.currentUser) {
                     // User is signed in, redirect to cart.html
                     window.location.href = 'cart.html';

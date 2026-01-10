@@ -1978,8 +1978,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (cartIconLink) {
         cartIconLink.addEventListener('click', async function(e) {
             e.preventDefault();
+            // Navigate directly to cart.html
+            window.location.href = 'cart.html';
+            return;
+            
             if (auth.currentUser) {
-                openCartSideMenu();
                 cartMessage.style.display = 'none';
                 cartDescription.style.display = 'none';
                 cartSignupBtn.style.display = 'none';
@@ -2075,7 +2078,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 cartItemsList.innerHTML = html;
                 cartCheckoutBtn.style.display = 'block';
             } else {
-                openCartSideMenu();
                 cartMessage.style.display = 'block';
                 cartDescription.style.display = 'block';
                 cartSignupBtn.style.display = 'inline-block';
