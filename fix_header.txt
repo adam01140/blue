@@ -1,0 +1,135 @@
+================================================================================
+HOW TO FIX DROPDOWN MENU STYLING IN HEADER NAVIGATION
+================================================================================
+
+PROBLEM:
+--------
+When dropdown menus in the header navigation don't match the styling from 
+index.html, they may have:
+- White text on white background (invisible text)
+- Orange hover color instead of blue
+- Incorrect spacing
+- Styling conflicts with nav link styles
+
+ROOT CAUSE:
+-----------
+The dropdown menu links are nested inside nav.desktop-nav elements, so they 
+inherit nav styles. The nav a:hover style uses orange color (#ff7043) which 
+overrides the dropdown menu's intended blue hover color (#2980b9).
+
+SOLUTION:
+---------
+Use more specific CSS selectors with !important flags to ensure dropdown menu 
+styles override the nav styles. The key is to make the dropdown menu selectors 
+more specific than the nav selectors.
+
+STEP-BY-STEP FIX:
+-----------------
+
+1. LOCATE THE DROPDOWN MENU CSS
+   Find the `.dropdown-menu` and `.dropdown-menu a` styles in the target file.
+
+2. UPDATE .dropdown-menu STYLES
+   Add !important to background and z-index:
+   
+   .dropdown-menu {
+       display: none;
+       position: absolute;
+       left: 0;
+       top: 38px;
+       background: #fff !important;          /* Add !important */
+       min-width: 210px;
+       box-shadow: 0 4px 24px rgba(44,62,80,0.13);
+       border-radius: 10px;
+       z-index: 1002 !important;            /* Increase z-index, add !important */
+       padding: 12px 0;
+       flex-direction: column;
+       gap: 0;
+   }
+
+3. UPDATE .dropdown-menu a STYLES WITH SPECIFIC SELECTORS
+   Use more specific selectors and add !important flags:
+   
+   /* Use multiple selectors for specificity */
+   .nav-dropdown-wrapper .dropdown-menu a,
+   nav.desktop-nav .dropdown-menu a,
+   .dropdown-menu a {
+       color: #222 !important;
+       padding: 12px 28px !important;
+       text-decoration: none !important;
+       display: block !important;
+       font-weight: 600 !important;
+       font-size: 1.08em !important;
+       border-radius: 0 !important;
+       transition: background 0.18s, color 0.18s !important;
+       letter-spacing: normal !important;    /* Override nav letter-spacing */
+       box-shadow: none !important;          /* Override nav box-shadow */
+   }
+
+4. ADD LINK STATE STYLES
+   Explicitly set colors for all link states:
+   
+   .nav-dropdown-wrapper .dropdown-menu a:link,
+   .nav-dropdown-wrapper .dropdown-menu a:visited,
+   .nav-dropdown-wrapper .dropdown-menu a:active,
+   nav.desktop-nav .dropdown-menu a:link,
+   nav.desktop-nav .dropdown-menu a:visited,
+   nav.desktop-nav .dropdown-menu a:active,
+   .dropdown-menu a:link,
+   .dropdown-menu a:visited,
+   .dropdown-menu a:active {
+       color: #222 !important;
+       background: transparent !important;
+   }
+
+5. ADD HOVER STATE WITH CORRECT COLORS
+   Ensure hover uses blue, not orange:
+   
+   .nav-dropdown-wrapper .dropdown-menu a:hover,
+   nav.desktop-nav .dropdown-menu a:hover,
+   .dropdown-menu a:hover {
+       background: #eaf1f8 !important;      /* Light blue background */
+       color: #2980b9 !important;           /* Dark blue text */
+       box-shadow: none !important;         /* Remove nav hover shadow */
+   }
+
+6. VERIFY Z-INDEX
+   Make sure z-index is high enough (1002) to appear above other elements.
+
+FILES THAT NEED THIS FIX:
+----------------------------
+- public/Pages/FreeForm.html
+- public/Pages/FAQ.html  
+- public/Pages/forms.html (already fixed)
+- Any other pages with dropdown menus that don't match index.html styling
+
+REFERENCE STYLING (from index.html):
+-------------------------------------
+The correct styling should match index.html:
+- Background: #fff (white)
+- Text color: #222 (dark gray)
+- Hover background: #eaf1f8 (light blue)
+- Hover text color: #2980b9 (dark blue)
+- Padding: 12px 28px
+- Font size: 1.08em
+- Font weight: 600
+
+TROUBLESHOOTING:
+----------------
+If dropdown menu still shows orange on hover:
+1. Check that !important flags are on all color properties
+2. Verify selectors are more specific than nav.desktop-nav a:hover
+3. Ensure styles come AFTER nav.desktop-nav styles in CSS cascade
+4. Use browser DevTools to inspect which styles are being applied
+
+If text is still invisible:
+1. Check background is set to #fff !important
+2. Verify text color is #222 !important (not white)
+3. Make sure there are no conflicting styles with higher specificity
+
+If spacing looks wrong:
+1. Verify padding: 12px 28px !important
+2. Check that letter-spacing: normal !important is set
+3. Ensure display: block !important is used
+
+================================================================================

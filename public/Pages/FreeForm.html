@@ -511,28 +511,48 @@
             position: absolute;
             left: 0;
             top: 38px;
-            background: #fff;
+            background: #fff !important;
             min-width: 210px;
             box-shadow: 0 4px 24px rgba(44,62,80,0.13);
             border-radius: 10px;
-            z-index: 10;
+            z-index: 1002 !important;
             padding: 12px 0;
             flex-direction: column;
             gap: 0;
         }
+        /* Ensure dropdown menu links are not affected by nav styles */
+        .nav-dropdown-wrapper .dropdown-menu a,
+        nav.desktop-nav .dropdown-menu a,
         .dropdown-menu a {
-            color: #222;
-            padding: 12px 28px;
-            text-decoration: none;
-            display: block;
-            font-weight: 600;
-            font-size: 1.08em;
-            border-radius: 0;
-            transition: background 0.18s, color 0.18s;
+            color: #222 !important;
+            padding: 12px 28px !important;
+            text-decoration: none !important;
+            display: block !important;
+            font-weight: 600 !important;
+            font-size: 1.08em !important;
+            border-radius: 0 !important;
+            transition: background 0.18s, color 0.18s !important;
+            letter-spacing: normal !important;
+            box-shadow: none !important;
         }
+        .nav-dropdown-wrapper .dropdown-menu a:link,
+        .nav-dropdown-wrapper .dropdown-menu a:visited,
+        .nav-dropdown-wrapper .dropdown-menu a:active,
+        nav.desktop-nav .dropdown-menu a:link,
+        nav.desktop-nav .dropdown-menu a:visited,
+        nav.desktop-nav .dropdown-menu a:active,
+        .dropdown-menu a:link,
+        .dropdown-menu a:visited,
+        .dropdown-menu a:active {
+            color: #222 !important;
+            background: transparent !important;
+        }
+        .nav-dropdown-wrapper .dropdown-menu a:hover,
+        nav.desktop-nav .dropdown-menu a:hover,
         .dropdown-menu a:hover {
-            background: #eaf1f8;
-            color: #2980b9;
+            background: #eaf1f8 !important;
+            color: #2980b9 !important;
+            box-shadow: none !important;
         }
         .nav-dropdown-wrapper.open .dropdown-menu {
             display: flex;
@@ -1308,7 +1328,7 @@
         <section class="freeform-hero-section" style="width:100%;background:#fff;border-radius:0 0 32px 32px;box-shadow:0 4px 32px rgba(44,62,80,0.07);margin-bottom:24px;padding:24px 20px 32px 20px;display:flex;flex-direction:column;align-items:center;box-sizing:border-box;">
             <div class="freeform-hero-row" style="display:flex;flex-direction:row;align-items:center;gap:48px;max-width:1100px;width:100%;box-sizing:border-box;margin:0 auto;">
                 <div class="freeform-hero-imgwrap" style="flex:1;min-width:260px;max-width:420px;display:flex;align-items:center;justify-content:center;">
-                    <img src="../Images/freeform.png" alt="Happy person at computer" class="freeform-hero-img" style="width:100%;max-width:400px;height:auto;border-radius:18px;box-shadow:0 2px 12px rgba(44,62,80,0.10);object-fit:cover;background:#eaf1f8;margin-top:40px;" />
+                    <img src="../Images/freeform2.png" alt="Happy person at computer" class="freeform-hero-img" style="width:100%;max-width:400px;height:auto;border-radius:18px;box-shadow:0 2px 12px rgba(44,62,80,0.10);object-fit:cover;background:#eaf1f8;margin-top:40px;" />
                 </div>
                 <div class="freeform-hero-copy" style="flex:2;min-width:260px;">
                     <h1 style="font-size:2.6em;color:#2c3e50;font-family:'Montserrat',serif;font-weight:700;margin-bottom:18px;">Free Forms</h1>
@@ -1332,7 +1352,7 @@
                     <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;">Get Started</a>
                 </div>
                 <!-- FW-001-GC Card -->
-                <div class="freeform-card">
+                <div class="freeform-card" style="cursor: pointer;" onclick="window.location.href='../Forms/Fee-Waiver/feewaiver.html?formId=fee-waiver';">
                     <svg width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="FW-001-GC Icon" style="margin-bottom:18px;display:block;">
                       <circle cx="50" cy="50" r="45" fill="#eaf1f8" stroke="#2980b9" stroke-width="2"/>
                       <text x="50%" y="42%" text-anchor="middle" font-family="Montserrat, sans-serif" font-size="1.1em" font-weight="bold" fill="#2980b9">FW-001</text>
@@ -1341,7 +1361,7 @@
                     <div style="font-size:1.25em;font-weight:700;color:#2c3e50;margin-bottom:8px;">FW-001-GC Fee Waiver</div>
                     <div style="font-size:1.05em;color:#555;margin-bottom:16px;">Request a court fee waiver if you cannot afford to pay court fees and costs for your case.</div>
                     <div style="font-size:1.1em;color:#2980b9;font-weight:700;margin-bottom:10px;">Free</div>
-                    <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;">Get Started</a>
+                    <a href="../Forms/Fee-Waiver/feewaiver.html?formId=fee-waiver" class="btn" style="padding:10px 36px;font-size:1.08em;" onclick="event.stopPropagation();">Get Started</a>
                 </div>
                 <!-- PCOR Card -->
                 <div class="freeform-card">

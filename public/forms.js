@@ -70,7 +70,7 @@ window.onclick = function(event) {
 // Logout Function
 logoutButton.addEventListener('click', () => {
     auth.signOut().then(() => {
-        window.location.href = 'index.html';
+        window.location.href = '../index.html';
     }).catch((error) => {
         console.error('Sign Out Error', error);
     });
@@ -1375,7 +1375,7 @@ const settingsLogoutBtn = document.getElementById('settings-logout-btn');
 if (settingsLogoutBtn) {
     settingsLogoutBtn.addEventListener('click', function() {
         auth.signOut().then(() => {
-            window.location.href = 'index.html';
+            window.location.href = '../index.html';
         }).catch((error) => {
             alert('Sign Out Error: ' + error.message);
         });

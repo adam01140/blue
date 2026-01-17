@@ -16,6 +16,31 @@
     
     // Calculate path to login page based on current location
     function getLoginPagePath() {
+        // Check if we're using file:// protocol
+        const isFileProtocol = window.location.protocol === 'file:';
+        
+        if (isFileProtocol) {
+            // For file:// protocol, calculate relative path based on current HTML file location
+            // login.html is always in the /public/ directory
+            // We need to find where we are relative to /public/
+            const currentHref = window.location.href;
+            const publicIndex = currentHref.indexOf('/public/');
+            
+            if (publicIndex !== -1) {
+                // Extract the path after /public/
+                const pathAfterPublic = currentHref.substring(publicIndex + '/public/'.length);
+                // Remove the HTML filename
+                const pathParts = pathAfterPublic.split('/').filter(p => p && !p.endsWith('.html'));
+                // Calculate how many directories deep we are from /public/
+                const depth = pathParts.length;
+                // Build relative path (go up to public folder, then login.html)
+                return depth > 0 ? '../'.repeat(depth) + 'login.html' : 'login.html';
+            } else {
+                // Fallback: assume we're one level deep (most common case)
+                return '../login.html';
+            }
+        } else {
+            // For http/https protocols, use the original logic
         const path = window.location.pathname;
         // Split path and filter out empty strings and the HTML file
         const parts = path.split('/').filter(p => p && !p.endsWith('.html'));
@@ -25,6 +50,7 @@
         // If depth is 0, we're at root, so just 'login.html'
         // If depth is 1, we're in a subfolder, so '../login.html'
         return depth > 0 ? '../'.repeat(depth) + 'login.html' : 'login.html';
+        }
     }
     
     // Function to check if user is authenticated
@@ -71,18 +97,49 @@
         const params = new URLSearchParams(window.location.search);
         const redirect = params.get('redirect');
         if (redirect) {
+            // For file:// protocol, the redirect should already be relative to /public/
+            // (set by redirectToLogin), so we can use it directly
+            const isFileProtocol = window.location.protocol === 'file:';
+            if (isFileProtocol && redirect.includes('/public/')) {
+                // If it somehow still contains /public/, extract the path after it
+                const publicIndex = redirect.indexOf('/public/');
+                const pathAfterPublic = redirect.substring(publicIndex + '/public/'.length);
+                // Remove any leading slashes
+                return pathAfterPublic.replace(/^\/+/, '');
+            }
+            // For file://, the redirect should be a relative path like "Pages/account.html"
+            // For http/https, it might be an absolute path like "/Pages/account.html"
             return redirect;
         }
-        // Default to index.html (adjust path based on current location)
-        const path = window.location.pathname;
-        const parts = path.split('/').filter(p => p && !p.endsWith('.html'));
-        const depth = Math.max(0, parts.length);
-        return depth > 0 ? '../'.repeat(depth) + 'index.html' : 'index.html';
+        // Default to index.html (login.html is in /public/, so index.html is there too)
+        return 'index.html';
     }
     
     // Function to redirect to login with current page as redirect
     function redirectToLogin() {
-        const currentUrl = window.location.pathname + window.location.search;
+        const isFileProtocol = window.location.protocol === 'file:';
+        let currentUrl;
+        
+        if (isFileProtocol) {
+            // For file://, extract path relative to /public/ since login.html is also in /public/
+            const currentHref = window.location.href;
+            const publicIndex = currentHref.indexOf('/public/');
+            if (publicIndex !== -1) {
+                // Extract path after /public/ (this will be relative to login.html's location)
+                const pathAfterPublic = currentHref.substring(publicIndex + '/public/'.length);
+                // Remove query string if present before extracting path
+                const pathOnly = pathAfterPublic.split('?')[0];
+                const queryString = window.location.search;
+                // Store as path relative to /public/ (without leading slash)
+                currentUrl = pathOnly + queryString;
+            } else {
+                // Fallback
+                currentUrl = window.location.pathname + window.location.search;
+            }
+        } else {
+            currentUrl = window.location.pathname + window.location.search;
+        }
+        
         const loginPagePath = getLoginPagePath();
         const loginUrl = loginPagePath + '?redirect=' + encodeURIComponent(currentUrl);
         // Use replace instead of href to prevent back button from accessing protected page

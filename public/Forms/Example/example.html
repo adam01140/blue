@@ -14,7 +14,7 @@
         .question-container .question-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
         .question-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 56px auto 0; max-width: 737px; }
         .question-nav-btn { width: 48px; height: 55px; border-radius: 50%; border: none; background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(30,73,150,0.22); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; line-height: 1; padding-top: 1px; }
-        .question-nav-btn.submit-mode { background: linear-(135deg, #0acffe, #495aff); box-shadow: 0 10px 24px rgba(9, 132, 227, 0.35); }
+        .question-nav-btn.submit-mode { background: linear-gradient(135deg, #0acffe, #495aff); box-shadow: 0 10px 24px rgba(9, 132, 227, 0.35); }
         .question-nav-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(28,126,214,0.25); }
         .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; }
         .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }
@@ -36,610 +36,28 @@
         .address-field:first-child { margin-top: 2px; }
         .address-field:last-child { margin-bottom: 2px; }
         .hidden { display: none !important; }
-        
-        /* ===== HEADER AND FOOTER STYLES ===== */
-        html, body {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            font-family: 'Montserrat', sans-serif;
-            color: #333;
-            background-color: #eaf1f8;
-            zoom: 0.90;
-            min-height: 100vh;
-        }
-        /* Let the main question area grow so the footer stays flush to bottom */
-        #questions {
-            flex: 1 0 auto;
-        }
-        /* Header Base Styles */
-        header {
-            background-color: #2c3e50;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-        }
-        
-        header img {
-            cursor: pointer;
-        }
-        
-        /* Desktop Navigation Base Styles */
-        nav {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 38px;
-            z-index: 2;
-        }
-        
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.18em;
-            letter-spacing: 0.02em;
-            padding: 2px 8px;
-            transition: color 0.2s, background 0.2s, box-shadow 0.2s;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-        }
-        
-        nav a:hover {
-            color: #ff7043;
-            background: rgba(255,255,255,0.08);
-            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
-        }
-        
-        .nav-chevron {
-            display: inline-block;
-            margin-left: 6px;
-            width: 14px;
-            height: 14px;
-            vertical-align: middle;
-        }
-        
-        .nav-chevron svg {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-            margin-left: auto;
-        }
-        
-        .sign-in-btn {
-            background: #fff;
-            color: #222;
-            font-weight: 700;
-            font-size: 1.08em;
-            border: none;
-            border-radius: 22px;
-            padding: 8px 28px;
-            margin-left: 18px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
-            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-            text-decoration: none;
-            outline: none;
-        }
-        
-        .sign-in-btn:hover {
-            background: #f4f4f4;
-            color: #2980b9;
-            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
-        }
-        
-        #cart-icon-link .cart-circle {
-            width: 54px !important;
-            height: 54px !important;
-            background: #2980b9;
-            border-radius: 50%;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        
-        #cart-icon {
-            width: 32px !important;
-            height: 32px !important;
-            display: block;
-        }
-        
-        /* Desktop Dropdown Menu */
-        .nav-dropdown-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            left: 0;
-            top: 38px;
-            background: #fff;
-            min-width: 210px;
-            box-shadow: 0 4px 24px rgba(44,62,80,0.13);
-            border-radius: 10px;
-            z-index: 10;
-            padding: 12px 0;
-            flex-direction: column;
-            gap: 0;
-        }
-        
-        .dropdown-menu a {
-            color: #222;
-            padding: 12px 28px;
-            text-decoration: none;
-            display: block;
-            font-weight: 600;
-            font-size: 1.08em;
-            border-radius: 0;
-            transition: background 0.18s, color 0.18s;
-        }
-        
-        .dropdown-menu a:hover {
-            background: #eaf1f8;
-            color: #2980b9;
-        }
-        
-        .nav-dropdown-wrapper.open .dropdown-menu {
-            display: flex;
-            animation: dropdownFadeIn 0.22s cubic-bezier(0.4,0,0.2,1);
-        }
-        
-        @keyframes dropdownFadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .forms-chevron {
-            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
-        }
-        
-        .nav-dropdown-wrapper.open .forms-chevron {
-            transform: rotate(-90deg);
-        }
-        
-        .desktop-nav {
-            display: flex;
-        }
-        
-        /* Mobile Menu Toggle (Hamburger Button) */
-        .mobile-menu-toggle {
-            display: none;
-            flex-direction: column;
-            justify-content: space-around;
-            width: 30px;
-            height: 30px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            z-index: 1001;
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        
-        .mobile-menu-toggle span {
-            width: 25px;
-            height: 3px;
-            background: #fff;
-            border-radius: 3px;
-            transition: all 0.3s ease;
-            transform-origin: 1px;
-        }
-        
-        .mobile-menu-toggle.active span:first-child {
-            transform: rotate(45deg);
-        }
-        
-        .mobile-menu-toggle.active span:nth-child(2) {
-            opacity: 0;
-        }
-        
-        .mobile-menu-toggle.active span:last-child {
-            transform: rotate(-45deg);
-        }
-        
-        /* Mobile Navigation Menu */
-        .mobile-nav {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 85%;
-            max-width: 300px;
-            height: 100vh;
-            background: #2c3e50;
-            flex-direction: column;
-            padding: 100px 20px 20px 20px;
-            transition: left 0.3s ease;
-            z-index: 1000;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .mobile-nav.active {
-            left: 150px;
-        }
-        
-        .mobile-nav a {
-            color: #fff;
-            text-decoration: none;
-            padding: 12px 0 12px 25px;
-            border-bottom: 1px solid #34495e;
-            font-size: 1.1em;
-            font-weight: 600;
-            line-height: 1.1;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            margin-top: -20px;
-        }
-        
-        .mobile-nav-section {
-            border-bottom: 1px solid #34495e;
-        }
-        
-        .mobile-nav-toggle {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #fff;
-            text-decoration: none;
-            padding: 12px 0 12px 25px;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        .mobile-nav-submenu {
-            display: none;
-            padding-left: 20px;
-        }
-        
-        .mobile-nav-submenu.active {
-            display: block;
-        }
-        
-        .mobile-nav-submenu a {
-            padding: 10px 0 10px 45px;
-            font-size: 1em;
-            border-bottom: 1px solid #34495e;
-            line-height: 1.1;
-            min-height: 45px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .mobile-nav-logout {
-            color: #ff7043 !important;
-            font-weight: 700;
-        }
-        
-        .mobile-nav-toggle span {
-            transition: transform 0.3s ease;
-        }
-        
-        .mobile-nav-toggle.active span {
-            transform: rotate(180deg);
-        }
-        
-        /* Mobile Overlay */
-        .mobile-nav-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-        
-        .mobile-nav-overlay.active {
-            display: block;
-        }
-        
-        /* Footer Base Styles - Override generate.css and generate2.css */
-        .pro-footer {
-            background: #2c3e50 !important;
-            color: #f3f7f8 !important;
-            display: flex !important;
-            justify-content: center !important;
-            align-items: flex-start !important;
-            gap: 60px !important;
-            padding: 48px 10vw 20px 10vw !important;
-            border-top: 2px solid #2c3e50 !important;
-            font-family: 'Montserrat', sans-serif !important;
-            font-size: 1.18em !important;
-            margin-top: 0 !important;
-            flex-direction: row !important;
-        }
-        
-        .pro-footer-col {
-            flex: 1 1 320px !important;
-            min-width: 220px !important;
-            max-width: 420px !important;
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 18px !important;
-        }
-        
-        .address-col {
-            border-right: 1.5px solid #2c7a7d !important;
-            padding-right: 48px !important;
-            align-items: flex-start !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            padding-left: 0 !important;
-            min-width: 220px !important;
-            max-width: 420px !important;
-        }
-        
-        .nav-col {
-            align-items: flex-start !important;
-            padding-left: 32px !important;
-            padding-right: 32px !important;
-            border-right: 1.5px solid #2c7a7d !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            min-width: 220px !important;
-            max-width: 420px !important;
-        }
-        
-        .company-col {
-            align-items: flex-start !important;
-            padding-left: 48px !important;
-            padding-right: 0 !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            min-width: 220px !important;
-            max-width: 420px !important;
-        }
-        
-        .pro-footer-title {
-            font-weight: 700 !important;
-            font-size: 1.25em !important;
-            margin-bottom: 6px !important;
-            color: #fff !important;
-            letter-spacing: 0.02em !important;
-        }
-        
-        .company-title {
-            margin-top: 8px !important;
-            margin-bottom: 0 !important;
-        }
-        
-        .pro-footer-contact a {
-            color: #b6e2e6 !important;
-            text-decoration: underline !important;
-            font-weight: 500 !important;
-            margin-right: 18px !important;
-            transition: color 0.2s !important;
-        }
-        
-        .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
-            color: #ff7043 !important;
-        }
-        
-        .pro-footer-logo {
-            margin-bottom: 8px !important;
-        }
-        
-        .pro-footer-desc {
-            color: #e0e6ea !important;
-            font-size: 1em !important;
-            margin-top: 0 !important;
-            line-height: 1.5 !important;
-        }
-        
-        .pro-footer-col.nav-col a {
-            color: #b6e2e6 !important;
-            text-decoration: none !important;
-            font-weight: 500 !important;
-            margin-bottom: 6px !important;
-            transition: color 0.2s !important;
-            font-size: 1em !important;
-        }
-        
-        .pro-footer-col.nav-col a:not(:last-child) {
-            margin-bottom: 8px !important;
-        }
-        
-        .pro-footer, footer {
-            flex-shrink: 0 !important;
-        }
-        
-        footer {
-            text-align: center !important;
-            padding: 20px !important;
-            background-color: #374656 !important;
-            color: white !important;
-        }
-        
-        /* Override generate.css @media (max-width: 900px) breakpoint */
-        @media (max-width: 900px) and (min-width: 769px) {
-            .pro-footer {
-                flex-direction: row !important;
-                gap: 60px !important;
-                padding: 48px 10vw 20px 10vw !important;
-            }
-            .address-col, .company-col, .nav-col {
-                border-right: 1.5px solid #2c7a7d !important;
-                padding-right: 48px !important;
-                padding-left: 48px !important;
-                min-width: 220px !important;
-                max-width: 420px !important;
-            }
-            .address-col {
-                padding-right: 48px !important;
-                padding-left: 0 !important;
-            }
-            .nav-col {
-                padding-left: 32px !important;
-                padding-right: 32px !important;
-            }
-            .company-col {
-                padding-left: 48px !important;
-                padding-right: 0 !important;
-            }
-        }
-        
-        /* Mobile Responsive Breakpoint */
-        @media (max-width: 768px) {
-            /* Typography adjustments */
-            html {
-                font-size: 14px !important;
-            }
-            
-            .mobile-menu-toggle {
-                display: flex;
-            }
-            
-            .desktop-nav {
-                display: none !important;
-            }
-            
-            .mobile-nav {
-                display: flex;
-            }
-            
-            body {
-                overflow-x: hidden;
-            }
-            
-            header {
-                padding: 16px 15px;
-                min-height: 80px;
-                flex-wrap: wrap;
-                gap: 12px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                position: relative;
-            }
-            
-            header img {
-                width: 119px;
-                height: 73px;
-                position: absolute;
-                left: 50%;
-                transform: translateX(-50%);
-            }
-            
-            .header-actions {
-                gap: 10px;
-                margin-left: auto;
-                margin-right: 15px;
-            }
-            
-            .sign-in-btn {
-                font-size: 0.9em;
-                padding: 6px 20px;
-                margin-left: 0;
-            }
-            
-            #logout-btn {
-                display: none !important;
-            }
-            
-            #cart-icon-link .cart-circle {
-                width: 55px !important;
-                height: 55px !important;
-            }
-            
-            #cart-icon {
-                width: 30px !important;
-                height: 30px !important;
-            }
-            
-            /* Footer mobile - hide navigation column */
-            .pro-footer-col.nav-col {
-                display: none !important;
-            }
-            
-            /* Footer mobile - reduce spacing */
-            .pro-footer {
-                gap: 20px !important;
-                padding: 30px 20px 15px 20px !important;
-                flex-direction: row !important;
-            }
-            
-            .pro-footer-col.address-col {
-                padding-right: 0 !important;
-                border-right: 1.5px solid #2c7a7d !important;
-            }
-            
-            .pro-footer-col.company-col {
-                padding-left: 20px !important;
-                border-right: none !important;
-            }
-            
-            .pro-footer-contact {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 8px !important;
-            }
-            
-            .pro-footer-contact a {
-                margin-right: 0 !important;
-            }
-            
-            footer {
-                padding: 20px !important;
-                padding-bottom: 20px !important;
-                margin-bottom: 0 !important;
-            }
-            
-            html, body {
-                margin-bottom: 0 !important;
-                padding-bottom: 0 !important;
-            }
-            
-            /* Ensure footer extends to bottom with no white space */
-            footer {
-                position: relative !important;
-                margin-bottom: 0 !important;
-            }
-            
-            /* Remove any white space below footer */
-            body {
-                padding-bottom: 0 !important;
-            }
-            
-            /* Ensure footer background color extends fully */
-            .pro-footer, footer {
-                margin-bottom: 0 !important;
-            }
-        }
-        
-        @media (hover: none) and (pointer: coarse) {
-            nav a {
-                min-height: 44px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            
-            .sign-in-btn {
-                min-height: 44px;
-                min-width: 44px;
-            }
-        }
+        .file-upload-container { margin: 20px 0; }
+        .file-upload-dropzone { border: 2px dashed #2f7bff; border-radius: 12px; padding: 40px 20px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.3s ease; }
+        .file-upload-dropzone:hover { background-color: #e9ecef; border-color: #0d4ed8; }
+        .file-upload-dropzone.file-upload-dragover { background-color: #e3f2fd; border-color: #0d4ed8; border-style: solid; }
+        .file-upload-content { pointer-events: none; }
+        .file-upload-text { margin: 8px 0; color: #2c3e50; font-size: 16px; font-weight: 500; }
+        .file-upload-link { color: #2f7bff; text-decoration: underline; cursor: pointer; pointer-events: auto; }
+        .file-upload-link:hover { color: #0d4ed8; }
+        .file-upload-hint { margin: 4px 0 0 0; color: #6c757d; font-size: 14px; }
+        .file-upload-preview { margin-top: 20px; border: 1px solid #dee2e6; border-radius: 8px; background-color: #ffffff; padding: 16px; }
+        .file-upload-preview-body { margin-bottom: 12px; }
+        .file-upload-cancel { background: #dc3545; color: white; border: none; border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 14px; font-weight: 500; display: block; margin: 0 auto; transition: background 0.2s ease; }
+        .file-upload-cancel:hover { background: #c82333; }
+        .file-upload-preview-body img { max-width: 100%; max-height: 400px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .file-upload-preview-body iframe { width: 100%; height: 500px; border: 1px solid #dee2e6; border-radius: 8px; }
+        .signin-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 10000; display: none; align-items: center; justify-content: center; }
+        .signin-modal { background-color: #ffffff; border-radius: 12px; padding: 32px; max-width: 500px; width: 90%; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); text-align: center; position: relative; }
+        .signin-modal h2 { margin: 0 0 16px 0; color: #2c3e50; font-size: 24px; font-weight: 700; }
+        .signin-modal p { margin: 0 0 24px 0; color: #5a6c7d; font-size: 16px; line-height: 1.5; }
+        .signin-modal-button { background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; border: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(47, 123, 255, 0.3); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .signin-modal-button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(47, 123, 255, 0.4); }
+        .signin-modal-button:active { transform: translateY(0); }
     </style>
     <script>
       // Phone formatter: Phone Number
@@ -663,17 +81,8 @@
 </head>
 <body>
 <header>
-    <!-- Mobile hamburger menu button -->
-    <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
-    
-    <img src="../../Images/logo.png" alt="Form-Star Logo" width="130" height="80" onclick="location.href='../../index.html';">
-    
-    <!-- Desktop Navigation -->
-    <nav class="desktop-nav">
+    <img src="logo.png" alt="FormStar Logo" width="130" height="80" onclick="location.href='../../index.html';">
+    <nav>
         <a href="../../index.html">Home
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </a>
@@ -682,8 +91,10 @@
                 <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
             <div class="dropdown-menu" id="forms-dropdown-menu">
-                <a href="../../Pages/forms.html" class="auth-required" style="display: none;">My Forms</a>
+                <a href="../../Pages/forms.html">My Forms</a>
                 <a href="../../Pages/FreeForm.html">Free Form</a>
+                <a href="../../Pages/Family.html">Family</a>
+                <a href="../../Pages/Property.html">Property</a>
                 <a href="../../Pages/Immigration.html">Immigration</a>
                 <a href="../../Pages/smallclaims.html">Small Claims</a>
                 <a href="../../Pages/Other.html">Other</a>
@@ -699,40 +110,17 @@
             <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </a>
     </nav>
-    
-    <!-- Mobile Navigation Menu -->
-    <nav class="mobile-nav" id="mobile-nav">
-        <a href="../../index.html">Home</a>
-        <div class="mobile-nav-section">
-            <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
-            <div class="mobile-nav-submenu" id="mobile-forms-menu">
-                <a href="../../Pages/forms.html" class="auth-required" style="display: none;">My Forms</a>
-                <a href="../../Pages/FreeForm.html">Free Form</a>
-                <a href="../../Pages/Immigration.html">Immigration</a>
-                <a href="../../Pages/smallclaims.html">Small Claims</a>
-                <a href="../../Pages/Other.html">Other</a>
-            </div>
-        </div>
-        <a href="../../Pages/about.html">About Us</a>
-        <a href="../../Pages/contact.html">Contact Us</a>
-        <a href="../../Pages/FAQ.html">FAQ</a>
-        <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
-            <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
-        </div>
-    </nav>
-    
-    <!-- Header Actions (Sign In Button and Cart) -->
     <div class="header-actions">
         <a href="../../Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
         <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
-        <a href="#" id="cart-icon-link" style="display: inline-flex; align-items: center; text-decoration: none; position: relative;">
+        <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
             <span class="cart-circle">
                 <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="10" cy="21" r="1.5"/>
                     <circle cx="18" cy="21" r="1.5"/>
                     <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
                 </svg>
-                <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
+                <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
             </span>
         </a>
     </div>
@@ -906,13 +294,60 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Section 1</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Section 1</h1>
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Employment Info</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Employment Info</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Does anybody else live in your home?</h3></label><select id="does_anybody_else_live_in_your_home" name="does_anybody_else_live_in_your_home" data-question-id="1"
+                      onchange="dropdownMirror(this, 'does_anybody_else_live_in_your_home'); updateHiddenLogic('does_anybody_else_live_in_your_home', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_does_anybody_else_live_in_your_home"></div>
+              <input type="text" id="does_anybody_else_live_in_your_home_dropdown" name="does_anybody_else_live_in_your_home_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many other people live in your household?</h3></label><select id="how_many_other_people_live_in_your_household" name="how_many_other_people_live_in_your_household" data-question-id="2" onchange="showTextboxLabels(2, this.value); updateHiddenCheckboxes(2, this.value); updateHiddenLogic('how_many_other_people_live_in_your_household', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer2"></div></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
       </div>
     <br><br><div class="navigation-buttons" style="display:none;"><button type="submit" class="next-button">Submit</button></div></div>
   <script>
+    // Function to show sign-in required modal
+    function showSignInRequiredModal() {
+      const modal = document.getElementById('signinRequiredModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal) {
+            modal.style.display = 'none';
+          }
+        });
+      }
+    }
+
+    // Function to hide sign-in required modal
+    function hideSignInRequiredModal() {
+      const modal = document.getElementById('signinRequiredModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+
+    // Function to check if user is logged in before navigation
+    function checkAuthBeforeNavigate(callback) {
+      // Check if isUserLoggedIn is defined (Firebase auth might not be loaded yet)
+      if (typeof isUserLoggedIn === 'undefined') {
+        // Wait a bit for Firebase auth to initialize
+        setTimeout(function() {
+          if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) {
+            if (callback) callback();
+          } else {
+            showSignInRequiredModal();
+          }
+        }, 500);
+      } else if (isUserLoggedIn) {
+        if (callback) callback();
+      } else {
+        showSignInRequiredModal();
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       console.groupCollapsed('[NAV DEBUG] form boot');
       const qtMap = (typeof questionTypesMap !== 'undefined') ? questionTypesMap : (window.questionTypesMap || {});
@@ -952,25 +387,54 @@ document.addEventListener("DOMContentLoaded", function() {
           const items = Array.from(targetSectionEl.querySelectorAll('.question-container.question-item'));
           const indices = [];
           items.forEach(function(item, idx) {
-            if (!item.classList.contains('hidden')) {
+            // Only exclude questions that have the 'hidden' class
+            // Questions without the 'hidden' class should be considered visible
+            // even if their parent section is not active (they'll become visible when section activates)
+            const hasHiddenClass = item.classList.contains('hidden');
+            if (!hasHiddenClass) {
               indices.push(idx);
+
+            } else {
+
             }
           });
+
           return { indices, items };
         }
         function findNextSectionWithVisibleQuestions() {
+
           for (let nextIdx = sectionIdx + 1; nextIdx < sectionElements.length; nextIdx++) {
             const candidateSection = sectionElements[nextIdx];
+
             const visibleInfo = getVisibleIndicesForSectionElement(candidateSection);
+
+            // If we find visible questions, return immediately
             if (visibleInfo.indices.length) {
-              return {
+              const result = {
                 sectionEl: candidateSection,
                 sectionId: candidateSection.id,
                 sectionNumber: sectionNumbers[nextIdx] || (nextIdx + 1),
                 firstVisibleIndex: visibleInfo.indices[0]
               };
+
+              return result;
+            }
+            // If no visible questions found, check if section has any questions at all
+            // This handles cases where questions might be hidden initially but should become visible
+            const allQuestions = candidateSection.querySelectorAll('.question-container.question-item');
+            if (allQuestions.length > 0) {
+
+              const result = {
+                sectionEl: candidateSection,
+                sectionId: candidateSection.id,
+                sectionNumber: sectionNumbers[nextIdx] || (nextIdx + 1),
+                firstVisibleIndex: 0  // Will be recalculated when section becomes active
+              };
+
+              return result;
             }
           }
+
           return null;
         }
         function findPrevSectionWithVisibleQuestions() {
@@ -1011,13 +475,15 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         function isQuestionAnswered(container) {
           if (!container) {
+
             return false;
           }
-          const elements = Array.from(container.querySelectorAll('select, textarea, input'));
-          const eligibleElements = elements.filter(isElementEligible);
           const questionId = container.getAttribute('data-question-id') || container.id || 'unknown';
           const questionTextEl = container.querySelector('.question-text');
           const questionText = questionTextEl ? questionTextEl.textContent.trim() : '';
+
+          const elements = Array.from(container.querySelectorAll('select, textarea, input'));
+          const eligibleElements = elements.filter(isElementEligible);
           const debugElements = eligibleElements.map(el => ({
             id: el.id || null,
             tag: el.tagName,
@@ -1026,7 +492,13 @@ document.addEventListener("DOMContentLoaded", function() {
             display: el.style && el.style.display ? el.style.display : null
           }));
 
-          if (!eligibleElements.length) {
+          // Check for file upload questions BEFORE early return (file inputs are hidden, so they won't be in eligibleElements)
+          const fileUploadInput = container.querySelector('input[type="file"][id^="fileUpload_"]');
+
+          if (fileUploadInput) {
+
+            // This is a file upload question - don't return early, continue to file upload validation below
+          } else if (!eligibleElements.length) {
 
             return true;
           }
@@ -1061,7 +533,56 @@ document.addEventListener("DOMContentLoaded", function() {
           const checkboxRequired = Object.prototype.hasOwnProperty.call(checkboxRequiredMap, questionId)
             ? checkboxRequiredMap[questionId]
             : false;
-          const checkboxesSatisfied = !hasCheckbox || !checkboxRequired || checkboxAnyChecked;
+          // Check if "all are required" is enabled
+          const allAreRequired = Object.prototype.hasOwnProperty.call(allAreRequiredMap, questionId)
+            ? allAreRequiredMap[questionId]
+            : false;
+
+          let checkboxesSatisfied = true;
+          if (hasCheckbox && checkboxRequired) {
+            if (allAreRequired) {
+              // When "all are required" is enabled, all main checkbox options must be checked
+              // Get all checkboxes that are part of the main question (not in trigger containers)
+              // Look for checkboxes in the checkbox-group class for this question
+              const checkboxGroup = container.querySelector('.checkbox-group-' + questionId);
+              if (checkboxGroup) {
+                // Get all checkboxes in the main checkbox group (excluding "None of the above")
+                const mainCheckboxes = Array.from(checkboxGroup.querySelectorAll('input[type="checkbox"]')).filter(cb => {
+                  const cbId = cb.id || '';
+                  const cbName = cb.name || '';
+                  // Exclude "None of the above" checkbox and hidden checkboxes
+                  return !cbId.includes('none_of_the_above') && 
+                         !cbId.includes('_hidden') &&
+                         cb.style.display !== 'none' &&
+                         isElementEligible(cb);
+                });
+                // Check if all main checkboxes are checked
+                const allChecked = mainCheckboxes.length > 0 && mainCheckboxes.every(cb => cb.checked);
+                checkboxesSatisfied = allChecked;
+              } else {
+                // Fallback: use eligibleElements that are checkboxes
+                const mainCheckboxes = eligibleElements.filter(el => {
+                  const type = (el.type || '').toLowerCase();
+                  if (type !== 'checkbox') return false;
+                  const cbId = el.id || '';
+                  // Exclude "None of the above" and checkboxes in trigger containers
+                  const isInTriggerContainer = el.closest('[id^="triggerFields_"]') !== null;
+                  return !cbId.includes('none_of_the_above') && !isInTriggerContainer;
+                });
+                const allChecked = mainCheckboxes.length > 0 && mainCheckboxes.every(cb => cb.checked);
+                checkboxesSatisfied = allChecked;
+              }
+            } else {
+              // Standard behavior: at least one checkbox must be checked
+              checkboxesSatisfied = checkboxAnyChecked;
+            }
+          } else if (hasCheckbox && !checkboxRequired) {
+            // Optional checkbox question - always satisfied
+            checkboxesSatisfied = true;
+          } else if (!hasCheckbox) {
+            // No checkboxes - always satisfied
+            checkboxesSatisfied = true;
+          }
 
           // Additional check: if any trigger sequence container is visible, its fields become required
           const visibleTriggerContainers = Array.from(container.querySelectorAll('[id^="triggerFields_"]')).filter(tc => window.getComputedStyle(tc).display !== 'none');
@@ -1092,7 +613,38 @@ document.addEventListener("DOMContentLoaded", function() {
               });
             });
           }
-          const answered = allStandardSatisfied && radiosSatisfied && checkboxesSatisfied;
+
+          // Check for file upload questions - verify a file has been uploaded (fileUploadInput already found above)
+          let fileUploadSatisfied = true;
+
+          if (fileUploadInput) {
+            const fileInputId = fileUploadInput.id;
+
+            // Extract questionId from the file input ID (format: "fileUpload_123")
+            // Use [0-9] instead of \d to avoid template literal escaping issues
+            const fileQuestionIdMatch = fileInputId.match(/fileUpload_([0-9]+)/);
+
+            if (fileQuestionIdMatch) {
+              const fileQuestionId = fileQuestionIdMatch[1];
+
+              // Check if a file has been uploaded for this question
+              const hasUploadedFile = window.uploadedFiles && window.uploadedFiles[fileQuestionId];
+
+              fileUploadSatisfied = !!hasUploadedFile;
+
+              if (!fileUploadSatisfied) {
+
+              } else {
+
+              }
+            } else {
+
+            }
+          } else {
+
+          }
+
+          const answered = allStandardSatisfied && radiosSatisfied && checkboxesSatisfied && fileUploadSatisfied;
 
           return answered;
         }
@@ -1228,8 +780,15 @@ document.addEventListener("DOMContentLoaded", function() {
             }
           }
           if (nextBtn) {
+
             if (shouldSubmit) {
-              nextBtn.disabled = !isAnswered;
+              // Use removeAttribute/setAttribute to ensure the disabled state is properly applied
+              if (isAnswered) {
+                nextBtn.removeAttribute('disabled');
+              } else {
+                nextBtn.setAttribute('disabled', 'disabled');
+              }
+
               nextBtn.dataset.advanceMode = 'submit';
               delete nextBtn.dataset.nextSectionNumber;
               delete nextBtn.dataset.nextSectionId;
@@ -1240,7 +799,12 @@ document.addEventListener("DOMContentLoaded", function() {
               // Allow advancing if: can advance within section, can advance across sections, OR we're on the last question and it's answered (to allow submit/end)
               const canAdvance = isAnswered && !!(canAdvanceWithinSection || canAdvanceAcrossSection || (isLastQuestion && isAnswered));
 
-              nextBtn.disabled = !canAdvance;
+              // Use removeAttribute/setAttribute to ensure the disabled state is properly applied
+              if (canAdvance) {
+                nextBtn.removeAttribute('disabled');
+              } else {
+                nextBtn.setAttribute('disabled', 'disabled');
+              }
 
               if (!canAdvance) {
                 nextBtn.dataset.advanceMode = '';
@@ -1258,6 +822,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
               }
             }
+
           }
         }
         function activateIndex(targetIdx) {
@@ -1312,11 +877,14 @@ document.addEventListener("DOMContentLoaded", function() {
           const shouldSubmit = answerTriggersEnd(activeContainer);
           const isAnswered = isQuestionAnswered(activeContainer);
           const hasPrevQuestion = currentPos > 0;
+
           cachedNextSectionInfo = shouldSubmit ? null : findNextSectionWithVisibleQuestions();
           cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
+
           const canAdvanceAcrossSection = shouldSubmit ? false : !!cachedNextSectionInfo;
           // Allow advancing within section if there's a next question in the current section
           const canAdvanceWithinSection = isAnswered && (!shouldSubmit) && currentPos !== -1 && currentPos < visibleTotal - 1;
+
           // If we're on the last question and can't advance within section, but can advance across sections, log it for debugging
           if (isAnswered && !shouldSubmit && currentPos === visibleTotal - 1 && !canAdvanceWithinSection) {
 
@@ -1334,24 +902,56 @@ document.addEventListener("DOMContentLoaded", function() {
           isUpdating = false;
         }
         function goToNextSection() {
+
+          // Check authentication before moving to next section
+          if (typeof isUserLoggedIn === 'undefined' || !isUserLoggedIn) {
+
+            if (typeof showSignInRequiredModal === 'function') {
+              showSignInRequiredModal();
+            }
+            return;
+          }
+
           if (!cachedNextSectionInfo) {
+
             return;
           }
           const targetSectionId = cachedNextSectionInfo.sectionId;
           const targetSectionNumber = cachedNextSectionInfo.sectionNumber;
+
           const triggerNavigation = () => {
+
             if (typeof validateAndProceed === 'function') {
-              validateAndProceed(currentSectionNumber);
+
+              const validationResult = validateAndProceed(currentSectionNumber);
+
+              // If validation fails, still try to navigate directly
+              if (!validationResult) {
+
+                if (typeof navigateSection === 'function') {
+                  navigateSection(targetSectionNumber);
+                }
+              }
             } else if (typeof navigateSection === 'function') {
+
               navigateSection(targetSectionNumber);
+            } else {
+
             }
           };
           const updateTargetNav = () => {
+
             const activeSection = document.querySelector('.section.active');
+
             if (activeSection && activeSection.id === targetSectionId) {
               if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
+
                 window.questionNavControllers[targetSectionId]();
+              } else {
+
               }
+            } else {
+
             }
           };
           triggerNavigation();
@@ -1402,31 +1002,85 @@ document.addEventListener("DOMContentLoaded", function() {
           triggerNavigation();
         }
         function shiftQuestion(direction) {
+
           const visibleIndices = getVisibleIndices();
+
           if (!visibleIndices.length || activeIndex === -1) {
+
             if (direction > 0 && cachedNextSectionInfo) {
+
               goToNextSection();
             } else if (direction < 0 && cachedPrevSectionInfo) {
+
               goToPrevSection();
+            } else {
+
             }
             return;
           }
           const currentPos = visibleIndices.indexOf(activeIndex);
+
           if (direction > 0) {
+            // Check authentication before moving forward
+            if (typeof isUserLoggedIn === 'undefined' || !isUserLoggedIn) {
+
+              if (typeof showSignInRequiredModal === 'function') {
+                showSignInRequiredModal();
+              }
+              return;
+            }
             const activeContainer = questionItems[activeIndex];
-            if (activeContainer && !isQuestionAnswered(activeContainer)) {
+            const isAnswered = activeContainer ? isQuestionAnswered(activeContainer) : false;
+
+            if (activeContainer && !isAnswered) {
+
               return;
             }
           }
           const nextPos = currentPos + direction;
+
           if (nextPos < 0 || nextPos >= visibleIndices.length) {
-            if (direction > 0 && cachedNextSectionInfo) {
-              goToNextSection();
+
+            if (direction > 0) {
+              // If we're going forward and at the end, try to find next section
+              if (cachedNextSectionInfo) {
+
+                goToNextSection();
+              } else {
+                // Re-check for next section in case cache is stale
+
+                const freshNextSectionInfo = findNextSectionWithVisibleQuestions();
+                if (freshNextSectionInfo) {
+
+                  cachedNextSectionInfo = freshNextSectionInfo;
+                  goToNextSection();
+                } else {
+                  // Last resort: if there's a next section element, navigate to it anyway
+                  const nextSectionIdx = sectionIdx + 1;
+                  if (nextSectionIdx < sectionElements.length) {
+                    const nextSection = sectionElements[nextSectionIdx];
+
+                    cachedNextSectionInfo = {
+                      sectionEl: nextSection,
+                      sectionId: nextSection.id,
+                      sectionNumber: sectionNumbers[nextSectionIdx] || (nextSectionIdx + 1),
+                      firstVisibleIndex: 0
+                    };
+                    goToNextSection();
+                  } else {
+
+                  }
+                }
+              }
             } else if (direction < 0 && cachedPrevSectionInfo) {
+
               goToPrevSection();
+            } else {
+
             }
             return;
           }
+
           activateIndex(visibleIndices[nextPos]);
         }
         function refreshNav(targetIdx) {
@@ -1434,7 +1088,18 @@ document.addEventListener("DOMContentLoaded", function() {
           const visibleIndices = getVisibleIndices();
 
           if (!visibleIndices.length) {
+            // If no visible questions found, try to show the first question anyway
+            // This handles cases where questions don't have the 'hidden' class but might be hidden by CSS
 
+            if (questionItems.length > 0) {
+              const firstQuestion = questionItems[0];
+              if (firstQuestion) {
+                // Remove both question-step-hidden AND hidden classes to ensure question is visible
+                firstQuestion.classList.remove('question-step-hidden');
+                firstQuestion.classList.remove('hidden');
+
+              }
+            }
             activateIndex(0);
             return;
           }
@@ -1460,18 +1125,29 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         if (nextBtn) {
           nextBtn.addEventListener('click', function() {
+
             if (nextBtn.dataset.advanceMode === 'submit') {
-              const formEl = document.getElementById('customForm');
-              if (formEl) {
-                if (typeof formEl.requestSubmit === 'function') {
-                  formEl.requestSubmit();
-                } else {
-                  formEl.submit();
+
+              // Check authentication before submitting
+              checkAuthBeforeNavigate(function() {
+
+                const formEl = document.getElementById('customForm');
+                if (formEl) {
+                  if (typeof formEl.requestSubmit === 'function') {
+                    formEl.requestSubmit();
+                  } else {
+                    formEl.submit();
+                  }
                 }
-              }
+              });
               return;
             }
-            shiftQuestion(1);
+
+            // Check authentication before navigating
+            checkAuthBeforeNavigate(function() {
+
+              shiftQuestion(1);
+            });
           });
         }
         const observer = new MutationObserver(function(mutations) {
@@ -1549,25 +1225,15 @@ document.addEventListener("DOMContentLoaded", function() {
           }
         }
       });
-      // Global shortcut: Ctrl+CapsLock or Command+CapsLock → click the visible "previous" arrow
+      // Global shortcut: Ctrl+CapsLock → click the visible "previous" arrow
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'CapsLock' && (e.ctrlKey || e.metaKey)) {
+        if (e.key === 'CapsLock' && e.ctrlKey) {
           e.preventDefault();
           const activeSection = document.querySelector('.section.active');
           const prevBtn = activeSection ? activeSection.querySelector('.question-prev') : null;
 
           if (prevBtn) {
             prevBtn.click();
-          }
-        }
-      });
-      // Global shortcut: Ctrl+Enter or Command+Enter → submit the form
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-          e.preventDefault();
-          const submitBtn = document.querySelector('button[type="submit"]');
-          if (submitBtn && !submitBtn.disabled) {
-            submitBtn.click();
           }
         }
       });
@@ -1626,33 +1292,32 @@ document.addEventListener("DOMContentLoaded", function() {
     <iframe id="previewPdfIframe" style="width: 100%; height: 98vh; border: none;"></iframe>
   </div>
 </div>
-      <!-- PROFESSIONAL FOOTER SECTION -->
-      <div class="pro-footer">
+<div class="pro-footer">
         <div class="pro-footer-col address-col">
             <div class="pro-footer-logo">
-                <img src="../../Images/logo.png" alt="Form-Star Logo" style="max-width:120px;max-height:80px;">
+                <img src="logo.png" alt="FormStar Logo" style="max-width:120px;max-height:80px;">
             </div>
-            <div class="pro-footer-title">Form-Star</div>
+            <div class="pro-footer-title">FormStar</div>
             <div class="pro-footer-contact">
-                <a href="tel:18008508370">1-800-850-8370</a> &nbsp; 
+                <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
                 <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
             </div>
         </div>
         <div class="pro-footer-col nav-col">
             <div class="pro-footer-title">Navigation</div>
-            <a href="../../index.html">Home</a>
-            <a href="../../Pages/FreeForm.html">Forms</a>
-            <a href="../../Pages/FAQ.html">FAQ</a>
-            <a href="../../Pages/about.html">About Us</a>
-            <a href="../../Pages/contact.html">Contact Us</a>
+            <a href="index.html">Home</a>
+            <a href="../Pages/FreeForm.html">Forms</a>
+            <a href="../Pages/FAQ.html">FAQ</a>
+            <a href="../Pages/about.html">About Us</a>
+            <a href="../Pages/contact.html">Contact Us</a>
         </div>
         <div class="pro-footer-col company-col">
-            <div class="pro-footer-title company-title">About Form-Star</div>
-            <div class="pro-footer-desc">Form-Star consists of a group of proven professionals with over 70 years of combined legal, technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify paperwork for everyone.</div>
+            <div class="pro-footer-title company-title">About FormStar</div>
+            <div class="pro-footer-desc">FormStar consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
         </div>
     </div>
     <footer>
-        &copy; 2024 Form-Star. All rights reserved.
+        &copy; 2024 FormStar. All rights reserved.
     </footer>
   <style>
   .alert-overlay {
@@ -1729,13 +1394,16 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {};
-var questionNameIds = {};
+var questionSlugMap = {"1":"does_anybody_else_live_in_your_home","2":"how_many_other_people_live_in_your_household"};
+var questionNameIds = {"1":"does_anybody_else_live_in_your_home","2":"how_many_other_people_live_in_your_household"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {};
-var unifiedFieldsMap = {};
+var allAreRequiredMap = {};
+var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_other_people_live_in_your_household_name","order":1,"prefill":""},{"type":"label","label":"Age","nodeId":"how_many_other_people_live_in_your_household_age","order":2,"prefill":""},{"type":"label","label":"Relationship","nodeId":"how_many_other_people_live_in_your_household_relationship","order":3,"prefill":""},{"type":"label","label":"Monthly Income","nodeId":"how_many_other_people_live_in_your_household_monthly_income","order":4,"prefill":""}]};
 var entryTitleMap = {};
+window.fileUploadQuestions = [];
+window.latexPreviewQuestions = [];
 
   // Address helper functions (must exist before conditional logic runs)
   function generateHiddenAddressTextboxes(questionId, count, allFieldsInOrder) {
@@ -1905,7 +1573,7 @@ var entryTitleMap = {};
         const optionValue = parts[parts.length - 1]; // last part: "yes"
         const entryNumber = parts[parts.length - 2]; // second last: "1"
         const fieldName = parts.slice(0, -2).join('_'); // everything before: "is_this_plaintiff_a_business"
-        
+
         // Try to find checkbox with pattern: *{fieldName}_{optionValue}_{entryNumber}
         // Or pattern: *{fieldName}*_{optionValue}_{entryNumber}
         const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -1915,7 +1583,7 @@ var entryTitleMap = {};
           // and contains the field name somewhere
           const endsWithPattern = cb.id.endsWith('_' + optionValue + '_' + entryNumber);
           const containsFieldName = cb.id.includes(fieldName);
-          
+
           if (endsWithPattern && containsFieldName) {
             return cb;
           }
@@ -3539,7 +3207,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [];
+    var jumpLogics = [{"questionId":"1","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":1},{"questionId":"2","questionType":"numberedDropdown","jumpOption":"1","jumpTo":"end","section":1},{"questionId":"2","questionType":"numberedDropdown","jumpOption":"2","jumpTo":"end","section":1},{"questionId":"2","questionType":"numberedDropdown","jumpOption":"3","jumpTo":"end","section":1},{"questionId":"2","questionType":"numberedDropdown","jumpOption":"4","jumpTo":"end","section":1}];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
@@ -3547,9 +3215,9 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"length":0};
-var amountMap = {"length":0};
-var labelNodeIdsMap = {};
+var labelMap = {"2":["Name","Age","Relationship","Monthly Income"],"length":0};
+var amountMap = {"2":[],"length":0};
+var labelNodeIdsMap = {"2":["how_many_other_people_live_in_your_household_name","how_many_other_people_live_in_your_household_age","how_many_other_people_live_in_your_household_relationship","how_many_other_people_live_in_your_household_monthly_income"]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -3835,6 +3503,69 @@ var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
+
+(function(){
+ var thisQ=document.getElementById("question-container-2");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("2");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
 
 
 /*──────────────────────────────────────────────────────────────*
@@ -4143,6 +3874,40 @@ window.showCartModal = function () {
     }
   } else {
   }
+  // Add file upload items to cart preview
+  if (window.fileUploadQuestions && window.fileUploadQuestions.length > 0 && window.uploadedFiles) {
+    for (const fileUpload of window.fileUploadQuestions) {
+      const uploadedFile = window.uploadedFiles[fileUpload.questionId];
+      if (uploadedFile && fileUpload.fileTitle) {
+        // Convert file title to PDF name (add .pdf extension if not present)
+        const pdfName = fileUpload.fileTitle.endsWith('.pdf') ? fileUpload.fileTitle : (fileUpload.fileTitle + '.pdf');
+        allPdfsToAdd.push({
+          formId: fileUpload.fileTitle.replace(/.pdf$/i, '').toLowerCase(),
+          title: fileUpload.fileTitle,
+          priceId: fileUpload.priceId,
+          pdfName: pdfName
+        });
+      }
+    }
+  }
+
+  // Add LaTeX preview PDFs to cart preview (if "Attach to packet" is selected)
+  if (window.latexPreviewQuestions && window.latexPreviewQuestions.length > 0 && window.latexPdfs) {
+    for (const latexPreviewQ of window.latexPreviewQuestions) {
+      const latexPdf = window.latexPdfs[latexPreviewQ.questionId];
+      if (latexPdf && latexPreviewQ.title && latexPreviewQ.priceId) {
+        // Use title as the PDF name
+        const pdfName = latexPreviewQ.title.endsWith('.pdf') ? latexPreviewQ.title : (latexPreviewQ.title + '.pdf');
+        allPdfsToAdd.push({
+          formId: latexPreviewQ.title.replace(/.pdf$/i, '').toLowerCase(),
+          title: latexPreviewQ.title,
+          priceId: latexPreviewQ.priceId,
+          pdfName: pdfName
+        });
+      }
+    }
+  }
+
   // Deduplicate PDFs to prevent multiple requests for the same PDF
   const originalCount = allPdfsToAdd.length;
   const deduplicatedPdfs = deduplicatePdfs(allPdfsToAdd);
@@ -4498,6 +4263,28 @@ window.addFormToCart = function (priceId) {
       }
     } else {
     }
+    // Add file upload items
+    if (window.fileUploadQuestions && window.fileUploadQuestions.length > 0 && window.uploadedFiles) {
+      for (const fileUpload of window.fileUploadQuestions) {
+        const uploadedFile = window.uploadedFiles[fileUpload.questionId];
+        if (uploadedFile && fileUpload.fileTitle) {
+          // Convert file title to PDF name (add .pdf extension if not present)
+          const pdfName = fileUpload.fileTitle.endsWith('.pdf') ? fileUpload.fileTitle : (fileUpload.fileTitle + '.pdf');
+          const pdfItem = {
+            formId: fileUpload.fileTitle.replace(/.pdf$/i, '').toLowerCase(),
+            title: fileUpload.fileTitle,
+            priceId: fileUpload.priceId,
+            formData: { ...formData, originalFormId: originalFormId, portfolioId: portfolioId, pdfName: pdfName, uploadedFile: uploadedFile },
+            countyName: countyName,
+            defendantName: defendantName,
+            pdfName: pdfName,
+            isFileUpload: true,
+            uploadedFile: uploadedFile
+          };
+          allItems.push(pdfItem);
+        }
+      }
+    }
     // Add all items to cart with a small delay between each to prevent race conditions
     let addedCount = 0;
     allItems.forEach((item, index) => {
@@ -4561,6 +4348,57 @@ window.addFormToCart = function (priceId) {
         timestamp: nowTs
       };
       cart.push(cartItem);
+    }
+  }
+  // Add file upload items to cart
+  if (window.fileUploadQuestions && window.fileUploadQuestions.length > 0 && window.uploadedFiles) {
+    for (const fileUpload of window.fileUploadQuestions) {
+      const uploadedFile = window.uploadedFiles[fileUpload.questionId];
+      if (uploadedFile && fileUpload.fileTitle) {
+        // Convert file title to PDF name (add .pdf extension if not present)
+        const pdfName = fileUpload.fileTitle.endsWith('.pdf') ? fileUpload.fileTitle : (fileUpload.fileTitle + '.pdf');
+        const cartItem = {
+          formId: fileUpload.fileTitle.replace(/.pdf$/i, '').toLowerCase(),
+          title: fileUpload.fileTitle,
+          priceId: fileUpload.priceId,
+          pdfName: pdfName,
+          originalFormId: originalFormId,
+          portfolioId: portfolioId,
+          formData: formData,
+          countyName: countyName,
+          defendantName: defendantName,
+          timestamp: nowTs,
+          isFileUpload: true,
+          uploadedFile: uploadedFile
+        };
+        cart.push(cartItem);
+      }
+    }
+  }
+
+  // Add LaTeX preview PDFs to cart (if "Attach to packet" is selected)
+  if (window.latexPreviewQuestions && window.latexPreviewQuestions.length > 0 && window.latexPdfs) {
+    for (const latexPreviewQ of window.latexPreviewQuestions) {
+      const latexPdf = window.latexPdfs[latexPreviewQ.questionId];
+      if (latexPdf && latexPreviewQ.title && latexPreviewQ.priceId) {
+        // Use title as the PDF name
+        const pdfName = latexPreviewQ.title.endsWith('.pdf') ? latexPreviewQ.title : (latexPreviewQ.title + '.pdf');
+        const cartItem = {
+          formId: latexPreviewQ.title.replace(/.pdf$/i, '').toLowerCase(),
+          title: latexPreviewQ.title,
+          priceId: latexPreviewQ.priceId,
+          pdfName: pdfName,
+          originalFormId: originalFormId,
+          portfolioId: portfolioId,
+          formData: formData,
+          countyName: countyName,
+          defendantName: defendantName,
+          timestamp: nowTs,
+          isLatexPreview: true,
+          latexPdf: latexPdf
+        };
+        cart.push(cartItem);
+      }
     }
   }
   // Final deduplication of the entire cart to prevent any duplicates
@@ -4768,11 +4606,18 @@ function updateCheckboxStyle(checkbox) {
  * Form validation functions
  *──────────────────────────────────────────────────────────────*/
 function validateAndProceed(sectionNumber) {
-    if (validateCurrentSection(sectionNumber)) {
+
+    const isValid = validateCurrentSection(sectionNumber);
+
+    if (isValid) {
+
         handleNext(sectionNumber);
+        return true;
     } else {
+
         // Show validation popup when validation fails
         showValidationPopup();
+        return false;
     }
 }
 // Show validation popup when user tries to proceed without answering all questions
@@ -4923,13 +4768,37 @@ function validateDropdownQuestion(questionContainer) {
     return isValid;
 }
 function validateTextQuestion(questionContainer) {
+    const questionId = questionContainer.id.replace('question-container-', '');
+
     const inputs = questionContainer.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea');
-    if (inputs.length === 0) return true;
-    for (let input of inputs) {
-        if (!input.value || input.value.trim() === '') {
+
+    if (inputs.length === 0) {
+
+        return true;
+    }
+    // Filter out hidden inputs and inputs that are not eligible
+    const eligibleInputs = Array.from(inputs).filter(input => {
+        const style = window.getComputedStyle(input);
+        const isVisible = style.display !== 'none' && style.visibility !== 'hidden';
+        const isNotDisabled = !input.disabled;
+        const isNotHiddenType = input.type !== 'hidden';
+        const hasOffsetParent = input.offsetParent !== null || input.type === 'hidden';
+        return isVisible && isNotDisabled && isNotHiddenType && (hasOffsetParent || input.type === 'text' || input.type === 'email' || input.type === 'tel' || input.type === 'number' || input.type === 'date');
+    });
+
+    if (eligibleInputs.length === 0) {
+
+        return true;
+    }
+    for (let input of eligibleInputs) {
+        const value = input.value ? input.value.trim() : '';
+
+        if (!value) {
+
             return false;
         }
     }
+
     return true;
 }
 function showValidationError(container, message) {
@@ -6939,6 +6808,13 @@ function showThankYouMessage (event) {
     if (event && typeof event.preventDefault === 'function') {
         event.preventDefault();
     }
+    // Check authentication before submitting form
+    if (typeof isUserLoggedIn === 'undefined' || !isUserLoggedIn) {
+        if (typeof showSignInRequiredModal === 'function') {
+            showSignInRequiredModal();
+        }
+        return false;
+    }
     // Show thank you message immediately (no PDF processing)
     document.getElementById('customForm').style.display = 'none';
     document.getElementById('thankYouMessage').style.display = 'block';
@@ -7162,6 +7038,55 @@ async function processAllPdfs() {
         }
     } else {
     }
+    // Process Uploaded File PDFs
+    if (window.uploadedFiles && typeof window.uploadedFiles === 'object' && window.fileUploadQuestions && Array.isArray(window.fileUploadQuestions)) {
+        for (const fileUploadQ of window.fileUploadQuestions) {
+            const uploadedFile = window.uploadedFiles[fileUploadQ.questionId];
+            if (uploadedFile && uploadedFile.type === 'application/pdf') {
+                // Use fileTitle as the base name for the PDF
+                const baseName = fileUploadQ.fileTitle || ('uploaded_' + fileUploadQ.questionId);
+                if (!processedPdfs.has(baseName)) {
+                    processedPdfs.add(baseName);
+                    // Download the uploaded file directly (it's already a PDF, no server processing needed)
+                    const url = URL.createObjectURL(uploadedFile);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = (fileUploadQ.fileTitle.endsWith('.pdf') ? fileUploadQ.fileTitle : (fileUploadQ.fileTitle + '.pdf'));
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    // Small delay to prevent browser from blocking multiple downloads
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+            }
+        }
+    }
+
+    // Process LaTeX Preview PDFs (if "Attach to packet" is selected)
+    if (window.latexPdfs && typeof window.latexPdfs === 'object' && window.latexPreviewQuestions && Array.isArray(window.latexPreviewQuestions)) {
+        for (const latexPreviewQ of window.latexPreviewQuestions) {
+            const latexPdf = window.latexPdfs[latexPreviewQ.questionId];
+            if (latexPdf && latexPdf instanceof Blob) {
+                // Use title as the base name for the PDF
+                const baseName = latexPreviewQ.title || ('latex_preview_' + latexPreviewQ.questionId);
+                if (!processedPdfs.has(baseName)) {
+                    processedPdfs.add(baseName);
+                    // Download the LaTeX PDF directly (it's already a PDF blob)
+                    const url = URL.createObjectURL(latexPdf);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = (latexPreviewQ.title.endsWith('.pdf') ? latexPreviewQ.title : (latexPreviewQ.title + '.pdf'));
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    // Small delay to prevent browser from blocking multiple downloads
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+            }
+        }
+    }
 }
 // Function to collect all PDFs that would be downloaded (for preview)
 async function getAllPdfsList() {
@@ -7352,6 +7277,48 @@ async function getAllPdfsList() {
         }
     }
 
+    // Process Uploaded File PDFs
+    if (window.uploadedFiles && typeof window.uploadedFiles === 'object' && window.fileUploadQuestions && Array.isArray(window.fileUploadQuestions)) {
+        for (const fileUploadQ of window.fileUploadQuestions) {
+            const uploadedFile = window.uploadedFiles[fileUploadQ.questionId];
+            if (uploadedFile && uploadedFile.type === 'application/pdf') {
+                // Use fileTitle as the base name for the PDF
+                const baseName = fileUploadQ.fileTitle || ('uploaded_' + fileUploadQ.questionId);
+                if (!processedPdfs.has(baseName)) {
+                    processedPdfs.add(baseName);
+                    pdfsList.push({
+                        baseName: baseName,
+                        displayName: fileUploadQ.fileTitle || uploadedFile.name.replace(/.pdf$/i, ''),
+                        type: 'uploaded',
+                        questionId: fileUploadQ.questionId,
+                        file: uploadedFile
+                    });
+                }
+            }
+        }
+    }
+
+    // Process LaTeX Preview PDFs (if "Attach to packet" is selected)
+    if (window.latexPdfs && typeof window.latexPdfs === 'object' && window.latexPreviewQuestions && Array.isArray(window.latexPreviewQuestions)) {
+        for (const latexPreviewQ of window.latexPreviewQuestions) {
+            const latexPdf = window.latexPdfs[latexPreviewQ.questionId];
+            if (latexPdf && latexPdf instanceof Blob) {
+                // Use title as the base name for the PDF
+                const baseName = latexPreviewQ.title || ('latex_preview_' + latexPreviewQ.questionId);
+                if (!processedPdfs.has(baseName)) {
+                    processedPdfs.add(baseName);
+                    pdfsList.push({
+                        baseName: baseName,
+                        displayName: latexPreviewQ.title || ('LaTeX Preview ' + latexPreviewQ.questionId),
+                        type: 'latex',
+                        questionId: latexPreviewQ.questionId,
+                        file: latexPdf
+                    });
+                }
+            }
+        }
+    }
+
     return pdfsList;
 }
 
@@ -7384,8 +7351,11 @@ async function showPreviewPdfsModal() {
         pdfsList.forEach((pdf, index) => {
             const escapedBaseName = pdf.baseName.replace(/'/g, "\'").replace(/"/g, '&quot;');
             const escapedDisplayName = pdf.displayName.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-            // Use data attribute and addEventListener to avoid quote escaping issues
-            listHTML += '<div class="pdf-preview-item" data-pdf-name="' + escapedBaseName.replace(/"/g, '&quot;') + '">' +
+            // Use data attributes to store PDF info (including type and file object for uploaded/LaTeX PDFs)
+            const isUploaded = pdf.type === 'uploaded' ? 'true' : 'false';
+            const isLatex = pdf.type === 'latex' ? 'true' : 'false';
+            const questionId = pdf.questionId || '';
+            listHTML += '<div class="pdf-preview-item" data-pdf-name="' + escapedBaseName.replace(/"/g, '&quot;') + '" data-is-uploaded="' + isUploaded + '" data-is-latex="' + isLatex + '" data-question-id="' + questionId + '">' +
                     '<strong style="color: #2c3e50; font-size: 1.1em;">' + escapedDisplayName + '</strong>' +
                     '<span style="color: #6c757d; font-size: 0.9em; display: block; margin-top: 5px;">Click to preview</span>' +
                 '</div>';
@@ -7398,8 +7368,11 @@ async function showPreviewPdfsModal() {
         pdfItems.forEach(item => {
             item.addEventListener('click', function() {
                 const pdfName = this.getAttribute('data-pdf-name');
+                const isUploaded = this.getAttribute('data-is-uploaded') === 'true';
+                const isLatex = this.getAttribute('data-is-latex') === 'true';
+                const questionId = this.getAttribute('data-question-id');
                 if (pdfName) {
-                    previewPdf(pdfName);
+                    previewPdf(pdfName, isUploaded, isLatex, questionId);
                 }
             });
         });
@@ -7418,7 +7391,7 @@ function closePreviewPdfsListModal() {
 }
 
 // Function to preview a PDF in full screen
-async function previewPdf(baseName) {
+async function previewPdf(baseName, isUploaded, isLatex, questionId) {
     const modal = document.getElementById('previewPdfFullscreenModal');
     const iframe = document.getElementById('previewPdfIframe');
 
@@ -7435,50 +7408,65 @@ async function previewPdf(baseName) {
     iframe.style.display = 'none';
 
     try {
-        // Collect form data
-        const form = document.getElementById('customForm');
-        const fd = new FormData();
-        const formElements = form.querySelectorAll('input, textarea, select');
-        const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
-        const allFormElements = [...formElements, ...externalFormElements];
+        let url;
+        
+        // Check if this is a LaTeX PDF
+        if (isLatex && questionId && window.latexPdfs && window.latexPdfs[questionId]) {
+            // For LaTeX PDFs, use the Blob directly
+            const latexPdf = window.latexPdfs[questionId];
+            url = URL.createObjectURL(latexPdf);
+        } else if (isUploaded && questionId && window.uploadedFiles && window.uploadedFiles[questionId]) {
+            // For uploaded files, use the File object directly
+            const uploadedFile = window.uploadedFiles[questionId];
+            url = URL.createObjectURL(uploadedFile);
+        } else {
+            // For server-side PDFs, fetch from server
+            // Collect form data
+            const form = document.getElementById('customForm');
+            const fd = new FormData();
+            const formElements = form.querySelectorAll('input, textarea, select');
+            const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+            const allFormElements = [...formElements, ...externalFormElements];
 
-        allFormElements.forEach(element => {
-            if (element.name && !element.disabled) {
-                if (element.type === 'checkbox' || element.type === 'radio') {
-                    if (element.checked) {
-                        fd.append(element.name, 'on');
-                    }
-                } else {
-                    let value = element.value;
-                    if (element.type === 'date' && value) {
-                        value = formatDateForServer(value);
-                    }
-                    if (value && value.trim() !== '') {
-                        fd.append(element.name, value);
+            allFormElements.forEach(element => {
+                if (element.name && !element.disabled) {
+                    if (element.type === 'checkbox' || element.type === 'radio') {
+                        if (element.checked) {
+                            fd.append(element.name, 'on');
+                        }
+                    } else {
+                        let value = element.value;
+                        if (element.type === 'date' && value) {
+                            value = formatDateForServer(value);
+                        }
+                        if (value && value.trim() !== '') {
+                            fd.append(element.name, value);
+                        }
                     }
                 }
+            });
+
+            // Fetch the filled PDF (keep extension and include credentials for sessioned APIs)
+            const pdfParam = baseName.endsWith('.pdf') ? baseName : (baseName + '.pdf');
+            const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(pdfParam);
+            const res = await fetch(endpoint, { 
+                method: 'POST', 
+                body: fd, 
+                credentials: 'include' 
+            });
+
+            if (!res.ok) {
+                throw new Error("HTTP error! status: " + res.status);
             }
-        });
 
-        // Fetch the filled PDF (keep extension and include credentials for sessioned APIs)
-        const pdfParam = baseName.endsWith('.pdf') ? baseName : (baseName + '.pdf');
-        const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(pdfParam);
-        const res = await fetch(endpoint, { 
-            method: 'POST', 
-            body: fd, 
-            credentials: 'include' 
-        });
+            const blob = await res.blob();
+            if (blob.size === 0) {
+                throw new Error("Received empty PDF blob from server");
+            }
 
-        if (!res.ok) {
-            throw new Error("HTTP error! status: " + res.status);
+            url = URL.createObjectURL(blob);
         }
 
-        const blob = await res.blob();
-        if (blob.size === 0) {
-            throw new Error("Received empty PDF blob from server");
-        }
-
-        const url = URL.createObjectURL(blob);
         iframe.src = url;
         iframe.style.display = 'block';
 
@@ -8086,23 +8074,23 @@ if (typeof handleNext === 'function') {
         let saveRetryCount = 0;
         const MAX_RETRIES = 3;
         const DEBOUNCE_DELAY = 1000; // Wait 1 second after last change before saving
-        
+
         // Helper: save answers (with debouncing, error handling, and visibility prioritization)
         async function saveAnswers(immediate = false) {
             if (!isUserLoggedIn || !userId) return;
-            
+
             // If immediate save requested, clear any pending debounced save
             if (immediate && saveAnswersTimeout) {
                 clearTimeout(saveAnswersTimeout);
                 saveAnswersTimeout = null;
             }
-            
+
             // If already saving, mark that we need to save again after current save completes
             if (isSaving) {
                 pendingSave = true;
                 return;
             }
-            
+
             // Debounce: wait for user to stop typing
             if (!immediate) {
                 clearTimeout(saveAnswersTimeout);
@@ -8111,27 +8099,27 @@ if (typeof handleNext === 'function') {
                 }, DEBOUNCE_DELAY);
                 return;
             }
-            
+
             // 🔧 NEW: Prevent blank values from being saved in first 3 seconds
             if (window.preventBlankSaves) {
                 return;
             }
-            
+
             isSaving = true;
             try {
                 const fields = getFormFields();
                 const answers = {};
                 const fieldVisibility = {}; // Track which fields are visible
-                
+
                 fields.forEach(el => {
                     const isVisible = isElementActuallyVisible(el);
                     const fieldName = el.name;
-                    
+
                     // Skip if we already have a visible field's value and this field is hidden
                     if (fieldVisibility[fieldName] === true && !isVisible) {
                         return; // Skip this hidden field, we already have a visible one
                     }
-                    
+
                     // Store the value
                     if (el.type === 'checkbox') {
                         // For checkboxes, save true/false
@@ -8144,42 +8132,39 @@ if (typeof handleNext === 'function') {
                         // For other fields, save the value
                         answers[fieldName] = el.value;
                     }
-                    
+
                     // Track visibility for this field name
                     fieldVisibility[fieldName] = isVisible;
                 });
-                
+
                 // Write to Firestore with error handling and retry logic
                 await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
                 saveRetryCount = 0; // Reset retry count on success
             } catch (error) {
-                console.error('[AUTOSAVE] error saving to Firestore:', error);
-                
+
                 // Handle resource-exhausted error specifically
                 if (error.code === 'resource-exhausted' || (error.message && error.message.includes('queued writes'))) {
-                    console.warn('[AUTOSAVE] Firestore write queue exhausted, will retry with backoff');
-                    
+
                     // Retry with exponential backoff
                     if (saveRetryCount < MAX_RETRIES) {
                         saveRetryCount++;
                         const backoffDelay = Math.min(1000 * Math.pow(2, saveRetryCount), 10000); // Max 10 seconds
-                        console.log('[AUTOSAVE] retrying in ' + backoffDelay + 'ms (attempt ' + saveRetryCount + '/' + MAX_RETRIES + ')');
-                        
+
                         setTimeout(() => {
                             saveAnswers(true); // Retry immediately
                         }, backoffDelay);
                     } else {
-                        console.error('[AUTOSAVE] max retries reached, giving up');
+
                         saveRetryCount = 0;
                     }
                 } else {
                     // For other errors, just log and reset
-                    console.error('[AUTOSAVE] non-retryable error:', error);
+
                     saveRetryCount = 0;
                 }
             } finally {
                 isSaving = false;
-                
+
                 // If there's a pending save, trigger it after a short delay
                 if (pendingSave) {
                     pendingSave = false;
@@ -9266,27 +9251,14 @@ if (typeof handleNext === 'function') {
             function updateAuthButtons(user) {
                 const signInBtn = document.getElementById('sign-in-btn');
                 const logoutBtn = document.getElementById('logout-btn');
-                const mobileAuthSection = document.getElementById('mobile-auth-section');
-                const myFormsLinks = document.querySelectorAll('.auth-required');
-                
                 if (user) {
                     // User is signed in
                     if (signInBtn) signInBtn.style.display = 'none';
                     if (logoutBtn) logoutBtn.style.display = 'inline-block';
-                    if (mobileAuthSection) mobileAuthSection.style.display = 'block';
-                    // Show "My Forms" links
-                    myFormsLinks.forEach(link => {
-                        link.style.display = 'block';
-                    });
                 } else {
                     // User is signed out
                     if (signInBtn) signInBtn.style.display = 'inline-block';
                     if (logoutBtn) logoutBtn.style.display = 'none';
-                    if (mobileAuthSection) mobileAuthSection.style.display = 'none';
-                    // Hide "My Forms" links
-                    myFormsLinks.forEach(link => {
-                        link.style.display = 'none';
-                    });
                 }
             }
             // Authentication state observer
@@ -9342,107 +9314,6 @@ if (typeof handleNext === 'function') {
                     }
                 });
             }
-            
-            // Mobile menu functionality
-            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-            const mobileNav = document.getElementById('mobile-nav');
-            const mobileFormsToggle = document.getElementById('mobile-forms-toggle');
-            const mobileFormsMenu = document.getElementById('mobile-forms-menu');
-            const body = document.body;
-
-            function toggleMobileMenu() {
-                mobileMenuToggle.classList.toggle('active');
-                mobileNav.classList.toggle('active');
-                body.classList.toggle('menu-open');
-            }
-
-            function closeMobileMenu() {
-                mobileMenuToggle.classList.remove('active');
-                mobileNav.classList.remove('active');
-                body.classList.remove('menu-open');
-            }
-
-            // Toggle mobile menu
-            if (mobileMenuToggle) {
-                mobileMenuToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    toggleMobileMenu();
-                });
-            }
-
-            // Toggle mobile forms submenu
-            if (mobileFormsToggle) {
-                mobileFormsToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    mobileFormsToggle.classList.toggle('active');
-                    mobileFormsMenu.classList.toggle('active');
-                });
-            }
-
-            // Close mobile menu when clicking on links
-            if (mobileNav) {
-                mobileNav.addEventListener('click', function(e) {
-                    if (e.target.tagName === 'A' && !e.target.classList.contains('mobile-nav-toggle')) {
-                        closeMobileMenu();
-                    }
-                });
-            }
-
-            // Close mobile menu when clicking outside
-            document.addEventListener('click', function(e) {
-                if (mobileNav && mobileMenuToggle && !mobileNav.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
-                    closeMobileMenu();
-                }
-            });
-
-            // Close mobile menu on escape key
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && mobileNav && mobileNav.classList.contains('active')) {
-                    closeMobileMenu();
-                }
-            });
-
-            // Prevent body scroll when menu is open
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.attributeName === 'class') {
-                        if (body.classList.contains('menu-open')) {
-                            body.style.overflow = 'hidden';
-                        } else {
-                            body.style.overflow = '';
-                        }
-                    }
-                });
-            });
-            if (body) {
-                observer.observe(body, { attributes: true });
-            }
-            
-            // Update mobile auth section based on Firebase auth state
-            const mobileAuthSection = document.getElementById('mobile-auth-section');
-            const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
-            if (auth) {
-                auth.onAuthStateChanged(function(user) {
-                    if (user) {
-                        if (mobileAuthSection) mobileAuthSection.style.display = 'block';
-                    } else {
-                        if (mobileAuthSection) mobileAuthSection.style.display = 'none';
-                    }
-                });
-            }
-            if (mobileLogoutBtn) {
-                mobileLogoutBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    if (auth) {
-                        auth.signOut().then(function() {
-                            window.location.reload();
-                        }).catch(function(error) {
-                            console.error('Error signing out:', error);
-                        });
-                    }
-                });
-            }
-            
             // Update cart count badge in header
             function updateCartCountBadge() {
                 const cartCountElement = document.getElementById('cart-count-badge');
@@ -9726,9 +9597,9 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
 <script>
 // Debug Menu Functionality
 let debugMenuVisible = false;
-// Show debug menu on Ctrl+Shift or Command+Shift
+// Show debug menu on Ctrl+Shift
 document.addEventListener('keydown', function(e) {
-  if ((e.ctrlKey || e.metaKey) && e.shiftKey && !debugMenuVisible) {
+  if (e.ctrlKey && e.shiftKey && !debugMenuVisible) {
     e.preventDefault();
     showDebugMenu();
   }
@@ -10478,6 +10349,120 @@ function updateUserFullName() {
   } else {
   }
 }
+// Store uploaded files for cart processing
+if (!window.uploadedFiles) {
+  window.uploadedFiles = {}; // questionId -> file object
+}
+
+// File upload handler functions
+function handleFileUpload(questionId, input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const dropzone = document.getElementById('fileUploadDropzone' + questionId);
+  const preview = document.getElementById('fileUploadPreview' + questionId);
+  const previewBody = document.getElementById('fileUploadPreviewBody' + questionId);
+
+  if (!dropzone || !preview || !previewBody) return;
+
+  // Store the uploaded file for cart processing
+  if (!window.uploadedFiles) {
+    window.uploadedFiles = {};
+  }
+  window.uploadedFiles[questionId] = file;
+
+  // Hide dropzone and show preview
+  dropzone.style.display = 'none';
+  preview.style.display = 'block';
+
+  // Clear previous preview
+  previewBody.innerHTML = '';
+
+  // PDF preview only (PDFs only)
+  if (file.type === 'application/pdf') {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const iframe = document.createElement('iframe');
+      iframe.src = e.target.result;
+      iframe.title = file.name;
+      previewBody.appendChild(iframe);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    // Fallback for non-PDF files (shouldn't happen with accept=".pdf")
+    const p = document.createElement('p');
+    p.textContent = 'File uploaded: ' + file.name;
+    p.style.color = '#6c757d';
+    previewBody.appendChild(p);
+  }
+
+  // Refresh navigation to update button states
+
+  if (typeof refreshNavForQ3 === 'function') {
+
+    refreshNavForQ3();
+  } else if (window.questionNavControllers) {
+    const activeSection = document.querySelector('.section.active');
+
+    if (activeSection && window.questionNavControllers[activeSection.id]) {
+      const controller = window.questionNavControllers[activeSection.id];
+
+      if (typeof controller === 'function') {
+        controller();
+      } else {
+
+      }
+    } else {
+
+      // Fallback: try to find the section containing this question
+      const questionContainer = document.getElementById('question-container-' + questionId);
+      if (questionContainer) {
+        const sectionEl = questionContainer.closest('[id^="section"]');
+        if (sectionEl && window.questionNavControllers[sectionEl.id]) {
+
+          const controller = window.questionNavControllers[sectionEl.id];
+          if (typeof controller === 'function') {
+            controller();
+          }
+        }
+      }
+    }
+  } else {
+
+  }
+}
+
+function removeFileUpload(questionId) {
+  const dropzone = document.getElementById('fileUploadDropzone' + questionId);
+  const preview = document.getElementById('fileUploadPreview' + questionId);
+  const fileInput = document.getElementById('fileUpload_' + questionId);
+
+  // Remove the file from stored uploads
+  if (window.uploadedFiles && window.uploadedFiles[questionId]) {
+    delete window.uploadedFiles[questionId];
+  }
+
+  if (dropzone) dropzone.style.display = 'block';
+  if (preview) preview.style.display = 'none';
+  if (fileInput) {
+    fileInput.value = '';
+    fileInput.files = null;
+  }
+
+  // Refresh navigation to update button states
+  if (typeof refreshNavForQ3 === 'function') {
+    refreshNavForQ3();
+  } else if (window.questionNavControllers) {
+    const activeSection = document.querySelector('.section.active');
+    if (activeSection && window.questionNavControllers[activeSection.id]) {
+      const controller = window.questionNavControllers[activeSection.id];
+      if (typeof controller === 'function') {
+        controller();
+      }
+    }
+  }
+}
+
 // Function to update user address fields
 function updateUserAddressFields() {
   const street = document.getElementById('user_street')?.value || '';
@@ -10594,5 +10579,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   // Note: createTriggerFieldsContainer is already defined earlier in the script
   </script>
+  <!-- Sign-in Required Modal -->
+  <div id="signinRequiredModal" class="signin-modal-overlay">
+    <div class="signin-modal">
+      <h2>Sign In Required</h2>
+      <p>You need to sign up before you can finish filling out the form. Please sign in to continue.</p>
+      <button type="button" class="signin-modal-button" onclick="window.location.href='https://www.form-star.com/Pages/account.html'">Sign In</button>
+    </div>
+  </div>
 </body>
 </html>

@@ -1307,6 +1307,13 @@
 
         .step-option-btn .option-icon {
             font-size: 1.2em;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .step-option-btn .option-icon svg {
+            width: 27px;
+            height: 27px;
         }
 
         .step-examples {
@@ -1575,21 +1582,41 @@
             <!-- Guided Module Section -->
             <div class="guided-module" style="margin-bottom:0;">
                 <h2 class="guided-module-title">
-                    <span>⚖️</span>
+                    <span>
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle;">
+                            <circle cx="12" cy="12" r="10" stroke="#2980b9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13" stroke="#2980b9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 17H12.01" stroke="#2980b9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
                     <span>Which Small Claims Form Do I Use?</span>
                     <br><br>
                 </h2>
                 
                 <!-- Step 1: Are you suing? -->
                 <div class="guided-step active" id="step1">
-                    <div class="step-question">1️⃣ Are you suing somebody?</div>
+                    <div class="step-question">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                            <circle cx="12" cy="12" r="10" stroke="#2980b9" stroke-width="2"/>
+                            <text x="12" y="17" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2980b9">1</text>
+                        </svg>
+                        Are you suing somebody?
+                    </div>
                     <div class="step-options">
                         <button class="step-option-btn" onclick="handleStep1Answer('yes')">
-                            <span class="option-icon">✓</span>
+                            <span class="option-icon">
+                                <svg width="27" height="27" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20 6L9 17L4 12" stroke="#27ae60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
                             <span>Yes</span>
                         </button>
                         <button class="step-option-btn" onclick="handleStep1Answer('no')">
-                            <span class="option-icon">✗</span>
+                            <span class="option-icon">
+                                <svg width="27" height="27" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M18 6L6 18M6 6L18 18" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
                             <span>No</span>
                         </button>
                     </div>
@@ -1597,14 +1624,28 @@
 
                 <!-- Step 2: Filed against you? -->
                 <div class="guided-step" id="step2">
-                    <div class="step-question">2️⃣ Has that person already filed a claim against you?</div>
+                    <div class="step-question">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                            <circle cx="12" cy="12" r="10" stroke="#2980b9" stroke-width="2"/>
+                            <text x="12" y="17" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2980b9">2</text>
+                        </svg>
+                        Has that person already filed a claim against you?
+                    </div>
                     <div class="step-options">
                         <button class="step-option-btn" onclick="handleStep2Answer('yes')">
-                            <span class="option-icon">✓</span>
+                            <span class="option-icon">
+                                <svg width="27" height="27" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20 6L9 17L4 12" stroke="#27ae60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
                             <span>Yes</span>
                         </button>
                         <button class="step-option-btn" onclick="handleStep2Answer('no')">
-                            <span class="option-icon">✗</span>
+                            <span class="option-icon">
+                                <svg width="27" height="27" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M18 6L6 18M6 6L18 18" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
                             <span>No</span>
                         </button>
                     </div>
@@ -1615,7 +1656,13 @@
 
                 <!-- Step 3: COVID-19 Related -->
                 <div class="guided-step" id="step3">
-                    <div class="step-question">3️⃣ Is this COVID-19 related?</div>
+                    <div class="step-question">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                            <circle cx="12" cy="12" r="10" stroke="#2980b9" stroke-width="2"/>
+                            <text x="12" y="17" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2980b9">3</text>
+                        </svg>
+                        Is this COVID-19 related?
+                    </div>
                     <div class="step-examples">
                         <div class="step-examples-title">Examples:</div>
                         <ul class="step-examples-list">
@@ -1626,11 +1673,19 @@
                     </div><br>
                     <div class="step-options">
                         <button class="step-option-btn" onclick="handleStep3Answer('yes')">
-                            <span class="option-icon">✓</span>
+                            <span class="option-icon">
+                                <svg width="27" height="27" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20 6L9 17L4 12" stroke="#27ae60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
                             <span>Yes</span>
                         </button>
                         <button class="step-option-btn" onclick="handleStep3Answer('no')">
-                            <span class="option-icon">✗</span>
+                            <span class="option-icon">
+                                <svg width="27" height="27" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M18 6L6 18M6 6L18 18" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
                             <span>No</span>
                         </button>
                     </div>
