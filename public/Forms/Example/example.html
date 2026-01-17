@@ -294,18 +294,165 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Employment Info</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Employment Info</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Does anybody else live in your home?</h3></label><select id="does_anybody_else_live_in_your_home" name="does_anybody_else_live_in_your_home" data-question-id="1"
-                      onchange="dropdownMirror(this, 'does_anybody_else_live_in_your_home'); updateHiddenLogic('does_anybody_else_live_in_your_home', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_does_anybody_else_live_in_your_home"></div>
-              <input type="text" id="does_anybody_else_live_in_your_home_dropdown" name="does_anybody_else_live_in_your_home_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many other people live in your household?</h3></label><select id="how_many_other_people_live_in_your_household" name="how_many_other_people_live_in_your_household" data-question-id="2" onchange="showTextboxLabels(2, this.value); updateHiddenCheckboxes(2, this.value); updateHiddenLogic('how_many_other_people_live_in_your_household', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer2"></div></div>
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Employment Info</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Employment Info</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Please enter lawyer info</h3></label><div id="labelContainer1"></div><input type="text" id="please_enter_lawyer_info_address" name="please_enter_lawyer_info_address" style="display: none;"><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 585px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="please_enter_lawyer_info_laywer_name_1" name="please_enter_lawyer_info_laywer_name_1" placeholder="Laywer Name" class="address-input"></div><div class="address-field"><input type="text" id="please_enter_lawyer_info_lawyer_firm_1" name="please_enter_lawyer_info_lawyer_firm_1" placeholder="Lawyer Firm" class="address-input"></div><input type="tel" id="please_enter_lawyer_info_lawyer_phone_number" name="please_enter_lawyer_info_lawyer_phone_number" placeholder="Lawyer Phone Number" class="address-input" style="margin: 4px auto; max-width: 400px;" oninput="formatPhoneInput(this)"><div class="address-field"><input type="number" id="please_enter_lawyer_info_state_bar_number" name="please_enter_lawyer_info_state_bar_number" placeholder="State Bar Number" class="address-input"></div><br><br><div style="margin: 10px 0px; padding: 12px; background-color: rgb(255, 255, 255); border: 1px solid rgb(225, 229, 233); border-radius: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 6px;"><label style="display: block; margin-bottom: 8px; font-weight: 600; color: rgb(51, 51, 51); font-size: 15px; text-align: center;">Please enter their address:</label><input type="text" id="please_enter_lawyer_info_please_enter_their_address_street" name="please_enter_lawyer_info_please_enter_their_address_street" placeholder="Street" oninput="
+                    (function() {
+                        var streetEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_street');
+                        var cityEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_city');
+                        var stateShortEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_state_short');
+                        var zipEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_zip');
+                        var fullAddressEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_full_address');
+                        if (!fullAddressEl) { return; }
+                        var street = streetEl ? streetEl.value.trim() : '';
+                        var city = cityEl ? cityEl.value.trim() : '';
+                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
+                        var zip = zipEl ? zipEl.value.trim() : '';
+
+                        var parts = [];
+                        if (street) parts.push(street);
+                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
+                            parts.push(city + ', ' + stateShort + ' ' + zip);
+                        } else if (city &amp;&amp; stateShort) {
+                            parts.push(city + ', ' + stateShort);
+                        } else if (city &amp;&amp; zip) {
+                            parts.push(city + ' ' + zip);
+                        } else if (city) {
+                            parts.push(city);
+                        } else if (stateShort &amp;&amp; zip) {
+                            parts.push(stateShort + ' ' + zip);
+                        } else if (stateShort) {
+                            parts.push(stateShort);
+                        } else if (zip) {
+                            parts.push(zip);
+                        }
+                        var fullAddress = parts.join(', ');
+                        fullAddressEl.value = fullAddress;
+
+                    })();
+                " style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"><input type="text" id="please_enter_lawyer_info_please_enter_their_address_city" name="please_enter_lawyer_info_please_enter_their_address_city" placeholder="City" oninput="
+                    (function() {
+                        var streetEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_street');
+                        var cityEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_city');
+                        var stateShortEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_state_short');
+                        var zipEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_zip');
+                        var fullAddressEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_full_address');
+                        if (!fullAddressEl) { return; }
+                        var street = streetEl ? streetEl.value.trim() : '';
+                        var city = cityEl ? cityEl.value.trim() : '';
+                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
+                        var zip = zipEl ? zipEl.value.trim() : '';
+
+                        var parts = [];
+                        if (street) parts.push(street);
+                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
+                            parts.push(city + ', ' + stateShort + ' ' + zip);
+                        } else if (city &amp;&amp; stateShort) {
+                            parts.push(city + ', ' + stateShort);
+                        } else if (city &amp;&amp; zip) {
+                            parts.push(city + ' ' + zip);
+                        } else if (city) {
+                            parts.push(city);
+                        } else if (stateShort &amp;&amp; zip) {
+                            parts.push(stateShort + ' ' + zip);
+                        } else if (stateShort) {
+                            parts.push(stateShort);
+                        } else if (zip) {
+                            parts.push(zip);
+                        }
+                        var fullAddress = parts.join(', ');
+                        fullAddressEl.value = fullAddress;
+
+                    })();
+                " style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"><select id="please_enter_lawyer_info_please_enter_their_address_state" name="please_enter_lawyer_info_please_enter_their_address_state" class="address-select-trigger" onchange="
+
+                            var fullField = document.getElementById('please_enter_lawyer_info_please_enter_their_address_state_hidden');
+                            var shortField = document.getElementById('please_enter_lawyer_info_please_enter_their_address_state_short');
+
+                            if (typeof updateStateHiddenFields === 'function') {
+
+                                updateStateHiddenFields(this, 'please_enter_lawyer_info_please_enter_their_address_state_hidden', 'please_enter_lawyer_info_please_enter_their_address_state_short');
+
+                            } else {
+
+                            }
+                            if (typeof dropdownMirror === 'function') {
+                                dropdownMirror(this, 'please_enter_lawyer_info_please_enter_their_address_state');
+                            }
+                            // Update full address after state change (with small delay to ensure state_short is updated)
+                            setTimeout(function() { 
+                    (function() {
+                        var streetEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_street');
+                        var cityEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_city');
+                        var stateShortEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_state_short');
+                        var zipEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_zip');
+                        var fullAddressEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_full_address');
+                        if (!fullAddressEl) { return; }
+                        var street = streetEl ? streetEl.value.trim() : '';
+                        var city = cityEl ? cityEl.value.trim() : '';
+                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
+                        var zip = zipEl ? zipEl.value.trim() : '';
+
+                        var parts = [];
+                        if (street) parts.push(street);
+                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
+                            parts.push(city + ', ' + stateShort + ' ' + zip);
+                        } else if (city &amp;&amp; stateShort) {
+                            parts.push(city + ', ' + stateShort);
+                        } else if (city &amp;&amp; zip) {
+                            parts.push(city + ' ' + zip);
+                        } else if (city) {
+                            parts.push(city);
+                        } else if (stateShort &amp;&amp; zip) {
+                            parts.push(stateShort + ' ' + zip);
+                        } else if (stateShort) {
+                            parts.push(stateShort);
+                        } else if (zip) {
+                            parts.push(zip);
+                        }
+                        var fullAddress = parts.join(', ');
+                        fullAddressEl.value = fullAddress;
+
+                    })();
+                 }, 50);
+                        " style="width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><option value="">Select State</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option></select><input type="text" id="please_enter_lawyer_info_please_enter_their_address_state_hidden" name="please_enter_lawyer_info_please_enter_their_address_state_hidden" style="display: none;"><input type="text" id="please_enter_lawyer_info_please_enter_their_address_state_short" name="please_enter_lawyer_info_please_enter_their_address_state_short" style="display: none;"><input type="text" id="please_enter_lawyer_info_please_enter_their_address_zip" name="please_enter_lawyer_info_please_enter_their_address_zip" placeholder="Zip" oninput="
+                    (function() {
+                        var streetEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_street');
+                        var cityEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_city');
+                        var stateShortEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_state_short');
+                        var zipEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_zip');
+                        var fullAddressEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_full_address');
+                        if (!fullAddressEl) { return; }
+                        var street = streetEl ? streetEl.value.trim() : '';
+                        var city = cityEl ? cityEl.value.trim() : '';
+                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
+                        var zip = zipEl ? zipEl.value.trim() : '';
+
+                        var parts = [];
+                        if (street) parts.push(street);
+                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
+                            parts.push(city + ', ' + stateShort + ' ' + zip);
+                        } else if (city &amp;&amp; stateShort) {
+                            parts.push(city + ', ' + stateShort);
+                        } else if (city &amp;&amp; zip) {
+                            parts.push(city + ' ' + zip);
+                        } else if (city) {
+                            parts.push(city);
+                        } else if (stateShort &amp;&amp; zip) {
+                            parts.push(stateShort + ' ' + zip);
+                        } else if (stateShort) {
+                            parts.push(stateShort);
+                        } else if (zip) {
+                            parts.push(zip);
+                        }
+                        var fullAddress = parts.join(', ');
+                        fullAddressEl.value = fullAddress;
+
+                    })();
+                " style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"><input type="text" id="please_enter_lawyer_info_please_enter_their_address_full_address" name="please_enter_lawyer_info_please_enter_their_address_full_address" style="display: none;"></div></div><br></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
       </div>
-    <br><br><div class="navigation-buttons" style="display:none;"><button type="submit" class="next-button">Submit</button></div></div>
+    <br><br><div class="navigation-buttons" style="display:none;"></div></div>
   <script>
     // Function to show sign-in required modal
     function showSignInRequiredModal() {
@@ -1394,13 +1541,13 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"does_anybody_else_live_in_your_home","2":"how_many_other_people_live_in_your_household"};
-var questionNameIds = {"1":"does_anybody_else_live_in_your_home","2":"how_many_other_people_live_in_your_household"};
+var questionSlugMap = {"1":"please_enter_lawyer_info"};
+var questionNameIds = {"1":"please_enter_lawyer_info"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {};
 var allAreRequiredMap = {};
-var unifiedFieldsMap = {"2":[{"type":"label","label":"Name","nodeId":"how_many_other_people_live_in_your_household_name","order":1,"prefill":""},{"type":"label","label":"Age","nodeId":"how_many_other_people_live_in_your_household_age","order":2,"prefill":""},{"type":"label","label":"Relationship","nodeId":"how_many_other_people_live_in_your_household_relationship","order":3,"prefill":""},{"type":"label","label":"Monthly Income","nodeId":"how_many_other_people_live_in_your_household_monthly_income","order":4,"prefill":""}]};
+var unifiedFieldsMap = {"1":[{"type":"label","label":"Laywer Name","nodeId":"please_enter_lawyer_info_laywer_name","order":1,"prefill":""},{"type":"label","label":"Lawyer Firm","nodeId":"please_enter_lawyer_info_lawyer_firm","order":2,"prefill":""},{"type":"phone","label":"Lawyer Phone Number","nodeId":"please_enter_lawyer_info_lawyer_phone_number","order":3},{"type":"amount","label":"State Bar Number","nodeId":"please_enter_lawyer_info_state_bar_number","order":4},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":5}]};
 var entryTitleMap = {};
 window.fileUploadQuestions = [];
 window.latexPreviewQuestions = [];
@@ -3207,7 +3354,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [{"questionId":"1","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":1},{"questionId":"2","questionType":"numberedDropdown","jumpOption":"1","jumpTo":"end","section":1},{"questionId":"2","questionType":"numberedDropdown","jumpOption":"2","jumpTo":"end","section":1},{"questionId":"2","questionType":"numberedDropdown","jumpOption":"3","jumpTo":"end","section":1},{"questionId":"2","questionType":"numberedDropdown","jumpOption":"4","jumpTo":"end","section":1}];
+    var jumpLogics = [];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
@@ -3215,9 +3362,9 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"2":["Name","Age","Relationship","Monthly Income"],"length":0};
-var amountMap = {"2":[],"length":0};
-var labelNodeIdsMap = {"2":["how_many_other_people_live_in_your_household_name","how_many_other_people_live_in_your_household_age","how_many_other_people_live_in_your_household_relationship","how_many_other_people_live_in_your_household_monthly_income"]};
+var labelMap = {"length":0};
+var amountMap = {"length":0};
+var labelNodeIdsMap = {};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -3503,69 +3650,6 @@ var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
-
-(function(){
- var thisQ=document.getElementById("question-container-2");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="1";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("2");
-     } else {
-       
-     }
-   }
-   var allDropdowns = thisQ.querySelectorAll('select');
-   for(var d=0; d<allDropdowns.length; d++){
-     var dropdown = allDropdowns[d];
-     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
-     if(dropdown.closest('[id^="triggerFields"]')) continue;
-     // Reset to default "Select an option"
-     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
-     if(placeholderOption){
-       placeholderOption.selected = true;
-       dropdown.selectedIndex = 0;
-     } else if(dropdown.options.length > 0){
-       dropdown.selectedIndex = 0;
-     }
-     // Also reset any hidden dropdown inputs
-     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
-     if(hiddenDropdownInput){
-       hiddenDropdownInput.value = '';
-     }
-     // Clear hidden checkboxes created by dropdownMirror
-     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
-     if(dropdownWrapper){
-       dropdownWrapper.innerHTML = '';
-     }
-     // Trigger change event to update any dependent logic
-     dropdown.dispatchEvent(new Event('change'));
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
- (function(){
-   var selectQuestion = "1";
-   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
-   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
- })();
- updateVisibility();
-})();
 
 
 /*──────────────────────────────────────────────────────────────*
