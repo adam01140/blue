@@ -712,14 +712,14 @@ document.addEventListener("DOMContentLoaded", function() {
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="3">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="3">&rarr;</button>
       </div>
-    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section4" class="section"><center><h1 class="section-title">Household Income Qualifications</h1><div id="question-container-8" data-question-id="8" class="question-container question-item" data-section="4" data-question-index="1"><label><h3 class="question-text">Is your household monthly income less than the amount below?</h3></label><select id="is_your_household_monthly_income_less_than_the_amount_below" name="is_your_household_monthly_income_less_than_the_amount_below" data-question-id="8"
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section4" class="section"><center><h1 class="section-title">Household Income Qualifications</h1><div id="question-container-8" data-question-id="8" class="question-container question-item" data-section="4" data-question-index="1"><label><h3 class="question-text">Is your household monthly income less than the amount below?</h3></label><br><div class="dropdown-image-container" style="display: flex; justify-content: center; align-items: center; width: 100%; margin: 12px 0; box-sizing: border-box;"><img src="income.png" alt="Dropdown Image" width="700" height="90" style="max-width: 100%; height: auto; object-fit: contain; display: block;"></div><br><select id="is_your_household_monthly_income_less_than_the_amount_below" name="is_your_household_monthly_income_less_than_the_amount_below" data-question-id="8"
                       onchange="dropdownMirror(this, 'is_your_household_monthly_income_less_than_the_amount_below'); updateHiddenLogic('is_your_household_monthly_income_less_than_the_amount_below', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_is_your_household_monthly_income_less_than_the_amount_below"></div>
               <input type="text" id="is_your_household_monthly_income_less_than_the_amount_below_dropdown" name="is_your_household_monthly_income_less_than_the_amount_below_dropdown"
                    readonly style="display:none;"></div><div id="question-container-9" data-question-id="9" class="question-container question-item hidden question-step-hidden" data-section="4" data-question-index="2"><label><h3 class="question-text">What would you like the court to do?</h3></label><select id="what_would_you_like_the_court_to_do" name="what_would_you_like_the_court_to_do" data-question-id="9"
                       onchange="dropdownMirror(this, 'what_would_you_like_the_court_to_do'); updateHiddenLogic('what_would_you_like_the_court_to_do', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="waive some fees">waive some fees</option><option value="waive all fees">waive all fees</option><option value="let me pay them over time">let me pay them over time</option></select><br>
+                       <option value="" disabled selected>Select an option</option><option value="Waive some fees">Waive some fees</option><option value="Waive all fees">Waive all fees</option><option value="Let me pay them over time">Let me pay them over time</option></select><br>
               <div id="dropdowntext_what_would_you_like_the_court_to_do"></div>
               <input type="text" id="what_would_you_like_the_court_to_do_dropdown" name="what_would_you_like_the_court_to_do_dropdown"
                    readonly style="display:none;"></div>
@@ -739,12 +739,12 @@ document.addEventListener("DOMContentLoaded", function() {
               <div id="dropdowntext_does_anybody_else_live_in_your_home"></div>
               <input type="text" id="does_anybody_else_live_in_your_home_dropdown" name="does_anybody_else_live_in_your_home_dropdown"
                    readonly style="display:none;"></div><div id="question-container-13" data-question-id="13" class="question-container question-item hidden question-step-hidden" data-section="5" data-question-index="4" data-question-type="numberedDropdown"><label><h3 class="question-text">How many other people live in your household?</h3></label><select id="how_many_other_people_live_in_your_household" name="how_many_other_people_live_in_your_household" data-question-id="13" onchange="showTextboxLabels(13, this.value); updateHiddenCheckboxes(13, this.value); updateHiddenLogic('how_many_other_people_live_in_your_household', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer13"></div></div><div id="question-container-14" data-question-id="14" class="question-container question-item question-step-hidden" data-section="5" data-question-index="5"><label><h3 class="question-text">Does your income change a lot from month to month?</h3></label><select id="does_your_income_change_a_lot_from_month_to_month" name="does_your_income_change_a_lot_from_month_to_month" data-question-id="14"
-                      onchange="dropdownMirror(this, 'does_your_income_change_a_lot_from_month_to_month'); updateHiddenLogic('does_your_income_change_a_lot_from_month_to_month', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer13"></div></div><div id="question-container-14" data-question-id="14" class="question-container question-item hidden question-step-hidden" data-section="5" data-question-index="5"><label><h3 class="question-text">Does your income change a lot from month to month?</h3></label><select id="does_your_income_change_a_lot_from_month_to_month_dup2" name="does_your_income_change_a_lot_from_month_to_month_dup2" data-question-id="14"
+                      onchange="dropdownMirror(this, 'does_your_income_change_a_lot_from_month_to_month_dup2'); updateHiddenLogic('does_your_income_change_a_lot_from_month_to_month_dup2', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_does_your_income_change_a_lot_from_month_to_month"></div>
-              <input type="text" id="does_your_income_change_a_lot_from_month_to_month_dropdown" name="does_your_income_change_a_lot_from_month_to_month_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-15" data-question-id="15" class="question-container question-item hidden question-step-hidden" data-section="5" data-question-index="6" data-question-type="numberedDropdown"><label><h3 class="question-text">How many sources of income do you have?</h3></label><select id="how_many_sources_of_income_do_you_have" name="how_many_sources_of_income_do_you_have" data-question-id="15" onchange="showTextboxLabels(15, this.value); updateHiddenCheckboxes(15, this.value); updateHiddenLogic('how_many_sources_of_income_do_you_have', this.value)">
+              <div id="dropdowntext_does_your_income_change_a_lot_from_month_to_month_dup2"></div>
+              <input type="text" id="does_your_income_change_a_lot_from_month_to_month_dup2_dropdown" name="does_your_income_change_a_lot_from_month_to_month_dup2_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-15" data-question-id="15" class="question-container question-item hidden question-step-hidden" data-section="5" data-question-index="6" data-question-type="numberedDropdown"><label><h3 class="question-text">How many sources of income do you have?</h3></label><select id="how_many_sources_of_income_do_you_have_dup2" name="how_many_sources_of_income_do_you_have_dup2" data-question-id="15" onchange="showTextboxLabels(15, this.value); updateHiddenCheckboxes(15, this.value); updateHiddenLogic('how_many_sources_of_income_do_you_have_dup2', this.value)">
                        <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer15"></div></div>
       <div class="question-nav" data-section-index="5">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="5">&larr;</button>
@@ -755,7 +755,7 @@ document.addEventListener("DOMContentLoaded", function() {
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_do_you_have_anybody_else_living_in_your_home"></div>
               <input type="text" id="do_you_have_anybody_else_living_in_your_home_dropdown" name="do_you_have_anybody_else_living_in_your_home_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-17" data-question-id="17" class="question-container question-item hidden question-step-hidden" data-section="6" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many other people live in your household?</h3></label><select id="how_many_other_people_live_in_your_household" name="how_many_other_people_live_in_your_household" data-question-id="17" onchange="showTextboxLabels(17, this.value); updateHiddenCheckboxes(17, this.value); updateHiddenLogic('how_many_other_people_live_in_your_household', this.value)">
+                   readonly style="display:none;"></div><div id="question-container-17" data-question-id="17" class="question-container question-item hidden question-step-hidden" data-section="6" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many other people live in your household?</h3></label><select id="how_many_other_people_live_in_your_household_dup2" name="how_many_other_people_live_in_your_household_dup2" data-question-id="17" onchange="showTextboxLabels(17, this.value); updateHiddenCheckboxes(17, this.value); updateHiddenLogic('how_many_other_people_live_in_your_household_dup2', this.value)">
                        <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer17"></div></div>
       <div class="question-nav" data-section-index="6">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="6">&larr;</button>
@@ -822,50 +822,6 @@ document.addEventListener("DOMContentLoaded", function() {
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="11">&rarr;</button>
       </div>
     <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section12" class="section"><center><h1 class="section-title">Monthly Deductions & Expenses</h1><div id="question-container-30" data-question-id="30" class="question-container question-item" data-section="12" data-question-index="1"><label><h3 class="question-text">Mark All That Apply:</h3></label><div><center><div id="checkmark" class="checkbox-group-30">
-      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_transportation_auto_gas">
-        <label class="checkbox-label">
-          <input type="checkbox" id="mark_all_that_apply_transportation_auto_gas" name="mark_all_that_apply_transportation_auto_gas" value="Transportation / auto / gas" 
-                 onchange="toggleAmountField('mark_all_that_apply_transportation_auto_gas_amount', this.checked); toggleNoneOption(this, 30); updateCheckboxStyle(this);">
-          Transportation / auto / gas
-        </label>
-      </span>
-          <input type="number" id="mark_all_that_apply_transportation_auto_gas_amount"
-                 name="value"
-                 placeholder="Enter amount"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
-      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_transportation_auto_gas">
-        <label class="checkbox-label">
-          <input type="checkbox" id="mark_all_that_apply_transportation_auto_gas" name="mark_all_that_apply_transportation_auto_gas" value="Transportation / auto / gas" 
-                 onchange="toggleAmountField('mark_all_that_apply_transportation_auto_gas_amount', this.checked); toggleNoneOption(this, 30); updateCheckboxStyle(this);">
-          Transportation / auto / gas
-        </label>
-      </span>
-          <input type="number" id="mark_all_that_apply_transportation_auto_gas_amount"
-                 name="value"
-                 placeholder="Enter amount"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
-      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_child_spousal_support">
-        <label class="checkbox-label">
-          <input type="checkbox" id="mark_all_that_apply_child_spousal_support" name="mark_all_that_apply_child_spousal_support" value="Child / spousal support" 
-                 onchange="toggleAmountField('mark_all_that_apply_child_spousal_support_amount', this.checked); toggleNoneOption(this, 30); updateCheckboxStyle(this);">
-          Child / spousal support
-        </label>
-      </span>
-          <input type="number" id="mark_all_that_apply_child_spousal_support_amount"
-                 name="value"
-                 placeholder="Enter amount"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
-      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_school_child_care">
-        <label class="checkbox-label">
-          <input type="checkbox" id="mark_all_that_apply_school_child_care" name="mark_all_that_apply_school_child_care" value="School / child care" 
-                 onchange="toggleAmountField('mark_all_that_apply_school_child_care_amount', this.checked); toggleNoneOption(this, 30); updateCheckboxStyle(this);">
-          School / child care
-        </label>
-      </span>
-          <input type="number" id="mark_all_that_apply_school_child_care_amount"
-                 name="value"
-                 placeholder="Enter amount"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
       <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_insurance_life_health_etc">
         <label class="checkbox-label">
           <input type="checkbox" id="mark_all_that_apply_insurance_life_health_etc" name="mark_all_that_apply_insurance_life_health_etc" value="Insurance (life, health, etc.)" 
@@ -874,9 +830,11 @@ document.addEventListener("DOMContentLoaded", function() {
         </label>
       </span>
           <input type="number" id="mark_all_that_apply_insurance_life_health_etc_amount"
-                 name="value"
+                 name="mark_all_that_apply_insurance_life_health_etc_amount"
                  placeholder="Enter amount"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
       <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_medical_dental">
         <label class="checkbox-label">
           <input type="checkbox" id="mark_all_that_apply_medical_dental" name="mark_all_that_apply_medical_dental" value="Medical / dental" 
@@ -885,9 +843,11 @@ document.addEventListener("DOMContentLoaded", function() {
         </label>
       </span>
           <input type="number" id="mark_all_that_apply_medical_dental_amount"
-                 name="value"
+                 name="mark_all_that_apply_medical_dental_amount"
                  placeholder="Enter amount"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
       <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_laundry_cleaning">
         <label class="checkbox-label">
           <input type="checkbox" id="mark_all_that_apply_laundry_cleaning" name="mark_all_that_apply_laundry_cleaning" value="Laundry / cleaning" 
@@ -896,9 +856,11 @@ document.addEventListener("DOMContentLoaded", function() {
         </label>
       </span>
           <input type="number" id="mark_all_that_apply_laundry_cleaning_amount"
-                 name="value"
+                 name="mark_all_that_apply_laundry_cleaning_amount"
                  placeholder="Enter amount"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
       <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_clothing">
         <label class="checkbox-label">
           <input type="checkbox" id="mark_all_that_apply_clothing" name="mark_all_that_apply_clothing" value="Clothing" 
@@ -907,9 +869,11 @@ document.addEventListener("DOMContentLoaded", function() {
         </label>
       </span>
           <input type="number" id="mark_all_that_apply_clothing_amount"
-                 name="value"
+                 name="mark_all_that_apply_clothing_amount"
                  placeholder="Enter amount"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
       <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_utilities_phone">
         <label class="checkbox-label">
           <input type="checkbox" id="mark_all_that_apply_utilities_phone" name="mark_all_that_apply_utilities_phone" value="Utilities / phone" 
@@ -918,9 +882,11 @@ document.addEventListener("DOMContentLoaded", function() {
         </label>
       </span>
           <input type="number" id="mark_all_that_apply_utilities_phone_amount"
-                 name="value"
+                 name="mark_all_that_apply_utilities_phone_amount"
                  placeholder="Enter amount"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
       <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_rent_housing">
         <label class="checkbox-label">
           <input type="checkbox" id="mark_all_that_apply_rent_housing" name="mark_all_that_apply_rent_housing" value="Rent / housing" 
@@ -929,9 +895,50 @@ document.addEventListener("DOMContentLoaded", function() {
         </label>
       </span>
           <input type="number" id="mark_all_that_apply_rent_housing_amount"
-                 name="value"
+                 name="mark_all_that_apply_rent_housing_amount"
                  placeholder="Enter amount"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_school_child_care">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_school_child_care" name="mark_all_that_apply_school_child_care" value="School / child care" 
+                 onchange="toggleAmountField('mark_all_that_apply_school_child_care_amount', this.checked); toggleNoneOption(this, 30); updateCheckboxStyle(this);">
+          School / child care
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_school_child_care_amount"
+                 name="mark_all_that_apply_school_child_care_amount"
+                 placeholder="Enter amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_child_spousal_support">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_child_spousal_support" name="mark_all_that_apply_child_spousal_support" value="Child / spousal support" 
+                 onchange="toggleAmountField('mark_all_that_apply_child_spousal_support_amount', this.checked); toggleNoneOption(this, 30); updateCheckboxStyle(this);">
+          Child / spousal support
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_child_spousal_support_amount"
+                 name="mark_all_that_apply_child_spousal_support_amount"
+                 placeholder="Enter amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
+      <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_transportation_auto_gas">
+        <label class="checkbox-label">
+          <input type="checkbox" id="mark_all_that_apply_transportation_auto_gas" name="mark_all_that_apply_transportation_auto_gas" value="Transportation / auto / gas" 
+                 onchange="toggleAmountField('mark_all_that_apply_transportation_auto_gas_amount', this.checked); toggleNoneOption(this, 30); updateCheckboxStyle(this);">
+          Transportation / auto / gas
+        </label>
+      </span>
+          <input type="number" id="mark_all_that_apply_transportation_auto_gas_amount"
+                 name="mark_all_that_apply_transportation_auto_gas_amount"
+                 placeholder="Enter amount"
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
       <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_food_supplies">
         <label class="checkbox-label">
           <input type="checkbox" id="mark_all_that_apply_food_supplies" name="mark_all_that_apply_food_supplies" value="Food / supplies" 
@@ -940,9 +947,11 @@ document.addEventListener("DOMContentLoaded", function() {
         </label>
       </span>
           <input type="number" id="mark_all_that_apply_food_supplies_amount"
-                 name="value"
+                 name="mark_all_that_apply_food_supplies_amount"
                  placeholder="Enter amount"
-                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;">
+                 style="display:none; margin-top:5px; text-align:center; width:200px; padding:5px;"
+                 oninput="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }"
+                 onchange="if(typeof updateLinkedFields === 'function') { updateLinkedFields(); }">
       <span class="checkbox-inline" id="checkbox-container-mark_all_that_apply_none">
         <label class="checkbox-label">
           <input type="checkbox" id="mark_all_that_apply_none" name="mark_all_that_apply_none" value="None of the above" 
@@ -970,7 +979,23 @@ document.addEventListener("DOMContentLoaded", function() {
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_do_you_have_any_wagesearnings_withheld_by_the_court"></div>
               <input type="text" id="do_you_have_any_wagesearnings_withheld_by_the_court_dropdown" name="do_you_have_any_wagesearnings_withheld_by_the_court_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-34" data-question-id="34" class="question-container question-item hidden question-step-hidden" data-section="14" data-question-index="2"><label><h3 class="question-text">How much is being withheld?</h3></label><div class="text-input-container"><input type="number" id="how_much_is_being_withheld" name="how_much_is_being_withheld" min="0" step="0.01" placeholder="Enter amount"></div></div>
+                   readonly style="display:none;"></div><div id="question-container-34" data-question-id="34" class="question-container question-item hidden question-step-hidden" data-section="14" data-question-index="2"><label><h3 class="question-text">How much is being withheld?</h3></label><div class="text-input-container"><input type="text" id="how_much_is_being_withheld" name="how_much_is_being_withheld" inputmode="decimal" placeholder="Enter amount" oninput="formatCurrencyInput(this)"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
       <div class="question-nav" data-section-index="14">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="14">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="14">&rarr;</button>
@@ -1065,14 +1090,28 @@ document.addEventListener("DOMContentLoaded", function() {
           return indices;
         }
         function getVisibleIndicesForSectionElement(targetSectionEl) {
+
           const items = Array.from(targetSectionEl.querySelectorAll('.question-container.question-item'));
+
           const indices = [];
           items.forEach(function(item, idx) {
-            // Only exclude questions that have the 'hidden' class
-            // Questions without the 'hidden' class should be considered visible
-            // even if their parent section is not active (they'll become visible when section activates)
+            const questionId = item.getAttribute('data-question-id') || item.id || 'unknown';
             const hasHiddenClass = item.classList.contains('hidden');
+            const hasQuestionStepHidden = item.classList.contains('question-step-hidden');
+            const computedStyle = window.getComputedStyle(item);
+            const isActuallyVisible = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden';
+
+            // CRITICAL FIX: Check both conditional visibility (hidden class) AND navigation state (question-step-hidden)
+            // A question is visible if:
+            // 1. It doesn't have the 'hidden' class (conditional logic allows it)
+            // 2. It doesn't have 'question-step-hidden' OR if it does, we should still consider it if it's conditionally visible
+            // The key insight: question-step-hidden is a navigation state, but we should prioritize questions that are conditionally visible
+            // However, if a question has both 'hidden' and 'question-step-hidden', it's definitely not visible
+
             if (!hasHiddenClass) {
+              // Question is conditionally visible (no 'hidden' class)
+              // Even if it has 'question-step-hidden', we should include it in the indices
+              // because the navigation system will handle activating it when we navigate to this section
               indices.push(idx);
 
             } else {
@@ -1507,10 +1546,16 @@ document.addEventListener("DOMContentLoaded", function() {
           }
         }
         function activateIndex(targetIdx) {
-          if (isUpdating) return;
+
+          if (isUpdating) {
+
+            return;
+          }
           isUpdating = true;
           const visibleIndices = getVisibleIndices();
+
           if (!visibleIndices.length) {
+
             questionItems.forEach(function(item) {
               item.classList.add('question-step-hidden');
             });
@@ -1531,12 +1576,20 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
           }
           if (visibleIndices.indexOf(targetIdx) === -1) {
+
             targetIdx = visibleIndices[0];
           }
+
           questionItems.forEach(function(item, idx) {
-            if (idx === targetIdx && !item.classList.contains('hidden')) {
+            const questionId = item.getAttribute('data-question-id') || item.id || 'unknown';
+            const hasHiddenClass = item.classList.contains('hidden');
+            if (idx === targetIdx && !hasHiddenClass) {
+
               item.classList.remove('question-step-hidden');
             } else {
+              if (idx === targetIdx && hasHiddenClass) {
+
+              }
               item.classList.add('question-step-hidden');
             }
           });
@@ -1599,6 +1652,7 @@ document.addEventListener("DOMContentLoaded", function() {
           }
           const targetSectionId = cachedNextSectionInfo.sectionId;
           const targetSectionNumber = cachedNextSectionInfo.sectionNumber;
+          const targetFirstVisibleIndex = cachedNextSectionInfo.firstVisibleIndex;
 
           const triggerNavigation = () => {
 
@@ -1610,6 +1664,7 @@ document.addEventListener("DOMContentLoaded", function() {
               if (!validationResult) {
 
                 if (typeof navigateSection === 'function') {
+
                   navigateSection(targetSectionNumber);
                 }
               }
@@ -1627,7 +1682,8 @@ document.addEventListener("DOMContentLoaded", function() {
             if (activeSection && activeSection.id === targetSectionId) {
               if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
 
-                window.questionNavControllers[targetSectionId]();
+                // Pass the firstVisibleIndex to the navigation controller
+                window.questionNavControllers[targetSectionId](targetFirstVisibleIndex);
               } else {
 
               }
@@ -1769,12 +1825,15 @@ document.addEventListener("DOMContentLoaded", function() {
           const visibleIndices = getVisibleIndices();
 
           if (!visibleIndices.length) {
+
             // If no visible questions found, try to show the first question anyway
             // This handles cases where questions don't have the 'hidden' class but might be hidden by CSS
 
             if (questionItems.length > 0) {
               const firstQuestion = questionItems[0];
               if (firstQuestion) {
+                const questionId = firstQuestion.getAttribute('data-question-id') || firstQuestion.id || 'unknown';
+
                 // Remove both question-step-hidden AND hidden classes to ensure question is visible
                 firstQuestion.classList.remove('question-step-hidden');
                 firstQuestion.classList.remove('hidden');
@@ -1785,6 +1844,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
           }
           if (typeof targetIdx !== 'number' || visibleIndices.indexOf(targetIdx) === -1) {
+
             const currentVisibleIdx = visibleIndices.indexOf(activeIndex);
 
             if (currentVisibleIdx === -1) {
@@ -1906,15 +1966,61 @@ document.addEventListener("DOMContentLoaded", function() {
           }
         }
       });
-      // Global shortcut: Ctrl+CapsLock → click the visible "previous" arrow
+      // Global shortcut: Ctrl+CapsLock (Windows/Linux) or Command+CapsLock (Mac) → click the visible "previous" arrow
+      // CRITICAL FIX: Use a flag to prevent double-firing and add extensive logging
+      let capsLockHandlerExecuting = false;
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'CapsLock' && e.ctrlKey) {
+        console.log('[CAPSLOCK DEBUG] keydown event:', {
+          code: e.code,
+          key: e.key,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          target: e.target ? e.target.tagName + (e.target.id ? '#' + e.target.id : '') : 'null',
+          handlerExecuting: capsLockHandlerExecuting
+        });
+        
+        // Use e.code for more reliable CapsLock detection (works even when CapsLock is toggled)
+        const isCapsLock = (e.code === 'CapsLock' || e.key === 'CapsLock');
+        const hasModifier = (e.ctrlKey || e.metaKey);
+        
+        if (isCapsLock && hasModifier) {
+          console.log('[CAPSLOCK DEBUG] CapsLock + modifier detected');
+          
+          // Prevent double-firing: if handler is already executing, skip
+          if (capsLockHandlerExecuting) {
+            console.log('[CAPSLOCK DEBUG] Handler already executing, skipping');
+            return;
+          }
+          
           e.preventDefault();
+          e.stopPropagation();
+          
+          console.log('[CAPSLOCK DEBUG] Finding active section and previous button');
           const activeSection = document.querySelector('.section.active');
+          console.log('[CAPSLOCK DEBUG] Active section:', activeSection ? activeSection.id : 'null');
+          
           const prevBtn = activeSection ? activeSection.querySelector('.question-prev') : null;
+          console.log('[CAPSLOCK DEBUG] Previous button:', prevBtn ? 'FOUND' : 'NOT FOUND', prevBtn ? {
+            id: prevBtn.id,
+            disabled: prevBtn.disabled,
+            className: prevBtn.className
+          } : {});
 
-          if (prevBtn) {
+          if (prevBtn && !prevBtn.disabled) {
+            console.log('[CAPSLOCK DEBUG] Clicking previous button');
+            // Set flag to prevent double-firing
+            capsLockHandlerExecuting = true;
+            
+            // Reset flag after a short delay to allow the click to process
+            setTimeout(() => {
+              capsLockHandlerExecuting = false;
+              console.log('[CAPSLOCK DEBUG] Handler flag reset');
+            }, 100);
+            
             prevBtn.click();
+            console.log('[CAPSLOCK DEBUG] Previous button clicked');
+          } else {
+            console.log('[CAPSLOCK DEBUG] Previous button not available or disabled');
           }
         }
       });
@@ -1933,9 +2039,11 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_full_address"     name="user_full_address">
 <input type="hidden" id="user_full_address_hidden" name="user_full_address_hidden">
 <div style="display:none;"><input type="checkbox" id="5a" name="5a"></div>
-<input type="text" id="8b" name="8b" style="display:none;">
-<input type="text" id="6b2" name="6b2" style="display:none;">
-<input type="text" id="9b" name="9b" style="display:none;">
+<div style="display:none;"><input type="checkbox" id="income_changes_month_to_month" name="income_changes_month_to_month"></div>
+<input type="text" id="total_house_income" name="total_house_income" style="display:none;">
+<input type="text" id="89b" name="89b" style="display:none;">
+<input type="text" id="total_monthly_expenses" name="total_monthly_expenses" style="display:none;">
+<input type="text" id="total_income_value" name="total_income_value" style="display:none;">
 <input type="checkbox" id="fee_waiver_default_checkbox" name="fee_waiver_default_checkbox" checked style="display: none;">
 </div>
   <script>
@@ -2080,12 +2188,12 @@ document.addEventListener("DOMContentLoaded", function() {
 <script>
 window.formId = 'Fee Waiver';
 var questionSlugMap = {"1":"are_you_currently_employed","2":"please_enter_your_work_info","3":"do_you_have_a_lawyer","4":"please_enter_lawyer_info","5":"has_your_lawyer_agreed_to_cover_a_portion_of_your_fees","6":"have_you_filed_a_claim_before","7":"do_you_receive_any_of_the_following","8":"is_your_household_monthly_income_less_than_the_amount_below","9":"what_would_you_like_the_court_to_do","10":"does_your_income_change_a_lot_from_month_to_month","11":"how_many_sources_of_income_do_you_have","12":"does_anybody_else_live_in_your_home","13":"how_many_other_people_live_in_your_household","14":"does_your_income_change_a_lot_from_month_to_month","15":"how_many_sources_of_income_do_you_have","16":"do_you_have_anybody_else_living_in_your_home","17":"how_many_other_people_live_in_your_household","18":"do_you_have_any_cash_savings","19":"how_much_cash_saving_do_you_have","20":"do_you_have_a_bank_account","21":"how_many_bank_accounts_do_you_have","22":"do_you_own_any_cars_boats_and_other_vehicles","23":"how_many_vehicles_do_you_own","24":"do_you_own_any_real_estate","25":"how_many_real_estate_properties_do_you_have","26":"do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect","27":"how_many_items","28":"do_you_have_any_payroll_deductions","29":"how_many_deductions","30":"mark_all_that_apply","31":"do_you_have_any_installment_payments","32":"how_many_installment_payments_do_you_have","33":"do_you_have_any_wages_earnings_withheld_by_the_court","34":"how_much_is_being_withheld","35":"do_you_have_any_other_monthly_expenses","36":"how_many_other_monthly_expenses_do_you_have"};
-var questionNameIds = {"1":"are_you_currently_employed","2":"please_enter_your_work_info","3":"do_you_have_a_lawyer","4":"please_enter_lawyer_info","5":"has_your_lawyer_agreed_to_cover_a_portion_of_your_fees","6":"have_you_filed_a_claim_before","7":"do_you_receive_any_of_the_following","8":"is_your_household_monthly_income_less_than_the_amount_below","9":"what_would_you_like_the_court_to_do","10":"does_your_income_change_a_lot_from_month_to_month","11":"how_many_sources_of_income_do_you_have","12":"does_anybody_else_live_in_your_home","13":"how_many_other_people_live_in_your_household","14":"does_your_income_change_a_lot_from_month_to_month","15":"how_many_sources_of_income_do_you_have","16":"do_you_have_anybody_else_living_in_your_home","17":"how_many_other_people_live_in_your_household","18":"do_you_have_any_cash_savings","19":"how_much_cash_saving_do_you_have","20":"do_you_have_a_bank_account","21":"how_many_bank_accounts_do_you_have","22":"do_you_own_any_cars_boats_and_other_vehicles","23":"how_many_vehicles_do_you_own","24":"do_you_own_any_real_estate","25":"how_many_real_estate_properties_do_you_have","26":"do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect","27":"how_many_items","28":"do_you_have_any_payroll_deductions","29":"how_many_deductions","30":"mark_all_that_apply","31":"do_you_have_any_installment_payments","32":"how_many_installment_payments_do_you_have","33":"do_you_have_any_wagesearnings_withheld_by_the_court","34":"how_much_is_being_withheld","35":"do_you_have_any_other_monthly_expenses","36":"how_many_other_monthly_expenses_do_you_have"};
-var linkedCheckboxes = [{"linkedCheckboxId":"5a","checkboxes":["do_you_receive_any_of_the_following_unemployment","do_you_receive_any_of_the_following_food_stamps","do_you_receive_any_of_the_following_supp_sec_inc","do_you_receive_any_of_the_following_ssp","do_you_receive_any_of_the_following_county_reliefgen_assist","do_you_receive_any_of_the_following_medical","do_you_receive_any_of_the_following_calworks_or_tribal_tanf","do_you_receive_any_of_the_following_ihss","do_you_receive_any_of_the_following_capi","do_you_receive_any_of_the_following_wic"]}];
+var questionNameIds = {"1":"are_you_currently_employed","2":"please_enter_your_work_info","3":"do_you_have_a_lawyer","4":"please_enter_lawyer_info","5":"has_your_lawyer_agreed_to_cover_a_portion_of_your_fees","6":"have_you_filed_a_claim_before","7":"do_you_receive_any_of_the_following","8":"is_your_household_monthly_income_less_than_the_amount_below","9":"what_would_you_like_the_court_to_do","10":"does_your_income_change_a_lot_from_month_to_month","11":"how_many_sources_of_income_do_you_have","12":"does_anybody_else_live_in_your_home","13":"how_many_other_people_live_in_your_household","14":"does_your_income_change_a_lot_from_month_to_month_dup2","15":"how_many_sources_of_income_do_you_have_dup2","16":"do_you_have_anybody_else_living_in_your_home","17":"how_many_other_people_live_in_your_household_dup2","18":"do_you_have_any_cash_savings","19":"how_much_cash_saving_do_you_have","20":"do_you_have_a_bank_account","21":"how_many_bank_accounts_do_you_have","22":"do_you_own_any_cars_boats_and_other_vehicles","23":"how_many_vehicles_do_you_own","24":"do_you_own_any_real_estate","25":"how_many_real_estate_properties_do_you_have","26":"do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect","27":"how_many_items","28":"do_you_have_any_payroll_deductions","29":"how_many_deductions","30":"mark_all_that_apply","31":"do_you_have_any_installment_payments","32":"how_many_installment_payments_do_you_have","33":"do_you_have_any_wagesearnings_withheld_by_the_court","34":"how_much_is_being_withheld","35":"do_you_have_any_other_monthly_expenses","36":"how_many_other_monthly_expenses_do_you_have"};
+var linkedCheckboxes = [{"linkedCheckboxId":"5a","checkboxes":["do_you_receive_any_of_the_following_unemployment","do_you_receive_any_of_the_following_food_stamps","do_you_receive_any_of_the_following_supp_sec_inc","do_you_receive_any_of_the_following_ssp","do_you_receive_any_of_the_following_county_reliefgen_assist","do_you_receive_any_of_the_following_medical","do_you_receive_any_of_the_following_calworks_or_tribal_tanf","do_you_receive_any_of_the_following_ihss","do_you_receive_any_of_the_following_capi","do_you_receive_any_of_the_following_wic"]},{"linkedCheckboxId":"income_changes_month_to_month","checkboxes":["does_your_income_change_a_lot_from_month_to_month_dup2_yes","does_your_income_change_a_lot_from_month_to_month_yes"]}];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {"7":true,"30":true};
 var allAreRequiredMap = {"7":false,"30":false};
-var unifiedFieldsMap = {"2":[{"type":"label","label":"Job Title","nodeId":"please_enter_your_work_info_job_title","order":1,"prefill":""},{"type":"label","label":"Employer Name","nodeId":"please_enter_your_work_info_employer_name","order":2,"prefill":""},{"type":"location","fieldName":"Please enter your work address","nodeId":"location_data","order":3}],"4":[{"type":"label","label":"Laywer Name","nodeId":"please_enter_lawyer_info_laywer_name","order":1,"prefill":""},{"type":"label","label":"Lawyer Firm","nodeId":"please_enter_lawyer_info_lawyer_firm","order":2,"prefill":""},{"type":"phone","label":"Lawyer Phone Number","nodeId":"please_enter_lawyer_info_lawyer_phone_number","order":3},{"type":"amount","label":"State Bar Number","nodeId":"please_enter_lawyer_info_state_bar_number","order":4},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":5}],"11":[{"type":"label","label":"Description","nodeId":"how_many_sources_of_income_do_you_have_description","order":1,"prefill":""},{"type":"amount","label":"Income Value","nodeId":"how_many_sources_of_income_do_you_have_income_value","order":2}],"13":[{"type":"label","label":"Name","nodeId":"how_many_other_people_live_in_your_household_name","order":1,"prefill":""},{"type":"amount","label":"Age","nodeId":"how_many_other_people_live_in_your_household_age","order":2},{"type":"label","label":"Relationship","nodeId":"how_many_other_people_live_in_your_household_relationship","order":3,"prefill":""},{"type":"amount","label":"Monthly Income","nodeId":"how_many_other_people_live_in_your_household_monthly_income","order":4}],"15":[{"type":"label","label":"Income Source","nodeId":"how_many_sources_of_income_do_you_have_income_source","order":1,"prefill":""},{"type":"amount","label":"Income Value","nodeId":"how_many_sources_of_income_do_you_have_income_value","order":2}],"17":[{"type":"label","label":"Name","nodeId":"how_many_other_people_live_in_your_household_name","order":1,"prefill":""},{"type":"amount","label":"Age","nodeId":"how_many_other_people_live_in_your_household_age","order":2},{"type":"label","label":"Relationship","nodeId":"how_many_other_people_live_in_your_household_relationship","order":3,"prefill":""},{"type":"amount","label":"Monthly Income","nodeId":"how_many_other_people_live_in_your_household_monthly_income","order":4}],"21":[{"type":"label","label":"Bank Name","nodeId":"how_many_bank_accounts_do_you_have_bank_name","order":1,"prefill":""},{"type":"amount","label":"Amount","nodeId":"how_many_bank_accounts_do_you_have_amount","order":2}],"23":[{"type":"label","label":"Make/Year","nodeId":"how_many_vehicles_do_you_own_make/year","order":1,"prefill":""},{"type":"amount","label":"Fair Market Value","nodeId":"how_many_vehicles_do_you_own_fair_market_value","order":2},{"type":"amount","label":"Amount Owed","nodeId":"how_many_vehicles_do_you_own_amount_owed","order":3}],"25":[{"type":"label","label":"Address","nodeId":"how_many_real_estate_properties_do_you_have_address","order":1,"prefill":""},{"type":"amount","label":"Fair Market Value","nodeId":"how_many_real_estate_properties_do_you_have_fair_market_value","order":2},{"type":"amount","label":"Amount Owed","nodeId":"how_many_real_estate_properties_do_you_have_amount_owed","order":3}],"27":[{"type":"label","label":"Description","nodeId":"how_many_items_description","order":1,"prefill":""},{"type":"amount","label":"Fair Market Value","nodeId":"how_many_items_fair_market_value","order":2},{"type":"amount","label":"Amount Owed","nodeId":"how_many_items_amount_owed","order":3}],"29":[{"type":"label","label":"Description","nodeId":"how_many_deductions_description","order":1,"prefill":""},{"type":"amount","label":"Fair Market Value","nodeId":"how_many_deductions_fair_market_value","order":2}],"32":[{"type":"label","label":"Description","nodeId":"how_many_installment_payments_do_you_have_description","order":1,"prefill":""},{"type":"amount","label":"Amount","nodeId":"how_many_installment_payments_do_you_have_amount","order":2}],"36":[{"type":"label","label":"Description","nodeId":"how_many_other_monthly_expenses_do_you_have_description","order":1,"prefill":""},{"type":"amount","label":"Amount","nodeId":"how_many_other_monthly_expenses_do_you_have_amount","order":2}]};
+var unifiedFieldsMap = {"2":[{"type":"label","label":"Job Title","nodeId":"please_enter_your_work_info_job_title","order":1,"prefill":""},{"type":"label","label":"Employer Name","nodeId":"please_enter_your_work_info_employer_name","order":2,"prefill":""},{"type":"location","fieldName":"Please enter your work address","nodeId":"location_data","order":3}],"4":[{"type":"label","label":"Laywer Name","nodeId":"please_enter_lawyer_info_laywer_name","order":1,"prefill":""},{"type":"label","label":"Lawyer Firm","nodeId":"please_enter_lawyer_info_lawyer_firm","order":2,"prefill":""},{"type":"phone","label":"Lawyer Phone Number","nodeId":"please_enter_lawyer_info_lawyer_phone_number","order":3},{"type":"amount","label":"State Bar Number","nodeId":"please_enter_lawyer_info_state_bar_number","order":4},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":5}],"11":[{"type":"label","label":"Income Source","nodeId":"how_many_sources_of_income_do_you_have_income_source","order":1,"prefill":""},{"type":"amount","label":"Income Value","nodeId":"how_many_sources_of_income_do_you_have_income_value","order":2}],"13":[{"type":"label","label":"Name","nodeId":"how_many_other_people_live_in_your_household_name","order":1,"prefill":""},{"type":"amount","label":"Age","nodeId":"how_many_other_people_live_in_your_household_age","order":2},{"type":"label","label":"Relationship","nodeId":"how_many_other_people_live_in_your_household_relationship","order":3,"prefill":""},{"type":"amount","label":"Monthly Income","nodeId":"how_many_other_people_live_in_your_household_monthly_income","order":4}],"15":[{"type":"label","label":"Income Source","nodeId":"how_many_sources_of_income_do_you_have_dup2_income_source","order":1,"prefill":""},{"type":"amount","label":"Income Value","nodeId":"how_many_sources_of_income_do_you_have_dup2_income_value","order":2}],"17":[{"type":"label","label":"Name","nodeId":"how_many_other_people_live_in_your_household_dup2_name","order":1,"prefill":""},{"type":"amount","label":"Age","nodeId":"how_many_other_people_live_in_your_household_dup2_age","order":2},{"type":"label","label":"Relationship","nodeId":"how_many_other_people_live_in_your_household_dup2_relationship","order":3,"prefill":""},{"type":"amount","label":"Monthly Income","nodeId":"how_many_other_people_live_in_your_household_dup2_monthly_income","order":4}],"21":[{"type":"label","label":"Bank Name","nodeId":"how_many_bank_accounts_do_you_have_bank_name","order":1,"prefill":""},{"type":"amount","label":"Amount","nodeId":"how_many_bank_accounts_do_you_have_amount","order":2}],"23":[{"type":"label","label":"Make/Year","nodeId":"how_many_vehicles_do_you_own_make/year","order":1,"prefill":""},{"type":"amount","label":"Fair Market Value","nodeId":"how_many_vehicles_do_you_own_fair_market_value","order":2},{"type":"amount","label":"Amount Owed","nodeId":"how_many_vehicles_do_you_own_amount_owed","order":3}],"25":[{"type":"label","label":"Address","nodeId":"how_many_real_estate_properties_do_you_have_address","order":1,"prefill":""},{"type":"amount","label":"Fair Market Value","nodeId":"how_many_real_estate_properties_do_you_have_fair_market_value","order":2},{"type":"amount","label":"Amount Owed","nodeId":"how_many_real_estate_properties_do_you_have_amount_owed","order":3}],"27":[{"type":"label","label":"Description","nodeId":"how_many_items_description","order":1,"prefill":""},{"type":"amount","label":"Fair Market Value","nodeId":"how_many_items_fair_market_value","order":2},{"type":"amount","label":"Amount Owed","nodeId":"how_many_items_amount_owed","order":3}],"29":[{"type":"label","label":"Description","nodeId":"how_many_deductions_description","order":1,"prefill":""},{"type":"amount","label":"Fair Market Value","nodeId":"how_many_deductions_fair_market_value","order":2}],"32":[{"type":"label","label":"Description","nodeId":"how_many_installment_payments_do_you_have_description","order":1,"prefill":""},{"type":"amount","label":"Amount","nodeId":"how_many_installment_payments_do_you_have_amount","order":2}],"36":[{"type":"label","label":"Description","nodeId":"how_many_other_monthly_expenses_do_you_have_description","order":1,"prefill":""},{"type":"amount","label":"Amount","nodeId":"how_many_other_monthly_expenses_do_you_have_amount","order":2}]};
 var entryTitleMap = {};
 window.fileUploadQuestions = [];
 window.latexPreviewQuestions = [];
@@ -3900,12 +4008,12 @@ var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"11":["Description"],"13":["Name","Relationship"],"15":["Income Source"],"17":["Name","Relationship"],"21":["Bank Name"],"23":["Make/Year"],"25":["Address"],"27":["Description"],"29":["Description"],"32":["Description"],"36":["Description"],"length":0};
+var labelMap = {"11":["Income Source"],"13":["Name","Relationship"],"15":["Income Source"],"17":["Name","Relationship"],"21":["Bank Name"],"23":["Make/Year"],"25":["Address"],"27":["Description"],"29":["Description"],"32":["Description"],"36":["Description"],"length":0};
 var amountMap = {"11":["Income Value"],"13":["Age","Monthly Income"],"15":["Income Value"],"17":["Age","Monthly Income"],"21":["Amount"],"23":["Fair Market Value","Amount Owed"],"25":["Fair Market Value","Amount Owed"],"27":["Fair Market Value","Amount Owed"],"29":["Fair Market Value"],"32":["Amount"],"36":["Amount"],"length":0};
-var labelNodeIdsMap = {"11":["how_many_sources_of_income_do_you_have_description"],"13":["how_many_other_people_live_in_your_household_name","how_many_other_people_live_in_your_household_relationship"],"15":["how_many_sources_of_income_do_you_have_income_source"],"17":["how_many_other_people_live_in_your_household_name","how_many_other_people_live_in_your_household_relationship"],"21":["how_many_bank_accounts_do_you_have_bank_name"],"23":["how_many_vehicles_do_you_own_make/year"],"25":["how_many_real_estate_properties_do_you_have_address"],"27":["how_many_items_description"],"29":["how_many_deductions_description"],"32":["how_many_installment_payments_do_you_have_description"],"36":["how_many_other_monthly_expenses_do_you_have_description"]};
+var labelNodeIdsMap = {"11":["how_many_sources_of_income_do_you_have_income_source"],"13":["how_many_other_people_live_in_your_household_name","how_many_other_people_live_in_your_household_relationship"],"15":["how_many_sources_of_income_do_you_have_dup2_income_source"],"17":["how_many_other_people_live_in_your_household_dup2_name","how_many_other_people_live_in_your_household_dup2_relationship"],"21":["how_many_bank_accounts_do_you_have_bank_name"],"23":["how_many_vehicles_do_you_own_make/year"],"25":["how_many_real_estate_properties_do_you_have_address"],"27":["how_many_items_description"],"29":["how_many_deductions_description"],"32":["how_many_installment_payments_do_you_have_description"],"36":["how_many_other_monthly_expenses_do_you_have_description"]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
-var linkedFields = [];
+var linkedFields = [{"linkedFieldId":"income_value_1","fields":["how_many_sources_of_income_do_you_have_income_value_1","how_many_sources_of_income_do_you_have_dup2_income_value_1"]},{"linkedFieldId":"household_name_1","fields":["how_many_other_people_live_in_your_household_name_1","how_many_other_people_live_in_your_household_dup2_name_1"]},{"linkedFieldId":"income_value_2","fields":["how_many_sources_of_income_do_you_have_income_value_2","how_many_sources_of_income_do_you_have_dup2_income_value_2"]},{"linkedFieldId":"income_value_3","fields":["how_many_sources_of_income_do_you_have_income_value_3","how_many_sources_of_income_do_you_have_dup2_income_value_3"]},{"linkedFieldId":"income_value_4","fields":["how_many_sources_of_income_do_you_have_income_value_4","how_many_sources_of_income_do_you_have_dup2_income_value_4"]},{"linkedFieldId":"income_source_1","fields":["how_many_sources_of_income_do_you_have_income_source_1","how_many_sources_of_income_do_you_have_dup2_income_source_1"]},{"linkedFieldId":"income_source_2","fields":["how_many_sources_of_income_do_you_have_income_source_2","how_many_sources_of_income_do_you_have_dup2_income_source_2"]},{"linkedFieldId":"income_source_3","fields":["how_many_sources_of_income_do_you_have_income_source_3","how_many_sources_of_income_do_you_have_dup2_income_source_3"]},{"linkedFieldId":"income_source_4","fields":["how_many_sources_of_income_do_you_have_income_source_4","how_many_sources_of_income_do_you_have_dup2_income_source_4"]},{"linkedFieldId":"household_name_2","fields":["how_many_other_people_live_in_your_household_name_2","how_many_other_people_live_in_your_household_dup2_name_2"]},{"linkedFieldId":"household_name_3","fields":["how_many_other_people_live_in_your_household_name_3","how_many_other_people_live_in_your_household_dup2_name_3"]},{"linkedFieldId":"household_name_4","fields":["how_many_other_people_live_in_your_household_name_4","how_many_other_people_live_in_your_household_dup2_name_4"]},{"linkedFieldId":"household_age_1","fields":["how_many_other_people_live_in_your_household_age_1","how_many_other_people_live_in_your_household_dup2_age_1"]},{"linkedFieldId":"household_age_2","fields":["how_many_other_people_live_in_your_household_age_2","how_many_other_people_live_in_your_household_dup2_age_2"]},{"linkedFieldId":"household_age_3","fields":["how_many_other_people_live_in_your_household_age_3","how_many_other_people_live_in_your_household_dup2_age_3"]},{"linkedFieldId":"household_age_4","fields":["how_many_other_people_live_in_your_household_age_4","how_many_other_people_live_in_your_household_dup2_age_4"]},{"linkedFieldId":"household_relationship_1","fields":["how_many_other_people_live_in_your_household_relationship_1","how_many_other_people_live_in_your_household_dup2_relationship_1"]},{"linkedFieldId":"household_relationship_2","fields":["how_many_other_people_live_in_your_household_relationship_2","how_many_other_people_live_in_your_household_dup2_relationship_2"]},{"linkedFieldId":"household_relationship_3","fields":["how_many_other_people_live_in_your_household_relationship_3","how_many_other_people_live_in_your_household_dup2_relationship_3"]},{"linkedFieldId":"household_relationship_4","fields":["how_many_other_people_live_in_your_household_relationship_4","how_many_other_people_live_in_your_household_dup2_relationship_4"]},{"linkedFieldId":"household_income_1","fields":["how_many_other_people_live_in_your_household_monthly_income_1","how_many_other_people_live_in_your_household_dup2_monthly_income_1"]},{"linkedFieldId":"household_income_2","fields":["how_many_other_people_live_in_your_household_monthly_income_2","how_many_other_people_live_in_your_household_dup2_monthly_income_2"]},{"linkedFieldId":"household_income_3","fields":["how_many_other_people_live_in_your_household_monthly_income_3","how_many_other_people_live_in_your_household_dup2_monthly_income_3"]},{"linkedFieldId":"household_income_4","fields":["how_many_other_people_live_in_your_household_monthly_income_4","how_many_other_people_live_in_your_household_dup2_monthly_income_4"]}];
 var isHandlingLink = false;
 
 // Dynamic conditional logic for business type question to show county question
@@ -4186,7 +4294,7 @@ var stripePriceId = "price_1SCYyUFJeSRMFQ8Xzk0GWZpM";
 var additionalPdfFileNames = [];
 var allPdfFileNames = ["feewaiver", ];
 var hiddenCheckboxCalculations = [];
-var hiddenTextCalculations = [{"hiddenFieldName":"8b","calculations":[{"terms":[{"operator":"","questionNameId":""},{"operator":"+","questionNameId":""},{"operator":"+","questionNameId":""},{"operator":"+","questionNameId":""},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_have_1_income_value"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_have_2_income_value"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_have_3_income_value"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_have_4_income_value"}],"compareOperator":">","threshold":"0","fillValue":"##8b##"}]},{"hiddenFieldName":"6b2","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_sources_of_income_do_you_have_1_income_value"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_2_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_3_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_4_monthly_income"}],"compareOperator":">","threshold":"0","fillValue":"##6b2##"}]},{"hiddenFieldName":"9b","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_other_people_live_in_your_household_1_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_2_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_3_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_4_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_1_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_2_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_3_monthly_income"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_4_monthly_income"}],"compareOperator":">","threshold":"0","fillValue":"##9b##"}]}];
+var hiddenTextCalculations = [{"hiddenFieldName":"total_house_income","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_other_people_live_in_your_household_monthly_income_1"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_monthly_income_2"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_monthly_income_3"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_monthly_income_4"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_dup2_monthly_income_1"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_dup2_monthly_income_2"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_dup2_monthly_income_3"},{"operator":"+","questionNameId":"how_many_other_people_live_in_your_household_dup2_monthly_income_4"}],"compareOperator":">","threshold":"0","fillValue":"##total_house_income##"}]},{"hiddenFieldName":"89b","calculations":[{"terms":[{"operator":"","questionNameId":""},{"operator":"+","questionNameId":"total_house_income"}],"compareOperator":">","threshold":"0","fillValue":"##89b##"}]},{"hiddenFieldName":"total_monthly_expenses","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_deductions_fair_market_value_1"},{"operator":"+","questionNameId":"how_many_deductions_fair_market_value_2"},{"operator":"+","questionNameId":"how_many_deductions_fair_market_value_3"},{"operator":"+","questionNameId":"how_many_deductions_fair_market_value_4"},{"operator":"+","questionNameId":"mark_all_that_apply_rent_housing_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_food_supplies_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_utilities_phone_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_clothing_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_laundry_cleaning_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_medical_dental_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_insurance_life_health_etc_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_school_child_care_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_child_spousal_support_amount"},{"operator":"+","questionNameId":"mark_all_that_apply_transportation_auto_gas_amount"},{"operator":"+","questionNameId":"how_many_installment_payments_do_you_have_amount_1"},{"operator":"+","questionNameId":"how_many_installment_payments_do_you_have_amount_2"},{"operator":"+","questionNameId":"how_many_installment_payments_do_you_have_amount_3"},{"operator":"+","questionNameId":""},{"operator":"+","questionNameId":""},{"operator":"+","questionNameId":"how_many_other_monthly_expenses_do_you_have_amount_1"},{"operator":"+","questionNameId":"how_many_other_monthly_expenses_do_you_have_amount_2"},{"operator":"+","questionNameId":"how_many_other_monthly_expenses_do_you_have_amount_3"}],"compareOperator":">","threshold":"0","fillValue":"##total_monthly_expenses##"}]},{"hiddenFieldName":"total_income_value","calculations":[{"terms":[{"operator":"","questionNameId":"how_many_sources_of_income_do_you_have_income_value_1"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_have_income_value_2"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_have_income_value_3"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_have_income_value_4"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_have_dup2_income_value_1"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_have_dup2_income_value_2"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_have_dup2_income_value_3"},{"operator":"+","questionNameId":"how_many_sources_of_income_do_you_have_dup2_income_value_4"}],"compareOperator":">","threshold":"0","fillValue":"##total_income_value##"}]}];
 
 
 (function(){
@@ -4244,6 +4352,81 @@ var hiddenTextCalculations = [{"hiddenFieldName":"8b","calculations":[{"terms":[
     document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
   }
 }
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-3");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("3");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
  (function(){
    var selectQuestion = "1";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
@@ -4468,6 +4651,157 @@ checkboxRequiredMap[7] = true;
 allAreRequiredMap[7] = false; 
 
 (function(){
+ var thisQ=document.getElementById("question-container-7");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="6";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="6";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("7");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "6";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "6";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-8");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="none of the above";
+    var cPrevQNum="7";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("8");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var checkQuestion = "7";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
  var thisQ=document.getElementById("question-container-9");
  function updateVisibility(){
   var anyMatch=false;
@@ -4485,6 +4819,69 @@ allAreRequiredMap[7] = false;
      
      if(typeof resetNumberedDropdownFields === 'function'){
        resetNumberedDropdownFields("9");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "8";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-10");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="8";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("10");
      } else {
        
      }
@@ -4744,6 +5141,93 @@ allAreRequiredMap[7] = false;
 })();
 
 (function(){
+ var thisQ=document.getElementById("question-container-14");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="let me pay them over time";
+    var cPrevQNum="9";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="waive all fees";
+    var cPrevQNum="9";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="waive some fees";
+    var cPrevQNum="9";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("14");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "9";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
  var thisQ=document.getElementById("question-container-15");
  function updateVisibility(){
   var anyMatch=false;
@@ -4768,6 +5252,81 @@ allAreRequiredMap[7] = false;
      
      if(typeof resetNumberedDropdownFields === 'function'){
        resetNumberedDropdownFields("15");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "14";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "14";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-16");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="14";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="14";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("16");
      } else {
        
      }
@@ -4873,6 +5432,81 @@ allAreRequiredMap[7] = false;
     document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
   }
 }
+ (function(){
+   var selectQuestion = "16";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-18");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="16";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="16";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("18");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "16";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
  (function(){
    var selectQuestion = "16";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
@@ -5083,6 +5717,81 @@ allAreRequiredMap[7] = false;
 })();
 
 (function(){
+ var thisQ=document.getElementById("question-container-22");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="20";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="20";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("22");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "20";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "20";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
  var thisQ=document.getElementById("question-container-23");
  function updateVisibility(){
   var anyMatch=false;
@@ -5137,6 +5846,81 @@ allAreRequiredMap[7] = false;
     document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
   }
 }
+ (function(){
+   var selectQuestion = "22";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-24");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="22";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="22";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("24");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "22";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
  (function(){
    var selectQuestion = "22";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
@@ -5209,6 +5993,81 @@ allAreRequiredMap[7] = false;
 })();
 
 (function(){
+ var thisQ=document.getElementById("question-container-26");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="24";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="24";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("26");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "24";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "24";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
  var thisQ=document.getElementById("question-container-27");
  function updateVisibility(){
   var anyMatch=false;
@@ -5263,6 +6122,81 @@ allAreRequiredMap[7] = false;
     document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
   }
 }
+ (function(){
+   var selectQuestion = "26";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-28");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="26";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="26";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("28");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "26";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
  (function(){
    var selectQuestion = "26";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
@@ -5337,6 +6271,407 @@ checkboxRequiredMap[30] = true;
 allAreRequiredMap[30] = false; 
 
 (function(){
+ var thisQ=document.getElementById("question-container-30");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="28";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="28";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("30");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "28";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "28";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-31");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="none of the above";
+    var cPrevQNum="30";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="food / supplies";
+    var cPrevQNum="30";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="rent / housing";
+    var cPrevQNum="30";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="utilities / phone";
+    var cPrevQNum="30";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="clothing";
+    var cPrevQNum="30";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="laundry / cleaning";
+    var cPrevQNum="30";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="medical / dental";
+    var cPrevQNum="30";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="insurance (life, health, etc.)";
+    var cPrevQNum="30";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="school / child care";
+    var cPrevQNum="30";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="child / spousal support";
+    var cPrevQNum="30";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+  (function(){
+    var cPrevType="checkbox";
+    var cPrevAns="transportation / auto / gas";
+    var cPrevQNum="30";
+    if(cPrevType==="checkbox"){
+      // For checkboxes, look for all checkboxes in the question container
+      var questionContainer = document.getElementById('question-container-' + cPrevQNum);
+      // Check if this is a markOnlyOne question (radio buttons) or regular checkboxes
+      var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+      
+      var checkedVals=[];
+      for(var cc=0; cc<cbs.length; cc++){ if(cbs[cc].checked) checkedVals.push(cbs[cc].value.trim().toLowerCase());}
+      
+      if(checkedVals.indexOf(cPrevAns)!==-1){ anyMatch=true; }
+    } else {
+      var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+      if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+    }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("31");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var checkQuestion = "30";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "30";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "30";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "30";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "30";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "30";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "30";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "30";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "30";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "30";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var checkQuestion = "30";
+   var questionContainer = document.getElementById('question-container-' + checkQuestion);
+   var cbs = questionContainer ? questionContainer.querySelectorAll('input[type="checkbox"], input[type="radio"]') : [];
+   for(var i=0;i<cbs.length;i++){ cbs[i].addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
  var thisQ=document.getElementById("question-container-32");
  function updateVisibility(){
   var anyMatch=false;
@@ -5354,6 +6689,69 @@ allAreRequiredMap[30] = false;
      
      if(typeof resetNumberedDropdownFields === 'function'){
        resetNumberedDropdownFields("32");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "31";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-33");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="31";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("33");
      } else {
        
      }
@@ -5454,6 +6852,86 @@ allAreRequiredMap[30] = false;
     document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
   }
 }
+ (function(){
+   var selectQuestion = "33";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "32";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
+
+(function(){
+ var thisQ=document.getElementById("question-container-35");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="currency";
+    var cPrevAns="any text";
+    var cPrevQNum="34";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim(); if(val2 !== ""){ anyMatch=true; } else { } }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="33";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var val2= el2.value.trim().toLowerCase(); if(val2===cPrevAns){ anyMatch=true; } else { } }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("35");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var textQuestion = "34";
+   var el3= document.getElementById(questionNameIds[textQuestion]) || document.getElementById("answer"+textQuestion);
+   if(el3){ el3.addEventListener("input", function(){ updateVisibility();});}
+ })();
  (function(){
    var selectQuestion = "33";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
@@ -6590,26 +8068,52 @@ function showValidationPopup() {
 }
 // Global function to trigger visibility updates for dependent questions
 function triggerVisibilityUpdates() {
-    // Find all question containers and trigger their visibility logic
-    const questionContainers = document.querySelectorAll('[id^="question-container-"]');
-    questionContainers.forEach(container => {
-        const questionId = container.id.replace('question-container-', '');
-        // Try to find and call the updateVisibility function for this question
-        // The conditional logic creates functions in the global scope, so we need to call them
-        try {
-            // Look for the updateVisibility function that was created for this question
-            // The function is created in a closure, so we need to trigger it via the event listeners
-        const questionElement = document.getElementById(questionNameIds[questionId]) || 
-                              document.getElementById('answer' + questionId);
-        if (questionElement) {
-            // Trigger change event to update visibility
-            const event = new Event('change', { bubbles: true });
-            questionElement.dispatchEvent(event);
-            } else {
+    // Avoid blocking the main thread by batching visibility updates
+    if (window._visibilityUpdateRunning) {
+        window._visibilityUpdateQueued = true;
+        return;
+    }
+    window._visibilityUpdateRunning = true;
+    const questionContainers = Array.from(document.querySelectorAll('[id^="question-container-"]'));
+    let idx = 0;
+    const total = questionContainers.length;
+    const processBatch = (deadline) => {
+        let processed = 0;
+        const hasDeadline = deadline && typeof deadline.timeRemaining === 'function';
+        while (idx < total && (hasDeadline ? deadline.timeRemaining() > 5 : processed < 10)) {
+            const container = questionContainers[idx];
+            const questionId = container.id.replace('question-container-', '');
+            try {
+                const questionElement = document.getElementById(questionNameIds[questionId]) || 
+                                      document.getElementById('answer' + questionId);
+                if (questionElement) {
+                    const event = new Event('change', { bubbles: true });
+                    questionElement.dispatchEvent(event);
+                }
+            } catch (error) {
             }
-        } catch (error) {
+            idx += 1;
+            processed += 1;
         }
-    });
+        if (idx < total) {
+            if (typeof requestIdleCallback !== 'undefined') {
+                requestIdleCallback(processBatch, { timeout: 1000 });
+            } else {
+                setTimeout(() => processBatch(null), 0);
+            }
+            return;
+        }
+        window._visibilityUpdateRunning = false;
+        if (window._visibilityUpdateQueued) {
+            window._visibilityUpdateQueued = false;
+            triggerVisibilityUpdates();
+        }
+    };
+    if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(processBatch, { timeout: 1000 });
+    } else {
+        setTimeout(() => processBatch(null), 0);
+    }
 }
 // Fallback function to manually check and update visibility without relying on generated scripts
 function triggerVisibilityUpdatesFallback() {
@@ -7734,7 +9238,8 @@ function showTextboxLabels(questionId, count){
         const br = document.createElement('br');
         container.appendChild(br);
     }
-    attachCalculationListeners();   // keep this
+    window.__calcListenersNeedRefresh = true;
+    scheduleCalculationListeners();
     // Update linked fields after creating new textboxes
     updateLinkedFields();
     // 🔧 NEW: Trigger navigation refresh after fields are created so Next button updates
@@ -8393,12 +9898,20 @@ function handleBusinessTypeSelection() {
 }
 // Function to handle linked fields synchronization
 function updateLinkedFields() {
-    if (!linkedFields || linkedFields.length === 0) return;
-    linkedFields.forEach(linkedField => {
+
+    if (!linkedFields || linkedFields.length === 0) {
+
+        return;
+    }
+
+    linkedFields.forEach((linkedField, index) => {
+
         const { linkedFieldId, fields } = linkedField;
         // Find the hidden textbox for this linked field
         let hiddenField = document.getElementById(linkedFieldId);
+
         if (!hiddenField) {
+
             // Create the hidden textbox if it doesn't exist
             hiddenField = document.createElement('input');
             hiddenField.type = 'text';
@@ -8409,30 +9922,49 @@ function updateLinkedFields() {
             const form = document.getElementById('customForm');
             if (form) {
                 form.appendChild(hiddenField);
+
             } else {
                 document.body.appendChild(hiddenField);
+
             }
         }
         // Get all the linked textboxes (filter out null/undefined - textboxes that have been removed)
-        const linkedTextboxes = fields.map(fieldId => document.getElementById(fieldId)).filter(el => el);
+
+        const linkedTextboxes = fields.map(fieldId => {
+            const field = document.getElementById(fieldId);
+
+            return field;
+        }).filter(el => el);
+
         // If no linked textboxes exist (all have been removed), clear the hidden field
         if (linkedTextboxes.length === 0) {
+
             hiddenField.value = '';
             return;
         }
         // Find which textbox has content
-        const textboxesWithContent = linkedTextboxes.filter(tb => tb.value.trim() !== '');
+        const textboxesWithContent = linkedTextboxes.filter(tb => {
+            const hasContent = tb.value.trim() !== '';
+
+            return hasContent;
+        });
+
         if (textboxesWithContent.length === 0) {
             // No textboxes have content, clear the hidden field
+
             hiddenField.value = '';
         } else if (textboxesWithContent.length === 1) {
             // Only one textbox has content, use its value
             const val = textboxesWithContent[0].value.trim();
-            hiddenField.value = (textboxesWithContent[0].type === 'date') ? formatDateForServer(val) : val;
+            const finalValue = (textboxesWithContent[0].type === 'date') ? formatDateForServer(val) : val;
+
+            hiddenField.value = finalValue;
         } else {
             // Multiple textboxes have content
+
             const allAreDates = textboxesWithContent.every(tb => tb.type === 'date' || /^d{2}[-/]d{2}[-/]d{4}$/.test(tb.value.trim()) || /^d{4}-d{2}-d{2}$/.test(tb.value.trim()));
             if (allAreDates) {
+
                 // Choose the latest date
                 const parseDate = (val) => {
                     const trimmed = val.trim();
@@ -8457,15 +9989,20 @@ function updateLinkedFields() {
                 hiddenField.value = latest.type === 'date'
                     ? formatDateForServer(chosenVal)
                     : (/^d{4}-d{2}-d{2}$/.test(chosenVal) ? formatDateForServer(chosenVal) : chosenVal);
+
             } else {
                 // Fall back to longest text
+
                 const longestTextbox = textboxesWithContent.reduce((longest, current) => 
                     current.value.length > longest.value.length ? current : longest
                 );
                 hiddenField.value = longestTextbox.value.trim();
+
             }
         }
+
     });
+
 }
 // Function to clear inactive linked textboxes (with delay to avoid interfering with typing)
 function clearInactiveLinkedFields() {
@@ -8535,8 +10072,12 @@ function setupLinkedFields() {
             }
         }
     });
-    // Initial update
-    updateLinkedFields();
+    // Initial update (deferred to avoid blocking load)
+    if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(() => updateLinkedFields(), { timeout: 1000 });
+    } else {
+        setTimeout(() => updateLinkedFields(), 100);
+    }
 }
 function getQuestionInputs (questionId, type = null) {
   /* 1️⃣ First look inside the question container, if it exists */
@@ -8734,7 +10275,9 @@ function formatDateForDisplay(dateString) {
 }
 window.onload=function(){
     setCurrentDate();
-    attachCalculationListeners();
+    // 🔧 PERFORMANCE FIX: Defer heavy listener attachment until idle time
+    window.__calcListenersNeedRefresh = true;
+    scheduleCalculationListeners();
     // Trigger visibility updates on page load to show dependent questions
     setTimeout(() => {
         if (typeof triggerVisibilityUpdates === 'function') {
@@ -9367,7 +10910,7 @@ async function previewPdf(baseName, isUploaded, isLatex, questionId) {
 
     try {
         let url;
-        
+
         // Check if this is a LaTeX PDF
         if (isLatex && questionId && window.latexPdfs && window.latexPdfs[questionId]) {
             // For LaTeX PDFs, use the Blob directly
@@ -9506,16 +11049,21 @@ async function editAndDownloadPDF (pdfName) {
         const formElements = form.querySelectorAll('input, textarea, select');
         const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
         const allFormElements = [...formElements, ...externalFormElements];
+
         // Log all elements we're about to process
         allFormElements.forEach((element, index) => {
+
         });
+
         allFormElements.forEach(element => {
             if (element.name && !element.disabled) {
                 // For checkboxes and radios, only include if checked
                 if (element.type === 'checkbox' || element.type === 'radio') {
                     if (element.checked) {
                         fd.append(element.name, 'on'); // Send 'on' for checked checkboxes (standard HTML form behavior)
+
                     } else {
+
                     }
                     // Skip unchecked checkboxes entirely - don't send them to server
                 } else {
@@ -9524,16 +11072,28 @@ async function editAndDownloadPDF (pdfName) {
                     if (element.type === 'date' && value) {
                         const originalValue = value;
                         value = formatDateForServer(value);
+
                     }
                     // Include ALL fields with values, including hidden ones
                     if (value && value.trim() !== '') {
                         fd.append(element.name, value);
+
                     } else {
+
                     }
                 }
             } else {
+                if (!element.name) {
+
+                } else if (element.disabled) {
+
+                }
             }
         });
+
+        for (const [key, val] of fd.entries()) {
+
+        }
         // Use the /edit_pdf endpoint with the PDF name as a query parameter.
         // Keep the extension and include credentials so the backend can find the file and respect the current session.
         const baseName = pdfName.replace(/.pdf$/i, '');
@@ -9654,29 +11214,52 @@ function runAllHiddenTextCalculations(){
  * using the field's own name (or any other field name).
  */
 function runSingleHiddenTextCalculation(calcObj) {
+    console.log('[CALCULATION DEBUG] runSingleHiddenTextCalculation called for:', calcObj.hiddenFieldName);
     const textField = document.getElementById(calcObj.hiddenFieldName);
-    if (!textField) return;
+    if (!textField) {
+        console.log('[CALCULATION DEBUG] Text field not found:', calcObj.hiddenFieldName);
+        return;
+    }
+    console.log('[CALCULATION DEBUG] Text field found:', calcObj.hiddenFieldName);
+    
     // We'll assume that the last matched condition takes precedence
     let finalValue = "";
-    calcObj.calculations.forEach(function(oneCalc) {
+    calcObj.calculations.forEach(function(oneCalc, calcIndex) {
+        console.log('[CALCULATION DEBUG] Processing calculation ' + (calcIndex + 1) + ':', {
+            terms: oneCalc.terms,
+            compareOperator: oneCalc.compareOperator,
+            threshold: oneCalc.threshold,
+            fillValue: oneCalc.fillValue
+        });
+        
         let val = 0;
         // Calculate the sum of all terms
         if (oneCalc.terms && oneCalc.terms.length > 0) {
             // Get the first term's value
             const firstTerm = oneCalc.terms[0];
+            console.log('[CALCULATION DEBUG] First term:', firstTerm.questionNameId);
             val = parseFloat(getMoneyValue(firstTerm.questionNameId)) || 0;
+            console.log('[CALCULATION DEBUG] First term value:', val);
+
             // Process remaining terms
             for (let t = 1; t < oneCalc.terms.length; t++) {
                 const term = oneCalc.terms[t];
+                console.log('[CALCULATION DEBUG] Term ' + (t + 1) + ':', term.questionNameId, 'operator:', term.operator);
                 const termVal = parseFloat(getMoneyValue(term.questionNameId)) || 0;
+                console.log('[CALCULATION DEBUG] Term ' + (t + 1) + ' value:', termVal);
+
                 switch(term.operator) {
                     case '+': val += termVal; break;
                     case '-': val -= termVal; break;
                     case 'x': val *= termVal; break;
                     case '/': val = termVal !== 0 ? val / termVal : 0; break;
                 }
+                console.log('[CALCULATION DEBUG] Running total after term ' + (t + 1) + ':', val);
             }
         }
+        
+        console.log('[CALCULATION DEBUG] Final calculated value:', val);
+        
         // Compare to threshold
         const threshold = parseFloat(oneCalc.threshold) || 0;
         let matched = false;
@@ -9685,17 +11268,30 @@ function runSingleHiddenTextCalculation(calcObj) {
             case '<': matched = val < threshold; break;
             case '=': matched = Math.abs(val - threshold) < 0.000001; break; // Use epsilon for float comparison
         }
+        
+        console.log('[CALCULATION DEBUG] Comparison:', {
+            value: val,
+            operator: oneCalc.compareOperator,
+            threshold: threshold,
+            matched: matched
+        });
+
         if (matched) {
             // Handle special fillValue formats
             if (oneCalc.fillValue === "##total##" || oneCalc.fillValue.match(/^##(.+)##$/)) {
                 finalValue = val.toFixed(2); // Format money values with 2 decimal places
+                console.log('[CALCULATION DEBUG] Using calculated value as finalValue:', finalValue);
             } else {
                 finalValue = oneCalc.fillValue;
+                console.log('[CALCULATION DEBUG] Using fillValue as finalValue:', finalValue);
             }
         }
     });
+    
+    console.log('[CALCULATION DEBUG] Setting text field value to:', finalValue);
     // Update the text field
     textField.value = finalValue;
+    console.log('[CALCULATION DEBUG] Text field value after setting:', textField.value);
 }
 function replacePlaceholderTokens (str){
     /* note the doubled back-slashes in the delimiters $$ */
@@ -9732,29 +11328,90 @@ function parseTokenValue(token){
  *       (note the escaped \d+ instead of stray 'd').
  *───────────────────────────────────────────────────────────────*/
 function getMoneyValue(qId) {
+    console.log('[CALCULATION DEBUG] getMoneyValue called with:', qId);
+    
     /* direct hit first */
     const el = document.getElementById(qId);
     if (el) {
+        console.log('[CALCULATION DEBUG] Found direct element:', el.id, 'value:', el.value);
         if (el.type === "checkbox") {
             const amt = document.getElementById(el.id + "_amount");
-            if (amt && el.checked) return parseFloat(amt.value) || 0;
-            return el.checked ? 1 : 0;
+            if (amt && el.checked) {
+                const value = parseFloat(amt.value) || 0;
+                console.log('[CALCULATION DEBUG] Checkbox with amount field, returning:', value);
+                return value;
+            }
+            const value = el.checked ? 1 : 0;
+            console.log('[CALCULATION DEBUG] Checkbox without amount, returning:', value);
+            return value;
         }
-        return parseFloat(el.value) || 0;
+        const value = parseFloat(el.value) || 0;
+        console.log('[CALCULATION DEBUG] Direct element value, returning:', value);
+        return value;
     }
+    
     /* legacy builder‑shorthand amountX_Y_Z */
     if (/^amountd+_d+_.+/.test(qId)) {
-        const el2 = document.getElementById(normaliseDesignerFieldRef(qId));
-        if (el2) return parseFloat(el2.value) || 0;
+        const normalized = normaliseDesignerFieldRef(qId);
+        console.log('[CALCULATION DEBUG] Normalized shorthand:', qId, '->', normalized);
+        const el2 = document.getElementById(normalized);
+        if (el2) {
+            const value = parseFloat(el2.value) || 0;
+            console.log('[CALCULATION DEBUG] Found normalized element, returning:', value);
+            return value;
+        } else {
+            console.log('[CALCULATION DEBUG] Normalized element not found:', normalized);
+        }
     }
+    
     /* name‑attribute fallback */
     const byName = document.getElementsByName(qId);
-    if (byName.length) return parseFloat(byName[0].value) || 0;
+    if (byName.length) {
+        const value = parseFloat(byName[0].value) || 0;
+        console.log('[CALCULATION DEBUG] Found by name, returning:', value);
+        return value;
+    }
+    
+    console.log('[CALCULATION DEBUG] No element found, returning 0');
     return 0;
 }
+function scheduleCalculationListeners() {
+    // Debounce heavy listener attachment to avoid blocking during bulk DOM updates
+    if (window.__calcAttachTimer) {
+        clearTimeout(window.__calcAttachTimer);
+    }
+    window.__calcAttachTimer = setTimeout(() => {
+        if (typeof requestIdleCallback !== 'undefined') {
+            requestIdleCallback(() => attachCalculationListeners(), { timeout: 500 });
+        } else {
+            attachCalculationListeners();
+        }
+    }, 50);
+}
 function attachCalculationListeners() {
+    // Skip if there are no calculations at all
+    const hasCheckboxCalcs = hiddenCheckboxCalculations && hiddenCheckboxCalculations.length > 0;
+    const hasTextCalcs = hiddenTextCalculations && hiddenTextCalculations.length > 0;
+    if (!hasCheckboxCalcs && !hasTextCalcs) {
+        return;
+    }
+    // Avoid repeated full scans unless we explicitly need a refresh
+    if (window.__calcListenersAttached && !window.__calcListenersNeedRefresh) {
+        return;
+    }
+    window.__calcListenersNeedRefresh = false;
     // Universal function to attach listeners in a consistent way
     function attachListenersToCalculationTerms(calculations, runCalculationFunction) {
+        // 🔧 PERFORMANCE FIX: Cache DOM queries and name lookups once
+        const allInputs = Array.from(document.querySelectorAll('input, select, textarea'));
+        const nameMap = new Map();
+        allInputs.forEach(input => {
+            if (!input.name) return;
+            if (!nameMap.has(input.name)) {
+                nameMap.set(input.name, []);
+            }
+            nameMap.get(input.name).push(input);
+        });
         for (let i = 0; i < calculations.length; i++) {
             const calcObj = calculations[i];
             for (let c = 0; c < calcObj.calculations.length; c++) {
@@ -9777,7 +11434,7 @@ function attachCalculationListeners() {
                         continue; // Found and attached, go to next term
                     }
                     // 2. Try elements with this name
-                    const namedElements = document.getElementsByName(qNameId);
+                    const namedElements = nameMap.get(qNameId) || [];
                     if (namedElements.length > 0) {
                         for (let n = 0; n < namedElements.length; n++) {
                             namedElements[n].addEventListener('change', runCalculationFunction);
@@ -9787,7 +11444,6 @@ function attachCalculationListeners() {
                     }
                     // 3. Look for prefixed IDs like "answerX_qId"
                     const prefixPattern = new RegExp('.*_' + qNameId + '$');
-                    const allInputs = document.querySelectorAll('input, select, textarea');
                     for (let inp = 0; inp < allInputs.length; inp++) {
                         const input = allInputs[inp];
                         if (prefixPattern.test(input.id)) {
@@ -9803,7 +11459,7 @@ function attachCalculationListeners() {
                         }
                     }
                     // 4. Look specifically for amount fields with this name
-                    const amountElements = document.querySelectorAll('input[name="' + qNameId + '"]');
+                    const amountElements = nameMap.get(qNameId) || [];
                     for (let a = 0; a < amountElements.length; a++) {
                         amountElements[a].addEventListener('input', runCalculationFunction);
                         // Also find and attach to the controlling checkbox
@@ -9831,22 +11487,34 @@ function attachCalculationListeners() {
         }
     }
     // For hidden checkbox calculations
-    if (hiddenCheckboxCalculations && hiddenCheckboxCalculations.length > 0) {
+    if (hasCheckboxCalcs) {
         const runAllCheckboxCalcs = function() {
             runAllHiddenCheckboxCalculations();
         };
         attachListenersToCalculationTerms(hiddenCheckboxCalculations, runAllCheckboxCalcs);
     }
     // For hidden text calculations
-    if (hiddenTextCalculations && hiddenTextCalculations.length > 0) {
+    if (hasTextCalcs) {
         const runAllTextCalcs = function() {
             runAllHiddenTextCalculations();
         };
         attachListenersToCalculationTerms(hiddenTextCalculations, runAllTextCalcs);
     }
-    // Run calculations once on page load to set initial values
-    runAllHiddenCheckboxCalculations();
-    runAllHiddenTextCalculations();
+    // 🔧 PERFORMANCE FIX: Defer initial calculations to avoid blocking page load
+    // Run calculations asynchronously after page is interactive
+    if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(() => {
+            runAllHiddenCheckboxCalculations();
+            runAllHiddenTextCalculations();
+        }, { timeout: 1000 });
+    } else {
+        // Fallback for browsers without requestIdleCallback
+        setTimeout(() => {
+            runAllHiddenCheckboxCalculations();
+            runAllHiddenTextCalculations();
+        }, 100);
+    }
+    window.__calcListenersAttached = true;
 }
 // Progress Bar Logic
 function updateProgressBar() {
@@ -10249,62 +11917,12 @@ if (typeof handleNext === 'function') {
                             visibleFieldNames.add(el.name);
                         }
                     });
-                    
-                    // 🔧 NEW: Identify duplicate field names and which ones have values
-                    const fieldsByName = {};
-                    const fieldsById = {};
-                    fields.forEach(el => {
-                        if (el.name) {
-                            if (!fieldsByName[el.name]) {
-                                fieldsByName[el.name] = [];
-                            }
-                            fieldsByName[el.name].push(el);
-                        }
-                        if (el.id) {
-                            if (!fieldsById[el.id]) {
-                                fieldsById[el.id] = [];
-                            }
-                            fieldsById[el.id].push(el);
-                        }
-                    });
-                    
-                    // 🔧 NEW: For each field name, check if there are duplicates with values
-                    const duplicateNamesWithValues = new Set();
-                    Object.keys(fieldsByName).forEach(fieldName => {
-                        const fieldsWithSameName = fieldsByName[fieldName];
-                        if (fieldsWithSameName.length > 1) {
-                            // Check if any of these fields already have values
-                            const hasValue = fieldsWithSameName.some(field => {
-                                if (field.type === 'checkbox' || field.type === 'radio') {
-                                    return field.checked;
-                                } else {
-                                    return field.value && field.value.trim() !== '';
-                                }
-                            });
-                            if (hasValue) {
-                                duplicateNamesWithValues.add(fieldName);
-                            }
-                        }
-                    });
-                    
                     fields.forEach(el => {
                     // Skip hidden fields if there's a visible field with the same name
                     const isVisible = isElementActuallyVisible(el);
                     if (!isVisible && el.name && visibleFieldNames.has(el.name)) {
                         return; // Skip this hidden field, there's a visible one
                     }
-                    
-                    // 🔧 NEW: For duplicate field names that have values, only autofill fields that already have values
-                    if (el.name && duplicateNamesWithValues.has(el.name)) {
-                        const hasExistingValue = (el.type === 'checkbox' || el.type === 'radio') 
-                            ? el.checked 
-                            : (el.value && el.value.trim() !== '');
-                        if (!hasExistingValue) {
-                            // Skip autofilling this field - there are duplicates and this one doesn't have a value
-                            return;
-                        }
-                    }
-                    
                     // Check both by name and by ID for autofill
                     let autofillValue = null;
                     if (mappedData.hasOwnProperty(el.name)) {
@@ -10451,49 +12069,7 @@ if (typeof handleNext === 'function') {
                                 fieldsById[el.id] = el;
                             }
                         });
-                        
-                        // 🔧 NEW: Identify duplicate field names for second pass
-                        const fieldsByNamePass2 = {};
                         allFields.forEach(el => {
-                            if (el.name) {
-                                if (!fieldsByNamePass2[el.name]) {
-                                    fieldsByNamePass2[el.name] = [];
-                                }
-                                fieldsByNamePass2[el.name].push(el);
-                            }
-                        });
-                        
-                        // 🔧 NEW: For each field name, check if there are duplicates with values
-                        const duplicateNamesWithValuesPass2 = new Set();
-                        Object.keys(fieldsByNamePass2).forEach(fieldName => {
-                            const fieldsWithSameName = fieldsByNamePass2[fieldName];
-                            if (fieldsWithSameName.length > 1) {
-                                // Check if any of these fields already have values
-                                const hasValue = fieldsWithSameName.some(field => {
-                                    if (field.type === 'checkbox' || field.type === 'radio') {
-                                        return field.checked;
-                                    } else {
-                                        return field.value && field.value.trim() !== '';
-                                    }
-                                });
-                                if (hasValue) {
-                                    duplicateNamesWithValuesPass2.add(fieldName);
-                                }
-                            }
-                        });
-                        
-                        allFields.forEach(el => {
-                            // 🔧 NEW: For duplicate field names that have values, only autofill fields that already have values
-                            if (el.name && duplicateNamesWithValuesPass2.has(el.name)) {
-                                const hasExistingValue = (el.type === 'checkbox' || el.type === 'radio') 
-                                    ? el.checked 
-                                    : (el.value && el.value.trim() !== '');
-                                if (!hasExistingValue) {
-                                    // Skip autofilling this field - there are duplicates and this one doesn't have a value
-                                    return;
-                                }
-                            }
-                            
                             if (mappedData.hasOwnProperty(el.name)) {
                                 // Skip current_date field - it should be set dynamically
                                 if (el.id === 'current_date' || el.name === 'current_date') {
@@ -10691,49 +12267,7 @@ if (typeof handleNext === 'function') {
         // 🔧 NEW: Delayed autofill for conditional fields that are created after initial autofill
         setTimeout(() => {
             const conditionalFields = getFormFields();
-            
-            // 🔧 NEW: Identify duplicate field names for conditional fields pass
-            const fieldsByNameConditional = {};
             conditionalFields.forEach(el => {
-                if (el.name) {
-                    if (!fieldsByNameConditional[el.name]) {
-                        fieldsByNameConditional[el.name] = [];
-                    }
-                    fieldsByNameConditional[el.name].push(el);
-                }
-            });
-            
-            // 🔧 NEW: For each field name, check if there are duplicates with values
-            const duplicateNamesWithValuesConditional = new Set();
-            Object.keys(fieldsByNameConditional).forEach(fieldName => {
-                const fieldsWithSameName = fieldsByNameConditional[fieldName];
-                if (fieldsWithSameName.length > 1) {
-                    // Check if any of these fields already have values
-                    const hasValue = fieldsWithSameName.some(field => {
-                        if (field.type === 'checkbox' || field.type === 'radio') {
-                            return field.checked;
-                        } else {
-                            return field.value && field.value.trim() !== '';
-                        }
-                    });
-                    if (hasValue) {
-                        duplicateNamesWithValuesConditional.add(fieldName);
-                    }
-                }
-            });
-            
-            conditionalFields.forEach(el => {
-                // 🔧 NEW: For duplicate field names that have values, only autofill fields that already have values
-                if (el.name && duplicateNamesWithValuesConditional.has(el.name)) {
-                    const hasExistingValue = (el.type === 'checkbox' || el.type === 'radio') 
-                        ? el.checked 
-                        : (el.value && el.value.trim() !== '');
-                    if (!hasExistingValue) {
-                        // Skip autofilling this field - there are duplicates and this one doesn't have a value
-                        return;
-                    }
-                }
-                
                 // Check both by name and by ID for autofill
                 let autofillValue = null;
                 if (mappedData.hasOwnProperty(el.name)) {
@@ -10795,49 +12329,7 @@ if (typeof handleNext === 'function') {
             // 🔧 NEW: Additional delayed autofill with longer delay for stubborn fields
             setTimeout(() => {
                 const stubbornFields = getFormFields();
-                
-                // 🔧 NEW: Identify duplicate field names for stubborn fields pass
-                const fieldsByNameStubborn = {};
                 stubbornFields.forEach(el => {
-                    if (el.name) {
-                        if (!fieldsByNameStubborn[el.name]) {
-                            fieldsByNameStubborn[el.name] = [];
-                        }
-                        fieldsByNameStubborn[el.name].push(el);
-                    }
-                });
-                
-                // 🔧 NEW: For each field name, check if there are duplicates with values
-                const duplicateNamesWithValuesStubborn = new Set();
-                Object.keys(fieldsByNameStubborn).forEach(fieldName => {
-                    const fieldsWithSameName = fieldsByNameStubborn[fieldName];
-                    if (fieldsWithSameName.length > 1) {
-                        // Check if any of these fields already have values
-                        const hasValue = fieldsWithSameName.some(field => {
-                            if (field.type === 'checkbox' || field.type === 'radio') {
-                                return field.checked;
-                            } else {
-                                return field.value && field.value.trim() !== '';
-                            }
-                        });
-                        if (hasValue) {
-                            duplicateNamesWithValuesStubborn.add(fieldName);
-                        }
-                    }
-                });
-                
-                stubbornFields.forEach(el => {
-                    // 🔧 NEW: For duplicate field names that have values, only autofill fields that already have values
-                    if (el.name && duplicateNamesWithValuesStubborn.has(el.name)) {
-                        const hasExistingValue = (el.type === 'checkbox' || el.type === 'radio') 
-                            ? el.checked 
-                            : (el.value && el.value.trim() !== '');
-                        if (!hasExistingValue) {
-                            // Skip autofilling this field - there are duplicates and this one doesn't have a value
-                            return;
-                        }
-                    }
-                    
                     // Check both by name and by ID for autofill
                     let autofillValue = null;
                     if (mappedData.hasOwnProperty(el.name)) {
@@ -11731,9 +13223,9 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
 <script>
 // Debug Menu Functionality
 let debugMenuVisible = false;
-// Show debug menu on Ctrl+Shift
+// Show debug menu on Ctrl+Shift (Windows/Linux) or Command+Shift (Mac)
 document.addEventListener('keydown', function(e) {
-  if (e.ctrlKey && e.shiftKey && !debugMenuVisible) {
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && !debugMenuVisible) {
     e.preventDefault();
     showDebugMenu();
   }

@@ -294,165 +294,17 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Employment Info</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Section 2</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Employment Info</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Please enter lawyer info</h3></label><div id="labelContainer1"></div><input type="text" id="please_enter_lawyer_info_address" name="please_enter_lawyer_info_address" style="display: none;"><div class="entry-container" style="border-radius: 12px; padding: 20px; margin: 10px auto; background-color: rgb(248, 249, 255); box-shadow: rgba(41, 128, 185, 0.15) 0px 4px 8px; transition: 0.3s; display: inline-block; width: auto; min-width: 585px; max-width: 100%; box-sizing: border-box; border: 2px solid rgb(41, 128, 185) !important;"><div class="address-field"><input type="text" id="please_enter_lawyer_info_laywer_name_1" name="please_enter_lawyer_info_laywer_name_1" placeholder="Laywer Name" class="address-input"></div><div class="address-field"><input type="text" id="please_enter_lawyer_info_lawyer_firm_1" name="please_enter_lawyer_info_lawyer_firm_1" placeholder="Lawyer Firm" class="address-input"></div><input type="tel" id="please_enter_lawyer_info_lawyer_phone_number" name="please_enter_lawyer_info_lawyer_phone_number" placeholder="Lawyer Phone Number" class="address-input" style="margin: 4px auto; max-width: 400px;" oninput="formatPhoneInput(this)"><div class="address-field"><input type="number" id="please_enter_lawyer_info_state_bar_number" name="please_enter_lawyer_info_state_bar_number" placeholder="State Bar Number" class="address-input"></div><br><br><div style="margin: 10px 0px; padding: 12px; background-color: rgb(255, 255, 255); border: 1px solid rgb(225, 229, 233); border-radius: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 6px;"><label style="display: block; margin-bottom: 8px; font-weight: 600; color: rgb(51, 51, 51); font-size: 15px; text-align: center;">Please enter their address:</label><input type="text" id="please_enter_lawyer_info_please_enter_their_address_street" name="please_enter_lawyer_info_please_enter_their_address_street" placeholder="Street" oninput="
-                    (function() {
-                        var streetEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_street');
-                        var cityEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_city');
-                        var stateShortEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_state_short');
-                        var zipEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_zip');
-                        var fullAddressEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_full_address');
-                        if (!fullAddressEl) { return; }
-                        var street = streetEl ? streetEl.value.trim() : '';
-                        var city = cityEl ? cityEl.value.trim() : '';
-                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
-                        var zip = zipEl ? zipEl.value.trim() : '';
-
-                        var parts = [];
-                        if (street) parts.push(street);
-                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
-                            parts.push(city + ', ' + stateShort + ' ' + zip);
-                        } else if (city &amp;&amp; stateShort) {
-                            parts.push(city + ', ' + stateShort);
-                        } else if (city &amp;&amp; zip) {
-                            parts.push(city + ' ' + zip);
-                        } else if (city) {
-                            parts.push(city);
-                        } else if (stateShort &amp;&amp; zip) {
-                            parts.push(stateShort + ' ' + zip);
-                        } else if (stateShort) {
-                            parts.push(stateShort);
-                        } else if (zip) {
-                            parts.push(zip);
-                        }
-                        var fullAddress = parts.join(', ');
-                        fullAddressEl.value = fullAddress;
-
-                    })();
-                " style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"><input type="text" id="please_enter_lawyer_info_please_enter_their_address_city" name="please_enter_lawyer_info_please_enter_their_address_city" placeholder="City" oninput="
-                    (function() {
-                        var streetEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_street');
-                        var cityEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_city');
-                        var stateShortEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_state_short');
-                        var zipEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_zip');
-                        var fullAddressEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_full_address');
-                        if (!fullAddressEl) { return; }
-                        var street = streetEl ? streetEl.value.trim() : '';
-                        var city = cityEl ? cityEl.value.trim() : '';
-                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
-                        var zip = zipEl ? zipEl.value.trim() : '';
-
-                        var parts = [];
-                        if (street) parts.push(street);
-                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
-                            parts.push(city + ', ' + stateShort + ' ' + zip);
-                        } else if (city &amp;&amp; stateShort) {
-                            parts.push(city + ', ' + stateShort);
-                        } else if (city &amp;&amp; zip) {
-                            parts.push(city + ' ' + zip);
-                        } else if (city) {
-                            parts.push(city);
-                        } else if (stateShort &amp;&amp; zip) {
-                            parts.push(stateShort + ' ' + zip);
-                        } else if (stateShort) {
-                            parts.push(stateShort);
-                        } else if (zip) {
-                            parts.push(zip);
-                        }
-                        var fullAddress = parts.join(', ');
-                        fullAddressEl.value = fullAddress;
-
-                    })();
-                " style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"><select id="please_enter_lawyer_info_please_enter_their_address_state" name="please_enter_lawyer_info_please_enter_their_address_state" class="address-select-trigger" onchange="
-
-                            var fullField = document.getElementById('please_enter_lawyer_info_please_enter_their_address_state_hidden');
-                            var shortField = document.getElementById('please_enter_lawyer_info_please_enter_their_address_state_short');
-
-                            if (typeof updateStateHiddenFields === 'function') {
-
-                                updateStateHiddenFields(this, 'please_enter_lawyer_info_please_enter_their_address_state_hidden', 'please_enter_lawyer_info_please_enter_their_address_state_short');
-
-                            } else {
-
-                            }
-                            if (typeof dropdownMirror === 'function') {
-                                dropdownMirror(this, 'please_enter_lawyer_info_please_enter_their_address_state');
-                            }
-                            // Update full address after state change (with small delay to ensure state_short is updated)
-                            setTimeout(function() { 
-                    (function() {
-                        var streetEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_street');
-                        var cityEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_city');
-                        var stateShortEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_state_short');
-                        var zipEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_zip');
-                        var fullAddressEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_full_address');
-                        if (!fullAddressEl) { return; }
-                        var street = streetEl ? streetEl.value.trim() : '';
-                        var city = cityEl ? cityEl.value.trim() : '';
-                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
-                        var zip = zipEl ? zipEl.value.trim() : '';
-
-                        var parts = [];
-                        if (street) parts.push(street);
-                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
-                            parts.push(city + ', ' + stateShort + ' ' + zip);
-                        } else if (city &amp;&amp; stateShort) {
-                            parts.push(city + ', ' + stateShort);
-                        } else if (city &amp;&amp; zip) {
-                            parts.push(city + ' ' + zip);
-                        } else if (city) {
-                            parts.push(city);
-                        } else if (stateShort &amp;&amp; zip) {
-                            parts.push(stateShort + ' ' + zip);
-                        } else if (stateShort) {
-                            parts.push(stateShort);
-                        } else if (zip) {
-                            parts.push(zip);
-                        }
-                        var fullAddress = parts.join(', ');
-                        fullAddressEl.value = fullAddress;
-
-                    })();
-                 }, 50);
-                        " style="width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><option value="">Select State</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option></select><input type="text" id="please_enter_lawyer_info_please_enter_their_address_state_hidden" name="please_enter_lawyer_info_please_enter_their_address_state_hidden" style="display: none;"><input type="text" id="please_enter_lawyer_info_please_enter_their_address_state_short" name="please_enter_lawyer_info_please_enter_their_address_state_short" style="display: none;"><input type="text" id="please_enter_lawyer_info_please_enter_their_address_zip" name="please_enter_lawyer_info_please_enter_their_address_zip" placeholder="Zip" oninput="
-                    (function() {
-                        var streetEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_street');
-                        var cityEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_city');
-                        var stateShortEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_state_short');
-                        var zipEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_zip');
-                        var fullAddressEl = document.getElementById('please_enter_lawyer_info_please_enter_their_address_full_address');
-                        if (!fullAddressEl) { return; }
-                        var street = streetEl ? streetEl.value.trim() : '';
-                        var city = cityEl ? cityEl.value.trim() : '';
-                        var stateShort = stateShortEl ? stateShortEl.value.trim() : '';
-                        var zip = zipEl ? zipEl.value.trim() : '';
-
-                        var parts = [];
-                        if (street) parts.push(street);
-                        if (city &amp;&amp; stateShort &amp;&amp; zip) {
-                            parts.push(city + ', ' + stateShort + ' ' + zip);
-                        } else if (city &amp;&amp; stateShort) {
-                            parts.push(city + ', ' + stateShort);
-                        } else if (city &amp;&amp; zip) {
-                            parts.push(city + ' ' + zip);
-                        } else if (city) {
-                            parts.push(city);
-                        } else if (stateShort &amp;&amp; zip) {
-                            parts.push(stateShort + ' ' + zip);
-                        } else if (stateShort) {
-                            parts.push(stateShort);
-                        } else if (zip) {
-                            parts.push(zip);
-                        }
-                        var fullAddress = parts.join(', ');
-                        fullAddressEl.value = fullAddress;
-
-                    })();
-                " style="width: 170px; padding: 10px; margin: 2px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s; text-align: center;"><input type="text" id="please_enter_lawyer_info_please_enter_their_address_full_address" name="please_enter_lawyer_info_please_enter_their_address_full_address" style="display: none;"></div></div><br></div>
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Employment Info</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Employment Info</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Is your household monthly income less than the amount below?</h3></label><select id="is_your_household_monthly_income_less_than_the_amount_below" name="is_your_household_monthly_income_less_than_the_amount_below" data-question-id="1"
+                      onchange="dropdownMirror(this, 'is_your_household_monthly_income_less_than_the_amount_below'); updateHiddenLogic('is_your_household_monthly_income_less_than_the_amount_below', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_is_your_household_monthly_income_less_than_the_amount_below"></div>
+              <input type="text" id="is_your_household_monthly_income_less_than_the_amount_below_dropdown" name="is_your_household_monthly_income_less_than_the_amount_below_dropdown"
+                   readonly style="display:none;"></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button>
       </div>
-    <br><br><div class="navigation-buttons" style="display:none;"></div></div>
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="submit" class="next-button">Submit</button></div></div>
   <script>
     // Function to show sign-in required modal
     function showSignInRequiredModal() {
@@ -531,14 +383,28 @@ document.addEventListener("DOMContentLoaded", function() {
           return indices;
         }
         function getVisibleIndicesForSectionElement(targetSectionEl) {
+
           const items = Array.from(targetSectionEl.querySelectorAll('.question-container.question-item'));
+
           const indices = [];
           items.forEach(function(item, idx) {
-            // Only exclude questions that have the 'hidden' class
-            // Questions without the 'hidden' class should be considered visible
-            // even if their parent section is not active (they'll become visible when section activates)
+            const questionId = item.getAttribute('data-question-id') || item.id || 'unknown';
             const hasHiddenClass = item.classList.contains('hidden');
+            const hasQuestionStepHidden = item.classList.contains('question-step-hidden');
+            const computedStyle = window.getComputedStyle(item);
+            const isActuallyVisible = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden';
+
+            // CRITICAL FIX: Check both conditional visibility (hidden class) AND navigation state (question-step-hidden)
+            // A question is visible if:
+            // 1. It doesn't have the 'hidden' class (conditional logic allows it)
+            // 2. It doesn't have 'question-step-hidden' OR if it does, we should still consider it if it's conditionally visible
+            // The key insight: question-step-hidden is a navigation state, but we should prioritize questions that are conditionally visible
+            // However, if a question has both 'hidden' and 'question-step-hidden', it's definitely not visible
+
             if (!hasHiddenClass) {
+              // Question is conditionally visible (no 'hidden' class)
+              // Even if it has 'question-step-hidden', we should include it in the indices
+              // because the navigation system will handle activating it when we navigate to this section
               indices.push(idx);
 
             } else {
@@ -973,10 +839,16 @@ document.addEventListener("DOMContentLoaded", function() {
           }
         }
         function activateIndex(targetIdx) {
-          if (isUpdating) return;
+
+          if (isUpdating) {
+
+            return;
+          }
           isUpdating = true;
           const visibleIndices = getVisibleIndices();
+
           if (!visibleIndices.length) {
+
             questionItems.forEach(function(item) {
               item.classList.add('question-step-hidden');
             });
@@ -997,12 +869,20 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
           }
           if (visibleIndices.indexOf(targetIdx) === -1) {
+
             targetIdx = visibleIndices[0];
           }
+
           questionItems.forEach(function(item, idx) {
-            if (idx === targetIdx && !item.classList.contains('hidden')) {
+            const questionId = item.getAttribute('data-question-id') || item.id || 'unknown';
+            const hasHiddenClass = item.classList.contains('hidden');
+            if (idx === targetIdx && !hasHiddenClass) {
+
               item.classList.remove('question-step-hidden');
             } else {
+              if (idx === targetIdx && hasHiddenClass) {
+
+              }
               item.classList.add('question-step-hidden');
             }
           });
@@ -1065,6 +945,7 @@ document.addEventListener("DOMContentLoaded", function() {
           }
           const targetSectionId = cachedNextSectionInfo.sectionId;
           const targetSectionNumber = cachedNextSectionInfo.sectionNumber;
+          const targetFirstVisibleIndex = cachedNextSectionInfo.firstVisibleIndex;
 
           const triggerNavigation = () => {
 
@@ -1076,6 +957,7 @@ document.addEventListener("DOMContentLoaded", function() {
               if (!validationResult) {
 
                 if (typeof navigateSection === 'function') {
+
                   navigateSection(targetSectionNumber);
                 }
               }
@@ -1093,7 +975,8 @@ document.addEventListener("DOMContentLoaded", function() {
             if (activeSection && activeSection.id === targetSectionId) {
               if (window.questionNavControllers && typeof window.questionNavControllers[targetSectionId] === 'function') {
 
-                window.questionNavControllers[targetSectionId]();
+                // Pass the firstVisibleIndex to the navigation controller
+                window.questionNavControllers[targetSectionId](targetFirstVisibleIndex);
               } else {
 
               }
@@ -1235,12 +1118,15 @@ document.addEventListener("DOMContentLoaded", function() {
           const visibleIndices = getVisibleIndices();
 
           if (!visibleIndices.length) {
+
             // If no visible questions found, try to show the first question anyway
             // This handles cases where questions don't have the 'hidden' class but might be hidden by CSS
 
             if (questionItems.length > 0) {
               const firstQuestion = questionItems[0];
               if (firstQuestion) {
+                const questionId = firstQuestion.getAttribute('data-question-id') || firstQuestion.id || 'unknown';
+
                 // Remove both question-step-hidden AND hidden classes to ensure question is visible
                 firstQuestion.classList.remove('question-step-hidden');
                 firstQuestion.classList.remove('hidden');
@@ -1251,6 +1137,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
           }
           if (typeof targetIdx !== 'number' || visibleIndices.indexOf(targetIdx) === -1) {
+
             const currentVisibleIdx = visibleIndices.indexOf(activeIndex);
 
             if (currentVisibleIdx === -1) {
@@ -1372,15 +1259,61 @@ document.addEventListener("DOMContentLoaded", function() {
           }
         }
       });
-      // Global shortcut: Ctrl+CapsLock → click the visible "previous" arrow
+      // Global shortcut: Ctrl+CapsLock (Windows/Linux) or Command+CapsLock (Mac) → click the visible "previous" arrow
+      // CRITICAL FIX: Use a flag to prevent double-firing and add extensive logging
+      let capsLockHandlerExecuting = false;
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'CapsLock' && e.ctrlKey) {
+        console.log('[CAPSLOCK DEBUG] keydown event:', {
+          code: e.code,
+          key: e.key,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          target: e.target ? e.target.tagName + (e.target.id ? '#' + e.target.id : '') : 'null',
+          handlerExecuting: capsLockHandlerExecuting
+        });
+        
+        // Use e.code for more reliable CapsLock detection (works even when CapsLock is toggled)
+        const isCapsLock = (e.code === 'CapsLock' || e.key === 'CapsLock');
+        const hasModifier = (e.ctrlKey || e.metaKey);
+        
+        if (isCapsLock && hasModifier) {
+          console.log('[CAPSLOCK DEBUG] CapsLock + modifier detected');
+          
+          // Prevent double-firing: if handler is already executing, skip
+          if (capsLockHandlerExecuting) {
+            console.log('[CAPSLOCK DEBUG] Handler already executing, skipping');
+            return;
+          }
+          
           e.preventDefault();
+          e.stopPropagation();
+          
+          console.log('[CAPSLOCK DEBUG] Finding active section and previous button');
           const activeSection = document.querySelector('.section.active');
+          console.log('[CAPSLOCK DEBUG] Active section:', activeSection ? activeSection.id : 'null');
+          
           const prevBtn = activeSection ? activeSection.querySelector('.question-prev') : null;
+          console.log('[CAPSLOCK DEBUG] Previous button:', prevBtn ? 'FOUND' : 'NOT FOUND', prevBtn ? {
+            id: prevBtn.id,
+            disabled: prevBtn.disabled,
+            className: prevBtn.className
+          } : {});
 
-          if (prevBtn) {
+          if (prevBtn && !prevBtn.disabled) {
+            console.log('[CAPSLOCK DEBUG] Clicking previous button');
+            // Set flag to prevent double-firing
+            capsLockHandlerExecuting = true;
+            
+            // Reset flag after a short delay to allow the click to process
+            setTimeout(() => {
+              capsLockHandlerExecuting = false;
+              console.log('[CAPSLOCK DEBUG] Handler flag reset');
+            }, 100);
+            
             prevBtn.click();
+            console.log('[CAPSLOCK DEBUG] Previous button clicked');
+          } else {
+            console.log('[CAPSLOCK DEBUG] Previous button not available or disabled');
           }
         }
       });
@@ -1541,13 +1474,13 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = '';
-var questionSlugMap = {"1":"please_enter_lawyer_info"};
-var questionNameIds = {"1":"please_enter_lawyer_info"};
+var questionSlugMap = {"1":"is_your_household_monthly_income_less_than_the_amount_below"};
+var questionNameIds = {"1":"is_your_household_monthly_income_less_than_the_amount_below"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {};
 var allAreRequiredMap = {};
-var unifiedFieldsMap = {"1":[{"type":"label","label":"Laywer Name","nodeId":"please_enter_lawyer_info_laywer_name","order":1,"prefill":""},{"type":"label","label":"Lawyer Firm","nodeId":"please_enter_lawyer_info_lawyer_firm","order":2,"prefill":""},{"type":"phone","label":"Lawyer Phone Number","nodeId":"please_enter_lawyer_info_lawyer_phone_number","order":3},{"type":"amount","label":"State Bar Number","nodeId":"please_enter_lawyer_info_state_bar_number","order":4},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":5}]};
+var unifiedFieldsMap = {};
 var entryTitleMap = {};
 window.fileUploadQuestions = [];
 window.latexPreviewQuestions = [];
@@ -4716,26 +4649,52 @@ function showValidationPopup() {
 }
 // Global function to trigger visibility updates for dependent questions
 function triggerVisibilityUpdates() {
-    // Find all question containers and trigger their visibility logic
-    const questionContainers = document.querySelectorAll('[id^="question-container-"]');
-    questionContainers.forEach(container => {
-        const questionId = container.id.replace('question-container-', '');
-        // Try to find and call the updateVisibility function for this question
-        // The conditional logic creates functions in the global scope, so we need to call them
-        try {
-            // Look for the updateVisibility function that was created for this question
-            // The function is created in a closure, so we need to trigger it via the event listeners
-        const questionElement = document.getElementById(questionNameIds[questionId]) || 
-                              document.getElementById('answer' + questionId);
-        if (questionElement) {
-            // Trigger change event to update visibility
-            const event = new Event('change', { bubbles: true });
-            questionElement.dispatchEvent(event);
-            } else {
+    // Avoid blocking the main thread by batching visibility updates
+    if (window._visibilityUpdateRunning) {
+        window._visibilityUpdateQueued = true;
+        return;
+    }
+    window._visibilityUpdateRunning = true;
+    const questionContainers = Array.from(document.querySelectorAll('[id^="question-container-"]'));
+    let idx = 0;
+    const total = questionContainers.length;
+    const processBatch = (deadline) => {
+        let processed = 0;
+        const hasDeadline = deadline && typeof deadline.timeRemaining === 'function';
+        while (idx < total && (hasDeadline ? deadline.timeRemaining() > 5 : processed < 10)) {
+            const container = questionContainers[idx];
+            const questionId = container.id.replace('question-container-', '');
+            try {
+                const questionElement = document.getElementById(questionNameIds[questionId]) || 
+                                      document.getElementById('answer' + questionId);
+                if (questionElement) {
+                    const event = new Event('change', { bubbles: true });
+                    questionElement.dispatchEvent(event);
+                }
+            } catch (error) {
             }
-        } catch (error) {
+            idx += 1;
+            processed += 1;
         }
-    });
+        if (idx < total) {
+            if (typeof requestIdleCallback !== 'undefined') {
+                requestIdleCallback(processBatch, { timeout: 1000 });
+            } else {
+                setTimeout(() => processBatch(null), 0);
+            }
+            return;
+        }
+        window._visibilityUpdateRunning = false;
+        if (window._visibilityUpdateQueued) {
+            window._visibilityUpdateQueued = false;
+            triggerVisibilityUpdates();
+        }
+    };
+    if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(processBatch, { timeout: 1000 });
+    } else {
+        setTimeout(() => processBatch(null), 0);
+    }
 }
 // Fallback function to manually check and update visibility without relying on generated scripts
 function triggerVisibilityUpdatesFallback() {
@@ -5860,7 +5819,8 @@ function showTextboxLabels(questionId, count){
         const br = document.createElement('br');
         container.appendChild(br);
     }
-    attachCalculationListeners();   // keep this
+    window.__calcListenersNeedRefresh = true;
+    scheduleCalculationListeners();
     // Update linked fields after creating new textboxes
     updateLinkedFields();
     // 🔧 NEW: Trigger navigation refresh after fields are created so Next button updates
@@ -6519,12 +6479,20 @@ function handleBusinessTypeSelection() {
 }
 // Function to handle linked fields synchronization
 function updateLinkedFields() {
-    if (!linkedFields || linkedFields.length === 0) return;
-    linkedFields.forEach(linkedField => {
+
+    if (!linkedFields || linkedFields.length === 0) {
+
+        return;
+    }
+
+    linkedFields.forEach((linkedField, index) => {
+
         const { linkedFieldId, fields } = linkedField;
         // Find the hidden textbox for this linked field
         let hiddenField = document.getElementById(linkedFieldId);
+
         if (!hiddenField) {
+
             // Create the hidden textbox if it doesn't exist
             hiddenField = document.createElement('input');
             hiddenField.type = 'text';
@@ -6535,30 +6503,49 @@ function updateLinkedFields() {
             const form = document.getElementById('customForm');
             if (form) {
                 form.appendChild(hiddenField);
+
             } else {
                 document.body.appendChild(hiddenField);
+
             }
         }
         // Get all the linked textboxes (filter out null/undefined - textboxes that have been removed)
-        const linkedTextboxes = fields.map(fieldId => document.getElementById(fieldId)).filter(el => el);
+
+        const linkedTextboxes = fields.map(fieldId => {
+            const field = document.getElementById(fieldId);
+
+            return field;
+        }).filter(el => el);
+
         // If no linked textboxes exist (all have been removed), clear the hidden field
         if (linkedTextboxes.length === 0) {
+
             hiddenField.value = '';
             return;
         }
         // Find which textbox has content
-        const textboxesWithContent = linkedTextboxes.filter(tb => tb.value.trim() !== '');
+        const textboxesWithContent = linkedTextboxes.filter(tb => {
+            const hasContent = tb.value.trim() !== '';
+
+            return hasContent;
+        });
+
         if (textboxesWithContent.length === 0) {
             // No textboxes have content, clear the hidden field
+
             hiddenField.value = '';
         } else if (textboxesWithContent.length === 1) {
             // Only one textbox has content, use its value
             const val = textboxesWithContent[0].value.trim();
-            hiddenField.value = (textboxesWithContent[0].type === 'date') ? formatDateForServer(val) : val;
+            const finalValue = (textboxesWithContent[0].type === 'date') ? formatDateForServer(val) : val;
+
+            hiddenField.value = finalValue;
         } else {
             // Multiple textboxes have content
+
             const allAreDates = textboxesWithContent.every(tb => tb.type === 'date' || /^d{2}[-/]d{2}[-/]d{4}$/.test(tb.value.trim()) || /^d{4}-d{2}-d{2}$/.test(tb.value.trim()));
             if (allAreDates) {
+
                 // Choose the latest date
                 const parseDate = (val) => {
                     const trimmed = val.trim();
@@ -6583,15 +6570,20 @@ function updateLinkedFields() {
                 hiddenField.value = latest.type === 'date'
                     ? formatDateForServer(chosenVal)
                     : (/^d{4}-d{2}-d{2}$/.test(chosenVal) ? formatDateForServer(chosenVal) : chosenVal);
+
             } else {
                 // Fall back to longest text
+
                 const longestTextbox = textboxesWithContent.reduce((longest, current) => 
                     current.value.length > longest.value.length ? current : longest
                 );
                 hiddenField.value = longestTextbox.value.trim();
+
             }
         }
+
     });
+
 }
 // Function to clear inactive linked textboxes (with delay to avoid interfering with typing)
 function clearInactiveLinkedFields() {
@@ -6661,8 +6653,12 @@ function setupLinkedFields() {
             }
         }
     });
-    // Initial update
-    updateLinkedFields();
+    // Initial update (deferred to avoid blocking load)
+    if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(() => updateLinkedFields(), { timeout: 1000 });
+    } else {
+        setTimeout(() => updateLinkedFields(), 100);
+    }
 }
 function getQuestionInputs (questionId, type = null) {
   /* 1️⃣ First look inside the question container, if it exists */
@@ -6860,7 +6856,9 @@ function formatDateForDisplay(dateString) {
 }
 window.onload=function(){
     setCurrentDate();
-    attachCalculationListeners();
+    // 🔧 PERFORMANCE FIX: Defer heavy listener attachment until idle time
+    window.__calcListenersNeedRefresh = true;
+    scheduleCalculationListeners();
     // Trigger visibility updates on page load to show dependent questions
     setTimeout(() => {
         if (typeof triggerVisibilityUpdates === 'function') {
@@ -7493,7 +7491,7 @@ async function previewPdf(baseName, isUploaded, isLatex, questionId) {
 
     try {
         let url;
-        
+
         // Check if this is a LaTeX PDF
         if (isLatex && questionId && window.latexPdfs && window.latexPdfs[questionId]) {
             // For LaTeX PDFs, use the Blob directly
@@ -7632,16 +7630,21 @@ async function editAndDownloadPDF (pdfName) {
         const formElements = form.querySelectorAll('input, textarea, select');
         const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
         const allFormElements = [...formElements, ...externalFormElements];
+
         // Log all elements we're about to process
         allFormElements.forEach((element, index) => {
+
         });
+
         allFormElements.forEach(element => {
             if (element.name && !element.disabled) {
                 // For checkboxes and radios, only include if checked
                 if (element.type === 'checkbox' || element.type === 'radio') {
                     if (element.checked) {
                         fd.append(element.name, 'on'); // Send 'on' for checked checkboxes (standard HTML form behavior)
+
                     } else {
+
                     }
                     // Skip unchecked checkboxes entirely - don't send them to server
                 } else {
@@ -7650,16 +7653,28 @@ async function editAndDownloadPDF (pdfName) {
                     if (element.type === 'date' && value) {
                         const originalValue = value;
                         value = formatDateForServer(value);
+
                     }
                     // Include ALL fields with values, including hidden ones
                     if (value && value.trim() !== '') {
                         fd.append(element.name, value);
+
                     } else {
+
                     }
                 }
             } else {
+                if (!element.name) {
+
+                } else if (element.disabled) {
+
+                }
             }
         });
+
+        for (const [key, val] of fd.entries()) {
+
+        }
         // Use the /edit_pdf endpoint with the PDF name as a query parameter.
         // Keep the extension and include credentials so the backend can find the file and respect the current session.
         const baseName = pdfName.replace(/.pdf$/i, '');
@@ -7780,29 +7795,52 @@ function runAllHiddenTextCalculations(){
  * using the field's own name (or any other field name).
  */
 function runSingleHiddenTextCalculation(calcObj) {
+    console.log('[CALCULATION DEBUG] runSingleHiddenTextCalculation called for:', calcObj.hiddenFieldName);
     const textField = document.getElementById(calcObj.hiddenFieldName);
-    if (!textField) return;
+    if (!textField) {
+        console.log('[CALCULATION DEBUG] Text field not found:', calcObj.hiddenFieldName);
+        return;
+    }
+    console.log('[CALCULATION DEBUG] Text field found:', calcObj.hiddenFieldName);
+    
     // We'll assume that the last matched condition takes precedence
     let finalValue = "";
-    calcObj.calculations.forEach(function(oneCalc) {
+    calcObj.calculations.forEach(function(oneCalc, calcIndex) {
+        console.log('[CALCULATION DEBUG] Processing calculation ' + (calcIndex + 1) + ':', {
+            terms: oneCalc.terms,
+            compareOperator: oneCalc.compareOperator,
+            threshold: oneCalc.threshold,
+            fillValue: oneCalc.fillValue
+        });
+        
         let val = 0;
         // Calculate the sum of all terms
         if (oneCalc.terms && oneCalc.terms.length > 0) {
             // Get the first term's value
             const firstTerm = oneCalc.terms[0];
+            console.log('[CALCULATION DEBUG] First term:', firstTerm.questionNameId);
             val = parseFloat(getMoneyValue(firstTerm.questionNameId)) || 0;
+            console.log('[CALCULATION DEBUG] First term value:', val);
+
             // Process remaining terms
             for (let t = 1; t < oneCalc.terms.length; t++) {
                 const term = oneCalc.terms[t];
+                console.log('[CALCULATION DEBUG] Term ' + (t + 1) + ':', term.questionNameId, 'operator:', term.operator);
                 const termVal = parseFloat(getMoneyValue(term.questionNameId)) || 0;
+                console.log('[CALCULATION DEBUG] Term ' + (t + 1) + ' value:', termVal);
+
                 switch(term.operator) {
                     case '+': val += termVal; break;
                     case '-': val -= termVal; break;
                     case 'x': val *= termVal; break;
                     case '/': val = termVal !== 0 ? val / termVal : 0; break;
                 }
+                console.log('[CALCULATION DEBUG] Running total after term ' + (t + 1) + ':', val);
             }
         }
+        
+        console.log('[CALCULATION DEBUG] Final calculated value:', val);
+        
         // Compare to threshold
         const threshold = parseFloat(oneCalc.threshold) || 0;
         let matched = false;
@@ -7811,17 +7849,30 @@ function runSingleHiddenTextCalculation(calcObj) {
             case '<': matched = val < threshold; break;
             case '=': matched = Math.abs(val - threshold) < 0.000001; break; // Use epsilon for float comparison
         }
+        
+        console.log('[CALCULATION DEBUG] Comparison:', {
+            value: val,
+            operator: oneCalc.compareOperator,
+            threshold: threshold,
+            matched: matched
+        });
+
         if (matched) {
             // Handle special fillValue formats
             if (oneCalc.fillValue === "##total##" || oneCalc.fillValue.match(/^##(.+)##$/)) {
                 finalValue = val.toFixed(2); // Format money values with 2 decimal places
+                console.log('[CALCULATION DEBUG] Using calculated value as finalValue:', finalValue);
             } else {
                 finalValue = oneCalc.fillValue;
+                console.log('[CALCULATION DEBUG] Using fillValue as finalValue:', finalValue);
             }
         }
     });
+    
+    console.log('[CALCULATION DEBUG] Setting text field value to:', finalValue);
     // Update the text field
     textField.value = finalValue;
+    console.log('[CALCULATION DEBUG] Text field value after setting:', textField.value);
 }
 function replacePlaceholderTokens (str){
     /* note the doubled back-slashes in the delimiters $$ */
@@ -7858,29 +7909,90 @@ function parseTokenValue(token){
  *       (note the escaped \d+ instead of stray 'd').
  *───────────────────────────────────────────────────────────────*/
 function getMoneyValue(qId) {
+    console.log('[CALCULATION DEBUG] getMoneyValue called with:', qId);
+    
     /* direct hit first */
     const el = document.getElementById(qId);
     if (el) {
+        console.log('[CALCULATION DEBUG] Found direct element:', el.id, 'value:', el.value);
         if (el.type === "checkbox") {
             const amt = document.getElementById(el.id + "_amount");
-            if (amt && el.checked) return parseFloat(amt.value) || 0;
-            return el.checked ? 1 : 0;
+            if (amt && el.checked) {
+                const value = parseFloat(amt.value) || 0;
+                console.log('[CALCULATION DEBUG] Checkbox with amount field, returning:', value);
+                return value;
+            }
+            const value = el.checked ? 1 : 0;
+            console.log('[CALCULATION DEBUG] Checkbox without amount, returning:', value);
+            return value;
         }
-        return parseFloat(el.value) || 0;
+        const value = parseFloat(el.value) || 0;
+        console.log('[CALCULATION DEBUG] Direct element value, returning:', value);
+        return value;
     }
+    
     /* legacy builder‑shorthand amountX_Y_Z */
     if (/^amountd+_d+_.+/.test(qId)) {
-        const el2 = document.getElementById(normaliseDesignerFieldRef(qId));
-        if (el2) return parseFloat(el2.value) || 0;
+        const normalized = normaliseDesignerFieldRef(qId);
+        console.log('[CALCULATION DEBUG] Normalized shorthand:', qId, '->', normalized);
+        const el2 = document.getElementById(normalized);
+        if (el2) {
+            const value = parseFloat(el2.value) || 0;
+            console.log('[CALCULATION DEBUG] Found normalized element, returning:', value);
+            return value;
+        } else {
+            console.log('[CALCULATION DEBUG] Normalized element not found:', normalized);
+        }
     }
+    
     /* name‑attribute fallback */
     const byName = document.getElementsByName(qId);
-    if (byName.length) return parseFloat(byName[0].value) || 0;
+    if (byName.length) {
+        const value = parseFloat(byName[0].value) || 0;
+        console.log('[CALCULATION DEBUG] Found by name, returning:', value);
+        return value;
+    }
+    
+    console.log('[CALCULATION DEBUG] No element found, returning 0');
     return 0;
 }
+function scheduleCalculationListeners() {
+    // Debounce heavy listener attachment to avoid blocking during bulk DOM updates
+    if (window.__calcAttachTimer) {
+        clearTimeout(window.__calcAttachTimer);
+    }
+    window.__calcAttachTimer = setTimeout(() => {
+        if (typeof requestIdleCallback !== 'undefined') {
+            requestIdleCallback(() => attachCalculationListeners(), { timeout: 500 });
+        } else {
+            attachCalculationListeners();
+        }
+    }, 50);
+}
 function attachCalculationListeners() {
+    // Skip if there are no calculations at all
+    const hasCheckboxCalcs = hiddenCheckboxCalculations && hiddenCheckboxCalculations.length > 0;
+    const hasTextCalcs = hiddenTextCalculations && hiddenTextCalculations.length > 0;
+    if (!hasCheckboxCalcs && !hasTextCalcs) {
+        return;
+    }
+    // Avoid repeated full scans unless we explicitly need a refresh
+    if (window.__calcListenersAttached && !window.__calcListenersNeedRefresh) {
+        return;
+    }
+    window.__calcListenersNeedRefresh = false;
     // Universal function to attach listeners in a consistent way
     function attachListenersToCalculationTerms(calculations, runCalculationFunction) {
+        // 🔧 PERFORMANCE FIX: Cache DOM queries and name lookups once
+        const allInputs = Array.from(document.querySelectorAll('input, select, textarea'));
+        const nameMap = new Map();
+        allInputs.forEach(input => {
+            if (!input.name) return;
+            if (!nameMap.has(input.name)) {
+                nameMap.set(input.name, []);
+            }
+            nameMap.get(input.name).push(input);
+        });
         for (let i = 0; i < calculations.length; i++) {
             const calcObj = calculations[i];
             for (let c = 0; c < calcObj.calculations.length; c++) {
@@ -7903,7 +8015,7 @@ function attachCalculationListeners() {
                         continue; // Found and attached, go to next term
                     }
                     // 2. Try elements with this name
-                    const namedElements = document.getElementsByName(qNameId);
+                    const namedElements = nameMap.get(qNameId) || [];
                     if (namedElements.length > 0) {
                         for (let n = 0; n < namedElements.length; n++) {
                             namedElements[n].addEventListener('change', runCalculationFunction);
@@ -7913,7 +8025,6 @@ function attachCalculationListeners() {
                     }
                     // 3. Look for prefixed IDs like "answerX_qId"
                     const prefixPattern = new RegExp('.*_' + qNameId + '$');
-                    const allInputs = document.querySelectorAll('input, select, textarea');
                     for (let inp = 0; inp < allInputs.length; inp++) {
                         const input = allInputs[inp];
                         if (prefixPattern.test(input.id)) {
@@ -7929,7 +8040,7 @@ function attachCalculationListeners() {
                         }
                     }
                     // 4. Look specifically for amount fields with this name
-                    const amountElements = document.querySelectorAll('input[name="' + qNameId + '"]');
+                    const amountElements = nameMap.get(qNameId) || [];
                     for (let a = 0; a < amountElements.length; a++) {
                         amountElements[a].addEventListener('input', runCalculationFunction);
                         // Also find and attach to the controlling checkbox
@@ -7957,22 +8068,34 @@ function attachCalculationListeners() {
         }
     }
     // For hidden checkbox calculations
-    if (hiddenCheckboxCalculations && hiddenCheckboxCalculations.length > 0) {
+    if (hasCheckboxCalcs) {
         const runAllCheckboxCalcs = function() {
             runAllHiddenCheckboxCalculations();
         };
         attachListenersToCalculationTerms(hiddenCheckboxCalculations, runAllCheckboxCalcs);
     }
     // For hidden text calculations
-    if (hiddenTextCalculations && hiddenTextCalculations.length > 0) {
+    if (hasTextCalcs) {
         const runAllTextCalcs = function() {
             runAllHiddenTextCalculations();
         };
         attachListenersToCalculationTerms(hiddenTextCalculations, runAllTextCalcs);
     }
-    // Run calculations once on page load to set initial values
-    runAllHiddenCheckboxCalculations();
-    runAllHiddenTextCalculations();
+    // 🔧 PERFORMANCE FIX: Defer initial calculations to avoid blocking page load
+    // Run calculations asynchronously after page is interactive
+    if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(() => {
+            runAllHiddenCheckboxCalculations();
+            runAllHiddenTextCalculations();
+        }, { timeout: 1000 });
+    } else {
+        // Fallback for browsers without requestIdleCallback
+        setTimeout(() => {
+            runAllHiddenCheckboxCalculations();
+            runAllHiddenTextCalculations();
+        }, 100);
+    }
+    window.__calcListenersAttached = true;
 }
 // Progress Bar Logic
 function updateProgressBar() {
@@ -9681,9 +9804,9 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
 <script>
 // Debug Menu Functionality
 let debugMenuVisible = false;
-// Show debug menu on Ctrl+Shift
+// Show debug menu on Ctrl+Shift (Windows/Linux) or Command+Shift (Mac)
 document.addEventListener('keydown', function(e) {
-  if (e.ctrlKey && e.shiftKey && !debugMenuVisible) {
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && !debugMenuVisible) {
     e.preventDefault();
     showDebugMenu();
   }
