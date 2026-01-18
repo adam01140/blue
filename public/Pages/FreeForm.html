@@ -1246,6 +1246,116 @@
                 font-size: 1.1em;
             }
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: #e74c3c;
+        }
+
+        /* County Selection Modal Styles */
+        #county-modal .modal-content {
+            text-align: center;
+            max-width: 500px;
+        }
+        #county-modal h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        #county-modal p {
+            font-size: 1.1em;
+            margin: 20px 0;
+            line-height: 1.5;
+            color: #34495e;
+        }
+        #county-modal .btn {
+            width: auto;
+            padding: 12px 30px;
+            margin: 0 10px;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        #county-modal-cancel {
+            background-color: #95a5a6;
+        }
+        #county-modal-cancel:hover {
+            background-color: #7f8c8d;
+        }
+        #county-modal-submit {
+            background-color: #2980b9;
+        }
+        #county-modal-submit:hover {
+            background-color: #1c598a;
+        }
+
+        /* Defendant Modal Styles */
+        #defendant-modal .modal-content {
+            text-align: center;
+            max-width: 500px;
+        }
+        #defendant-modal h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        #defendant-modal p {
+            font-size: 1.1em;
+            margin: 20px 0;
+            line-height: 1.5;
+            color: #34495e;
+        }
+        #defendant-modal .btn {
+            width: auto;
+            padding: 12px 30px;
+            margin: 0 10px;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        #defendant-modal-cancel {
+            background-color: #95a5a6;
+        }
+        #defendant-modal-cancel:hover {
+            background-color: #7f8c8d;
+        }
+        #defendant-modal-submit {
+            background-color: #2980b9;
+        }
+        #defendant-modal-submit:hover {
+            background-color: #1c598a;
+        }
     </style>
 </head>
 <body>
@@ -1352,7 +1462,7 @@
                     <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;">Get Started</a>
                 </div>
                 <!-- FW-001-GC Card -->
-                <div class="freeform-card" style="cursor: pointer;" onclick="window.location.href='../Forms/Fee-Waiver/feewaiver.html?formId=fee-waiver';">
+                <div class="freeform-card" style="cursor: pointer;" onclick="showCountyModal('fee-waiver', 'FW-001-GC Fee Waiver');">
                     <svg width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="FW-001-GC Icon" style="margin-bottom:18px;display:block;">
                       <circle cx="50" cy="50" r="45" fill="#eaf1f8" stroke="#2980b9" stroke-width="2"/>
                       <text x="50%" y="42%" text-anchor="middle" font-family="Montserrat, sans-serif" font-size="1.1em" font-weight="bold" fill="#2980b9">FW-001</text>
@@ -1361,7 +1471,7 @@
                     <div style="font-size:1.25em;font-weight:700;color:#2c3e50;margin-bottom:8px;">FW-001-GC Fee Waiver</div>
                     <div style="font-size:1.05em;color:#555;margin-bottom:16px;">Request a court fee waiver if you cannot afford to pay court fees and costs for your case.</div>
                     <div style="font-size:1.1em;color:#2980b9;font-weight:700;margin-bottom:10px;">Free</div>
-                    <a href="../Forms/Fee-Waiver/feewaiver.html?formId=fee-waiver" class="btn" style="padding:10px 36px;font-size:1.08em;" onclick="event.stopPropagation();">Get Started</a>
+                    <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;" onclick="event.preventDefault(); event.stopPropagation(); showCountyModal('fee-waiver', 'FW-001-GC Fee Waiver');">Get Started</a>
                 </div>
                 <!-- PCOR Card -->
                 <div class="freeform-card">
@@ -1847,6 +1957,406 @@
                     closeCartSideMenu();
                 }
             });
+        });
+    </script>
+
+    <!-- County Selection Modal -->
+    <div id="county-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <span class="close-modal" id="county-modal-close">&times;</span>
+            <h2 id="county-modal-title">Which county are you filing in?</h2>
+            <p id="county-modal-message" style="font-size: 1.1em; margin: 20px 0; line-height: 1.5;">Enter your zip code below to determine your county.</p>
+            <input type="text" id="county-zip-input" placeholder="Enter zip code" maxlength="5" pattern="[0-9]*" inputmode="numeric" style="width: 90%; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0; margin-bottom: 18px; text-align: center;">
+            <div id="county-modal-error" style="color: #e74c3c; font-size: 1em; margin-bottom: 10px; display: none;"></div>
+              <div id="county-modal-buttons" style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
+                  <button type="button" id="county-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">Cancel</button>
+                  <button type="button" id="county-modal-submit" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9;">Submit</button>
+              </div>
+        </div>
+    </div>
+
+    <!-- Defendant Name Modal -->
+    <div id="defendant-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <span class="close-modal" id="defendant-modal-close">&times;</span>
+            <h2>Defendant Information</h2>
+            <p style="font-size: 1.1em; margin: 20px 0; line-height: 1.5;">Who are you suing?</p>
+            <input type="text" id="defendant-name-input" placeholder="Enter defendant's name" style="width: 90%; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0; margin-bottom: 18px;">
+            <div id="defendant-modal-error" style="color: #e74c3c; font-size: 1em; margin-bottom: 10px; display: none;"></div>
+              <div style="display: flex; gap: 15px; justify-content: center; margin-top: 10px;">
+                  <button type="button" id="defendant-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">Cancel</button>
+                  <button type="button" id="defendant-modal-submit" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9;">Submit</button>
+              </div>
+        </div>
+    </div>
+
+    <!-- County Modal JavaScript -->
+    <script>
+        // Initialize Firebase references
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Global variables for popup system
+        let currentFormId = null;
+        let currentFormName = null;
+        let currentCounty = null;
+        let currentZipCode = null;
+        let availableFormsData = [];
+
+        // Load county data from JSON file
+        let countyZipMap = null;
+        async function loadCountyData() {
+            if (countyZipMap) return countyZipMap;
+            try {
+                const response = await fetch('../JSON/county-zips.json');
+                if (!response.ok) throw new Error('Failed to load county-zips.json');
+                countyZipMap = await response.json();
+                console.log('Loaded county data from JSON:', countyZipMap);
+                return countyZipMap;
+            } catch (e) {
+                console.error('Error loading county-zips.json:', e);
+                return {};
+            }
+        }
+
+        // Load available forms from Firebase
+        async function loadAvailableForms() {
+            try {
+                const snapshot = await db.collection('forms').get();
+                const forms = [];
+                
+                snapshot.forEach(doc => {
+                    const formData = doc.data();
+                    formData.id = doc.id;
+                    forms.push(formData);
+                });
+                
+                console.log('Loaded available forms from Firebase:', forms);
+                return forms;
+            } catch (error) {
+                console.error('Error loading available forms from Firebase:', error);
+                return [];
+            }
+        }
+
+        // Show county modal
+        function showCountyModal(formId, formName) {
+            console.log('showCountyModal called with:', { formId, formName });
+            currentFormId = formId;
+            currentFormName = formName;
+            currentCounty = null;
+            console.log('Variables set:', { currentFormId, currentFormName, currentCounty });
+            
+            // Reset modal state
+            document.getElementById('county-zip-input').value = '';
+            document.getElementById('county-zip-input').style.display = 'block';
+            document.getElementById('county-modal-error').style.display = 'none';
+            document.getElementById('county-modal-title').textContent = 'Which county are you filing in?';
+            document.getElementById('county-modal-message').textContent = 'Enter your zip code below to determine your county.';
+            document.getElementById('county-modal-buttons').style.display = 'flex';
+            
+            document.getElementById('county-modal').style.display = 'block';
+        }
+
+        // Show defendant modal
+        function showDefendantModal() {
+            document.getElementById('defendant-name-input').value = '';
+            document.getElementById('defendant-modal-error').style.display = 'none';
+            document.getElementById('defendant-modal').style.display = 'block';
+        }
+
+        // Close county modal
+        function closeCountyModal() {
+            document.getElementById('county-modal').style.display = 'none';
+            currentFormId = null;
+            currentFormName = null;
+            currentCounty = null;
+            currentZipCode = null;
+        }
+
+        // Hide county modal without resetting variables
+        function hideCountyModal() {
+            document.getElementById('county-modal').style.display = 'none';
+        }
+
+        // Close defendant modal
+        function closeDefendantModal() {
+            document.getElementById('defendant-modal').style.display = 'none';
+        }
+
+        // Helper function to get form URL
+        function getFormUrl(formId) {
+            // For fee-waiver, return the fee waiver form URL
+            if (formId === 'fee-waiver') {
+                return '../Forms/Fee-Waiver/feewaiver.html?formId=fee-waiver';
+            }
+            
+            // Try to get from available forms data
+            const formObj = availableFormsData.find(f => f.id === formId);
+            if (formObj && formObj.url) {
+                return formObj.url;
+            }
+            
+            // Fallback
+            return `../Forms/${formId}.html?formId=${formId}`;
+        }
+
+        // Add form to portfolio before navigating
+        async function addFormToPortfolio(formId, formName, defendantName, county, zipCode = null) {
+            console.log('Adding form to portfolio:', { formId, formName, defendantName, county, zipCode });
+            
+            const zipCodeToUse = zipCode || currentZipCode;
+            const formUrl = getFormUrl(formId);
+            
+            const user = auth.currentUser;
+            if (!user) {
+                // If not logged in, redirect to form without portfolio
+                let url = formUrl + (formUrl.includes('?') ? '&' : '?') + 'county=' + encodeURIComponent(county);
+                if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                if (zipCodeToUse) url += '&zipCode=' + encodeURIComponent(zipCodeToUse);
+                window.location.href = url;
+                return;
+            }
+            
+            const userId = user.uid;
+            try {
+                // Add form to user's portfolio in Firebase
+                const formRef = db.collection('users').doc(userId).collection('forms').doc();
+                const portfolioId = formRef.id;
+                
+                const formData = {
+                    originalFormId: formId,
+                    name: formName,
+                    url: formUrl,
+                    countyName: county,
+                    addedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastOpened: firebase.firestore.FieldValue.serverTimestamp(),
+                    zipCode: zipCodeToUse
+                };
+                
+                // Only add defendantName if it's provided
+                if (defendantName) {
+                    formData.defendantName = defendantName;
+                }
+                
+                await formRef.set(formData);
+                
+                console.log('Form added to portfolio with ID:', portfolioId);
+                
+                // Verify the form was stored
+                const verifyDoc = await formRef.get();
+                if (verifyDoc.exists) {
+                    // Redirect to form with portfolio ID
+                    const separator = formUrl.includes('?') ? '&' : '?';
+                    let url = formUrl + separator + 'county=' + encodeURIComponent(county) + '&portfolioId=' + encodeURIComponent(portfolioId);
+                    if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                    if (zipCodeToUse) url += '&zipCode=' + encodeURIComponent(zipCodeToUse);
+                    
+                    window.location.href = url;
+                    
+                    // Reset variables after successful form addition
+                    currentFormId = null;
+                    currentFormName = null;
+                    currentCounty = null;
+                    currentZipCode = null;
+                } else {
+                    console.error('Failed to verify form was stored!');
+                    // Fallback: redirect without portfolio
+                    let url = formUrl + (formUrl.includes('?') ? '&' : '?') + 'county=' + encodeURIComponent(county);
+                    if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                    if (zipCodeToUse) url += '&zipCode=' + encodeURIComponent(zipCodeToUse);
+                    window.location.href = url;
+                }
+                
+            } catch (error) {
+                console.error('Error adding form to portfolio:', error);
+                
+                // Fallback: redirect to form without portfolio
+                let url = formUrl + (formUrl.includes('?') ? '&' : '?') + 'county=' + encodeURIComponent(county);
+                if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
+                if (zipCodeToUse) url += '&zipCode=' + encodeURIComponent(zipCodeToUse);
+                window.location.href = url;
+                
+                // Reset variables after error fallback
+                currentFormId = null;
+                currentFormName = null;
+                currentCounty = null;
+                currentZipCode = null;
+            }
+        }
+
+        // Handle county zip input submission
+        async function handleCountySubmit() {
+            const zipCode = document.getElementById('county-zip-input').value.trim();
+            const errorDiv = document.getElementById('county-modal-error');
+            
+            if (!zipCode) {
+                errorDiv.textContent = 'Please enter a zip code.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (!/^\d{5}$/.test(zipCode)) {
+                errorDiv.textContent = 'Please enter a valid 5-digit zip code.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Load county data from JSON
+            const countyData = await loadCountyData();
+            
+            // Look up county - iterate through all counties to find the one containing this zip code
+            let county = null;
+            for (const [countyName, zipCodes] of Object.entries(countyData)) {
+                if (zipCodes.includes(zipCode)) {
+                    county = countyName;
+                    break;
+                }
+            }
+            
+            if (!county) {
+                errorDiv.textContent = 'Zip code not found. Please check your zip code and try again.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Check if form supports this county
+            if (!availableFormsData.length) {
+                availableFormsData = await loadAvailableForms();
+            }
+            const formObj = availableFormsData.find(f => f.id === currentFormId);
+            
+            if (formObj && (!Array.isArray(formObj.counties) || !formObj.counties.includes(county))) {
+                errorDiv.textContent = `This form is not offered in ${county} County. Please try a different zip code.`;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            currentCounty = county;
+            currentZipCode = zipCode;
+            console.log('County and zip code set:', { currentFormId, currentFormName, currentCounty, currentZipCode });
+            
+            // Update modal for confirmation
+            document.getElementById('county-modal-title').textContent = 'Confirm Your County';
+            document.getElementById('county-modal-message').textContent = `Great! You're filing in ${county} County, right?`;
+            document.getElementById('county-zip-input').style.display = 'none';
+            document.getElementById('county-modal-buttons').style.display = 'none';
+            document.getElementById('county-modal-error').style.display = 'none';
+            
+            // Add confirmation buttons
+            const buttonsDiv = document.getElementById('county-modal-buttons');
+            buttonsDiv.innerHTML = `
+                <button type="button" id="county-confirm-no" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">No</button>
+                <button type="button" id="county-confirm-yes" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9;">Yes</button>
+            `;
+            buttonsDiv.style.display = 'flex';
+            
+            // Add event listeners for confirmation buttons
+            document.getElementById('county-confirm-no').addEventListener('click', function() {
+                // Reset to zip input
+                document.getElementById('county-modal-title').textContent = 'Which county are you filing in?';
+                document.getElementById('county-modal-message').textContent = 'Enter your zip code below to determine your county.';
+                document.getElementById('county-zip-input').value = '';
+                document.getElementById('county-zip-input').style.display = 'block';
+                document.getElementById('county-modal-error').style.display = 'none';
+                buttonsDiv.innerHTML = `
+                    <button type="button" id="county-modal-cancel" class="btn" style="width: auto; padding: 12px 30px; background-color: #95a5a6;">Cancel</button>
+                    <button type="button" id="county-modal-submit" class="btn" style="width: auto; padding: 12px 30px; background-color: #2980b9;">Submit</button>
+                `;
+                addCountyModalEventListeners();
+            });
+            
+            document.getElementById('county-confirm-yes').addEventListener('click', async function() {
+                console.log('County confirmed, variables before transition:', { currentFormId, currentFormName, currentCounty, currentZipCode });
+                // Hide county modal but don't reset variables yet
+                hideCountyModal();
+                
+                // Check if form requires defendant information
+                if (!availableFormsData.length) {
+                    availableFormsData = await loadAvailableForms();
+                }
+                const formObj = availableFormsData.find(f => f.id === currentFormId);
+                console.log('Form object from Firebase:', formObj);
+                
+                if (formObj && formObj.defendant && formObj.defendant.toUpperCase() === 'YES') {
+                    // Form requires defendant information
+                    showDefendantModal();
+                } else {
+                    // Form doesn't require defendant information, add to portfolio and proceed
+                    const formNameToUse = formObj && formObj.name ? formObj.name : currentFormName;
+                    addFormToPortfolio(currentFormId, formNameToUse, null, currentCounty, currentZipCode);
+                }
+            });
+        }
+
+        // Handle defendant name submission
+        async function handleDefendantSubmit() {
+            console.log('Defendant submit called, variables:', { currentFormId, currentFormName, currentCounty });
+            const defendantName = document.getElementById('defendant-name-input').value.trim();
+            const errorDiv = document.getElementById('defendant-modal-error');
+            
+            if (!defendantName) {
+                errorDiv.textContent = 'Please enter the defendant\'s name.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Get form name from Firebase data
+            if (!availableFormsData.length) {
+                availableFormsData = await loadAvailableForms();
+            }
+            const formObj = availableFormsData.find(f => f.id === currentFormId);
+            const formNameToUse = formObj && formObj.name ? formObj.name : currentFormName;
+            
+            closeDefendantModal();
+            
+            // Add form to portfolio and redirect
+            addFormToPortfolio(currentFormId, formNameToUse, defendantName, currentCounty, currentZipCode);
+        }
+
+        // Add event listeners for county modal
+        function addCountyModalEventListeners() {
+            document.getElementById('county-modal-submit').addEventListener('click', handleCountySubmit);
+            document.getElementById('county-modal-cancel').addEventListener('click', closeCountyModal);
+            document.getElementById('county-modal-close').addEventListener('click', closeCountyModal);
+        }
+
+        // Add event listeners for defendant modal
+        function addDefendantModalEventListeners() {
+            document.getElementById('defendant-modal-submit').addEventListener('click', handleDefendantSubmit);
+            document.getElementById('defendant-modal-cancel').addEventListener('click', closeDefendantModal);
+            document.getElementById('defendant-modal-close').addEventListener('click', closeDefendantModal);
+        }
+
+        // Initialize popup system
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadAvailableForms();
+            addCountyModalEventListeners();
+            addDefendantModalEventListeners();
+            
+            // Add zip code input validation
+            const zipInput = document.getElementById('county-zip-input');
+            if (zipInput) {
+                zipInput.addEventListener('input', function() {
+                    // Only allow numbers, max 5 digits
+                    let val = zipInput.value.replace(/\D/g, '');
+                    if (val.length > 5) val = val.slice(0, 5);
+                    zipInput.value = val;
+                });
+            }
+            
+            // Close modals when clicking outside
+            window.onclick = function(event) {
+                const countyModal = document.getElementById('county-modal');
+                const defendantModal = document.getElementById('defendant-modal');
+                
+                if (event.target === countyModal) {
+                    closeCountyModal();
+                }
+                if (event.target === defendantModal) {
+                    closeDefendantModal();
+                }
+            };
         });
     </script>
     <!-- Authentication Script -->
