@@ -410,7 +410,175 @@
                 padding-bottom: 30px !important;
                 margin-bottom: 0 !important;
             }
+            
+            /* Banner/Hero section mobile - "Find the Right Form" */
+            main > section:first-child {
+                margin: 0 20px 24px 20px !important;
+                padding: 25px 20px !important;
+                max-width: calc(100% - 40px) !important;
+                width: calc(100% - 40px) !important;
+                box-sizing: border-box !important;
+                border-radius: 20px !important;
+            }
+            main > section:first-child > div {
+                flex-direction: column !important;
+                gap: 20px !important;
+                width: 100% !important;
+            }
+            main > section:first-child img {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 auto !important;
+            }
+            main > section:first-child h1 {
+                font-size: 1.8em !important;
+                text-align: center !important;
+                margin-bottom: 12px !important;
+            }
+            main > section:first-child p {
+                font-size: 1.1em !important;
+                text-align: center !important;
+                margin-bottom: 0 !important;
+            }
+            
+            /* Main forms wrapper mobile - add side margins */
+            .main-forms-wrapper {
+                margin: 8px auto 32px auto !important;
+                gap: 32px !important;
+                padding: 0 15px !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+            }
+            
+            /* Available Forms section mobile - match forms.html */
+            .forms-card {
+                padding: 24px 20px 20px 20px !important;
+                margin: 0 auto !important;
+                border-radius: 18px !important;
+                box-sizing: border-box !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .forms-card h1 {
+                font-size: 1.6em !important;
+            }
+            .forms-card .subtitle {
+                font-size: 0.95em !important;
+                margin-bottom: 20px !important;
+            }
+            
+            /* Forms list mobile - Available Forms 2x2 grid - match forms.html */
+            #available-forms-list {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                column-gap: 40px !important;
+                row-gap: 32px !important;
+                gap: 32px 40px !important;
+                justify-items: center !important;
+                max-width: 500px !important;
+                margin: 0 auto !important;
+                padding: 0 20px !important;
+                flex-direction: unset !important;
+                flex-wrap: unset !important;
+            }
+            #available-forms-list li {
+                width: auto !important;
+                max-width: 200px !important;
+                min-width: 160px !important;
+                padding: 24px 18px 18px 18px !important;
+                box-shadow: 0 4px 16px rgba(44,62,80,0.15) !important;
+                border: 1px solid rgba(44,62,80,0.08) !important;
+            }
+            /* Center the last item if it's odd (spans both columns and centers) */
+            #available-forms-list li:last-child:nth-child(odd) {
+                grid-column: 1 / -1 !important;
+                justify-self: center !important;
+                max-width: 200px !important;
+            }
+            
+            /* Available forms search mobile */
+            #available-forms-search {
+                width: 80% !important;
+                max-width: 320px !important;
+                padding: 14px !important;
+                font-size: 1em !important;
+                margin: 0 auto 12px auto !important;
+                display: block !important;
+            }
+            #available-forms-zip {
+                width: 80% !important;
+                max-width: 176px !important;
+                padding: 14px !important;
+                font-size: 1em !important;
+                margin: 0 auto 18px auto !important;
+                display: block !important;
+            }
+            
+            /* Pagination mobile */
+            .forms-pagination {
+                gap: 24px !important;
+                margin-top: 28px !important;
+            }
+            .circle-arrow-btn {
+                width: 44px !important;
+                height: 44px !important;
+            }
+            .circle-arrow-btn svg {
+                width: 24px !important;
+                height: 24px !important;
+            }
+            
+            .form-action-button {
+                padding: 8px 20px !important;
+                font-size: 0.95em !important;
+                max-width: 140px !important;
+            }
         }
+        
+        /* Very small screens - match forms.html */
+        @media (max-width: 480px) {
+            .forms-card h1 {
+                font-size: 1.4em !important;
+            }
+            .forms-card .subtitle {
+                font-size: 0.9em !important;
+            }
+            
+            /* Available Forms small mobile - keep 2x2 like forms.html */
+            #available-forms-list {
+                column-gap: 32px !important;
+                row-gap: 28px !important;
+                gap: 28px 32px !important;
+                padding: 0 15px !important;
+            }
+            #available-forms-list li {
+                max-width: 100% !important;
+                min-width: 140px !important;
+                padding: 20px 14px 16px 14px !important;
+                box-shadow: 0 4px 16px rgba(44,62,80,0.15) !important;
+                border: 1px solid rgba(44,62,80,0.08) !important;
+            }
+            /* Center the last item if it's odd on very small screens */
+            #available-forms-list li:last-child:nth-child(odd) {
+                grid-column: 1 / -1 !important;
+                justify-self: center !important;
+                max-width: 100% !important;
+            }
+            
+            /* Adjust hero section for very small screens */
+            main > section:first-child {
+                margin: 0 15px 20px 15px !important;
+                padding: 20px 15px !important;
+                width: calc(100% - 30px) !important;
+            }
+            main > section:first-child h1 {
+                font-size: 1.5em !important;
+            }
+            main > section:first-child p {
+                font-size: 1em !important;
+            }
+        }
+        
         .pro-footer {
             background: #2c3e50 !important;
             color: #f3f7f8 !important;
@@ -1111,7 +1279,8 @@
         .forms-list li {
             background: #f8fafc;
             border-radius: 14px;
-            box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+            box-shadow: 0 4px 16px rgba(44,62,80,0.15);
+            border: 1px solid rgba(44,62,80,0.08);
             padding: 28px 22px 22px 22px;
             width: 28%;
             min-width: 220px;
@@ -1119,14 +1288,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: box-shadow 0.2s, background 0.2s;
-            border: none;
+            transition: box-shadow 0.2s, background 0.2s, border-color 0.2s;
             position: relative;
         }
 
         .forms-list li:hover {
             background: #eaf1f8;
-            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+            box-shadow: 0 6px 20px rgba(44,62,80,0.20);
+            border-color: rgba(41,128,185,0.2);
             transform: translateY(-2px) scale(1.03);
         }
 
@@ -1710,8 +1879,8 @@
                 <h1>Available Forms</h1><br>
                 <div class="subtitle">Browse and add new forms to your portfolio. Click a form to add it below.</div>
                 <!-- Search Bar for Available Forms -->
-                <input type="text" id="available-forms-search" placeholder="Search By Form Name " style="width: 100%; max-width: 400px; margin-bottom: 18px; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0;">
-                <input type="text" id="available-forms-zip" placeholder="Search By ZIP Code" maxlength="5" style="width: 100%; max-width: 220px; margin: 0 auto 18px auto; display: block; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #b3e0ff; background: #f8fbff; text-align: center; box-shadow: 0 1px 4px rgba(44,62,80,0.06);">
+                <input type="text" id="available-forms-search" placeholder="Search By Form Name " style="width: 80%; max-width: 320px; margin: 0 auto 18px auto; display: block; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0;">
+                <input type="text" id="available-forms-zip" placeholder="Search By ZIP Code" maxlength="5" style="width: 80%; max-width: 176px; margin: 0 auto 18px auto; display: block; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #b3e0ff; background: #f8fbff; text-align: center; box-shadow: 0 1px 4px rgba(44,62,80,0.06);">
                 <br><br>
                 <ul id="available-forms-list" class="forms-list">
                     <!-- Available forms will be dynamically loaded here -->
@@ -2004,16 +2173,66 @@
             let currentFormsPage = 0;
             const FORMS_PER_PAGE = 5;
 
+            // Generate portfolio ID helper function
+            function generatePortfolioId() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                let result = '';
+                for (let i = 0; i < 20; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+
+            // Load available forms from Firebase
             async function loadAvailableForms() {
                 try {
-                    const response = await fetch('available-forms.json');
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const data = await response.json();
-                    return data.forms || [];
+                    const snapshot = await db.collection('forms').get();
+                    const forms = [];
+                    
+                    snapshot.forEach(doc => {
+                        const formData = doc.data();
+                        formData.id = doc.id;
+                        
+                        // Transform URLs to use the correct format with Forms/ prefix and include portfolio ID
+                        const portfolioId = generatePortfolioId();
+                        
+                        if (formData.url) {
+                            // Respect the admin-configured path but normalize it and inject a fresh portfolioId
+                            let correctedUrl = formData.url;
+
+                            if (correctedUrl.includes('Pages/Forms/')) {
+                                correctedUrl = correctedUrl.replace('Pages/Forms/', '../Forms/');
+                            } else if (correctedUrl.startsWith('Pages/')) {
+                                correctedUrl = correctedUrl.replace('Pages/', '../Forms/');
+                            } else if (!correctedUrl.startsWith('../') && !correctedUrl.startsWith('http')) {
+                                correctedUrl = '../Forms/' + correctedUrl;
+                            }
+
+                            // Ensure the URL has the current portfolioId
+                            if (correctedUrl.includes('portfolioId=')) {
+                                correctedUrl = correctedUrl.replace(/portfolioId=[^&]*/i, `portfolioId=${portfolioId}`);
+                            } else {
+                                const separator = correctedUrl.includes('?') ? '&' : '?';
+                                correctedUrl += `${separator}portfolioId=${portfolioId}`;
+                            }
+
+                            formData.url = correctedUrl;
+                        } else {
+                            // Fallback for legacy forms: infer folder/filename from ID (e.g., sc500 -> SC-500/sc-500.html)
+                            const baseId = formData.id || '';
+                            const lowerId = baseId.toLowerCase();
+                            const hyphenated = lowerId.replace(/^([a-z]+)(\d+)$/, '$1-$2');
+                            const folderName = baseId.replace(/^([a-zA-Z]+)(\d+)$/, (_, letters, numbers) => `${letters.toUpperCase()}-${numbers}`);
+                            formData.url = `../Forms/${folderName}/${hyphenated}.html?formId=${lowerId}&portfolioId=${portfolioId}`;
+                        }
+                        
+                        forms.push(formData);
+                    });
+                    
+                    console.log('Loaded available forms from Firebase:', forms);
+                    return forms;
                 } catch (error) {
-                    console.error('Error loading available forms:', error);
+                    console.error('Error loading available forms from Firebase:', error);
                     return [];
                 }
             }
@@ -2025,7 +2244,16 @@
                     }
                     let forms = availableFormsData;
                     if (searchFilter) {
-                        forms = forms.filter(form => form.name.toLowerCase().includes(searchFilter.toLowerCase()));
+                        const searchTerm = searchFilter.toLowerCase();
+                        // Create a prioritized list: title matches first, then description matches
+                        const titleMatches = forms.filter(form => form.name.toLowerCase().includes(searchTerm));
+                        const descriptionMatches = forms.filter(form => 
+                            form.description && 
+                            form.description.toLowerCase().includes(searchTerm) && 
+                            !form.name.toLowerCase().includes(searchTerm) // Exclude already matched titles
+                        );
+                        // Combine with title matches first, then description matches
+                        forms = [...titleMatches, ...descriptionMatches];
                     }
                     if (zipFilter) {
                         forms = forms.filter(form => Array.isArray(form.zipCodes) && form.zipCodes.some(z => z.startsWith(zipFilter)));

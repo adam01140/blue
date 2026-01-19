@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FormWiz - Simplify Your Paperwork</title>
+    <title>FormWiz - Find the Right Form</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link href="../Pages/cart.css" rel="stylesheet">
     <!-- Firebase SDK -->
@@ -185,20 +185,343 @@
         footer {
             text-align: center;
             padding: 20px;
-            background-color: #2c3e50;
+            background-color: #374656;
             color: white;
         }
+        
+        /* Desktop Navigation Visibility */
+        .desktop-nav {
+            display: flex;
+        }
+        
+        /* Mobile hamburger menu styles */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .mobile-menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            transform-origin: 1px;
+        }
+        
+        .mobile-menu-toggle.active span:first-child {
+            transform: rotate(45deg);
+        }
+        
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .mobile-menu-toggle.active span:last-child {
+            transform: rotate(-45deg);
+        }
+        
+        /* Mobile navigation menu */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 85%;
+            max-width: 300px;
+            height: 100vh;
+            background: #2c3e50;
+            flex-direction: column;
+            gap: 0;
+            padding: 140px 20px 20px 20px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            transform: none;
+            margin: 0;
+        }
+        
+        .mobile-nav.active {
+            left: 0 !important;
+            display: flex;
+            transform: none !important;
+            position: fixed !important;
+        }
+        
+        .mobile-nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 0 12px 25px;
+            border-bottom: 1px solid #34495e;
+            font-size: 1.1em;
+            font-weight: 600;
+            line-height: 1.1;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            margin-top: 0;
+        }
+        
+        .mobile-nav-section {
+            border-bottom: 1px solid #34495e;
+        }
+        
+        .mobile-nav-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 0 12px 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .mobile-nav-submenu {
+            display: none;
+            padding-left: 20px;
+        }
+        
+        .mobile-nav-submenu.active {
+            display: block;
+        }
+        
+        .mobile-nav-submenu a {
+            padding: 10px 0 10px 45px;
+            font-size: 1em;
+            border-bottom: 1px solid #34495e;
+            line-height: 1.1;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .mobile-nav-logout,
+        .mobile-nav-logout a,
+        #mobile-logout-btn {
+            color: #ff7043 !important;
+            font-weight: 700 !important;
+        }
+        
+        .mobile-nav-toggle span {
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-nav-toggle.active span {
+            transform: rotate(180deg);
+        }
+        
+        /* Professional Footer Styles */
+        .pro-footer {
+            background: #2c3e50;
+            color: #f3f7f8;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 60px;
+            padding: 48px 10vw 20px 10vw;
+            border-top: 2px solid #2c3e50;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.18em;
+            margin-top: 0;
+        }
+        
+        .pro-footer-col {
+            flex: 1 1 320px;
+            min-width: 220px;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        
+        .address-col {
+            border-right: 1.5px solid #2c7a7d;
+            padding-right: 48px;
+            align-items: flex-start;
+        }
+        
+        .company-col {
+            align-items: flex-start;
+            padding-left: 48px;
+        }
+        
+        .pro-footer-title {
+            font-weight: 700;
+            font-size: 1.25em;
+            margin-bottom: 6px;
+            color: #fff;
+            letter-spacing: 0.02em;
+        }
+        
+        .company-title {
+            margin-top: 8px;
+            margin-bottom: 0;
+        }
+        
+        .pro-footer-contact a {
+            color: #b6e2e6;
+            text-decoration: underline;
+            font-weight: 500;
+            margin-right: 18px;
+            transition: color 0.2s;
+        }
+        
+        .pro-footer-contact a:hover {
+            color: #ff7043;
+        }
+        
+        .pro-footer-logo {
+            margin-bottom: 8px;
+        }
+        
+        .pro-footer-desc {
+            color: #e0e6ea;
+            font-size: 1em;
+            margin-top: 0;
+            line-height: 1.5;
+        }
+        
+        .pro-footer, footer {
+            flex-shrink: 0;
+        }
+        
         /* Media query for smaller screens */
         @media (max-width: 768px) {
+            /* Show mobile menu toggle */
+            .mobile-menu-toggle {
+                display: flex;
+            }
+            
+            /* Hide desktop nav */
+            .desktop-nav {
+                display: none !important;
+            }
+            
+            /* Show mobile nav structure */
+            .mobile-nav {
+                display: flex;
+            }
+            
+            /* Typography adjustments */
+            html {
+                font-size: 14px !important;
+            }
+            
+            body {
+                overflow-x: hidden;
+            }
+            
+            /* Header mobile optimization */
             header {
+                padding: 16px 15px;
+                min-height: 80px;
+                flex-wrap: wrap;
+                gap: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                position: relative;
+            }
+            
+            header img {
+                width: 119px;
+                height: 73px;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            .header-actions {
+                gap: 10px;
+                margin-left: auto;
+                margin-right: 15px;
+            }
+            
+            .sign-in-btn {
+                font-size: 0.9em;
+                padding: 6px 20px;
+                margin-left: 0;
+            }
+            
+            #logout-btn {
+                display: none !important;
+            }
+            
+            #cart-icon-link .cart-circle {
+                width: 55px !important;
+                height: 55px !important;
+            }
+            
+            #cart-icon {
+                width: 30px !important;
+                height: 30px !important;
+            }
+            
+            /* Footer mobile - match homepage */
+            .pro-footer-col.nav-col {
+                display: none !important;
+            }
+            .pro-footer {
+                gap: 20px !important;
+                padding: 30px 20px 15px 20px !important;
+                flex-direction: row !important;
+                align-items: flex-start !important;
+                text-align: left !important;
+            }
+            .pro-footer-col {
+                min-width: unset !important;
+                max-width: unset !important;
+                padding: 0 !important;
+                align-items: flex-start !important;
+                text-align: left !important;
+            }
+            .pro-footer-col.address-col {
+                padding-right: 0 !important;
+            }
+            .pro-footer-col.company-col {
+                padding-left: 20px !important;
+            }
+            .pro-footer-contact {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .pro-footer-contact a {
+                margin-right: 0 !important;
+            }
+            footer {
+                padding-bottom: 30px !important;
+            }
+            
+            .pro-footer-contact {
+                display: flex;
                 flex-direction: column;
-                padding: 10px;
+                gap: 8px;
             }
-            nav {
-                position: static;
-                transform: none;
-                margin-top: 10px;
+            
+            .pro-footer-contact a {
+                margin-right: 0;
             }
+            
+            footer {
+                padding: 15px;
+                padding-bottom: 30px !important;
+            }
+            
             .steps {
                 grid-template-columns: 1fr;
                 max-width: 100%;
@@ -1079,7 +1402,7 @@
             }
         }
         
-        /* AI Lawyer Assistant Styles */
+        /* Form Finder Styles */
         .ai-lawyer-container {
             background: #fff;
             border-radius: 20px;
@@ -1543,7 +1866,7 @@
             transform: translateY(0);
         }
         
-        /* Responsive Design for AI Assistant */
+        /* Responsive Design for Form Finder */
         @media (max-width: 768px) {
             main {
                 padding: 10px !important;
@@ -1749,8 +2072,15 @@
 </head>
 <body>
     <header>
+        <!-- Mobile hamburger menu button -->
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
         <img src="logo.png" alt="FormWiz Logo" width="130" height="80" onclick="location.href='../index.html';">
-        <nav>
+        <nav class="desktop-nav">
             <a href="../index.html">Home
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
@@ -1776,6 +2106,28 @@
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
         </nav>
+        
+        <!-- Mobile navigation menu -->
+        <nav class="mobile-nav" id="mobile-nav">
+            <a href="../index.html">Home</a>
+            <div class="mobile-nav-section">
+                <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
+                <div class="mobile-nav-submenu" id="mobile-forms-menu">
+                    <a href="../Pages/forms.html">My Forms</a>
+                    <a href="../Pages/FreeForm.html">Free Form</a>
+                    <a href="../Pages/Immigration.html">Immigration</a>
+                    <a href="../Pages/smallclaims.html">Small Claims</a>
+                    <a href="../Pages/Other.html">Other</a>
+                </div>
+            </div>
+            <a href="../Pages/about.html">About Us</a>
+            <a href="../Pages/contact.html">Contact Us</a>
+            <a href="../Pages/FAQ.html">FAQ</a>
+            <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
+                <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
+            </div>
+        </nav>
+        
         <div class="header-actions">
             <a href="../Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
             <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
@@ -1793,18 +2145,18 @@
     </header>
 
     <main style="flex:1;padding:20px;background:#f8fafc;">
-        <!-- AI Lawyer Assistant Section -->
+        <!-- Form Finder Section -->
         <div class="ai-lawyer-container">
             <div class="ai-lawyer-header">
                 <div class="ai-lawyer-avatar">
-                    <div class="avatar-icon">⚖️</div>
+                    <div class="avatar-icon">📋</div>
                 </div>
                 <div class="ai-lawyer-info">
-                    <h1>AI Form Assistant</h1>
-                    <p>Get instant legal guidance and answers to your questions</p>
+                    <h1>Form Finder</h1>
+                    <p>Find the right form for your situation</p>
                     <div class="ai-status">
                         <span class="status-dot"></span>
-                        <span class="status-text">Online</span>
+                        <span class="status-text">Ready</span>
                     </div>
                 </div>
             </div>
@@ -1812,19 +2164,18 @@
             <div class="chat-container">
                 <div class="chat-messages" id="chatMessages">
                     <div class="message ai-message">
-                        <div class="message-avatar">⚖️</div>
+                        <div class="message-avatar">📋</div>
                         <div class="message-content">
-                            <p>Hello! I'm your AI Form Assistant. I can help you with:</p>
+                            <p>Hello! I'm here to help you find the right form for your needs.</p>
+                            <p><strong>How it works:</strong> Simply describe your situation or what you're trying to accomplish, and I'll recommend the most appropriate form from our library. I can help you with:</p>
                             <ul>
-                                <li>General legal questions and guidance</li>
-                                <li>Understanding legal processes</li>
-                                <li>Assessing your situation and recommending appropriate forms</li>
-                                <li>Document preparation assistance</li>
-                                <li>Legal terminology explanations</li>
+                                <li>Finding forms based on your specific situation</li>
+                                <li>Understanding which form is right for your needs</li>
+                                <li>Getting started with the form process</li>
                             </ul>
-                            <p><strong>Form Assessment:</strong> I have access to various legal forms and can assess your situation to recommend the most appropriate form for your needs. Just describe your legal situation and I'll help you find the right form!</p>
-                            <p><strong>Important:</strong> I provide general information only and cannot replace professional legal advice. For specific legal matters, please consult with a qualified attorney.</p>
-                            <p>How can I help you today?</p>
+                            <p><strong>What to tell me:</strong> Describe what you need to do (e.g., "I need to sue someone for money," "I can't afford court fees," "Someone is suing me and I want to counter-sue"). I'll match you with the right form!</p>
+                            <p><strong>Important:</strong> This tool helps you find forms only. It does not provide legal advice. For legal questions, please consult with a qualified attorney.</p>
+                            <p>What form are you looking for today?</p>
                         </div>
                     </div>
                 </div>
@@ -1836,12 +2187,12 @@
                             <span></span>
                             <span></span>
                         </div>
-                        <span>AI is thinking...</span>
+                        <span>Finding the right form...</span>
                     </div>
                     <div class="input-wrapper">
                         <textarea 
                             id="messageInput" 
-                            placeholder="Ask me about your legal question..." 
+                            placeholder="Describe your situation to find the right form..." 
                             rows="1"
                             maxlength="2000"
                         ></textarea>
@@ -1853,27 +2204,42 @@
                     </div>
                     <div class="input-footer">
                         <span class="char-count" id="charCount">0/2000</span>
-                        <span class="disclaimer-text">AI responses are for informational purposes only</span>
+                        <span class="disclaimer-text">Form recommendations only - not legal advice</span>
                     </div>
                 </div>
             </div>
             
             <div class="quick-actions">
-                <h3>Quick Questions</h3>
+                <h3>Common Form Searches</h3>
                 <div class="quick-buttons">
                     <button class="quick-btn" data-question="I need to sue someone for money they owe me">Small Claims</button>
                     <button class="quick-btn" data-question="I can't afford to pay court filing fees">Fee Waiver</button>
                     <button class="quick-btn" data-question="Someone is suing me and I want to counter-sue">Counter Claim</button>
                     <button class="quick-btn" data-question="I have a legal issue related to COVID-19">COVID-19 Legal</button>
-                    <button class="quick-btn" data-question="What are my rights as a tenant?">Tenant Rights</button>
-                    <button class="quick-btn" data-question="How do I start a business?">Business Law</button>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- Professional Footer Section -->
+    <div class="pro-footer">
+        <div class="pro-footer-col address-col">
+            <div class="pro-footer-logo">
+                <img src="logo.png" alt="FormWiz Logo" style="max-width:120px;max-height:80px;">
+            </div>
+            <div class="pro-footer-title">FormWiz</div>
+            <div class="pro-footer-contact">
+                <a href="tel:18884108370">1-888-410-8370</a> &nbsp; 
+                <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
+            </div>
+        </div>
+        <div class="pro-footer-col company-col">
+            <div class="pro-footer-title company-title">About FormWiz</div>
+            <div class="pro-footer-desc">FormWiz consists of a group of proven professionals with over 70 years of combined technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify legal paperwork for everyone.</div>
+        </div>
+    </div>
     <footer>
-        &copy; 2024 Placeholder Company. All rights reserved.
+        &copy; 2024 FormWiz. All rights reserved.
     </footer>
 
     <!-- County Selection Modal -->
@@ -2178,7 +2544,7 @@
                 // Hide typing indicator
                 hideTypingIndicator();
 
-                // Check if the AI response mentions form recommendations
+                // Check if the response mentions form recommendations
                 // If so, add a form recommendation module
                 let finalResponse = response;
                 const matchingForms = availableForms.filter(form => {
@@ -2233,7 +2599,7 @@
                     }, 500);
                 }
 
-                // Add AI response
+                // Add response
                 addMessage('ai', finalResponse);
                 conversationHistory.push({ role: 'assistant', content: finalResponse });
 
@@ -2241,16 +2607,16 @@
                 hideTypingIndicator();
                 console.error('Error calling OpenAI API:', error);
                 
-                let errorMessage = 'I apologize, but I encountered an error. ';
+                let errorMessage = 'I apologize, but I encountered an error while trying to help you find a form. ';
                 
                 if (error.message.includes('429') || error.message.includes('quota')) {
-                    errorMessage += 'It looks like you\'ve exceeded your OpenAI API quota. Please check your billing details at https://platform.openai.com/account/billing or try again later.';
+                    errorMessage += 'The service is temporarily unavailable. Please try again in a few moments.';
                 } else if (error.message.includes('401') || error.message.includes('unauthorized')) {
-                    errorMessage += 'There seems to be an issue with your API key. Please check that it\'s correct and has the proper permissions.';
+                    errorMessage += 'There seems to be a connection issue. Please try again.';
                 } else if (error.message.includes('network') || error.message.includes('fetch')) {
                     errorMessage += 'There\'s a network connectivity issue. Please check your internet connection and try again.';
                 } else {
-                    errorMessage += 'Please check your API key and try again. If the problem persists, please contact support.';
+                    errorMessage += 'Please try again. If the problem persists, please contact support.';
                 }
                 
                 addMessage('ai', errorMessage);
@@ -2258,7 +2624,7 @@
                 // Offer fallback mode
                 if (error.message.includes('429') || error.message.includes('quota')) {
                     setTimeout(() => {
-                        addMessage('ai', 'Would you like me to provide some general legal information using my built-in knowledge base instead? Click "Yes" to continue with basic legal guidance.');
+                        addMessage('ai', 'I can still help you find forms using our form database. Would you like to continue?');
                         addFallbackOption();
                     }, 2000);
                 }
@@ -2290,7 +2656,7 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}-message`;
             
-            const avatar = sender === 'ai' ? '⚖️' : '👤';
+            const avatar = sender === 'ai' ? '📋' : '👤';
             
             messageDiv.innerHTML = `
                 <div class="message-avatar">${avatar}</div>
@@ -2301,8 +2667,8 @@
             
             chatMessages.appendChild(messageDiv);
             
-            // Only auto-scroll if this is a new user message or AI response
-            // Don't auto-scroll for the initial welcome message
+                // Only auto-scroll if this is a new user message or response
+                // Don't auto-scroll for the initial welcome message
             if (autoScroll) {
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
@@ -2378,10 +2744,10 @@
         function addFallbackOption() {
             const fallbackHtml = `
                 <div class="message ai-message">
-                    <div class="message-avatar">⚖️</div>
+                    <div class="message-avatar">📋</div>
                     <div class="message-content">
                         <button id="enableFallback" class="btn" style="margin: 10px 5px; padding: 8px 16px; font-size: 0.9em;">
-                            Yes, Use Basic Legal Guidance
+                            Yes, Continue
                         </button>
                         <button id="retryApi" class="btn" style="margin: 10px 5px; padding: 8px 16px; font-size: 0.9em; background: #95a5a6;">
                             Retry API
@@ -2397,12 +2763,12 @@
 
         function enableFallbackMode() {
             fallbackMode = true;
-            addMessage('ai', 'Great! I\'m now in basic guidance mode. I can provide general legal information and direct you to helpful resources. What legal topic would you like to know about?');
+            addMessage('ai', 'Great! I can still help you find the right form. What situation are you trying to handle?');
         }
 
         function retryApiCall() {
             fallbackMode = false;
-            addMessage('ai', 'Retrying API connection...');
+            addMessage('ai', 'Reconnecting...');
             // Remove the fallback buttons
             const fallbackButtons = document.querySelectorAll('#enableFallback, #retryApi');
             fallbackButtons.forEach(btn => btn.parentElement.parentElement.remove());
@@ -2442,166 +2808,40 @@
             
             // If we found matching forms, recommend them
             if (matchingForms.length > 0) {
-                let response = `It sounds like we have just what you need! Based on your situation, I recommend these forms:\n\n`;
+                let response = `Based on your situation, I found these forms that might help:\n\n`;
                 
                 matchingForms.forEach(form => {
                     response += `**${form.name}**\n`;
                     response += `${form.description}\n\n`;
                 });
                 
-                response += `These forms should help you with your specific situation. Make sure to read all instructions carefully and consider consulting with a qualified attorney if you have any questions.\n\n`;
-                response += `*This is general information only. Please consult with a qualified attorney for specific legal advice.*`;
+                response += `Click "Get Started" on any form above to begin. If you need legal advice, please consult with a qualified attorney.`;
                 
                 return response;
             }
             
-            // Fallback to general responses if no forms match
-            if (lowerMessage.includes('small claims') || lowerMessage.includes('small claim')) {
-                return `For small claims court cases, here's what you typically need:
+            // Fallback to simple form-focused responses if no forms match
+            if (lowerMessage.includes('small claims') || lowerMessage.includes('small claim') || lowerMessage.includes('sue')) {
+                return `I can help you find forms for small claims cases. Based on your situation, you might need:
 
-**Required Documents:**
-• Complaint form (filed with the court)
-• Proof of service (showing the defendant was notified)
-• Evidence supporting your claim (receipts, contracts, photos, etc.)
-• Any correspondence with the defendant
+**SC-100** - Plaintiff's Claim form (if you're suing someone)
+**SC-120** - Defendant's Claim form (if someone is suing you and you want to counter-sue)
 
-**Process:**
-1. File your complaint with the court
-2. Pay the filing fee (usually $25-100)
-3. Serve the defendant with court papers
-4. Attend the hearing with your evidence
-
-**Important:** Small claims limits vary by state (usually $3,000-$10,000). Check your local court's website for specific requirements.
-
-*This is general information only. Please consult with a qualified attorney for specific legal advice.*`;
+Describe your specific situation and I'll recommend the right form for you.`;
             }
             
-            if (lowerMessage.includes('divorce') || lowerMessage.includes('divorce process')) {
-                return `The divorce process typically involves these steps:
+            // Default response for general questions - focus on form finding
+            return `I'm here to help you find the right form for your needs. 
 
-**Initial Steps:**
-• Determine if you meet residency requirements
-• Decide on grounds for divorce (fault vs. no-fault)
-• Gather financial documents and asset information
+**Available Form Categories:**
+• Small Claims (SC-100, SC-120, SC-500)
+• Fee Waiver
+• And more...
 
-**Filing Process:**
-1. File a petition for divorce with the court
-2. Serve your spouse with divorce papers
-3. Wait for response period (usually 20-30 days)
-4. Negotiate settlement or proceed to trial
+**How to use this tool:**
+Simply describe what you're trying to accomplish (e.g., "I need to sue someone," "I can't afford court fees," "Someone is suing me"). I'll match you with the appropriate form.
 
-**Key Considerations:**
-• Child custody and support arrangements
-• Division of marital property and debts
-• Spousal support/alimony
-• Legal representation (recommended for complex cases)
-
-**Important:** Divorce laws vary significantly by state. Consider consulting with a family law attorney for guidance specific to your situation.
-
-*This is general information only. Please consult with a qualified attorney for specific legal advice.*`;
-            }
-            
-            if (lowerMessage.includes('probate') || lowerMessage.includes('will')) {
-                return `Probate is the legal process of distributing a deceased person's assets. Here's what you should know:
-
-**When Probate is Needed:**
-• Person dies with assets in their name only
-• No living trust or joint ownership
-• Assets exceed state's small estate limits
-
-**Probate Process:**
-1. File petition with probate court
-2. Notify heirs and creditors
-3. Inventory and appraise assets
-4. Pay debts and taxes
-5. Distribute remaining assets to beneficiaries
-
-**Avoiding Probate:**
-• Living trusts
-• Joint ownership with right of survivorship
-• Beneficiary designations on accounts
-• Transfer-on-death deeds
-
-**Important:** Probate laws vary by state and can be complex. Consider consulting with an estate planning attorney.
-
-*This is general information only. Please consult with a qualified attorney for specific legal advice.*`;
-            }
-            
-            if (lowerMessage.includes('tenant') || lowerMessage.includes('rent') || lowerMessage.includes('landlord')) {
-                return `As a tenant, you have important rights and responsibilities:
-
-**Tenant Rights:**
-• Right to habitable living conditions
-• Right to privacy (landlord must give notice before entering)
-• Right to security deposit return (if no damages)
-• Protection against illegal eviction
-
-**Landlord Responsibilities:**
-• Maintain safe and habitable premises
-• Make necessary repairs
-• Provide proper notice for entry
-• Follow legal eviction procedures
-
-**Common Issues:**
-• Security deposit disputes
-• Maintenance and repair problems
-• Lease violations
-• Eviction proceedings
-
-**Important:** Tenant-landlord laws vary by state and locality. Document everything and consider consulting with a housing attorney for serious disputes.
-
-*This is general information only. Please consult with a qualified attorney for specific legal advice.*`;
-            }
-            
-            if (lowerMessage.includes('business') || lowerMessage.includes('start a business')) {
-                return `Starting a business involves several legal considerations:
-
-**Business Structure Options:**
-• Sole Proprietorship (simplest, but unlimited personal liability)
-• Partnership (shared ownership and liability)
-• LLC (limited liability, flexible management)
-• Corporation (strongest liability protection, more complex)
-
-**Key Steps:**
-1. Choose business structure
-2. Register with state (if required)
-3. Obtain necessary licenses and permits
-4. Get federal tax ID (EIN)
-5. Open business bank account
-6. Consider insurance needs
-
-**Important Legal Areas:**
-• Contracts and agreements
-• Employment law (if hiring)
-• Tax obligations
-• Intellectual property protection
-
-**Important:** Business law is complex and varies by state. Consider consulting with a business attorney to ensure proper setup and compliance.
-
-*This is general information only. Please consult with a qualified attorney for specific legal advice.*`;
-            }
-            
-            // Default response for general questions
-            return `I can provide general information about various legal topics. Here are some areas I can help with:
-
-**Common Legal Topics:**
-• Small Claims Court procedures
-• Divorce and family law basics
-• Probate and estate planning
-• Tenant and landlord rights
-• Business formation and law
-• Contract basics
-• Employment law fundamentals
-
-**Important Reminders:**
-• This is general information only
-• Laws vary by state and locality
-• Every situation is unique
-• Always consult with a qualified attorney for specific legal advice
-
-What specific legal topic would you like to know more about?
-
-*This is general information only. Please consult with a qualified attorney for specific legal advice.*`;
+What situation are you trying to handle?`;
         }
 
         // Legacy functions for existing page functionality
@@ -3217,14 +3457,18 @@ What specific legal topic would you like to know more about?
             // Authentication state management
             const signInBtn = document.getElementById('sign-in-btn');
             const logoutBtn = document.getElementById('logout-btn');
+            const mobileAuthSection = document.getElementById('mobile-auth-section');
+            const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
             
             auth.onAuthStateChanged(function(user) {
                 if (user) {
                     if (signInBtn) signInBtn.style.display = 'none';
                     if (logoutBtn) logoutBtn.style.display = 'inline-block';
+                    if (mobileAuthSection) mobileAuthSection.style.display = 'block';
                 } else {
                     if (signInBtn) signInBtn.style.display = 'inline-block';
                     if (logoutBtn) logoutBtn.style.display = 'none';
+                    if (mobileAuthSection) mobileAuthSection.style.display = 'none';
                 }
             });
             
@@ -3239,6 +3483,97 @@ What specific legal topic would you like to know more about?
                     });
                 });
             }
+            
+            // Mobile logout functionality
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    auth.signOut().then(() => {
+                        window.location.href = '../index.html';
+                    }).catch((error) => {
+                        alert('Sign Out Error: ' + error.message);
+                    });
+                });
+            }
+            
+            // Mobile menu functionality
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileNav = document.getElementById('mobile-nav');
+            const mobileFormsToggle = document.getElementById('mobile-forms-toggle');
+            const mobileFormsMenu = document.getElementById('mobile-forms-menu');
+            const body = document.body;
+            
+            function toggleMobileMenu() {
+                if (mobileMenuToggle && mobileNav) {
+                    mobileMenuToggle.classList.toggle('active');
+                    mobileNav.classList.toggle('active');
+                    body.classList.toggle('menu-open');
+                }
+            }
+            
+            function closeMobileMenu() {
+                if (mobileMenuToggle && mobileNav) {
+                    mobileMenuToggle.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                    body.classList.remove('menu-open');
+                }
+            }
+            
+            // Toggle mobile menu
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleMobileMenu();
+                });
+            }
+            
+            // Toggle mobile forms submenu
+            if (mobileFormsToggle) {
+                mobileFormsToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    mobileFormsToggle.classList.toggle('active');
+                    if (mobileFormsMenu) {
+                        mobileFormsMenu.classList.toggle('active');
+                    }
+                });
+            }
+            
+            // Close mobile menu when clicking on links
+            if (mobileNav) {
+                mobileNav.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'A' && !e.target.classList.contains('mobile-nav-toggle')) {
+                        closeMobileMenu();
+                    }
+                });
+            }
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (mobileNav && !mobileNav.contains(e.target) && mobileMenuToggle && !mobileMenuToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
+            
+            // Close mobile menu on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && mobileNav && mobileNav.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+            });
+            
+            // Prevent body scroll when menu is open
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        if (body.classList.contains('menu-open')) {
+                            body.style.overflow = 'hidden';
+                        } else {
+                            body.style.overflow = '';
+                        }
+                    }
+                });
+            });
+            observer.observe(body, { attributes: true });
             
             // Cart functionality (matching forms.js exactly)
             const cartIconLink = document.getElementById('cart-icon-link');

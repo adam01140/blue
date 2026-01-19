@@ -133,3 +133,83 @@ If spacing looks wrong:
 3. Ensure display: block !important is used
 
 ================================================================================
+DESKTOP LOGOUT BUTTON IN HEADER
+================================================================================
+
+OVERVIEW:
+---------
+All pages should display a "Log Out" button in the header next to the cart icon 
+when a user is signed in (desktop mode only). This matches the behavior on the 
+AI form finder page (public/Bot/index.html).
+
+IMPLEMENTATION:
+---------------
+
+1. HTML STRUCTURE
+   Add the logout button in the header-actions section, after the sign-in button:
+   
+   <div class="header-actions">
+       <a href="Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
+       <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
+       <a href="#" id="cart-icon-link" ...>
+           <!-- cart icon -->
+       </a>
+   </div>
+
+2. JAVASCRIPT AUTH STATE MANAGEMENT
+   Update the auth.onAuthStateChanged handler to show/hide the logout button:
+   
+   const signInBtn = document.getElementById('sign-in-btn');
+   const logoutBtn = document.getElementById('logout-btn');
+   
+   auth.onAuthStateChanged(function(user) {
+       if (user) {
+           if (signInBtn) signInBtn.style.display = 'none';
+           if (logoutBtn) logoutBtn.style.display = 'inline-block';
+           // ... other logic
+       } else {
+           if (signInBtn) signInBtn.style.display = 'inline-block';
+           if (logoutBtn) logoutBtn.style.display = 'none';
+           // ... other logic
+       }
+   });
+
+3. LOGOUT FUNCTIONALITY
+   Add an event listener for the logout button:
+   
+   if (logoutBtn) {
+       logoutBtn.addEventListener('click', function(e) {
+           e.preventDefault();
+           auth.signOut().then(() => {
+               window.location.href = '../index.html';  // or 'index.html' for root pages
+           }).catch((error) => {
+               alert('Sign Out Error: ' + error.message);
+           });
+       });
+   }
+
+4. MOBILE CSS (Hide on Mobile)
+   Ensure the logout button is hidden on mobile devices:
+   
+   @media (max-width: 768px) {
+       #logout-btn {
+           display: none !important;
+       }
+   }
+
+FILES WITH LOGOUT BUTTON:
+-------------------------
+- public/index.html
+- public/Pages/forms.html
+- public/Pages/FreeForm.html
+- public/Pages/smallclaims.html
+- public/Bot/index.html (reference implementation)
+
+NOTES:
+------
+- The logout button uses the same styling as the sign-in button (.sign-in-btn class)
+- On mobile, users should use the logout option in the hamburger menu instead
+- The logout button redirects to index.html after signing out
+- Mobile logout buttons should also redirect to index.html (not reload the page)
+
+================================================================================

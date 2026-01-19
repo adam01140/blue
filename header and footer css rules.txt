@@ -551,32 +551,63 @@ nav a:hover {
         display: none !important;
     }
     
-    /* Footer mobile - reduce spacing */
+    /* Footer mobile - match homepage layout (two columns side-by-side) */
     .pro-footer {
-        gap: 20px;
-        padding: 30px 20px 15px 20px;
+        gap: 20px !important;
+        padding: 30px 20px 15px 20px !important;
+        flex-direction: row !important;  /* CRITICAL: Keep columns side-by-side, not stacked */
+        align-items: flex-start !important;
+        text-align: left !important;
     }
     
+    /* Reset column constraints for mobile */
+    .pro-footer-col {
+        min-width: unset !important;
+        max-width: unset !important;
+        padding: 0 !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+    }
+    
+    /* Address column - remove right padding and border */
     .pro-footer-col.address-col {
-        padding-right: 0;
+        padding-right: 0 !important;
+        border-right: 1.5px solid #2c7a7d !important;  /* Keep border between columns */
     }
     
+    /* Company column - add left padding for spacing */
     .pro-footer-col.company-col {
-        padding-left: 20px;
+        padding-left: 20px !important;
+        border-right: none !important;  /* Remove border on last column */
     }
     
+    /* Contact info - stack vertically */
     .pro-footer-contact {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
     }
     
+    /* Contact links - remove horizontal margin */
     .pro-footer-contact a {
-        margin-right: 0;
+        margin-right: 0 !important;
     }
     
+    /* Footer copyright - consistent padding */
     footer {
-        padding-bottom: 30px !important;
+        padding: 20px !important;
+        padding-bottom: 20px !important;
+        margin-bottom: 0 !important;
+    }
+    
+    /* Prevent white space below footer */
+    html, body {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    
+    .pro-footer, footer {
+        margin-bottom: 0 !important;
     }
 }
 ```
@@ -924,14 +955,16 @@ When implementing this header/footer system:
 12. ✅ Test responsive breakpoint at 768px width
 13. ✅ Verify hamburger menu animation (X formation when active)
 14. ✅ Ensure mobile nav slides from left with proper z-index
-15. ✅ Verify footer columns stack properly on mobile
+15. ✅ **Verify footer columns display side-by-side on mobile (NOT stacked) - use `flex-direction: row !important`**
 16. ✅ Test dropdown menu appears on hover/click (desktop)
 17. ✅ Verify body scroll is disabled when mobile menu is open
 18. ✅ Check that mobile menu closes when clicking outside or on link
-19. ✅ Ensure footer contact info stacks vertically on mobile
+19. ✅ Ensure footer contact info stacks vertically on mobile (phone above email)
 20. ✅ Verify navigation column is hidden on mobile footer
 21. ✅ **Check footer text size matches index.html on mobile (should be smaller due to 14px base font)**
 22. ✅ **Verify no white space appears below copyright notice on mobile**
+23. ✅ **Ensure `.pro-footer` uses `flex-direction: row !important` on mobile (not column)**
+24. ✅ **Verify address and company columns have proper spacing and borders on mobile**
 
 ---
 
@@ -945,6 +978,7 @@ When implementing this header/footer system:
 6. **Cart Functionality**: Cart icon and badge are included in HTML but require separate cart.js functionality
 7. **Authentication**: Sign-in button and mobile logout require separate auth functionality
 8. **Footer Content**: Update footer text content to match your site information
+9. **Mobile Footer Layout**: On mobile, the footer should display TWO columns side-by-side (address + company), NOT stacked vertically. Use `flex-direction: row !important` in the mobile media query. The navigation column is hidden with `display: none !important`.
 
 ---
 
@@ -1414,6 +1448,79 @@ if (mobileMenuToggle) {
 
 ---
 
+### Issue: Mobile Footer Columns Stack Vertically Instead of Side-by-Side
+
+**Symptom**: On mobile, the footer columns (address and company) stack vertically instead of displaying side-by-side like on the homepage.
+
+**Cause**: External CSS files or media queries are setting `flex-direction: column` on `.pro-footer` for mobile breakpoints, overriding the intended two-column layout.
+
+**Fix**: Explicitly set `flex-direction: row !important` in the mobile media query:
+
+```css
+@media (max-width: 768px) {
+    .pro-footer {
+        gap: 20px !important;
+        padding: 30px 20px 15px 20px !important;
+        flex-direction: row !important;  /* CRITICAL: Keep side-by-side layout */
+        align-items: flex-start !important;
+        text-align: left !important;
+    }
+    
+    .pro-footer-col {
+        min-width: unset !important;
+        max-width: unset !important;
+        padding: 0 !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+    }
+    
+    .pro-footer-col.address-col {
+        padding-right: 0 !important;
+        border-right: 1.5px solid #2c7a7d !important;
+    }
+    
+    .pro-footer-col.company-col {
+        padding-left: 20px !important;
+        border-right: none !important;
+    }
+}
+```
+
+**Why**: The `!important` flags ensure external CSS can't override the layout. The `flex-direction: row` keeps the two columns (address and company) side-by-side, matching the homepage design. The navigation column is hidden with `display: none !important`.
+
+---
+
+### Issue: White Space Appears Below Footer on Mobile
+
+**Symptom**: There's unwanted white space below the footer/copyright notice on mobile devices.
+
+**Cause**: Body or HTML elements have default margins/padding, or footer elements have extra spacing.
+
+**Fix**: Remove all bottom margins and padding:
+
+```css
+@media (max-width: 768px) {
+    html, body {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    
+    footer {
+        padding: 20px !important;
+        padding-bottom: 20px !important;
+        margin-bottom: 0 !important;
+    }
+    
+    .pro-footer, footer {
+        margin-bottom: 0 !important;
+    }
+}
+```
+
+**Why**: Explicitly setting `margin-bottom: 0` and `padding-bottom: 0` on both `html`/`body` and footer elements ensures no extra space appears below the footer.
+
+---
+
 ## QUICK REFERENCE: Mobile Menu Positioning Values
 
 **Correct Values** (as of latest implementation):
@@ -1432,6 +1539,397 @@ if (mobileMenuToggle) {
 - ❌ `margin-top: -20px` on `.mobile-nav a` (pulls items up, misaligns)
 - ❌ Missing `display: flex` on `.mobile-nav.active` (menu won't show)
 - ❌ Missing JavaScript to show/hide `#mobile-auth-section` (logout button won't appear)
+
+---
+
+## MOBILE-FRIENDLY HERO AND CONTENT SECTIONS
+
+### Overview
+This section documents how to make hero/banner sections and "Available Forms" sections mobile-friendly, ensuring proper margins, responsive layouts, and consistent styling across pages.
+
+---
+
+### HERO/BANNER SECTION MOBILE STYLES
+
+#### HTML Structure
+```html
+<main>
+    <!-- Hero/Banner Section -->
+    <section style="width:100%;background:#fff;border-radius:0 0 32px 32px;...">
+        <div style="display:flex;flex-direction:row;align-items:center;gap:48px;max-width:1100px;width:95vw;">
+            <div style="flex:1;min-width:260px;max-width:420px;">
+                <img src="..." alt="..." style="width:100%;max-width:340px;...">
+            </div>
+            <div style="flex:2;min-width:260px;">
+                <h1>Find the Right Form</h1>
+                <p>Easily search and discover forms that fit your needs...</p>
+            </div>
+        </div>
+    </section>
+</main>
+```
+
+#### Mobile CSS (within `@media (max-width: 768px)`)
+```css
+/* Banner/Hero section mobile - "Find the Right Form" */
+main > section:first-child {
+    margin: 0 20px 24px 20px !important;
+    padding: 25px 20px !important;
+    max-width: calc(100% - 40px) !important;
+    width: calc(100% - 40px) !important;  /* CRITICAL: Ensures equal margins */
+    box-sizing: border-box !important;     /* CRITICAL: Includes padding in width */
+    border-radius: 20px !important;
+}
+main > section:first-child > div {
+    flex-direction: column !important;     /* Stack vertically on mobile */
+    gap: 20px !important;
+    width: 100% !important;
+}
+main > section:first-child img {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;            /* Center image */
+}
+main > section:first-child h1 {
+    font-size: 1.8em !important;          /* Reduced from 2.6em */
+    text-align: center !important;
+    margin-bottom: 12px !important;
+}
+main > section:first-child p {
+    font-size: 1.1em !important;         /* Reduced from 1.35em */
+    text-align: center !important;
+    margin-bottom: 0 !important;
+}
+```
+
+#### Very Small Screens (within `@media (max-width: 480px)`)
+```css
+main > section:first-child {
+    margin: 0 15px 20px 15px !important;
+    padding: 20px 15px !important;
+    width: calc(100% - 30px) !important;   /* Tighter margins */
+}
+main > section:first-child h1 {
+    font-size: 1.5em !important;          /* Further reduced */
+}
+main > section:first-child p {
+    font-size: 1em !important;           /* Further reduced */
+}
+```
+
+#### Key Points:
+- **Equal Margins**: Use `width: calc(100% - 40px)` with `box-sizing: border-box` to ensure equal left/right margins
+- **Vertical Stacking**: Change `flex-direction: row` to `column` on mobile
+- **Centered Content**: Center text and images for better mobile readability
+- **Responsive Font Sizes**: Reduce font sizes appropriately (h1: 2.6em → 1.8em → 1.5em)
+
+---
+
+### AVAILABLE FORMS SECTION MOBILE STYLES
+
+#### HTML Structure
+```html
+<div class="main-forms-wrapper">
+    <div class="forms-card">
+        <h1>Available Forms</h1>
+        <div class="subtitle">Browse and add new forms to your portfolio...</div>
+        <input type="text" id="available-forms-search" placeholder="Search By Form Name">
+        <input type="text" id="available-forms-zip" placeholder="Search By ZIP Code">
+        <ul id="available-forms-list" class="forms-list">
+            <!-- Form cards dynamically inserted here -->
+        </ul>
+        <div class="forms-pagination">
+            <button id="forms-prev-btn" class="circle-arrow-btn">...</button>
+            <button id="forms-next-btn" class="circle-arrow-btn">...</button>
+        </div>
+    </div>
+</div>
+```
+
+#### Mobile CSS (within `@media (max-width: 768px)`)
+```css
+/* Main forms wrapper mobile - add side margins */
+.main-forms-wrapper {
+    margin: 8px auto 32px auto !important;
+    gap: 32px !important;
+    padding: 0 15px !important;           /* CRITICAL: Creates side margins */
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+/* Available Forms section mobile - match forms.html */
+.forms-card {
+    padding: 24px 20px 20px 20px !important;
+    margin: 0 auto !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+.forms-card h1 {
+    font-size: 1.6em !important;         /* Reduced from 2.2em */
+}
+.forms-card .subtitle {
+    font-size: 0.95em !important;         /* Reduced from 1.1em */
+    margin-bottom: 20px !important;
+}
+
+/* Forms list mobile - Available Forms 2x2 grid */
+#available-forms-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    column-gap: 40px !important;
+    row-gap: 32px !important;
+    gap: 32px 40px !important;
+    justify-items: center !important;
+    max-width: 500px !important;          /* Constrain width for better layout */
+    margin: 0 auto !important;            /* Center the grid */
+    padding: 0 20px !important;
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+}
+#available-forms-list li {
+    width: auto !important;
+    max-width: 200px !important;
+    min-width: 160px !important;
+    padding: 24px 18px 18px 18px !important;
+}
+
+/* Available forms search mobile - 80% width, centered */
+#available-forms-search {
+    width: 80% !important;                /* Reduced from 100% */
+    max-width: 320px !important;          /* 20% reduction from 400px */
+    padding: 14px !important;
+    font-size: 1em !important;
+    margin: 0 auto 12px auto !important;  /* Center horizontally */
+    display: block !important;
+}
+#available-forms-zip {
+    width: 80% !important;                /* Reduced from 100% */
+    max-width: 176px !important;          /* 20% reduction from 220px */
+    padding: 14px !important;
+    font-size: 1em !important;
+    margin: 0 auto 18px auto !important;  /* Center horizontally */
+    display: block !important;
+}
+
+/* Pagination mobile */
+.forms-pagination {
+    gap: 24px !important;
+    margin-top: 28px !important;
+}
+.circle-arrow-btn {
+    width: 44px !important;
+    height: 44px !important;
+}
+.circle-arrow-btn svg {
+    width: 24px !important;
+    height: 24px !important;
+}
+```
+
+#### Very Small Screens (within `@media (max-width: 480px)`)
+```css
+.forms-card h1 {
+    font-size: 1.4em !important;          /* Further reduced */
+}
+.forms-card .subtitle {
+    font-size: 0.9em !important;          /* Further reduced */
+}
+
+/* Available Forms small mobile - keep 2x2 grid */
+#available-forms-list {
+    column-gap: 32px !important;          /* Reduced gaps */
+    row-gap: 28px !important;
+    gap: 28px 32px !important;
+    padding: 0 15px !important;
+}
+#available-forms-list li {
+    max-width: 100% !important;
+    min-width: 140px !important;          /* Smaller minimum */
+    padding: 20px 14px 16px 14px !important;
+}
+```
+
+#### Key Points:
+- **Parent Container Margins**: Add `padding: 0 15px` to `.main-forms-wrapper` to create side margins for child elements
+- **Search Input Sizing**: Use `width: 80%` with `max-width` constraints and `margin: 0 auto` to center
+- **Grid Layout**: Use CSS Grid (`grid-template-columns: repeat(2, 1fr)`) for form cards on mobile
+- **Centered Grid**: Use `max-width: 500px` with `margin: 0 auto` to center the grid
+- **Consistent Spacing**: Match gap values (40px column, 32px row) with forms.html for consistency
+
+---
+
+### COMMON MOBILE LAYOUT PATTERNS
+
+#### Pattern 1: Equal Side Margins
+```css
+/* For sections that need equal left/right margins */
+.section {
+    margin: 0 20px !important;
+    width: calc(100% - 40px) !important;
+    box-sizing: border-box !important;
+}
+```
+
+#### Pattern 2: Parent Container Padding
+```css
+/* For wrapper containers that need to create margins for children */
+.wrapper {
+    padding: 0 15px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+```
+
+#### Pattern 3: Centered Input Fields
+```css
+/* For search inputs and form fields */
+input {
+    width: 80% !important;
+    max-width: 320px !important;         /* Adjust based on design */
+    margin: 0 auto !important;
+    display: block !important;
+}
+```
+
+#### Pattern 4: Responsive Grid
+```css
+/* For card grids on mobile */
+.grid-container {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 32px 40px !important;
+    max-width: 500px !important;
+    margin: 0 auto !important;
+    padding: 0 20px !important;
+}
+```
+
+---
+
+### TROUBLESHOOTING MOBILE LAYOUT ISSUES
+
+#### Issue: Section Touching Screen Edges
+
+**Symptom**: Hero section or content cards have no margin on one or both sides, touching the screen edges.
+
+**Causes**:
+1. Missing `width: calc(100% - 40px)` on the section
+2. Missing `box-sizing: border-box`
+3. Parent container doesn't have padding
+
+**Fix**:
+```css
+/* Option 1: Direct margin on section */
+section {
+    margin: 0 20px !important;
+    width: calc(100% - 40px) !important;
+    box-sizing: border-box !important;
+}
+
+/* Option 2: Padding on parent container */
+.wrapper {
+    padding: 0 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+```
+
+---
+
+#### Issue: Search Inputs Overflowing Container
+
+**Symptom**: Search input fields extend beyond the card edges or screen boundaries.
+
+**Causes**:
+1. `width: 100%` without max-width constraint
+2. Missing `box-sizing: border-box`
+3. Padding causing overflow
+
+**Fix**:
+```css
+input {
+    width: 80% !important;                /* Reduce from 100% */
+    max-width: 320px !important;         /* Add constraint */
+    padding: 14px !important;
+    box-sizing: border-box !important;    /* Include padding in width */
+    margin: 0 auto !important;           /* Center */
+    display: block !important;
+}
+```
+
+---
+
+#### Issue: Form Cards Not Centered or Properly Spaced
+
+**Symptom**: Form cards in grid layout are not centered, have inconsistent spacing, or overflow.
+
+**Causes**:
+1. Missing `max-width` constraint on grid container
+2. Missing `margin: 0 auto` for centering
+3. Incorrect gap values
+
+**Fix**:
+```css
+#available-forms-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    column-gap: 40px !important;
+    row-gap: 32px !important;
+    gap: 32px 40px !important;
+    max-width: 500px !important;          /* Constrain width */
+    margin: 0 auto !important;            /* Center */
+    padding: 0 20px !important;          /* Side padding */
+    justify-items: center !important;     /* Center items */
+}
+```
+
+---
+
+### IMPLEMENTATION CHECKLIST
+
+When making hero and content sections mobile-friendly:
+
+1. ✅ **Hero Section**:
+   - Add `width: calc(100% - 40px)` with `box-sizing: border-box`
+   - Change `flex-direction: row` to `column` on mobile
+   - Center text and images
+   - Reduce font sizes appropriately
+
+2. ✅ **Content Wrapper**:
+   - Add `padding: 0 15px` to parent container (`.main-forms-wrapper`)
+   - Ensure `box-sizing: border-box` is set
+
+3. ✅ **Forms Card**:
+   - Reduce padding on mobile (40px → 24px)
+   - Reduce font sizes (h1: 2.2em → 1.6em → 1.4em)
+   - Ensure `width: 100%` with `max-width: 100%`
+
+4. ✅ **Search Inputs**:
+   - Set `width: 80%` (not 100%)
+   - Add appropriate `max-width` constraint
+   - Center with `margin: 0 auto` and `display: block`
+
+5. ✅ **Form Cards Grid**:
+   - Use CSS Grid with `repeat(2, 1fr)`
+   - Set `max-width: 500px` and `margin: 0 auto` to center
+   - Add proper gaps (40px column, 32px row)
+   - Constrain card sizes (max-width: 200px, min-width: 160px)
+
+6. ✅ **Pagination**:
+   - Size buttons appropriately (44px x 44px)
+   - Set proper gap between buttons (24px)
+
+7. ✅ **Test on Multiple Breakpoints**:
+   - 768px (tablet/mobile)
+   - 480px (small mobile)
+   - Verify margins are equal on both sides
+   - Verify no horizontal scrolling
+
+---
+
+This documentation provides everything needed to make hero sections and Available Forms sections mobile-friendly with proper margins and responsive layouts.
 
 ---
 

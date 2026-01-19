@@ -1255,6 +1255,10 @@
                 margin-left: 0;
             }
             
+            #logout-btn {
+                display: none !important;
+            }
+            
             #cart-icon-link .cart-circle {
                 width: 55px !important;
                 height: 55px !important;
@@ -1666,6 +1670,7 @@
         
         <div class="header-actions">
             <a href="Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
+            <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
             <a href="#" id="cart-icon-link" style="display: inline-flex; align-items: center; text-decoration: none; position: relative;">
                 <span class="cart-circle">
                     <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1708,10 +1713,10 @@
                         Simplifying Forms <span class="hero-highlight-orange">For You</span>
                     </h1>
                     <p>Answer a few simple questions and we'll generate your completed forms instantly.</p></center><br>
-                    <a href="Pages/forms.html" class="btn hero-btn" id="get-started-btn" style="display: none;">Get Started
+                    <a href="Pages/forms.html" class="btn hero-btn" id="get-started-btn" style="display: none;">Go to My Forms
                         <div class="tiny-click-here"></div>
                     </a><br>
-                    <a href="Bot/index.html" class="btn hero-btn">How can we help?
+                    <a href="Bot/index.html" class="btn hero-btn">Find The Right Form For You
                         <div class="tiny-click-here"></div>
                     </a>
                     <div class="hero-services-row hero-services-row-gridfit">
@@ -1882,6 +1887,7 @@
             }
             const auth = firebase.auth();
             const signInButton = document.getElementById('sign-in-btn');
+            const logoutBtn = document.getElementById('logout-btn');
             const getStartedBtn = document.getElementById('get-started-btn');
             const mobileAuthSection = document.getElementById('mobile-auth-section');
             const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
@@ -1896,9 +1902,12 @@
                     // User is signed in.
                     console.log('User is signed in. Showing mobile logout button.');
                     
-                    // Hide sign-in button, show logout in hamburger menu
+                    // Hide sign-in button, show logout button
                     if (signInButton) {
                         signInButton.style.display = 'none';
+                    }
+                    if (logoutBtn) {
+                        logoutBtn.style.display = 'inline-block';
                     }
                     if (mobileAuthSection) {
                         mobileAuthSection.style.display = 'block';
@@ -1917,9 +1926,12 @@
                     // No user is signed in.
                     console.log('User is not signed in. Showing sign-in button.');
                     
-                    // Show sign-in button, hide mobile logout
+                    // Show sign-in button, hide logout button
                     if (signInButton) {
                         signInButton.style.display = 'inline-block';
+                    }
+                    if (logoutBtn) {
+                        logoutBtn.style.display = 'none';
                     }
                     if (mobileAuthSection) {
                         mobileAuthSection.style.display = 'none';
@@ -1937,12 +1949,24 @@
                 }
             });
 
+            // Logout functionality
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    auth.signOut().then(() => {
+                        window.location.href = 'index.html';
+                    }).catch((error) => {
+                        alert('Sign Out Error: ' + error.message);
+                    });
+                });
+            }
+
             // Handle mobile logout button click
             if (mobileLogoutBtn) {
                 mobileLogoutBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     auth.signOut().then(() => {
-                        window.location.reload();
+                        window.location.href = 'index.html';
                     }).catch((error) => {
                         console.error('Error signing out:', error);
                     });

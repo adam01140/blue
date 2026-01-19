@@ -294,11 +294,12 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Employment Info</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Employment Info</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Is your household monthly income less than the amount below?</h3></label><select id="is_your_household_monthly_income_less_than_the_amount_below" name="is_your_household_monthly_income_less_than_the_amount_below" data-question-id="1"
-                      onchange="dropdownMirror(this, 'is_your_household_monthly_income_less_than_the_amount_below'); updateHiddenLogic('is_your_household_monthly_income_less_than_the_amount_below', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1" data-question-type="numberedDropdown"><label><h3 class="question-text">How many people are you suing?</h3></label><select id="how_many_people_are_you_suing" name="how_many_people_are_you_suing" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_people_are_you_suing', this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer1"></div></div><div id="question-container-2" data-question-id="2" class="question-container question-item question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="2"
+                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_is_your_household_monthly_income_less_than_the_amount_below"></div>
-              <input type="text" id="is_your_household_monthly_income_less_than_the_amount_below_dropdown" name="is_your_household_monthly_income_less_than_the_amount_below_dropdown"
+              <div id="dropdowntext_hungry"></div>
+              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
                    readonly style="display:none;"></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
@@ -1473,14 +1474,14 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = '';
-var questionSlugMap = {"1":"is_your_household_monthly_income_less_than_the_amount_below"};
-var questionNameIds = {"1":"is_your_household_monthly_income_less_than_the_amount_below"};
+window.formId = 'SC-100';
+var questionSlugMap = {"1":"how_many_people_are_you_suing","2":"hungry"};
+var questionNameIds = {"1":"how_many_people_are_you_suing","2":"hungry"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {};
 var allAreRequiredMap = {};
-var unifiedFieldsMap = {};
+var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_people_are_you_suing_name","order":1,"prefill":""},{"type":"phone","label":"Phone","nodeId":"how_many_people_are_you_suing_phone","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"checkbox","label":"Military Status","nodeId":"","selectionType":"multiple","options":[{"text":"Check here if the defendant is on military duty","nodeId":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty","linkedFields":[{"nodeId":"how_many_people_are_you_suing_name","title":"how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name"}],"pdfEntries":[{"triggerNumber":"2","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"},{"triggerNumber":"3","pdfName":"MC-031 (Military)","pdfFile":"mc031-military.pdf","priceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E"}]}],"order":4},{"type":"dropdown","fieldName":"Are they a business or public entity?","options":[{"text":"Yes","nodeId":"are_they_a_business_or_public_entity_yes"},{"text":"No","nodeId":"are_they_a_business_or_public_entity_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"label","label":"Name","nodeId":"are_they_a_business_or_public_entity_yes_name"},{"type":"label","label":"Job Title","nodeId":"are_they_a_business_or_public_entity_yes_job_title"},{"type":"location","fieldName":"Work Address","nodeId":"location_data"},{"type":"dropdown","fieldName":"Are they a public entity?","options":[{"text":"Yes"},{"text":"No"}]},{"type":"dropdown","fieldName":"Have you filed a written claim against them?","options":[{"text":"Yes"},{"text":"No"}],"conditionalLogic":{"enabled":true,"conditions":["are_they_a_public_entity_yes"]}},{"type":"date","label":"When did you file the written claim?","nodeId":"are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim","conditionalLogic":{"enabled":true,"conditions":["have_you_filed_a_written_claim_against_them_yes"]}},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":5}]};
 var entryTitleMap = {};
 window.fileUploadQuestions = [];
 window.latexPreviewQuestions = [];
@@ -2403,10 +2404,13 @@ window.latexPreviewQuestions = [];
           }, 300);
         }
       } else if (triggerField.type === 'dropdown') {
+        console.log('[ALERT DEBUG] Processing dropdown trigger field:', triggerField.fieldName, 'Full triggerField object:', JSON.stringify(triggerField));
         const dropdownFieldDiv = document.createElement('div');
         // Check if conditional logic is enabled
         const hasConditionalLogic = triggerField.conditionalLogic && triggerField.conditionalLogic.enabled;
         const conditionalConditions = hasConditionalLogic && triggerField.conditionalLogic.conditions ? triggerField.conditionalLogic.conditions : [];
+        // Log alert data at field processing time
+        console.log('[ALERT DEBUG] Alert data in triggerField:', triggerField.alert);
         // Initially hide if conditional logic is enabled
         if (hasConditionalLogic) {
           dropdownFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1); display: none;';
@@ -2469,8 +2473,39 @@ window.latexPreviewQuestions = [];
         hiddenDropdownInput.name = select.id + '_dropdown';
         hiddenDropdownInput.style.display = 'none';
         dropdownWrapper.appendChild(hiddenDropdownInput);
+        // Capture alert data in local variable to avoid closure issues
+        const alertData = triggerField.alert ? {
+          enabled: triggerField.alert.enabled || false,
+          condition: (triggerField.alert.condition || '').trim(),
+          title: (triggerField.alert.title || '').trim()
+        } : null;
+        console.log('[ALERT DEBUG] Setting up alert for dropdown:', select.id, 'Alert data:', alertData);
         // Add change event listener to call dropdownMirror
         select.addEventListener('change', function() {
+          console.log('[ALERT DEBUG] Dropdown change event fired for:', this.id, 'Selected value:', this.value);
+          // Check for alert functionality if enabled
+          if (alertData && alertData.enabled && alertData.condition && alertData.title) {
+            console.log('[ALERT DEBUG] Alert is enabled. Checking condition...');
+            console.log('[ALERT DEBUG] - Selected value:', this.value, '(trimmed:', (this.value || '').trim() + ')');
+            console.log('[ALERT DEBUG] - Alert condition:', alertData.condition);
+            console.log('[ALERT DEBUG] - Alert title:', alertData.title);
+            const selectedValue = (this.value || '').trim();
+            const alertCondition = alertData.condition;
+            if (selectedValue === alertCondition) {
+              console.log('[ALERT DEBUG] ✅ Condition matched! Showing alert with title:', alertData.title);
+              alert(alertData.title);
+              console.log('[ALERT DEBUG] Alert should have been displayed');
+            } else {
+              console.log('[ALERT DEBUG] ❌ Condition did not match. Selected:', selectedValue, 'Expected:', alertCondition);
+            }
+          } else {
+            console.log('[ALERT DEBUG] Alert not enabled or missing data:', {
+              hasAlertData: !!alertData,
+              enabled: alertData ? alertData.enabled : 'N/A',
+              hasCondition: alertData ? !!alertData.condition : 'N/A',
+              hasTitle: alertData ? !!alertData.title : 'N/A'
+            });
+          }
           if (typeof dropdownMirror === 'function') {
             dropdownMirror(this, this.id);
           }
@@ -3287,17 +3322,17 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       let userId = null;
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [];
+    var jumpLogics = [{"questionId":"2","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"2","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":1}];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [];
+var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"1","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Are they a business or public entity?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"}];
 var checkboxPdfEntries = [];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"length":0};
-var amountMap = {"length":0};
-var labelNodeIdsMap = {};
+var labelMap = {"1":["Name"],"length":0};
+var amountMap = {"1":[],"length":0};
+var labelNodeIdsMap = {"1":["how_many_people_are_you_suing_name"]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -3575,11 +3610,11 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "";
-var pdfOutputFileName = "example.html";
-var stripePriceId = "";
+var pdfFileName = "SC-100";
+var pdfOutputFileName = "sc100.pdf";
+var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["example.html", ];
+var allPdfFileNames = ["sc100", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 

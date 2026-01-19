@@ -1419,6 +1419,7 @@
         
         <div class="header-actions">
             <a href="account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
+            <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
             <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
                 <span class="cart-circle">
                     <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1692,7 +1693,7 @@
                 mobileLogoutBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     auth.signOut().then(() => {
-                        window.location.reload();
+                        window.location.href = '../index.html';
                     }).catch((error) => {
                         alert('Sign Out Error: ' + error.message);
                     });

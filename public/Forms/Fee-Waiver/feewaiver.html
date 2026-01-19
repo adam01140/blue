@@ -733,19 +733,67 @@ document.addEventListener("DOMContentLoaded", function() {
               <div id="dropdowntext_does_your_income_change_a_lot_from_month_to_month"></div>
               <input type="text" id="does_your_income_change_a_lot_from_month_to_month_dropdown" name="does_your_income_change_a_lot_from_month_to_month_dropdown"
                    readonly style="display:none;"></div><div id="question-container-11" data-question-id="11" class="question-container question-item hidden question-step-hidden" data-section="5" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many sources of income do you have?</h3></label><select id="how_many_sources_of_income_do_you_have" name="how_many_sources_of_income_do_you_have" data-question-id="11" onchange="showTextboxLabels(11, this.value); updateHiddenCheckboxes(11, this.value); updateHiddenLogic('how_many_sources_of_income_do_you_have', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer11"></div></div><div id="question-container-12" data-question-id="12" class="question-container question-item hidden question-step-hidden" data-section="5" data-question-index="3"><label><h3 class="question-text">Does anybody else live in your home?</h3></label><select id="does_anybody_else_live_in_your_home" name="does_anybody_else_live_in_your_home" data-question-id="12"
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer11"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div><div id="question-container-12" data-question-id="12" class="question-container question-item hidden question-step-hidden" data-section="5" data-question-index="3"><label><h3 class="question-text">Does anybody else live in your home?</h3></label><select id="does_anybody_else_live_in_your_home" name="does_anybody_else_live_in_your_home" data-question-id="12"
                       onchange="dropdownMirror(this, 'does_anybody_else_live_in_your_home'); updateHiddenLogic('does_anybody_else_live_in_your_home', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_does_anybody_else_live_in_your_home"></div>
               <input type="text" id="does_anybody_else_live_in_your_home_dropdown" name="does_anybody_else_live_in_your_home_dropdown"
                    readonly style="display:none;"></div><div id="question-container-13" data-question-id="13" class="question-container question-item hidden question-step-hidden" data-section="5" data-question-index="4" data-question-type="numberedDropdown"><label><h3 class="question-text">How many other people live in your household?</h3></label><select id="how_many_other_people_live_in_your_household" name="how_many_other_people_live_in_your_household" data-question-id="13" onchange="showTextboxLabels(13, this.value); updateHiddenCheckboxes(13, this.value); updateHiddenLogic('how_many_other_people_live_in_your_household', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer13"></div></div><div id="question-container-14" data-question-id="14" class="question-container question-item hidden question-step-hidden" data-section="5" data-question-index="5"><label><h3 class="question-text">Does your income change a lot from month to month?</h3></label><select id="does_your_income_change_a_lot_from_month_to_month_dup2" name="does_your_income_change_a_lot_from_month_to_month_dup2" data-question-id="14"
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer13"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div><div id="question-container-14" data-question-id="14" class="question-container question-item hidden question-step-hidden" data-section="5" data-question-index="5"><label><h3 class="question-text">Does your income change a lot from month to month?</h3></label><select id="does_your_income_change_a_lot_from_month_to_month_dup2" name="does_your_income_change_a_lot_from_month_to_month_dup2" data-question-id="14"
                       onchange="dropdownMirror(this, 'does_your_income_change_a_lot_from_month_to_month_dup2'); updateHiddenLogic('does_your_income_change_a_lot_from_month_to_month_dup2', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_does_your_income_change_a_lot_from_month_to_month_dup2"></div>
               <input type="text" id="does_your_income_change_a_lot_from_month_to_month_dup2_dropdown" name="does_your_income_change_a_lot_from_month_to_month_dup2_dropdown"
                    readonly style="display:none;"></div><div id="question-container-15" data-question-id="15" class="question-container question-item hidden question-step-hidden" data-section="5" data-question-index="6" data-question-type="numberedDropdown"><label><h3 class="question-text">How many sources of income do you have?</h3></label><select id="how_many_sources_of_income_do_you_have_dup2" name="how_many_sources_of_income_do_you_have_dup2" data-question-id="15" onchange="showTextboxLabels(15, this.value); updateHiddenCheckboxes(15, this.value); updateHiddenLogic('how_many_sources_of_income_do_you_have_dup2', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer15"></div></div>
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer15"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
       <div class="question-nav" data-section-index="5">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="5">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="5">&rarr;</button>
@@ -756,7 +804,23 @@ document.addEventListener("DOMContentLoaded", function() {
               <div id="dropdowntext_do_you_have_anybody_else_living_in_your_home"></div>
               <input type="text" id="do_you_have_anybody_else_living_in_your_home_dropdown" name="do_you_have_anybody_else_living_in_your_home_dropdown"
                    readonly style="display:none;"></div><div id="question-container-17" data-question-id="17" class="question-container question-item hidden question-step-hidden" data-section="6" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many other people live in your household?</h3></label><select id="how_many_other_people_live_in_your_household_dup2" name="how_many_other_people_live_in_your_household_dup2" data-question-id="17" onchange="showTextboxLabels(17, this.value); updateHiddenCheckboxes(17, this.value); updateHiddenLogic('how_many_other_people_live_in_your_household_dup2', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer17"></div></div>
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer17"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
       <div class="question-nav" data-section-index="6">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="6">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="6">&rarr;</button>
@@ -772,7 +836,23 @@ document.addEventListener("DOMContentLoaded", function() {
               <div id="dropdowntext_do_you_have_a_bank_account"></div>
               <input type="text" id="do_you_have_a_bank_account_dropdown" name="do_you_have_a_bank_account_dropdown"
                    readonly style="display:none;"></div><div id="question-container-21" data-question-id="21" class="question-container question-item hidden question-step-hidden" data-section="7" data-question-index="4" data-question-type="numberedDropdown"><label><h3 class="question-text">How many bank accounts do you have?</h3></label><select id="how_many_bank_accounts_do_you_have" name="how_many_bank_accounts_do_you_have" data-question-id="21" onchange="showTextboxLabels(21, this.value); updateHiddenCheckboxes(21, this.value); updateHiddenLogic('how_many_bank_accounts_do_you_have', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer21"></div></div>
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer21"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
       <div class="question-nav" data-section-index="7">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="7">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="7">&rarr;</button>
@@ -783,7 +863,23 @@ document.addEventListener("DOMContentLoaded", function() {
               <div id="dropdowntext_do_you_own_any_cars_boats_and_other_vehicles"></div>
               <input type="text" id="do_you_own_any_cars_boats_and_other_vehicles_dropdown" name="do_you_own_any_cars_boats_and_other_vehicles_dropdown"
                    readonly style="display:none;"></div><div id="question-container-23" data-question-id="23" class="question-container question-item hidden question-step-hidden" data-section="8" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many vehicles do you own?</h3></label><select id="how_many_vehicles_do_you_own" name="how_many_vehicles_do_you_own" data-question-id="23" onchange="showTextboxLabels(23, this.value); updateHiddenCheckboxes(23, this.value); updateHiddenLogic('how_many_vehicles_do_you_own', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer23"></div></div>
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer23"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
       <div class="question-nav" data-section-index="8">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="8">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="8">&rarr;</button>
@@ -794,7 +890,23 @@ document.addEventListener("DOMContentLoaded", function() {
               <div id="dropdowntext_do_you_own_any_real_estate"></div>
               <input type="text" id="do_you_own_any_real_estate_dropdown" name="do_you_own_any_real_estate_dropdown"
                    readonly style="display:none;"></div><div id="question-container-25" data-question-id="25" class="question-container question-item hidden question-step-hidden" data-section="9" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many real estate properties do you have?</h3></label><select id="how_many_real_estate_properties_do_you_have" name="how_many_real_estate_properties_do_you_have" data-question-id="25" onchange="showTextboxLabels(25, this.value); updateHiddenCheckboxes(25, this.value); updateHiddenLogic('how_many_real_estate_properties_do_you_have', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option></select><br><div id="labelContainer25"></div></div>
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option></select><br><div id="labelContainer25"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
       <div class="question-nav" data-section-index="9">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="9">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="9">&rarr;</button>
@@ -805,7 +917,23 @@ document.addEventListener("DOMContentLoaded", function() {
               <div id="dropdowntext_do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect"></div>
               <input type="text" id="do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect_dropdown" name="do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect_dropdown"
                    readonly style="display:none;"></div><div id="question-container-27" data-question-id="27" class="question-container question-item hidden question-step-hidden" data-section="10" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many items</h3></label><select id="how_many_items" name="how_many_items" data-question-id="27" onchange="showTextboxLabels(27, this.value); updateHiddenCheckboxes(27, this.value); updateHiddenLogic('how_many_items', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option></select><br><div id="labelContainer27"></div></div>
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option></select><br><div id="labelContainer27"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
       <div class="question-nav" data-section-index="10">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="10">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="10">&rarr;</button>
@@ -816,7 +944,23 @@ document.addEventListener("DOMContentLoaded", function() {
               <div id="dropdowntext_do_you_have_any_payroll_deductions"></div>
               <input type="text" id="do_you_have_any_payroll_deductions_dropdown" name="do_you_have_any_payroll_deductions_dropdown"
                    readonly style="display:none;"></div><div id="question-container-29" data-question-id="29" class="question-container question-item hidden question-step-hidden" data-section="11" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many deductions?</h3></label><select id="how_many_deductions" name="how_many_deductions" data-question-id="29" onchange="showTextboxLabels(29, this.value); updateHiddenCheckboxes(29, this.value); updateHiddenLogic('how_many_deductions', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer29"></div></div>
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select><br><div id="labelContainer29"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
       <div class="question-nav" data-section-index="11">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="11">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="11">&rarr;</button>
@@ -969,16 +1113,32 @@ document.addEventListener("DOMContentLoaded", function() {
               <div id="dropdowntext_do_you_have_any_installment_payments"></div>
               <input type="text" id="do_you_have_any_installment_payments_dropdown" name="do_you_have_any_installment_payments_dropdown"
                    readonly style="display:none;"></div><div id="question-container-32" data-question-id="32" class="question-container question-item hidden question-step-hidden" data-section="13" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many installment payments do you have?</h3></label><select id="how_many_installment_payments_do_you_have" name="how_many_installment_payments_do_you_have" data-question-id="32" onchange="showTextboxLabels(32, this.value); updateHiddenCheckboxes(32, this.value); updateHiddenLogic('how_many_installment_payments_do_you_have', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer32"></div></div>
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer32"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
       <div class="question-nav" data-section-index="13">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="13">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="13">&rarr;</button>
       </div>
-    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section14" class="section"><center><h1 class="section-title">Wage Garnishments</h1><div id="question-container-33" data-question-id="33" class="question-container question-item" data-section="14" data-question-index="1"><label><h3 class="question-text">Do you have any wages/earnings withheld by the court:</h3></label><select id="do_you_have_any_wagesearnings_withheld_by_the_court" name="do_you_have_any_wagesearnings_withheld_by_the_court" data-question-id="33"
-                      onchange="dropdownMirror(this, 'do_you_have_any_wagesearnings_withheld_by_the_court'); updateHiddenLogic('do_you_have_any_wagesearnings_withheld_by_the_court', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+    <br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section14" class="section"><center><h1 class="section-title">Wage Garnishments</h1><div id="question-container-33" data-question-id="33" class="question-container question-item" data-section="14" data-question-index="1"><label><h3 class="question-text">Do you have any wages/earnings withheld by the court:</h3></label><select id="do_you_have_any_wages/earnings_withheld_by_the_court" name="do_you_have_any_wages/earnings_withheld_by_the_court" data-question-id="33"
+                      onchange="dropdownMirror(this, 'do_you_have_any_wages/earnings_withheld_by_the_court'); updateHiddenLogic('do_you_have_any_wages/earnings_withheld_by_the_court', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_do_you_have_any_wagesearnings_withheld_by_the_court"></div>
-              <input type="text" id="do_you_have_any_wagesearnings_withheld_by_the_court_dropdown" name="do_you_have_any_wagesearnings_withheld_by_the_court_dropdown"
+              <div id="dropdowntext_do_you_have_any_wages/earnings_withheld_by_the_court"></div>
+              <input type="text" id="do_you_have_any_wages/earnings_withheld_by_the_court_dropdown" name="do_you_have_any_wages/earnings_withheld_by_the_court_dropdown"
                    readonly style="display:none;"></div><div id="question-container-34" data-question-id="34" class="question-container question-item hidden question-step-hidden" data-section="14" data-question-index="2"><label><h3 class="question-text">How much is being withheld?</h3></label><div class="text-input-container"><input type="text" id="how_much_is_being_withheld" name="how_much_is_being_withheld" inputmode="decimal" placeholder="Enter amount" oninput="formatCurrencyInput(this)"></div><script>
           window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
             if (!input) return;
@@ -1006,7 +1166,23 @@ document.addEventListener("DOMContentLoaded", function() {
               <div id="dropdowntext_do_you_have_any_other_monthly_expenses"></div>
               <input type="text" id="do_you_have_any_other_monthly_expenses_dropdown" name="do_you_have_any_other_monthly_expenses_dropdown"
                    readonly style="display:none;"></div><div id="question-container-36" data-question-id="36" class="question-container question-item hidden question-step-hidden" data-section="15" data-question-index="2" data-question-type="numberedDropdown"><label><h3 class="question-text">How many other monthly expenses do you have?</h3></label><select id="how_many_other_monthly_expenses_do_you_have" name="how_many_other_monthly_expenses_do_you_have" data-question-id="36" onchange="showTextboxLabels(36, this.value); updateHiddenCheckboxes(36, this.value); updateHiddenLogic('how_many_other_monthly_expenses_do_you_have', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer36"></div></div>
+                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><br><div id="labelContainer36"></div><script>
+          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
+            if (!input) return;
+            // Remove all non-numeric characters except decimal point, including dollar sign
+            let val = (input.value || '').replace(/[^0-9.]/g, '');
+            if (!val) {
+              input.value = '';
+              return;
+            }
+            const parts = val.split('.');
+            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
+            // Add dollar sign prefix
+            input.value = '$' + parts[0] + decimal;
+          };
+        </script></div>
       <div class="question-nav" data-section-index="15">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="15">&larr;</button>
         <button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="15">&rarr;</button>
@@ -1519,10 +1695,26 @@ document.addEventListener("DOMContentLoaded", function() {
               // Allow advancing if: can advance within section, can advance across sections, OR we're on the last question and it's answered (to allow submit/end)
               const canAdvance = isAnswered && !!(canAdvanceWithinSection || canAdvanceAcrossSection || (isLastQuestion && isAnswered));
 
+              // CRITICAL FIX: Check for hard alerts before enabling the button
+              // Hard alerts should always prevent navigation, regardless of canAdvance state
+              const hasHardAlert = nextBtn.dataset.hardAlertActive === 'true';
+
               // Use removeAttribute/setAttribute to ensure the disabled state is properly applied
-              if (canAdvance) {
+              // Don't enable if there's an active hard alert
+              if (canAdvance && !hasHardAlert) {
+
                 nextBtn.removeAttribute('disabled');
+                // Make sure styling is cleared if not disabled by hard alert
+                if (nextBtn.dataset.hardAlertActive !== 'true') {
+                  nextBtn.style.opacity = '';
+                  nextBtn.style.cursor = '';
+                }
               } else {
+                if (hasHardAlert) {
+
+                } else {
+
+                }
                 nextBtn.setAttribute('disabled', 'disabled');
               }
 
@@ -1773,6 +1965,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
               return;
             }
+            
+            // Check alert logic for the current question before navigating
+            if (activeContainer && typeof checkAlertLogic === 'function') {
+              // Get the question ID from the active container
+              const questionId = activeContainer.getAttribute('data-question-id');
+              if (questionId) {
+                // Find the input/select element for this question
+                const questionInput = activeContainer.querySelector('input, select, textarea');
+                if (questionInput) {
+                  const alertShown = checkAlertLogic(questionInput);
+                  // If alert was shown, don't navigate - user must close alert first
+                  if (alertShown) {
+                    return; // Prevent navigation until alert is closed
+                  }
+                }
+              }
+            }
           }
           const nextPos = currentPos + direction;
 
@@ -1923,6 +2132,13 @@ document.addEventListener("DOMContentLoaded", function() {
         const visibleIndices = getVisibleIndices();
         const initialIndex = visibleIndices.length ? visibleIndices[0] : 0;
         activateIndex(initialIndex);
+        // Check hard alerts on initial page load
+        setTimeout(() => {
+
+          if (typeof checkAllHardAlertsAndUpdateNavigation === 'function') {
+            checkAllHardAlertsAndUpdateNavigation();
+          }
+        }, 500);
       });
       // --- Fallback visibility enforcement for Q3 based on JSON logic (Q1 yes OR any text in Q2) ---
       (function attachQ3FallbackLogic(){
@@ -1970,57 +2186,41 @@ document.addEventListener("DOMContentLoaded", function() {
       // CRITICAL FIX: Use a flag to prevent double-firing and add extensive logging
       let capsLockHandlerExecuting = false;
       document.addEventListener('keydown', function(e) {
-        console.log('[CAPSLOCK DEBUG] keydown event:', {
-          code: e.code,
-          key: e.key,
-          ctrlKey: e.ctrlKey,
-          metaKey: e.metaKey,
-          target: e.target ? e.target.tagName + (e.target.id ? '#' + e.target.id : '') : 'null',
-          handlerExecuting: capsLockHandlerExecuting
-        });
-        
+
         // Use e.code for more reliable CapsLock detection (works even when CapsLock is toggled)
         const isCapsLock = (e.code === 'CapsLock' || e.key === 'CapsLock');
         const hasModifier = (e.ctrlKey || e.metaKey);
-        
+
         if (isCapsLock && hasModifier) {
-          console.log('[CAPSLOCK DEBUG] CapsLock + modifier detected');
-          
+
           // Prevent double-firing: if handler is already executing, skip
           if (capsLockHandlerExecuting) {
-            console.log('[CAPSLOCK DEBUG] Handler already executing, skipping');
+
             return;
           }
-          
+
           e.preventDefault();
           e.stopPropagation();
-          
-          console.log('[CAPSLOCK DEBUG] Finding active section and previous button');
+
           const activeSection = document.querySelector('.section.active');
-          console.log('[CAPSLOCK DEBUG] Active section:', activeSection ? activeSection.id : 'null');
-          
+
           const prevBtn = activeSection ? activeSection.querySelector('.question-prev') : null;
-          console.log('[CAPSLOCK DEBUG] Previous button:', prevBtn ? 'FOUND' : 'NOT FOUND', prevBtn ? {
-            id: prevBtn.id,
-            disabled: prevBtn.disabled,
-            className: prevBtn.className
-          } : {});
 
           if (prevBtn && !prevBtn.disabled) {
-            console.log('[CAPSLOCK DEBUG] Clicking previous button');
+
             // Set flag to prevent double-firing
             capsLockHandlerExecuting = true;
-            
+
             // Reset flag after a short delay to allow the click to process
             setTimeout(() => {
               capsLockHandlerExecuting = false;
-              console.log('[CAPSLOCK DEBUG] Handler flag reset');
+
             }, 100);
-            
+
             prevBtn.click();
-            console.log('[CAPSLOCK DEBUG] Previous button clicked');
+
           } else {
-            console.log('[CAPSLOCK DEBUG] Previous button not available or disabled');
+
           }
         }
       });
@@ -2188,12 +2388,12 @@ document.addEventListener("DOMContentLoaded", function() {
 <script>
 window.formId = 'Fee Waiver';
 var questionSlugMap = {"1":"are_you_currently_employed","2":"please_enter_your_work_info","3":"do_you_have_a_lawyer","4":"please_enter_lawyer_info","5":"has_your_lawyer_agreed_to_cover_a_portion_of_your_fees","6":"have_you_filed_a_claim_before","7":"do_you_receive_any_of_the_following","8":"is_your_household_monthly_income_less_than_the_amount_below","9":"what_would_you_like_the_court_to_do","10":"does_your_income_change_a_lot_from_month_to_month","11":"how_many_sources_of_income_do_you_have","12":"does_anybody_else_live_in_your_home","13":"how_many_other_people_live_in_your_household","14":"does_your_income_change_a_lot_from_month_to_month","15":"how_many_sources_of_income_do_you_have","16":"do_you_have_anybody_else_living_in_your_home","17":"how_many_other_people_live_in_your_household","18":"do_you_have_any_cash_savings","19":"how_much_cash_saving_do_you_have","20":"do_you_have_a_bank_account","21":"how_many_bank_accounts_do_you_have","22":"do_you_own_any_cars_boats_and_other_vehicles","23":"how_many_vehicles_do_you_own","24":"do_you_own_any_real_estate","25":"how_many_real_estate_properties_do_you_have","26":"do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect","27":"how_many_items","28":"do_you_have_any_payroll_deductions","29":"how_many_deductions","30":"mark_all_that_apply","31":"do_you_have_any_installment_payments","32":"how_many_installment_payments_do_you_have","33":"do_you_have_any_wages_earnings_withheld_by_the_court","34":"how_much_is_being_withheld","35":"do_you_have_any_other_monthly_expenses","36":"how_many_other_monthly_expenses_do_you_have"};
-var questionNameIds = {"1":"are_you_currently_employed","2":"please_enter_your_work_info","3":"do_you_have_a_lawyer","4":"please_enter_lawyer_info","5":"has_your_lawyer_agreed_to_cover_a_portion_of_your_fees","6":"have_you_filed_a_claim_before","7":"do_you_receive_any_of_the_following","8":"is_your_household_monthly_income_less_than_the_amount_below","9":"what_would_you_like_the_court_to_do","10":"does_your_income_change_a_lot_from_month_to_month","11":"how_many_sources_of_income_do_you_have","12":"does_anybody_else_live_in_your_home","13":"how_many_other_people_live_in_your_household","14":"does_your_income_change_a_lot_from_month_to_month_dup2","15":"how_many_sources_of_income_do_you_have_dup2","16":"do_you_have_anybody_else_living_in_your_home","17":"how_many_other_people_live_in_your_household_dup2","18":"do_you_have_any_cash_savings","19":"how_much_cash_saving_do_you_have","20":"do_you_have_a_bank_account","21":"how_many_bank_accounts_do_you_have","22":"do_you_own_any_cars_boats_and_other_vehicles","23":"how_many_vehicles_do_you_own","24":"do_you_own_any_real_estate","25":"how_many_real_estate_properties_do_you_have","26":"do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect","27":"how_many_items","28":"do_you_have_any_payroll_deductions","29":"how_many_deductions","30":"mark_all_that_apply","31":"do_you_have_any_installment_payments","32":"how_many_installment_payments_do_you_have","33":"do_you_have_any_wagesearnings_withheld_by_the_court","34":"how_much_is_being_withheld","35":"do_you_have_any_other_monthly_expenses","36":"how_many_other_monthly_expenses_do_you_have"};
+var questionNameIds = {"1":"are_you_currently_employed","2":"please_enter_your_work_info","3":"do_you_have_a_lawyer","4":"please_enter_lawyer_info","5":"has_your_lawyer_agreed_to_cover_a_portion_of_your_fees","6":"have_you_filed_a_claim_before","7":"do_you_receive_any_of_the_following","8":"is_your_household_monthly_income_less_than_the_amount_below","9":"what_would_you_like_the_court_to_do","10":"does_your_income_change_a_lot_from_month_to_month","11":"how_many_sources_of_income_do_you_have","12":"does_anybody_else_live_in_your_home","13":"how_many_other_people_live_in_your_household","14":"does_your_income_change_a_lot_from_month_to_month_dup2","15":"how_many_sources_of_income_do_you_have_dup2","16":"do_you_have_anybody_else_living_in_your_home","17":"how_many_other_people_live_in_your_household_dup2","18":"do_you_have_any_cash_savings","19":"how_much_cash_saving_do_you_have","20":"do_you_have_a_bank_account","21":"how_many_bank_accounts_do_you_have","22":"do_you_own_any_cars_boats_and_other_vehicles","23":"how_many_vehicles_do_you_own","24":"do_you_own_any_real_estate","25":"how_many_real_estate_properties_do_you_have","26":"do_you_own_any_other_personal_property_jewelry_furniture_furs_bonds_ect","27":"how_many_items","28":"do_you_have_any_payroll_deductions","29":"how_many_deductions","30":"mark_all_that_apply","31":"do_you_have_any_installment_payments","32":"how_many_installment_payments_do_you_have","33":"do_you_have_any_wages/earnings_withheld_by_the_court","34":"how_much_is_being_withheld","35":"do_you_have_any_other_monthly_expenses","36":"how_many_other_monthly_expenses_do_you_have"};
 var linkedCheckboxes = [{"linkedCheckboxId":"5a","checkboxes":["do_you_receive_any_of_the_following_unemployment","do_you_receive_any_of_the_following_food_stamps","do_you_receive_any_of_the_following_supp_sec_inc","do_you_receive_any_of_the_following_ssp","do_you_receive_any_of_the_following_county_reliefgen_assist","do_you_receive_any_of_the_following_medical","do_you_receive_any_of_the_following_calworks_or_tribal_tanf","do_you_receive_any_of_the_following_ihss","do_you_receive_any_of_the_following_capi","do_you_receive_any_of_the_following_wic"]},{"linkedCheckboxId":"income_changes_month_to_month","checkboxes":["does_your_income_change_a_lot_from_month_to_month_dup2_yes","does_your_income_change_a_lot_from_month_to_month_yes"]}];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {"7":true,"30":true};
 var allAreRequiredMap = {"7":false,"30":false};
-var unifiedFieldsMap = {"2":[{"type":"label","label":"Job Title","nodeId":"please_enter_your_work_info_job_title","order":1,"prefill":""},{"type":"label","label":"Employer Name","nodeId":"please_enter_your_work_info_employer_name","order":2,"prefill":""},{"type":"location","fieldName":"Please enter your work address","nodeId":"location_data","order":3}],"4":[{"type":"label","label":"Laywer Name","nodeId":"please_enter_lawyer_info_laywer_name","order":1,"prefill":""},{"type":"label","label":"Lawyer Firm","nodeId":"please_enter_lawyer_info_lawyer_firm","order":2,"prefill":""},{"type":"phone","label":"Lawyer Phone Number","nodeId":"please_enter_lawyer_info_lawyer_phone_number","order":3},{"type":"amount","label":"State Bar Number","nodeId":"please_enter_lawyer_info_state_bar_number","order":4},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":5}],"11":[{"type":"label","label":"Income Source","nodeId":"how_many_sources_of_income_do_you_have_income_source","order":1,"prefill":""},{"type":"amount","label":"Income Value","nodeId":"how_many_sources_of_income_do_you_have_income_value","order":2}],"13":[{"type":"label","label":"Name","nodeId":"how_many_other_people_live_in_your_household_name","order":1,"prefill":""},{"type":"amount","label":"Age","nodeId":"how_many_other_people_live_in_your_household_age","order":2},{"type":"label","label":"Relationship","nodeId":"how_many_other_people_live_in_your_household_relationship","order":3,"prefill":""},{"type":"amount","label":"Monthly Income","nodeId":"how_many_other_people_live_in_your_household_monthly_income","order":4}],"15":[{"type":"label","label":"Income Source","nodeId":"how_many_sources_of_income_do_you_have_dup2_income_source","order":1,"prefill":""},{"type":"amount","label":"Income Value","nodeId":"how_many_sources_of_income_do_you_have_dup2_income_value","order":2}],"17":[{"type":"label","label":"Name","nodeId":"how_many_other_people_live_in_your_household_dup2_name","order":1,"prefill":""},{"type":"amount","label":"Age","nodeId":"how_many_other_people_live_in_your_household_dup2_age","order":2},{"type":"label","label":"Relationship","nodeId":"how_many_other_people_live_in_your_household_dup2_relationship","order":3,"prefill":""},{"type":"amount","label":"Monthly Income","nodeId":"how_many_other_people_live_in_your_household_dup2_monthly_income","order":4}],"21":[{"type":"label","label":"Bank Name","nodeId":"how_many_bank_accounts_do_you_have_bank_name","order":1,"prefill":""},{"type":"amount","label":"Amount","nodeId":"how_many_bank_accounts_do_you_have_amount","order":2}],"23":[{"type":"label","label":"Make/Year","nodeId":"how_many_vehicles_do_you_own_make/year","order":1,"prefill":""},{"type":"amount","label":"Fair Market Value","nodeId":"how_many_vehicles_do_you_own_fair_market_value","order":2},{"type":"amount","label":"Amount Owed","nodeId":"how_many_vehicles_do_you_own_amount_owed","order":3}],"25":[{"type":"label","label":"Address","nodeId":"how_many_real_estate_properties_do_you_have_address","order":1,"prefill":""},{"type":"amount","label":"Fair Market Value","nodeId":"how_many_real_estate_properties_do_you_have_fair_market_value","order":2},{"type":"amount","label":"Amount Owed","nodeId":"how_many_real_estate_properties_do_you_have_amount_owed","order":3}],"27":[{"type":"label","label":"Description","nodeId":"how_many_items_description","order":1,"prefill":""},{"type":"amount","label":"Fair Market Value","nodeId":"how_many_items_fair_market_value","order":2},{"type":"amount","label":"Amount Owed","nodeId":"how_many_items_amount_owed","order":3}],"29":[{"type":"label","label":"Description","nodeId":"how_many_deductions_description","order":1,"prefill":""},{"type":"amount","label":"Fair Market Value","nodeId":"how_many_deductions_fair_market_value","order":2}],"32":[{"type":"label","label":"Description","nodeId":"how_many_installment_payments_do_you_have_description","order":1,"prefill":""},{"type":"amount","label":"Amount","nodeId":"how_many_installment_payments_do_you_have_amount","order":2}],"36":[{"type":"label","label":"Description","nodeId":"how_many_other_monthly_expenses_do_you_have_description","order":1,"prefill":""},{"type":"amount","label":"Amount","nodeId":"how_many_other_monthly_expenses_do_you_have_amount","order":2}]};
+var unifiedFieldsMap = {"2":[{"type":"label","label":"Job Title","nodeId":"please_enter_your_work_info_job_title","order":1,"prefill":""},{"type":"label","label":"Employer Name","nodeId":"please_enter_your_work_info_employer_name","order":2,"prefill":""},{"type":"location","fieldName":"Please enter your work address","nodeId":"location_data","order":3}],"4":[{"type":"label","label":"Laywer Name","nodeId":"please_enter_lawyer_info_laywer_name","order":1,"prefill":""},{"type":"label","label":"Lawyer Firm","nodeId":"please_enter_lawyer_info_lawyer_firm","order":2,"prefill":""},{"type":"phone","label":"Lawyer Phone Number","nodeId":"please_enter_lawyer_info_lawyer_phone_number","order":3},{"type":"amount","label":"State Bar Number","nodeId":"please_enter_lawyer_info_state_bar_number","order":4},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":5}],"11":[{"type":"label","label":"Income Source","nodeId":"how_many_sources_of_income_do_you_have_income_source","order":1,"prefill":""},{"type":"currency","label":"Income Value","nodeId":"how_many_sources_of_income_do_you_have_income_value","order":2}],"13":[{"type":"label","label":"Name","nodeId":"how_many_other_people_live_in_your_household_name","order":1,"prefill":""},{"type":"amount","label":"Age","nodeId":"how_many_other_people_live_in_your_household_age","order":2},{"type":"label","label":"Relationship","nodeId":"how_many_other_people_live_in_your_household_relationship","order":3,"prefill":""},{"type":"currency","label":"Monthly Income","nodeId":"how_many_other_people_live_in_your_household_monthly_income","order":4}],"15":[{"type":"label","label":"Income Source","nodeId":"how_many_sources_of_income_do_you_have_dup2_income_source","order":1,"prefill":""},{"type":"currency","label":"Income Value","nodeId":"how_many_sources_of_income_do_you_have_dup2_income_value","order":2}],"17":[{"type":"label","label":"Name","nodeId":"how_many_other_people_live_in_your_household_dup2_name","order":1,"prefill":""},{"type":"amount","label":"Age","nodeId":"how_many_other_people_live_in_your_household_dup2_age","order":2},{"type":"label","label":"Relationship","nodeId":"how_many_other_people_live_in_your_household_dup2_relationship","order":3,"prefill":""},{"type":"currency","label":"Monthly Income","nodeId":"how_many_other_people_live_in_your_household_dup2_monthly_income","order":4}],"21":[{"type":"label","label":"Bank Name","nodeId":"how_many_bank_accounts_do_you_have_bank_name","order":1,"prefill":""},{"type":"currency","label":"Amount","nodeId":"how_many_bank_accounts_do_you_have_amount","order":2}],"23":[{"type":"label","label":"Make/Year","nodeId":"how_many_vehicles_do_you_own_make/year","order":1,"prefill":""},{"type":"currency","label":"Fair Market Value","nodeId":"how_many_vehicles_do_you_own_fair_market_value","order":2},{"type":"currency","label":"Amount Owed","nodeId":"how_many_vehicles_do_you_own_amount_owed","order":3}],"25":[{"type":"label","label":"Address","nodeId":"how_many_real_estate_properties_do_you_have_address","order":1,"prefill":""},{"type":"currency","label":"Fair Market Value","nodeId":"how_many_real_estate_properties_do_you_have_fair_market_value","order":2},{"type":"currency","label":"Amount Owed","nodeId":"how_many_real_estate_properties_do_you_have_amount_owed","order":3}],"27":[{"type":"label","label":"Description","nodeId":"how_many_items_description","order":1,"prefill":""},{"type":"currency","label":"Fair Market Value","nodeId":"how_many_items_fair_market_value","order":2},{"type":"currency","label":"Amount Owed","nodeId":"how_many_items_amount_owed","order":3}],"29":[{"type":"label","label":"Description","nodeId":"how_many_deductions_description","order":1,"prefill":""},{"type":"currency","label":"Fair Market Value","nodeId":"how_many_deductions_fair_market_value","order":2}],"32":[{"type":"label","label":"Description","nodeId":"how_many_installment_payments_do_you_have_description","order":1,"prefill":""},{"type":"currency","label":"Amount","nodeId":"how_many_installment_payments_do_you_have_amount","order":2}],"36":[{"type":"label","label":"Description","nodeId":"how_many_other_monthly_expenses_do_you_have_description","order":1,"prefill":""},{"type":"currency","label":"Amount","nodeId":"how_many_other_monthly_expenses_do_you_have_amount","order":2}]};
 var entryTitleMap = {};
 window.fileUploadQuestions = [];
 window.latexPreviewQuestions = [];
@@ -2733,7 +2933,80 @@ window.latexPreviewQuestions = [];
     // Sanitize dropdown name and trigger condition for multipleTextboxes ID format
     const sanitizedDropdownName = sanitizeForId(dropdownFieldName);
     const sanitizedTriggerCondition = triggerCondition ? sanitizeForId(triggerCondition) : '';
+    // Helper function to enrich triggerField with data from unifiedFieldsMap
+    function enrichTriggerFieldWithUnifiedData(triggerField, fieldIndex) {
+
+      // Try to find the complete field data from unifiedFieldsMap
+      if (window.unifiedFieldsMap && window.unifiedFieldsMap[questionId]) {
+        const allFields = window.unifiedFieldsMap[questionId];
+
+        // Find the parent dropdown field that contains trigger sequences
+        const parentDropdownField = allFields.find(f => 
+          f.type === 'dropdown' && 
+          f.triggerSequences && 
+          Array.isArray(f.triggerSequences) &&
+          f.triggerSequences.length > sequenceIndex
+        );
+        if (parentDropdownField) {
+
+          const sequence = parentDropdownField.triggerSequences[sequenceIndex];
+          if (sequence && sequence.fields && Array.isArray(sequence.fields)) {
+
+            // Find the matching field by fieldName/label and type, or by index as fallback
+            let matchingField = sequence.fields.find(f => 
+              f.type === triggerField.type &&
+              ((f.fieldName && triggerField.fieldName && f.fieldName === triggerField.fieldName) ||
+               (f.label && triggerField.label && f.label === triggerField.label))
+            );
+            // Fallback: try to match by index if name matching failed
+            if (!matchingField && fieldIndex < sequence.fields.length) {
+              const fieldByIndex = sequence.fields[fieldIndex];
+              if (fieldByIndex && fieldByIndex.type === triggerField.type) {
+                matchingField = fieldByIndex;
+
+              }
+            }
+            if (matchingField) {
+
+              if (matchingField.alert) {
+
+              }
+              // Merge alert data and other properties from unifiedFieldsMap
+              if (matchingField.alert) {
+                triggerField.alert = matchingField.alert;
+
+              } else {
+
+              }
+              // Merge hardAlert data if present
+              if (matchingField.hardAlert) {
+                triggerField.hardAlert = matchingField.hardAlert;
+
+              }
+              // Also merge conditionalLogic if it's missing
+              if (matchingField.conditionalLogic && !triggerField.conditionalLogic) {
+                triggerField.conditionalLogic = matchingField.conditionalLogic;
+              }
+            } else {
+
+            }
+          } else {
+
+          }
+        } else {
+
+        }
+      } else {
+
+        if (window.unifiedFieldsMap) {
+
+        }
+      }
+      return triggerField;
+    }
     fields.forEach((triggerField, fieldIndex) => {
+      // Enrich triggerField with data from unifiedFieldsMap (especially alert data)
+      enrichTriggerFieldWithUnifiedData(triggerField, fieldIndex);
       if (triggerField.type === 'label') {
         const fieldDiv = document.createElement('div');
         // Check if conditional logic is enabled
@@ -3116,10 +3389,13 @@ window.latexPreviewQuestions = [];
           }, 300);
         }
       } else if (triggerField.type === 'dropdown') {
+
         const dropdownFieldDiv = document.createElement('div');
         // Check if conditional logic is enabled
         const hasConditionalLogic = triggerField.conditionalLogic && triggerField.conditionalLogic.enabled;
         const conditionalConditions = hasConditionalLogic && triggerField.conditionalLogic.conditions ? triggerField.conditionalLogic.conditions : [];
+        // Log alert data at field processing time
+
         // Initially hide if conditional logic is enabled
         if (hasConditionalLogic) {
           dropdownFieldDiv.style.cssText = 'margin: 10px 0; padding: 12px; background-color: white; border: 1px solid #87CEEB; border-radius: 8px; box-shadow: 0 1px 3px rgba(135, 206, 235, 0.1); display: none;';
@@ -3182,8 +3458,63 @@ window.latexPreviewQuestions = [];
         hiddenDropdownInput.name = select.id + '_dropdown';
         hiddenDropdownInput.style.display = 'none';
         dropdownWrapper.appendChild(hiddenDropdownInput);
+        // Capture alert data in local variable to avoid closure issues
+        const alertData = triggerField.alert ? {
+          enabled: triggerField.alert.enabled || false,
+          condition: (triggerField.alert.condition || '').trim(),
+          title: (triggerField.alert.title || '').trim()
+        } : null;
+        // Capture hard alert data in local variable to avoid closure issues
+        const hardAlertData = triggerField.hardAlert ? {
+          enabled: triggerField.hardAlert.enabled || false,
+          condition: (triggerField.hardAlert.condition || '').trim(),
+          title: (triggerField.hardAlert.title || '').trim()
+        } : null;
+
         // Add change event listener to call dropdownMirror
         select.addEventListener('change', function() {
+
+          // Check for alert functionality if enabled
+          if (alertData && alertData.enabled && alertData.condition && alertData.title) {
+
+            const selectedValue = (this.value || '').trim();
+            const alertCondition = alertData.condition;
+            if (selectedValue === alertCondition) {
+
+              // Use custom alert modal instead of default browser alert
+              if (typeof showAlert === 'function') {
+                showAlert(alertData.title);
+
+              } else {
+                // Fallback to default alert if showAlert is not available
+
+                alert(alertData.title);
+              }
+            } else {
+
+            }
+          } else {
+
+          }
+          // Check for hard alert functionality if enabled
+          if (hardAlertData && hardAlertData.enabled && hardAlertData.condition && hardAlertData.title) {
+
+            const selectedValue = (this.value || '').trim();
+            const hardAlertCondition = hardAlertData.condition;
+            if (selectedValue === hardAlertCondition) {
+
+              // Use custom alert modal with hard alert flag
+              if (typeof showAlert === 'function') {
+                showAlert(hardAlertData.title, true); // Pass true as second parameter for hard alert
+
+              } else {
+
+                alert(hardAlertData.title);
+              }
+            }
+          }
+          // Check all hard alerts and update navigation button
+          checkAllHardAlertsAndUpdateNavigation();
           if (typeof dropdownMirror === 'function') {
             dropdownMirror(this, this.id);
           }
@@ -4009,7 +4340,7 @@ var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
 var labelMap = {"11":["Income Source"],"13":["Name","Relationship"],"15":["Income Source"],"17":["Name","Relationship"],"21":["Bank Name"],"23":["Make/Year"],"25":["Address"],"27":["Description"],"29":["Description"],"32":["Description"],"36":["Description"],"length":0};
-var amountMap = {"11":["Income Value"],"13":["Age","Monthly Income"],"15":["Income Value"],"17":["Age","Monthly Income"],"21":["Amount"],"23":["Fair Market Value","Amount Owed"],"25":["Fair Market Value","Amount Owed"],"27":["Fair Market Value","Amount Owed"],"29":["Fair Market Value"],"32":["Amount"],"36":["Amount"],"length":0};
+var amountMap = {"11":[],"13":["Age"],"15":[],"17":["Age"],"21":[],"23":[],"25":[],"27":[],"29":[],"32":[],"36":[],"length":0};
 var labelNodeIdsMap = {"11":["how_many_sources_of_income_do_you_have_income_source"],"13":["how_many_other_people_live_in_your_household_name","how_many_other_people_live_in_your_household_relationship"],"15":["how_many_sources_of_income_do_you_have_dup2_income_source"],"17":["how_many_other_people_live_in_your_household_dup2_name","how_many_other_people_live_in_your_household_dup2_relationship"],"21":["how_many_bank_accounts_do_you_have_bank_name"],"23":["how_many_vehicles_do_you_own_make/year"],"25":["how_many_real_estate_properties_do_you_have_address"],"27":["how_many_items_description"],"29":["how_many_deductions_description"],"32":["how_many_installment_payments_do_you_have_description"],"36":["how_many_other_monthly_expenses_do_you_have_description"]};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
@@ -7081,7 +7412,106 @@ function removeHiddenCheckbox(radioId) {
 // Track page load time to prevent alerts in first 3 seconds
 const pageLoadTime = Date.now();
 const ALERT_DELAY_MS = 3000; // 3 seconds
-function showAlert(message) {
+// Function to check all hard alerts and disable/enable navigation button
+function checkAllHardAlertsAndUpdateNavigation() {
+    let hasActiveHardAlert = false;
+
+    // Check unifiedFieldsMap for all hard alerts
+    if (window.unifiedFieldsMap) {
+        Object.keys(window.unifiedFieldsMap).forEach(questionId => {
+            const allFields = window.unifiedFieldsMap[questionId];
+            if (!Array.isArray(allFields)) return;
+
+            // Check all dropdown fields in trigger sequences
+            allFields.forEach(field => {
+                if (field.type === 'dropdown' && field.triggerSequences && Array.isArray(field.triggerSequences)) {
+                    field.triggerSequences.forEach((sequence, seqIndex) => {
+                        if (sequence.fields && Array.isArray(sequence.fields)) {
+                            sequence.fields.forEach(triggerField => {
+                                // Check for hard alert
+                                if (triggerField.type === 'dropdown' && triggerField.hardAlert && triggerField.hardAlert.enabled) {
+                                    const hardAlertCondition = (triggerField.hardAlert.condition || '').trim();
+
+                                    if (hardAlertCondition) {
+                                        // CRITICAL FIX: For numbered dropdowns, the baseNodeId comes from parentDropdownNodeId
+                                        // which is passed to createTriggerFieldsContainer. This is typically derived from the
+                                        // parent dropdown field's first option's nodeId, or if that fails, from fieldName.
+                                        // In unifiedFieldsMap, the parent dropdown field has fieldName which we can sanitize.
+                                        // The dropdown ID format is: {parentDropdownFieldName}_{triggerFieldName}_{entryNumber}
+                                        let baseNodeId = '';
+
+                                        // For numbered dropdowns, parentDropdownNodeId is often derived from the field's nodeId
+                                        // or by sanitizing the fieldName. Let's use fieldName (sanitized) as it's most reliable.
+                                        if (field.fieldName) {
+                                            baseNodeId = (field.fieldName || '').toLowerCase()
+                                                .replace(/[?]/g, '')
+                                                .replace(/[^a-z0-9_]+/g, '_')
+                                                .replace(/^_+|_+$/g, '');
+                                        } else if (field.nodeId) {
+                                            baseNodeId = field.nodeId;
+                                        } else {
+                                            // Last resort: use questionNameIds
+                                            baseNodeId = (window.questionNameIds && window.questionNameIds[questionId]) || ('answer' + questionId);
+                                        }
+
+                                        // Sanitize the trigger field name to match how it's done in createTriggerFieldsContainer
+                                        const sanitizedFieldName = (triggerField.fieldName || '').toLowerCase()
+                                            .replace(/[?]/g, '')
+                                            .replace(/[^a-z0-9_]+/g, '_')
+                                            .replace(/^_+|_+$/g, '');
+
+                                        // Check ALL entries (1-10) for this field
+                                        for (let entryNum = 1; entryNum <= 10; entryNum++) {
+                                            const dropdownId = baseNodeId + '_' + sanitizedFieldName + '_' + entryNum;
+                                            const dropdownEl = document.getElementById(dropdownId);
+
+                                            if (dropdownEl) {
+                                                const selectedValue = (dropdownEl.value || '').trim();
+                                                if (selectedValue === hardAlertCondition) {
+                                                    hasActiveHardAlert = true;
+                                                    // Don't return - continue checking all entries to find all active alerts
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    // Update navigation button state
+    const activeSection = document.querySelector('.section.active');
+    if (activeSection) {
+        const nextBtn = activeSection.querySelector('.question-next');
+        if (nextBtn) {
+            // Store hard alert state on button for reference
+            const previousState = nextBtn.dataset.hardAlertActive;
+            nextBtn.dataset.hardAlertActive = hasActiveHardAlert ? 'true' : 'false';
+
+            if (hasActiveHardAlert) {
+                nextBtn.setAttribute('disabled', 'disabled');
+                nextBtn.style.opacity = '0.5';
+                nextBtn.style.cursor = 'not-allowed';
+            } else {
+                // Remove hard alert styling, but don't force enable - let normal logic handle it
+                if (previousState === 'true') {
+                    nextBtn.style.opacity = '';
+                    nextBtn.style.cursor = '';
+                    // Trigger refreshNav to re-evaluate button state normally
+                    const sectionId = activeSection.id;
+                    if (window.questionNavControllers && typeof window.questionNavControllers[sectionId] === 'function') {
+                        window.questionNavControllers[sectionId]();
+                    }
+                }
+            }
+        }
+    }
+}
+function showAlert(message, isHardAlert) {
     // Check if 3 seconds have passed since page load
     const currentTime = Date.now();
     const timeSinceLoad = currentTime - pageLoadTime;
@@ -7098,7 +7528,15 @@ function showAlert(message) {
             alertMessage.innerHTML = message;
         } else {
             // This is a regular text alert
-            alertMessage.textContent = message;
+            if (isHardAlert) {
+                // For hard alerts, add subtitle
+                alertMessage.innerHTML = '<div style="text-align: center;">' +
+                    '<div style="margin-bottom: 10px;">' + message + '</div>' +
+                    '<div style="font-size: 0.9em; color: #666; font-style: italic;">Please change your answer to proceed</div>' +
+                    '</div>';
+            } else {
+                alertMessage.textContent = message;
+            }
         }
         alertOverlay.style.display = 'flex';
     }
@@ -8390,8 +8828,8 @@ function showTextboxLabels(questionId, count){
                     if (fieldType === 'label') {
                         fieldData.prefill = prefillValue;
                     }
-                    // Include conditional prefills for both label and amount fields
-                    if (fieldType === 'label' || fieldType === 'amount') {
+                    // Include conditional prefills for label, amount, and currency fields
+                    if (fieldType === 'label' || fieldType === 'amount' || fieldType === 'currency') {
                         const conditionalPrefillsData = el.getAttribute('data-conditional-prefills');
                         if (conditionalPrefillsData) {
                             try {
@@ -8661,6 +9099,39 @@ function showTextboxLabels(questionId, count){
                 inputDiv.innerHTML = createAddressInput(fieldId, field.label, j, 'number', prefillValue);
                 entryContainer.appendChild(inputDiv.firstElementChild);
                 // Add a <br> after the Zip input only if there are more fields after it
+                const remainingFields = allFieldsInOrder.slice(fieldIndex + 1);
+                if (remainingFields.length > 0) {
+                  const brElement = document.createElement('br');
+                  entryContainer.appendChild(brElement);
+                }
+            } else if (field.type === 'currency') {
+                const fieldId = field.nodeId + "_" + j;
+                const inputDiv = document.createElement('div');
+                let prefillValue = '';
+                // Check for conditional prefills - if current entry number (j) matches a trigger, use that value
+                if (field.conditionalPrefills && Array.isArray(field.conditionalPrefills)) {
+                    const matchingConditional = field.conditionalPrefills.find(cp => cp.trigger == j);
+                    if (matchingConditional && matchingConditional.value) {
+                        // Use conditional prefill value (process URL parameters if needed)
+                        prefillValue = replaceUrlParametersInText(matchingConditional.value);
+                    }
+                }
+                const safePrefill = prefillValue ? prefillValue.replace(/"/g, '&quot;') : '';
+                inputDiv.innerHTML =
+                  '<div class="address-field">' +
+                    '<input type="text"' +
+                    ' id="' + fieldId + '"' +
+                    ' name="' + fieldId + '"' +
+                    ' placeholder="' + (field.label || 'Amount') + '"' +
+                    ' inputmode="decimal"' +
+                    ' class="address-input"' +
+                    ' style="margin: 4px auto; max-width: 400px;"' +
+                    ' oninput="formatCurrencyInput(this)"' +
+                    ' value="' + safePrefill + '">' +
+                  '</div>';
+                // Append all children (wrapper + input)
+                Array.from(inputDiv.children).forEach(child => entryContainer.appendChild(child));
+                // Add a <br> after the currency input only if there are more fields after it
                 const remainingFields = allFieldsInOrder.slice(fieldIndex + 1);
                 if (remainingFields.length > 0) {
                   const brElement = document.createElement('br');
@@ -11214,39 +11685,30 @@ function runAllHiddenTextCalculations(){
  * using the field's own name (or any other field name).
  */
 function runSingleHiddenTextCalculation(calcObj) {
-    console.log('[CALCULATION DEBUG] runSingleHiddenTextCalculation called for:', calcObj.hiddenFieldName);
+
     const textField = document.getElementById(calcObj.hiddenFieldName);
     if (!textField) {
-        console.log('[CALCULATION DEBUG] Text field not found:', calcObj.hiddenFieldName);
+
         return;
     }
-    console.log('[CALCULATION DEBUG] Text field found:', calcObj.hiddenFieldName);
-    
+
     // We'll assume that the last matched condition takes precedence
     let finalValue = "";
     calcObj.calculations.forEach(function(oneCalc, calcIndex) {
-        console.log('[CALCULATION DEBUG] Processing calculation ' + (calcIndex + 1) + ':', {
-            terms: oneCalc.terms,
-            compareOperator: oneCalc.compareOperator,
-            threshold: oneCalc.threshold,
-            fillValue: oneCalc.fillValue
-        });
-        
+
         let val = 0;
         // Calculate the sum of all terms
         if (oneCalc.terms && oneCalc.terms.length > 0) {
             // Get the first term's value
             const firstTerm = oneCalc.terms[0];
-            console.log('[CALCULATION DEBUG] First term:', firstTerm.questionNameId);
+
             val = parseFloat(getMoneyValue(firstTerm.questionNameId)) || 0;
-            console.log('[CALCULATION DEBUG] First term value:', val);
 
             // Process remaining terms
             for (let t = 1; t < oneCalc.terms.length; t++) {
                 const term = oneCalc.terms[t];
-                console.log('[CALCULATION DEBUG] Term ' + (t + 1) + ':', term.questionNameId, 'operator:', term.operator);
+
                 const termVal = parseFloat(getMoneyValue(term.questionNameId)) || 0;
-                console.log('[CALCULATION DEBUG] Term ' + (t + 1) + ' value:', termVal);
 
                 switch(term.operator) {
                     case '+': val += termVal; break;
@@ -11254,12 +11716,10 @@ function runSingleHiddenTextCalculation(calcObj) {
                     case 'x': val *= termVal; break;
                     case '/': val = termVal !== 0 ? val / termVal : 0; break;
                 }
-                console.log('[CALCULATION DEBUG] Running total after term ' + (t + 1) + ':', val);
+
             }
         }
-        
-        console.log('[CALCULATION DEBUG] Final calculated value:', val);
-        
+
         // Compare to threshold
         const threshold = parseFloat(oneCalc.threshold) || 0;
         let matched = false;
@@ -11268,30 +11728,22 @@ function runSingleHiddenTextCalculation(calcObj) {
             case '<': matched = val < threshold; break;
             case '=': matched = Math.abs(val - threshold) < 0.000001; break; // Use epsilon for float comparison
         }
-        
-        console.log('[CALCULATION DEBUG] Comparison:', {
-            value: val,
-            operator: oneCalc.compareOperator,
-            threshold: threshold,
-            matched: matched
-        });
 
         if (matched) {
             // Handle special fillValue formats
             if (oneCalc.fillValue === "##total##" || oneCalc.fillValue.match(/^##(.+)##$/)) {
                 finalValue = val.toFixed(2); // Format money values with 2 decimal places
-                console.log('[CALCULATION DEBUG] Using calculated value as finalValue:', finalValue);
+
             } else {
                 finalValue = oneCalc.fillValue;
-                console.log('[CALCULATION DEBUG] Using fillValue as finalValue:', finalValue);
+
             }
         }
     });
-    
-    console.log('[CALCULATION DEBUG] Setting text field value to:', finalValue);
+
     // Update the text field
     textField.value = finalValue;
-    console.log('[CALCULATION DEBUG] Text field value after setting:', textField.value);
+
 }
 function replacePlaceholderTokens (str){
     /* note the doubled back-slashes in the delimiters $$ */
@@ -11319,7 +11771,9 @@ function parseTokenValue(token){
     if(!token) return 0;
     var el= document.getElementById(token);
     if(!el) return 0;
-    var val= parseFloat(el.value);
+    // Strip currency formatting ($ and commas) before parsing
+    var cleanedValue = String(el.value || '').replace(/[^0-9.]/g, '');
+    var val= parseFloat(cleanedValue);
     return isNaN(val) ? 0 : val;
 }
 /*───────────────────────────────────────────────────────────────*
@@ -11328,51 +11782,56 @@ function parseTokenValue(token){
  *       (note the escaped \d+ instead of stray 'd').
  *───────────────────────────────────────────────────────────────*/
 function getMoneyValue(qId) {
-    console.log('[CALCULATION DEBUG] getMoneyValue called with:', qId);
-    
+    // Helper function to strip currency formatting ($ and commas) and parse as float
+    function parseCurrencyValue(str) {
+        if (!str) return 0;
+        // Remove dollar signs, commas, and any other non-numeric characters except decimal point
+        const cleaned = String(str).replace(/[^0-9.]/g, '');
+        return parseFloat(cleaned) || 0;
+    }
+
     /* direct hit first */
     const el = document.getElementById(qId);
     if (el) {
-        console.log('[CALCULATION DEBUG] Found direct element:', el.id, 'value:', el.value);
+
         if (el.type === "checkbox") {
             const amt = document.getElementById(el.id + "_amount");
             if (amt && el.checked) {
-                const value = parseFloat(amt.value) || 0;
-                console.log('[CALCULATION DEBUG] Checkbox with amount field, returning:', value);
+                const value = parseCurrencyValue(amt.value);
+
                 return value;
             }
             const value = el.checked ? 1 : 0;
-            console.log('[CALCULATION DEBUG] Checkbox without amount, returning:', value);
+
             return value;
         }
-        const value = parseFloat(el.value) || 0;
-        console.log('[CALCULATION DEBUG] Direct element value, returning:', value);
+        const value = parseCurrencyValue(el.value);
+
         return value;
     }
-    
+
     /* legacy builder‑shorthand amountX_Y_Z */
     if (/^amountd+_d+_.+/.test(qId)) {
         const normalized = normaliseDesignerFieldRef(qId);
-        console.log('[CALCULATION DEBUG] Normalized shorthand:', qId, '->', normalized);
+
         const el2 = document.getElementById(normalized);
         if (el2) {
-            const value = parseFloat(el2.value) || 0;
-            console.log('[CALCULATION DEBUG] Found normalized element, returning:', value);
+            const value = parseCurrencyValue(el2.value);
+
             return value;
         } else {
-            console.log('[CALCULATION DEBUG] Normalized element not found:', normalized);
+
         }
     }
-    
+
     /* name‑attribute fallback */
     const byName = document.getElementsByName(qId);
     if (byName.length) {
-        const value = parseFloat(byName[0].value) || 0;
-        console.log('[CALCULATION DEBUG] Found by name, returning:', value);
+        const value = parseCurrencyValue(byName[0].value);
+
         return value;
     }
-    
-    console.log('[CALCULATION DEBUG] No element found, returning 0');
+
     return 0;
 }
 function scheduleCalculationListeners() {
