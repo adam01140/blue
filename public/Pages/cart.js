@@ -72,12 +72,82 @@ class CartManager {
         return cart;
     }
 
-    saveCart() {
-        const cartData = JSON.stringify(this.cart);
+    async saveCart() {
+        // Convert all blob types (LaTeX PDF, PDF preview, file upload) to base64 before serialization
+        const cartToSave = await Promise.all(this.cart.map(async (item) => {
+            // Handle LaTeX preview blobs
+            if (item.isLatexPreview && item._latexPdfBlob && item._latexPdfBlob instanceof Blob) {
+                // Convert blob to base64
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const result = reader.result;
+                        const base64Data = result.includes(',') ? result.split(',')[1] : result;
+                        resolve(base64Data);
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(item._latexPdfBlob);
+                });
+                
+                // Create a copy without the blob, but with base64
+                const { _latexPdfBlob, ...itemWithoutBlob } = item;
+                return {
+                    ...itemWithoutBlob,
+                    latexPdfBase64: base64
+                };
+            }
+            // Handle PDF preview blobs
+            if (item.isPdfPreview && item.pdfPreviewBlob && item.pdfPreviewBlob instanceof Blob) {
+                // Convert blob to base64
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const result = reader.result;
+                        const base64Data = result.includes(',') ? result.split(',')[1] : result;
+                        resolve(base64Data);
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(item.pdfPreviewBlob);
+                });
+                
+                // Create a copy without the blob, but with base64
+                const { pdfPreviewBlob, ...itemWithoutBlob } = item;
+                return {
+                    ...itemWithoutBlob,
+                    pdfPreviewBase64: base64
+                };
+            }
+            // Handle file upload blobs
+            if (item.isFileUpload && item.uploadedFile && item.uploadedFile instanceof Blob) {
+                // Convert blob to base64
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const result = reader.result;
+                        const base64Data = result.includes(',') ? result.split(',')[1] : result;
+                        resolve(base64Data);
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(item.uploadedFile);
+                });
+                
+                // Create a copy without the blob, but with base64
+                const { uploadedFile, ...itemWithoutBlob } = item;
+                return {
+                    ...itemWithoutBlob,
+                    uploadedFileBase64: base64
+                };
+            }
+            // Remove blob references if they exist (for items that were already converted)
+            const { _latexPdfBlob, pdfPreviewBlob, uploadedFile, ...itemWithoutBlob } = item;
+            return itemWithoutBlob;
+        }));
+        
+        const cartData = JSON.stringify(cartToSave);
         this.setCookie(this.cartCookieName, cartData, 30);
         // Also save to localStorage for compatibility with cart.html
         localStorage.setItem(this.cartCookieName, cartData);
-        console.log('💾 Cart saved to both cookies and localStorage:', this.cart);
+        console.log('💾 Cart saved to both cookies and localStorage:', cartToSave);
 
         // Save to Firebase if user is logged in
         if (typeof firebase !== 'undefined' && firebase.auth) {
@@ -544,6 +614,8 @@ class CartManager {
             for (const item of this.cart) {
                 try {
                     console.log('🎉 [PAYMENT DEBUG] Processing item:', item.title, 'formId:', item.formId, 'portfolioId:', item.portfolioId);
+                    console.log('🔍 [PAYMENT DEBUG] Item flags - isLatexPreview:', item.isLatexPreview, 'isPdfPreview:', item.isPdfPreview, 'isFileUpload:', item.isFileUpload);
+                    console.log('🔍 [PAYMENT DEBUG] Item has pdfPreviewBase64:', !!item.pdfPreviewBase64, 'has latexPdfBase64:', !!item.latexPdfBase64, 'has uploadedFileBase64:', !!item.uploadedFileBase64);
                     await this.processFormPDF(item); // run unconditionally
                     processedItems.push(item);
                     console.log('✅ [PAYMENT DEBUG] Successfully processed:', item.title);
@@ -690,25 +762,115 @@ class CartManager {
 
     async processFormPDF(cartItem) {
         try {
-            const formData = new FormData();
-            if (cartItem.formData) {
-                for (const k in cartItem.formData) formData.append(k, cartItem.formData[k]);
-            }
-            const base = cartItem.formId.replace(/\.pdf$/i, '');
-            const res = await fetch('/edit_pdf?pdf=' + encodeURIComponent(base), {
-                method: 'POST',
-                body: formData,
-                mode: 'cors'
+            let blob;
+            
+            // Debug: Log the cart item structure
+            console.log('🔍 [PROCESS PDF DEBUG] Cart item structure:', {
+                title: cartItem.title,
+                formId: cartItem.formId,
+                isLatexPreview: cartItem.isLatexPreview,
+                isPdfPreview: cartItem.isPdfPreview,
+                hasLatexPdfBase64: !!cartItem.latexPdfBase64,
+                hasPdfPreviewBase64: !!cartItem.pdfPreviewBase64,
+                allKeys: Object.keys(cartItem)
             });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const blob = await res.blob();
+            
+            // Check if this is a LaTeX preview PDF (client-side generated blob)
+            if (cartItem.isLatexPreview === true || cartItem.isLatexPreview === 'true') {
+                console.log('📄 [LATEX PDF] Processing LaTeX preview PDF:', cartItem.title);
+                
+                // Try to get blob from cart item first (if it wasn't serialized)
+                if (cartItem.latexPdf && cartItem.latexPdf instanceof Blob) {
+                    blob = cartItem.latexPdf;
+                } 
+                // If blob was lost during serialization, restore from base64
+                else if (cartItem.latexPdfBase64) {
+                    console.log('📄 [LATEX PDF] Restoring blob from base64');
+                    // Convert base64 back to blob
+                    const byteCharacters = atob(cartItem.latexPdfBase64);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    blob = new Blob([byteArray], { type: 'application/pdf' });
+                } else {
+                    throw new Error('LaTeX PDF blob not found in cart item');
+                }
+            }
+            // Check if this is a PDF preview PDF (fetched from server/file)
+            // Handle both boolean true and string "true" (in case of JSON serialization issues)
+            else if (cartItem.isPdfPreview === true || cartItem.isPdfPreview === 'true' || cartItem.pdfPreviewBase64) {
+                console.log('📄 [PDF PREVIEW] Processing PDF preview:', cartItem.title);
+                
+                // Restore blob from base64
+                if (cartItem.pdfPreviewBase64) {
+                    console.log('📄 [PDF PREVIEW] Restoring blob from base64, length:', cartItem.pdfPreviewBase64.length);
+                    // Convert base64 back to blob
+                    const byteCharacters = atob(cartItem.pdfPreviewBase64);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    blob = new Blob([byteArray], { type: 'application/pdf' });
+                    console.log('📄 [PDF PREVIEW] Blob restored successfully, size:', blob.size);
+                } else {
+                    console.error('📄 [PDF PREVIEW] pdfPreviewBase64 not found in cart item. Available keys:', Object.keys(cartItem));
+                    throw new Error('PDF preview blob not found in cart item');
+                }
+            }
+            // Check if this is a file upload PDF (user uploaded file)
+            else if (cartItem.isFileUpload === true || cartItem.isFileUpload === 'true' || cartItem.uploadedFileBase64) {
+                console.log('📄 [FILE UPLOAD] Processing file upload:', cartItem.title);
+                
+                // Restore blob from base64
+                if (cartItem.uploadedFileBase64) {
+                    console.log('📄 [FILE UPLOAD] Restoring blob from base64, length:', cartItem.uploadedFileBase64.length);
+                    // Convert base64 back to blob
+                    const byteCharacters = atob(cartItem.uploadedFileBase64);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    blob = new Blob([byteArray], { type: 'application/pdf' });
+                    console.log('📄 [FILE UPLOAD] Blob restored successfully, size:', blob.size);
+                } else if (cartItem.uploadedFile && cartItem.uploadedFile instanceof Blob) {
+                    // If blob still exists (shouldn't happen after serialization, but handle it)
+                    console.log('📄 [FILE UPLOAD] Using existing blob');
+                    blob = cartItem.uploadedFile;
+                } else {
+                    console.error('📄 [FILE UPLOAD] uploadedFileBase64 not found in cart item. Available keys:', Object.keys(cartItem));
+                    throw new Error('File upload blob not found in cart item');
+                }
+            } else {
+                // Regular PDF: fetch from server
+                console.log('📄 [REGULAR PDF] Processing regular PDF:', cartItem.title);
+                console.log('🔍 [REGULAR PDF] Checking if this should be PDF preview - isPdfPreview:', cartItem.isPdfPreview, 'has pdfPreviewBase64:', !!cartItem.pdfPreviewBase64);
+                const formData = new FormData();
+                if (cartItem.formData) {
+                    for (const k in cartItem.formData) formData.append(k, cartItem.formData[k]);
+                }
+                const base = cartItem.formId.replace(/\.pdf$/i, '');
+                const res = await fetch('/edit_pdf?pdf=' + encodeURIComponent(base), {
+                    method: 'POST',
+                    body: formData,
+                    mode: 'cors'
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                blob = await res.blob();
+            }
+            
             const url = URL.createObjectURL(blob);
 
             const a = document.createElement('a');
             a.href = url;
             const safeFormId = cartItem.formId.replace(/\W+/g, '_');
             const docId = `${Date.now()}_${safeFormId}`;
-            a.download = `Edited_${cartItem.formId}`;
+            // Use the proper filename for LaTeX preview PDFs and PDF previews, otherwise use the formId
+            const downloadFilename = (cartItem.isLatexPreview || cartItem.isPdfPreview || cartItem.isFileUpload) ? (cartItem.pdfName || cartItem.title || cartItem.formId) : `Edited_${cartItem.formId}`;
+            a.download = downloadFilename.endsWith('.pdf') ? downloadFilename : `${downloadFilename}.pdf`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
