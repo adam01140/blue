@@ -1182,7 +1182,7 @@ document.addEventListener("DOMContentLoaded", function() {
                       iframe.dataset.blobUrl = url;
 
                       // Store PDF blob if "Attach to packet" is selected
-                      const attachment = 'Preview Only';
+                      const attachment = 'Attach to packet';
                       if (attachment === 'Attach to packet') {
                         // Initialize window.latexPdfs if it doesn't exist
                         if (!window.latexPdfs) {
@@ -2433,7 +2433,7 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = 'SC-1201';
+window.formId = 'SC-120';
 var questionSlugMap = {"1":"please_explain_why_you_are_suing_at_this_location","2":"please_explain_why_you_re_filing_at_this_courthouse","3":"is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans","4":"is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract","5":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","6":"have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months","7":"have_you_filed_more_then_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year","8":"are_you_suing_an_attorney","9":"are_you_doing_business_under_a_fictious_business_name","10":"are_you_suing_for_more_than_12_500","11":"please_enter_your_business_details","12":"what_do_you_do_business_as","13":"please_explain_what_you_do_business_as","14":"what_county_did_you_file_your_fictious_business_name_statement","15":"what_is_your_fictious_business_name_statement_number","16":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","17":"are_you_suing_for_more_than_6_250","18":"are_you_counter_suing_by_yourself","19":"how_many_people_are_counter_suing_with_you","20":"how_many_people_are_you_counter_suing","21":"how_much_are_you_counter_suing_for","22":"explain_why_they_owe_you_that_money","23":"do_you_know_the_date_of_the_incident","24":"when_did_the_incident_occur","25":"do_you_know_the_date_range_that_it_occured","26":"when_did_this_happen","27":"how_did_you_calculate_the_money_owed_to_you","28":"have_you_sent_a_demand_letter_to_the_defendant","29":"explain_why_you_have_not_sent_a_demand_letter_yet"};
 var questionNameIds = {"1":"please_explain_why_you_are_suing_at_this_location","2":"please_explain_why_you_re_filing_at_this_courthouse","3":"is_your_claim_about_an_agreement_or_contract_for_personal_family_or_household_goods_services_or_loans","4":"is_your_claim_related_to_a_retail_dispute_such_as_a_credit_card_or_retail_installment_contract","5":"is_your_claim_related_to_a_vehicle_dispute_such_as_a_car_purchase_financing_or_lease","6":"have_you_filed_more_than_twelve_other_small_claims_within_the_last_twelve_months","7":"have_you_filed_more_then_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year","8":"are_you_suing_an_attorney","9":"are_you_doing_business_under_a_fictious_business_name","10":"are_you_suing_for_more_than_12_500","11":"please_enter_your_business_details","12":"what_do_you_do_business_as","13":"please_explain_what_you_do_business_as","14":"what_county_did_you_file_your_fictious_business_name_statement","15":"what_is_your_fictious_business_name_statement_number","16":"what_is_the_date_that_your_fictious_businesses_name_statement_expires","17":"are_you_suing_for_more_than_6_250","18":"are_you_counter_suing_by_yourself","19":"how_many_people_are_counter_suing_with_you","20":"how_many_people_are_you_counter_suing","21":"how_much_are_you_counter_suing_for","22":"explain_why_they_owe_you_that_money","23":"do_you_know_the_date_of_the_incident","24":"when_did_the_incident_occur","25":"do_you_know_the_date_range_that_it_occured","26":"when_did_this_happen","27":"how_did_you_calculate_the_money_owed_to_you","28":"have_you_sent_a_demand_letter_to_the_defendant","29":"explain_why_you_have_not_sent_a_demand_letter_yet"};
 var linkedCheckboxes = [{"linkedCheckboxId":"military_check","checkboxes":["how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_1","how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_2","how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_3"]},{"linkedCheckboxId":"public_yes","checkboxes":["are_they_a_business_or_public_entity_are_they_a_public_entity_yes_1","are_they_a_business_or_public_entity_are_they_a_public_entity_yes_2","are_they_a_business_or_public_entity_are_they_a_public_entity_yes_3"]},{"linkedCheckboxId":"written_claim","checkboxes":["are_they_a_business_or_public_entity_have_you_filed_a_written_claim_against_them_yes_1","are_they_a_business_or_public_entity_have_you_filed_a_written_claim_against_them_yes_2","are_they_a_business_or_public_entity_have_you_filed_a_written_claim_against_them_yes_3"]},{"linkedCheckboxId":"biz_check","checkboxes":["are_you_doing_business_under_a_fictious_business_name_yes","is_this_defendant_a_business_yes_1"]}];
@@ -2444,7 +2444,7 @@ var unifiedFieldsMap = {"11":[{"type":"label","label":"Name","nodeId":"please_en
 window.hardAlertData = {"7":{"enabled":true,"trigger":"Yes","title":"You cannot file more than two small claims cases for more than $2,500 each within the past year.","dropdownId":"have_you_filed_more_then_two_small_claims_cases_for_more_than_2_500_each_within_the_past_year"},"8":{"enabled":true,"trigger":"Yes","title":"Unfortunately we do not support small claims cases that are suing an attorney.","dropdownId":"are_you_suing_an_attorney"},"10":{"enabled":true,"trigger":"Yes","title":"You legally cannot sue for that much, individuals can't sue for more than $12,500","dropdownId":"are_you_suing_for_more_than_12_500"},"17":{"enabled":true,"trigger":"Yes","title":"Sorry you can't sue for that much. The maximum that a business can sue for is $6,250","dropdownId":"are_you_suing_for_more_than_6_250"}};
 var entryTitleMap = {"19":"Please enter this defendant's info","20":"Please enter this plaintiff's info"};
 window.fileUploadQuestions = [];
-window.latexPreviewQuestions = [];
+window.latexPreviewQuestions = [{"questionId":"28","title":"Heres a sample demand letter:","filename":"Heres a sample demand letter:","priceId":"price_1SqS2XFJeSRMFQ8XXlBzhcqW","trigger":"No"}];
 window.pdfPreviewQuestions = [];
 
   // Address helper functions (must exist before conditional logic runs)
@@ -5091,7 +5091,7 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "SC-1201";
+var pdfFileName = "SC-120";
 var pdfOutputFileName = "sc120.pdf";
 var stripePriceId = "price_1SB6ukFJeSRMFQ8XXhlqdkHX";
 var additionalPdfFileNames = [];
@@ -10327,19 +10327,13 @@ function showTextboxLabels(questionId, count){
 function resetNumberedDropdownFields(questionId) {
     if (typeof window !== 'undefined' && window.isInitialAutofill) {
         const questionName = questionNameIds && questionNameIds[questionId] ? questionNameIds[questionId] : '';
-        console.log('[LINKED FIELD DEBUG] resetNumberedDropdownFields skipped during autofill', {
-            questionId: questionId,
-            questionName: questionName
-        });
+
         return;
     }
     const questionName = questionNameIds && questionNameIds[questionId] ? questionNameIds[questionId] : '';
     const isTargetNumberedDropdown = questionId === '11' || questionId === 11 || questionName === 'how_many_people_are_you_counter_suing';
     if (isTargetNumberedDropdown) {
-        console.log('[LINKED FIELD DEBUG] resetNumberedDropdownFields called', {
-            questionId: questionId,
-            questionName: questionName
-        });
+
     }
     // Reset the main dropdown select to its default (empty/placeholder)
     const dropdownId = questionNameIds[questionId] || ("answer" + questionId);
@@ -10381,10 +10375,7 @@ function resetNumberedDropdownFields(questionId) {
     const checkboxes = container.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(checkbox => {
         if (isTargetNumberedDropdown && checkbox.id.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
-            console.log('[LINKED FIELD DEBUG] resetNumberedDropdownFields unchecking checkbox', {
-                checkboxId: checkbox.id,
-                wasChecked: checkbox.checked
-            });
+
         }
         checkbox.checked = false;
     });
@@ -10889,15 +10880,13 @@ function updateLinkedFields() {
 
         const { linkedFieldId, fields } = linkedField;
         const isTargetLinkedField = linkedFieldId && linkedFieldId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_counter_suing_name') !== -1;
+        const isTargetPublicDateLinkedField = linkedFieldId === 'public_date';
         // Find the hidden textbox for this linked field
         let hiddenField = document.getElementById(linkedFieldId);
 
         if (!hiddenField) {
             if (isTargetLinkedField) {
-                console.log('[LINKED FIELD DEBUG] updateLinkedFields creating hidden field', {
-                    linkedFieldId: linkedFieldId,
-                    fields: fields
-                });
+
             }
             // Create the hidden textbox if it doesn't exist
             hiddenField = document.createElement('input');
@@ -10922,23 +10911,14 @@ function updateLinkedFields() {
 
             return field;
         }).filter(el => el);
-        if (isTargetLinkedField) {
-            console.log('[LINKED FIELD DEBUG] updateLinkedFields linked textboxes snapshot', {
-                linkedFieldId: linkedFieldId,
-                linkedTextboxIds: fields,
-                foundIds: linkedTextboxes.map(el => el.id),
-                foundValues: linkedTextboxes.map(el => el.value)
-            });
+        if (isTargetLinkedField || isTargetPublicDateLinkedField) {
+
         }
 
         // If no linked textboxes exist (all have been removed), clear the hidden field
         if (linkedTextboxes.length === 0) {
+            if (isTargetLinkedField || isTargetPublicDateLinkedField) {
 
-            if (isTargetLinkedField) {
-                console.log('[LINKED FIELD DEBUG] updateLinkedFields no linked textboxes, clearing hidden field', {
-                    linkedFieldId: linkedFieldId,
-                    previousValue: hiddenField.value
-                });
             }
             hiddenField.value = '';
             return;
@@ -10952,26 +10932,16 @@ function updateLinkedFields() {
 
         if (textboxesWithContent.length === 0) {
             // No textboxes have content, clear the hidden field
+            if (isTargetLinkedField || isTargetPublicDateLinkedField) {
 
-            if (isTargetLinkedField) {
-                console.log('[LINKED FIELD DEBUG] updateLinkedFields no content, clearing hidden field', {
-                    linkedFieldId: linkedFieldId,
-                    previousValue: hiddenField.value
-                });
             }
             hiddenField.value = '';
         } else if (textboxesWithContent.length === 1) {
             // Only one textbox has content, use its value
             const val = textboxesWithContent[0].value.trim();
             const finalValue = (textboxesWithContent[0].type === 'date') ? formatDateForServer(val) : val;
+            if (isTargetLinkedField || isTargetPublicDateLinkedField) {
 
-            if (isTargetLinkedField) {
-                console.log('[LINKED FIELD DEBUG] updateLinkedFields setting hidden field from single textbox', {
-                    linkedFieldId: linkedFieldId,
-                    sourceId: textboxesWithContent[0].id,
-                    sourceValue: val,
-                    finalValue: finalValue
-                });
             }
             hiddenField.value = finalValue;
         } else {
@@ -11005,13 +10975,8 @@ function updateLinkedFields() {
                     ? formatDateForServer(chosenVal)
                     : (/^d{4}-d{2}-d{2}$/.test(chosenVal) ? formatDateForServer(chosenVal) : chosenVal);
 
-                if (isTargetLinkedField) {
-                    console.log('[LINKED FIELD DEBUG] updateLinkedFields setting hidden field from latest date', {
-                        linkedFieldId: linkedFieldId,
-                        chosenId: latest.id,
-                        chosenValue: chosenVal,
-                        finalValue: hiddenField.value
-                    });
+                if (isTargetLinkedField || isTargetPublicDateLinkedField) {
+
                 }
             } else {
                 // Fall back to longest text
@@ -11021,12 +10986,8 @@ function updateLinkedFields() {
                 );
                 hiddenField.value = longestTextbox.value.trim();
 
-                if (isTargetLinkedField) {
-                    console.log('[LINKED FIELD DEBUG] updateLinkedFields setting hidden field from longest textbox', {
-                        linkedFieldId: linkedFieldId,
-                        chosenId: longestTextbox.id,
-                        chosenValue: longestTextbox.value.trim()
-                    });
+                if (isTargetLinkedField || isTargetPublicDateLinkedField) {
+
                 }
             }
         }
@@ -11043,6 +11004,7 @@ function clearInactiveLinkedFields() {
             const { fields } = linkedField;
             const linkedFieldId = linkedField.linkedFieldId;
             const isTargetLinkedField = linkedFieldId && linkedFieldId.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_counter_suing_name') !== -1;
+            const isTargetPublicDateLinkedField = linkedFieldId === 'public_date';
             // Get all the linked textboxes
             const linkedTextboxes = fields.map(fieldId => document.getElementById(fieldId)).filter(el => el);
             if (linkedTextboxes.length === 0) return;
@@ -11057,31 +11019,27 @@ function clearInactiveLinkedFields() {
             linkedTextboxes.forEach(tb => {
                 const container = tb.closest('.question-container');
                 if (container && container.classList.contains('hidden') && tb.value.trim() !== '') {
-                    if (isTargetLinkedField) {
-                        console.log('[LINKED FIELD DEBUG] clearInactiveLinkedFields clearing hidden textbox value', {
-                            linkedFieldId: linkedFieldId,
-                            textboxId: tb.id,
-                            previousValue: tb.value
-                        });
+                    if (isTargetLinkedField || isTargetPublicDateLinkedField || tb.id.indexOf('are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim') !== -1) {
+
                     }
                     tb.value = '';
                 }
             });
             // If multiple visible textboxes have content, keep only the longest one
             const visibleTextboxesWithContent = visibleTextboxes.filter(tb => tb.value.trim() !== '');
+            const hasVisibleDateInputs = visibleTextboxesWithContent.some(tb => tb.type === 'date');
             if (visibleTextboxesWithContent.length > 1) {
+                if (linkedFieldId === 'public_date' || hasVisibleDateInputs) {
+                    return;
+                }
                 const longestTextbox = visibleTextboxesWithContent.reduce((longest, current) => 
                     current.value.length > longest.value.length ? current : longest
                 );
                 // Clear all other visible textboxes that aren't the longest
                 visibleTextboxes.forEach(tb => {
                     if (tb !== longestTextbox && tb.value.trim() !== '') {
-                        if (isTargetLinkedField) {
-                            console.log('[LINKED FIELD DEBUG] clearInactiveLinkedFields clearing shorter visible textbox', {
-                                linkedFieldId: linkedFieldId,
-                                textboxId: tb.id,
-                                previousValue: tb.value
-                            });
+                        if (isTargetLinkedField || isTargetPublicDateLinkedField || tb.id.indexOf('are_they_a_business_or_public_entity_yes_when_did_you_file_the_written_claim') !== -1) {
+
                         }
                         tb.value = '';
                     }
@@ -13228,23 +13186,14 @@ if (typeof handleNext === 'function') {
                                 const wasChecked = el.checked;
                                 el.checked = !!autofillValue;
                                 if (el.id && el.id.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
-                                    console.log('[LINKED FIELD DEBUG] Autofill checkbox update', {
-                                        id: el.id,
-                                        name: el.name,
-                                        wasChecked: wasChecked,
-                                        nowChecked: el.checked,
-                                        autofillValue: autofillValue
-                                    });
+
                                 }
                                 // Dispatch change event if checkbox state changed to trigger linked textbox creation
                                 if (el.checked !== wasChecked) {
                                     const changeEvent = new Event('change', { bubbles: true });
                                     el.dispatchEvent(changeEvent);
                                     if (el.id && el.id.indexOf('how_many_people_are_you_counter_suing_military_status_check_here_if_the_defendant_is_on_military_duty') !== -1) {
-                                        console.log('[LINKED FIELD DEBUG] Autofill checkbox change dispatched', {
-                                            id: el.id,
-                                            name: el.name
-                                        });
+
                                     }
                                 }
                             }
