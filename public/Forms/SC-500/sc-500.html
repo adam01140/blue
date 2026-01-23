@@ -19,7 +19,7 @@
         .question-nav-btn { width: 48px; height: 55px; border-radius: 50%; border: none; background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(30,73,150,0.22); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; line-height: 1; padding-top: 1px; }
         .question-nav-btn.submit-mode { background: linear-gradient(135deg, #0acffe, #495aff); box-shadow: 0 10px 24px rgba(9, 132, 227, 0.35); }
         .question-nav-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(28,126,214,0.25); }
-        .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; }
+        .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; pointer-events: auto !important; }
         .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }
         .question-step-hidden { display: none !important; }
         #box { padding-top: 100px; margin: 50px; }
@@ -637,6 +637,31 @@
     </style>
     <script>
       // Phone formatter: Phone Number
+      window.updatePhoneSplitFields = window.updatePhoneSplitFields || function(inputEl) {
+        if (!inputEl) return;
+        const id = inputEl.id || inputEl.name;
+        if (!id) return;
+        const digits = (inputEl.value || "").replace(/\D/g, "").slice(0, 10);
+        const match = id.match(/^(.*)_([0-9]+)$/);
+        const base = match ? match[1] : id;
+        const suffix = match ? "_" + match[2] : "";
+        const codeField = document.getElementById(base + "_code" + suffix);
+        const noCodeField = document.getElementById(base + "_no_code" + suffix);
+        if (!codeField && !noCodeField) return;
+        const area = digits.slice(0, 3);
+        const rest = digits.slice(3);
+        const codeValue = area ? "(" + area + ")" : "";
+        let noCodeValue = "";
+        if (rest.length > 0) {
+          if (rest.length <= 3) {
+            noCodeValue = rest;
+          } else {
+            noCodeValue = rest.slice(0, 3) + "-" + rest.slice(3, 7);
+          }
+        }
+        if (codeField) codeField.value = codeValue;
+        if (noCodeField) noCodeField.value = noCodeValue;
+      };
       window.formatPhoneInput = window.formatPhoneInput || function(inputEl) {
         if (!inputEl) return;
         const digits = (inputEl.value || "").replace(/\D/g, "").slice(0, 10);
@@ -652,6 +677,7 @@
           formatted += "-" + digits.slice(6, 10);
         }
         inputEl.value = formatted;
+        window.updatePhoneSplitFields(inputEl);
       };
     </script>
 </head>
@@ -1018,7 +1044,7 @@ document.addEventListener("DOMContentLoaded", function() {
         </div>
         <div style="flex: 1;">
             <label for="user_zip" style="display: block; margin-bottom: 5px; font-weight: bold;">ZIP</label>
-            <input type="text" form="customForm" id="user_zip" name="user_zip" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            <input type="text" form="customForm" id="user_zip" name="user_zip" maxlength="5" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
         </div>
     </div>
 </div>
@@ -1301,7 +1327,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                     })();
                  }, 50);
-                        " style="width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><option value="">Select State</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option></select><input type="text" id="please_enter_your_business_details_please_enter_your_business_address_state_hidden" name="please_enter_your_business_details_please_enter_your_business_address_state_hidden" style="display: none;"><input type="text" id="please_enter_your_business_details_please_enter_your_business_address_state_short" name="please_enter_your_business_details_please_enter_your_business_address_state_short" style="display: none;"><input type="text" id="please_enter_your_business_details_please_enter_your_business_address_zip" name="please_enter_your_business_details_please_enter_your_business_address_zip" placeholder="Zip" oninput="
+                        " style="width: 170px; padding: 10px; margin: 1px 0px; border: 1px solid rgb(135, 206, 235); border-radius: 8px; font-size: 14px; background-color: white; color: rgb(44, 62, 80); transition: 0.2s;"><option value="">Select State</option><option value="Alabama">Alabama</option><option value="Alaska">Alaska</option><option value="Arizona">Arizona</option><option value="Arkansas">Arkansas</option><option value="California">California</option><option value="Colorado">Colorado</option><option value="Connecticut">Connecticut</option><option value="Delaware">Delaware</option><option value="Florida">Florida</option><option value="Georgia">Georgia</option><option value="Hawaii">Hawaii</option><option value="Idaho">Idaho</option><option value="Illinois">Illinois</option><option value="Indiana">Indiana</option><option value="Iowa">Iowa</option><option value="Kansas">Kansas</option><option value="Kentucky">Kentucky</option><option value="Louisiana">Louisiana</option><option value="Maine">Maine</option><option value="Maryland">Maryland</option><option value="Massachusetts">Massachusetts</option><option value="Michigan">Michigan</option><option value="Minnesota">Minnesota</option><option value="Mississippi">Mississippi</option><option value="Missouri">Missouri</option><option value="Montana">Montana</option><option value="Nebraska">Nebraska</option><option value="Nevada">Nevada</option><option value="New Hampshire">New Hampshire</option><option value="New Jersey">New Jersey</option><option value="New Mexico">New Mexico</option><option value="New York">New York</option><option value="North Carolina">North Carolina</option><option value="North Dakota">North Dakota</option><option value="Ohio">Ohio</option><option value="Oklahoma">Oklahoma</option><option value="Oregon">Oregon</option><option value="Pennsylvania">Pennsylvania</option><option value="Rhode Island">Rhode Island</option><option value="South Carolina">South Carolina</option><option value="South Dakota">South Dakota</option><option value="Tennessee">Tennessee</option><option value="Texas">Texas</option><option value="Utah">Utah</option><option value="Vermont">Vermont</option><option value="Virginia">Virginia</option><option value="Washington">Washington</option><option value="West Virginia">West Virginia</option><option value="Wisconsin">Wisconsin</option><option value="Wyoming">Wyoming</option></select><input type="text" id="please_enter_your_business_details_please_enter_your_business_address_state_hidden" name="please_enter_your_business_details_please_enter_your_business_address_state_hidden" style="display: none;"><input type="text" id="please_enter_your_business_details_please_enter_your_business_address_state_short" name="please_enter_your_business_details_please_enter_your_business_address_state_short" style="display: none;"><input type="text" id="please_enter_your_business_details_please_enter_your_business_address_zip" name="please_enter_your_business_details_please_enter_your_business_address_zip" placeholder="Zip" maxlength="5" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, ''); 
                     (function() {
                         var streetEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_street');
                         var cityEl = document.getElementById('please_enter_your_business_details_please_enter_your_business_address_city');
@@ -2221,6 +2247,7 @@ document.addEventListener("DOMContentLoaded", function() {
           eligibleElements.forEach(el => {
             const tag = el.tagName;
             const type = (el.type || '').toLowerCase();
+            const elId = (el.id || el.name || '').toLowerCase();
             if (tag === 'SELECT') {
               const value = (el.value || '').trim();
 
@@ -2228,7 +2255,24 @@ document.addEventListener("DOMContentLoaded", function() {
             } else if (tag === 'TEXTAREA' || type === 'text' || type === 'email' || type === 'tel' || type === 'url' || type === 'number' || type === 'date' || type === 'time' || type === 'datetime-local') {
               const value = (el.value || '').trim();
 
-              if (!value) allStandardSatisfied = false;
+              if (!value) {
+                allStandardSatisfied = false;
+              } else {
+                // Special validation for zip codes: must have exactly 5 digits
+                if (elId.includes('_zip')) {
+                  const digitsOnly = value.replace(/[^0-9]/g, '');
+                  if (digitsOnly.length !== 5) {
+                    allStandardSatisfied = false;
+                  }
+                }
+                // Special validation for phone numbers: must have exactly 10 digits
+                if (elId.includes('_phone_number') || elId.includes('phone_number_')) {
+                  const digitsOnly = value.replace(/[^0-9]/g, '');
+                  if (digitsOnly.length !== 10) {
+                    allStandardSatisfied = false;
+                  }
+                }
+              }
             } else if (type === 'radio') {
               const group = radioGroups[el.name || el.id] || [];
               group.push(!!el.checked);
@@ -2309,12 +2353,30 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (!isElementEligible(inp)) return;
                 const tag = inp.tagName;
                 const type = (inp.type || '').toLowerCase();
+                const inpId = (inp.id || inp.name || '').toLowerCase();
                 if (tag === 'SELECT') {
                   const value = (inp.value || '').trim();
                   if (!value) allStandardSatisfied = false;
                 } else if (tag === 'TEXTAREA' || type === 'text' || type === 'email' || type === 'tel' || type === 'url' || type === 'number' || type === 'date' || type === 'time' || type === 'datetime-local') {
                   const value = (inp.value || '').trim();
-                  if (!value) allStandardSatisfied = false;
+                  if (!value) {
+                    allStandardSatisfied = false;
+                  } else {
+                    // Special validation for zip codes: must have exactly 5 digits
+                    if (inpId.includes('_zip')) {
+                      const digitsOnly = value.replace(/[^0-9]/g, '');
+                      if (digitsOnly.length !== 5) {
+                        allStandardSatisfied = false;
+                      }
+                    }
+                    // Special validation for phone numbers: must have exactly 10 digits
+                    if (inpId.includes('_phone_number') || inpId.includes('phone_number_')) {
+                      const digitsOnly = value.replace(/[^0-9]/g, '');
+                      if (digitsOnly.length !== 10) {
+                        allStandardSatisfied = false;
+                      }
+                    }
+                  }
                 } else if (type === 'radio') {
                   const group = radioGroups[inp.name || inp.id] || [];
                   group.push(!!inp.checked);
@@ -2895,21 +2957,182 @@ document.addEventListener("DOMContentLoaded", function() {
           });
         }
         if (nextBtn) {
-          nextBtn.addEventListener('click', function() {
+          // Use pointerdown event to handle disabled button clicks (click events don't fire on disabled buttons)
+          nextBtn.addEventListener('pointerdown', function(e) {
+            // Only handle if button is disabled
+            if (!nextBtn.disabled && !nextBtn.hasAttribute('disabled')) {
+              return; // Let normal click handler take over
+            }
+            
+            console.log('[DISABLED NEXT BTN] Pointerdown on disabled button, looking for unfilled fields...');
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Find the current active question item - use .question-item class (not .question-step-item)
+            const activeQuestionItem = sectionEl.querySelector('.question-item:not(.question-step-hidden)');
+            console.log('[DISABLED NEXT BTN] Active question item:', activeQuestionItem);
+            console.log('[DISABLED NEXT BTN] Section element:', sectionEl);
+            
+            if (activeQuestionItem) {
+              // Find all visible inputs, selects, and textareas that should be filled
+              const inputs = activeQuestionItem.querySelectorAll('input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), select, textarea');
+              const checkboxGroups = activeQuestionItem.querySelectorAll('.checkbox-group, .radio-group');
+              
+              console.log('[DISABLED NEXT BTN] Found inputs:', inputs.length);
+              console.log('[DISABLED NEXT BTN] Found checkbox/radio groups:', checkboxGroups.length);
+              
+              // Helper function to check if input is properly filled (with special rules for zip/phone)
+              function isInputProperlyFilled(input) {
+                const value = input.value ? input.value.trim() : '';
+                const inputId = (input.id || input.name || '').toLowerCase();
+                
+                // Empty value is never filled
+                if (!value) {
+                  console.log('[DISABLED NEXT BTN] Input is empty:', inputId);
+                  return false;
+                }
+                
+                // Zip code validation: must have exactly 5 digits
+                if (inputId.includes('_zip')) {
+                  const digitsOnly = value.replace(/[^0-9]/g, '');
+                  const isFilled = digitsOnly.length === 5;
+                  console.log('[DISABLED NEXT BTN] Zip validation for', inputId, '- digits:', digitsOnly.length, '- filled:', isFilled);
+                  return isFilled;
+                }
+                
+                // Phone number validation: must have exactly 10 digits
+                if (inputId.includes('_phone_number') || inputId.includes('phone_number_')) {
+                  const digitsOnly = value.replace(/[^0-9]/g, '');
+                  const isFilled = digitsOnly.length === 10;
+                  console.log('[DISABLED NEXT BTN] Phone validation for', inputId, '- digits:', digitsOnly.length, '- filled:', isFilled);
+                  return isFilled;
+                }
+                
+                // Default: any non-empty value is filled
+                return true;
+              }
+              
+              // Check regular inputs first
+              for (const input of inputs) {
+                // Skip hidden elements
+                if (input.offsetParent === null) {
+                  console.log('[DISABLED NEXT BTN] Skipping hidden input:', input.id || input.name);
+                  continue;
+                }
+                
+                const value = input.value ? input.value.trim() : '';
+                console.log('[DISABLED NEXT BTN] Checking input:', input.id || input.name, 'value:', value);
+                
+                if (!isInputProperlyFilled(input)) {
+                  // Found unfilled/incomplete input - scroll to it and highlight
+                  console.log('[DISABLED NEXT BTN] Found unfilled/incomplete input:', input.id || input.name);
+                  input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  input.focus();
+                  
+                  // Add temporary highlight effect
+                  const originalBorder = input.style.border;
+                  const originalBoxShadow = input.style.boxShadow;
+                  input.style.border = '2px solid #e74c3c';
+                  input.style.boxShadow = '0 0 10px rgba(231, 76, 60, 0.5)';
+                  setTimeout(() => {
+                    input.style.border = originalBorder;
+                    input.style.boxShadow = originalBoxShadow;
+                  }, 2000);
+                  return;
+                }
+              }
+              
+              // Check checkbox/radio groups - at least one should be checked
+              for (const group of checkboxGroups) {
+                if (group.offsetParent === null) {
+                  console.log('[DISABLED NEXT BTN] Skipping hidden checkbox/radio group');
+                  continue;
+                }
+                
+                const checkedInputs = group.querySelectorAll('input[type="checkbox"]:checked, input[type="radio"]:checked');
+                console.log('[DISABLED NEXT BTN] Checkbox/radio group has', checkedInputs.length, 'checked items');
+                if (checkedInputs.length === 0) {
+                  // No selection made - scroll to the group
+                  console.log('[DISABLED NEXT BTN] Found unchecked checkbox/radio group');
+                  group.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  
+                  // Highlight the group
+                  const originalBorder = group.style.border;
+                  const originalBoxShadow = group.style.boxShadow;
+                  const originalBorderRadius = group.style.borderRadius;
+                  const originalPadding = group.style.padding;
+                  group.style.border = '2px solid #e74c3c';
+                  group.style.boxShadow = '0 0 10px rgba(231, 76, 60, 0.5)';
+                  group.style.borderRadius = '8px';
+                  group.style.padding = '10px';
+                  setTimeout(() => {
+                    group.style.border = originalBorder;
+                    group.style.boxShadow = originalBoxShadow;
+                    group.style.borderRadius = originalBorderRadius;
+                    group.style.padding = originalPadding;
+                  }, 2000);
+                  return;
+                }
+              }
+              
+              // Check for dropdown/select that needs selection
+              const selects = activeQuestionItem.querySelectorAll('select');
+              console.log('[DISABLED NEXT BTN] Found selects:', selects.length);
+              for (const select of selects) {
+                if (select.offsetParent === null) {
+                  console.log('[DISABLED NEXT BTN] Skipping hidden select:', select.id || select.name);
+                  continue;
+                }
+                
+                console.log('[DISABLED NEXT BTN] Checking select:', select.id || select.name, 'value:', select.value, 'selectedIndex:', select.selectedIndex);
+                if (!select.value || select.value === '' || select.selectedIndex === 0) {
+                  console.log('[DISABLED NEXT BTN] Found unfilled select:', select.id || select.name);
+                  select.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  select.focus();
+                  
+                  const originalBorder = select.style.border;
+                  const originalBoxShadow = select.style.boxShadow;
+                  select.style.border = '2px solid #e74c3c';
+                  select.style.boxShadow = '0 0 10px rgba(231, 76, 60, 0.5)';
+                  setTimeout(() => {
+                    select.style.border = originalBorder;
+                    select.style.boxShadow = originalBoxShadow;
+                  }, 2000);
+                  return;
+                }
+              }
+              
+              console.log('[DISABLED NEXT BTN] No unfilled fields found in active question');
+            } else {
+              console.log('[DISABLED NEXT BTN] No active question item found!');
+              // Try alternate selectors as fallback
+              const allQuestionItems = sectionEl.querySelectorAll('.question-item, .question-container');
+              console.log('[DISABLED NEXT BTN] All question items in section:', allQuestionItems.length);
+              allQuestionItems.forEach((item, idx) => {
+                console.log('[DISABLED NEXT BTN] Question item', idx, ':', item.id, 'classes:', item.className);
+              });
+            }
+          });
+          
+          nextBtn.addEventListener('click', function(e) {
+            // Skip if button is disabled (handled by pointerdown)
+            if (nextBtn.disabled || nextBtn.hasAttribute('disabled')) {
+              return;
+            }
 
             if (nextBtn.dataset.advanceMode === 'submit') {
 
               // Check authentication before submitting
               checkAuthBeforeNavigate(function() {
 
-                const formEl = document.getElementById('customForm');
-                if (formEl) {
-                  if (typeof formEl.requestSubmit === 'function') {
-                    formEl.requestSubmit();
-                  } else {
-                    formEl.submit();
-                  }
+              const formEl = document.getElementById('customForm');
+              if (formEl) {
+                if (typeof formEl.requestSubmit === 'function') {
+                  formEl.requestSubmit();
+                } else {
+                  formEl.submit();
                 }
+              }
               });
               return;
             }
@@ -2917,7 +3140,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Check authentication before navigating
             checkAuthBeforeNavigate(function() {
 
-              shiftQuestion(1);
+            shiftQuestion(1);
             });
           });
         }
@@ -3361,7 +3584,7 @@ window.pdfPreviewQuestions = [];
         const optionValue = parts[parts.length - 1]; // last part: "yes"
         const entryNumber = parts[parts.length - 2]; // second last: "1"
         const fieldName = parts.slice(0, -2).join('_'); // everything before: "is_this_plaintiff_a_business"
-
+        
         // Try to find checkbox with pattern: *{fieldName}_{optionValue}_{entryNumber}
         // Or pattern: *{fieldName}*_{optionValue}_{entryNumber}
         const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -3371,7 +3594,7 @@ window.pdfPreviewQuestions = [];
           // and contains the field name somewhere
           const endsWithPattern = cb.id.endsWith('_' + optionValue + '_' + entryNumber);
           const containsFieldName = cb.id.includes(fieldName);
-
+          
           if (endsWithPattern && containsFieldName) {
             return cb;
           }
@@ -4197,28 +4420,28 @@ window.pdfPreviewQuestions = [];
               // CRITICAL: Don't reset checkbox/radio values during autofill - they might not be ready yet
               if (!isAutofill) {
                 // Reset checkbox values when hidden (only if not during autofill)
-                checkboxOptions.forEach((option) => {
-                  // Use the same ID format as when creating the checkbox
-                  let checkboxId;
-                  if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
-                    const sanitizedFieldName = sanitizeForId(triggerField.fieldName);
-                    const sanitizedOptionNodeId = sanitizeForId(option.nodeId);
-                    if (selectionType === 'single') {
-                      checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId + '_radio';
-                    } else {
-                      checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId;
-                    }
+              checkboxOptions.forEach((option) => {
+                // Use the same ID format as when creating the checkbox
+                let checkboxId;
+                if (isMultipleTextboxes && sanitizedDropdownName && sanitizedTriggerCondition) {
+                  const sanitizedFieldName = sanitizeForId(triggerField.fieldName);
+                  const sanitizedOptionNodeId = sanitizeForId(option.nodeId);
+                  if (selectionType === 'single') {
+                    checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId + '_radio';
                   } else {
-                    checkboxId = selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber;
+                    checkboxId = sanitizedDropdownName + '_' + sanitizedTriggerCondition + '_' + sanitizedFieldName + '_' + sanitizedOptionNodeId;
                   }
-                  const optionInput = document.getElementById(checkboxId);
-                  if (optionInput) {
+                } else {
+                  checkboxId = selectionType === 'single' ? option.nodeId + "_" + entryNumber + "_radio" : option.nodeId + "_" + entryNumber;
+                }
+                const optionInput = document.getElementById(checkboxId);
+                if (optionInput) {
 
-                    optionInput.checked = false;
-                    optionInput.dispatchEvent(new Event('change'));
+                  optionInput.checked = false;
+                  optionInput.dispatchEvent(new Event('change'));
 
-                  }
-                });
+                }
+              });
               } else {
 
               }
@@ -5223,7 +5446,7 @@ window.pdfPreviewQuestions = [];
           } else {
             // Create text input for other fields
             input = document.createElement('input');
-            input.type = field.label === 'Zip' ? 'number' : 'text';
+            input.type = 'text'; // Use text for all fields including Zip (zip codes can start with 0)
             // For multipleTextboxes: {dropdownName}_{locationFieldName}_{fieldType}
             // For numberedDropdown: {dropdownName}_{locationFieldName}_{fieldType}_{entryNumber}
             if (isMultipleTextboxes) {
@@ -5235,8 +5458,15 @@ window.pdfPreviewQuestions = [];
             input.placeholder = field.label; // e.g., Street, City, Zip
             input.className = 'address-input';
             input.style.textAlign = 'center'; // Ensure text is centered
-            // Add oninput handler to update full address when street, city, or zip changes
-            input.setAttribute('oninput', triggerUpdateFullAddressCode);
+            // Add maxlength and numeric-only for zip fields
+            if (field.label === 'Zip' || field.nodeId === 'zip' || input.id.includes('_zip')) {
+              input.setAttribute('maxlength', '5');
+              input.setAttribute('inputmode', 'numeric');
+              input.setAttribute('oninput', "this.value = this.value.replace(/[^0-9]/g, ''); " + triggerUpdateFullAddressCode);
+            } else {
+              // Add oninput handler to update full address when street, city, or zip changes
+              input.setAttribute('oninput', triggerUpdateFullAddressCode);
+            }
           }
           // Wrap each input in an .address-field div so margins apply
           const addrWrap = document.createElement('div');
@@ -5360,13 +5590,18 @@ function isFieldPartOfTriggerSequence(fieldName, fieldId) {
     const inputType = (type === 'number') ? 'number' : 'text';
     const placeholder = label;
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
+    // Add maxlength and inputmode for zip fields (numeric only, max 5 chars)
+    const isZipField = (label === 'Zip' || label === 'zip' || id.includes('_zip'));
+    const maxLengthAttr = isZipField ? ' maxlength="5"' : '';
+    const inputModeAttr = isZipField ? ' inputmode="numeric"' : '';
+    const zipOnInput = isZipField ? ' oninput="this.value = this.value.replace(/[^0-9]/g, \'\')"' : '';
     return (
       '<div class="address-field">' +
       '<input type="' + inputType + '" ' +
       'id="' + id + '" ' +
       'name="' + id + '" ' +
       'placeholder="' + placeholder + '" ' +
-      'class="address-input"' + valueAttr + '>' +
+      'class="address-input"' + valueAttr + maxLengthAttr + inputModeAttr + zipOnInput + '>' +
       '</div>'
     );
   };
@@ -8380,7 +8615,7 @@ function showAlert(message, isHardAlert) {
                     '<div style="font-size: 0.9em; color: #666; font-style: italic;">Please change your answer to proceed</div>' +
                     '</div>';
             } else {
-                alertMessage.textContent = message;
+            alertMessage.textContent = message;
             }
         }
         alertOverlay.style.display = 'flex';
@@ -9699,16 +9934,16 @@ function triggerVisibilityUpdates() {
         const hasDeadline = deadline && typeof deadline.timeRemaining === 'function';
         while (idx < total && (hasDeadline ? deadline.timeRemaining() > 5 : processed < 10)) {
             const container = questionContainers[idx];
-            const questionId = container.id.replace('question-container-', '');
-            try {
-                const questionElement = document.getElementById(questionNameIds[questionId]) || 
-                                      document.getElementById('answer' + questionId);
-                if (questionElement) {
-                    const event = new Event('change', { bubbles: true });
-                    questionElement.dispatchEvent(event);
-                }
-            } catch (error) {
+        const questionId = container.id.replace('question-container-', '');
+        try {
+        const questionElement = document.getElementById(questionNameIds[questionId]) || 
+                              document.getElementById('answer' + questionId);
+        if (questionElement) {
+            const event = new Event('change', { bubbles: true });
+            questionElement.dispatchEvent(event);
             }
+        } catch (error) {
+        }
             idx += 1;
             processed += 1;
         }
@@ -10175,12 +10410,18 @@ function showTextboxLabels(questionId, count){
                         locationFieldDiv.appendChild(hiddenWrap);
                     } else {
                         input = document.createElement('input');
-                        input.type = f.label === 'Zip' ? 'number' : 'text';
+                        input.type = 'text'; // Use text for all fields including Zip (zip codes can start with 0)
                         input.id = locPrefix + '_' + f.nodeId + '_' + j;
                         input.name = input.id;
                         input.placeholder = f.label; // Street, City, Zip
                         input.className = 'address-input';
                         input.style.textAlign = 'center'; // Ensure text is centered
+                        // Add maxlength and numeric-only for zip fields
+                        if (f.label === 'Zip' || f.nodeId === 'zip' || input.id.includes('_zip')) {
+                            input.setAttribute('maxlength', '5');
+                            input.setAttribute('inputmode', 'numeric');
+                            input.oninput = function() { this.value = this.value.replace(/[^0-9]/g, ''); };
+                        }
                     }
                     const fieldWrap = document.createElement('div');
                     fieldWrap.className = 'address-field';
@@ -10260,9 +10501,21 @@ function showTextboxLabels(questionId, count){
                     ' style="margin: 4px auto; max-width: 400px;"' +
                     ' oninput="formatPhoneInput(this)"' +
                     ' value="' + safePrefill + '">' +
+                    '<input type="hidden"' +
+                    ' id="' + field.nodeId + '_code_' + j + '"' +
+                    ' name="' + field.nodeId + '_code_' + j + '">' +
+                    '<input type="hidden"' +
+                    ' id="' + field.nodeId + '_no_code_' + j + '"' +
+                    ' name="' + field.nodeId + '_no_code_' + j + '">' +
                   '</div>';
-                // Append all children (wrapper + input)
+                // Append all children (wrapper + input + hidden fields)
                 Array.from(inputDiv.children).forEach(child => entryContainer.appendChild(child));
+                setTimeout(() => {
+                    const createdInput = document.getElementById(fieldId);
+                    if (createdInput) {
+                        window.formatPhoneInput(createdInput);
+                    }
+                }, 0);
             } else if (field.type === 'amount') {
                 const fieldId = field.nodeId + "_" + j;
                 const inputDiv = document.createElement('div');
@@ -11681,8 +11934,8 @@ function updateLinkedFields() {
 
                 if (isTargetLinkedField || isTargetPublicDateLinkedField) {
 
-                }
             }
+        }
         }
 
     });
@@ -12802,48 +13055,48 @@ async function previewPdf(baseName, isUploaded, isLatex, isPdfPreview, questionI
             }
         } else {
             // For server-side PDFs, fetch from server
-            // Collect form data
-            const form = document.getElementById('customForm');
-            const fd = new FormData();
-            const formElements = form.querySelectorAll('input, textarea, select');
-            const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
-            const allFormElements = [...formElements, ...externalFormElements];
+        // Collect form data
+        const form = document.getElementById('customForm');
+        const fd = new FormData();
+        const formElements = form.querySelectorAll('input, textarea, select');
+        const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+        const allFormElements = [...formElements, ...externalFormElements];
 
-            allFormElements.forEach(element => {
-                if (element.name && !element.disabled) {
-                    if (element.type === 'checkbox' || element.type === 'radio') {
-                        if (element.checked) {
-                            fd.append(element.name, 'on');
-                        }
-                    } else {
-                        let value = element.value;
-                        if (element.type === 'date' && value) {
-                            value = formatDateForServer(value);
-                        }
-                        if (value && value.trim() !== '') {
-                            fd.append(element.name, value);
-                        }
+        allFormElements.forEach(element => {
+            if (element.name && !element.disabled) {
+                if (element.type === 'checkbox' || element.type === 'radio') {
+                    if (element.checked) {
+                        fd.append(element.name, 'on');
+                    }
+                } else {
+                    let value = element.value;
+                    if (element.type === 'date' && value) {
+                        value = formatDateForServer(value);
+                    }
+                    if (value && value.trim() !== '') {
+                        fd.append(element.name, value);
                     }
                 }
-            });
-
-            // Fetch the filled PDF (keep extension and include credentials for sessioned APIs)
-            const pdfParam = baseName.endsWith('.pdf') ? baseName : (baseName + '.pdf');
-            const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(pdfParam);
-            const res = await fetch(endpoint, { 
-                method: 'POST', 
-                body: fd, 
-                credentials: 'include' 
-            });
-
-            if (!res.ok) {
-                throw new Error("HTTP error! status: " + res.status);
             }
+        });
 
-            const blob = await res.blob();
-            if (blob.size === 0) {
-                throw new Error("Received empty PDF blob from server");
-            }
+        // Fetch the filled PDF (keep extension and include credentials for sessioned APIs)
+        const pdfParam = baseName.endsWith('.pdf') ? baseName : (baseName + '.pdf');
+        const endpoint = '/edit_pdf?pdf=' + encodeURIComponent(pdfParam);
+        const res = await fetch(endpoint, { 
+            method: 'POST', 
+            body: fd, 
+            credentials: 'include' 
+        });
+
+        if (!res.ok) {
+            throw new Error("HTTP error! status: " + res.status);
+        }
+
+        const blob = await res.blob();
+        if (blob.size === 0) {
+            throw new Error("Received empty PDF blob from server");
+        }
 
             url = URL.createObjectURL(blob);
         }
@@ -13375,8 +13628,8 @@ function attachCalculationListeners() {
     // Run calculations asynchronously after page is interactive
     if (typeof requestIdleCallback !== 'undefined') {
         requestIdleCallback(() => {
-            runAllHiddenCheckboxCalculations();
-            runAllHiddenTextCalculations();
+    runAllHiddenCheckboxCalculations();
+    runAllHiddenTextCalculations();
         }, { timeout: 1000 });
     } else {
         // Fallback for browsers without requestIdleCallback
@@ -13571,27 +13824,27 @@ if (typeof handleNext === 'function') {
         let saveRetryCount = 0;
         const MAX_RETRIES = 3;
         const DEBOUNCE_DELAY = 1000; // Wait 1 second after last change before saving
-
+        
         // Helper: save answers (with debouncing, error handling, and visibility prioritization)
         async function saveAnswers(immediate = false) {
             if (!isUserLoggedIn || !userId) {
 
                 return;
             }
-
+            
             // If immediate save requested, clear any pending debounced save
             if (immediate && saveAnswersTimeout) {
                 clearTimeout(saveAnswersTimeout);
                 saveAnswersTimeout = null;
             }
-
+            
             // If already saving, mark that we need to save again after current save completes
             if (isSaving) {
 
                 pendingSave = true;
                 return;
             }
-
+            
             // Debounce: wait for user to stop typing
             if (!immediate) {
                 clearTimeout(saveAnswersTimeout);
@@ -13600,32 +13853,32 @@ if (typeof handleNext === 'function') {
                 }, DEBOUNCE_DELAY);
                 return;
             }
-
+            
             // 🔧 NEW: Prevent blank values from being saved in first 3 seconds
             if (window.preventBlankSaves) {
 
                 return;
             }
-
+            
             isSaving = true;
             try {
                 const fields = getFormFields();
 
                 const answers = {};
                 const fieldVisibility = {}; // Track which fields are visible
-
+                
                 fields.forEach(el => {
                     const isVisible = isElementActuallyVisible(el);
                     const fieldName = el.name;
                     const fieldId = el.id;
                     const fieldType = el.type || el.tagName;
-
+                    
                     // Skip if we already have a visible field's value and this field is hidden
                     if (fieldVisibility[fieldName] === true && !isVisible) {
 
                         return; // Skip this hidden field, we already have a visible one
                     }
-
+                    
                     // Store the value
                     let valueToSave = null;
                     if (el.type === 'checkbox') {
@@ -13642,7 +13895,7 @@ if (typeof handleNext === 'function') {
                         valueToSave = el.value;
                         answers[fieldName] = valueToSave;
                     }
-
+                    
                     // Track visibility for this field name
                     fieldVisibility[fieldName] = isVisible;
 
@@ -13651,21 +13904,21 @@ if (typeof handleNext === 'function') {
 
                     }
                 });
-
+                
                 // Write to Firestore with error handling and retry logic
                 await db.collection('users').doc(userId).collection('formAnswers').doc(formId).set(answers, { merge: true });
 
                 saveRetryCount = 0; // Reset retry count on success
             } catch (error) {
-
+                
                 // Handle resource-exhausted error specifically
                 if (error.code === 'resource-exhausted' || (error.message && error.message.includes('queued writes'))) {
-
+                    
                     // Retry with exponential backoff
                     if (saveRetryCount < MAX_RETRIES) {
                         saveRetryCount++;
                         const backoffDelay = Math.min(1000 * Math.pow(2, saveRetryCount), 10000); // Max 10 seconds
-
+                        
                         setTimeout(() => {
                             saveAnswers(true); // Retry immediately
                         }, backoffDelay);
@@ -13680,7 +13933,7 @@ if (typeof handleNext === 'function') {
                 }
             } finally {
                 isSaving = false;
-
+                
                 // If there's a pending save, trigger it after a short delay
                 if (pendingSave) {
                     pendingSave = false;
@@ -13926,10 +14179,10 @@ if (typeof handleNext === 'function') {
                                         el.checked = false;
                                     } else {
                                         console.log('✅ [AUTOFILL RADIO] First pass - checking radio (safe)');
-                                        el.checked = true;
-                                        // Dispatch change event to trigger linked textbox creation
-                                        const changeEvent = new Event('change', { bubbles: true });
-                                        el.dispatchEvent(changeEvent);
+                                    el.checked = true;
+                                    // Dispatch change event to trigger linked textbox creation
+                                    const changeEvent = new Event('change', { bubbles: true });
+                                    el.dispatchEvent(changeEvent);
                                         // Verify radio is still checked after change event
                                         setTimeout(() => {
 
@@ -13948,7 +14201,7 @@ if (typeof handleNext === 'function') {
                                         el.checked = false;
                                     } else {
 
-                                        el.checked = !!autofillValue;
+                                el.checked = !!autofillValue;
                                     }
                                 } else {
                                     el.checked = !!autofillValue;
@@ -14020,7 +14273,7 @@ if (typeof handleNext === 'function') {
                                     }
                                 }
                                 // If no hard alert match, proceed with normal autofill
-                                el.value = autofillValue;
+                            el.value = autofillValue;
 
                                 // Trigger change event to call dropdownMirror and update conditional logic
                                 const changeEvent = new Event('change', { bubbles: true });
@@ -14028,13 +14281,13 @@ if (typeof handleNext === 'function') {
                             } else {
                                 el.value = autofillValue;
 
-                                // Dispatch input and change events for text inputs to trigger linked textbox syncing
-                                if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
-                                    const inputEvent = new Event('input', { bubbles: true });
-                                    el.dispatchEvent(inputEvent);
-                                    const changeEvent = new Event('change', { bubbles: true });
-                                    el.dispatchEvent(changeEvent);
-                                }
+                            // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                            if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                                const inputEvent = new Event('input', { bubbles: true });
+                                el.dispatchEvent(inputEvent);
+                                const changeEvent = new Event('change', { bubbles: true });
+                                el.dispatchEvent(changeEvent);
+                            }
                             }
                             }
                         } else {
@@ -14048,7 +14301,7 @@ if (typeof handleNext === 'function') {
                                     if (fieldType === 'text' || fieldType === 'SELECT' || fieldType === 'INPUT' || fieldType === 'location') {
 
                                     }
-                                }
+                            }
                             }
                         }
                     });
@@ -14183,7 +14436,7 @@ if (typeof handleNext === 'function') {
                                         el.checked = false;
                                     } else {
                                         // Safe to check the checkbox
-                                        el.checked = !!mappedData[el.name];
+                                    el.checked = !!mappedData[el.name];
                                     }
                                 } else if (el.type === 'radio') {
                                     // For radio buttons, check if it would trigger a hard alert before checking
@@ -14194,7 +14447,7 @@ if (typeof handleNext === 'function') {
                                             el.checked = false;
                                         } else {
                                             console.log('✅ [AUTOFILL RADIO] Second pass - checking radio (safe)');
-                                            el.checked = true;
+                                        el.checked = true;
                                         }
                                     } else {
                                         el.checked = false;
@@ -14227,7 +14480,7 @@ if (typeof handleNext === 'function') {
                                                     fieldById.checked = false;
                                                 } else {
                                                     console.log('✅ [AUTOFILL RADIO] Additional pass (by ID) - checking radio (safe)');
-                                                    fieldById.checked = true;
+                                                fieldById.checked = true;
                                                 }
                                             } else {
                                                 fieldById.checked = false;
@@ -14239,7 +14492,7 @@ if (typeof handleNext === 'function') {
                                                 fieldById.checked = false;
                                             } else {
                                                 // Safe to check the checkbox
-                                                fieldById.checked = !!mappedData[fieldName];
+                                    fieldById.checked = !!mappedData[fieldName];
                                             }
                                         }
                                 } else {
@@ -14422,10 +14675,10 @@ if (typeof handleNext === 'function') {
                                     el.checked = false;
                                 } else {
                                     console.log('✅ [AUTOFILL RADIO] Second pass (fallback) - checking radio (safe)');
-                                    el.checked = true;
-                                    // Dispatch change event to trigger linked textbox creation
-                                    const changeEvent = new Event('change', { bubbles: true });
-                                    el.dispatchEvent(changeEvent);
+                                el.checked = true;
+                                // Dispatch change event to trigger linked textbox creation
+                                const changeEvent = new Event('change', { bubbles: true });
+                                el.dispatchEvent(changeEvent);
                                 }
                             } else {
                                 el.checked = false;
@@ -14440,7 +14693,7 @@ if (typeof handleNext === 'function') {
                                     el.checked = false;
                                 } else {
 
-                                    el.checked = !!autofillValue;
+                            el.checked = !!autofillValue;
                                 }
                             } else {
                                 el.checked = !!autofillValue;
@@ -14489,15 +14742,15 @@ if (typeof handleNext === 'function') {
                             // Trigger change event to call dropdownMirror and update conditional logic
                             const changeEvent = new Event('change', { bubbles: true });
                             el.dispatchEvent(changeEvent);
-                        } else {
-                            el.value = autofillValue;
-                            // Dispatch input and change events for text inputs to trigger linked textbox syncing
-                            if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
-                                const inputEvent = new Event('input', { bubbles: true });
-                                el.dispatchEvent(inputEvent);
-                                const changeEvent = new Event('change', { bubbles: true });
-                                el.dispatchEvent(changeEvent);
-                            }
+                    } else {
+                        el.value = autofillValue;
+                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                        if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                            const inputEvent = new Event('input', { bubbles: true });
+                            el.dispatchEvent(inputEvent);
+                            const changeEvent = new Event('change', { bubbles: true });
+                            el.dispatchEvent(changeEvent);
+                        }
                         }
                     }
                     // Debug successful autofill
@@ -14557,14 +14810,14 @@ if (typeof handleNext === 'function') {
                             const changeEvent = new Event('change', { bubbles: true });
                             el.dispatchEvent(changeEvent);
                         } else {
-                            el.value = autofillValue;
-                            // Dispatch input and change events for text inputs to trigger linked textbox syncing
-                            if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
-                                const inputEvent = new Event('input', { bubbles: true });
-                                el.dispatchEvent(inputEvent);
-                                const changeEvent = new Event('change', { bubbles: true });
-                                el.dispatchEvent(changeEvent);
-                            }
+                        el.value = autofillValue;
+                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                        if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                            const inputEvent = new Event('input', { bubbles: true });
+                            el.dispatchEvent(inputEvent);
+                            const changeEvent = new Event('change', { bubbles: true });
+                            el.dispatchEvent(changeEvent);
+                        }
                         }
                     } else if (autofillValue !== null && el.type === 'checkbox' && !el.checked) {
                         // Check if this checkbox would trigger a hard alert before checking
@@ -14573,7 +14826,7 @@ if (typeof handleNext === 'function') {
                             el.checked = false;
                         } else {
                             // Safe to check the checkbox
-                            el.checked = !!autofillValue;
+                        el.checked = !!autofillValue;
                         }
                     }
                 });
@@ -14621,7 +14874,7 @@ if (typeof handleNext === 'function') {
                 if (targetRadioBefore) {
 
                 }
-                window.isInitialAutofill = false;
+            window.isInitialAutofill = false;
 
                 // Verify target radio button state after clearing flag
                 setTimeout(() => {
@@ -14630,8 +14883,8 @@ if (typeof handleNext === 'function') {
 
                     }
                 }, 100);
-                // 🔧 NEW: Restore prefill values for any blank fields after Firebase autofill
-                if (window.unifiedFieldsMap) {
+            // 🔧 NEW: Restore prefill values for any blank fields after Firebase autofill
+            if (window.unifiedFieldsMap) {
                 Object.keys(window.unifiedFieldsMap).forEach(questionId => {
                     const fields = window.unifiedFieldsMap[questionId];
                     if (Array.isArray(fields)) {
@@ -14695,20 +14948,20 @@ if (typeof handleNext === 'function') {
                         });
                     }
                 });
-                } else {
-                }
-                // 🔧 NEW: Update all hidden address fields after autofill completes
-                if (typeof updateAllHiddenAddressFields === 'function') {
-                    updateAllHiddenAddressFields();
-                }
-                // 🔧 NEW: Update all linked checkboxes after autofill completes
-                if (typeof window.updateAllLinkedCheckboxes === 'function') {
-                    window.updateAllLinkedCheckboxes();
-                }
-                // Also update inverse checkboxes after autofill
-                if (typeof window.updateAllInverseCheckboxes === 'function') {
-                    window.updateAllInverseCheckboxes();
-                }
+            } else {
+            }
+            // 🔧 NEW: Update all hidden address fields after autofill completes
+            if (typeof updateAllHiddenAddressFields === 'function') {
+                updateAllHiddenAddressFields();
+            }
+            // 🔧 NEW: Update all linked checkboxes after autofill completes
+            if (typeof window.updateAllLinkedCheckboxes === 'function') {
+                window.updateAllLinkedCheckboxes();
+            }
+            // Also update inverse checkboxes after autofill
+            if (typeof window.updateAllInverseCheckboxes === 'function') {
+                window.updateAllInverseCheckboxes();
+            }
                 // NOTE: radioGroupChanged events are now dispatched BEFORE isInitialAutofill is set to false
                 // (see code above that processes autofilled radio buttons before clearing the flag)
             }, 300); // Wait 300ms for conditional logic to process radioGroupChanged events
@@ -14846,7 +15099,7 @@ if (typeof handleNext === 'function') {
                                     el.checked = false;
                                 } else {
 
-                                    el.checked = !!data[el.name];
+                                el.checked = !!data[el.name];
                                 }
                             } else if (el.type === 'radio') {
                                 // For radio buttons, check if it would trigger a hard alert before checking
@@ -14857,7 +15110,7 @@ if (typeof handleNext === 'function') {
                                         el.checked = false;
                                     } else {
                                         console.log('✅ [AUTOFILL RADIO] localStorage pass - checking radio (safe)');
-                                        el.checked = true;
+                                    el.checked = true;
                                     }
                             } else {
                                     el.checked = false;
@@ -14964,7 +15217,7 @@ if (typeof handleNext === 'function') {
                                             el.checked = false;
                                         } else {
 
-                                            el.checked = !!data[el.name];
+                                        el.checked = !!data[el.name];
                                         }
                                     } else if (el.type === 'radio') {
                                         // For radio buttons, check if it would trigger a hard alert before checking
@@ -15002,7 +15255,7 @@ if (typeof handleNext === 'function') {
                                             fieldById.checked = false;
                                         } else {
 
-                                            fieldById.checked = !!data[fieldName];
+                                        fieldById.checked = !!data[fieldName];
                                         }
                                     } else if (fieldById.type === 'radio') {
                                         // For radio buttons, check if it would trigger a hard alert before checking
@@ -15080,10 +15333,10 @@ if (typeof handleNext === 'function') {
                                                 el.checked = false;
                                             } else {
                                                 console.log('✅ [AUTOFILL RADIO] Additional pass 3 - checking radio (safe)');
-                                                el.checked = true;
-                                                // Dispatch change event to trigger linked textbox creation
-                                                const changeEvent = new Event('change', { bubbles: true });
-                                                el.dispatchEvent(changeEvent);
+                                            el.checked = true;
+                                            // Dispatch change event to trigger linked textbox creation
+                                            const changeEvent = new Event('change', { bubbles: true });
+                                            el.dispatchEvent(changeEvent);
                                             }
                                         } else {
                                             el.checked = false;
@@ -15098,7 +15351,7 @@ if (typeof handleNext === 'function') {
                                                 el.checked = false;
                                             } else {
 
-                                                el.checked = !!autofillValue;
+                                        el.checked = !!autofillValue;
                                             }
                                         } else {
                                             el.checked = !!autofillValue;
@@ -15147,15 +15400,15 @@ if (typeof handleNext === 'function') {
                                         // Trigger change event to call dropdownMirror and update conditional logic
                                         const changeEvent = new Event('change', { bubbles: true });
                                         el.dispatchEvent(changeEvent);
-                                    } else {
-                                        el.value = autofillValue;
-                                        // Dispatch input and change events for text inputs to trigger linked textbox syncing
-                                        if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
-                                            const inputEvent = new Event('input', { bubbles: true });
-                                            el.dispatchEvent(inputEvent);
-                                            const changeEvent = new Event('change', { bubbles: true });
-                                            el.dispatchEvent(changeEvent);
-                                        }
+                                } else {
+                                    el.value = autofillValue;
+                                    // Dispatch input and change events for text inputs to trigger linked textbox syncing
+                                    if (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number' || !el.type)) {
+                                        const inputEvent = new Event('input', { bubbles: true });
+                                        el.dispatchEvent(inputEvent);
+                                        const changeEvent = new Event('change', { bubbles: true });
+                                        el.dispatchEvent(changeEvent);
+                                    }
                                     }
                                 }
                                 // Debug successful autofill
@@ -15197,11 +15450,11 @@ if (typeof handleNext === 'function') {
                                         el.checked = false;
                                     } else {
                                         // Safe to check the checkbox
-                                        el.checked = !!autofillValue;
-                                        // Dispatch change event to trigger linked textbox creation
-                                        if (el.checked) {
-                                            const changeEvent = new Event('change', { bubbles: true });
-                                            el.dispatchEvent(changeEvent);
+                                    el.checked = !!autofillValue;
+                                    // Dispatch change event to trigger linked textbox creation
+                                    if (el.checked) {
+                                        const changeEvent = new Event('change', { bubbles: true });
+                                        el.dispatchEvent(changeEvent);
                                         }
                                     }
                                 }
@@ -15679,12 +15932,17 @@ function createAddressInput(id, label, index, type = 'text', prefill = '') {
     const inputType = type === 'number' ? 'number' : 'text';
     const placeholder = label; // Remove the index number from placeholder
     const valueAttr = prefill ? ' value="' + prefill.replace(/"/g, '&quot;') + '"' : '';
+    // Add maxlength and inputmode for zip fields (numeric only, max 5 chars)
+    const isZipField = (label === 'Zip' || label === 'zip' || id.includes('_zip'));
+    const maxLengthAttr = isZipField ? ' maxlength="5"' : '';
+    const inputModeAttr = isZipField ? ' inputmode="numeric"' : '';
+    const zipOnInput = isZipField ? ' oninput="this.value = this.value.replace(/[^0-9]/g, \'\')"' : '';
     return '<div class="address-field">' +
            '<input type="' + inputType + '" ' +
            'id="' + id + '" ' +
            'name="' + id + '" ' +
            'placeholder="' + placeholder + '" ' +
-           'class="address-input"' + valueAttr + '>' +
+           'class="address-input"' + valueAttr + maxLengthAttr + inputModeAttr + zipOnInput + '>' +
            '</div>';
 }
 </script>
