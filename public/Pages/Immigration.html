@@ -234,28 +234,50 @@
             position: absolute;
             left: 0;
             top: 38px;
-            background: #fff;
+            background: #fff !important;
             min-width: 210px;
             box-shadow: 0 4px 24px rgba(44,62,80,0.13);
             border-radius: 10px;
-            z-index: 10;
+            z-index: 1002 !important;
             padding: 12px 0;
             flex-direction: column;
             gap: 0;
         }
+        /* Use multiple selectors for specificity */
+        .nav-dropdown-wrapper .dropdown-menu a,
+        nav.desktop-nav .dropdown-menu a,
         .dropdown-menu a {
-            color: #222;
-            padding: 12px 28px;
-            text-decoration: none;
-            display: block;
-            font-weight: 600;
-            font-size: 1.08em;
-            border-radius: 0;
-            transition: background 0.18s, color 0.18s;
+            color: #222 !important;
+            padding: 12px 28px !important;
+            text-decoration: none !important;
+            display: block !important;
+            font-weight: 600 !important;
+            font-size: 1.08em !important;
+            border-radius: 0 !important;
+            transition: background 0.18s, color 0.18s !important;
+            letter-spacing: normal !important;
+            box-shadow: none !important;
         }
+        /* Explicit link states */
+        .nav-dropdown-wrapper .dropdown-menu a:link,
+        .nav-dropdown-wrapper .dropdown-menu a:visited,
+        .nav-dropdown-wrapper .dropdown-menu a:active,
+        nav.desktop-nav .dropdown-menu a:link,
+        nav.desktop-nav .dropdown-menu a:visited,
+        nav.desktop-nav .dropdown-menu a:active,
+        .dropdown-menu a:link,
+        .dropdown-menu a:visited,
+        .dropdown-menu a:active {
+            color: #222 !important;
+            background: transparent !important;
+        }
+        /* Hover state with correct colors */
+        .nav-dropdown-wrapper .dropdown-menu a:hover,
+        nav.desktop-nav .dropdown-menu a:hover,
         .dropdown-menu a:hover {
-            background: #eaf1f8;
-            color: #2980b9;
+            background: #eaf1f8 !important;
+            color: #2980b9 !important;
+            box-shadow: none !important;
         }
         .nav-dropdown-wrapper.open .dropdown-menu {
             display: flex;
@@ -1002,8 +1024,7 @@
                     </svg>
                     <div style="font-size:1.25em;font-weight:700;color:#2c3e50;margin-bottom:8px;">I-9 Employment Eligibility Verification</div>
                     <div style="font-size:1.05em;color:#555;margin-bottom:16px;">Verify the identity and employment authorization of individuals hired for employment in the United States.</div>
-                    <div style="font-size:1.1em;color:#2980b9;font-weight:700;margin-bottom:10px;">Free</div>
-                    <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;">Get Started</a>
+                    <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;">Coming Soon</a>
                 </div>
                 <!-- I-90 Card -->
                 <div class="freeform-card">
@@ -1013,8 +1034,7 @@
                     </svg>
                     <div style="font-size:1.25em;font-weight:700;color:#2c3e50;margin-bottom:8px;">I-90 Application to Replace Permanent Resident Card</div>
                     <div style="font-size:1.05em;color:#555;margin-bottom:16px;">Apply to replace or renew your Green Card (Permanent Resident Card).</div>
-                    <div style="font-size:1.1em;color:#2980b9;font-weight:700;margin-bottom:10px;">Free</div>
-                    <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;">Get Started</a>
+                    <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;">Coming Soon</a>
                 </div>
                 <!-- I-485 Card -->
                 <div class="freeform-card">
@@ -1024,8 +1044,7 @@
                     </svg>
                     <div style="font-size:1.25em;font-weight:700;color:#2c3e50;margin-bottom:8px;">I-485 Application to Register Permanent Residence or Adjust Status</div>
                     <div style="font-size:1.05em;color:#555;margin-bottom:16px;">Apply for lawful permanent resident status (a Green Card) while living in the United States.</div>
-                    <div style="font-size:1.1em;color:#2980b9;font-weight:700;margin-bottom:10px;">Free</div>
-                    <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;">Get Started</a>
+                    <a href="#" class="btn" style="padding:10px 36px;font-size:1.08em;">Coming Soon</a>
                 </div>
             </div>
         </section>
@@ -1056,7 +1075,7 @@
         </div>
     </div>
     <footer>
-        &copy; 2024 Form-Star. All rights reserved.
+        &copy; 2026 Form-Star. All rights reserved.
     </footer>
     <div class="cart-overlay" id="cart-overlay">
         <div class="cart-side-menu" id="cart-side-menu">
@@ -1159,7 +1178,7 @@
                 mobileLogoutBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     auth.signOut().then(() => {
-                        window.location.reload();
+                        window.location.href = '../index.html';
                     }).catch((error) => {
                         alert('Sign Out Error: ' + error.message);
                     });

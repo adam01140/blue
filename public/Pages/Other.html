@@ -221,6 +221,7 @@
             height: 100vh;
             background: #2c3e50;
             flex-direction: column;
+            gap: 0;
             padding: 140px 20px 20px 20px !important;
             transition: left 0.3s ease;
             z-index: 1000;
@@ -254,7 +255,8 @@
             align-items: center;
             color: #fff;
             text-decoration: none;
-            padding: 12px 0 12px 25px;
+            padding: 15px 0;
+            padding-left: 25px;
             font-size: 1.1em;
             font-weight: 600;
             cursor: pointer;
@@ -274,6 +276,12 @@
             min-height: 45px;
             display: flex;
             align-items: center;
+        }
+        .mobile-nav-submenu a:first-child {
+            border-top: 1px solid #34495e;
+            margin-top: 0px;
+            padding-top: 30px;
+            padding-bottom: 0;
         }
         .mobile-nav-logout,
         .mobile-nav-logout a,
@@ -1949,7 +1957,7 @@
         </div>
     </div>
     <footer>
-        &copy; 2024 Form-Star. All rights reserved.
+        &copy; 2026 Form-Star. All rights reserved.
     </footer>
     <script src="Pages/cart.js"></script>
 
