@@ -13,6 +13,9 @@ RUN apt-get update && \
     texlive-latex-recommended \
     && rm -rf /var/lib/apt/lists/*
 
+# Verify pdflatex installation
+RUN pdflatex --version || (echo "ERROR: pdflatex installation failed!" && exit 1)
+
 # Set working directory
 WORKDIR /app
 

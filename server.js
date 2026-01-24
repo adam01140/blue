@@ -107,6 +107,37 @@ app.get('/', (_, res) => {
   res.send('Welcome to the PDF Editing Server');
 });
 
+// Health check endpoint (used by Render)
+app.get('/healthz', async (req, res) => {
+  try {
+    // Check if pdflatex is available
+    let latexStatus = 'unknown';
+    try {
+      await execAsync('which pdflatex', { timeout: 5000 });
+      const versionOutput = await execAsync('pdflatex --version', { timeout: 5000 });
+      latexStatus = 'installed';
+      res.json({ 
+        status: 'healthy', 
+        latex: 'installed',
+        version: versionOutput.stdout.substring(0, 100)
+      });
+    } catch (latexError) {
+      latexStatus = 'not_installed';
+      res.status(503).json({ 
+        status: 'unhealthy', 
+        latex: 'not_installed',
+        error: latexError.message,
+        message: 'pdflatex is not available. Dockerfile may not be in use.'
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'error', 
+      error: error.message 
+    });
+  }
+});
+
 // Site-wide authentication endpoint (uses ADMIN_PASSWORD from env)
 app.post('/api/verify-password', (req, res) => {
   try {
@@ -1082,10 +1113,25 @@ app.post('/latex_to_pdf', async (req, res) => {
     // -interaction=nonstopmode: don't stop for errors
     // -output-directory: specify output directory
     // -halt-on-error: stop on first error
+    // First check if pdflatex is available
+    try {
+      await execAsync('which pdflatex', { timeout: 5000 });
+    } catch (checkError) {
+      console.error('[LATEX SERVER] pdflatex not found in PATH!');
+      console.error('[LATEX SERVER] Check error:', checkError.message);
+      return res.status(500).json({ 
+        error: 'LaTeX compiler (pdflatex) is not installed',
+        details: 'pdflatex command not found. Please ensure LaTeX is installed via Dockerfile.',
+        checkError: checkError.message
+      });
+    }
+    
     const compileCommand = `pdflatex -interaction=nonstopmode -output-directory="${tempDir}" -halt-on-error "${texFile}"`;
     
     try {
       console.log('[LATEX SERVER] Executing compilation command:', compileCommand);
+      console.log('[LATEX SERVER] Temp directory:', tempDir);
+      console.log('[LATEX SERVER] LaTeX file:', texFile);
       const { stdout, stderr } = await execAsync(compileCommand, {
         timeout: 30000, // 30 second timeout
         maxBuffer: 1024 * 1024 * 10 // 10MB buffer
@@ -1402,5 +1448,32 @@ async function sendPdfEmail(to, subject, text, pdfBuffer, filename) {
 // ────────────────────────────────────────────────────────────
 // Start server
 // ────────────────────────────────────────────────────────────
+// Check if pdflatex is available at startup
+async function checkLaTeXInstallation() {
+  try {
+    console.log('[STARTUP] Checking LaTeX installation...');
+    const { stdout, stderr } = await execAsync('which pdflatex', { timeout: 5000 });
+    console.log('[STARTUP] pdflatex found at:', stdout.trim());
+    
+    // Try to get version
+    try {
+      const versionOutput = await execAsync('pdflatex --version', { timeout: 5000 });
+      console.log('[STARTUP] pdflatex version (first 200 chars):', versionOutput.stdout.substring(0, 200));
+    } catch (versionError) {
+      console.warn('[STARTUP] Could not get pdflatex version:', versionError.message);
+    }
+  } catch (error) {
+    console.error('[STARTUP] ========== CRITICAL ERROR ==========');
+    console.error('[STARTUP] pdflatex is NOT installed or not in PATH!');
+    console.error('[STARTUP] Error:', error.message);
+    console.error('[STARTUP] This will cause LaTeX-to-PDF conversion to fail.');
+    console.error('[STARTUP] Please ensure Dockerfile is being used or LaTeX is installed.');
+    console.error('[STARTUP] =====================================');
+  }
+}
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+app.listen(PORT, async () => {
+  console.log(`Server is running on port ${PORT}`);
+  await checkLaTeXInstallation();
+});
