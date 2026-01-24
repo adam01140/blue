@@ -1,6 +1,7 @@
 services:
   - type: web
     name: Form-Star
+    env: docker
     # Use Docker to install LaTeX dependencies
     dockerfilePath: ./Dockerfile
     dockerContext: .
