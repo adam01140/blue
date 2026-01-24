@@ -295,6 +295,14 @@ function listenToMyForms(userId) {
         });
 }
 
+function normalizeFormStatus(status) {
+    const normalized = String(status || '').trim().toLowerCase();
+    if (normalized === 'archived') {
+        return 'Archived';
+    }
+    return 'Public';
+}
+
 // Load available forms from Firebase
 async function loadAvailableForms() {
     try {
@@ -303,6 +311,7 @@ async function loadAvailableForms() {
         
         snapshot.forEach(doc => {
             const formData = doc.data();
+            formData.status = normalizeFormStatus(formData.status);
             formData.id = doc.id;
             
             // Transform URLs to use the correct format with Forms/ prefix and include portfolio ID
@@ -367,6 +376,7 @@ async function loadCountyZipMap() {
 let availableFormsData = [];
 let currentFormsPage = 0;
 const FORMS_PER_PAGE = 5;
+let showArchivedForms = false;
 
 // Update renderAvailableForms to use county-based zip search
 async function renderAvailableForms(page = 0, searchFilter = '', zipFilter = '') {
@@ -374,7 +384,7 @@ async function renderAvailableForms(page = 0, searchFilter = '', zipFilter = '')
         if (!availableFormsData.length) {
             availableFormsData = await loadAvailableForms();
         }
-        let forms = availableFormsData;
+        let forms = availableFormsData.filter(form => showArchivedForms || normalizeFormStatus(form.status) !== 'Archived');
         if (searchFilter) {
             const searchTerm = searchFilter.toLowerCase();
             // Create a prioritized list: title matches first, then description matches
@@ -447,6 +457,22 @@ async function renderAvailableForms(page = 0, searchFilter = '', zipFilter = '')
                 formInfo.appendChild(anchor);
                 formInfo.appendChild(description);
                 
+                if (showArchivedForms && normalizeFormStatus(form.status) === 'Archived') {
+                    const archivedBadge = document.createElement('div');
+                    archivedBadge.textContent = 'Archived';
+                    archivedBadge.style.display = 'inline-block';
+                    archivedBadge.style.alignSelf = 'flex-start';
+                    archivedBadge.style.background = '#f6e5e5';
+                    archivedBadge.style.color = '#c0392b';
+                    archivedBadge.style.border = '1px solid #e0b4b4';
+                    archivedBadge.style.borderRadius = '8px';
+                    archivedBadge.style.padding = '2px 8px';
+                    archivedBadge.style.fontSize = '0.78em';
+                    archivedBadge.style.fontWeight = '600';
+                    archivedBadge.style.marginTop = '6px';
+                    formInfo.appendChild(archivedBadge);
+                }
+                
                 // Create Click Here button
                 const addButton = document.createElement('button');
                 addButton.textContent = 'Click Here';
@@ -476,6 +502,34 @@ async function renderAvailableForms(page = 0, searchFilter = '', zipFilter = '')
     } catch (error) {
         console.error('Error rendering available forms:', error);
     }
+}
+
+function getAvailableFormsFilters() {
+    const searchInput = document.getElementById('available-forms-search');
+    const zipInput = document.getElementById('available-forms-zip');
+    return {
+        search: searchInput ? searchInput.value.trim() : '',
+        zip: zipInput ? zipInput.value.trim() : ''
+    };
+}
+
+function updateArchivedFormsIndicator() {
+    const indicator = document.getElementById('archived-forms-indicator');
+    if (!indicator) return;
+    if (showArchivedForms) {
+        indicator.textContent = 'Archived forms are visible (Ctrl/Cmd + CapsLock to hide)';
+        indicator.style.display = 'block';
+    } else {
+        indicator.textContent = 'Archived forms are hidden (Ctrl/Cmd + CapsLock to show)';
+        indicator.style.display = 'none';
+    }
+}
+
+function toggleArchivedFormsVisibility() {
+    showArchivedForms = !showArchivedForms;
+    updateArchivedFormsIndicator();
+    const filters = getAvailableFormsFilters();
+    renderAvailableForms(0, filters.search, filters.zip);
 }
 
 // Variables to store pending form data for duplicate confirmation
@@ -1215,22 +1269,10 @@ if (userSettingsBtn) {
 // Add search functionality for available forms
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('available-forms-search');
-    const availableFormsList = document.getElementById('available-forms-list');
-    if (searchInput && availableFormsList) {
+    if (searchInput) {
         searchInput.addEventListener('input', function() {
-            const filter = searchInput.value.trim().toLowerCase();
-            const formItems = availableFormsList.querySelectorAll('li');
-            formItems.forEach(li => {
-                const anchor = li.querySelector('a');
-                if (anchor) {
-                    const formName = anchor.textContent.toLowerCase();
-                    if (formName.includes(filter)) {
-                        li.style.display = '';
-                    } else {
-                        li.style.display = 'none';
-                    }
-                }
-            });
+            const filters = getAvailableFormsFilters();
+            renderAvailableForms(0, filters.search, filters.zip);
         });
     }
     
@@ -1297,17 +1339,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const zipInput = document.getElementById('available-forms-zip');
     if (prevBtn) {
         prevBtn.addEventListener('click', function() {
-            renderAvailableForms(currentFormsPage - 1, searchInput.value.trim(), zipInput.value.trim());
+            const filters = getAvailableFormsFilters();
+            renderAvailableForms(currentFormsPage - 1, filters.search, filters.zip);
         });
     }
     if (nextBtn) {
         nextBtn.addEventListener('click', function() {
-            renderAvailableForms(currentFormsPage + 1, searchInput.value.trim(), zipInput.value.trim());
+            const filters = getAvailableFormsFilters();
+            renderAvailableForms(currentFormsPage + 1, filters.search, filters.zip);
         });
     }
     if (searchInput) {
         searchInput.addEventListener('input', function() {
-            renderAvailableForms(0, searchInput.value.trim(), zipInput.value.trim());
+            const filters = getAvailableFormsFilters();
+            renderAvailableForms(0, filters.search, filters.zip);
         });
     }
     if (zipInput) {
@@ -1316,11 +1361,21 @@ document.addEventListener('DOMContentLoaded', function() {
             let val = zipInput.value.replace(/\D/g, '');
             if (val.length > 5) val = val.slice(0, 5);
             zipInput.value = val;
-            renderAvailableForms(0, searchInput.value.trim(), zipInput.value.trim());
+            const filters = getAvailableFormsFilters();
+            renderAvailableForms(0, filters.search, filters.zip);
         });
     }
     // Initial render
     renderAvailableForms(0);
+    updateArchivedFormsIndicator();
+});
+
+document.addEventListener('keydown', function(e) {
+    const isToggle = (e.ctrlKey || e.metaKey) && (e.key === 'CapsLock' || e.code === 'CapsLock');
+    if (isToggle && !e.repeat) {
+        e.preventDefault();
+        toggleArchivedFormsVisibility();
+    }
 });
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -548,6 +548,13 @@
                             <option value="Yes">Yes</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label for="edit-status">📌 Status</label>
+                        <select id="edit-status">
+                            <option value="Public">Public</option>
+                            <option value="Archived">Archived</option>
+                        </select>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -605,6 +612,14 @@
                         // Ensure description field exists for backward compatibility
                         if (!form.description) {
                             form.description = '';
+                        }
+                        // Ensure status field exists for backward compatibility
+                        if (!form.status) {
+                            form.status = 'Public';
+                        } else if (String(form.status).toLowerCase() === 'archived') {
+                            form.status = 'Archived';
+                        } else {
+                            form.status = 'Public';
                         }
                     });
                     
@@ -733,7 +748,7 @@
             const newId = 'form_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             
             // Add new form to data
-            formsData.push({ id: newId, name: 'New Form', description: '', url: '', counties: ['Monterey'], defendant: 'N/A' });
+            formsData.push({ id: newId, name: 'New Form', description: '', url: '', counties: ['Monterey'], defendant: 'N/A', status: 'Public' });
             currentEditIndex = formsData.length - 1;
             
             // Clear form fields
@@ -741,6 +756,7 @@
             document.getElementById('edit-id').value = newId;
             document.getElementById('edit-description').value = '';
             document.getElementById('edit-url').value = '';
+            document.getElementById('edit-status').value = 'Public';
             
             // Set up counties select
             const countiesSelect = document.getElementById('edit-counties');
@@ -844,6 +860,14 @@
                             if (!form.description) {
                                 form.description = '';
                             }
+                            // Ensure status field exists for backward compatibility
+                            if (!form.status) {
+                                form.status = 'Public';
+                            } else if (String(form.status).toLowerCase() === 'archived') {
+                                form.status = 'Archived';
+                            } else {
+                                form.status = 'Public';
+                            }
                             // Generate unique ID if not present
                             if (!form.id) {
                                 form.id = 'form_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -880,6 +904,7 @@
             document.getElementById('edit-name').value = form.name || '';
             document.getElementById('edit-id').value = form.id || '';
             document.getElementById('edit-description').value = form.description || '';
+            document.getElementById('edit-status').value = form.status || 'Public';
             
             // Handle URL - extract base from full URL
             const urlBase = (form.url || '').split('.html')[0] || '';
@@ -917,6 +942,7 @@
             const name = document.getElementById('edit-name').value.trim();
             const id = document.getElementById('edit-id').value.trim();
             const description = document.getElementById('edit-description').value.trim();
+            const status = document.getElementById('edit-status').value;
             const urlBase = document.getElementById('edit-url').value.trim();
             const counties = Array.from(document.getElementById('edit-counties').selectedOptions).map(opt => opt.value);
             const defendant = document.getElementById('edit-defendant').value;
@@ -935,6 +961,7 @@
                 formsData[currentEditIndex].url = urlBase ? `${urlBase}.html?formId=${id}` : '';
                 formsData[currentEditIndex].counties = counties;
                 formsData[currentEditIndex].defendant = defendant;
+            formsData[currentEditIndex].status = status || 'Public';
                 
                 // Save to server via API
                 console.log('🔍 DEBUG: About to save form with data:', {
