@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: Form-Star
+    env: node
+    buildCommand: yarn && bash install-latex.sh
+    startCommand: node server.js
+    # Note: For LaTeX to work, you need to use Docker or install it via build script
+    # If using Docker, Render will automatically detect the Dockerfile
+
