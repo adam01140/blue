@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New SC-120</title>
+    <title>Example Form</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="generate.css">
     <link rel="stylesheet" href="generate2.css">
@@ -1184,130 +1184,6 @@ document.addEventListener("DOMContentLoaded", function() {
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_hungry"></div>
               <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-3" data-question-id="3" class="question-container question-item question-step-hidden" data-section="1" data-question-index="3"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry_dup2" name="hungry_dup2" data-question-id="3"
-                      onchange="dropdownMirror(this, 'hungry_dup2'); updateHiddenLogic('hungry_dup2', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handleLatexPreview3(this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_hungry_dup2"></div>
-              <input type="text" id="hungry_dup2_dropdown" name="hungry_dup2_dropdown"
-                   readonly style="display:none;">
-              <div id="latexPreview3" style="display: none; margin-top: 20px; padding: 20px; border: 2px solid #4CAF50; border-radius: 12px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);">
-                <h4 style="margin: 0 0 15px 0; color: #2E7D32; font-size: 18px; font-weight: 600; text-align: center;">Latex PDF Preview</h4>
-                <div id="latexPreviewLoading3" style="text-align: center; padding: 20px; display: none;">
-                  <p style="color: #2E7D32; font-size: 16px;">Generating PDF from LaTeX...</p>
-                </div>
-                <div style="text-align: center; background: white; padding: 10px; border-radius: 8px;">
-                  <iframe id="latexPreviewIframe3" width="100%" height="600px" style="border: none; border-radius: 8px;"></iframe>
-                </div>
-              </div>
-              <script>
-                async function handleLatexPreview3(value) {
-
-                  const previewDiv = document.getElementById('latexPreview3');
-                  const iframe = document.getElementById('latexPreviewIframe3');
-                  const loadingDiv = document.getElementById('latexPreviewLoading3');
-                  const latexContent = `\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage[margin=1in]{geometry}\n\\usepackage{enumitem}\n\n\\begin{document}\n\n% Sender Information (Top Left)\n\\begin{flushleft}\n[user_fullname]\\\\\n[user_full_address]\\\\\nEmail: [user_email]\\\\\nPhone: [user_phone]\\\\[1em]\nDate: [current_date]\n\\end{flushleft}\n\n\\vspace{1em}\n\n% Recipient Information\n[how_many_people_are_you_counter_suing_name_1]\\\\\n[how_many_people_are_you_counter_suing_please_enter_their_address_street_1]\n\n\\vspace{1em}\n\n\\textbf{Re: Demand for Payment}\n\n\\vspace{1em}\n\nDear [how_many_people_are_you_counter_suing_name_1],\n\n\\vspace{1em}\n\nI am writing to formally demand payment in the amount of [how_much_are_you_counter_suing_for] for the following reasons:\n\n[explain_why_they_owe_you_that_money]\n\n\\vspace{1em}\n\nThis amount remains unpaid despite previous attempts to resolve this matter amicably.\n\n\\vspace{1em}\n\nPlease remit payment in full by 14 days from the date of this letter. Payment can be made via cash, check, or bank transfer.\n\n\\vspace{1em}\n\nIf payment is not received by the stated deadline, I will have no choice but to pursue legal action in small claims court to recover the amount owed, along with any applicable court costs and fees.\n\n\\vspace{1em}\n\nI hope we can resolve this matter promptly and avoid further escalation. Please feel free to contact me at [user_phone] or [user_email] if you have any questions or wish to discuss this matter further.\n\n\\vspace{1em}\n\nThank you for your immediate attention to this matter.\n\n\\vspace{1em}\n\nSincerely,\\\\[2em]\n[user_fullname]\n\n\\end{document}\n`;
-
-                  if (value === 'Yes') {
-
-                    previewDiv.style.display = 'block';
-                    loadingDiv.style.display = 'block';
-                    iframe.style.display = 'none';
-                    // Convert LaTeX to PDF
-                    try {
-                      // Collect all form data for placeholder replacement
-
-                      const form = document.getElementById('customForm');
-                      if (!form) {
-
-                        throw new Error('Form element not found');
-                      }
-
-                      const fd = new FormData();
-                      fd.append('latex', latexContent);
-
-                      // Collect all form data
-                      const formElements = form.querySelectorAll('input, textarea, select');
-                      const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
-                      const allFormElements = [...formElements, ...externalFormElements];
-
-                      let collectedFields = {};
-                      allFormElements.forEach(element => {
-                        if (element.name && !element.disabled) {
-                          if (element.type === 'checkbox' || element.type === 'radio') {
-                            if (element.checked) {
-                              fd.append(element.name, 'on');
-                              collectedFields[element.name] = 'on';
-                            }
-                          } else {
-                            let value = element.value;
-                            if (element.type === 'date' && value) {
-                              value = formatDateForServer(value);
-                            }
-                            if (value && value.trim() !== '') {
-                              fd.append(element.name, value);
-                              collectedFields[element.name] = value;
-                            }
-                          }
-                        }
-                      });
-
-                      // Send LaTeX content and form data to server endpoint to generate PDF
-
-                      const res = await fetch('/latex_to_pdf', { 
-                        method: 'POST', 
-                        body: fd, 
-                        credentials: 'include' 
-                      });
-
-                      if (!res.ok) {
-                        throw new Error('Failed to generate PDF from LaTeX');
-                      }
-                      const blob = await res.blob();
-                      const url = URL.createObjectURL(blob);
-                      // Display in iframe
-                      iframe.src = url;
-                      loadingDiv.style.display = 'none';
-                      iframe.style.display = 'block';
-                      // Store URL for cleanup
-                      iframe.dataset.blobUrl = url;
-
-                      // Store PDF blob if "Attach to packet" is selected
-                      const attachment = 'Preview Only';
-                      if (attachment === 'Attach to packet') {
-                        // Initialize window.latexPdfs if it doesn't exist
-                        if (!window.latexPdfs) {
-                          window.latexPdfs = {};
-                        }
-                        // Store the blob for this question
-                        window.latexPdfs[3] = blob;
-
-                      }
-                    } catch (error) {
-
-                      loadingDiv.innerHTML = '<p style="color: #c62828;">Failed to generate PDF from LaTeX. Please check your LaTeX code and try again.</p>';
-                      iframe.style.display = 'none';
-                    }
-                  } else {
-
-                    previewDiv.style.display = 'none';
-                    // Clean up blob URL and remove stored PDF if exists
-                    if (iframe.dataset.blobUrl) {
-                      URL.revokeObjectURL(iframe.dataset.blobUrl);
-                      iframe.dataset.blobUrl = '';
-                      iframe.src = '';
-                    }
-                    // Remove stored PDF blob if user changes away from trigger
-                    if (window.latexPdfs && window.latexPdfs[3]) {
-                      delete window.latexPdfs[3];
-                    }
-                  }
-                }
-              </script>
-            </div><div id="question-container-4" data-question-id="4" class="question-container question-item question-step-hidden" data-section="1" data-question-index="4"><label><h3 class="question-text">Tired?</h3></label><select id="tired" name="tired" data-question-id="4"
-                      onchange="dropdownMirror(this, 'tired'); updateHiddenLogic('tired', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_tired"></div>
-              <input type="text" id="tired_dropdown" name="tired_dropdown"
                    readonly style="display:none;"></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
@@ -2536,7 +2412,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
 <input type="hidden" id="user_full_address"     name="user_full_address">
 <input type="hidden" id="user_full_address_hidden" name="user_full_address_hidden">
-<input type="checkbox" id="new_sc_120_default_checkbox" name="new_sc_120_default_checkbox" checked style="display: none;">
+<input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
 </div>
   <script>
     window.showLoginRequiredModal = function() {
@@ -2553,7 +2429,7 @@ document.addEventListener("DOMContentLoaded", function() {
     };
   </script>
   </form>
-<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button onclick="downloadAllPdfs()" style="font-size: 1.2em;">Download PDF</button><br><br><button onclick="showPreviewPdfsModal()" style="font-size: 1.2em;">Preview PDFs</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Continue</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='../Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button></div>
+<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><br><button id="debugDownloadPdfBtn" onclick="downloadAllPdfs()" style="font-size: 1.2em; display: none;">Download PDF</button><br id="debugDownloadPdfBr" style="display: none;"><br id="debugPreviewPdfsBr" style="display: none;"><button id="debugPreviewPdfsBtn" onclick="showPreviewPdfsModal()" style="font-size: 1.2em; display: none;">Preview PDFs</button><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Checkout</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='/Pages/FreeForm.html'" style="font-size: 1.2em;">Exit Survey</button></div>
 </div>
 </section>
 </div>
@@ -2680,9 +2556,9 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = 'Test Form';
-var questionSlugMap = {"1":"do_you_have_any_documentation_showing_these_efforts","2":"hungry","3":"hungry","4":"tired"};
-var questionNameIds = {"1":"do_you_have_any_documentation_showing_these_efforts","2":"hungry","3":"hungry_dup2","4":"tired"};
+window.formId = '';
+var questionSlugMap = {"1":"do_you_have_any_documentation_showing_these_efforts","2":"hungry"};
+var questionNameIds = {"1":"do_you_have_any_documentation_showing_these_efforts","2":"hungry"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {};
@@ -3203,6 +3079,39 @@ window.pdfPreviewQuestions = [];
         subtree: true,
         childList: true
       });
+    }
+  });
+  
+  // Debug mode toggle for thank you message buttons
+  let debugModeEnabled = false;
+  document.addEventListener('keydown', function(e) {
+    // Check for Ctrl+Shift (Windows/Linux) or Cmd+Shift (Mac)
+    const isModifierPressed = (e.ctrlKey || e.metaKey) && e.shiftKey;
+    
+    if (isModifierPressed) {
+      debugModeEnabled = !debugModeEnabled;
+      
+      // Toggle visibility of debug buttons
+      const downloadBtn = document.getElementById('debugDownloadPdfBtn');
+      const previewBtn = document.getElementById('debugPreviewPdfsBtn');
+      const downloadBr = document.getElementById('debugDownloadPdfBr');
+      const previewBr = document.getElementById('debugPreviewPdfsBr');
+      
+      if (downloadBtn && previewBtn && downloadBr && previewBr) {
+        if (debugModeEnabled) {
+          downloadBtn.style.display = 'inline-block';
+          previewBtn.style.display = 'inline-block';
+          downloadBr.style.display = 'block';
+          previewBr.style.display = 'block';
+          console.log('Debug mode enabled - PDF buttons visible');
+        } else {
+          downloadBtn.style.display = 'none';
+          previewBtn.style.display = 'none';
+          downloadBr.style.display = 'none';
+          previewBr.style.display = 'none';
+          console.log('Debug mode disabled - PDF buttons hidden');
+        }
+      }
     }
   });
   var isCreatingFields = false;
@@ -4995,7 +4904,7 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       if (typeof userId === 'undefined') { var userId = null; }
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [{"questionId":"4","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"4","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":1}];
+    var jumpLogics = [{"questionId":"2","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"2","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":1}];
 var conditionalPDFs = [];
 var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
@@ -5350,11 +5259,11 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "Test Form";
-var pdfOutputFileName = "sc120.pdf";
-var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
+var pdfFileName = "";
+var pdfOutputFileName = "example.html";
+var stripePriceId = "";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["sc120", ];
+var allPdfFileNames = ["example.html", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
@@ -5365,7 +5274,7 @@ var hiddenTextCalculations = [];
   var anyMatch=false;
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="yes";
+    var cPrevAns="no";
     var cPrevQNum="1";
     var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
     if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
@@ -5374,7 +5283,7 @@ var hiddenTextCalculations = [];
   })();
   (function(){
     var cPrevType="dropdown";
-    var cPrevAns="no";
+    var cPrevAns="yes";
     var cPrevQNum="1";
     var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
     if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
