@@ -1060,28 +1060,254 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1" data-question-type="numberedDropdown"><label><h3 class="question-text">How many people</h3></label><select id="how_many_people" name="how_many_people" data-question-id="1" onchange="showTextboxLabels(1, this.value); updateHiddenCheckboxes(1, this.value); updateHiddenLogic('how_many_people', this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select><br><div id="labelContainer1"></div><script>
-          window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
-            if (!input) return;
-            // Remove all non-numeric characters except decimal point, including dollar sign
-            let val = (input.value || '').replace(/[^0-9.]/g, '');
-            if (!val) {
-              input.value = '';
-              return;
-            }
-            const parts = val.split('.');
-            parts[0] = parts[0].replace(/^0+(?=\d)/, '');
-            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            const decimal = parts[1] ? '.' + parts[1].slice(0, 2) : '';
-            // Add dollar sign prefix
-            input.value = '$' + parts[0] + decimal;
-          };
-        </script></div><div id="question-container-2" data-question-id="2" class="question-container question-item question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="2"
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Do you have any documentation showing these efforts?</h3></label><select id="do_you_have_any_documentation_showing_these_efforts" name="do_you_have_any_documentation_showing_these_efforts" data-question-id="1"
+                      onchange="dropdownMirror(this, 'do_you_have_any_documentation_showing_these_efforts'); updateHiddenLogic('do_you_have_any_documentation_showing_these_efforts', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handleLatexPreview1(this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_do_you_have_any_documentation_showing_these_efforts"></div>
+              <input type="text" id="do_you_have_any_documentation_showing_these_efforts_dropdown" name="do_you_have_any_documentation_showing_these_efforts_dropdown"
+                   readonly style="display:none;">
+              <div id="latexPreview1" style="display: none; margin-top: 20px; padding: 20px; border: 2px solid #4CAF50; border-radius: 12px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);">
+                <h4 style="margin: 0 0 15px 0; color: #2E7D32; font-size: 18px; font-weight: 600; text-align: center;">Heres a sample demand letter:</h4>
+                <div id="latexPreviewLoading1" style="text-align: center; padding: 20px; display: none;">
+                  <p style="color: #2E7D32; font-size: 16px;">Generating PDF from LaTeX...</p>
+                </div>
+                <div style="text-align: center; background: white; padding: 10px; border-radius: 8px;">
+                  <iframe id="latexPreviewIframe1" width="100%" height="600px" style="border: none; border-radius: 8px;"></iframe>
+                </div>
+              </div>
+              <script>
+                async function handleLatexPreview1(value) {
+
+                  const previewDiv = document.getElementById('latexPreview1');
+                  const iframe = document.getElementById('latexPreviewIframe1');
+                  const loadingDiv = document.getElementById('latexPreviewLoading1');
+                  const latexContent = `\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage[margin=1in]{geometry}\n\\usepackage{enumitem}\n\n\\begin{document}\n\n% Sender Information (Top Left)\n\\begin{flushleft}\n[user_fullname]\\\\\n[user_full_address]\\\\\nEmail: [user_email]\\\\\nPhone: [user_phone]\\\\[1em]\nDate: [current_date]\n\\end{flushleft}\n\n\\vspace{1em}\n\n% Recipient Information\n[how_many_people_are_you_suing_name_1]\\\\\n[how_many_people_are_you_suing_please_enter_]\n\n\\vspace{1em}\n\n\\textbf{Re: Demand for Payment}\n\n\\vspace{1em}\n\nDear [how_many_people_are_you_suing_name_1],\n\n\\vspace{1em}\n\nI am writing to formally demand payment in the amount of [how_much_are_you_suing_for] for the following reasons:\n\n[explain_why_they_owe_you_that_money]\n\n\\vspace{1em}\n\nAs of the date of this letter, the amount of [how_much_are_you_suing_for] remains unpaid. I demand that you pay this amount in full by 14 days from the date of this letter.\n\n\\vspace{1em}\n\nPayment may be made by cash, check, or bank transfer. Please send payment to the address listed above, or contact me directly at [user_phone] or [user_email] to arrange payment.\n\n\\vspace{1em}\n\nIf payment is not received by the deadline specified above, I will pursue all available legal remedies, including filing a lawsuit in small claims court to recover the amount owed, plus any applicable interest, court costs, and attorneys\' fees.\n\n\\vspace{1em}\n\nI hope we can resolve this matter amicably without the need for legal action. Please contact me at [user_phone] or [user_email] to discuss payment arrangements.\n\n\\vspace{1em}\n\nSincerely,\\\\[2em]\n[user_fullname]\n\n\\end{document}`;
+
+                  if (value === 'No') {
+
+                    previewDiv.style.display = 'block';
+                    loadingDiv.style.display = 'block';
+                    iframe.style.display = 'none';
+                    // Convert LaTeX to PDF
+                    try {
+                      // Collect all form data for placeholder replacement
+
+                      const form = document.getElementById('customForm');
+                      if (!form) {
+
+                        throw new Error('Form element not found');
+                      }
+
+                      const fd = new FormData();
+                      fd.append('latex', latexContent);
+
+                      // Collect all form data
+                      const formElements = form.querySelectorAll('input, textarea, select');
+                      const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+                      const allFormElements = [...formElements, ...externalFormElements];
+
+                      let collectedFields = {};
+                      allFormElements.forEach(element => {
+                        if (element.name && !element.disabled) {
+                          if (element.type === 'checkbox' || element.type === 'radio') {
+                            if (element.checked) {
+                              fd.append(element.name, 'on');
+                              collectedFields[element.name] = 'on';
+                            }
+                          } else {
+                            let value = element.value;
+                            if (element.type === 'date' && value) {
+                              value = formatDateForServer(value);
+                            }
+                            if (value && value.trim() !== '') {
+                              fd.append(element.name, value);
+                              collectedFields[element.name] = value;
+                            }
+                          }
+                        }
+                      });
+
+                      // Send LaTeX content and form data to server endpoint to generate PDF
+
+                      const res = await fetch('/latex_to_pdf', { 
+                        method: 'POST', 
+                        body: fd, 
+                        credentials: 'include' 
+                      });
+
+                      if (!res.ok) {
+                        throw new Error('Failed to generate PDF from LaTeX');
+                      }
+                      const blob = await res.blob();
+                      const url = URL.createObjectURL(blob);
+                      // Display in iframe
+                      iframe.src = url;
+                      loadingDiv.style.display = 'none';
+                      iframe.style.display = 'block';
+                      // Store URL for cleanup
+                      iframe.dataset.blobUrl = url;
+
+                      // Store PDF blob if "Attach to packet" is selected
+                      const attachment = 'Attach to packet';
+                      if (attachment === 'Attach to packet') {
+                        // Initialize window.latexPdfs if it doesn't exist
+                        if (!window.latexPdfs) {
+                          window.latexPdfs = {};
+                        }
+                        // Store the blob for this question
+                        window.latexPdfs[1] = blob;
+
+                      }
+                    } catch (error) {
+
+                      loadingDiv.innerHTML = '<p style="color: #c62828;">Failed to generate PDF from LaTeX. Please check your LaTeX code and try again.</p>';
+                      iframe.style.display = 'none';
+                    }
+                  } else {
+
+                    previewDiv.style.display = 'none';
+                    // Clean up blob URL and remove stored PDF if exists
+                    if (iframe.dataset.blobUrl) {
+                      URL.revokeObjectURL(iframe.dataset.blobUrl);
+                      iframe.dataset.blobUrl = '';
+                      iframe.src = '';
+                    }
+                    // Remove stored PDF blob if user changes away from trigger
+                    if (window.latexPdfs && window.latexPdfs[1]) {
+                      delete window.latexPdfs[1];
+                    }
+                  }
+                }
+              </script>
+            </div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="2"
                       onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
               <div id="dropdowntext_hungry"></div>
               <input type="text" id="hungry_dropdown" name="hungry_dropdown"
+                   readonly style="display:none;"></div><div id="question-container-3" data-question-id="3" class="question-container question-item question-step-hidden" data-section="1" data-question-index="3"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry_dup2" name="hungry_dup2" data-question-id="3"
+                      onchange="dropdownMirror(this, 'hungry_dup2'); updateHiddenLogic('hungry_dup2', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handleLatexPreview3(this.value)">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_hungry_dup2"></div>
+              <input type="text" id="hungry_dup2_dropdown" name="hungry_dup2_dropdown"
+                   readonly style="display:none;">
+              <div id="latexPreview3" style="display: none; margin-top: 20px; padding: 20px; border: 2px solid #4CAF50; border-radius: 12px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);">
+                <h4 style="margin: 0 0 15px 0; color: #2E7D32; font-size: 18px; font-weight: 600; text-align: center;">Latex PDF Preview</h4>
+                <div id="latexPreviewLoading3" style="text-align: center; padding: 20px; display: none;">
+                  <p style="color: #2E7D32; font-size: 16px;">Generating PDF from LaTeX...</p>
+                </div>
+                <div style="text-align: center; background: white; padding: 10px; border-radius: 8px;">
+                  <iframe id="latexPreviewIframe3" width="100%" height="600px" style="border: none; border-radius: 8px;"></iframe>
+                </div>
+              </div>
+              <script>
+                async function handleLatexPreview3(value) {
+
+                  const previewDiv = document.getElementById('latexPreview3');
+                  const iframe = document.getElementById('latexPreviewIframe3');
+                  const loadingDiv = document.getElementById('latexPreviewLoading3');
+                  const latexContent = `\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage[margin=1in]{geometry}\n\\usepackage{enumitem}\n\n\\begin{document}\n\n% Sender Information (Top Left)\n\\begin{flushleft}\n[user_fullname]\\\\\n[user_full_address]\\\\\nEmail: [user_email]\\\\\nPhone: [user_phone]\\\\[1em]\nDate: [current_date]\n\\end{flushleft}\n\n\\vspace{1em}\n\n% Recipient Information\n[how_many_people_are_you_counter_suing_name_1]\\\\\n[how_many_people_are_you_counter_suing_please_enter_their_address_street_1]\n\n\\vspace{1em}\n\n\\textbf{Re: Demand for Payment}\n\n\\vspace{1em}\n\nDear [how_many_people_are_you_counter_suing_name_1],\n\n\\vspace{1em}\n\nI am writing to formally demand payment in the amount of [how_much_are_you_counter_suing_for] for the following reasons:\n\n[explain_why_they_owe_you_that_money]\n\n\\vspace{1em}\n\nThis amount remains unpaid despite previous attempts to resolve this matter amicably.\n\n\\vspace{1em}\n\nPlease remit payment in full by 14 days from the date of this letter. Payment can be made via cash, check, or bank transfer.\n\n\\vspace{1em}\n\nIf payment is not received by the stated deadline, I will have no choice but to pursue legal action in small claims court to recover the amount owed, along with any applicable court costs and fees.\n\n\\vspace{1em}\n\nI hope we can resolve this matter promptly and avoid further escalation. Please feel free to contact me at [user_phone] or [user_email] if you have any questions or wish to discuss this matter further.\n\n\\vspace{1em}\n\nThank you for your immediate attention to this matter.\n\n\\vspace{1em}\n\nSincerely,\\\\[2em]\n[user_fullname]\n\n\\end{document}\n`;
+
+                  if (value === 'Yes') {
+
+                    previewDiv.style.display = 'block';
+                    loadingDiv.style.display = 'block';
+                    iframe.style.display = 'none';
+                    // Convert LaTeX to PDF
+                    try {
+                      // Collect all form data for placeholder replacement
+
+                      const form = document.getElementById('customForm');
+                      if (!form) {
+
+                        throw new Error('Form element not found');
+                      }
+
+                      const fd = new FormData();
+                      fd.append('latex', latexContent);
+
+                      // Collect all form data
+                      const formElements = form.querySelectorAll('input, textarea, select');
+                      const externalFormElements = document.querySelectorAll('input[form="customForm"], textarea[form="customForm"], select[form="customForm"]');
+                      const allFormElements = [...formElements, ...externalFormElements];
+
+                      let collectedFields = {};
+                      allFormElements.forEach(element => {
+                        if (element.name && !element.disabled) {
+                          if (element.type === 'checkbox' || element.type === 'radio') {
+                            if (element.checked) {
+                              fd.append(element.name, 'on');
+                              collectedFields[element.name] = 'on';
+                            }
+                          } else {
+                            let value = element.value;
+                            if (element.type === 'date' && value) {
+                              value = formatDateForServer(value);
+                            }
+                            if (value && value.trim() !== '') {
+                              fd.append(element.name, value);
+                              collectedFields[element.name] = value;
+                            }
+                          }
+                        }
+                      });
+
+                      // Send LaTeX content and form data to server endpoint to generate PDF
+
+                      const res = await fetch('/latex_to_pdf', { 
+                        method: 'POST', 
+                        body: fd, 
+                        credentials: 'include' 
+                      });
+
+                      if (!res.ok) {
+                        throw new Error('Failed to generate PDF from LaTeX');
+                      }
+                      const blob = await res.blob();
+                      const url = URL.createObjectURL(blob);
+                      // Display in iframe
+                      iframe.src = url;
+                      loadingDiv.style.display = 'none';
+                      iframe.style.display = 'block';
+                      // Store URL for cleanup
+                      iframe.dataset.blobUrl = url;
+
+                      // Store PDF blob if "Attach to packet" is selected
+                      const attachment = 'Preview Only';
+                      if (attachment === 'Attach to packet') {
+                        // Initialize window.latexPdfs if it doesn't exist
+                        if (!window.latexPdfs) {
+                          window.latexPdfs = {};
+                        }
+                        // Store the blob for this question
+                        window.latexPdfs[3] = blob;
+
+                      }
+                    } catch (error) {
+
+                      loadingDiv.innerHTML = '<p style="color: #c62828;">Failed to generate PDF from LaTeX. Please check your LaTeX code and try again.</p>';
+                      iframe.style.display = 'none';
+                    }
+                  } else {
+
+                    previewDiv.style.display = 'none';
+                    // Clean up blob URL and remove stored PDF if exists
+                    if (iframe.dataset.blobUrl) {
+                      URL.revokeObjectURL(iframe.dataset.blobUrl);
+                      iframe.dataset.blobUrl = '';
+                      iframe.src = '';
+                    }
+                    // Remove stored PDF blob if user changes away from trigger
+                    if (window.latexPdfs && window.latexPdfs[3]) {
+                      delete window.latexPdfs[3];
+                    }
+                  }
+                }
+              </script>
+            </div><div id="question-container-4" data-question-id="4" class="question-container question-item question-step-hidden" data-section="1" data-question-index="4"><label><h3 class="question-text">Tired?</h3></label><select id="tired" name="tired" data-question-id="4"
+                      onchange="dropdownMirror(this, 'tired'); updateHiddenLogic('tired', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
+              <div id="dropdowntext_tired"></div>
+              <input type="text" id="tired_dropdown" name="tired_dropdown"
                    readonly style="display:none;"></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
@@ -2454,18 +2680,18 @@ document.addEventListener("DOMContentLoaded", function() {
   </div>
   
 <script>
-window.formId = '';
-var questionSlugMap = {"1":"how_many_people","2":"hungry"};
-var questionNameIds = {"1":"how_many_people","2":"hungry"};
+window.formId = 'Test Form';
+var questionSlugMap = {"1":"do_you_have_any_documentation_showing_these_efforts","2":"hungry","3":"hungry","4":"tired"};
+var questionNameIds = {"1":"do_you_have_any_documentation_showing_these_efforts","2":"hungry","3":"hungry_dup2","4":"tired"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {};
 var allAreRequiredMap = {};
-var unifiedFieldsMap = {"1":[{"type":"label","label":"Name","nodeId":"how_many_people_name","order":1,"prefill":""},{"type":"phone","label":"Phone Number","nodeId":"how_many_people_phone_number","order":2},{"type":"location","fieldName":"Please enter their address","nodeId":"location_data","order":3},{"type":"dropdown","fieldName":"Is this defendant a business?","options":[{"text":"Yes","nodeId":"is_this_defendant_a_business_yes"},{"text":"No","nodeId":"is_this_defendant_a_business_no"}],"triggerSequences":[{"condition":"Yes","title":"Additional Information","fields":[{"type":"location","fieldName":"Where did they file their fictitious business name?","nodeId":"location_data"},{"type":"label","label":"Business Name","nodeId":"is_this_defendant_a_business_yes_business_name"},{"type":"label","label":"Business Name Statement Number","nodeId":"is_this_defendant_a_business_yes_business_name_statement_number","isAmountOption":true},{"type":"checkbox","fieldName":"What do they do business as?","selectionType":"single","options":[{"text":"An Individual","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_an_individual"},{"text":"An Association","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_an_association"},{"text":"A Partnership","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_a_partnership"},{"text":"A Corporation","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_a_corporation"},{"text":"A Limited Liability Company","nodeId":"is_this_defendant_a_business_yes_what_do_they_do_business_as_a_limited_liability_company"}]},{"type":"date","label":"When does their business statement expire?","nodeId":"is_this_defendant_a_business_yes_when_does_their_business_statement_expire","conditionalLogic":{"enabled":true,"conditions":["is_this_defendant_a_business_yes_what_do_they_do_business_as_an_individual"]}},{"type":"pdf","number":"1","pdfTitle":"SC-103 For Extra Plaintiff 1","pdfName":"sc103(1).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"2","pdfTitle":"SC-103 For Extra Plaintiff 2","pdfName":"sc103(2).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"3","pdfTitle":"SC-103 For Extra Plaintiff 3","pdfName":"sc103(3).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"4","pdfTitle":"SC-103 For Extra Plaintiff 4","pdfName":"sc103(4).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"},{"type":"pdf","number":"5","pdfTitle":"SC-103 For Extra Plaintiff 5","pdfName":"sc103(5).pdf","priceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2"}]}],"order":4}]};
+var unifiedFieldsMap = {};
 window.hardAlertData = {};
 var entryTitleMap = {};
 window.fileUploadQuestions = [];
-window.latexPreviewQuestions = [];
+window.latexPreviewQuestions = [{"questionId":"1","title":"Heres a sample demand letter:","filename":"Heres a sample demand letter:","priceId":"price_1SqS2XFJeSRMFQ8XXlBzhcqW","trigger":"No"}];
 window.pdfPreviewQuestions = [];
 
   // Address helper functions (must exist before conditional logic runs)
@@ -4769,17 +4995,17 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       if (typeof userId === 'undefined') { var userId = null; }
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [];
+    var jumpLogics = [{"questionId":"4","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"4","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":1}];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"1","pdfName":"sc103(1).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 1","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"1"},{"questionId":"1","pdfName":"sc103(2).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 2","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"2"},{"questionId":"1","pdfName":"sc103(3).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 3","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"3"},{"questionId":"1","pdfName":"sc103(4).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 4","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"4"},{"questionId":"1","pdfName":"sc103(5).pdf","pdfDisplayName":"SC-103 For Extra Plaintiff 5","stripePriceId":"price_1S8YpVFJeSRMFQ8XLldrcqu2","triggerOption":"","conditions":[{"prevQuestion":"1","prevAnswer":"*"}],"isBigParagraph":false,"isTriggerSequencePdf":true,"triggerSequenceFieldName":"Is this defendant a business?","triggerSequenceCondition":"Yes","pdfEntryNumber":"5"}];
+var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
 var alertLogics = [];
 var checklistLogics = [];
 var checklistItems = [];
 var conditionalAlerts = [];
-var labelMap = {"1":["Name"],"length":0};
-var amountMap = {"1":[],"length":0};
-var labelNodeIdsMap = {"1":["how_many_people_name"]};
+var labelMap = {"length":0};
+var amountMap = {"length":0};
+var labelNodeIdsMap = {};
 var linkedDropdowns = [];
 var hiddenLogicConfigs = [];
 var linkedFields = [];
@@ -5124,14 +5350,93 @@ function checkParagraphLimit(textareaId, paragraphLimit) {
 }
 var sectionStack = [];
 var currentSectionNumber = 1;
-var pdfFileName = "";
-var pdfOutputFileName = "example.html";
-var stripePriceId = "";
+var pdfFileName = "Test Form";
+var pdfOutputFileName = "sc120.pdf";
+var stripePriceId = "price_1SB7CbFJeSRMFQ8X2afGFckf";
 var additionalPdfFileNames = [];
-var allPdfFileNames = ["example.html", ];
+var allPdfFileNames = ["sc120", ];
 var hiddenCheckboxCalculations = [];
 var hiddenTextCalculations = [];
 
+
+(function(){
+ var thisQ=document.getElementById("question-container-2");
+ function updateVisibility(){
+  var anyMatch=false;
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+ if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
+   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
+   var questionType = thisQ.getAttribute('data-question-type') || '';
+   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
+     
+     if(typeof resetNumberedDropdownFields === 'function'){
+       resetNumberedDropdownFields("2");
+     } else {
+       
+     }
+   }
+   var allDropdowns = thisQ.querySelectorAll('select');
+   for(var d=0; d<allDropdowns.length; d++){
+     var dropdown = allDropdowns[d];
+     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
+     if(dropdown.closest('[id^="triggerFields"]')) continue;
+     // Reset to default "Select an option"
+     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
+     if(placeholderOption){
+       placeholderOption.selected = true;
+       dropdown.selectedIndex = 0;
+     } else if(dropdown.options.length > 0){
+       dropdown.selectedIndex = 0;
+     }
+     // Also reset any hidden dropdown inputs
+     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
+     if(hiddenDropdownInput){
+       hiddenDropdownInput.value = '';
+     }
+     // Clear hidden checkboxes created by dropdownMirror
+     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
+     if(dropdownWrapper){
+       dropdownWrapper.innerHTML = '';
+     }
+     // Trigger change event to update any dependent logic
+     dropdown.dispatchEvent(new Event('change'));
+   }
+   thisQ.classList.add("hidden");
+ }
+  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
+  if(parentSection){
+    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
+  }
+}
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ (function(){
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
+ })();
+ updateVisibility();
+})();
 
 
 /*──────────────────────────────────────────────────────────────*
