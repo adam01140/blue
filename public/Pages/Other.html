@@ -1012,7 +1012,7 @@
 
         .forms-list {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 28px;
             list-style: none;
             padding: 0;
@@ -1021,9 +1021,9 @@
         }
 
         .forms-list li {
-            background: #f8fafc;
+            background: #ffffff;
             border-radius: 14px;
-            box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+            box-shadow: 0 4px 20px rgba(44,62,80,0.15);
             padding: 28px 22px 22px 22px;
             min-width: 220px;
             max-width: 340px;
@@ -1031,14 +1031,15 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: box-shadow 0.2s, background 0.2s;
-            border: none;
+            transition: box-shadow 0.2s, background 0.2s, border-color 0.2s;
+            border: 2px solid rgba(41,128,185,0.15);
             position: relative;
         }
 
         .forms-list li:hover {
-            background: #eaf1f8;
-            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+            background: #f0f7ff;
+            box-shadow: 0 6px 24px rgba(44,62,80,0.20);
+            border-color: rgba(41,128,185,0.3);
             transform: translateY(-2px) scale(1.03);
         }
 
@@ -1278,21 +1279,21 @@
             list-style: none;
             padding: 0;
             margin: 0;
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 28px;
-            justify-content: center;
+            justify-items: center;
         }
 
         .forms-list li {
-            background: #f8fafc;
+            background: #ffffff;
             border-radius: 14px;
-            box-shadow: 0 4px 16px rgba(44,62,80,0.15);
-            border: 1px solid rgba(44,62,80,0.08);
+            box-shadow: 0 4px 20px rgba(44,62,80,0.15);
+            border: 2px solid rgba(41,128,185,0.15);
             padding: 28px 22px 22px 22px;
-            width: 28%;
             min-width: 220px;
             max-width: 340px;
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -1301,9 +1302,9 @@
         }
 
         .forms-list li:hover {
-            background: #eaf1f8;
-            box-shadow: 0 6px 20px rgba(44,62,80,0.20);
-            border-color: rgba(41,128,185,0.2);
+            background: #f0f7ff;
+            box-shadow: 0 6px 24px rgba(44,62,80,0.20);
+            border-color: rgba(41,128,185,0.3);
             transform: translateY(-2px) scale(1.03);
         }
 
@@ -1887,7 +1888,10 @@
                 <h1>Available Forms</h1><br>
                 <div class="subtitle">Browse and add new forms to your portfolio. Click a form to add it below.</div>
                 <!-- Search Bar for Available Forms -->
-                <input type="text" id="available-forms-search" placeholder="Search By Form Name " style="width: 80%; max-width: 320px; margin: 0 auto 18px auto; display: block; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #e2e8f0;">
+                <input type="text" id="available-forms-search" placeholder="Search By Form Name " style="width: 80%; max-width: 320px; margin: 0 auto 18px auto; display: block; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 3px solid #2980b9; text-align: center;">
+                <div id="archived-forms-indicator" style="display: none; margin: 0 auto 14px auto; font-size: 0.95em; color: #c0392b; font-weight: 600;">
+                    Archived forms are hidden (Ctrl/Cmd + CapsLock to show)
+                </div>
                 <input type="text" id="available-forms-zip" placeholder="Search By ZIP Code" maxlength="5" style="width: 80%; max-width: 176px; margin: 0 auto 18px auto; display: block; padding: 12px; font-size: 1.1em; border-radius: 6px; border: 2px solid #b3e0ff; background: #f8fbff; text-align: center; box-shadow: 0 1px 4px rgba(44,62,80,0.06);">
                 <br><br>
                 <ul id="available-forms-list" class="forms-list">
@@ -2180,6 +2184,41 @@
             let availableFormsData = [];
             let currentFormsPage = 0;
             const FORMS_PER_PAGE = 5;
+            let showArchivedForms = false;
+
+            function normalizeFormStatus(status) {
+                const normalized = String(status || '').trim().toLowerCase();
+                if (normalized === 'archived') {
+                    return 'Archived';
+                }
+                return 'Public';
+            }
+
+            function getAvailableFormsFilters() {
+                return {
+                    search: searchInput ? searchInput.value.trim() : '',
+                    zip: zipInput ? zipInput.value.trim() : ''
+                };
+            }
+
+            function updateArchivedFormsIndicator() {
+                const indicator = document.getElementById('archived-forms-indicator');
+                if (!indicator) return;
+                if (showArchivedForms) {
+                    indicator.textContent = 'Archived forms are visible (Ctrl/Cmd + CapsLock to hide)';
+                    indicator.style.display = 'block';
+                } else {
+                    indicator.textContent = 'Archived forms are hidden (Ctrl/Cmd + CapsLock to show)';
+                    indicator.style.display = 'none';
+                }
+            }
+
+            function toggleArchivedFormsVisibility() {
+                showArchivedForms = !showArchivedForms;
+                updateArchivedFormsIndicator();
+                const filters = getAvailableFormsFilters();
+                renderAvailableForms(0, filters.search, filters.zip);
+            }
 
             // Generate portfolio ID helper function
             function generatePortfolioId() {
@@ -2199,6 +2238,7 @@
                     
                     snapshot.forEach(doc => {
                         const formData = doc.data();
+                        formData.status = normalizeFormStatus(formData.status);
                         formData.id = doc.id;
                         
                         // Transform URLs to use the correct format with Forms/ prefix and include portfolio ID
@@ -2245,12 +2285,26 @@
                 }
             }
 
+            let countyZipMap = null;
+            async function loadCountyZipMap() {
+                if (countyZipMap) return countyZipMap;
+                try {
+                    const response = await fetch('../JSON/county-zips.json');
+                    if (!response.ok) throw new Error('Failed to load county-zips.json');
+                    countyZipMap = await response.json();
+                    return countyZipMap;
+                } catch (e) {
+                    console.error('Error loading county-zips.json:', e);
+                    return {};
+                }
+            }
+
             async function renderAvailableForms(page = 0, searchFilter = '', zipFilter = '') {
                 try {
                     if (!availableFormsData.length) {
                         availableFormsData = await loadAvailableForms();
                     }
-                    let forms = availableFormsData;
+                    let forms = availableFormsData.filter(form => showArchivedForms || normalizeFormStatus(form.status) !== 'Archived');
                     if (searchFilter) {
                         const searchTerm = searchFilter.toLowerCase();
                         // Create a prioritized list: title matches first, then description matches
@@ -2264,7 +2318,11 @@
                         forms = [...titleMatches, ...descriptionMatches];
                     }
                     if (zipFilter) {
-                        forms = forms.filter(form => Array.isArray(form.zipCodes) && form.zipCodes.some(z => z.startsWith(zipFilter)));
+                        const countyZipMap = await loadCountyZipMap();
+                        const matchingCounties = Object.entries(countyZipMap)
+                            .filter(([county, zips]) => zips.includes(zipFilter))
+                            .map(([county]) => county);
+                        forms = forms.filter(form => Array.isArray(form.counties) && form.counties.some(c => matchingCounties.includes(c)));
                     }
                     const totalPages = Math.ceil(forms.length / FORMS_PER_PAGE);
                     if (page < 0) page = 0;
@@ -2280,11 +2338,48 @@
                         availableFormsList.innerHTML = '';
                         formsToShow.forEach(form => {
                             const li = document.createElement('li');
+                            const formInfo = document.createElement('div');
+                            formInfo.style.display = 'flex';
+                            formInfo.style.flexDirection = 'column';
+                            formInfo.style.gap = '4px';
+                            formInfo.style.flex = '1';
+
                             const anchor = document.createElement('a');
                             anchor.href = '#';
                             anchor.setAttribute('data-form-id', form.id);
                             anchor.setAttribute('data-form-url', form.url);
                             anchor.textContent = form.name;
+                            anchor.style.fontWeight = 'bold';
+                            anchor.style.fontSize = '1.1em';
+                            anchor.style.color = '#2c3e50';
+                            anchor.style.textDecoration = 'none';
+
+                            const description = document.createElement('div');
+                            description.textContent = form.description || 'No description available';
+                            description.style.fontSize = '0.9em';
+                            description.style.color = '#7f8c8d';
+                            description.style.lineHeight = '1.4';
+                            description.style.marginTop = '0px';
+                            description.style.marginBottom = '10px';
+
+                            formInfo.appendChild(anchor);
+                            formInfo.appendChild(description);
+
+                            if (showArchivedForms && normalizeFormStatus(form.status) === 'Archived') {
+                                const archivedBadge = document.createElement('div');
+                                archivedBadge.textContent = 'Archived';
+                                archivedBadge.style.display = 'inline-block';
+                                archivedBadge.style.alignSelf = 'flex-start';
+                                archivedBadge.style.background = '#f6e5e5';
+                                archivedBadge.style.color = '#c0392b';
+                                archivedBadge.style.border = '1px solid #e0b4b4';
+                                archivedBadge.style.borderRadius = '8px';
+                                archivedBadge.style.padding = '2px 8px';
+                                archivedBadge.style.fontSize = '0.78em';
+                                archivedBadge.style.fontWeight = '600';
+                                archivedBadge.style.marginTop = '6px';
+                                formInfo.appendChild(archivedBadge);
+                            }
                             // Create Click Here button
                             const addButton = document.createElement('button');
                             addButton.textContent = 'Click Here';
@@ -2296,7 +2391,7 @@
                                 e.preventDefault();
                                 addFormToPortfolio(form.id, form.url, form.name);
                             });
-                            li.appendChild(anchor);
+                            li.appendChild(formInfo);
                             li.appendChild(addButton);
                             availableFormsList.appendChild(li);
                         });
@@ -2343,17 +2438,20 @@
             // Event listeners for search and pagination
             if (prevBtn) {
                 prevBtn.addEventListener('click', function() {
-                    renderAvailableForms(currentFormsPage - 1, searchInput.value.trim(), zipInput.value.trim());
+                    const filters = getAvailableFormsFilters();
+                    renderAvailableForms(currentFormsPage - 1, filters.search, filters.zip);
                 });
             }
             if (nextBtn) {
                 nextBtn.addEventListener('click', function() {
-                    renderAvailableForms(currentFormsPage + 1, searchInput.value.trim(), zipInput.value.trim());
+                    const filters = getAvailableFormsFilters();
+                    renderAvailableForms(currentFormsPage + 1, filters.search, filters.zip);
                 });
             }
             if (searchInput) {
                 searchInput.addEventListener('input', function() {
-                    renderAvailableForms(0, searchInput.value.trim(), zipInput.value.trim());
+                    const filters = getAvailableFormsFilters();
+                    renderAvailableForms(0, filters.search, filters.zip);
                 });
             }
             if (zipInput) {
@@ -2362,11 +2460,21 @@
                     let val = zipInput.value.replace(/\D/g, '');
                     if (val.length > 5) val = val.slice(0, 5);
                     zipInput.value = val;
-                    renderAvailableForms(0, searchInput.value.trim(), zipInput.value.trim());
+                    const filters = getAvailableFormsFilters();
+                    renderAvailableForms(0, filters.search, filters.zip);
                 });
             }
             // Initial render
             renderAvailableForms(0);
+            updateArchivedFormsIndicator();
+
+            document.addEventListener('keydown', function(e) {
+                const isToggle = (e.ctrlKey || e.metaKey) && (e.key === 'CapsLock' || e.code === 'CapsLock');
+                if (isToggle && !e.repeat) {
+                    e.preventDefault();
+                    toggleArchivedFormsVisibility();
+                }
+            });
 
 
             
