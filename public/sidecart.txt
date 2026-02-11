@@ -1,0 +1,127 @@
+================================================================================
+SIDE CART — FINAL IMPORT SPEC (GROUPED + WIDER)
+================================================================================
+
+This file matches the current working `public/index.html` side cart behavior.
+
+Key updates included:
+- Drawer widened on desktop: 460px
+- Side cart entries grouped by portfolio ID
+- Group container is wider (items-list max-width 390px)
+- Group header shows parent form name (not raw portfolio ID) using fallbacks
+- Item cards keep larger right margin (46px), thicker blue border, hover pop effect
+- Trash icon enlarged and centered
+- Scrollable cart content for long lists
+- Total + Checkout is a single summary module (one card) and horizontally centered
+- Loading state text is centered inside the cart list area
+- Summary checkout button uses high-contrast styling (white button on gradient card)
+
+--------------------------------------------------------------------------------
+1) DESKTOP WIDTH
+--------------------------------------------------------------------------------
+Use exactly:
+- .cart-side-menu right: -460px;
+- .cart-side-menu width: 460px;
+
+--------------------------------------------------------------------------------
+2) GROUPING LOGIC (SIDE CART)
+--------------------------------------------------------------------------------
+Group key:
+- groupKey = item.portfolioId ? String(item.portfolioId) : 'NO_PORTFOLIO_ID'
+
+Label resolution per group (in order):
+1. first item with `item.formData.formName`
+2. title of item where normalized(formId) === normalized(originalFormId)
+3. first non-empty item title
+4. fallback:
+   - 'Ungrouped Forms' when key = NO_PORTFOLIO_ID
+   - 'Portfolio Group' otherwise
+
+Group header format:
+- "<groupName> (N items)"
+
+Important remove behavior for grouped rendering:
+- store original cart array index in `data-index`
+- remove by that index, not by rendered button order
+- after remove, re-render the side cart in place (no `window.location.reload()`), so the drawer stays open
+
+Checkout behavior in grouped side cart:
+- Do not use a separate floating checkout button below the summary
+- Render checkout button inside the summary module:
+  - `Total`
+  - `$X.XX`
+  - `Checkout - $X.XX`
+- Wire click on `#cart-summary-checkout-btn` to `window.location.href = 'Pages/cart.html'`
+
+--------------------------------------------------------------------------------
+3) COPY/PASTE SOURCE OF TRUTH
+--------------------------------------------------------------------------------
+For exact import-ready code blocks, use:
+- `public/sidecart-minimal.txt`
+
+That file contains complete:
+- [HTML]
+- [CSS]
+- [JS]
+for the current grouped, wider side cart.
+
+--------------------------------------------------------------------------------
+4) REQUIRED DATA FIELDS ON CART ITEMS
+--------------------------------------------------------------------------------
+Used by grouping + display:
+- portfolioId
+- formData.formName (optional but best label source)
+- originalFormId
+- formId
+- title
+- countyName
+- defendantName
+- priceId
+
+--------------------------------------------------------------------------------
+5) STORAGE + PRICING
+--------------------------------------------------------------------------------
+Read cart with fallback:
+- getCookie('formwiz_cart') || localStorage.getItem('formwiz_cart')
+
+Write on remove:
+- cookie + localStorage (both)
+
+Price lookup:
+- GET /stripe-price/:priceId
+- uses `unit_amount` (cents)
+
+--------------------------------------------------------------------------------
+6) CONFLICT FIX STEP (CRITICAL FOR NEW FORMS)
+--------------------------------------------------------------------------------
+When importing this side cart into a new page, do this before debugging anything:
+
+1. Keep exactly ONE cart drawer markup block:
+   - one `#cart-overlay`
+   - one `#cart-side-menu`
+   - one `#cart-content`
+   - one `#cart-close-btn`
+
+2. Keep exactly ONE cart JS binding block:
+   - one click listener on `#cart-icon-link`
+   - one close listener on `#cart-close-btn`
+   - one overlay click handler
+   - one Escape key handler
+
+3. If entries are not showing but badge count is non-zero:
+   - remove duplicate cart blocks/listeners first
+   - ensure cart read logic decodes cookie and falls back to localStorage if cookie parse fails
+
+4. CSS must include all final cart rules, especially:
+   - `.cart-content { flex: 1; min-height: 0; overflow-y: auto; }` (scrollable cart)
+   - `.cart-group-header { background: #dfeffc; ... }` (blue group header)
+   - `.cart-side-menu { width: 460px; right: -460px; overflow: hidden; }`
+
+If any one of these is missing, common symptoms are:
+- empty cart despite items existing
+- non-scrollable drawer
+- missing blue group header background
+
+================================================================================
+END
+================================================================================

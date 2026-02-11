@@ -328,35 +328,88 @@ class CartManager {
         let html = '';
         let total = 0;
 
+        // Group items by portfolio ID (fallback group for missing IDs)
+        const groupedItems = new Map();
         for (const item of filteredCart) {
-            const priceInfo = await fetchStripePrice(item.priceId);
-            let display = '...';
-            if (priceInfo && priceInfo.unit_amount != null) {
-                display = `$${(priceInfo.unit_amount / 100).toFixed(2)}`;
-                total += priceInfo.unit_amount / 100;
+            const groupKey = item.portfolioId ? String(item.portfolioId) : 'NO_PORTFOLIO_ID';
+            if (!groupedItems.has(groupKey)) groupedItems.set(groupKey, []);
+            groupedItems.get(groupKey).push(item);
+        }
+
+        const escapeHtml = (value) => String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+
+        for (const [groupKey, groupCartItems] of groupedItems.entries()) {
+            const normalized = (v) => String(v || '').replace(/\.pdf$/i, '').trim().toLowerCase();
+            let groupName = '';
+
+            // 1) Best-case: explicit form name captured in formData
+            const withExplicitName = groupCartItems.find(item => item?.formData?.formName);
+            if (withExplicitName) groupName = String(withExplicitName.formData.formName).trim();
+
+            // 2) Next: title from the parent/original form row
+            if (!groupName) {
+                const parentRow = groupCartItems.find(item => {
+                    const fid = normalized(item.formId);
+                    const ofid = normalized(item.originalFormId);
+                    return fid && ofid && fid === ofid;
+                });
+                if (parentRow && parentRow.title) groupName = String(parentRow.title).trim();
             }
-            // Capitalize defendant's name if present
-            let defendantDisplay = '';
-            if (item.defendantName) {
-                const capName = String(item.defendantName)
-                  .split(/\s+/)
-                  .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-                  .join(' ');
-                defendantDisplay = `<div style='font-weight:bold;color:#e74c3c;'>Defendant: ${capName}</div>`;
+
+            // 3) Fallback: first non-empty title
+            if (!groupName) {
+                const titled = groupCartItems.find(item => item.title);
+                if (titled) groupName = String(titled.title).trim();
             }
+
+            // 4) Final fallback labels
+            if (!groupName) {
+                groupName = groupKey === 'NO_PORTFOLIO_ID' ? 'Ungrouped Forms' : 'Portfolio Group';
+            }
+
+            const groupLabel = escapeHtml(groupName);
             html += `
-                <div class="cart-item">
-                    <div class="cart-item-content">
-                        <div style="flex:1;display:flex;flex-direction:column;">
-                            <div class="cart-item-title">${item.title}</div>
-                            ${defendantDisplay}
-                            ${item.countyName ? `<div class='cart-item-county' style='font-size:0.98em;color:#153a5b;margin-bottom:2px;'>${item.countyName}${item.countyName.toLowerCase().includes('county') ? '' : ' County'}</div>` : ''}
-                            <div class="cart-item-price">${display}</div>
-                        </div>
-                        <button class="remove-item" onclick="cartManager.removeFromCart('${item.cartItemId}')">Remove</button>
-                    </div>
-                </div>
+                <div class="cart-group">
+                    <div class="cart-group-header">${groupLabel} (${groupCartItems.length} item${groupCartItems.length === 1 ? '' : 's'})</div>
             `;
+
+            for (const item of groupCartItems) {
+                const priceInfo = await fetchStripePrice(item.priceId);
+                let display = '...';
+                if (priceInfo && priceInfo.unit_amount != null) {
+                    display = `$${(priceInfo.unit_amount / 100).toFixed(2)}`;
+                    total += priceInfo.unit_amount / 100;
+                }
+                // Capitalize defendant's name if present
+                let defendantDisplay = '';
+                if (item.defendantName) {
+                    const capName = String(item.defendantName)
+                      .split(/\s+/)
+                      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+                      .join(' ');
+                    defendantDisplay = `<div style='font-weight:bold;color:#e74c3c;'>Defendant: ${capName}</div>`;
+                }
+                html += `
+                    <div class="cart-item">
+                        <div class="cart-item-content">
+                            <div style="flex:1;display:flex;flex-direction:column;">
+                                <div class="cart-item-title">${item.title}</div>
+                                ${defendantDisplay}
+                                ${item.countyName ? `<div class='cart-item-county' style='font-size:0.98em;color:#153a5b;margin-bottom:2px;'>${item.countyName}${item.countyName.toLowerCase().includes('county') ? '' : ' County'}</div>` : ''}
+                                <div class="cart-item-price">${display}</div>
+                            </div>
+                            <button class="remove-item" onclick="cartManager.removeFromCart('${item.cartItemId}')">Remove</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
         }
 
         itemsEl.innerHTML = html;

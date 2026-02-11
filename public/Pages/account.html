@@ -455,6 +455,7 @@
             flex-shrink: 0;
         }
     </style>
+    <link rel="stylesheet" href="sidecart-unified.css">
 </head>
 <body>
     <header>
@@ -486,6 +487,16 @@
             </a>
         </nav>
         <div class="header-actions">
+            <a href="#" id="cart-icon-link" style="display: inline-flex; align-items: center; text-decoration: none; position: relative;">
+                <span class="cart-circle">
+                    <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="10" cy="21" r="1.5"/>
+                        <circle cx="18" cy="21" r="1.5"/>
+                        <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
+                    </svg>
+                    <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
+                </span>
+            </a>
         </div>
     </header>
     <div class="main-wrapper">
@@ -628,12 +639,32 @@
     <footer>
         &copy; 2026 Form-Star. All rights reserved.
     </footer>
+    <div class="cart-overlay" id="cart-overlay">
+        <div class="cart-side-menu" id="cart-side-menu">
+            <div class="cart-header">
+                <h2>🛒 Cart</h2>
+                <button class="cart-close-btn" id="cart-close-btn">&times;</button>
+            </div>
+            <div class="cart-content" id="cart-content">
+                <div class="cart-icon-large">🛒</div>
+                <div class="cart-message" id="cart-message">Create an account to start shopping!</div>
+                <div class="cart-description" id="cart-description">
+                    To add forms to your cart and make purchases, you'll need to create a FormStar account.
+                    Sign up now to access our complete library of legal forms and start simplifying your paperwork.
+                </div>
+                <a href="account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
+                <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>
+                <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>
+            </div>
+        </div>
+    </div>
     <!-- Authentication Script -->
     <script src="../auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script src="cart.js"></script>
     <script>
       let signingUp = false; // flag to suppress redirect during signup
       // Firebase config
@@ -891,5 +922,6 @@
         }
       })();
     </script>
+    <script src="sidecart-unified.js"></script>
 </body>
 </html>

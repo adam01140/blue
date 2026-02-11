@@ -1480,6 +1480,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="sidecart-unified.css">
 </head>
 <body>
     <header>
@@ -1562,14 +1563,16 @@
                 <h2>🛒 Cart</h2>
                 <button class="cart-close-btn" id="cart-close-btn">&times;</button>
             </div>
-            <div class="cart-content">
+            <div class="cart-content" id="cart-content">
                 <div class="cart-icon-large">🛒</div>
-                <div class="cart-message">Create an account to start shopping!</div>
-                <div class="cart-description">
+                <div class="cart-message" id="cart-message">Create an account to start shopping!</div>
+                <div class="cart-description" id="cart-description">
                     To add forms to your cart and make purchases, you'll need to create a FormStar account. 
                     Sign up now to access our complete library of legal forms and start simplifying your paperwork.
                 </div>
-                <a href="account.html" class="cart-signup-btn">Sign Up</a>
+                <a href="account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
+                <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>
+                <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>
             </div>
         </div>
     </div>
@@ -1997,15 +2000,40 @@
             // Update cart count badge in header
             function updateCartCountBadge() {
                 const cartCountElement = document.getElementById('cart-count-badge');
-                if (cartCountElement && typeof getCartCount === 'function') {
-                    const count = getCartCount();
-                    if (count > 0) {
-                        cartCountElement.textContent = count;
-                        cartCountElement.style.display = 'flex';
-                    } else {
-                        cartCountElement.style.display = 'none';
-                    }
-                } else if (cartCountElement) {
+                if (!cartCountElement) return;
+                let count = 0;
+                if (typeof getCartCount === 'function') {
+                    count = getCartCount();
+                } else {
+                    const parseCartCount = (raw) => {
+                        if (!raw || typeof raw !== 'string') return 0;
+                        try {
+                            const normalized = raw.startsWith('%') ? decodeURIComponent(raw) : raw;
+                            const parsed = JSON.parse(normalized);
+                            if (Array.isArray(parsed)) return parsed.length;
+                            if (parsed && Array.isArray(parsed.cart)) return parsed.cart.length;
+                            return 0;
+                        } catch {
+                            return 0;
+                        }
+                    };
+                    const getCookie = (name) => {
+                        const eq = name + '=';
+                        const parts = document.cookie.split(';');
+                        for (let c of parts) {
+                            while (c.charAt(0) === ' ') c = c.slice(1);
+                            if (c.indexOf(eq) === 0) return c.slice(eq.length);
+                        }
+                        return null;
+                    };
+                    const cookieRaw = getCookie('formwiz_cart');
+                    const localRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('formwiz_cart') : null;
+                    count = parseCartCount(cookieRaw) || parseCartCount(localRaw);
+                }
+                if (count > 0) {
+                    cartCountElement.textContent = count;
+                    cartCountElement.style.display = 'flex';
+                } else {
                     cartCountElement.style.display = 'none';
                 }
             }
@@ -2014,42 +2042,224 @@
             updateCartCountBadge();
             setInterval(updateCartCountBadge, 5000);
 
-            // Sliding Cart Menu
+            // Sliding Cart Menu (auth-aware: signed-in users see cart; others see sign-up prompt)
             const cartIconLink = document.getElementById('cart-icon-link');
             const cartOverlay = document.getElementById('cart-overlay');
             const cartSideMenu = document.getElementById('cart-side-menu');
             const cartCloseBtn = document.getElementById('cart-close-btn');
+            const cartMessage = document.getElementById('cart-message');
+            const cartDescription = document.getElementById('cart-description');
+            const cartSignupBtn = document.getElementById('cart-signup-btn');
+            const cartItemsList = document.getElementById('cart-items-list');
+            const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
+            const cartContent = document.getElementById('cart-content');
+            const cartIconLarge = cartContent ? cartContent.querySelector('.cart-icon-large') : null;
+            console.log('[FAQ SIDECART] init refs', {
+                hasIcon: !!cartIconLink,
+                hasOverlay: !!cartOverlay,
+                hasSideMenu: !!cartSideMenu,
+                hasCloseBtn: !!cartCloseBtn,
+                hasMessage: !!cartMessage,
+                hasDescription: !!cartDescription,
+                hasSignupBtn: !!cartSignupBtn,
+                hasItemsList: !!cartItemsList,
+                hasCheckoutBtn: !!cartCheckoutBtn,
+                hasContent: !!cartContent,
+                hasIconLarge: !!cartIconLarge
+            });
 
             function openCart() {
                 cartOverlay.classList.add('active');
                 cartSideMenu.classList.add('active');
-                document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+                cartOverlay.style.opacity = '1';
+                cartOverlay.style.visibility = 'visible';
+                document.body.style.overflow = 'hidden';
+                if (cartContent) cartContent.scrollTop = 0;
             }
 
             function closeCart() {
                 cartOverlay.classList.remove('active');
                 cartSideMenu.classList.remove('active');
-                document.body.style.overflow = ''; // Restore scrolling
+                cartOverlay.style.opacity = '0';
+                cartOverlay.style.visibility = 'hidden';
+                document.body.style.overflow = '';
             }
 
-            cartIconLink.addEventListener('click', function(e) {
+            function getCookie(name) {
+                const eq = name + '=';
+                const parts = document.cookie.split(';');
+                for (let c of parts) {
+                    while (c.charAt(0) === ' ') c = c.slice(1);
+                    if (c.indexOf(eq) === 0) return c.slice(eq.length);
+                }
+                return null;
+            }
+
+            function parseCartPayload(raw) {
+                if (!raw || typeof raw !== 'string') return null;
+                try {
+                    const normalized = raw.startsWith('%') ? decodeURIComponent(raw) : raw;
+                    const parsed = JSON.parse(normalized);
+                    if (Array.isArray(parsed)) return parsed;
+                    if (parsed && Array.isArray(parsed.cart)) return parsed.cart;
+                    return null;
+                } catch {
+                    return null;
+                }
+            }
+
+            cartIconLink.addEventListener('click', async function(e) {
                 e.preventDefault();
-                // Always open the cart menu, regardless of mobile or auth state
                 openCart();
+                console.log('[FAQ SIDECART] cart icon clicked');
+
+                const cookieRaw = getCookie('formwiz_cart');
+                const localRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('formwiz_cart') : null;
+                const previewCart = parseCartPayload(cookieRaw) || parseCartPayload(localRaw) || [];
+                const hasCartItems = Array.isArray(previewCart) && previewCart.length > 0;
+                const user = firebase.auth().currentUser;
+                console.log('[FAQ SIDECART] data snapshot', {
+                    isSignedIn: !!user,
+                    hasCartItems,
+                    previewCount: Array.isArray(previewCart) ? previewCart.length : -1,
+                    cookieExists: !!cookieRaw,
+                    localExists: !!localRaw,
+                    cookieLen: cookieRaw ? cookieRaw.length : 0,
+                    localLen: localRaw ? localRaw.length : 0
+                });
+
+                if (user || hasCartItems) {
+                    console.log('[FAQ SIDECART] rendering cart mode');
+                    if (cartContent) cartContent.style.justifyContent = 'flex-start';
+                    if (cartIconLarge) cartIconLarge.style.display = 'block';
+                    cartSignupBtn.style.display = 'none';
+                    cartItemsList.style.display = 'block';
+                    cartCheckoutBtn.style.display = 'none';
+                    cartItemsList.innerHTML = '';
+
+                    const cart = parseCartPayload(cookieRaw) || parseCartPayload(localRaw) || [];
+                    console.log('[FAQ SIDECART] parsed cart', {
+                        isArray: Array.isArray(cart),
+                        count: Array.isArray(cart) ? cart.length : -1,
+                        sample: Array.isArray(cart) && cart.length ? cart[0] : null
+                    });
+                    if (!Array.isArray(cart) || cart.length === 0) {
+                        console.warn('[FAQ SIDECART] expected cart items but parsed empty');
+                        if (cartContent) cartContent.style.justifyContent = 'center';
+                        if (cartIconLarge) cartIconLarge.style.display = 'block';
+                        cartMessage.style.display = 'none';
+                        cartDescription.style.display = 'none';
+                        cartItemsList.innerHTML = '<div style="color:#7f8c8d;font-size:1.1em;margin-top:18px;">Your cart is empty.</div>';
+                        cartCheckoutBtn.style.display = 'none';
+                        return;
+                    }
+
+                    cartMessage.textContent = 'Your Cart';
+                    cartDescription.textContent = 'Review your selected forms and proceed to checkout.';
+                    cartMessage.style.display = 'block';
+                    cartDescription.style.display = 'block';
+                    cartItemsList.innerHTML = '<div style="color:#7f8c8d;font-size:1.1em;margin-top:18px;text-align:center;width:100%;">Loading cart...</div>';
+
+                    async function fetchStripePrice(priceId) {
+                        try {
+                            const res = await fetch('/stripe-price/' + priceId, { mode: 'cors' });
+                            if (!res.ok) return null;
+                            return await res.json();
+                        } catch {
+                            return null;
+                        }
+                    }
+
+                    const groupedItems = new Map();
+                    for (let i = 0; i < cart.length; i++) {
+                        const item = cart[i];
+                        const groupKey = item && item.portfolioId ? String(item.portfolioId) : 'NO_PORTFOLIO_ID';
+                        if (!groupedItems.has(groupKey)) groupedItems.set(groupKey, []);
+                        groupedItems.get(groupKey).push({ item, index: i });
+                    }
+                    console.log('[FAQ SIDECART] grouping complete', { groups: groupedItems.size });
+
+                    const normalizeFormId = (value) => String(value || '').replace(/\.pdf$/i, '').trim().toLowerCase();
+                    let html = '';
+                    let totalAmount = 0;
+
+                    for (const [groupKey, entries] of groupedItems.entries()) {
+                        let groupName = '';
+                        const withExplicitName = entries.find(entry => entry.item && entry.item.formData && entry.item.formData.formName);
+                        if (withExplicitName) groupName = String(withExplicitName.item.formData.formName).trim();
+                        if (!groupName) {
+                            const parentRow = entries.find(entry => {
+                                const fid = normalizeFormId(entry.item && entry.item.formId);
+                                const ofid = normalizeFormId(entry.item && entry.item.originalFormId);
+                                return fid && ofid && fid === ofid;
+                            });
+                            if (parentRow && parentRow.item && parentRow.item.title) groupName = String(parentRow.item.title).trim();
+                        }
+                        if (!groupName) {
+                            const titled = entries.find(entry => entry.item && entry.item.title);
+                            if (titled) groupName = String(titled.item.title).trim();
+                        }
+                        if (!groupName) groupName = groupKey === 'NO_PORTFOLIO_ID' ? 'Ungrouped Forms' : 'Portfolio Group';
+
+                        html += '<div class="cart-group"><div class="cart-group-header">' + groupName + ' (' + entries.length + ' item' + (entries.length === 1 ? '' : 's') + ')</div>';
+
+                        for (const entry of entries) {
+                            const item = entry.item;
+                            const priceInfo = await fetchStripePrice(item.priceId);
+                            let display = '...';
+                            if (priceInfo && priceInfo.unit_amount != null) {
+                                display = '$' + (priceInfo.unit_amount / 100).toFixed(2);
+                                totalAmount += (priceInfo.unit_amount / 100);
+                            }
+                            let defendantDisplay = '';
+                            if (item.defendantName) {
+                                const capName = String(item.defendantName).split(/\s+/).map(function(w){ return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }).join(' ');
+                                defendantDisplay = '<div style="font-weight:bold;color:#e74c3c;">Defendant: ' + capName + '</div>';
+                            }
+                            html += '<div class="cart-item"><div class="cart-item-info"><div class="cart-item-title">' + (item.title || 'Form') + '</div>' + defendantDisplay + (item.countyName ? '<div class="cart-item-county" style="font-size:0.98em;color:#153a5b;margin-bottom:2px;">' + item.countyName + '</div>' : '') + '<div class="cart-item-price">' + display + '</div></div><button class="remove-item" title="Remove" data-index="' + entry.index + '"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h10"></path><path d="M8 7V5.8a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V7"></path><rect x="6.5" y="7" width="7" height="9" rx="1.2"></rect><line x1="9" y1="10" x2="9" y2="14"></line><line x1="11" y1="10" x2="11" y2="14"></line></svg></button></div>';
+                        }
+                        html += '</div>';
+                    }
+
+                    html += '<div class="cart-summary"><div class="summary-label">Total:</div><div class="total-amount">$' + totalAmount.toFixed(2) + '</div><button class="cart-summary-checkout-btn" id="cart-summary-checkout-btn">Checkout - $' + totalAmount.toFixed(2) + '</button></div>';
+                    cartItemsList.innerHTML = html;
+                    console.log('[FAQ SIDECART] render complete', { totalAmount: totalAmount.toFixed(2), htmlLength: html.length });
+                    cartCheckoutBtn.style.display = 'none';
+
+                    cartItemsList.querySelectorAll('.remove-item').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const cartIndex = parseInt(btn.getAttribute('data-index'), 10);
+                            if (isNaN(cartIndex) || cartIndex < 0 || cartIndex >= cart.length) return;
+                            cart.splice(cartIndex, 1);
+                            document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
+                            try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch (e2) {}
+                            updateCartCountBadge();
+                            cartIconLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+                        });
+                    });
+
+                    const summaryCheckoutBtn = document.getElementById('cart-summary-checkout-btn');
+                    if (summaryCheckoutBtn) summaryCheckoutBtn.onclick = function() { window.location.href = 'cart.html'; };
+                } else {
+                    console.log('[FAQ SIDECART] rendering signup prompt mode');
+                    if (cartContent) cartContent.style.justifyContent = 'center';
+                    if (cartIconLarge) cartIconLarge.style.display = 'block';
+                    cartMessage.textContent = 'Create an account to start shopping!';
+                    cartMessage.style.display = 'block';
+                    cartDescription.style.display = 'block';
+                    cartSignupBtn.style.display = 'inline-block';
+                    cartItemsList.style.display = 'none';
+                    cartCheckoutBtn.style.display = 'none';
+                }
             });
 
             cartCloseBtn.addEventListener('click', closeCart);
             cartOverlay.addEventListener('click', function(e) {
-                if (e.target === cartOverlay) {
-                    closeCart();
-                }
+                if (e.target === cartOverlay) closeCart();
             });
-
             // Keyboard accessibility for cart menu
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeCart();
-                }
+                if (e.key === 'Escape') closeCart();
             });
         });
     </script>

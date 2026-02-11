@@ -6,7 +6,7 @@
     <title>Disclaimer - FormStar</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        html, body {
+       html, body {
             height: 100%;
             margin: 0;
             display: flex;
@@ -15,6 +15,7 @@
             color: #333;
             background-color: #eaf1f8;
             zoom: 0.90;
+            min-height: 100vh;
         }
         header {
             background-color: #2c3e50;
@@ -27,7 +28,7 @@
         header img {
             cursor: pointer;
         }
-        nav {
+        nav.desktop-nav {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
@@ -35,7 +36,7 @@
             gap: 38px;
             z-index: 2;
         }
-        nav a {
+        nav.desktop-nav a {
             color: #fff;
             text-decoration: none;
             font-weight: 700;
@@ -47,10 +48,100 @@
             display: flex;
             align-items: center;
         }
-        nav a:hover {
+        nav.desktop-nav a:hover {
             color: #ff7043;
             background: rgba(255,255,255,0.08);
             box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+        }
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .mobile-menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            transform-origin: 1px;
+        }
+        .mobile-menu-toggle.active span:first-child { transform: rotate(45deg); }
+        .mobile-menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .mobile-menu-toggle.active span:last-child { transform: rotate(-45deg); }
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background: #2c3e50;
+            flex-direction: column;
+            padding: 80px 20px 20px 20px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+        }
+        .mobile-nav.active { left: 0; }
+        .mobile-nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 0 10px 25px;
+            border-bottom: 1px solid #34495e;
+            font-size: 1.1em;
+            font-weight: 600;
+            line-height: 1.1;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+        .mobile-nav-section { border-bottom: 1px solid #34495e; }
+        .mobile-nav-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            padding: 15px 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .mobile-nav-submenu {
+            display: none;
+            padding-left: 20px;
+        }
+        .mobile-nav-submenu.active { display: block; }
+        .mobile-nav-submenu a {
+            padding: 10px 0 10px 45px;
+            font-size: 1em;
+            border-bottom: 1px solid #34495e;
+            line-height: 1.1;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+        }
+        .mobile-nav-submenu a:first-child {
+            border-top: 1px solid #34495e;
+        }
+        .mobile-nav-toggle span { transition: transform 0.3s ease; }
+        .mobile-nav-toggle.active span { transform: rotate(180deg); }
+        .mobile-nav-logout {
+            color: #ff7043 !important;
+            font-weight: 700;
         }
         .nav-chevron {
             display: inline-block;
@@ -204,9 +295,61 @@
             .address-col, .company-col, .nav-col { border: none; padding: 0; min-width: unset; max-width: unset; align-items: flex-start; }
         }
         @media (max-width: 768px) {
-            header { flex-direction: column; padding: 10px; }
-            nav { position: static; transform: none; margin-top: 10px; }
-            .disclaimer-card { padding: 32px; }
+            html, body { zoom: 1; }
+            .mobile-menu-toggle {
+                display: flex;
+            }
+            nav.desktop-nav {
+                display: none !important;
+            }
+            .mobile-nav {
+                display: flex;
+            }
+            header {
+                padding: 15px 15px;
+                min-height: 72px;
+                box-sizing: border-box;
+            }
+            header img {
+                width: 100px;
+                height: auto;
+                margin: 0 auto;
+                display: block;
+            }
+            .header-actions {
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                gap: 8px;
+                margin-left: 0;
+            }
+            .sign-in-btn {
+                display: none;
+            }
+            #cart-icon-link .cart-circle {
+                width: 46px !important;
+                height: 46px !important;
+            }
+            #cart-icon {
+                width: 26px !important;
+                height: 26px !important;
+            }
+            .disclaimer-card {
+                margin: 20px 12px;
+                padding: 20px;
+                border-radius: 16px;
+            }
+            .disclaimer-card h1 {
+                font-size: 1.8em;
+            }
+            .disclaimer-card h2 {
+                font-size: 1.2em;
+            }
+            .disclaimer-card p, .disclaimer-card li {
+                font-size: 0.98em;
+                line-height: 1.55;
+            }
         }
         /* Cart Icon Styles */
         #cart-icon-link .cart-circle {
@@ -346,11 +489,267 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="sidecart-unified.css">
+    <style>
+        /* Force disclaimer header/footer to match index.html */
+        header {
+            background-color: #2c3e50 !important;
+            padding: 20px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            position: relative !important;
+        }
+        header img {
+            cursor: pointer !important;
+        }
+        nav.desktop-nav {
+            position: absolute !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            display: flex !important;
+            gap: 38px !important;
+            z-index: 2 !important;
+        }
+        nav.desktop-nav a {
+            color: #fff !important;
+            text-decoration: none !important;
+            font-weight: 700 !important;
+            font-size: 1.18em !important;
+            letter-spacing: 0.02em !important;
+            padding: 2px 8px !important;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s !important;
+            border-radius: 6px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        nav.desktop-nav a:hover {
+            color: #ff7043 !important;
+            background: rgba(255,255,255,0.08) !important;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10) !important;
+        }
+        .header-actions {
+            display: flex !important;
+            align-items: center !important;
+            gap: 18px !important;
+            margin-left: auto !important;
+        }
+
+        .pro-footer {
+            background: #2c3e50 !important;
+            color: #f3f7f8 !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: flex-start !important;
+            gap: 60px !important;
+            padding: 48px 10vw 32px 10vw !important;
+            border-top: 2px solid #2c3e50 !important;
+            font-family: 'Montserrat', sans-serif !important;
+            font-size: 1.18em !important;
+            margin-top: 0 !important;
+        }
+        .pro-footer-col {
+            flex: 1 1 320px !important;
+            min-width: 220px !important;
+            max-width: 420px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 18px !important;
+        }
+        .address-col {
+            border-right: 1.5px solid #2c7a7d !important;
+            padding-right: 48px !important;
+            align-items: flex-start !important;
+        }
+        .nav-col {
+            align-items: flex-start !important;
+            padding-left: 32px !important;
+            padding-right: 32px !important;
+            border-right: 1.5px solid #2c7a7d !important;
+        }
+        .company-col {
+            align-items: flex-start !important;
+            padding-left: 48px !important;
+        }
+        .pro-footer-title {
+            font-weight: 700 !important;
+            font-size: 1.25em !important;
+            margin-bottom: 6px !important;
+            color: #fff !important;
+            letter-spacing: 0.02em !important;
+        }
+        .company-title {
+            margin-top: 8px !important;
+            margin-bottom: 0 !important;
+        }
+        .pro-footer-contact a {
+            color: #b6e2e6 !important;
+            text-decoration: underline !important;
+            font-weight: 500 !important;
+            margin-right: 18px !important;
+            transition: color 0.2s !important;
+        }
+        .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
+            color: #ff7043 !important;
+        }
+        .pro-footer-logo {
+            margin-bottom: 8px !important;
+        }
+        .pro-footer-desc {
+            color: #e0e6ea !important;
+            font-size: 1em !important;
+            margin-top: 0 !important;
+            line-height: 1.5 !important;
+        }
+        .pro-footer-col.nav-col a {
+            color: #b6e2e6 !important;
+            text-decoration: none !important;
+            font-weight: 500 !important;
+            margin-bottom: 6px !important;
+            transition: color 0.2s !important;
+            font-size: 1em !important;
+        }
+        .pro-footer-col.nav-col a:not(:last-child) {
+            margin-bottom: 8px !important;
+        }
+        .pro-footer, footer {
+            flex-shrink: 0 !important;
+        }
+
+        @media (max-width: 768px) {
+            html, body {
+                font-size: 14px !important;
+                zoom: 1 !important;
+                overflow-x: hidden !important;
+            }
+            .cart-side-menu {
+                width: 90% !important;
+                max-width: 380px !important;
+                right: -90% !important;
+            }
+            .cart-side-menu.active {
+                right: 0 !important;
+            }
+            .mobile-menu-toggle {
+                display: flex !important;
+                position: absolute !important;
+                left: 15px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+            }
+            .desktop-nav,
+            nav.desktop-nav,
+            header nav.desktop-nav,
+            header nav.desktop-nav * {
+                display: none !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
+            }
+            .mobile-nav {
+                display: flex !important;
+            }
+            header {
+                padding: 16px 15px !important;
+                min-height: 80px !important;
+                flex-wrap: wrap !important;
+                gap: 12px !important;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+                position: relative !important;
+            }
+            header img {
+                width: 119px !important;
+                height: 73px !important;
+                position: absolute !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+            }
+            .header-actions {
+                gap: 10px !important;
+                margin-left: auto !important;
+                margin-right: 15px !important;
+            }
+            .sign-in-btn {
+                display: none !important;
+            }
+            #cart-icon-link .cart-circle {
+                width: 55px !important;
+                height: 55px !important;
+            }
+            #cart-icon {
+                width: 30px !important;
+                height: 30px !important;
+            }
+            .pro-footer-col.nav-col {
+                display: none !important;
+            }
+            .pro-footer {
+                gap: 20px !important;
+                padding: 30px 20px 15px 20px !important;
+                flex-direction: row !important;
+                box-sizing: border-box !important;
+                overflow: hidden !important;
+                font-size: 1em !important;
+            }
+            .pro-footer-col {
+                min-width: 0 !important;
+                max-width: none !important;
+                flex: 1 1 0 !important;
+            }
+            .pro-footer-col.address-col {
+                padding-right: 0 !important;
+                border-right: 1.5px solid #2c7a7d !important;
+            }
+            .pro-footer-col.company-col {
+                padding-left: 20px !important;
+                border-right: none !important;
+            }
+            .pro-footer-title {
+                font-size: 1.1em !important;
+            }
+            .pro-footer-desc {
+                font-size: 0.95em !important;
+                line-height: 1.45 !important;
+                word-break: break-word !important;
+            }
+            .pro-footer-col.nav-col a,
+            .pro-footer-contact a,
+            .pro-footer-contact,
+            .pro-footer-col.address-col,
+            .pro-footer-col.company-col {
+                word-break: break-word !important;
+            }
+            .pro-footer-contact {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .pro-footer-contact a {
+                margin-right: 0 !important;
+            }
+            footer {
+                padding: 20px !important;
+                padding-bottom: 20px !important;
+                margin-bottom: 0 !important;
+            }
+            html, body {
+                margin-bottom: 0 !important;
+                padding-bottom: 0 !important;
+            }
+            .pro-footer, footer {
+                margin-bottom: 0 !important;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
         <img src="logo.png" alt="FormStar Logo" width="130" height="80" onclick="location.href='../index.html';">
-        <nav>
+        <nav class="desktop-nav">
             <a href="../index.html">Home
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
@@ -376,6 +775,25 @@
                 <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
         </nav>
+        <nav class="mobile-nav" id="mobile-nav">
+            <a href="../index.html">Home</a>
+            <div class="mobile-nav-section">
+                <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
+                <div class="mobile-nav-submenu" id="mobile-forms-menu">
+                    <a href="forms.html" class="auth-required" style="display: none;">My Forms</a>
+                    <a href="FreeForm.html">Free Form</a>
+                    <a href="Immigration.html">Immigration</a>
+                    <a href="smallclaims.html">Small Claims</a>
+                    <a href="Other.html">Other</a>
+                </div>
+            </div>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="FAQ.html">FAQ</a>
+            <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
+                <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
+            </div>
+        </nav>
         <div class="header-actions">
             <a href="account.html" class="sign-in-btn">Sign In</a>
             <a href="#" id="cart-icon-link" style="margin-left: -10px; display: inline-flex; align-items: center; text-decoration: none; position: relative;">
@@ -398,14 +816,16 @@
                 <h2>🛒 Cart</h2>
                 <button class="cart-close-btn" id="cart-close-btn">&times;</button>
             </div>
-            <div class="cart-content">
+            <div class="cart-content" id="cart-content">
                 <div class="cart-icon-large">🛒</div>
-                <div class="cart-message">Create an account to start shopping!</div>
-                <div class="cart-description">
+                <div class="cart-message" id="cart-message">Create an account to start shopping!</div>
+                <div class="cart-description" id="cart-description">
                     To add forms to your cart and make purchases, you'll need to create a FormStar account. 
                     Sign up now to access our complete library of legal forms and start simplifying your paperwork.
                 </div>
-                <a href="account.html" class="cart-signup-btn">Sign Up</a>
+                <a href="account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
+                <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>
+                <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>
             </div>
         </div>
     </div>
@@ -436,7 +856,7 @@
                 <img src="logo.png" alt="FormStar Logo" style="max-width:120px;max-height:80px;">
             </div>
             <div class="pro-footer-title">Form-Star</div>
-            <div>1043 Garland Ave Unit C #1235<br>San Jose, CA 95126, US</div>
+    
             <div class="pro-footer-contact">
                 <a href="mailto:formstarhelpdesk@gmail.com">formstarhelpdesk@gmail.com</a>
             </div>
@@ -463,7 +883,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <!-- Authentication Script -->
     <script src="../auth.js"></script>
-    <script src="Pages/cart.js"></script>
+    <script src="cart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Firebase Configuration
@@ -483,6 +903,8 @@
             }
             const auth = firebase.auth();
             const signInButton = document.querySelector('.sign-in-btn');
+            const mobileAuthSection = document.getElementById('mobile-auth-section');
+            const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
 
             auth.onAuthStateChanged(function(user) {
                 console.log('Auth state changed on disclaimer.html. User:', user);
@@ -507,8 +929,10 @@
                     
                     // Show "My Forms" links
                     myFormsLinks.forEach(link => {
-                        link.style.display = 'block';
+                        // Preserve CSS-driven row layout (display:flex in mobile submenu).
+                        link.style.display = '';
                     });
+                    if (mobileAuthSection) mobileAuthSection.style.display = 'block';
                 } else {
                     // No user is signed in.
                     if (signInButton) {
@@ -521,8 +945,19 @@
                     myFormsLinks.forEach(link => {
                         link.style.display = 'none';
                     });
+                    if (mobileAuthSection) mobileAuthSection.style.display = 'none';
                 }
             });
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    auth.signOut().then(() => {
+                        window.location.reload();
+                    }).catch((error) => {
+                        console.error('Error signing out:', error);
+                    });
+                });
+            }
         
             // Dropdown for Forms nav
             const formsWrapper = document.getElementById('forms-dropdown-wrapper');
@@ -555,18 +990,94 @@
                 }
             });
 
+            // Mobile menu functionality
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileNav = document.getElementById('mobile-nav');
+            const mobileFormsToggle = document.getElementById('mobile-forms-toggle');
+            const mobileFormsMenu = document.getElementById('mobile-forms-menu');
+            const body = document.body;
+
+            function toggleMobileMenu() {
+                if (mobileMenuToggle && mobileNav) {
+                    mobileMenuToggle.classList.toggle('active');
+                    mobileNav.classList.toggle('active');
+                    body.classList.toggle('menu-open');
+                }
+            }
+            function closeMobileMenu() {
+                if (mobileMenuToggle && mobileNav) {
+                    mobileMenuToggle.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                    body.classList.remove('menu-open');
+                }
+            }
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleMobileMenu();
+                });
+            }
+            if (mobileFormsToggle && mobileFormsMenu) {
+                mobileFormsToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    mobileFormsToggle.classList.toggle('active');
+                    mobileFormsMenu.classList.toggle('active');
+                });
+            }
+            if (mobileNav) {
+                mobileNav.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'A' && !e.target.classList.contains('mobile-nav-toggle')) {
+                        closeMobileMenu();
+                    }
+                });
+            }
+            document.addEventListener('click', function(e) {
+                if (mobileNav && mobileMenuToggle && !mobileNav.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && mobileNav && mobileNav.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+            });
+
             // Update cart count badge in header
             function updateCartCountBadge() {
                 const cartCountElement = document.getElementById('cart-count-badge');
-                if (cartCountElement && typeof getCartCount === 'function') {
-                    const count = getCartCount();
-                    if (count > 0) {
-                        cartCountElement.textContent = count;
-                        cartCountElement.style.display = 'flex';
-                    } else {
-                        cartCountElement.style.display = 'none';
-                    }
-                } else if (cartCountElement) {
+                if (!cartCountElement) return;
+                let count = 0;
+                if (typeof getCartCount === 'function') {
+                    count = getCartCount();
+                } else {
+                    const parseCartCount = (raw) => {
+                        if (!raw || typeof raw !== 'string') return 0;
+                        try {
+                            const normalized = raw.startsWith('%') ? decodeURIComponent(raw) : raw;
+                            const parsed = JSON.parse(normalized);
+                            if (Array.isArray(parsed)) return parsed.length;
+                            if (parsed && Array.isArray(parsed.cart)) return parsed.cart.length;
+                            return 0;
+                        } catch {
+                            return 0;
+                        }
+                    };
+                    const cookieRaw = (function(name){
+                        const eq = name + '=';
+                        const parts = document.cookie.split(';');
+                        for (let c of parts) {
+                            while (c.charAt(0) === ' ') c = c.slice(1);
+                            if (c.indexOf(eq) === 0) return c.slice(eq.length);
+                        }
+                        return null;
+                    })('formwiz_cart');
+                    const localRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('formwiz_cart') : null;
+                    count = parseCartCount(cookieRaw) || parseCartCount(localRaw);
+                }
+                if (count > 0) {
+                    cartCountElement.textContent = count;
+                    cartCountElement.style.display = 'flex';
+                } else {
                     cartCountElement.style.display = 'none';
                 }
             }
@@ -575,39 +1086,168 @@
             updateCartCountBadge();
             setInterval(updateCartCountBadge, 5000);
 
-            // Sliding Cart Menu
+            // Sliding Cart Menu (auth-aware: signed-in users see cart; others see sign-up prompt)
             const cartIconLink = document.getElementById('cart-icon-link');
             const cartOverlay = document.getElementById('cart-overlay');
             const cartSideMenu = document.getElementById('cart-side-menu');
             const cartCloseBtn = document.getElementById('cart-close-btn');
+            const cartMessage = document.getElementById('cart-message');
+            const cartDescription = document.getElementById('cart-description');
+            const cartSignupBtn = document.getElementById('cart-signup-btn');
+            const cartItemsList = document.getElementById('cart-items-list');
+            const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
+            const cartContent = document.getElementById('cart-content');
+            const cartIconLarge = cartContent ? cartContent.querySelector('.cart-icon-large') : null;
 
             function openCart() {
                 cartOverlay.classList.add('active');
                 cartSideMenu.classList.add('active');
-                document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+                cartOverlay.style.opacity = '1';
+                cartOverlay.style.visibility = 'visible';
+                document.body.style.overflow = 'hidden';
+                if (cartContent) cartContent.scrollTop = 0;
             }
 
             function closeCart() {
                 cartOverlay.classList.remove('active');
                 cartSideMenu.classList.remove('active');
-                document.body.style.overflow = ''; // Restore scrolling
+                cartOverlay.style.opacity = '0';
+                cartOverlay.style.visibility = 'hidden';
+                document.body.style.overflow = '';
             }
 
-            cartIconLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                // On mobile, always navigate to cart.html
-                const isMobile = window.innerWidth <= 768;
-                if (isMobile) {
-                    window.location.href = 'cart.html';
-                    return;
+            function getCookie(name) {
+                const eq = name + '=';
+                const parts = document.cookie.split(';');
+                for (let c of parts) {
+                    while (c.charAt(0) === ' ') c = c.slice(1);
+                    if (c.indexOf(eq) === 0) return c.slice(eq.length);
                 }
-                // On desktop, check auth state
-                if (auth.currentUser) {
-                    // User is signed in, redirect to cart.html
-                    window.location.href = 'cart.html';
+                return null;
+            }
+
+            function parseCartPayload(raw) {
+                if (!raw || typeof raw !== 'string') return null;
+                try {
+                    const normalized = raw.startsWith('%') ? decodeURIComponent(raw) : raw;
+                    const parsed = JSON.parse(normalized);
+                    if (Array.isArray(parsed)) return parsed;
+                    if (parsed && Array.isArray(parsed.cart)) return parsed.cart;
+                    return null;
+                } catch {
+                    return null;
+                }
+            }
+
+            cartIconLink.addEventListener('click', async function(e) {
+                e.preventDefault();
+                openCart();
+                const previewCart = parseCartPayload(getCookie('formwiz_cart')) || parseCartPayload(typeof localStorage !== 'undefined' ? localStorage.getItem('formwiz_cart') : null) || [];
+                const hasCartItems = Array.isArray(previewCart) && previewCart.length > 0;
+                const user = firebase.auth().currentUser;
+                if (user || hasCartItems) {
+                    if (cartContent) cartContent.style.justifyContent = 'flex-start';
+                    if (cartIconLarge) cartIconLarge.style.display = 'block';
+                    cartSignupBtn.style.display = 'none';
+                    cartItemsList.style.display = 'block';
+                    cartCheckoutBtn.style.display = 'none';
+                    cartItemsList.innerHTML = '';
+                    var cart = parseCartPayload(getCookie('formwiz_cart')) || parseCartPayload(typeof localStorage !== 'undefined' ? localStorage.getItem('formwiz_cart') : null) || [];
+                    if (!Array.isArray(cart) || cart.length === 0) {
+                        if (cartContent) cartContent.style.justifyContent = 'center';
+                        if (cartIconLarge) cartIconLarge.style.display = 'block';
+                        cartMessage.style.display = 'none';
+                        cartDescription.style.display = 'none';
+                        cartItemsList.innerHTML = '<div style="color:#7f8c8d;font-size:1.1em;margin-top:18px;">Your cart is empty.</div>';
+                        cartCheckoutBtn.style.display = 'none';
+                        return;
+                    }
+                    cartMessage.textContent = 'Your Cart';
+                    cartDescription.textContent = 'Review your selected forms and proceed to checkout.';
+                    cartMessage.style.display = 'block';
+                    cartDescription.style.display = 'block';
+                    cartItemsList.innerHTML = '<div style="color:#7f8c8d;font-size:1.1em;margin-top:18px;text-align:center;width:100%;">Loading cart...</div>';
+
+                    async function fetchStripePrice(priceId) {
+                        try {
+                            const res = await fetch('/stripe-price/' + priceId, { mode: 'cors' });
+                            if (!res.ok) return null;
+                            return await res.json();
+                        } catch {
+                            return null;
+                        }
+                    }
+
+                    const groupedItems = new Map();
+                    for (let i = 0; i < cart.length; i++) {
+                        const item = cart[i];
+                        const groupKey = item && item.portfolioId ? String(item.portfolioId) : 'NO_PORTFOLIO_ID';
+                        if (!groupedItems.has(groupKey)) groupedItems.set(groupKey, []);
+                        groupedItems.get(groupKey).push({ item, index: i });
+                    }
+                    const normalizeFormId = (value) => String(value || '').replace(/\.pdf$/i, '').trim().toLowerCase();
+                    let html = '';
+                    let totalAmount = 0;
+                    for (const [groupKey, entries] of groupedItems.entries()) {
+                        let groupName = '';
+                        const withExplicitName = entries.find(entry => entry.item && entry.item.formData && entry.item.formData.formName);
+                        if (withExplicitName) groupName = String(withExplicitName.item.formData.formName).trim();
+                        if (!groupName) {
+                            const parentRow = entries.find(entry => {
+                                const fid = normalizeFormId(entry.item && entry.item.formId);
+                                const ofid = normalizeFormId(entry.item && entry.item.originalFormId);
+                                return fid && ofid && fid === ofid;
+                            });
+                            if (parentRow && parentRow.item && parentRow.item.title) groupName = String(parentRow.item.title).trim();
+                        }
+                        if (!groupName) {
+                            const titled = entries.find(entry => entry.item && entry.item.title);
+                            if (titled) groupName = String(titled.item.title).trim();
+                        }
+                        if (!groupName) groupName = groupKey === 'NO_PORTFOLIO_ID' ? 'Ungrouped Forms' : 'Portfolio Group';
+                        html += '<div class="cart-group"><div class="cart-group-header">' + groupName + ' (' + entries.length + ' item' + (entries.length === 1 ? '' : 's') + ')</div>';
+                        for (const entry of entries) {
+                            const item = entry.item;
+                            const priceInfo = await fetchStripePrice(item.priceId);
+                            let display = '...';
+                            if (priceInfo && priceInfo.unit_amount != null) {
+                                display = '$' + (priceInfo.unit_amount / 100).toFixed(2);
+                                totalAmount += (priceInfo.unit_amount / 100);
+                            }
+                            let defendantDisplay = '';
+                            if (item.defendantName) {
+                                const capName = String(item.defendantName).split(/\s+/).map(function(w){ return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }).join(' ');
+                                defendantDisplay = '<div style="font-weight:bold;color:#e74c3c;">Defendant: ' + capName + '</div>';
+                            }
+                            html += '<div class="cart-item"><div class="cart-item-info"><div class="cart-item-title">' + (item.title || 'Form') + '</div>' + defendantDisplay + (item.countyName ? '<div class="cart-item-county" style="font-size:0.98em;color:#153a5b;margin-bottom:2px;">' + item.countyName + '</div>' : '') + '<div class="cart-item-price">' + display + '</div></div><button class="remove-item" title="Remove" data-index="' + entry.index + '"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h10"></path><path d="M8 7V5.8a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V7"></path><rect x="6.5" y="7" width="7" height="9" rx="1.2"></rect><line x1="9" y1="10" x2="9" y2="14"></line><line x1="11" y1="10" x2="11" y2="14"></line></svg></button></div>';
+                        }
+                        html += '</div>';
+                    }
+                    html += '<div class="cart-summary"><div class="summary-label">Total:</div><div class="total-amount">$' + totalAmount.toFixed(2) + '</div><button class="cart-summary-checkout-btn" id="cart-summary-checkout-btn">Checkout - $' + totalAmount.toFixed(2) + '</button></div>';
+                    cartItemsList.innerHTML = html;
+                    cartCheckoutBtn.style.display = 'none';
+                    cartItemsList.querySelectorAll('.remove-item').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const cartIndex = parseInt(btn.getAttribute('data-index'), 10);
+                            if (isNaN(cartIndex) || cartIndex < 0 || cartIndex >= cart.length) return;
+                            cart.splice(cartIndex, 1);
+                            document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
+                            try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch (e2) {}
+                            updateCartCountBadge();
+                            cartIconLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+                        });
+                    });
+                    const summaryCheckoutBtn = document.getElementById('cart-summary-checkout-btn');
+                    if (summaryCheckoutBtn) summaryCheckoutBtn.onclick = function() { window.location.href = 'cart.html'; };
                 } else {
-                    // User is not signed in, open the cart menu
-                    openCart();
+                    if (cartContent) cartContent.style.justifyContent = 'center';
+                    if (cartIconLarge) cartIconLarge.style.display = 'block';
+                    cartMessage.textContent = 'Create an account to start shopping!';
+                    cartMessage.style.display = 'block';
+                    cartDescription.style.display = 'block';
+                    cartSignupBtn.style.display = 'inline-block';
+                    cartItemsList.style.display = 'none';
+                    cartCheckoutBtn.style.display = 'none';
                 }
             });
 

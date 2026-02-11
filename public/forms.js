@@ -2020,6 +2020,7 @@ function closeCartSideMenu() {
 }
 // Cart icon click handler
 document.addEventListener('DOMContentLoaded', function() {
+    if (window.__FORMS_INLINE_SIDECART__ === true) return;
     const cartIconLink = document.getElementById('cart-icon-link');
     const cartOverlay = document.getElementById('cart-overlay');
     const cartSideMenu = document.getElementById('cart-side-menu');
@@ -2033,10 +2034,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (cartIconLink) {
         cartIconLink.addEventListener('click', async function(e) {
             e.preventDefault();
-            // Navigate directly to cart.html
-            window.location.href = 'cart.html';
-            return;
-            
+
             if (auth.currentUser) {
                 cartMessage.style.display = 'none';
                 cartDescription.style.display = 'none';
