@@ -23,11 +23,19 @@
         .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }
         .question-step-hidden { display: none !important; }
         #box { padding-top: 100px; margin: 50px; }
+        @media (max-width: 768px) {
+            body { padding: 0 !important; margin: 0 !important; }
+            #box { margin: 12px 0 !important; margin-left: 0 !important; margin-right: 0 !important; padding-left: 6px !important; padding-right: 6px !important; max-width: none !important; width: 100% !important; box-sizing: border-box !important; }
+            section { padding: 20px 6px !important; padding-left: 6px !important; padding-right: 6px !important; }
+            .question-container { margin: 6px 0 !important; margin-left: 0 !important; margin-right: 0 !important; padding: 20px 10px !important; max-width: none !important; width: 100% !important; box-sizing: border-box !important; }
+            .question-nav { margin: 40px 0 0 !important; margin-left: 0 !important; margin-right: 0 !important; max-width: none !important; width: 100% !important; box-sizing: border-box !important; }
+        }
         @media (max-width: 600px) {
-            body { padding: 0 !important; }
-            #box { margin: 12px 4px !important; max-width: none !important; box-sizing: border-box !important; }
-            .question-container { margin: 6px 4px !important; padding: 20px 12px !important; max-width: none !important; width: 100% !important; box-sizing: border-box !important; }
-            .question-nav { margin: 40px 4px 0 !important; max-width: none !important; box-sizing: border-box !important; }
+            body { padding: 0 !important; margin: 0 !important; }
+            #box { margin: 12px 0 !important; margin-left: 0 !important; margin-right: 0 !important; padding-left: 6px !important; padding-right: 6px !important; max-width: none !important; width: 100% !important; box-sizing: border-box !important; }
+            section { padding: 20px 6px !important; padding-left: 6px !important; padding-right: 6px !important; }
+            .question-container { margin: 6px 0 !important; margin-left: 0 !important; margin-right: 0 !important; padding: 20px 10px !important; max-width: none !important; width: 100% !important; box-sizing: border-box !important; }
+            .question-nav { margin: 40px 0 0 !important; margin-left: 0 !important; margin-right: 0 !important; max-width: none !important; width: 100% !important; box-sizing: border-box !important; }
         }
         .address-field { margin: 4px auto; }
         .address-input { width: 80%; max-width: 400px; padding: 12px 16px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; height: 44px; line-height: 20px; }
@@ -436,6 +444,7 @@
             font-weight: 500;
             margin-right: 18px;
             transition: color 0.2s;
+            font-size: clamp(0.7rem, 2.2vw, 1em);
         }
         .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
             color: #ff7043;
@@ -470,9 +479,8 @@
             color: white;
         }
         
-        /* Mobile Responsive Breakpoint (@media max-width: 768px) */
-        @media (max-width: 768px) {
-            /* Show mobile menu toggle */
+        /* Single mobile breakpoint: all mobile features at 992px */
+        @media (max-width: 992px) {
             .mobile-menu-toggle {
                 display: flex !important;
                 position: absolute !important;
@@ -481,17 +489,12 @@
                 transform: translateY(-50%) !important;
                 z-index: 1001 !important;
             }
-            
-            /* Hide desktop nav */
             .desktop-nav {
                 display: none !important;
             }
-            
-            /* Show mobile nav structure */
             .mobile-nav {
                 display: flex !important;
             }
-            
             .mobile-nav.active {
                 left: 0 !important;
                 right: auto !important;
@@ -499,17 +502,20 @@
                 position: fixed !important;
                 margin-left: 0 !important;
             }
-            
-            /* Typography adjustments */
+            .cart-side-menu {
+                width: 90% !important;
+                max-width: 380px !important;
+                right: -90% !important;
+            }
+            .cart-side-menu.active {
+                right: 0 !important;
+            }
             html {
                 font-size: 14px !important;
             }
-            
             body {
                 overflow-x: hidden;
             }
-            
-            /* Header mobile optimization */
             header {
                 padding: 16px 15px;
                 min-height: 80px;
@@ -518,7 +524,6 @@
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                 position: relative;
             }
-            
             header img {
                 width: 119px;
                 height: 73px;
@@ -526,42 +531,31 @@
                 left: 50%;
                 transform: translateX(-50%);
             }
-            
-            /* Header actions mobile */
             .header-actions {
                 gap: 10px;
                 margin-left: auto;
                 margin-right: 15px;
             }
-            
             .sign-in-btn {
                 font-size: 0.9em;
                 padding: 6px 20px;
                 margin-left: 0;
             }
-            
             #cart-icon-link .cart-circle {
                 width: 55px !important;
                 height: 55px !important;
             }
-            
             #cart-icon {
                 width: 30px !important;
                 height: 30px !important;
             }
-            
-            /* Hide desktop sign-in/logout buttons on mobile */
             #logout-btn,
             .sign-in-btn {
                 display: none !important;
             }
-            
-            /* Footer mobile - hide navigation column */
             .pro-footer-col.nav-col {
                 display: none !important;
             }
-            
-            /* Footer mobile - match homepage layout (two columns side-by-side) */
             .pro-footer {
                 gap: 20px !important;
                 padding: 30px 20px 15px 20px !important;
@@ -569,8 +563,6 @@
                 align-items: flex-start !important;
                 text-align: left !important;
             }
-            
-            /* Reset column constraints for mobile */
             .pro-footer-col {
                 min-width: unset !important;
                 max-width: unset !important;
@@ -578,44 +570,31 @@
                 align-items: flex-start !important;
                 text-align: left !important;
             }
-            
-            /* Address column - remove right padding and border */
             .pro-footer-col.address-col {
                 padding-right: 0 !important;
                 border-right: 1.5px solid #2c7a7d !important;
             }
-            
-            /* Company column - add left padding for spacing */
             .pro-footer-col.company-col {
                 padding-left: 20px !important;
                 border-right: none !important;
             }
-            
-            /* Contact info - stack vertically */
             .pro-footer-contact {
                 display: flex !important;
                 flex-direction: column !important;
                 gap: 8px !important;
             }
-            
-            /* Contact links - remove horizontal margin */
             .pro-footer-contact a {
                 margin-right: 0 !important;
             }
-            
-            /* Footer copyright - consistent padding */
             footer {
                 padding: 20px !important;
                 padding-bottom: 20px !important;
                 margin-bottom: 0 !important;
             }
-            
-            /* Prevent white space below footer */
             html, body {
                 margin-bottom: 0 !important;
                 padding-bottom: 0 !important;
             }
-            
             .pro-footer, footer {
                 margin-bottom: 0 !important;
             }
@@ -634,6 +613,12 @@
                 min-width: 44px;
             }
         }
+    </style>
+    <link rel="stylesheet" href="../../Pages/sidecart-unified.css">
+    <style>
+        /* Keep cart close button pinned to top-right in Example page. */
+        .cart-header { position: relative !important; padding-right: 56px !important; }
+        .cart-close-btn { position: absolute !important; right: 12px !important; top: 50% !important; transform: translateY(-50%) !important; margin: 0 !important; }
     </style>
     <script>
       // Phone formatter: Phone Number
@@ -888,10 +873,10 @@ function dropdownMirror(selectEl, baseName){
 
     <!-- Sliding Cart Menu -->
     <div class="cart-overlay" id="cart-overlay">
-        <div class="cart-side-menu" id="cart-side-menu" style="max-height: 100vh; overflow-y: auto;">
-            <div class="cart-header" style="background:#2c3e50;color:#fff;padding:20px 0 20px 20px;display:flex;justify-content:space-between;align-items:center;">
-                <h2 style="margin:0;font-size:1.5em;font-weight:700;">🛒 Cart</h2>
-                <button class="cart-close-btn" id="cart-close-btn" style="background:none;border:none;color:#fff;font-size:1.5em;cursor:pointer;padding:0;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s;margin-right:8px;">&times;</button>
+        <div class="cart-side-menu" id="cart-side-menu">
+            <div class="cart-header">
+                <h2>🛒 Cart</h2>
+                <button class="cart-close-btn" id="cart-close-btn">&times;</button>
             </div>
             <div class="cart-content" id="cart-content">
                 <div class="cart-icon-large">🛒</div>
@@ -900,7 +885,7 @@ function dropdownMirror(selectEl, baseName){
                     To add forms to your cart and make purchases, you\'ll need to create a FormStar account. 
                     Sign up now to access our complete library of legal forms and start simplifying your paperwork.
                 </div>
-                <a href="../Pages/account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
+                <a href="../../Pages/account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
                 <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>
                 <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>
             </div>
@@ -16308,183 +16293,203 @@ if (typeof handleNext === 'function') {
             setInterval(updateAuthButtonsAndCart, 2000);
             // Also update cart count immediately when page loads
             setTimeout(updateCartCountBadge, 500);
-            // Sliding Cart Menu
+            // Sliding Cart Menu (match correct.html: group by portfolioId, cart-summary checkout)
             const cartIconLink = document.getElementById('cart-icon-link');
             const cartOverlay = document.getElementById('cart-overlay');
             const cartSideMenu = document.getElementById('cart-side-menu');
             const cartCloseBtn = document.getElementById('cart-close-btn');
+            const cartMessage = document.getElementById('cart-message');
+            const cartDescription = document.getElementById('cart-description');
+            const cartSignupBtn = document.getElementById('cart-signup-btn');
+            const cartItemsList = document.getElementById('cart-items-list');
+            const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
+            const cartContent = document.getElementById('cart-content');
+            const cartIconLarge = cartContent ? cartContent.querySelector('.cart-icon-large') : null;
+
             function openCart() {
                 cartOverlay.classList.add('active');
                 cartSideMenu.classList.add('active');
-                document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
-                // Update cart content based on auth state
-                updateCartContent();
+                cartOverlay.style.opacity = '1';
+                cartOverlay.style.visibility = 'visible';
+                document.body.style.overflow = 'hidden';
+                if (cartContent) cartContent.scrollTop = 0;
             }
+
             function closeCart() {
                 cartOverlay.classList.remove('active');
                 cartSideMenu.classList.remove('active');
-                document.body.style.overflow = ''; // Restore scrolling
+                cartOverlay.style.opacity = '0';
+                cartOverlay.style.visibility = 'hidden';
+                document.body.style.overflow = '';
             }
-            if (cartIconLink) {
-                cartIconLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    openCart();
-                });
-            }
-            if (cartCloseBtn) {
-                cartCloseBtn.addEventListener('click', closeCart);
-            }
-            if (cartOverlay) {
-                cartOverlay.addEventListener('click', function(e) {
-                    if (e.target === cartOverlay) {
-                        closeCart();
-                    }
-                });
-            }
-            // Update cart content based on authentication state
-            function updateCartContent() {
-                const cartMessage = document.getElementById('cart-message');
-                const cartDescription = document.getElementById('cart-description');
-                const cartSignupBtn = document.getElementById('cart-signup-btn');
-                const cartItemsList = document.getElementById('cart-items-list');
-                const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
-                const cartIconLarge = document.querySelector('.cart-icon-large');
-                if (auth.currentUser) {
-                    // User is signed in - show cart items
-                    if (cartMessage) cartMessage.textContent = 'Your Cart';
-                    if (cartDescription) cartDescription.textContent = 'Review your selected forms and proceed to checkout.';
-                    if (cartSignupBtn) cartSignupBtn.style.display = 'none';
-                    if (cartIconLarge) cartIconLarge.textContent = '🛒';
-                    // Load and display cart items
-                    loadCartItems();
-                } else {
-                    // User is not signed in - show signup message
-                    if (cartMessage) cartMessage.textContent = 'Create an account to start shopping!';
-                    if (cartDescription) cartDescription.textContent = 'To add forms to your cart and make purchases, you\'ll need to create a FormStar account. Sign up now to access our complete library of legal forms and start simplifying your paperwork.';
-                    if (cartSignupBtn) cartSignupBtn.style.display = 'inline-block';
-                    if (cartItemsList) cartItemsList.style.display = 'none';
-                    if (cartCheckoutBtn) cartCheckoutBtn.style.display = 'none';
-                    if (cartIconLarge) cartIconLarge.textContent = '🛒';
+
+            function getCookie(name) {
+                const eq = name + '=';
+                const parts = document.cookie.split(';');
+                for (let c of parts) {
+                    while (c.charAt(0) === ' ') c = c.slice(1);
+                    if (c.indexOf(eq) === 0) return c.slice(eq.length);
                 }
+                return null;
             }
-            // Load cart items for logged-in users
-            async function loadCartItems() {
-                const cartItemsList = document.getElementById('cart-items-list');
-                const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
-                if (!cartItemsList || !auth.currentUser) {
-                    return;
-                }
+
+            function parseCartPayload(raw) {
+                if (!raw || typeof raw !== 'string') return null;
                 try {
-                    // Get cart data from cookies or localStorage
-                    function getCookie(name) {
-                        const value = '; ' + document.cookie;
-                        const parts = value.split('; ' + name + '=');
-                        if (parts.length === 2) return parts.pop().split(';').shift();
-                        return null;
-                    }
-                    const cartData = getCookie('formwiz_cart') || localStorage.getItem('formwiz_cart');
-                    let cart = [];
-                    if (cartData) {
-                        try {
-                            // Decode URL-encoded cart data if it comes from cookie
-                            let decodedCartData = cartData;
-                            if (cartData.startsWith('%')) {
-                                decodedCartData = decodeURIComponent(cartData);
-                            }
-                            cart = JSON.parse(decodedCartData);
-                        } catch (e) {
-                        }
-                    }
-                    if (cart.length === 0) {
-                        cartItemsList.innerHTML = '<p style="color:#7f8c8d;font-style:italic;">Your cart is empty</p>';
-                        cartItemsList.style.display = 'block';
-                        if (cartCheckoutBtn) cartCheckoutBtn.style.display = 'none';
+                    const normalized = raw.startsWith('%') ? decodeURIComponent(raw) : raw;
+                    const parsed = JSON.parse(normalized);
+                    if (Array.isArray(parsed)) return parsed;
+                    if (parsed && Array.isArray(parsed.cart)) return parsed.cart;
+                    return null;
+                } catch {
+                    return null;
+                }
+            }
+
+            function readCart() {
+                const fromCookie = parseCartPayload(getCookie('formwiz_cart'));
+                if (fromCookie) return fromCookie;
+                const localRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('formwiz_cart') : null;
+                const fromLocal = parseCartPayload(localRaw);
+                if (fromLocal) return fromLocal;
+                return [];
+            }
+
+            cartIconLink.addEventListener('click', async function(e) {
+                e.preventDefault();
+                openCart();
+                const cartSnapshot = readCart();
+                const hasCartItems = Array.isArray(cartSnapshot) && cartSnapshot.length > 0;
+                const user = auth.currentUser;
+
+                if (user || hasCartItems) {
+                    if (cartContent) cartContent.style.justifyContent = 'flex-start';
+                    if (cartIconLarge) cartIconLarge.style.display = 'block';
+                    cartSignupBtn.style.display = 'none';
+                    cartItemsList.style.display = 'block';
+                    cartCheckoutBtn.style.display = 'none';
+                    cartItemsList.innerHTML = '';
+
+                    const cart = readCart();
+                    if (!Array.isArray(cart) || cart.length === 0) {
+                        if (cartContent) cartContent.style.justifyContent = 'center';
+                        if (cartIconLarge) cartIconLarge.style.display = 'block';
+                        cartMessage.style.display = 'none';
+                        cartDescription.style.display = 'none';
+                        cartItemsList.innerHTML = '<div style="color:#7f8c8d;font-size:1.1em;margin-top:18px;">Your cart is empty.</div>';
+                        cartCheckoutBtn.style.display = 'none';
                         return;
                     }
-                    // Fetch Stripe prices for cart items
+
+                    cartMessage.textContent = 'Your Cart';
+                    cartDescription.textContent = 'Review your selected forms and proceed to checkout.';
+                    cartMessage.style.display = 'block';
+                    cartDescription.style.display = 'block';
+                    cartItemsList.innerHTML = '<div style="color:#7f8c8d;font-size:1.1em;margin-top:18px;text-align:center;width:100%;">Loading cart...</div>';
+
                     async function fetchStripePrice(priceId) {
                         try {
-                            const response = await fetch('/stripe-price/' + priceId);
-                            if (!response.ok) return null;
-                            const data = await response.json();
-                            return data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : null;
-                        } catch (e) {
+                            const res = await fetch('/stripe-price/' + priceId, { mode: 'cors' });
+                            if (!res.ok) return null;
+                            return await res.json();
+                        } catch {
                             return null;
                         }
                     }
-                    // Render cart items
-                    let total = 0;
-                    let itemsHtml = '';
-                    let itemIndex = 0;
-                    for (const item of cart) {
-                        const price = await fetchStripePrice(item.priceId);
-                        const itemPrice = price ? parseFloat(price) : 0;
-                        total += itemPrice;
-                        // Defendant and county fields
-                        let defendantHtml = '';
-                        let countyHtml = '';
-                        if (item.defendantName) {
-                            const capName = String(item.defendantName)
-                              .split(/s+/)
-                              .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-                              .join(' ');
-                            defendantHtml = '<div style=\"color:#e74c3c;font-weight:600;\">Defendant: ' + capName + '</div>';
-                        }
-                        if (item.countyName) {
-                            const countyDisplay = item.countyName.toLowerCase().includes('county') ? item.countyName : item.countyName + ' County';
-                            countyHtml = '<div style="color:#7f8c8d;">' + countyDisplay + '</div>';
-                        }
-                        // Use the proper display name instead of the filename
-                        let displayTitle = item.title || 'Form';
-                        if (item.formId === 'sc120' || item.formId === 'SC-120') {
-                            displayTitle = 'SC-120';
-                        } else if (item.formId === 'sc500' || item.formId === 'SC-500') {
-                            displayTitle = 'SC-500';
-                        }
-                        itemsHtml +=
-     '<div class="cart-item">' +
-       '<div class="cart-item-info">' +
-         '<div class="cart-item-title">' + displayTitle + '</div>' +
-         defendantHtml +
-         countyHtml +
-       '</div>' +
-       '<div class="cart-item-price" style="margin-right: 12px;">$' + itemPrice.toFixed(2) + '</div>' +
-       '<button class="remove-item" title="Remove" data-cart-index="' + itemIndex + '">' +
-         '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-2 14H7L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"></path></svg>' +
-       '</button>' +
-     '</div>';
-                        itemIndex++;
+
+                    const groupedItems = new Map();
+                    for (let i = 0; i < cart.length; i++) {
+                        const item = cart[i];
+                        const groupKey = item && item.portfolioId ? String(item.portfolioId) : 'NO_PORTFOLIO_ID';
+                        if (!groupedItems.has(groupKey)) groupedItems.set(groupKey, []);
+                        groupedItems.get(groupKey).push({ item, index: i });
                     }
-                    cartItemsList.innerHTML = itemsHtml;
-                    cartItemsList.style.display = 'block';
-                    // Remove item event listeners
-                    const removeButtons = cartItemsList.querySelectorAll('.remove-item');
-                    removeButtons.forEach(btn => {
-                      btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const idx = parseInt(btn.getAttribute('data-cart-index'));
-                        if (!isNaN(idx)) {
-                          cart.splice(idx, 1);
-                          // Save updated cart
-                          document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
-                          localStorage.setItem('formwiz_cart', JSON.stringify(cart));
-                          loadCartItems();
+
+                    const normalizeFormId = (value) => String(value || '').replace(/.pdf$/i, '').trim().toLowerCase();
+                    let html = '';
+                    let totalAmount = 0;
+
+                    for (const [groupKey, entries] of groupedItems.entries()) {
+                        let groupName = '';
+                        const withExplicitName = entries.find(entry => entry.item && entry.item.formData && entry.item.formData.formName);
+                        if (withExplicitName) groupName = String(withExplicitName.item.formData.formName).trim();
+
+                        if (!groupName) {
+                            const parentRow = entries.find(entry => {
+                                const fid = normalizeFormId(entry.item && entry.item.formId);
+                                const ofid = normalizeFormId(entry.item && entry.item.originalFormId);
+                                return fid && ofid && fid === ofid;
+                            });
+                            if (parentRow && parentRow.item && parentRow.item.title) groupName = String(parentRow.item.title).trim();
                         }
-                      });
+
+                        if (!groupName) {
+                            const titled = entries.find(entry => entry.item && entry.item.title);
+                            if (titled) groupName = String(titled.item.title).trim();
+                        }
+
+                        if (!groupName) groupName = groupKey === 'NO_PORTFOLIO_ID' ? 'Ungrouped Forms' : 'Portfolio Group';
+                        html += '<div class="cart-group"><div class="cart-group-header">' + groupName + ' (' + entries.length + ' item' + (entries.length === 1 ? '' : 's') + ')</div>';
+
+                        for (const entry of entries) {
+                            const item = entry.item;
+                            const priceInfo = await fetchStripePrice(item.priceId);
+                            let display = '...';
+                            if (priceInfo && priceInfo.unit_amount != null) {
+                                display = '$' + (priceInfo.unit_amount / 100).toFixed(2);
+                                totalAmount += (priceInfo.unit_amount / 100);
+                            }
+
+                            let defendantDisplay = '';
+                            if (item.defendantName) {
+                                const capName = String(item.defendantName).split(/s+/).map(function(w){ return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }).join(' ');
+                                defendantDisplay = '<div style="font-weight:bold;color:#e74c3c;">Defendant: ' + capName + '</div>';
+                            }
+
+                            html += '<div class="cart-item"><div class="cart-item-info"><div class="cart-item-title">' + (item.title || 'Form') + '</div>' + defendantDisplay + (item.countyName ? '<div class="cart-item-county" style="font-size:0.98em;color:#153a5b;margin-bottom:2px;">' + item.countyName + '</div>' : '') + '<div class="cart-item-price">' + display + '</div></div><button class="remove-item" title="Remove" data-index="' + entry.index + '"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h10"></path><path d="M8 7V5.8a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V7"></path><rect x="6.5" y="7" width="7" height="9" rx="1.2"></rect><line x1="9" y1="10" x2="9" y2="14"></line><line x1="11" y1="10" x2="11" y2="14"></line></svg></button></div>';
+                        }
+
+                        html += '</div>';
+                    }
+
+                    html += '<div class="cart-summary"><div class="summary-label">Total:</div><div class="total-amount">$' + totalAmount.toFixed(2) + '</div><button class="cart-summary-checkout-btn" id="cart-summary-checkout-btn">Checkout - $' + totalAmount.toFixed(2) + '</button></div>';
+                    cartItemsList.innerHTML = html;
+                    cartCheckoutBtn.style.display = 'none';
+                    cartItemsList.style.display = 'block';
+
+                    cartItemsList.querySelectorAll('.remove-item').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const cartIndex = parseInt(btn.getAttribute('data-index'), 10);
+                            if (isNaN(cartIndex) || cartIndex < 0 || cartIndex >= cart.length) return;
+                            cart.splice(cartIndex, 1);
+                            document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
+                            try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch (e2) {}
+                            updateCartCountBadge();
+                            cartIconLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+                        });
                     });
-                    if (cartCheckoutBtn) {
-                        cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
-                        cartCheckoutBtn.style.display = 'block';
-                        cartCheckoutBtn.onclick = function() {
-                            window.location.href = '/Pages/cart.html';
-                        };
-                    }
-                } catch (error) {
-                    cartItemsList.innerHTML = '<p style="color:#e74c3c;">Error loading cart items</p>';
-                    cartItemsList.style.display = 'block';
+
+                    const summaryCheckoutBtn = document.getElementById('cart-summary-checkout-btn');
+                    if (summaryCheckoutBtn) summaryCheckoutBtn.onclick = function() { window.location.href = '../../Pages/cart.html'; };
+                } else {
+                    if (cartContent) cartContent.style.justifyContent = 'center';
+                    if (cartIconLarge) cartIconLarge.style.display = 'block';
+                    cartMessage.textContent = 'Create an account to start shopping!';
+                    cartMessage.style.display = 'block';
+                    cartDescription.style.display = 'block';
+                    cartSignupBtn.style.display = 'inline-block';
+                    cartItemsList.style.display = 'none';
+                    cartCheckoutBtn.style.display = 'none';
                 }
-            }
-            // Keyboard accessibility for cart menu
+            });
+
+            cartCloseBtn.addEventListener('click', closeCart);
+            cartOverlay.addEventListener('click', function(e) {
+                if (e.target === cartOverlay) {
+                    closeCart();
+                }
+            });
+
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeCart();

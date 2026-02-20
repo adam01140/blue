@@ -444,6 +444,7 @@
             font-weight: 500;
             margin-right: 18px;
             transition: color 0.2s;
+            font-size: clamp(0.7rem, 2.2vw, 1em);
         }
         .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
             color: #ff7043;
@@ -478,9 +479,8 @@
             color: white;
         }
         
-        /* Mobile Responsive Breakpoint (@media max-width: 768px) */
-        @media (max-width: 768px) {
-            /* Show mobile menu toggle */
+        /* Single mobile breakpoint: all mobile features at 992px */
+        @media (max-width: 992px) {
             .mobile-menu-toggle {
                 display: flex !important;
                 position: absolute !important;
@@ -489,17 +489,12 @@
                 transform: translateY(-50%) !important;
                 z-index: 1001 !important;
             }
-            
-            /* Hide desktop nav */
             .desktop-nav {
                 display: none !important;
             }
-            
-            /* Show mobile nav structure */
             .mobile-nav {
                 display: flex !important;
             }
-            
             .mobile-nav.active {
                 left: 0 !important;
                 right: auto !important;
@@ -507,17 +502,20 @@
                 position: fixed !important;
                 margin-left: 0 !important;
             }
-            
-            /* Typography adjustments */
+            .cart-side-menu {
+                width: 90% !important;
+                max-width: 380px !important;
+                right: -90% !important;
+            }
+            .cart-side-menu.active {
+                right: 0 !important;
+            }
             html {
                 font-size: 14px !important;
             }
-            
             body {
                 overflow-x: hidden;
             }
-            
-            /* Header mobile optimization */
             header {
                 padding: 16px 15px;
                 min-height: 80px;
@@ -526,7 +524,6 @@
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                 position: relative;
             }
-            
             header img {
                 width: 119px;
                 height: 73px;
@@ -534,42 +531,31 @@
                 left: 50%;
                 transform: translateX(-50%);
             }
-            
-            /* Header actions mobile */
             .header-actions {
                 gap: 10px;
                 margin-left: auto;
                 margin-right: 15px;
             }
-            
             .sign-in-btn {
                 font-size: 0.9em;
                 padding: 6px 20px;
                 margin-left: 0;
             }
-            
             #cart-icon-link .cart-circle {
                 width: 55px !important;
                 height: 55px !important;
             }
-            
             #cart-icon {
                 width: 30px !important;
                 height: 30px !important;
             }
-            
-            /* Hide desktop sign-in/logout buttons on mobile */
             #logout-btn,
             .sign-in-btn {
                 display: none !important;
             }
-            
-            /* Footer mobile - hide navigation column */
             .pro-footer-col.nav-col {
                 display: none !important;
             }
-            
-            /* Footer mobile - match homepage layout (two columns side-by-side) */
             .pro-footer {
                 gap: 20px !important;
                 padding: 30px 20px 15px 20px !important;
@@ -577,8 +563,6 @@
                 align-items: flex-start !important;
                 text-align: left !important;
             }
-            
-            /* Reset column constraints for mobile */
             .pro-footer-col {
                 min-width: unset !important;
                 max-width: unset !important;
@@ -586,44 +570,31 @@
                 align-items: flex-start !important;
                 text-align: left !important;
             }
-            
-            /* Address column - remove right padding and border */
             .pro-footer-col.address-col {
                 padding-right: 0 !important;
                 border-right: 1.5px solid #2c7a7d !important;
             }
-            
-            /* Company column - add left padding for spacing */
             .pro-footer-col.company-col {
                 padding-left: 20px !important;
                 border-right: none !important;
             }
-            
-            /* Contact info - stack vertically */
             .pro-footer-contact {
                 display: flex !important;
                 flex-direction: column !important;
                 gap: 8px !important;
             }
-            
-            /* Contact links - remove horizontal margin */
             .pro-footer-contact a {
                 margin-right: 0 !important;
             }
-            
-            /* Footer copyright - consistent padding */
             footer {
                 padding: 20px !important;
                 padding-bottom: 20px !important;
                 margin-bottom: 0 !important;
             }
-            
-            /* Prevent white space below footer */
             html, body {
                 margin-bottom: 0 !important;
                 padding-bottom: 0 !important;
             }
-            
             .pro-footer, footer {
                 margin-bottom: 0 !important;
             }
@@ -642,6 +613,12 @@
                 min-width: 44px;
             }
         }
+    </style>
+    <link rel="stylesheet" href="../../Pages/sidecart-unified.css">
+    <style>
+        /* Keep cart close button pinned to top-right in Example page. */
+        .cart-header { position: relative !important; padding-right: 56px !important; }
+        .cart-close-btn { position: absolute !important; right: 12px !important; top: 50% !important; transform: translateY(-50%) !important; margin: 0 !important; }
     </style>
     <script>
       // Phone formatter: Phone Number
@@ -896,10 +873,10 @@ function dropdownMirror(selectEl, baseName){
 
     <!-- Sliding Cart Menu -->
     <div class="cart-overlay" id="cart-overlay">
-        <div class="cart-side-menu" id="cart-side-menu" style="max-height: 100vh; overflow-y: auto;">
-            <div class="cart-header" style="background:#2c3e50;color:#fff;padding:20px 0 20px 20px;display:flex;justify-content:space-between;align-items:center;">
-                <h2 style="margin:0;font-size:1.5em;font-weight:700;">🛒 Cart</h2>
-                <button class="cart-close-btn" id="cart-close-btn" style="background:none;border:none;color:#fff;font-size:1.5em;cursor:pointer;padding:0;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s;margin-right:8px;">&times;</button>
+        <div class="cart-side-menu" id="cart-side-menu">
+            <div class="cart-header">
+                <h2>🛒 Cart</h2>
+                <button class="cart-close-btn" id="cart-close-btn">&times;</button>
             </div>
             <div class="cart-content" id="cart-content">
                 <div class="cart-icon-large">🛒</div>
@@ -908,7 +885,7 @@ function dropdownMirror(selectEl, baseName){
                     To add forms to your cart and make purchases, you\'ll need to create a FormStar account. 
                     Sign up now to access our complete library of legal forms and start simplifying your paperwork.
                 </div>
-                <a href="../Pages/account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
+                <a href="../../Pages/account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
                 <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>
                 <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>
             </div>
@@ -1068,81 +1045,30 @@ document.addEventListener("DOMContentLoaded", function() {
         <input type="hidden" id="form_ID" name="form_ID" value="">
         <input type="hidden" id="current_date" name="current_date" value="">
         <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><br><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">How did you calculate the money owed to you?</h3></label>
-            <div class="text-input-container">
-              <textarea id="how_did_you_calculate_the_money_owed_to_you" name="how_did_you_calculate_the_money_owed_to_you" rows="5" cols="50" placeholder="" data-line-limit="80" oninput="handleLineSplitting('how_did_you_calculate_the_money_owed_to_you', 80); checkParagraphLimit('how_did_you_calculate_the_money_owed_to_you', 320);"></textarea>
-            </div>
-            <script>
-              function handleLineSplitting(textareaId, lineLimit) {
-                const textarea = document.getElementById(textareaId);
-                const text = textarea.value;
-                const totalChars = text.length;
-                // Calculate how many lines we need
-                const linesNeeded = Math.ceil(totalChars / lineLimit);
-                // Create or update hidden textboxes for each line
-                for (let i = 1; i <= linesNeeded; i++) {
-                  const startIndex = (i - 1) * lineLimit;
-                  const endIndex = Math.min(startIndex + lineLimit, totalChars);
-                  const lineText = text.substring(startIndex, endIndex);
-                  const hiddenInputId = textareaId + '_line' + i;
-                  let hiddenInput = document.getElementById(hiddenInputId);
-                  if (!hiddenInput) {
-                    // Create new hidden input
-                    hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.id = hiddenInputId;
-                    hiddenInput.name = hiddenInputId;
-                    textarea.parentNode.appendChild(hiddenInput);
-                  }
-                  hiddenInput.value = lineText;
-                }
-                // Remove any extra hidden inputs that are no longer needed
-                let lineNum = linesNeeded + 1;
-                while (true) {
-                  const extraInput = document.getElementById(textareaId + '_line' + lineNum);
-                  if (extraInput) {
-                    extraInput.remove();
-                    lineNum++;
-                  } else {
-                    break;
-                  }
-                }
-              }
-            </script>
-          </div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Have you sent a demand letter to the defendant?</h3></label><select id="have_you_sent_a_demand_letter_to_the_defendant" name="have_you_sent_a_demand_letter_to_the_defendant" data-question-id="2"
-                      onchange="dropdownMirror(this, 'have_you_sent_a_demand_letter_to_the_defendant'); updateHiddenLogic('have_you_sent_a_demand_letter_to_the_defendant', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+        <input type="hidden" id="court_address" name="court_address" value=""><div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Introduction</div></div></div><div id="section1" class="section active"><br><center><h1 class="section-title">Introduction</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">Do you have any documentation showing these efforts?</h3></label><select id="do_you_have_any_documentation_showing_these_efforts" name="do_you_have_any_documentation_showing_these_efforts" data-question-id="1"
+                      onchange="dropdownMirror(this, 'do_you_have_any_documentation_showing_these_efforts'); updateHiddenLogic('do_you_have_any_documentation_showing_these_efforts', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handleLatexPreview1(this.value)">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_have_you_sent_a_demand_letter_to_the_defendant"></div>
-              <input type="text" id="have_you_sent_a_demand_letter_to_the_defendant_dropdown" name="have_you_sent_a_demand_letter_to_the_defendant_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-3" data-question-id="3" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="3"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="3"
-                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_hungry"></div>
-              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
-                   readonly style="display:none;"></div><div id="question-container-4" data-question-id="4" class="question-container question-item question-step-hidden" data-section="1" data-question-index="4"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry_dup2" name="hungry_dup2" data-question-id="4"
-                      onchange="dropdownMirror(this, 'hungry_dup2'); updateHiddenLogic('hungry_dup2', this.value); updateLinkedFields(); clearInactiveLinkedFields(); handleLatexPreview4(this.value)">
-                       <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_hungry_dup2"></div>
-              <input type="text" id="hungry_dup2_dropdown" name="hungry_dup2_dropdown"
+              <div id="dropdowntext_do_you_have_any_documentation_showing_these_efforts"></div>
+              <input type="text" id="do_you_have_any_documentation_showing_these_efforts_dropdown" name="do_you_have_any_documentation_showing_these_efforts_dropdown"
                    readonly style="display:none;">
-              <div id="latexPreview4" style="display: none; margin-top: 20px; padding: 20px; border: 2px solid #4CAF50; border-radius: 12px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);">
-                <h4 style="margin: 0 0 15px 0; color: #2E7D32; font-size: 18px; font-weight: 600; text-align: center;">Latex PDF Preview</h4>
-                <div id="latexPreviewLoading4" style="text-align: center; padding: 20px; display: none;">
+              <div id="latexPreview1" style="display: none; margin-top: 20px; padding: 20px; border: 2px solid #4CAF50; border-radius: 12px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);">
+                <h4 style="margin: 0 0 15px 0; color: #2E7D32; font-size: 18px; font-weight: 600; text-align: center;">Heres a sample demand letter:</h4>
+                <div id="latexPreviewLoading1" style="text-align: center; padding: 20px; display: none;">
                   <p style="color: #2E7D32; font-size: 16px;">Generating PDF from LaTeX...</p>
                 </div>
                 <div style="text-align: center; background: white; padding: 10px; border-radius: 8px;">
-                  <iframe id="latexPreviewIframe4" width="100%" height="600px" style="border: none; border-radius: 8px;"></iframe>
+                  <iframe id="latexPreviewIframe1" width="100%" height="600px" style="border: none; border-radius: 8px;"></iframe>
                 </div>
               </div>
               <script>
-                async function handleLatexPreview4(value) {
+                async function handleLatexPreview1(value) {
 
-                  const previewDiv = document.getElementById('latexPreview4');
-                  const iframe = document.getElementById('latexPreviewIframe4');
-                  const loadingDiv = document.getElementById('latexPreviewLoading4');
-                  const latexContent = `\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage[margin=1in]{geometry}\n\\usepackage{enumitem}\n\n\\begin{document}\n\n% Sender Information (Top Left)\n\\begin{flushleft}\n[user_fullname]\\\\\n[user_full_address]\\\\\nEmail: [user_email]\\\\\nPhone: [user_phone]\\\\[1em]\nDate: [current_date]\n\\end{flushleft}\n\n\\vspace{1em}\n\n% Recipient Information\n[how_many_people_are_you_counter_suing_name_1]\\\\\n[how_many_people_are_you_counter_suing_please_enter_their_address_street_1]\n\n\\vspace{1em}\n\n\\textbf{Re: Demand for Payment}\n\n\\vspace{1em}\n\nDear [how_many_people_are_you_counter_suing_name_1],\n\n\\vspace{1em}\n\nI am writing to formally demand payment in the amount of [how_much_are_you_counter_suing_for] for the following reasons:\n\n[explain_why_they_owe_you_that_money]\n\n\\vspace{1em}\n\nThis amount remains unpaid despite previous attempts to resolve this matter amicably.\n\n\\vspace{1em}\n\nPlease remit payment in full by 14 days from the date of this letter. Payment can be made via cash, check, or bank transfer.\n\n\\vspace{1em}\n\nIf payment is not received by the stated deadline, I will have no choice but to pursue legal action in small claims court to recover the amount owed, along with any applicable court costs and fees.\n\n\\vspace{1em}\n\nI hope we can resolve this matter promptly and avoid further escalation. Please feel free to contact me at [user_phone] or [user_email] if you have any questions or wish to discuss this matter further.\n\n\\vspace{1em}\n\nThank you for your immediate attention to this matter.\n\n\\vspace{1em}\n\nSincerely,\\\\[2em]\n[user_fullname]\n\n\\end{document}\n`;
+                  const previewDiv = document.getElementById('latexPreview1');
+                  const iframe = document.getElementById('latexPreviewIframe1');
+                  const loadingDiv = document.getElementById('latexPreviewLoading1');
+                  const latexContent = `\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage[margin=1in]{geometry}\n\\usepackage{enumitem}\n\n\\begin{document}\n\n% Sender Information (Top Left)\n\\begin{flushleft}\n[user_fullname]\\\\\n[user_full_address]\\\\\nEmail: [user_email]\\\\\nPhone: [user_phone]\\\\[1em]\nDate: [current_date]\n\\end{flushleft}\n\n\\vspace{1em}\n\n% Recipient Information\n[how_many_people_are_you_suing_name_1]\\\\\n[how_many_people_are_you_suing_please_enter_]\n\n\\vspace{1em}\n\n\\textbf{Re: Demand for Payment}\n\n\\vspace{1em}\n\nDear [how_many_people_are_you_suing_name_1],\n\n\\vspace{1em}\n\nI am writing to formally demand payment in the amount of [how_much_are_you_suing_for] for the following reasons:\n\n[explain_why_they_owe_you_that_money]\n\n\\vspace{1em}\n\nAs of the date of this letter, the amount of [how_much_are_you_suing_for] remains unpaid. I demand that you pay this amount in full by 14 days from the date of this letter.\n\n\\vspace{1em}\n\nPayment may be made by cash, check, or bank transfer. Please send payment to the address listed above, or contact me directly at [user_phone] or [user_email] to arrange payment.\n\n\\vspace{1em}\n\nIf payment is not received by the deadline specified above, I will pursue all available legal remedies, including filing a lawsuit in small claims court to recover the amount owed, plus any applicable interest, court costs, and attorneys\' fees.\n\n\\vspace{1em}\n\nI hope we can resolve this matter amicably without the need for legal action. Please contact me at [user_phone] or [user_email] to discuss payment arrangements.\n\n\\vspace{1em}\n\nSincerely,\\\\[2em]\n[user_fullname]\n\n\\end{document}`;
 
-                  if (value === 'Yes') {
+                  if (value === 'No') {
 
                     previewDiv.style.display = 'block';
                     loadingDiv.style.display = 'block';
@@ -1207,14 +1133,14 @@ document.addEventListener("DOMContentLoaded", function() {
                       iframe.dataset.blobUrl = url;
 
                       // Store PDF blob if "Attach to packet" is selected
-                      const attachment = 'Preview Only';
+                      const attachment = 'Attach to packet';
                       if (attachment === 'Attach to packet') {
                         // Initialize window.latexPdfs if it doesn't exist
                         if (!window.latexPdfs) {
                           window.latexPdfs = {};
                         }
                         // Store the blob for this question
-                        window.latexPdfs[4] = blob;
+                        window.latexPdfs[1] = blob;
 
                       }
                     } catch (error) {
@@ -1232,17 +1158,17 @@ document.addEventListener("DOMContentLoaded", function() {
                       iframe.src = '';
                     }
                     // Remove stored PDF blob if user changes away from trigger
-                    if (window.latexPdfs && window.latexPdfs[4]) {
-                      delete window.latexPdfs[4];
+                    if (window.latexPdfs && window.latexPdfs[1]) {
+                      delete window.latexPdfs[1];
                     }
                   }
                 }
               </script>
-            </div><div id="question-container-5" data-question-id="5" class="question-container question-item question-step-hidden" data-section="1" data-question-index="5"><label><h3 class="question-text">Tired?</h3></label><select id="tired" name="tired" data-question-id="5"
-                      onchange="dropdownMirror(this, 'tired'); updateHiddenLogic('tired', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
+            </div><div id="question-container-2" data-question-id="2" class="question-container question-item hidden question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">Hungry?</h3></label><select id="hungry" name="hungry" data-question-id="2"
+                      onchange="dropdownMirror(this, 'hungry'); updateHiddenLogic('hungry', this.value); updateLinkedFields(); clearInactiveLinkedFields();">
                        <option value="" disabled selected>Select an option</option><option value="Yes">Yes</option><option value="No">No</option></select><br>
-              <div id="dropdowntext_tired"></div>
-              <input type="text" id="tired_dropdown" name="tired_dropdown"
+              <div id="dropdowntext_hungry"></div>
+              <input type="text" id="hungry_dropdown" name="hungry_dropdown"
                    readonly style="display:none;"></div>
       <div class="question-nav" data-section-index="1">
         <button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button>
@@ -2615,8 +2541,8 @@ document.addEventListener("DOMContentLoaded", function() {
   
 <script>
 window.formId = 'Test Form';
-var questionSlugMap = {"1":"how_did_you_calculate_the_money_owed_to_you","2":"have_you_sent_a_demand_letter_to_the_defendant","3":"hungry","4":"hungry","5":"tired"};
-var questionNameIds = {"1":"how_did_you_calculate_the_money_owed_to_you","2":"have_you_sent_a_demand_letter_to_the_defendant","3":"hungry","4":"hungry_dup2","5":"tired"};
+var questionSlugMap = {"1":"do_you_have_any_documentation_showing_these_efforts","2":"hungry"};
+var questionNameIds = {"1":"do_you_have_any_documentation_showing_these_efforts","2":"hungry"};
 var linkedCheckboxes = [];
 var inverseCheckboxes = [];
 var checkboxRequiredMap = {};
@@ -2625,7 +2551,7 @@ var unifiedFieldsMap = {};
 window.hardAlertData = {};
 var entryTitleMap = {};
 window.fileUploadQuestions = [];
-window.latexPreviewQuestions = [];
+window.latexPreviewQuestions = [{"questionId":"1","title":"Heres a sample demand letter:","filename":"Heres a sample demand letter:","priceId":"price_1SqS2XFJeSRMFQ8XXlBzhcqW","trigger":"No"}];
 window.pdfPreviewQuestions = [];
 
   window.formatCurrencyInput = window.formatCurrencyInput || function(input) {
@@ -4982,9 +4908,9 @@ function buildCheckboxName (questionId, rawNameId, labelText){
       if (typeof userId === 'undefined') { var userId = null; }
       const urlParams = new URLSearchParams(window.location.search);
       const formId = urlParams.get("formId") || window.formId || 'default';
-    var jumpLogics = [{"questionId":"5","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"5","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":1}];
+    var jumpLogics = [{"questionId":"2","questionType":"dropdown","jumpOption":"Yes","jumpTo":"end","section":1},{"questionId":"2","questionType":"dropdown","jumpOption":"No","jumpTo":"end","section":1}];
 var conditionalPDFs = [];
-var pdfLogicPDFs = [{"questionId":"1","pdfName":"mc031.pdf","pdfDisplayName":"MC-031","stripePriceId":"price_1SHdb4FJeSRMFQ8XEsxSKU7E","triggerOption":"","conditions":[{"characterLimit":320}],"isBigParagraph":true}];
+var pdfLogicPDFs = [];
 var checkboxPdfEntries = [];
 var alertLogics = [];
 var checklistLogics = [];
@@ -5351,12 +5277,21 @@ var hiddenTextCalculations = [];
  function updateVisibility(){
   var anyMatch=false;
   (function(){
-    var cPrevType="bigParagraph";
-    var cPrevAns="any text";
+    var cPrevType="dropdown";
+    var cPrevAns="yes";
     var cPrevQNum="1";
     var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
     if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
-      if(val2Lower !== ""){ anyMatch=true; } else { } }
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
+    } else { }
+  })();
+  (function(){
+    var cPrevType="dropdown";
+    var cPrevAns="no";
+    var cPrevQNum="1";
+    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
+    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
+      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
     } else { }
   })();
  if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
@@ -5404,72 +5339,12 @@ var hiddenTextCalculations = [];
   }
 }
  (function(){
-   var textQuestion = "1";
-   var el3= document.getElementById(questionNameIds[textQuestion]) || document.getElementById("answer"+textQuestion);
-   if(el3){ el3.addEventListener("input", function(){ updateVisibility();}); }
+   var selectQuestion = "1";
+   var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
+   if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
- updateVisibility();
-})();
-
-(function(){
- var thisQ=document.getElementById("question-container-3");
- function updateVisibility(){
-  var anyMatch=false;
-  (function(){
-    var cPrevType="dropdown";
-    var cPrevAns="yes";
-    var cPrevQNum="2";
-    var el2=document.getElementById(questionNameIds[cPrevQNum]) || document.getElementById("answer"+cPrevQNum);
-    if(el2){ var prevQContainer = document.getElementById('question-container-' + cPrevQNum); var prevQIsVisible = prevQContainer && !prevQContainer.classList.contains('hidden'); var val2= el2.value.trim(); var isDropdownPlaceholder = false; if(el2.tagName === 'SELECT'){ var placeholderOpt = el2.querySelector('option[value=""][disabled]'); isDropdownPlaceholder = (val2 === "" && el2.selectedIndex === 0) || (placeholderOpt && placeholderOpt.selected); } var prevQIsAnswered = prevQIsVisible && val2 !== "" && val2 !== "select an option" && val2.toLowerCase() !== "select an option" && !isDropdownPlaceholder; if(prevQIsAnswered){ var val2Lower = val2.toLowerCase();
-      if(val2Lower===cPrevAns){ anyMatch=true; } else { } } else { }
-    } else { }
-  })();
- if(anyMatch){ thisQ.classList.remove("hidden"); } else { 
-   var hasNumberedDropdown = thisQ.querySelector('select[id^="answer"]') || thisQ.querySelector('select[data-question-id]');
-   var questionType = thisQ.getAttribute('data-question-type') || '';
-   if(questionType === 'numberedDropdown' || hasNumberedDropdown){
-     
-     if(typeof resetNumberedDropdownFields === 'function'){
-       resetNumberedDropdownFields("3");
-     } else {
-       
-     }
-   }
-   var allDropdowns = thisQ.querySelectorAll('select');
-   for(var d=0; d<allDropdowns.length; d++){
-     var dropdown = allDropdowns[d];
-     // Skip if this dropdown is part of a trigger sequence (nested dropdowns)
-     if(dropdown.closest('[id^="triggerFields"]')) continue;
-     // Reset to default "Select an option"
-     var placeholderOption = dropdown.querySelector('option[value=""][disabled]');
-     if(placeholderOption){
-       placeholderOption.selected = true;
-       dropdown.selectedIndex = 0;
-     } else if(dropdown.options.length > 0){
-       dropdown.selectedIndex = 0;
-     }
-     // Also reset any hidden dropdown inputs
-     var hiddenDropdownInput = document.getElementById(dropdown.id + '_dropdown');
-     if(hiddenDropdownInput){
-       hiddenDropdownInput.value = '';
-     }
-     // Clear hidden checkboxes created by dropdownMirror
-     var dropdownWrapper = document.getElementById('dropdowntext_' + dropdown.id);
-     if(dropdownWrapper){
-       dropdownWrapper.innerHTML = '';
-     }
-     // Trigger change event to update any dependent logic
-     dropdown.dispatchEvent(new Event('change'));
-   }
-   thisQ.classList.add("hidden");
- }
-  var parentSection = thisQ ? thisQ.closest('[id^="section"]') : null;
-  if(parentSection){
-    document.dispatchEvent(new CustomEvent("questionVisibilityChanged",{detail:{sectionId: parentSection.id}}));
-  }
-}
  (function(){
-   var selectQuestion = "2";
+   var selectQuestion = "1";
    var el3= document.getElementById(questionNameIds[selectQuestion]) || document.getElementById("answer"+selectQuestion);
    if(el3){ el3.addEventListener("change", function(){ updateVisibility();});}
  })();
@@ -12889,183 +12764,203 @@ if (typeof handleNext === 'function') {
             setInterval(updateAuthButtonsAndCart, 2000);
             // Also update cart count immediately when page loads
             setTimeout(updateCartCountBadge, 500);
-            // Sliding Cart Menu
+            // Sliding Cart Menu (match correct.html: group by portfolioId, cart-summary checkout)
             const cartIconLink = document.getElementById('cart-icon-link');
             const cartOverlay = document.getElementById('cart-overlay');
             const cartSideMenu = document.getElementById('cart-side-menu');
             const cartCloseBtn = document.getElementById('cart-close-btn');
+            const cartMessage = document.getElementById('cart-message');
+            const cartDescription = document.getElementById('cart-description');
+            const cartSignupBtn = document.getElementById('cart-signup-btn');
+            const cartItemsList = document.getElementById('cart-items-list');
+            const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
+            const cartContent = document.getElementById('cart-content');
+            const cartIconLarge = cartContent ? cartContent.querySelector('.cart-icon-large') : null;
+
             function openCart() {
                 cartOverlay.classList.add('active');
                 cartSideMenu.classList.add('active');
-                document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
-                // Update cart content based on auth state
-                updateCartContent();
+                cartOverlay.style.opacity = '1';
+                cartOverlay.style.visibility = 'visible';
+                document.body.style.overflow = 'hidden';
+                if (cartContent) cartContent.scrollTop = 0;
             }
+
             function closeCart() {
                 cartOverlay.classList.remove('active');
                 cartSideMenu.classList.remove('active');
-                document.body.style.overflow = ''; // Restore scrolling
+                cartOverlay.style.opacity = '0';
+                cartOverlay.style.visibility = 'hidden';
+                document.body.style.overflow = '';
             }
-            if (cartIconLink) {
-                cartIconLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    openCart();
-                });
-            }
-            if (cartCloseBtn) {
-                cartCloseBtn.addEventListener('click', closeCart);
-            }
-            if (cartOverlay) {
-                cartOverlay.addEventListener('click', function(e) {
-                    if (e.target === cartOverlay) {
-                        closeCart();
-                    }
-                });
-            }
-            // Update cart content based on authentication state
-            function updateCartContent() {
-                const cartMessage = document.getElementById('cart-message');
-                const cartDescription = document.getElementById('cart-description');
-                const cartSignupBtn = document.getElementById('cart-signup-btn');
-                const cartItemsList = document.getElementById('cart-items-list');
-                const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
-                const cartIconLarge = document.querySelector('.cart-icon-large');
-                if (auth.currentUser) {
-                    // User is signed in - show cart items
-                    if (cartMessage) cartMessage.textContent = 'Your Cart';
-                    if (cartDescription) cartDescription.textContent = 'Review your selected forms and proceed to checkout.';
-                    if (cartSignupBtn) cartSignupBtn.style.display = 'none';
-                    if (cartIconLarge) cartIconLarge.textContent = '🛒';
-                    // Load and display cart items
-                    loadCartItems();
-                } else {
-                    // User is not signed in - show signup message
-                    if (cartMessage) cartMessage.textContent = 'Create an account to start shopping!';
-                    if (cartDescription) cartDescription.textContent = 'To add forms to your cart and make purchases, you\'ll need to create a FormStar account. Sign up now to access our complete library of legal forms and start simplifying your paperwork.';
-                    if (cartSignupBtn) cartSignupBtn.style.display = 'inline-block';
-                    if (cartItemsList) cartItemsList.style.display = 'none';
-                    if (cartCheckoutBtn) cartCheckoutBtn.style.display = 'none';
-                    if (cartIconLarge) cartIconLarge.textContent = '🛒';
+
+            function getCookie(name) {
+                const eq = name + '=';
+                const parts = document.cookie.split(';');
+                for (let c of parts) {
+                    while (c.charAt(0) === ' ') c = c.slice(1);
+                    if (c.indexOf(eq) === 0) return c.slice(eq.length);
                 }
+                return null;
             }
-            // Load cart items for logged-in users
-            async function loadCartItems() {
-                const cartItemsList = document.getElementById('cart-items-list');
-                const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
-                if (!cartItemsList || !auth.currentUser) {
-                    return;
-                }
+
+            function parseCartPayload(raw) {
+                if (!raw || typeof raw !== 'string') return null;
                 try {
-                    // Get cart data from cookies or localStorage
-                    function getCookie(name) {
-                        const value = '; ' + document.cookie;
-                        const parts = value.split('; ' + name + '=');
-                        if (parts.length === 2) return parts.pop().split(';').shift();
-                        return null;
-                    }
-                    const cartData = getCookie('formwiz_cart') || localStorage.getItem('formwiz_cart');
-                    let cart = [];
-                    if (cartData) {
-                        try {
-                            // Decode URL-encoded cart data if it comes from cookie
-                            let decodedCartData = cartData;
-                            if (cartData.startsWith('%')) {
-                                decodedCartData = decodeURIComponent(cartData);
-                            }
-                            cart = JSON.parse(decodedCartData);
-                        } catch (e) {
-                        }
-                    }
-                    if (cart.length === 0) {
-                        cartItemsList.innerHTML = '<p style="color:#7f8c8d;font-style:italic;">Your cart is empty</p>';
-                        cartItemsList.style.display = 'block';
-                        if (cartCheckoutBtn) cartCheckoutBtn.style.display = 'none';
+                    const normalized = raw.startsWith('%') ? decodeURIComponent(raw) : raw;
+                    const parsed = JSON.parse(normalized);
+                    if (Array.isArray(parsed)) return parsed;
+                    if (parsed && Array.isArray(parsed.cart)) return parsed.cart;
+                    return null;
+                } catch {
+                    return null;
+                }
+            }
+
+            function readCart() {
+                const fromCookie = parseCartPayload(getCookie('formwiz_cart'));
+                if (fromCookie) return fromCookie;
+                const localRaw = typeof localStorage !== 'undefined' ? localStorage.getItem('formwiz_cart') : null;
+                const fromLocal = parseCartPayload(localRaw);
+                if (fromLocal) return fromLocal;
+                return [];
+            }
+
+            cartIconLink.addEventListener('click', async function(e) {
+                e.preventDefault();
+                openCart();
+                const cartSnapshot = readCart();
+                const hasCartItems = Array.isArray(cartSnapshot) && cartSnapshot.length > 0;
+                const user = auth.currentUser;
+
+                if (user || hasCartItems) {
+                    if (cartContent) cartContent.style.justifyContent = 'flex-start';
+                    if (cartIconLarge) cartIconLarge.style.display = 'block';
+                    cartSignupBtn.style.display = 'none';
+                    cartItemsList.style.display = 'block';
+                    cartCheckoutBtn.style.display = 'none';
+                    cartItemsList.innerHTML = '';
+
+                    const cart = readCart();
+                    if (!Array.isArray(cart) || cart.length === 0) {
+                        if (cartContent) cartContent.style.justifyContent = 'center';
+                        if (cartIconLarge) cartIconLarge.style.display = 'block';
+                        cartMessage.style.display = 'none';
+                        cartDescription.style.display = 'none';
+                        cartItemsList.innerHTML = '<div style="color:#7f8c8d;font-size:1.1em;margin-top:18px;">Your cart is empty.</div>';
+                        cartCheckoutBtn.style.display = 'none';
                         return;
                     }
-                    // Fetch Stripe prices for cart items
+
+                    cartMessage.textContent = 'Your Cart';
+                    cartDescription.textContent = 'Review your selected forms and proceed to checkout.';
+                    cartMessage.style.display = 'block';
+                    cartDescription.style.display = 'block';
+                    cartItemsList.innerHTML = '<div style="color:#7f8c8d;font-size:1.1em;margin-top:18px;text-align:center;width:100%;">Loading cart...</div>';
+
                     async function fetchStripePrice(priceId) {
                         try {
-                            const response = await fetch('/stripe-price/' + priceId);
-                            if (!response.ok) return null;
-                            const data = await response.json();
-                            return data && data.unit_amount != null ? (data.unit_amount / 100).toFixed(2) : null;
-                        } catch (e) {
+                            const res = await fetch('/stripe-price/' + priceId, { mode: 'cors' });
+                            if (!res.ok) return null;
+                            return await res.json();
+                        } catch {
                             return null;
                         }
                     }
-                    // Render cart items
-                    let total = 0;
-                    let itemsHtml = '';
-                    let itemIndex = 0;
-                    for (const item of cart) {
-                        const price = await fetchStripePrice(item.priceId);
-                        const itemPrice = price ? parseFloat(price) : 0;
-                        total += itemPrice;
-                        // Defendant and county fields
-                        let defendantHtml = '';
-                        let countyHtml = '';
-                        if (item.defendantName) {
-                            const capName = String(item.defendantName)
-                              .split(/s+/)
-                              .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-                              .join(' ');
-                            defendantHtml = '<div style=\"color:#e74c3c;font-weight:600;\">Defendant: ' + capName + '</div>';
-                        }
-                        if (item.countyName) {
-                            const countyDisplay = item.countyName.toLowerCase().includes('county') ? item.countyName : item.countyName + ' County';
-                            countyHtml = '<div style="color:#7f8c8d;">' + countyDisplay + '</div>';
-                        }
-                        // Use the proper display name instead of the filename
-                        let displayTitle = item.title || 'Form';
-                        if (item.formId === 'sc120' || item.formId === 'SC-120') {
-                            displayTitle = 'SC-120';
-                        } else if (item.formId === 'sc500' || item.formId === 'SC-500') {
-                            displayTitle = 'SC-500';
-                        }
-                        itemsHtml +=
-     '<div class="cart-item">' +
-       '<div class="cart-item-info">' +
-         '<div class="cart-item-title">' + displayTitle + '</div>' +
-         defendantHtml +
-         countyHtml +
-       '</div>' +
-       '<div class="cart-item-price" style="margin-right: 12px;">$' + itemPrice.toFixed(2) + '</div>' +
-       '<button class="remove-item" title="Remove" data-cart-index="' + itemIndex + '">' +
-         '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-2 14H7L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"></path></svg>' +
-       '</button>' +
-     '</div>';
-                        itemIndex++;
+
+                    const groupedItems = new Map();
+                    for (let i = 0; i < cart.length; i++) {
+                        const item = cart[i];
+                        const groupKey = item && item.portfolioId ? String(item.portfolioId) : 'NO_PORTFOLIO_ID';
+                        if (!groupedItems.has(groupKey)) groupedItems.set(groupKey, []);
+                        groupedItems.get(groupKey).push({ item, index: i });
                     }
-                    cartItemsList.innerHTML = itemsHtml;
-                    cartItemsList.style.display = 'block';
-                    // Remove item event listeners
-                    const removeButtons = cartItemsList.querySelectorAll('.remove-item');
-                    removeButtons.forEach(btn => {
-                      btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const idx = parseInt(btn.getAttribute('data-cart-index'));
-                        if (!isNaN(idx)) {
-                          cart.splice(idx, 1);
-                          // Save updated cart
-                          document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
-                          localStorage.setItem('formwiz_cart', JSON.stringify(cart));
-                          loadCartItems();
+
+                    const normalizeFormId = (value) => String(value || '').replace(/.pdf$/i, '').trim().toLowerCase();
+                    let html = '';
+                    let totalAmount = 0;
+
+                    for (const [groupKey, entries] of groupedItems.entries()) {
+                        let groupName = '';
+                        const withExplicitName = entries.find(entry => entry.item && entry.item.formData && entry.item.formData.formName);
+                        if (withExplicitName) groupName = String(withExplicitName.item.formData.formName).trim();
+
+                        if (!groupName) {
+                            const parentRow = entries.find(entry => {
+                                const fid = normalizeFormId(entry.item && entry.item.formId);
+                                const ofid = normalizeFormId(entry.item && entry.item.originalFormId);
+                                return fid && ofid && fid === ofid;
+                            });
+                            if (parentRow && parentRow.item && parentRow.item.title) groupName = String(parentRow.item.title).trim();
                         }
-                      });
+
+                        if (!groupName) {
+                            const titled = entries.find(entry => entry.item && entry.item.title);
+                            if (titled) groupName = String(titled.item.title).trim();
+                        }
+
+                        if (!groupName) groupName = groupKey === 'NO_PORTFOLIO_ID' ? 'Ungrouped Forms' : 'Portfolio Group';
+                        html += '<div class="cart-group"><div class="cart-group-header">' + groupName + ' (' + entries.length + ' item' + (entries.length === 1 ? '' : 's') + ')</div>';
+
+                        for (const entry of entries) {
+                            const item = entry.item;
+                            const priceInfo = await fetchStripePrice(item.priceId);
+                            let display = '...';
+                            if (priceInfo && priceInfo.unit_amount != null) {
+                                display = '$' + (priceInfo.unit_amount / 100).toFixed(2);
+                                totalAmount += (priceInfo.unit_amount / 100);
+                            }
+
+                            let defendantDisplay = '';
+                            if (item.defendantName) {
+                                const capName = String(item.defendantName).split(/s+/).map(function(w){ return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }).join(' ');
+                                defendantDisplay = '<div style="font-weight:bold;color:#e74c3c;">Defendant: ' + capName + '</div>';
+                            }
+
+                            html += '<div class="cart-item"><div class="cart-item-info"><div class="cart-item-title">' + (item.title || 'Form') + '</div>' + defendantDisplay + (item.countyName ? '<div class="cart-item-county" style="font-size:0.98em;color:#153a5b;margin-bottom:2px;">' + item.countyName + '</div>' : '') + '<div class="cart-item-price">' + display + '</div></div><button class="remove-item" title="Remove" data-index="' + entry.index + '"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h10"></path><path d="M8 7V5.8a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V7"></path><rect x="6.5" y="7" width="7" height="9" rx="1.2"></rect><line x1="9" y1="10" x2="9" y2="14"></line><line x1="11" y1="10" x2="11" y2="14"></line></svg></button></div>';
+                        }
+
+                        html += '</div>';
+                    }
+
+                    html += '<div class="cart-summary"><div class="summary-label">Total:</div><div class="total-amount">$' + totalAmount.toFixed(2) + '</div><button class="cart-summary-checkout-btn" id="cart-summary-checkout-btn">Checkout - $' + totalAmount.toFixed(2) + '</button></div>';
+                    cartItemsList.innerHTML = html;
+                    cartCheckoutBtn.style.display = 'none';
+                    cartItemsList.style.display = 'block';
+
+                    cartItemsList.querySelectorAll('.remove-item').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const cartIndex = parseInt(btn.getAttribute('data-index'), 10);
+                            if (isNaN(cartIndex) || cartIndex < 0 || cartIndex >= cart.length) return;
+                            cart.splice(cartIndex, 1);
+                            document.cookie = 'formwiz_cart=' + encodeURIComponent(JSON.stringify(cart)) + ';path=/;max-age=2592000';
+                            try { localStorage.setItem('formwiz_cart', JSON.stringify(cart)); } catch (e2) {}
+                            updateCartCountBadge();
+                            cartIconLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+                        });
                     });
-                    if (cartCheckoutBtn) {
-                        cartCheckoutBtn.textContent = 'Checkout - $' + total.toFixed(2);
-                        cartCheckoutBtn.style.display = 'block';
-                        cartCheckoutBtn.onclick = function() {
-                            window.location.href = '/Pages/cart.html';
-                        };
-                    }
-                } catch (error) {
-                    cartItemsList.innerHTML = '<p style="color:#e74c3c;">Error loading cart items</p>';
-                    cartItemsList.style.display = 'block';
+
+                    const summaryCheckoutBtn = document.getElementById('cart-summary-checkout-btn');
+                    if (summaryCheckoutBtn) summaryCheckoutBtn.onclick = function() { window.location.href = '../../Pages/cart.html'; };
+                } else {
+                    if (cartContent) cartContent.style.justifyContent = 'center';
+                    if (cartIconLarge) cartIconLarge.style.display = 'block';
+                    cartMessage.textContent = 'Create an account to start shopping!';
+                    cartMessage.style.display = 'block';
+                    cartDescription.style.display = 'block';
+                    cartSignupBtn.style.display = 'inline-block';
+                    cartItemsList.style.display = 'none';
+                    cartCheckoutBtn.style.display = 'none';
                 }
-            }
-            // Keyboard accessibility for cart menu
+            });
+
+            cartCloseBtn.addEventListener('click', closeCart);
+            cartOverlay.addEventListener('click', function(e) {
+                if (e.target === cartOverlay) {
+                    closeCart();
+                }
+            });
+
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeCart();

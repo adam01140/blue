@@ -1271,6 +1271,7 @@
         
         .mobile-nav.active {
             left: 150px;
+            display: flex;
         }
         
         .mobile-nav a {
@@ -1327,9 +1328,11 @@
             padding-bottom: 0;
         }
         
-        .mobile-nav-logout {
+        .mobile-nav-logout,
+        .mobile-nav-logout a,
+        #mobile-logout-btn {
             color: #ff7043 !important;
-            font-weight: 700;
+            font-weight: 700 !important;
         }
         
         .mobile-nav-toggle span {
@@ -1426,6 +1429,9 @@
             }
             
             #logout-btn {
+                display: none !important;
+            }
+            .sign-in-btn {
                 display: none !important;
             }
             
