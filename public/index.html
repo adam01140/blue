@@ -222,6 +222,9 @@
             background: #eaf1f8;
             box-shadow: 0 2px 8px rgba(44,62,80,0.10);
         }
+        .hiw-mobile-break {
+            display: none;
+        }
         /* FAQ / Help Section */
         .faq-help {
             background: #f8fafc;
@@ -397,15 +400,46 @@
             color: #444;
             margin: 0;
         }
+        .hiw-cycling-content {
+            overflow: hidden;
+            position: relative;
+        }
+        .hiw-cycling-content .hiw-cycle-inner {
+            min-width: 100%;
+            opacity: 1;
+            transition: transform 0.85s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform, opacity;
+        }
+        .hiw-images-swipe-wrap {
+            overflow: hidden;
+            width: 100%;
+            display: block;
+        }
+        .hiw-images-strip {
+            display: flex;
+            width: 100%;
+            flex: 0 0 100%;
+            flex-shrink: 0;
+            transition: transform 0.85s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .hiw-images-strip .hiw-image {
+            flex: 0 0 100%;
+            width: 100%;
+            min-width: 100%;
+            object-fit: contain;
+            display: block !important;
+        }
         .hiw-image {
-            display: none;
-           
             transition: opacity 0.4s;
         }
-        .hiw-image.active {
-            display: block;
-            opacity: 1;
-        }
+        /* Carousel images – desktop heights */
+        #hiw-img-0 { height: 300px; width: 100%; object-fit: contain; }
+        #hiw-img-1 { height: 300px; width: 100%; object-fit: contain; }
+        #hiw-img-2 { height: 300px; width: 100%; object-fit: contain; }
+        /* Inline step icons – desktop heights */
+        #hiw-inline-0 { width: 100px; height: 100px; }
+        #hiw-inline-1 { width: 115px; height: 115px; }
+        #hiw-inline-2 { width: 120px; height: 135px; }
         .hiw-steps-area {
             flex: 2;
             max-width: 1200px;
@@ -1423,15 +1457,13 @@
             }
             
             .sign-in-btn {
-                font-size: 0.9em;
-                padding: 6px 20px;
+                font-size: 1.05em;
+                padding: 10px 24px;
                 margin-left: 0;
+                min-height: unset !important;
             }
             
             #logout-btn {
-                display: none !important;
-            }
-            .sign-in-btn {
                 display: none !important;
             }
             
@@ -1448,11 +1480,15 @@
             /* Hero section mobile optimization */
             .hero-container.hero-gridfit {
                 flex-direction: column;
-                padding: 5px 20px 15px 20px;
+                align-items: flex-start;
+                padding: 0 10px 12px 10px;
                 gap: 15px;
-                max-width: 100%;
-                margin: 0 47px;
+                width: calc(100% - 20px);
+                max-width: none;
+                margin: 0 10px;
                 border-radius: 20px;
+                box-sizing: border-box;
+                min-height: auto;
             }
             
             /* Hide profile images on mobile */
@@ -1462,26 +1498,38 @@
             
             .hero-content.hero-content-gridfit {
                 text-align: center;
-                padding: 0;
+                padding-top: 50px;
+                padding-bottom: 50px;
+                flex: 0 0 auto;
+                width: 100%;
                 min-width: unset;
                 align-items: center;
+                justify-content: flex-start;
+                min-height: auto;
             }
             
             .hero-content h1 {
-                font-size: 2em;
+                font-size: 2.6em;
                 line-height: 1.2;
+            
                 margin-bottom: 18px;
                 text-shadow: 0 2px 4px rgba(0,0,0,0.3);
             }
             
             .hero-content p {
-                font-size: 1.15em;
+                font-size: 1.35em;
                 margin-bottom: 25px;
                 line-height: 1.4;
+                max-width: 440px;
+                margin-left: auto;
+                margin-right: auto;
+                padding-left: 20px;
+                padding-right: 20px;
+                box-sizing: border-box;
             }
             
             .hero-btn {
-                font-size: 1.1em;
+                font-size: 1.2em;
                 padding: 14px 35px;
                 margin: 0 auto 25px auto;
                 border-radius: 8px;
@@ -1491,33 +1539,37 @@
             /* Service cards mobile optimization */
             .hero-services-row.hero-services-row-gridfit {
                 display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-                margin: 25px 0 0 0;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                margin: 50px 0 0 0;
                 row-gap: 18px;
-                max-width: 500px;
+                max-width: 100%;
                 margin-left: auto;
                 margin-right: auto;
+                margin-bottom: 0;
             }
             
             .hero-service-card {
-                padding: 24px 16px;
-                min-height: 160px;
+                max-width: 130px !important;
+                padding: 20px 10px;
+                min-height: 140px;
                 min-width: unset;
-                max-width: 180px !important;
+                width: 100%;
+                max-width: 120px !important;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
                 text-align: center;
-                margin: 0 auto;
+                margin: 0;
             }
             
             .hero-service-card.free-forms-card {
                 min-width: unset !important;
-                max-width: 180px !important;
-                min-height: 160px !important;
-                padding: 24px 16px !important;
+                width: 100% !important;
+                max-width: 130px !important;
+                min-height: 140px !important;
+                padding: 20px 10px !important;
             }
             
             .hero-service-icon {
@@ -1533,13 +1585,13 @@
             }
             
             .hero-service-title {
-                font-size: 1.2em;
-                margin-bottom: 8px;
+                font-size: 1.1em;
+                margin-bottom: 6px;
                 font-weight: 700;
             }
             
             .hero-service-desc {
-                font-size: 1em;
+                font-size: 0.92em;
                 line-height: 1.4;
                 text-align: center;
             }
@@ -1547,7 +1599,7 @@
             /* How it works section mobile */
             .howitworks-wrapper {
                 padding: 20px 0;
-                margin: 0 47px;
+                margin: 0 16px;
             }
             
             .howitworks {
@@ -1562,7 +1614,7 @@
                 position: static;
                 margin: 0 auto;
                 width: 100%;
-                max-width: 300px;
+                max-width: 360px;
                 height: auto;
                 padding: 20px;
             }
@@ -1571,14 +1623,44 @@
                 font-size: 1.5em;
             }
             
-            .hiw-image-header p {
-                font-size: 1em;
+            .hiw-image-header p, .hiw-cycling-content p {
+                font-size: 1.22em;
+                line-height: 1.45;
+            }
+            
+            .hiw-cycling-content {
+                min-height: 3em;
             }
             
             .hiw-image {
                 width: 100% !important;
                 height: auto !important;
-                max-width: 250px;
+                max-width: none;
+            }
+
+            .hiw-images-strip .hiw-image {
+                width: 100% !important;
+                min-width: 100% !important;
+                max-width: none !important;
+            }
+
+            /* Carousel images – mobile heights */
+            #hiw-img-0 { height: 300px !important; }
+            #hiw-img-1 { height: 300px !important; }
+            #hiw-img-2 { height: 300px !important; }
+            /* Inline step icons – mobile heights */
+            #hiw-inline-0 { width: 105px !important; height: 105px !important; }
+            #hiw-inline-1 { width: 100px !important; height: 100px !important; }
+            #hiw-inline-2 { width: 100px !important; height: 100px !important; }
+
+            .hiw-images-swipe-wrap {
+                overflow: hidden !important;
+            }
+
+            .hiw-images-strip {
+                width: 100% !important;
+                flex: 0 0 100%;
+                flex-shrink: 0;
             }
             
             .hiw-step {
@@ -1588,6 +1670,11 @@
                 width: 100%;
                 box-sizing: border-box;
             }
+
+            .hiw-mobile-break {
+                display: block;
+                height: 10px;
+            }
             
             .hiw-step-left {
                 flex-direction: row;
@@ -1596,14 +1683,17 @@
                 margin-bottom: 10px;
             }
             
+            .hiw-step {
+                gap: 10px;
+            }
+            
             .hiw-step-number {
                 font-size: 2.5em;
                 margin-right: 15px;
             }
             
             .hiw-inline-img {
-                width: 60px;
-                height: 60px;
+                margin: 0;
             }
             
             .hiw-step h3 {
@@ -1618,7 +1708,7 @@
             /* FAQ section mobile */
             .faq-help {
                 padding: 20px 15px;
-                margin: 20px 47px;
+                margin: 20px 16px;
             }
             
             .faq-help h1 {
@@ -1639,13 +1729,26 @@
             .faq-help .btn {
                 font-size: 1.2em;
                 padding: 10px 25px;
+                display: inline-flex !important;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                width: 100%;
+                max-width: 340px;
+                margin-left: auto;
+                margin-right: auto;
             }
             
             /* Legal disclaimer mobile */
             .legal-disclaimer {
                 padding: 15px;
-                margin: 20px 47px;
+                margin: 20px 16px;
                 font-size: 0.9em;
+                text-align: left;
+            }
+
+            .legal-disclaimer .disclaimer-link-wrap {
+                text-align: center;
             }
             
             /* Footer mobile - hide navigation column */
@@ -1675,6 +1778,7 @@
             
             .pro-footer-contact a {
                 margin-right: 0;
+                font-size: 0.78em;
             }
             
             footer {
@@ -1702,46 +1806,95 @@
         
         /* Small mobile devices (320px - 480px) */
         @media (max-width: 480px) {
+            .hero-renovated {
+                padding: 8px 0 6px 0;
+            }
+
+            .hero-container.hero-gridfit {
+                padding-top: 0;
+                padding-bottom: 10px;
+                min-height: auto;
+            }
+
             .hero-services-row.hero-services-row-gridfit {
-                grid-template-columns: 1fr;
-                gap: 12px;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
                 row-gap: 12px;
-                max-width: 280px;
+                max-width: 100%;
+                margin-top: 50px;
+                margin-bottom: 0;
             }
             
             .hero-service-card {
-                min-height: 110px;
-                padding: 14px 8px;
-                max-width: 160px !important;
+                min-height: 100px;
+                padding: 12px 6px;
+                width: 100%;
+                max-width: 130px !important;
             }
             
             .hero-service-card.free-forms-card {
-                min-height: 110px !important;
-                padding: 14px 8px !important;
-                max-width: 160px !important;
+                min-height: 100px !important;
+                padding: 12px 6px !important;
+                width: 100% !important;
+                max-width: 130px !important;
+            }
+            
+            .hero-service-title {
+                font-size: 0.95em !important;
+            }
+            
+            .hero-service-desc {
+                font-size: 0.8em !important;
+            }
+            
+            .hero-service-icon {
+                font-size: 2em !important;
             }
             
             .hero-content h1 {
-                font-size: 1.5em;
+                font-size: 2.2em;
+                margin-top: 0;
             }
             
             .hero-content p {
-                font-size: 1em;
+                font-size: 1.18em;
+                max-width: 400px;
+                margin-left: auto;
+                margin-right: auto;
+                padding-left: 20px;
+                padding-right: 20px;
+                box-sizing: border-box;
             }
             
             .hiw-step {
-                flex-direction: column;
-                text-align: center;
+                flex-direction: row;
+                text-align: left;
+                align-items: flex-start;
             }
             
             .hiw-step-left {
-                flex-direction: column;
-                margin-bottom: 15px;
+                flex-direction: row;
+                margin-bottom: 0;
+                margin-right: 8px;
+                flex-shrink: 0;
+            }
+            
+            .hiw-step {
+                gap: 8px;
             }
             
             .hiw-step-number {
-                margin-right: 0;
-                margin-bottom: 10px;
+                margin-right: 10px;
+                margin-bottom: 0;
+            }
+            
+            
+            #hiw-inline-0 { width: 105px !important; height: 105px !important; }
+            #hiw-inline-1 { width: 100px !important; height: 100px !important; }
+            #hiw-inline-2 { width: 100px !important; height: 100px !important; }
+
+            .hiw-image-header p, .hiw-cycling-content p {
+                font-size: 1.15em;
             }
         }
         
@@ -1773,14 +1926,19 @@
         @media (hover: none) and (pointer: coarse) {
             .hero-service-card {
                 min-height: 140px;
+                max-width: 120px !important;
             }
             
-            .btn, .sign-in-btn, .cart-signup-btn {
+            .btn, .cart-signup-btn {
                 min-height: 44px;
                 min-width: 44px;
             }
+            .header-actions .sign-in-btn {
+                min-height: unset;
+                min-width: unset;
+            }
             
-            nav a {
+            nav.desktop-nav a {
                 min-height: 44px;
                 display: flex;
                 align-items: center;
@@ -1895,7 +2053,7 @@
                     <h1>
                         Simplifying Forms <span class="hero-highlight-orange">For You</span>
                     </h1>
-                    <p>Answer a few simple questions and we'll generate your completed forms instantly.</p></center><br>
+                    <p>Answer a few simple questions and we'll generate your completed forms instantly.</p><br>
                     <a href="Pages/forms.html" class="btn hero-btn" id="get-started-btn" style="display: none;">Go to My Forms
                         <div class="tiny-click-here"></div>
                     </a><br>
@@ -1945,11 +2103,17 @@
                 <div class="hiw-image-area" id="hiw-image-area">
                     <div class="hiw-image-header"><br>
                         <h2>How it works</h2><br>
-                        <p>We make navigating processes easier, whether you want to use our guided tools or choose an attorney to help you.</p>
+                        <div id="hiw-cycling-content" class="hiw-cycling-content">
+                            <div class="hiw-cycle-inner"><p>Browse our library or search for a specific form that you need</p></div>
+                        </div>
                     </div><br>
-                    <img src="Images/how4.png" alt="Step 1" class="hiw-image active" id="hiw-img-0" style="width:430px;height:330px">
-                    <img src="Images/how5.png" alt="Step 2" class="hiw-image" id="hiw-img-1" style="width:350px;height:300px">
-                    <img src="Images/how6.png" alt="Step 3" class="hiw-image" id="hiw-img-2" style="width:300px;height:500px">
+                    <div class="hiw-images-swipe-wrap">
+                        <div class="hiw-images-strip" id="hiw-images-strip">
+                            <img src="Images/how4.png" alt="Step 1" class="hiw-image active" id="hiw-img-0" >
+                            <img src="Images/how5.png" alt="Step 2" class="hiw-image" id="hiw-img-1" >
+                            <img src="Images/how6.png" alt="Step 3" class="hiw-image" id="hiw-img-2" >
+                        </div>
+                    </div>
                     
                 </div>
                 
@@ -1959,27 +2123,29 @@
                         <li class="hiw-step active" data-step="0">
                             <div class="hiw-step-left">
                                 <div class="hiw-step-number">01</div>
-                                <img src="Images/how1.png" alt="Step 1" class="hiw-inline-img"><br>
+                                <img src="Images/how1.png" alt="Step 1" class="hiw-inline-img" id="hiw-inline-0"><br>
                             </div>
                             <div class="hiw-step-right">
                                 <h3>Select Your Form</h3>
                                 <p>Browse our library and choose the form you need. We support a wide range of court and legal documents.</p>
                             </div>
                         </li>
+                        <br class="hiw-mobile-break">
                         <li class="hiw-step" data-step="1">
                             <div class="hiw-step-left">
                                 <div class="hiw-step-number">02</div>
-                                <img src="Images/how2.png" alt="Step 2" class="hiw-inline-img"><br>
+                                <img src="Images/how2.png" alt="Step 2" class="hiw-inline-img" id="hiw-inline-1"><br>
                             </div>
                             <div class="hiw-step-right">
                                 <h3>Answer Simple Questions</h3>
                                 <p>Fill out a brief, guided questionnaire. We only ask for information needed to complete your forms accurately.</p>
                             </div>
                         </li>
+                        <br class="hiw-mobile-break">
                         <li class="hiw-step" data-step="2">
                             <div class="hiw-step-left">
                                 <div class="hiw-step-number">03</div>
-                                <img src="Images/how3.png" alt="Step 3" class="hiw-inline-img"><br>
+                                <img src="Images/how3.png" alt="Step 3" class="hiw-inline-img" id="hiw-inline-2"><br>
                             </div>
                             <div class="hiw-step-right">
                                 <h3>Download & File</h3>
@@ -2015,7 +2181,8 @@
             
             Please review all documents carefully and consult with a qualified attorney
             if you have questions. Use of this service does not imply nor create an
-            attorney-client relationship at any time.<br><a href="Pages/disclaimer.html">Read full Disclaimer</a>.
+            attorney-client relationship at any time.
+            <div class="disclaimer-link-wrap"><a href="Pages/disclaimer.html">Read full Disclaimer</a>.</div>
         </section><br><br>
     </main>
 
@@ -2073,6 +2240,24 @@
             const getStartedBtn = document.getElementById('get-started-btn');
             const mobileAuthSection = document.getElementById('mobile-auth-section');
             const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+            const headerCartIconLink = document.getElementById('cart-icon-link');
+
+            function applyMobileHeaderAuthState(user) {
+                const isMobile = window.matchMedia('(max-width: 768px)').matches;
+                if (!headerCartIconLink) return;
+                if (isMobile) {
+                    if (user) {
+                        if (signInButton) signInButton.style.display = 'none';
+                        headerCartIconLink.style.display = 'inline-flex';
+                    } else {
+                        if (signInButton) signInButton.style.display = 'inline-block';
+                        headerCartIconLink.style.display = 'none';
+                    }
+                    if (logoutBtn) logoutBtn.style.display = 'none';
+                } else {
+                    headerCartIconLink.style.display = 'inline-flex';
+                }
+            }
 
             auth.onAuthStateChanged(function(user) {
                 console.log('Auth state changed. User:', user);
@@ -2129,6 +2314,11 @@
                         link.style.display = 'none';
                     });
                 }
+                applyMobileHeaderAuthState(user);
+            });
+
+            window.addEventListener('resize', function() {
+                applyMobileHeaderAuthState(auth.currentUser);
             });
 
             // Logout functionality
@@ -2158,30 +2348,105 @@
             // Dynamic How It Works image switching (hover and click)
             const steps = document.querySelectorAll('.hiw-step');
             const images = document.querySelectorAll('.hiw-image');
+            const hiwImagesStrip = document.getElementById('hiw-images-strip');
             let activeStep = 0;
 
             // Dynamic How It Works description text
             const hiwDesc = document.querySelector('.hiw-image-header p');
+            const hiwCyclingEl = document.getElementById('hiw-cycling-content');
             const hiwStepDescriptions = [
                 'Browse our library or search for a specific form that you need',
                 'Follow our plain language prompts so we can populate the form with the correct and required information',
                 'Use our filing checklist to make sure you are filing with everything required'
             ];
 
-            function setActiveStep(idx) {
-                steps.forEach((step, i) => {
-                    if (i === idx) {
-                        step.classList.add('active');
-                        images[i].classList.add('active');
-                    } else {
-                        step.classList.remove('active');
-                        images[i].classList.remove('active');
-                    }
-                });
-                activeStep = idx;
-                if (hiwDesc && hiwStepDescriptions[idx]) {
-                    hiwDesc.textContent = hiwStepDescriptions[idx];
+            // Mobile-only: auto-rotate How it works text and images every 2 seconds, swipe transition
+            function isMobileView() {
+                return window.matchMedia('(max-width: 768px)').matches;
+            }
+            let hiwRotateIdx = 0;
+            let hiwRotateInterval = null;
+            let hiwTextAnimTimer = null;
+
+            function updateHiwText(idx) {
+                if (!hiwCyclingEl || !hiwStepDescriptions[idx]) return;
+                var inner = hiwCyclingEl.querySelector('.hiw-cycle-inner');
+                if (!inner) return;
+                if (hiwTextAnimTimer) {
+                    clearTimeout(hiwTextAnimTimer);
+                    hiwTextAnimTimer = null;
                 }
+                inner.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+                inner.style.transform = 'translateX(-18px)';
+                inner.style.opacity = '0';
+
+                hiwTextAnimTimer = setTimeout(function() {
+                    inner.innerHTML = '<p>' + hiwStepDescriptions[idx] + '</p>';
+                    inner.style.transition = 'none';
+                    inner.style.transform = 'translateX(18px)';
+                    inner.style.opacity = '0';
+                    inner.offsetHeight;
+                    requestAnimationFrame(function() {
+                        inner.style.transition = 'transform 0.35s ease, opacity 0.35s ease';
+                        inner.style.transform = 'translateX(0)';
+                        inner.style.opacity = '1';
+                    });
+                }, 200);
+            }
+
+            function startHiwRotate() {
+                if (!hiwCyclingEl || !isMobileView()) return;
+                if (hiwRotateInterval) return;
+                hiwRotateInterval = setInterval(function() {
+                    var nextIdx = (hiwRotateIdx + 1) % 3;
+                    hiwRotateIdx = nextIdx;
+                    setActiveStep(hiwRotateIdx);
+                }, 2500);
+            }
+            function stopHiwRotate() {
+                if (hiwRotateInterval) {
+                    clearInterval(hiwRotateInterval);
+                    hiwRotateInterval = null;
+                }
+            }
+            if (isMobileView() && hiwCyclingEl) startHiwRotate();
+            window.addEventListener('resize', function() {
+                if (isMobileView() && hiwCyclingEl) startHiwRotate();
+                else stopHiwRotate();
+            });
+
+            function setActiveStep(idx) {
+                idx = Math.max(0, Math.min(2, idx));
+                steps.forEach((step, i) => {
+                    if (i === idx) step.classList.add('active');
+                    else step.classList.remove('active');
+                });
+                if (hiwImagesStrip) hiwImagesStrip.style.transform = 'translateX(' + (-idx * 100) + '%)';
+                activeStep = idx;
+                hiwRotateIdx = idx;
+                updateHiwText(idx);
+            }
+            setActiveStep(0);
+
+            // Mobile: swipe left/right on image carousel to change step
+            var hiwSwipeWrap = document.querySelector('.hiw-images-swipe-wrap');
+            if (hiwSwipeWrap) {
+                var touchStartX = 0, touchEndX = 0;
+                hiwSwipeWrap.addEventListener('touchstart', function(e) {
+                    touchStartX = e.changedTouches ? e.changedTouches[0].screenX : e.screenX;
+                }, { passive: true });
+                hiwSwipeWrap.addEventListener('touchend', function(e) {
+                    touchEndX = e.changedTouches ? e.changedTouches[0].screenX : e.screenX;
+                    var diff = touchStartX - touchEndX;
+                    if (Math.abs(diff) < 50) return;
+                    if (diff > 0) {
+                        setActiveStep((activeStep + 1) % 3);
+                    } else {
+                        setActiveStep((activeStep - 1 + 3) % 3);
+                    }
+                    stopHiwRotate();
+                    startHiwRotate();
+                }, { passive: true });
             }
 
             // Click or hover to activate step
@@ -2192,6 +2457,7 @@
 
             // Scroll-based activation
             function onScroll() {
+                if (isMobileView()) return;
                 let found = false;
                 steps.forEach((step, idx) => {
                     const rect = step.getBoundingClientRect();

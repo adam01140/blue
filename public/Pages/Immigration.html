@@ -1198,8 +1198,25 @@
             const logoutBtn = document.getElementById('logout-btn');
             const mobileAuthSection = document.getElementById('mobile-auth-section');
             const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
-            
-            // Auth state management
+            const headerCartIconLink = document.getElementById('cart-icon-link');
+
+            function applyMobileHeaderAuthState(user) {
+                const isMobile = window.matchMedia('(max-width: 768px)').matches;
+                if (!headerCartIconLink) return;
+                if (isMobile) {
+                    if (user) {
+                        if (signInBtn) signInBtn.style.display = 'none';
+                        headerCartIconLink.style.display = 'inline-flex';
+                    } else {
+                        if (signInBtn) signInBtn.style.display = 'inline-block';
+                        headerCartIconLink.style.display = 'none';
+                    }
+                    if (logoutBtn) logoutBtn.style.display = 'none';
+                } else {
+                    headerCartIconLink.style.display = 'inline-flex';
+                }
+            }
+
             auth.onAuthStateChanged(function(user) {
                 const myFormsLinks = document.querySelectorAll('.auth-required');
                 
@@ -1207,15 +1224,18 @@
                     if (signInBtn) signInBtn.style.display = 'none';
                     if (logoutBtn) logoutBtn.style.display = 'inline-block';
                     if (mobileAuthSection) mobileAuthSection.style.display = 'block';
-                    
                     myFormsLinks.forEach(link => { link.style.display = 'block'; });
                 } else {
                     if (signInBtn) signInBtn.style.display = 'inline-block';
                     if (logoutBtn) logoutBtn.style.display = 'none';
                     if (mobileAuthSection) mobileAuthSection.style.display = 'none';
-                    
                     myFormsLinks.forEach(link => { link.style.display = 'none'; });
                 }
+                applyMobileHeaderAuthState(user);
+            });
+
+            window.addEventListener('resize', function() {
+                applyMobileHeaderAuthState(auth.currentUser);
             });
             
             if (logoutBtn) {

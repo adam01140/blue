@@ -322,4 +322,30 @@
   .cart-message {
     font-size: 1.1em;
   }
+  /* Mobile footer – matches index.html (applies to all Pages) */
+  .pro-footer-col.nav-col {
+    display: none !important;
+  }
+  .pro-footer {
+    gap: 20px !important;
+    padding: 30px 20px 15px 20px !important;
+  }
+  .pro-footer-col.address-col {
+    padding-right: 0 !important;
+  }
+  .pro-footer-col.company-col {
+    padding-left: 20px !important;
+  }
+  .pro-footer-contact {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .pro-footer-contact a {
+    margin-right: 0 !important;
+    font-size: 0.78em !important;
+  }
+  footer {
+    padding-bottom: 30px !important;
+  }
 }

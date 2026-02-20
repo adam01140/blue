@@ -514,8 +514,7 @@
                 margin-right: 15px;
             }
             
-            #logout-btn,
-            .sign-in-btn {
+            #logout-btn {
                 display: none !important;
             }
             
@@ -2186,7 +2185,25 @@
             const logoutBtn = document.getElementById('logout-btn');
             const mobileAuthSection = document.getElementById('mobile-auth-section');
             const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
-            
+            const headerCartIconLink = document.getElementById('cart-icon-link');
+
+            function applyMobileHeaderAuthState(user) {
+                const isMobile = window.matchMedia('(max-width: 768px)').matches;
+                if (!headerCartIconLink) return;
+                if (isMobile) {
+                    if (user) {
+                        if (signInBtn) signInBtn.style.display = 'none';
+                        headerCartIconLink.style.display = 'inline-flex';
+                    } else {
+                        if (signInBtn) signInBtn.style.display = 'inline-block';
+                        headerCartIconLink.style.display = 'none';
+                    }
+                    if (logoutBtn) logoutBtn.style.display = 'none';
+                } else {
+                    headerCartIconLink.style.display = 'inline-flex';
+                }
+            }
+
             auth.onAuthStateChanged(function(user) {
                 // Get all "My Forms" links that require authentication
                 const myFormsLinks = document.querySelectorAll('.auth-required');
@@ -2210,6 +2227,11 @@
                         link.style.display = 'none';
                     });
                 }
+                applyMobileHeaderAuthState(user);
+            });
+
+            window.addEventListener('resize', function() {
+                applyMobileHeaderAuthState(auth.currentUser);
             });
 
             // Logout functionality

@@ -450,8 +450,7 @@
                 margin-left: 0;
             }
             
-            #logout-btn,
-            .sign-in-btn {
+            #logout-btn {
                 display: none !important;
             }
             
@@ -850,6 +849,23 @@
             const signInButton = document.querySelector('.sign-in-btn');
             const mobileAuthSection = document.getElementById('mobile-auth-section');
             const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+            const headerCartIconLink = document.getElementById('cart-icon-link');
+
+            function applyMobileHeaderAuthState(user) {
+                const isMobile = window.matchMedia('(max-width: 768px)').matches;
+                if (!headerCartIconLink) return;
+                if (isMobile) {
+                    if (user) {
+                        if (signInButton) signInButton.style.display = 'none';
+                        headerCartIconLink.style.display = 'inline-flex';
+                    } else {
+                        if (signInButton) signInButton.style.display = 'inline-block';
+                        headerCartIconLink.style.display = 'none';
+                    }
+                } else {
+                    headerCartIconLink.style.display = 'inline-flex';
+                }
+            }
 
             auth.onAuthStateChanged(function(user) {
                 console.log('Auth state changed on contact.html. User:', user);
@@ -891,7 +907,12 @@
                         link.style.display = 'none';
                     });
                 }
+                applyMobileHeaderAuthState(user);
             });
+
+        window.addEventListener('resize', function() {
+            applyMobileHeaderAuthState(auth.currentUser);
+        });
 
         if (mobileLogoutBtn) {
             mobileLogoutBtn.addEventListener('click', function(e) {
