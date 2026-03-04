@@ -3342,10 +3342,7 @@ What situation are you trying to handle?`;
                             const storedData = verifyDoc.data();
                             console.log('🔍 DEBUG: Verification successful, updated data:', storedData);
                             
-                            // Show success alert with debug info
                             console.log('🔍 DEBUG: ===== SUCCESS: Existing form updated =====');
-                            alert(`✅ Form successfully updated in portfolio!\n\nDebug Info:\n- Form ID: ${formId}\n- Form Name: ${formName}\n- County: ${countyName}\n- Portfolio ID: ${existingFormDoc.id}\n- Stored Name Field: ${storedData.name}\n- Defendant Name: ${defendantName || 'N/A'}\n- Is Existing Form: true\n\nClick OK to proceed to the form.`);
-                            
                             // Redirect to form
                             const separator = formUrl.includes('?') ? '&' : '?';
                             let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
@@ -3387,10 +3384,7 @@ What situation are you trying to handle?`;
                             const storedData = verifyDoc.data();
                             console.log('🔍 DEBUG: Verification successful, stored data:', storedData);
                             
-                            // Show success alert with debug info
                             console.log('🔍 DEBUG: ===== SUCCESS: New form added =====');
-                            alert(`✅ Form successfully added to portfolio!\n\nDebug Info:\n- Form ID: ${formId}\n- Form Name: ${formName}\n- County: ${countyName}\n- Portfolio ID: ${newFormRef.id}\n- Stored Name Field: ${storedData.name}\n- Defendant Name: ${defendantName || 'N/A'}\n- Is New Form: true\n\nClick OK to proceed to the form.`);
-                            
                             // Redirect to form
                             const separator = formUrl.includes('?') ? '&' : '?';
                             let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
