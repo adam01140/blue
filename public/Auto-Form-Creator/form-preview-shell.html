@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form Preview</title>
+</head>
+<body>
+<script>
+(function () {
+    var html = sessionStorage.getItem('formstarPreviewHtml');
+    if (!html) {
+        document.body.textContent = 'No form preview available. Generate form HTML from the demo first.';
+        return;
+    }
+    document.open();
+    document.write(html);
+    document.close();
+})();
+</script>
+</body>
+</html>

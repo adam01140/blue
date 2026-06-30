@@ -1,8 +1,10 @@
 // server.js
+const dns           = require('dns');
 const express       = require('express');
 const dotenv        = require('dotenv');
 const fetch         = require('node-fetch');
 dotenv.config();
+dns.setDefaultResultOrder('ipv4first');
 
 // WARNING: Using LIVE keys for local development is not recommended and will likely fail.
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -175,6 +177,42 @@ app.post('/api/verify-password', (req, res) => {
     });
   }
 });
+
+// ────────────────────────────────────────────────────────────
+// PDF unlock (XFA → AcroForm)
+// ────────────────────────────────────────────────────────────
+const { handleUnlockPdf, handlePreparePdfFields } = require('./unlock-pdf-handler');
+const { createHandleGenerateFieldConfig } = require('./field-config-generator');
+const { handleSanitizePdf } = require('./pdf-field-sanitizer');
+const { createHandleGenerateFormConfig } = require('./form-config-generator');
+const { enrichFormConfigAutopopulate } = require('./form-autopopulate');
+const { handleStoreAutoFormPdf, handleFillAutoFormPdf } = require('./auto-form-pdf-handler');
+app.post('/api/unlock-pdf', handleUnlockPdf);
+app.post('/api/prepare-pdf-fields', handlePreparePdfFields);
+app.post('/api/generate-field-config', createHandleGenerateFieldConfig(OPENAI_API_KEY));
+app.post('/api/sanitize-pdf', handleSanitizePdf);
+app.post('/api/generate-form-config', createHandleGenerateFormConfig(OPENAI_API_KEY));
+app.post('/api/enrich-autopopulate', (req, res) => {
+  try {
+    const { formConfig, fieldConfig, userProfile, displayMode } = req.body || {};
+    if (!formConfig) {
+      return res.status(400).json({ success: false, error: 'formConfig is required' });
+    }
+    const enriched = enrichFormConfigAutopopulate(
+      formConfig,
+      userProfile || {},
+      displayMode || 'all_at_once',
+      fieldConfig || null
+    );
+    res.json({ success: true, formConfig: enriched });
+  } catch (error) {
+    console.error('[enrich-autopopulate] Error:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to enrich autopopulate' });
+  }
+});
+
+app.post('/api/auto-form/store-pdf', handleStoreAutoFormPdf);
+app.post('/api/auto-form/fill-pdf/:pdfToken', handleFillAutoFormPdf);
 
 // Admin authentication endpoint
 app.post('/api/admin-login', (req, res) => {

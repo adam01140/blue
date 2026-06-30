@@ -1,0 +1,3350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Form Creator — Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #2c3e50;
+            --blue: #2980b9;
+            --orange: #ff7043;
+            --green: #27ae60;
+            --gray: #7f8c8d;
+            --light: #f7fafd;
+            --border: #e2e8f0;
+            --pending: #bdc3c7;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(180deg, #eaf1f8 0%, #f7fafd 100%);
+            color: var(--navy);
+        }
+
+        .demo-header {
+            background: var(--navy);
+            color: #fff;
+            width: 100%;
+        }
+
+        .demo-header-inner {
+            padding: 28px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+            width: 70%;
+            max-width: none;
+            margin: 0 auto;
+        }
+
+        .demo-header h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .demo-header p {
+            margin: 6px 0 0;
+            opacity: 0.85;
+            font-size: 0.95rem;
+        }
+
+        .demo-test-btn {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 999px;
+            padding: 8px 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            color: #fff;
+            text-decoration: none;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+
+        .demo-test-btn:hover {
+            background: rgba(255,255,255,0.22);
+        }
+
+        .demo-main {
+            width: 70%;
+            max-width: none;
+            margin: 0 auto;
+            padding: 32px 20px 64px;
+        }
+
+        .step {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(44,62,80,0.08);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .step-header {
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            background: #fbfdff;
+        }
+
+        .step-status {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--pending);
+            color: var(--pending);
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .step-status.complete {
+            border-color: var(--green);
+            background: var(--green);
+            color: #fff;
+        }
+
+        .step-status.error {
+            border-color: #e74c3c;
+            background: #e74c3c;
+            color: #fff;
+        }
+
+        .step-title {
+            margin: 0 0 8px;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .step-description {
+            margin: 0;
+            color: #546e7a;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .step-body {
+            padding: 28px;
+        }
+
+        .login-card {
+            max-width: 420px;
+        }
+
+        .login-card h3 {
+            margin: 0 0 6px;
+            font-size: 1.1rem;
+        }
+
+        .login-card .subtext {
+            margin: 0 0 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.88rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--blue);
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover { background: #2471a3; }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--gray);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.88rem;
+            margin-top: 12px;
+            min-height: 1.2em;
+        }
+
+        .signed-in-banner {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: #eafaf1;
+            border: 1px solid #b8e6c8;
+            border-radius: 10px;
+            padding: 14px 18px;
+            color: #1e8449;
+            font-weight: 600;
+        }
+
+        .signed-in-banner.visible { display: flex; }
+
+        .signed-in-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-sign-out {
+            background: #fff;
+            color: #1e8449;
+            border: 1px solid #b8e6c8;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .btn-sign-out:hover {
+            background: #f0fff4;
+            border-color: #27ae60;
+        }
+
+        .login-form-wrap.hidden { display: none; }
+
+        .step-results {
+            display: none;
+            padding: 0 28px 28px;
+            gap: 20px;
+            flex-direction: column;
+        }
+
+        .step-results.visible {
+            display: flex;
+        }
+
+        .result-panel {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .result-panel-header {
+            background: var(--navy);
+            color: #fff;
+            padding: 14px 18px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .result-panel-body {
+            padding: 0;
+        }
+
+        pre.json-display {
+            margin: 0;
+            padding: 18px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.82rem;
+            line-height: 1.55;
+            overflow-x: auto;
+            max-height: 360px;
+            overflow-y: auto;
+        }
+
+        .forms-grid {
+            display: grid;
+            gap: 12px;
+            padding: 18px;
+        }
+
+        .form-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 18px;
+            background: #fbfdff;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .form-card-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .btn-delete-form {
+            background: #fff;
+            color: #e74c3c;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .btn-delete-form:hover {
+            background: #fdf0f0;
+            border-color: #e74c3c;
+        }
+
+        .forms-actions {
+            padding: 0 18px 18px;
+        }
+
+        .btn-add-form {
+            width: 100%;
+            background: #fff;
+            color: var(--blue);
+            border: 2px dashed var(--blue);
+            border-radius: 10px;
+            padding: 14px;
+            font-family: inherit;
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-add-form:hover {
+            background: #f0f7ff;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(44,62,80,0.45);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal-card {
+            background: #fff;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            padding: 20px 22px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.15rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 18px 22px 22px;
+        }
+
+        .modal-body textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .unlock-progress {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            color: var(--blue);
+            font-weight: 600;
+            font-size: 0.92rem;
+            margin-top: 14px;
+        }
+
+        .unlock-progress.visible {
+            display: flex;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 3px solid #dbeafe;
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .form-card-id {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--blue);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+
+        .form-card-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .form-card-desc {
+            color: #546e7a;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .loading-text {
+            padding: 18px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .timed-progress {
+            display: none;
+            margin-top: 16px;
+            padding: 16px 18px;
+            background: #f0f7ff;
+            border: 1px solid #c5ddf8;
+            border-radius: 10px;
+        }
+
+        .timed-progress.visible {
+            display: block;
+        }
+
+        .timed-progress-label {
+            font-weight: 600;
+            color: var(--navy);
+            font-size: 0.92rem;
+            margin-bottom: 10px;
+        }
+
+        .timed-progress-track {
+            height: 10px;
+            background: #dbeafe;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .timed-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--blue), #38d39f);
+            border-radius: 999px;
+            transition: width 0.25s linear;
+        }
+
+        .timed-progress-bar.finishing {
+            transition: width 0.35s ease-out;
+        }
+
+        .timed-progress-eta {
+            margin-top: 8px;
+            font-size: 0.82rem;
+            color: var(--gray);
+        }
+
+        .display-mode-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 0 0 18px;
+        }
+
+        .display-mode-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            background: #fff;
+        }
+
+        .display-mode-option:has(input:checked) {
+            border-color: var(--blue);
+            background: #f0f7ff;
+        }
+
+        .display-mode-option input {
+            margin-top: 3px;
+        }
+
+        .display-mode-option strong {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .display-mode-option span {
+            font-size: 0.88rem;
+            color: var(--gray);
+        }
+
+        .btn-copy-panel {
+            margin-left: auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.35);
+            color: #fff;
+            border-radius: 8px;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.15s, border-color 0.15s, transform 0.15s;
+        }
+
+        .btn-copy-panel svg {
+            width: 16px;
+            height: 16px;
+            display: block;
+        }
+
+        .btn-copy-panel:hover {
+            background: rgba(255,255,255,0.22);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .btn-copy-panel.copied {
+            background: #38d39f;
+            border-color: #38d39f;
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .form-html-source-wrap {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-html-source-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 10px 14px;
+            background: #2a2a2a;
+            border-bottom: 1px solid #404040;
+        }
+
+        .btn-copy-source {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.08);
+            color: #e8e8e8;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, transform 0.15s;
+        }
+
+        .btn-copy-source svg {
+            width: 16px;
+            height: 16px;
+            display: block;
+        }
+
+        .btn-copy-source:hover {
+            background: rgba(255,255,255,0.16);
+            border-color: rgba(255,255,255,0.35);
+        }
+
+        .btn-copy-source.copied {
+            background: #38d39f;
+            border-color: #38d39f;
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .result-panel-header .btn-download {
+            flex-shrink: 0;
+        }
+
+        .profile-entries-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            padding: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .demo-header-inner,
+            .demo-main {
+                width: 100%;
+            }
+
+            .profile-entries-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .profile-entry-card {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #fbfdff;
+            height: 100%;
+        }
+
+        .profile-entry-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .btn-edit-entry {
+            background: #fff;
+            color: var(--blue);
+            border: 1px solid #c5ddf8;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-edit-entry:hover {
+            background: #f0f7ff;
+        }
+
+        .step8-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .profile-entry-meta {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .profile-entry-key {
+            font-weight: 700;
+            color: var(--navy);
+            font-size: 0.92rem;
+            margin-bottom: 4px;
+        }
+
+        .profile-entry-value {
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+
+        .profile-entry-desc {
+            font-size: 0.82rem;
+            color: var(--gray);
+        }
+
+        .btn-delete-entry {
+            background: #fff;
+            color: #e74c3c;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .btn-delete-entry:hover {
+            background: #fdf0f0;
+        }
+
+        .autopopulate-section-title {
+            padding: 14px 18px 0;
+            font-weight: 700;
+            color: var(--navy);
+            font-size: 0.95rem;
+        }
+
+        .autopopulate-section-hint {
+            padding: 4px 18px 12px;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .autopopulate-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        .autopopulate-table th,
+        .autopopulate-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .autopopulate-table th {
+            background: #f4f7fb;
+            font-weight: 700;
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status-pill.available {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pill.missing {
+            background: #fef3c7;
+            color: #92400e;
+            min-width: 9.5rem;
+            text-align: center;
+        }
+
+        .autopopulate-table td:last-child,
+        .autopopulate-table th:last-child {
+            min-width: 10.5rem;
+        }
+
+        .form-preview-frame {
+            width: 100%;
+            min-height: 640px;
+            border: none;
+            border-radius: 0 0 12px 12px;
+            background: #fff;
+            display: block;
+        }
+
+        .form-html-source {
+            margin: 0;
+            padding: 18px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.78rem;
+            line-height: 1.55;
+            overflow: auto;
+            min-height: 640px;
+            max-height: 640px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .form-preview-panel-body {
+            padding: 0;
+        }
+
+        .step-body .btn-generate-form {
+            margin-top: 4px;
+        }
+
+        .step-description code {
+            background: #eef2f7;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-size: 0.88em;
+        }
+
+        .step-locked {
+            opacity: 0.55;
+            pointer-events: none;
+        }
+
+        .step-locked .step-body {
+            color: var(--gray);
+            font-style: italic;
+        }
+
+        .upload-zone {
+            display: block;
+            width: 100%;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 32px 24px;
+            text-align: center;
+            transition: border-color 0.2s, background 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.drag-over {
+            border-color: var(--blue);
+            background: #f0f7ff;
+        }
+
+        .upload-zone input[type="file"] {
+            position: absolute;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .upload-section-title {
+            font-weight: 700;
+            font-size: 0.92rem;
+            margin: 0 0 10px;
+            color: var(--navy);
+        }
+
+        .upload-section {
+            margin-bottom: 20px;
+        }
+
+        .upload-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .instructions-panel {
+            background: #fff8f0;
+            border: 1px solid #f0d9b5;
+            border-radius: 12px;
+            padding: 20px 22px;
+            margin-bottom: 24px;
+        }
+
+        .instructions-panel h3 {
+            margin: 0 0 12px;
+            font-size: 1rem;
+            color: var(--navy);
+        }
+
+        .instructions-panel ol {
+            margin: 0;
+            padding-left: 22px;
+            line-height: 1.85;
+            color: #546e7a;
+            font-size: 0.92rem;
+        }
+
+        .instructions-panel li strong {
+            color: var(--navy);
+        }
+
+        .file-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #eef2f7;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-top: 12px;
+            color: var(--navy);
+        }
+
+        .unlock-success {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            background: #eafaf1;
+            border: 1px solid #b8e6c8;
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin-top: 20px;
+        }
+
+        .unlock-success.visible {
+            display: flex;
+        }
+
+        .unlock-success-text {
+            color: #1e8449;
+            font-weight: 600;
+            font-size: 0.92rem;
+        }
+
+        .btn-download {
+            background: var(--green);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-download:hover {
+            background: #219a52;
+        }
+
+        .btn-download:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .upload-label {
+            font-weight: 700;
+            color: var(--blue);
+            margin-bottom: 4px;
+        }
+
+        .upload-hint {
+            color: var(--gray);
+            font-size: 0.88rem;
+        }
+
+        .extracted-content {
+            padding: 18px;
+            background: #fbfdff;
+            font-size: 0.88rem;
+            line-height: 1.65;
+            max-height: 400px;
+            overflow: auto;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .extracted-content .text-line {
+            margin-bottom: 2px;
+        }
+
+        .extracted-content .field-highlight {
+            background: #cce5ff;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.82rem;
+        }
+
+        .extracted-content .checkbox-highlight {
+            background: #d4edda;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.82rem;
+        }
+
+        .extracted-content .page-break {
+            border-top: 2px dashed var(--border);
+            margin: 16px 0;
+        }
+
+        pre.field-list {
+            margin: 0;
+            padding: 18px;
+            background: #1e1e1e;
+            color: #9cdcfe;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.82rem;
+            line-height: 1.7;
+            overflow-x: auto;
+            max-height: 320px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        pre.field-list.checkboxes { color: #b5cea8; }
+
+        .field-count {
+            font-weight: 500;
+            opacity: 0.75;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 640px) {
+            .demo-header-inner { padding: 20px; }
+            .step-header, .step-body { padding: 20px; }
+            .step-results { padding: 0 20px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="demo-header">
+        <div class="demo-header-inner">
+            <div>
+                <h1>Auto-Form Creator</h1>
+                <p>Interactive demo — walkthrough for shareholders</p>
+            </div>
+            <a href="iframe-test.html" class="demo-test-btn">Test</a>
+        </div>
+    </header>
+
+    <main class="demo-main">
+        <!-- Step 1: Sign In -->
+        <section class="step" id="step-1">
+            <div class="step-header">
+                <div class="step-status" id="step-1-status" aria-label="Step 1 status">1</div>
+                <div>
+                    <h2 class="step-title">Step 1 — Sign In with FormStar</h2>
+                    <p class="step-description">
+                        Authenticate using your existing FormStar account. This identifies who you are
+                        and lets the Auto-Form Creator pull your saved profile from Firebase — name,
+                        contact info, address, and agreement details — so forms can be pre-filled automatically.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step-body">
+                <div class="signed-in-banner" id="signed-in-banner">
+                    <div class="signed-in-info">
+                        <span>✓</span>
+                        <span>Signed in as <strong id="signed-in-email"></strong></span>
+                    </div>
+                    <button type="button" class="btn-sign-out" id="logout-btn">Sign Out</button>
+                </div>
+
+                <div class="login-form-wrap" id="login-form-wrap">
+                    <div class="login-card">
+                        <h3>FormStar Login</h3>
+                        <p class="subtext">Use the same email and password as formstar.com</p>
+                        <form id="login-form">
+                            <div class="form-group">
+                                <label for="login-email">Email</label>
+                                <input type="email" id="login-email" required autocomplete="email">
+                            </div>
+                            <div class="form-group">
+                                <label for="login-password">Password</label>
+                                <input type="password" id="login-password" required autocomplete="current-password">
+                            </div>
+                            <div>
+                                <button type="submit" class="btn-primary" id="login-btn">Sign In</button>
+                            </div>
+                            <div class="error-message" id="login-error"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-results" id="step-1-results">
+                <div class="result-panel" data-copyable>
+                    <div class="result-panel-header">User Profile — Firestore JSON</div>
+                    <div class="result-panel-body">
+                        <pre class="json-display" id="user-json">Loading user data…</pre>
+                    </div>
+                </div>
+
+                <div class="result-panel">
+                    <div class="result-panel-header">
+                        User Profile Entries
+                        <button type="button" class="btn-download" id="add-profile-entry-btn" style="margin-left:auto;">+ Add Entry</button>
+                    </div>
+                    <div class="result-panel-body">
+                        <div class="profile-entries-list" id="profile-entries-list">
+                            <div class="loading-text">Sign in to manage profile entries…</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-panel">
+                    <div class="result-panel-header">Forms Available in System</div>
+                    <div class="result-panel-body">
+                        <div class="forms-grid" id="forms-grid">
+                            <div class="loading-text">Loading forms…</div>
+                        </div>
+                        <div class="forms-actions">
+                            <button type="button" class="btn-add-form" id="add-form-btn">+ Add Form</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Form Modal -->
+        <div class="modal-overlay" id="add-form-modal">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3>Add New Form</h3>
+                    <button type="button" class="modal-close" id="close-add-form-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-form-form">
+                        <div class="form-group">
+                            <label for="new-form-id">Form ID</label>
+                            <input type="text" id="new-form-id" required placeholder="e.g. sc100">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-form-name">Name</label>
+                            <input type="text" id="new-form-name" required placeholder="e.g. SC-100">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-form-description">Description</label>
+                            <textarea id="new-form-description" required placeholder="Brief description of the form"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-form-url">URL path</label>
+                            <input type="text" id="new-form-url" placeholder="e.g. SC-100/sc-100.html?formId=sc100">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-form-counties">Counties (comma-separated)</label>
+                            <input type="text" id="new-form-counties" placeholder="e.g. Monterey, Santa Clara">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-form-defendant">Defendant</label>
+                            <input type="text" id="new-form-defendant" placeholder="N/A" value="N/A">
+                        </div>
+                        <div class="error-message" id="add-form-error"></div>
+                        <div class="modal-actions">
+                            <button type="submit" class="btn-primary">Save Form</button>
+                            <button type="button" class="btn-secondary" id="cancel-add-form">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Profile Entry Modal -->
+        <div class="modal-overlay" id="add-profile-entry-modal">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3 id="profile-entry-modal-title">Add Profile Entry</h3>
+                    <button type="button" class="modal-close" id="close-add-profile-entry-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-profile-entry-form">
+                        <div class="form-group">
+                            <label for="profile-entry-name">Name (profile key)</label>
+                            <input type="text" id="profile-entry-name" required placeholder="e.g. hair_color">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-entry-answer">Answer</label>
+                            <input type="text" id="profile-entry-answer" required placeholder="e.g. Brown">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-entry-description">Description</label>
+                            <textarea id="profile-entry-description" required placeholder="What this entry refers to, e.g. User's hair color"></textarea>
+                        </div>
+                        <div class="error-message" id="add-profile-entry-error"></div>
+                        <div class="modal-actions">
+                            <button type="submit" class="btn-primary" id="profile-entry-submit-btn">Save Entry</button>
+                            <button type="button" class="btn-secondary" id="cancel-add-profile-entry">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Unlock XFA PDF -->
+        <section class="step step-locked" id="step-2">
+            <div class="step-header">
+                <div class="step-status" id="step-2-status" aria-label="Step 2 status">2</div>
+                <div>
+                    <h2 class="step-title">Step 2 — Unlock XFA Form</h2>
+                    <p class="step-description">
+                        Upload an XFA PDF and our tool automatically strips the XFA layer to reveal
+                        the underlying AcroForm fields — the same result as printing through Adobe PDF,
+                        but done instantly on the server. Duplicate field names (common on radio groups)
+                        are split into uniquely named checkboxes so each widget can be filled independently.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step-body">
+                <p id="step-2-lock-msg" style="color:var(--gray);font-style:italic;margin:0 0 16px;">
+                    Complete Step 1 (sign in) to unlock this step.
+                </p>
+
+                <div class="upload-section">
+                    <div class="upload-zone" id="xfa-upload-zone" tabindex="0" role="button" aria-label="Upload PDF to unlock">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-label">Choose PDF or drag &amp; drop</div>
+                        <div class="upload-hint">XFA or hybrid government forms — we unlock them automatically</div>
+                        <input type="file" id="xfa-input" accept=".pdf,application/pdf" tabindex="-1">
+                    </div>
+                    <div class="file-chip" id="xfa-file-chip" style="display:none;"></div>
+                </div>
+
+                <div class="unlock-progress" id="unlock-progress">
+                    <div class="spinner"></div>
+                    <span>Unlocking PDF…</span>
+                </div>
+
+                <div class="unlock-success" id="unlock-success">
+                    <span class="unlock-success-text">✓ PDF unlocked — download to verify before continuing</span>
+                    <button type="button" class="btn-download" id="download-unlocked-btn">Download Unlocked PDF</button>
+                </div>
+
+                <div class="error-message" id="step-2-error"></div>
+            </div>
+        </section>
+
+        <!-- Step 3: Extract fields -->
+        <section class="step step-locked" id="step-3">
+            <div class="step-header">
+                <div class="step-status" id="step-3-status" aria-label="Step 3 status">3</div>
+                <div>
+                    <h2 class="step-title">Step 3 — Extract Form Fields</h2>
+                    <p class="step-description">
+                        The unlocked PDF is analyzed to find every text field and checkbox,
+                        mapped to their positions in the layout. Text fields appear as
+                        <code>[[field]]</code> and checkboxes as <code>{{field}}</code>.
+                        Each widget gets its own entry — duplicate names are resolved during unlock.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step-body">
+                <p id="step-3-lock-msg" style="color:var(--gray);font-style:italic;margin:0 0 16px;">
+                    Complete Step 2 (unlock PDF) to unlock field extraction.
+                </p>
+
+                <div class="upload-section">
+                    <p class="upload-section-title">PDF for extraction (auto-loaded from Step 2)</p>
+                    <div class="upload-zone" id="extract-upload-zone" tabindex="0" role="button" aria-label="Upload PDF for extraction">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-label">Choose PDF or drag &amp; drop here</div>
+                        <div class="upload-hint">Uses your Step 2 unlocked PDF automatically when available</div>
+                        <input type="file" id="extract-input" accept=".pdf,application/pdf" tabindex="-1">
+                    </div>
+                    <div class="file-chip" id="extract-file-chip" style="display:none;"></div>
+                </div>
+
+                <div class="error-message" id="pdf-error"></div>
+                <div class="loading-text" id="pdf-loading" style="display:none;padding:12px 0 0;">Analyzing PDF…</div>
+            </div>
+
+            <div class="step-results" id="step-3-results">
+                <div class="result-panel" data-copyable>
+                    <div class="result-panel-header">Extracted Document Content</div>
+                    <div class="result-panel-body">
+                        <div class="extracted-content" id="pdf-full-content"></div>
+                    </div>
+                </div>
+
+                <div class="result-panel" data-copyable>
+                    <div class="result-panel-header">
+                        Text Fields <span class="field-count" id="text-field-count"></span>
+                    </div>
+                    <div class="result-panel-body">
+                        <pre class="field-list" id="pdf-text-fields"></pre>
+                    </div>
+                </div>
+
+                <div class="result-panel" data-copyable>
+                    <div class="result-panel-header">
+                        Checkbox Fields <span class="field-count" id="checkbox-field-count"></span>
+                    </div>
+                    <div class="result-panel-body">
+                        <pre class="field-list checkboxes" id="pdf-checkbox-fields"></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 4: Generate field_config.json -->
+        <section class="step step-locked" id="step-4">
+            <div class="step-header">
+                <div class="step-status" id="step-4-status" aria-label="Step 4 status">4</div>
+                <div>
+                    <h2 class="step-title">Step 4 — Generate Field Config</h2>
+                    <p class="step-description">
+                        Uses <code>field_config.txt</code> instructions and ChatGPT to map every extracted
+                        PDF field to a clean semantic name in <code>field_config.json</code>.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step-body">
+                <p id="step-4-lock-msg" style="color:var(--gray);font-style:italic;margin:0 0 16px;">
+                    Complete Step 3 (field extraction) to unlock field config generation.
+                </p>
+
+                <button type="button" class="btn-download" id="generate-field-config-btn" disabled>
+                    Generate field_config.json with ChatGPT
+                </button>
+
+                <div class="timed-progress" id="field-config-progress">
+                    <div class="timed-progress-label" id="field-config-progress-label">Generating field config with ChatGPT…</div>
+                    <div class="timed-progress-track">
+                        <div class="timed-progress-bar" id="field-config-progress-bar"></div>
+                    </div>
+                    <div class="timed-progress-eta">Estimated time ~1 min</div>
+                </div>
+                <div class="error-message" id="step-4-error"></div>
+            </div>
+
+            <div class="step-results" id="step-4-results">
+                <div class="result-panel" data-copyable>
+                    <div class="result-panel-header">
+                        field_config.json
+                        <button type="button" class="btn-download" id="download-field-config-btn" style="margin-left:auto;">Download JSON</button>
+                    </div>
+                    <div class="result-panel-body">
+                        <pre class="field-list" id="field-config-json"></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 5: Sanitized PDF -->
+        <section class="step step-locked" id="step-5">
+            <div class="step-header">
+                <div class="step-status" id="step-5-status" aria-label="Step 5 status">5</div>
+                <div>
+                    <h2 class="step-title">Step 5 — Sanitized PDF</h2>
+                    <p class="step-description">
+                        Applies <code>field_config.json</code> to the prepared PDF, renaming every AcroForm field
+                        (e.g. <code>form1[0].#subform[0].MorF[0]__1_1</code> → <code>applicant_sex_male</code>).
+                    </p>
+                </div>
+            </div>
+
+            <div class="step-body">
+                <p id="step-5-lock-msg" style="color:var(--gray);font-style:italic;margin:0 0 16px;">
+                    Complete Step 4 (field config) to unlock PDF sanitization.
+                </p>
+
+                <button type="button" class="btn-download" id="sanitize-pdf-btn" disabled>
+                    Generate Sanitized PDF
+                </button>
+
+                <div class="loading-text" id="sanitize-pdf-loading" style="display:none;padding:12px 0 0;">
+                    Renaming PDF fields…
+                </div>
+
+                <div class="unlock-success" id="sanitize-pdf-success" style="margin-top:12px;">
+                    <span class="unlock-success-text" id="sanitize-pdf-success-text">✓ PDF sanitized</span>
+                    <button type="button" class="btn-download" id="download-sanitized-pdf-btn">Download Sanitized PDF</button>
+                </div>
+
+                <div class="error-message" id="step-5-error"></div>
+            </div>
+
+            <div class="step-results" id="step-5-results">
+                <div class="result-panel" data-copyable>
+                    <div class="result-panel-header">Extracted Document Content (Sanitized PDF)</div>
+                    <div class="result-panel-body">
+                        <div class="extracted-content" id="sanitize-full-content"></div>
+                    </div>
+                </div>
+
+                <div class="result-panel" data-copyable>
+                    <div class="result-panel-header">
+                        Text Fields <span class="field-count" id="sanitize-text-field-count"></span>
+                    </div>
+                    <div class="result-panel-body">
+                        <pre class="field-list" id="sanitize-text-fields"></pre>
+                    </div>
+                </div>
+
+                <div class="result-panel" data-copyable>
+                    <div class="result-panel-header">
+                        Checkbox Fields <span class="field-count" id="sanitize-checkbox-field-count"></span>
+                    </div>
+                    <div class="result-panel-body">
+                        <pre class="field-list checkboxes" id="sanitize-checkbox-fields"></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 6: Generate form_config.json -->
+        <section class="step step-locked" id="step-6">
+            <div class="step-header">
+                <div class="step-status" id="step-6-status" aria-label="Step 6 status">6</div>
+                <div>
+                    <h2 class="step-title">Step 6 — Generate Form Config</h2>
+                    <p class="step-description">
+                        Uses <code>form_config.txt</code> instructions and ChatGPT to build
+                        <code>form_config.json</code> — the FormStar survey definition wired to sanitized field names.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step-body">
+                <p id="step-6-lock-msg" style="color:var(--gray);font-style:italic;margin:0 0 16px;">
+                    Complete Step 5 (sanitized PDF) to unlock form config generation.
+                </p>
+
+                <fieldset class="display-mode-options" id="form-display-mode-fieldset">
+                    <legend style="font-weight:700;margin-bottom:8px;">Form layout</legend>
+                    <label class="display-mode-option">
+                        <input type="radio" name="form-display-mode" value="all_at_once" checked>
+                        <div>
+                            <strong>All questions visible at once</strong>
+                            <span>Single scrollable page with every question shown together.</span>
+                        </div>
+                    </label>
+                    <label class="display-mode-option">
+                        <input type="radio" name="form-display-mode" value="one_at_a_time">
+                        <div>
+                            <strong>One question at a time</strong>
+                            <span>Step-through wizard — user sees one question per screen.</span>
+                        </div>
+                    </label>
+                </fieldset>
+
+                <fieldset class="display-mode-options" id="form-html-mode-fieldset">
+                    <legend style="font-weight:700;margin-bottom:8px;">HTML output mode</legend>
+                    <label class="display-mode-option">
+                        <input type="radio" name="form-html-mode" value="dev" checked>
+                        <div>
+                            <strong>Dev mode</strong>
+                            <span>Show sign-in bar, autofill badges, and question numbers — for testing and demos.</span>
+                        </div>
+                    </label>
+                    <label class="display-mode-option">
+                        <input type="radio" name="form-html-mode" value="normal">
+                        <div>
+                            <strong>Normal mode</strong>
+                            <span>Clean production form — no auth bar, no autofill badges, plain question text only.</span>
+                        </div>
+                    </label>
+                </fieldset>
+
+                <button type="button" class="btn-download" id="generate-form-config-btn" disabled>
+                    Generate form_config.json with ChatGPT
+                </button>
+
+                <div class="timed-progress" id="form-config-progress">
+                    <div class="timed-progress-label" id="form-config-progress-label">Generating form config with ChatGPT…</div>
+                    <div class="timed-progress-track">
+                        <div class="timed-progress-bar" id="form-config-progress-bar"></div>
+                    </div>
+                    <div class="timed-progress-eta">Estimated time ~2 min</div>
+                </div>
+                <div class="error-message" id="step-6-error"></div>
+            </div>
+
+            <div class="step-results" id="step-6-results">
+                <div class="result-panel" data-copyable>
+                    <div class="result-panel-header">
+                        form_config.json
+                        <button type="button" class="btn-download" id="download-form-config-btn" style="margin-left:8px;">Download JSON</button>
+                    </div>
+                    <div class="result-panel-body">
+                        <pre class="field-list" id="form-config-json"></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 7: User info / autopopulate fields -->
+        <section class="step step-locked" id="step-7">
+            <div class="step-header">
+                <div class="step-status" id="step-7-status" aria-label="Step 7 status">7</div>
+                <div>
+                    <h2 class="step-title">Step 7 — User Info Fields</h2>
+                    <p class="step-description">
+                        Fields marked as autopopulatable — reusable personal data that grows your user profile
+                        and can autofill this form on future visits.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step-body">
+                <p id="step-7-lock-msg" style="color:var(--gray);font-style:italic;margin:0;">
+                    Complete Step 6 to see autopopulate field analysis.
+                </p>
+            </div>
+
+            <div class="step-results" id="step-7-results">
+                <div class="result-panel" data-copyable>
+                    <div class="result-panel-header">Available in Profile Now</div>
+                    <div class="result-panel-body" style="padding:0;overflow-x:auto;">
+                        <div class="autopopulate-section-hint">These fields can autofill immediately from your user profile.</div>
+                        <table class="autopopulate-table">
+                            <thead>
+                                <tr>
+                                    <th>Question</th>
+                                    <th>PDF Field</th>
+                                    <th>Profile Key</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="autopopulate-available-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="result-panel" data-copyable>
+                    <div class="result-panel-header">Not Yet in Profile — Will Learn on Fill</div>
+                    <div class="result-panel-body" style="padding:0;overflow-x:auto;">
+                        <div class="autopopulate-section-hint">These are autopopulatable if the data existed — answers will be saved to your profile when you fill them.</div>
+                        <table class="autopopulate-table">
+                            <thead>
+                                <tr>
+                                    <th>Question</th>
+                                    <th>PDF Field</th>
+                                    <th>Profile Key</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="autopopulate-missing-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="result-panel" data-copyable>
+                    <div class="result-panel-header">Autopopulate Summary JSON</div>
+                    <div class="result-panel-body">
+                        <pre class="field-list" id="autopopulate-json"></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 8: Generate form HTML preview -->
+        <section class="step step-locked" id="step-8">
+            <div class="step-header">
+                <div class="step-status" id="step-8-status" aria-label="Step 8 status">8</div>
+                <div>
+                    <h2 class="step-title">Step 8 — Generate Form HTML</h2>
+                    <p class="step-description">
+                        Builds the live HTML form with autofill from the signed-in user's profile.
+                        Answers to profile-linked fields update the user info JSON for future forms.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step-body">
+                <p id="step-8-lock-msg" style="color:var(--gray);font-style:italic;margin:0 0 16px;">
+                    Complete Step 6 to generate the form preview.
+                </p>
+                <div class="step8-actions">
+                    <button type="button" class="btn-download btn-generate-form" id="generate-form-html-btn" disabled>
+                        Generate Form HTML
+                    </button>
+                    <button type="button" class="btn-download" id="view-form-html-btn" disabled>
+                        View HTML
+                    </button>
+                    <button type="button" class="btn-download" id="download-form-html-btn" disabled>
+                        Download HTML
+                    </button>
+                </div>
+                <div class="error-message" id="step-8-error"></div>
+            </div>
+
+            <div class="step-results" id="step-8-results">
+                <div class="result-panel" data-copyable id="step-8-preview-panel">
+                    <div class="result-panel-header" id="step-8-preview-header">Live Form Preview</div>
+                    <div class="result-panel-body form-preview-panel-body">
+                        <div id="form-preview-wrap">
+                            <iframe class="form-preview-frame" id="form-preview-iframe" title="Generated form preview"></iframe>
+                        </div>
+                        <div class="form-html-source-wrap" id="form-html-source-wrap" hidden>
+                            <div class="form-html-source-toolbar">
+                                <button type="button" class="btn-copy-source" id="copy-form-html-btn" title="Copy HTML" aria-label="Copy HTML"></button>
+                            </div>
+                            <pre class="form-html-source" id="form-html-source"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="pdf-extractor.js"></script>
+    <script src="form-html-renderer.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+            authDomain: "formwiz-3f4fd.firebaseapp.com",
+            projectId: "formwiz-3f4fd",
+            storageBucket: "formwiz-3f4fd.firebasestorage.app",
+            messagingSenderId: "404259212529",
+            appId: "1:404259212529:web:15a33bce82383b21cfed50",
+            measurementId: "G-P07YEN0HPD"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const step1Status = document.getElementById('step-1-status');
+        const step1Results = document.getElementById('step-1-results');
+        const step2 = document.getElementById('step-2');
+        const step2Status = document.getElementById('step-2-status');
+        const step2LockMsg = document.getElementById('step-2-lock-msg');
+        const step2Error = document.getElementById('step-2-error');
+        const step3 = document.getElementById('step-3');
+        const step3Status = document.getElementById('step-3-status');
+        const step3Results = document.getElementById('step-3-results');
+        const step3LockMsg = document.getElementById('step-3-lock-msg');
+        const signedInBanner = document.getElementById('signed-in-banner');
+        const signedInEmail = document.getElementById('signed-in-email');
+        const loginFormWrap = document.getElementById('login-form-wrap');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const userJsonEl = document.getElementById('user-json');
+        const profileEntriesList = document.getElementById('profile-entries-list');
+        const addProfileEntryBtn = document.getElementById('add-profile-entry-btn');
+        const addProfileEntryModal = document.getElementById('add-profile-entry-modal');
+        const addProfileEntryForm = document.getElementById('add-profile-entry-form');
+        const addProfileEntryError = document.getElementById('add-profile-entry-error');
+        const closeAddProfileEntryModal = document.getElementById('close-add-profile-entry-modal');
+        const cancelAddProfileEntry = document.getElementById('cancel-add-profile-entry');
+        const formsGrid = document.getElementById('forms-grid');
+
+        const xfaInput = document.getElementById('xfa-input');
+        const xfaUploadZone = document.getElementById('xfa-upload-zone');
+        const xfaFileChip = document.getElementById('xfa-file-chip');
+        const unlockProgress = document.getElementById('unlock-progress');
+        const unlockSuccess = document.getElementById('unlock-success');
+        const downloadUnlockedBtn = document.getElementById('download-unlocked-btn');
+        const addFormBtn = document.getElementById('add-form-btn');
+        const addFormModal = document.getElementById('add-form-modal');
+        const addFormForm = document.getElementById('add-form-form');
+        const addFormError = document.getElementById('add-form-error');
+        const closeAddFormModal = document.getElementById('close-add-form-modal');
+        const cancelAddForm = document.getElementById('cancel-add-form');
+
+        const extractInput = document.getElementById('extract-input');
+        const extractUploadZone = document.getElementById('extract-upload-zone');
+        const extractFileChip = document.getElementById('extract-file-chip');
+        const pdfError = document.getElementById('pdf-error');
+        const pdfLoading = document.getElementById('pdf-loading');
+        const pdfFullContent = document.getElementById('pdf-full-content');
+        const pdfTextFields = document.getElementById('pdf-text-fields');
+        const pdfCheckboxFields = document.getElementById('pdf-checkbox-fields');
+        const textFieldCount = document.getElementById('text-field-count');
+        const checkboxFieldCount = document.getElementById('checkbox-field-count');
+
+        const step4 = document.getElementById('step-4');
+        const step4Status = document.getElementById('step-4-status');
+        const step4LockMsg = document.getElementById('step-4-lock-msg');
+        const step4Error = document.getElementById('step-4-error');
+        const step4Results = document.getElementById('step-4-results');
+        const generateFieldConfigBtn = document.getElementById('generate-field-config-btn');
+        const fieldConfigProgress = document.getElementById('field-config-progress');
+        const fieldConfigProgressBar = document.getElementById('field-config-progress-bar');
+        const fieldConfigProgressLabel = document.getElementById('field-config-progress-label');
+        const fieldConfigJsonEl = document.getElementById('field-config-json');
+        const downloadFieldConfigBtn = document.getElementById('download-field-config-btn');
+
+        const step5 = document.getElementById('step-5');
+        const step5Status = document.getElementById('step-5-status');
+        const step5LockMsg = document.getElementById('step-5-lock-msg');
+        const step5Error = document.getElementById('step-5-error');
+        const step5Results = document.getElementById('step-5-results');
+        const sanitizePdfBtn = document.getElementById('sanitize-pdf-btn');
+        const sanitizePdfLoading = document.getElementById('sanitize-pdf-loading');
+        const sanitizePdfSuccess = document.getElementById('sanitize-pdf-success');
+        const sanitizePdfSuccessText = document.getElementById('sanitize-pdf-success-text');
+        const downloadSanitizedPdfBtn = document.getElementById('download-sanitized-pdf-btn');
+        const sanitizeFullContent = document.getElementById('sanitize-full-content');
+        const sanitizeTextFields = document.getElementById('sanitize-text-fields');
+        const sanitizeCheckboxFields = document.getElementById('sanitize-checkbox-fields');
+        const sanitizeTextFieldCount = document.getElementById('sanitize-text-field-count');
+        const sanitizeCheckboxFieldCount = document.getElementById('sanitize-checkbox-field-count');
+
+        const step6 = document.getElementById('step-6');
+        const step6Status = document.getElementById('step-6-status');
+        const step6LockMsg = document.getElementById('step-6-lock-msg');
+        const step6Error = document.getElementById('step-6-error');
+        const step6Results = document.getElementById('step-6-results');
+        const generateFormConfigBtn = document.getElementById('generate-form-config-btn');
+        const formConfigProgress = document.getElementById('form-config-progress');
+        const formConfigProgressBar = document.getElementById('form-config-progress-bar');
+        const formConfigProgressLabel = document.getElementById('form-config-progress-label');
+        const formConfigJsonEl = document.getElementById('form-config-json');
+        const downloadFormConfigBtn = document.getElementById('download-form-config-btn');
+
+        const step7 = document.getElementById('step-7');
+        const step7Status = document.getElementById('step-7-status');
+        const step7LockMsg = document.getElementById('step-7-lock-msg');
+        const step7Results = document.getElementById('step-7-results');
+        const autopopulateAvailableBody = document.getElementById('autopopulate-available-body');
+        const autopopulateMissingBody = document.getElementById('autopopulate-missing-body');
+        const autopopulateJsonEl = document.getElementById('autopopulate-json');
+
+        const step8 = document.getElementById('step-8');
+        const step8Status = document.getElementById('step-8-status');
+        const step8LockMsg = document.getElementById('step-8-lock-msg');
+        const step8Error = document.getElementById('step-8-error');
+        const step8Results = document.getElementById('step-8-results');
+        const generateFormHtmlBtn = document.getElementById('generate-form-html-btn');
+        const viewFormHtmlBtn = document.getElementById('view-form-html-btn');
+        const downloadFormHtmlBtn = document.getElementById('download-form-html-btn');
+        const formPreviewIframe = document.getElementById('form-preview-iframe');
+        const formPreviewWrap = document.getElementById('form-preview-wrap');
+        const formHtmlSourceWrap = document.getElementById('form-html-source-wrap');
+        const formHtmlSourceEl = document.getElementById('form-html-source');
+        const copyFormHtmlBtn = document.getElementById('copy-form-html-btn');
+        const step8PreviewHeader = document.getElementById('step-8-preview-header');
+        const profileEntryModalTitle = document.getElementById('profile-entry-modal-title');
+        const profileEntryNameInput = document.getElementById('profile-entry-name');
+        const profileEntryAnswerInput = document.getElementById('profile-entry-answer');
+        const profileEntryDescriptionInput = document.getElementById('profile-entry-description');
+        const profileEntrySubmitBtn = document.getElementById('profile-entry-submit-btn');
+
+        let step1Complete = false;
+        let step2Complete = false;
+        let step3Complete = false;
+        let step5Complete = false;
+        let lastExtractionPayload = null;
+        let lastFieldConfig = null;
+        let lastFormConfig = null;
+        let lastPreparedPdfFile = null;
+        let sanitizedPdfBlobUrl = null;
+        let sanitizedPdfFile = null;
+        let lastPdfToken = null;
+        let unlockedPdfFile = null;
+        let unlockedPdfBlobUrl = null;
+        let lastUserProfile = null;
+        let lastGeneratedFormHtml = null;
+        let step8ShowingHtmlSource = false;
+        let profileEntryEditingKey = null;
+        let currentUser = null;
+
+        const FORM_PREVIEW_SHELL = '/Auto-Form-Creator/form-preview-shell.html';
+        const FORM_PREVIEW_STORAGE_KEY = 'formstarPreviewHtml';
+        const CHATGPT_PROGRESS_MS = 60000;
+        const FORM_CONFIG_PROGRESS_MS = 120000;
+
+        const PROFILE_ENTRY_DEFAULT_DESCRIPTIONS = {
+            uid: 'Firebase user ID',
+            email: 'User email address',
+            firstName: 'User legal first name',
+            lastName: 'User legal last name',
+            phone: 'User phone number',
+            street: 'User street address',
+            city: 'User city',
+            state: 'User state or region',
+            zip: 'User ZIP or postal code',
+            agreedToTerms: 'Whether the user agreed to terms of service',
+            agreementDate: 'Date the user agreed to terms',
+            createdAt: 'When the profile was created',
+            signature: 'User signature',
+            address: 'Nested address object from Firestore'
+        };
+
+        function getCopyablePanelText(bodyEl) {
+            if (!bodyEl) return '';
+            const pre = bodyEl.querySelector('pre.form-html-source:not([hidden])')
+                || bodyEl.querySelector('pre.form-html-source')
+                || bodyEl.querySelector('pre');
+            if (pre) return pre.textContent || '';
+            const extracted = bodyEl.querySelector('.extracted-content');
+            if (extracted) return extracted.innerText || '';
+            const table = bodyEl.querySelector('table');
+            if (table) {
+                return Array.from(table.rows).map((row) =>
+                    Array.from(row.cells).map((cell) => cell.textContent.trim()).join('\t')
+                ).join('\n');
+            }
+            return bodyEl.innerText || bodyEl.textContent || '';
+        }
+
+        const COPY_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+        const CHECK_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+
+        function setCopyButtonState(btn, copied) {
+            if (!btn) return;
+            btn.innerHTML = copied ? CHECK_ICON_SVG : COPY_ICON_SVG;
+            btn.classList.toggle('copied', copied);
+        }
+
+        async function copyTextWithButtonFeedback(btn, text) {
+            if (!text) return false;
+            try {
+                await navigator.clipboard.writeText(text);
+                setCopyButtonState(btn, true);
+                setTimeout(() => setCopyButtonState(btn, false), 2000);
+                return true;
+            } catch (err) {
+                console.error('Copy failed:', err);
+                return false;
+            }
+        }
+
+        function initPanelCopyButtons() {
+            document.querySelectorAll('.result-panel[data-copyable]').forEach((panel) => {
+                const header = panel.querySelector('.result-panel-header');
+                const body = panel.querySelector('.result-panel-body');
+                if (!header || !body || header.querySelector('.btn-copy-panel')) return;
+
+                const copyBtn = document.createElement('button');
+                copyBtn.type = 'button';
+                copyBtn.className = 'btn-copy-panel';
+                copyBtn.title = 'Copy to clipboard';
+                copyBtn.setAttribute('aria-label', 'Copy panel content');
+                setCopyButtonState(copyBtn, false);
+
+                copyBtn.addEventListener('click', async () => {
+                    await copyTextWithButtonFeedback(copyBtn, getCopyablePanelText(body));
+                });
+
+                const downloadBtn = header.querySelector('.btn-download');
+                if (downloadBtn) {
+                    header.insertBefore(copyBtn, downloadBtn);
+                } else {
+                    header.appendChild(copyBtn);
+                }
+            });
+        }
+
+        initPanelCopyButtons();
+
+        if (copyFormHtmlBtn) {
+            setCopyButtonState(copyFormHtmlBtn, false);
+            copyFormHtmlBtn.addEventListener('click', async () => {
+                const text = formHtmlSourceEl?.textContent || lastGeneratedFormHtml || '';
+                await copyTextWithButtonFeedback(copyFormHtmlBtn, text);
+            });
+        }
+
+        function createTimedProgress(containerEl, barEl, labelEl, labelText, durationMs = CHATGPT_PROGRESS_MS) {
+            let timer = null;
+            let done = false;
+            const startedAt = Date.now();
+
+            labelEl.textContent = labelText;
+            barEl.classList.remove('finishing');
+            barEl.style.width = '0%';
+            containerEl.classList.add('visible');
+
+            timer = setInterval(() => {
+                if (done) return;
+                const elapsed = Date.now() - startedAt;
+                const pct = Math.min(95, (elapsed / durationMs) * 100);
+                barEl.style.width = pct + '%';
+            }, 150);
+
+            return {
+                async finish() {
+                    done = true;
+                    clearInterval(timer);
+                    const elapsed = Date.now() - startedAt;
+                    const finishedEarly = elapsed < durationMs * 0.95;
+                    barEl.classList.add('finishing');
+                    if (finishedEarly) {
+                        barEl.style.transition = 'width 0.18s ease-out';
+                    }
+                    barEl.style.width = '100%';
+                    await new Promise((resolve) => setTimeout(resolve, finishedEarly ? 200 : 380));
+                    containerEl.classList.remove('visible');
+                    barEl.classList.remove('finishing');
+                    barEl.style.width = '0%';
+                    barEl.style.transition = '';
+                },
+                cancel() {
+                    done = true;
+                    clearInterval(timer);
+                    containerEl.classList.remove('visible');
+                    barEl.classList.remove('finishing');
+                    barEl.style.width = '0%';
+                }
+            };
+        }
+
+        function renderExtractionResults(extracted, targets) {
+            targets.fullContentEl.innerHTML = extracted.fullContentHtml;
+
+            if (extracted.textFields.length) {
+                targets.textFieldsEl.textContent = extracted.textFields.map(f => f.marker).join('\n');
+                targets.textCountEl.textContent = `(${extracted.textFields.length})`;
+            } else {
+                targets.textFieldsEl.textContent = 'No text fields found in this PDF.';
+                targets.textCountEl.textContent = '(0)';
+            }
+
+            if (extracted.checkboxFields.length) {
+                targets.checkboxFieldsEl.textContent = extracted.checkboxFields.map(f => f.marker).join('\n');
+                targets.checkboxCountEl.textContent = `(${extracted.checkboxFields.length})`;
+            } else {
+                targets.checkboxFieldsEl.textContent = 'No checkbox fields found in this PDF.';
+                targets.checkboxCountEl.textContent = '(0)';
+            }
+        }
+
+        function resetSanitizeResults() {
+            sanitizeFullContent.innerHTML = '';
+            sanitizeTextFields.textContent = '';
+            sanitizeCheckboxFields.textContent = '';
+            sanitizeTextFieldCount.textContent = '';
+            sanitizeCheckboxFieldCount.textContent = '';
+        }
+
+        async function extractAndRenderSanitizedPdf(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const extracted = await PdfFieldExtractor.extract(arrayBuffer);
+            renderExtractionResults(extracted, {
+                fullContentEl: sanitizeFullContent,
+                textFieldsEl: sanitizeTextFields,
+                checkboxFieldsEl: sanitizeCheckboxFields,
+                textCountEl: sanitizeTextFieldCount,
+                checkboxCountEl: sanitizeCheckboxFieldCount
+            });
+
+            const allNames = [
+                ...extracted.textFields.map(f => f.name),
+                ...extracted.checkboxFields.map(f => f.name)
+            ];
+            const legacyNames = allNames.filter((name) => {
+                if (!lastFieldConfig?.fields) return false;
+                return lastFieldConfig.fields.some((f) => f.id === name);
+            });
+            if (legacyNames.length > 0) {
+                throw new Error(
+                    `Sanitized PDF still shows ${legacyNames.length} legacy field name(s), e.g. ${legacyNames[0]}`
+                );
+            }
+
+            return extracted;
+        }
+
+        function serializeFirestoreValue(value) {
+            if (value === null || value === undefined) return value;
+            if (value && typeof value.toDate === 'function') {
+                return value.toDate().toISOString();
+            }
+            if (Array.isArray(value)) {
+                return value.map(serializeFirestoreValue);
+            }
+            if (typeof value === 'object') {
+                const out = {};
+                for (const [k, v] of Object.entries(value)) {
+                    out[k] = serializeFirestoreValue(v);
+                }
+                return out;
+            }
+            return value;
+        }
+
+        function normalizeUserData(raw, uid, email) {
+            const data = serializeFirestoreValue(raw || {});
+
+            if (data.address && typeof data.address === 'object') {
+                data.street = data.street || data.address.street || '';
+                data.city = data.city || data.address.city || '';
+                data.state = data.state || data.address.state || '';
+                data.zip = data.zip || data.address.zip || '';
+            }
+
+            const standardKeys = new Set([
+                'uid', 'email', 'firstName', 'lastName', 'phone', 'street', 'city', 'state', 'zip',
+                'agreedToTerms', 'agreementDate', 'createdAt', 'signature', 'address'
+            ]);
+
+            const profile = {
+                uid,
+                email: data.email || email || '',
+                firstName: data.firstName || '',
+                lastName: data.lastName || '',
+                phone: data.phone || '',
+                street: data.street || '',
+                city: data.city || '',
+                state: data.state || '',
+                zip: data.zip || '',
+                agreedToTerms: data.agreedToTerms ?? false,
+                agreementDate: data.agreementDate || '',
+                createdAt: data.createdAt || '',
+                signature: data.signature || ''
+            };
+
+            for (const [key, value] of Object.entries(data)) {
+                if (!standardKeys.has(key) && value !== undefined && value !== null && value !== '') {
+                    profile[key] = value;
+                }
+            }
+
+            return profile;
+        }
+
+        function markStepComplete() {
+            step1Status.textContent = '✓';
+            step1Status.classList.add('complete');
+            step1Status.setAttribute('aria-label', 'Step 1 complete');
+            step1Results.classList.add('visible');
+            step1Complete = true;
+            unlockStep2();
+        }
+
+        function unlockStep2() {
+            step2.classList.remove('step-locked');
+            step2LockMsg.style.display = 'none';
+        }
+
+        function unlockStep3() {
+            step3.classList.remove('step-locked');
+            step3LockMsg.style.display = 'none';
+        }
+
+        function lockStep2() {
+            step2.classList.add('step-locked');
+            step2LockMsg.style.display = 'block';
+            step2Status.textContent = '2';
+            step2Status.classList.remove('complete', 'error');
+            step2Error.textContent = '';
+            xfaInput.value = '';
+            xfaFileChip.style.display = 'none';
+            unlockProgress.classList.remove('visible');
+            unlockSuccess.classList.remove('visible');
+            revokeUnlockedBlobUrl();
+            unlockedPdfFile = null;
+            step2Complete = false;
+            lockStep3();
+        }
+
+        function unlockStep4() {
+            step4.classList.remove('step-locked');
+            step4LockMsg.style.display = 'none';
+            generateFieldConfigBtn.disabled = false;
+        }
+
+        function lockStep4() {
+            step4.classList.add('step-locked');
+            step4LockMsg.style.display = 'block';
+            step4Status.textContent = '4';
+            step4Status.classList.remove('complete', 'error');
+            step4Results.classList.remove('visible');
+            step4Error.textContent = '';
+            fieldConfigProgress.classList.remove('visible');
+            generateFieldConfigBtn.disabled = true;
+            fieldConfigJsonEl.textContent = '';
+            lastFieldConfig = null;
+            step3Complete = false;
+            lastExtractionPayload = null;
+            lockStep5();
+        }
+
+        function unlockStep5() {
+            step5.classList.remove('step-locked');
+            step5LockMsg.style.display = 'none';
+            sanitizePdfBtn.disabled = !lastPreparedPdfFile || !lastFieldConfig;
+        }
+
+        function lockStep5() {
+            step5.classList.add('step-locked');
+            step5LockMsg.style.display = 'block';
+            step5Status.textContent = '5';
+            step5Status.classList.remove('complete', 'error');
+            step5Results.classList.remove('visible');
+            step5Error.textContent = '';
+            sanitizePdfLoading.style.display = 'none';
+            sanitizePdfBtn.disabled = true;
+            sanitizePdfSuccess.classList.remove('visible');
+            revokeSanitizedPdfBlobUrl();
+            sanitizedPdfFile = null;
+            lastPdfToken = null;
+            step5Complete = false;
+            resetSanitizeResults();
+            lockStep6();
+        }
+
+        function unlockStep6() {
+            step6.classList.remove('step-locked');
+            step6LockMsg.style.display = 'none';
+            generateFormConfigBtn.disabled = false;
+        }
+
+        function lockStep6() {
+            step6.classList.add('step-locked');
+            step6LockMsg.style.display = 'block';
+            step6Status.textContent = '6';
+            step6Status.classList.remove('complete', 'error');
+            step6Results.classList.remove('visible');
+            step6Error.textContent = '';
+            formConfigProgress.classList.remove('visible');
+            generateFormConfigBtn.disabled = true;
+            formConfigJsonEl.textContent = '';
+            lastFormConfig = null;
+            lockStep7();
+        }
+
+        function unlockStep7() {
+            step7.classList.remove('step-locked');
+            step7LockMsg.style.display = 'none';
+        }
+
+        function lockStep7() {
+            step7.classList.add('step-locked');
+            step7LockMsg.style.display = 'block';
+            step7Status.textContent = '7';
+            step7Status.classList.remove('complete', 'error');
+            step7Results.classList.remove('visible');
+            autopopulateAvailableBody.innerHTML = '';
+            autopopulateMissingBody.innerHTML = '';
+            autopopulateJsonEl.textContent = '';
+            lockStep8();
+        }
+
+        function setStep8HtmlButtonsEnabled(enabled) {
+            viewFormHtmlBtn.disabled = !enabled;
+            downloadFormHtmlBtn.disabled = !enabled;
+        }
+
+        function unlockStep8() {
+            step8.classList.remove('step-locked');
+            step8LockMsg.style.display = 'none';
+            generateFormHtmlBtn.disabled = !lastFormConfig;
+            setStep8HtmlButtonsEnabled(!!lastGeneratedFormHtml);
+        }
+
+        function lockStep8() {
+            step8.classList.add('step-locked');
+            step8LockMsg.style.display = 'block';
+            step8Status.textContent = '8';
+            step8Status.classList.remove('complete', 'error');
+            step8Results.classList.remove('visible');
+            step8Error.textContent = '';
+            generateFormHtmlBtn.disabled = true;
+            setStep8HtmlButtonsEnabled(false);
+            lastGeneratedFormHtml = null;
+            setStep8PreviewMode(false);
+            if (formHtmlSourceEl) formHtmlSourceEl.textContent = '';
+            if (formPreviewIframe) {
+                const doc = formPreviewIframe.contentDocument || formPreviewIframe.contentWindow?.document;
+                if (doc) {
+                    doc.open();
+                    doc.write('');
+                    doc.close();
+                }
+            }
+        }
+
+        function setStep8PreviewMode(showHtmlSource) {
+            step8ShowingHtmlSource = showHtmlSource;
+            if (formPreviewWrap) formPreviewWrap.hidden = showHtmlSource;
+            if (formHtmlSourceWrap) formHtmlSourceWrap.hidden = !showHtmlSource;
+            if (step8PreviewHeader) {
+                step8PreviewHeader.textContent = showHtmlSource ? 'Generated Form HTML' : 'Live Form Preview';
+            }
+            if (viewFormHtmlBtn) {
+                viewFormHtmlBtn.textContent = showHtmlSource ? 'View Preview' : 'View HTML';
+            }
+        }
+
+        function showFormHtmlPreview(html) {
+            sessionStorage.setItem(FORM_PREVIEW_STORAGE_KEY, html);
+            setStep8PreviewMode(false);
+            if (formHtmlSourceEl) formHtmlSourceEl.textContent = html;
+            const doc = formPreviewIframe.contentDocument || formPreviewIframe.contentWindow?.document;
+            if (doc) {
+                doc.open();
+                doc.write(html);
+                doc.close();
+            }
+        }
+
+        function toggleStep8HtmlSourceView() {
+            if (!lastGeneratedFormHtml) {
+                step8Error.textContent = 'Generate form HTML first.';
+                return;
+            }
+            step8Error.textContent = '';
+            if (formHtmlSourceEl && !formHtmlSourceEl.textContent) {
+                formHtmlSourceEl.textContent = lastGeneratedFormHtml;
+            }
+            setStep8PreviewMode(!step8ShowingHtmlSource);
+        }
+
+        function revokeSanitizedPdfBlobUrl() {
+            if (sanitizedPdfBlobUrl) {
+                URL.revokeObjectURL(sanitizedPdfBlobUrl);
+                sanitizedPdfBlobUrl = null;
+            }
+        }
+
+        function lockStep3() {
+            step3.classList.add('step-locked');
+            step3LockMsg.style.display = 'block';
+            step3Status.textContent = '3';
+            step3Status.classList.remove('complete', 'error');
+            step3Results.classList.remove('visible');
+            resetStep3Results();
+            lockStep4();
+        }
+
+        function resetStep3Results() {
+            pdfFullContent.innerHTML = '';
+            pdfTextFields.textContent = '';
+            pdfCheckboxFields.textContent = '';
+            textFieldCount.textContent = '';
+            checkboxFieldCount.textContent = '';
+            pdfError.textContent = '';
+            pdfLoading.style.display = 'none';
+            extractInput.value = '';
+            extractFileChip.style.display = 'none';
+            lastPreparedPdfFile = null;
+        }
+
+        function revokeUnlockedBlobUrl() {
+            if (unlockedPdfBlobUrl) {
+                URL.revokeObjectURL(unlockedPdfBlobUrl);
+                unlockedPdfBlobUrl = null;
+            }
+        }
+
+        function showFileChip(chipEl, file) {
+            chipEl.textContent = '📎 ' + file.name;
+            chipEl.style.display = 'inline-flex';
+        }
+
+        function markStep2Complete() {
+            step2Status.textContent = '✓';
+            step2Status.classList.add('complete');
+            step2Status.setAttribute('aria-label', 'Step 2 complete');
+            step2Complete = true;
+            unlockStep3();
+        }
+
+        function markStep3Complete(extractionPayload) {
+            step3Status.textContent = '✓';
+            step3Status.classList.add('complete');
+            step3Status.setAttribute('aria-label', 'Step 3 complete');
+            step3Results.classList.add('visible');
+            step3Complete = true;
+            lastExtractionPayload = extractionPayload;
+            unlockStep4();
+        }
+
+        function markStep4Complete() {
+            step4Status.textContent = '✓';
+            step4Status.classList.add('complete');
+            step4Status.setAttribute('aria-label', 'Step 4 complete');
+            step4Results.classList.add('visible');
+            unlockStep5();
+        }
+
+        function markStep5Complete(renamedCount) {
+            step5Status.textContent = '✓';
+            step5Status.classList.add('complete');
+            step5Status.setAttribute('aria-label', 'Step 5 complete');
+            step5Results.classList.add('visible');
+            sanitizePdfSuccess.classList.add('visible');
+            sanitizePdfSuccessText.textContent = `✓ PDF sanitized (${renamedCount} field name${renamedCount === 1 ? '' : 's'} renamed)`;
+            step5Complete = true;
+            unlockStep6();
+        }
+
+        function markStep5Error() {
+            step5Status.textContent = '!';
+            step5Status.classList.add('error');
+        }
+
+        function markStep6Complete() {
+            step6Status.textContent = '✓';
+            step6Status.classList.add('complete');
+            step6Status.setAttribute('aria-label', 'Step 6 complete');
+            step6Results.classList.add('visible');
+            renderAutopopulateResults();
+            unlockStep7();
+            markStep7Complete();
+            unlockStep8();
+        }
+
+        function markStep6Error() {
+            step6Status.textContent = '!';
+            step6Status.classList.add('error');
+        }
+
+        function formatProfileEntryValue(value) {
+            if (value === null || value === undefined) return '';
+            if (typeof value === 'object') return JSON.stringify(value);
+            return String(value);
+        }
+
+        function profileToEntries(profile) {
+            const entries = [];
+            for (const key of Object.keys(profile || {}).sort()) {
+                if (key.endsWith('_description')) continue;
+                entries.push({
+                    key,
+                    value: profile[key],
+                    description: profile[key + '_description']
+                        || PROFILE_ENTRY_DEFAULT_DESCRIPTIONS[key]
+                        || ''
+                });
+            }
+            return entries;
+        }
+
+        function renderProfileEntries(profile) {
+            const entries = profileToEntries(profile);
+            profileEntriesList.innerHTML = '';
+
+            if (!entries.length) {
+                profileEntriesList.innerHTML = '<div class="loading-text">No profile entries yet. Click + Add Entry to add one.</div>';
+                return;
+            }
+
+            entries.forEach((entry) => {
+                const card = document.createElement('div');
+                card.className = 'profile-entry-card';
+                const isUid = entry.key === 'uid';
+                const actionsHtml = isUid
+                    ? ''
+                    : `<div class="profile-entry-actions">
+                        <button type="button" class="btn-delete-entry" data-delete-profile-key="${escapeHtml(entry.key)}">Delete</button>
+                        <button type="button" class="btn-edit-entry" data-edit-profile-key="${escapeHtml(entry.key)}">Edit</button>
+                       </div>`;
+                card.innerHTML = `
+                    <div class="profile-entry-meta">
+                        <div class="profile-entry-key">${escapeHtml(entry.key)}</div>
+                        <div class="profile-entry-value">${escapeHtml(formatProfileEntryValue(entry.value))}</div>
+                        <div class="profile-entry-desc">${escapeHtml(entry.description || 'No description')}</div>
+                    </div>
+                    ${actionsHtml}
+                `;
+                profileEntriesList.appendChild(card);
+            });
+        }
+
+        function refreshUserProfileDisplay(profile) {
+            lastUserProfile = profile;
+            userJsonEl.textContent = JSON.stringify(profile, null, 2);
+            renderProfileEntries(profile);
+        }
+
+        async function refreshAutopopulateAnalysis() {
+            if (!lastFormConfig || !lastFieldConfig) return;
+            try {
+                const response = await fetch('/api/enrich-autopopulate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        formConfig: lastFormConfig,
+                        fieldConfig: lastFieldConfig,
+                        userProfile: lastUserProfile || {},
+                        displayMode: lastFormConfig.displayMode || 'all_at_once'
+                    })
+                });
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    lastFormConfig = data.formConfig;
+                    renderAutopopulateResults();
+                }
+            } catch (err) {
+                console.error('Autopopulate refresh error:', err);
+            }
+        }
+
+        async function saveProfileEntry(key, value, description) {
+            if (!currentUser) throw new Error('Not signed in');
+            const cleanKey = key.trim();
+            if (!cleanKey) throw new Error('Entry name is required');
+            const updates = {};
+            updates[cleanKey] = value;
+            updates[cleanKey + '_description'] = description;
+            await db.collection('users').doc(currentUser.uid).update(updates);
+            const next = { ...(lastUserProfile || {}), ...updates };
+            refreshUserProfileDisplay(next);
+            await refreshAutopopulateAnalysis();
+        }
+
+        async function deleteProfileEntry(key) {
+            if (!currentUser) throw new Error('Not signed in');
+            const updates = {};
+            updates[key] = firebase.firestore.FieldValue.delete();
+            updates[key + '_description'] = firebase.firestore.FieldValue.delete();
+            await db.collection('users').doc(currentUser.uid).update(updates);
+            const next = { ...(lastUserProfile || {}) };
+            delete next[key];
+            delete next[key + '_description'];
+            refreshUserProfileDisplay(next);
+            await refreshAutopopulateAnalysis();
+        }
+
+        function openAddProfileEntryModal() {
+            profileEntryEditingKey = null;
+            profileEntryModalTitle.textContent = 'Add Profile Entry';
+            profileEntrySubmitBtn.textContent = 'Save Entry';
+            profileEntryNameInput.readOnly = false;
+            addProfileEntryError.textContent = '';
+            addProfileEntryForm.reset();
+            addProfileEntryModal.classList.add('visible');
+        }
+
+        function openEditProfileEntryModal(key) {
+            const profile = lastUserProfile || {};
+            profileEntryEditingKey = key;
+            profileEntryModalTitle.textContent = 'Edit Profile Entry';
+            profileEntrySubmitBtn.textContent = 'Update Entry';
+            profileEntryNameInput.value = key;
+            profileEntryNameInput.readOnly = true;
+            profileEntryAnswerInput.value = profile[key] != null ? String(profile[key]) : '';
+            profileEntryDescriptionInput.value = profile[key + '_description']
+                || PROFILE_ENTRY_DEFAULT_DESCRIPTIONS[key]
+                || '';
+            addProfileEntryError.textContent = '';
+            addProfileEntryModal.classList.add('visible');
+        }
+
+        function closeAddProfileEntryModalFn() {
+            profileEntryEditingKey = null;
+            profileEntryNameInput.readOnly = false;
+            addProfileEntryModal.classList.remove('visible');
+            addProfileEntryError.textContent = '';
+        }
+
+        function renderAutopopulateRow(field) {
+            const tr = document.createElement('tr');
+            const statusClass = field.availableInProfile ? 'available' : 'missing';
+            const statusText = field.availableInProfile
+                ? `Available: ${field.currentProfileValue != null ? field.currentProfileValue : 'Yes'}`
+                : 'Not in profile yet';
+            tr.innerHTML = `
+                <td>${escapeHtml(field.questionText || '')}</td>
+                <td><code>${escapeHtml(field.nameId || '')}</code></td>
+                <td><code>${escapeHtml(field.profileKey || '')}</code></td>
+                <td>${escapeHtml(field.profileDescription || '')}</td>
+                <td><span class="status-pill ${statusClass}">${escapeHtml(statusText)}</span></td>
+            `;
+            return tr;
+        }
+
+        function renderAutopopulateResults() {
+            const available = lastFormConfig?.autopopulateAvailable || [];
+            const missing = lastFormConfig?.autopopulateMissing || [];
+            const all = lastFormConfig?.autopopulateFields || [];
+
+            autopopulateAvailableBody.innerHTML = '';
+            autopopulateMissingBody.innerHTML = '';
+
+            if (!available.length) {
+                autopopulateAvailableBody.innerHTML = '<tr><td colspan="5" style="padding:18px;color:var(--gray);">None yet — add entries to your profile or fill the form to learn them.</td></tr>';
+            } else {
+                available.forEach((field) => autopopulateAvailableBody.appendChild(renderAutopopulateRow(field)));
+            }
+
+            if (!missing.length) {
+                autopopulateMissingBody.innerHTML = '<tr><td colspan="5" style="padding:18px;color:var(--gray);">All autopopulatable fields are covered by your profile.</td></tr>';
+            } else {
+                missing.forEach((field) => autopopulateMissingBody.appendChild(renderAutopopulateRow(field)));
+            }
+
+            autopopulateJsonEl.textContent = JSON.stringify(all, null, 2);
+        }
+
+        function markStep7Complete() {
+            step7Status.textContent = '✓';
+            step7Status.classList.add('complete');
+            step7Status.setAttribute('aria-label', 'Step 7 complete');
+            step7Results.classList.add('visible');
+        }
+
+        function markStep8Complete() {
+            step8Status.textContent = '✓';
+            step8Status.classList.add('complete');
+            step8Status.setAttribute('aria-label', 'Step 8 complete');
+            step8Results.classList.add('visible');
+        }
+
+        function markStep8Error() {
+            step8Status.textContent = '!';
+            step8Status.classList.add('error');
+        }
+
+        function markStep4Error() {
+            step4Status.textContent = '!';
+            step4Status.classList.add('error');
+        }
+
+        function markStep3Error() {
+            step3Status.textContent = '!';
+            step3Status.classList.add('error');
+        }
+
+        function setupUploadZone(zoneEl, inputEl, onFile) {
+            zoneEl.addEventListener('click', () => inputEl.click());
+            zoneEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    inputEl.click();
+                }
+            });
+            inputEl.addEventListener('change', () => {
+                const file = inputEl.files[0];
+                if (file) onFile(file);
+            });
+            zoneEl.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zoneEl.classList.add('drag-over');
+            });
+            zoneEl.addEventListener('dragleave', (e) => {
+                if (!zoneEl.contains(e.relatedTarget)) {
+                    zoneEl.classList.remove('drag-over');
+                }
+            });
+            zoneEl.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zoneEl.classList.remove('drag-over');
+                const file = e.dataTransfer.files[0];
+                if (file) onFile(file);
+            });
+        }
+
+        async function unlockPdfOnServer(file) {
+            const formData = new FormData();
+            formData.append('pdf', file);
+            const response = await fetch('/api/unlock-pdf', {
+                method: 'POST',
+                body: formData
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                let message = 'Failed to unlock PDF';
+                try {
+                    const data = JSON.parse(text);
+                    message = data.error || message;
+                } catch (_) {
+                    if (text) message = text;
+                }
+                if (response.status === 404) {
+                    message = 'Unlock API not found — restart the server (npm start) and try again.';
+                }
+                throw new Error(message);
+            }
+            const blob = await response.blob();
+            const method = response.headers.get('X-Unlock-Method') || 'unknown';
+            const fieldCount = response.headers.get('X-Field-Count') || '?';
+            const fieldRenames = response.headers.get('X-Field-Renames') || '0';
+            const splitRadioGroups = response.headers.get('X-Split-Radio-Groups') || '0';
+            return { blob, method, fieldCount, fieldRenames, splitRadioGroups };
+        }
+
+        async function handleXfaUpload(file) {
+            if (!file || file.type !== 'application/pdf') {
+                step2Error.textContent = 'Please upload a valid PDF file.';
+                return;
+            }
+
+            step2Error.textContent = '';
+            step2Status.textContent = '2';
+            step2Status.classList.remove('complete', 'error');
+            unlockSuccess.classList.remove('visible');
+            showFileChip(xfaFileChip, file);
+            unlockProgress.classList.add('visible');
+
+            try {
+                const { blob, method, fieldCount, fieldRenames, splitRadioGroups } = await unlockPdfOnServer(file);
+
+                revokeUnlockedBlobUrl();
+                unlockedPdfFile = new File(
+                    [blob],
+                    file.name.replace(/\.pdf$/i, '') + '_unlocked.pdf',
+                    { type: 'application/pdf' }
+                );
+                unlockedPdfBlobUrl = URL.createObjectURL(blob);
+
+                unlockSuccess.classList.add('visible');
+                const renameNote = Number(fieldRenames) > 0
+                    ? ` — ${fieldRenames} duplicate field name(s) split into unique checkboxes`
+                    : '';
+                unlockSuccess.querySelector('.unlock-success-text').textContent =
+                    `✓ PDF unlocked (${fieldCount} fields via ${method}${renameNote}) — download to verify`;
+
+                markStep2Complete();
+                showFileChip(extractFileChip, unlockedPdfFile);
+                analyzeUploadedPdf(unlockedPdfFile);
+            } catch (err) {
+                console.error('Unlock error:', err);
+                step2Error.textContent = err.message || 'Failed to unlock PDF.';
+                step2Status.textContent = '!';
+                step2Status.classList.add('error');
+            } finally {
+                unlockProgress.classList.remove('visible');
+            }
+        }
+
+        downloadUnlockedBtn.addEventListener('click', () => {
+            if (!unlockedPdfFile || !unlockedPdfBlobUrl) return;
+            const link = document.createElement('a');
+            link.href = unlockedPdfBlobUrl;
+            link.download = unlockedPdfFile.name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        setupUploadZone(xfaUploadZone, xfaInput, handleXfaUpload);
+        setupUploadZone(extractUploadZone, extractInput, (file) => {
+            showFileChip(extractFileChip, file);
+            analyzeUploadedPdf(file);
+        });
+
+        function renderFormsGrid(forms) {
+            if (!forms.length) {
+                formsGrid.innerHTML = '<div class="loading-text">No forms in the system yet. Add one below.</div>';
+                return;
+            }
+
+            formsGrid.innerHTML = forms.map(form => `
+                <article class="form-card" data-form-id="${escapeHtml(form.id)}">
+                    <div class="form-card-body">
+                        <div class="form-card-id">${escapeHtml(form.id)}</div>
+                        <div class="form-card-name">${escapeHtml(form.name)}</div>
+                        <p class="form-card-desc">${escapeHtml(form.description)}</p>
+                    </div>
+                    <button type="button" class="btn-delete-form" data-delete-id="${escapeHtml(form.id)}">Delete</button>
+                </article>
+            `).join('');
+        }
+
+        async function deleteForm(formId) {
+            if (!confirm(`Delete form "${formId}" from the system? This cannot be undone.`)) {
+                return;
+            }
+            const response = await fetch(`/api/admin-delete-form/${encodeURIComponent(formId)}`, {
+                method: 'DELETE'
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'Failed to delete form');
+            }
+            await loadSystemForms();
+        }
+
+        function openAddFormModal() {
+            addFormError.textContent = '';
+            addFormForm.reset();
+            document.getElementById('new-form-defendant').value = 'N/A';
+            addFormModal.classList.add('visible');
+        }
+
+        function closeAddFormModalFn() {
+            addFormModal.classList.remove('visible');
+        }
+
+        async function saveNewForm(e) {
+            e.preventDefault();
+            addFormError.textContent = '';
+
+            const formId = document.getElementById('new-form-id').value.trim();
+            const name = document.getElementById('new-form-name').value.trim();
+            const description = document.getElementById('new-form-description').value.trim();
+            const url = document.getElementById('new-form-url').value.trim();
+            const countiesRaw = document.getElementById('new-form-counties').value.trim();
+            const defendant = document.getElementById('new-form-defendant').value.trim() || 'N/A';
+
+            if (!formId || !name || !description) {
+                addFormError.textContent = 'Form ID, name, and description are required.';
+                return;
+            }
+
+            const counties = countiesRaw
+                ? countiesRaw.split(',').map(c => c.trim()).filter(Boolean)
+                : [];
+
+            const formData = {
+                name,
+                description,
+                url: url || `${name}/${formId}.html?formId=${formId}`,
+                counties,
+                defendant,
+                status: 'Public'
+            };
+
+            try {
+                const response = await fetch('/api/admin-save-form', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ formId, formData })
+                });
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Failed to save form');
+                }
+                closeAddFormModalFn();
+                await loadSystemForms();
+            } catch (err) {
+                addFormError.textContent = err.message || 'Failed to save form.';
+            }
+        }
+
+        formsGrid.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-delete-id]');
+            if (!btn) return;
+            deleteForm(btn.getAttribute('data-delete-id')).catch(err => {
+                alert(err.message || 'Failed to delete form');
+            });
+        });
+
+        addFormBtn.addEventListener('click', openAddFormModal);
+        closeAddFormModal.addEventListener('click', closeAddFormModalFn);
+        cancelAddForm.addEventListener('click', closeAddFormModalFn);
+        addFormForm.addEventListener('submit', saveNewForm);
+        addFormModal.addEventListener('click', (e) => {
+            if (e.target === addFormModal) closeAddFormModalFn();
+        });
+
+        function markStepError() {
+            step1Status.textContent = '!';
+            step1Status.classList.add('error');
+        }
+
+        function resetStepUI() {
+            step1Complete = false;
+            step1Status.textContent = '1';
+            step1Status.classList.remove('complete', 'error');
+            step1Results.classList.remove('visible');
+            signedInBanner.classList.remove('visible');
+            loginFormWrap.classList.remove('hidden');
+            userJsonEl.textContent = 'Loading user data…';
+            formsGrid.innerHTML = '<div class="loading-text">Loading forms…</div>';
+            lockStep2();
+        }
+
+        async function loadUserProfile(user) {
+            currentUser = user;
+            const userDoc = await db.collection('users').doc(user.uid).get();
+
+            if (!userDoc.exists) {
+                const empty = {
+                    error: 'No user profile document found in Firestore',
+                    uid: user.uid,
+                    email: user.email
+                };
+                userJsonEl.textContent = JSON.stringify(empty, null, 2);
+                profileEntriesList.innerHTML = '<div class="loading-text">No Firestore profile document found.</div>';
+                return;
+            }
+
+            const profile = normalizeUserData(userDoc.data(), user.uid, user.email);
+            refreshUserProfileDisplay(profile);
+        }
+
+        async function loadSystemForms() {
+            const snapshot = await db.collection('forms').get();
+            const forms = [];
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                forms.push({
+                    id: doc.id,
+                    name: data.name || doc.id,
+                    description: data.description || 'No description',
+                    counties: data.counties || [],
+                    defendant: data.defendant || '',
+                    url: data.url || ''
+                });
+            });
+
+            forms.sort((a, b) => a.name.localeCompare(b.name));
+            renderFormsGrid(forms);
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        async function onSignedIn(user) {
+            loginError.textContent = '';
+            signedInEmail.textContent = user.email || 'Unknown';
+            signedInBanner.classList.add('visible');
+            loginFormWrap.classList.add('hidden');
+
+            try {
+                await Promise.all([
+                    loadUserProfile(user),
+                    loadSystemForms()
+                ]);
+                markStepComplete();
+            } catch (err) {
+                console.error('Step 1 data load error:', err);
+                loginError.textContent = 'Signed in, but failed to load profile or forms. Check console for details.';
+                markStepError();
+            }
+        }
+
+        async function preparePdfOnServer(file) {
+            const formData = new FormData();
+            formData.append('pdf', file);
+            const response = await fetch('/api/prepare-pdf-fields', {
+                method: 'POST',
+                body: formData
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                let message = 'Failed to prepare PDF fields';
+                try {
+                    const data = JSON.parse(text);
+                    message = data.error || message;
+                } catch (_) {
+                    if (text) message = text;
+                }
+                if (response.status === 404) {
+                    message = 'Prepare API not found — restart the server (npm start) and try again.';
+                }
+                throw new Error(message);
+            }
+            const blob = await response.blob();
+            const fieldRenames = response.headers.get('X-Field-Renames') || '0';
+            const preparedFile = new File(
+                [blob],
+                file.name.replace(/\.pdf$/i, '') + '_prepared.pdf',
+                { type: 'application/pdf' }
+            );
+            return { preparedFile, fieldRenames: Number(fieldRenames) };
+        }
+
+        async function analyzeUploadedPdf(file) {
+            if (!file || file.type !== 'application/pdf') {
+                pdfError.textContent = 'Please upload a valid PDF file.';
+                return;
+            }
+
+            pdfError.textContent = '';
+            pdfLoading.textContent = 'Preparing fields (splitting duplicate names)…';
+            pdfLoading.style.display = 'block';
+            step3Status.textContent = '3';
+            step3Status.classList.remove('complete', 'error');
+            step3Results.classList.remove('visible');
+            lockStep4();
+
+            try {
+                const { preparedFile, fieldRenames } = await preparePdfOnServer(file);
+                lastPreparedPdfFile = preparedFile;
+                if (fieldRenames > 0) {
+                    showFileChip(extractFileChip, preparedFile);
+                }
+
+                pdfLoading.textContent = 'Analyzing PDF…';
+                const arrayBuffer = await preparedFile.arrayBuffer();
+                const extracted = await PdfFieldExtractor.extract(arrayBuffer);
+                renderExtractionResults(extracted, {
+                    fullContentEl: pdfFullContent,
+                    textFieldsEl: pdfTextFields,
+                    checkboxFieldsEl: pdfCheckboxFields,
+                    textCountEl: textFieldCount,
+                    checkboxCountEl: checkboxFieldCount
+                });
+
+                markStep3Complete({
+                    extractedDocumentContent: pdfFullContent.innerText.trim(),
+                    textFields: extracted.textFields,
+                    checkboxFields: extracted.checkboxFields
+                });
+            } catch (err) {
+                console.error('PDF extraction error:', err);
+                pdfError.textContent = 'Error processing PDF: ' + (err.message || 'Unknown error');
+                markStep3Error();
+            } finally {
+                pdfLoading.style.display = 'none';
+            }
+        }
+
+        async function generateFieldConfigJson() {
+            if (!lastExtractionPayload) {
+                step4Error.textContent = 'No extraction data available. Complete Step 3 first.';
+                return;
+            }
+
+            step4Error.textContent = '';
+            const fieldProgress = createTimedProgress(
+                fieldConfigProgress,
+                fieldConfigProgressBar,
+                fieldConfigProgressLabel,
+                'Generating field config with ChatGPT…'
+            );
+            generateFieldConfigBtn.disabled = true;
+            step4Status.textContent = '4';
+            step4Status.classList.remove('complete', 'error');
+            step4Results.classList.remove('visible');
+
+            try {
+                const response = await fetch('/api/generate-field-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(lastExtractionPayload)
+                });
+
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Failed to generate field config');
+                }
+
+                lastFieldConfig = data.fieldConfig;
+                fieldConfigJsonEl.textContent = JSON.stringify(data.fieldConfig, null, 2);
+                await fieldProgress.finish();
+                markStep4Complete();
+            } catch (err) {
+                console.error('Field config generation error:', err);
+                fieldProgress.cancel();
+                step4Error.textContent = err.message || 'Failed to generate field config.';
+                markStep4Error();
+            } finally {
+                generateFieldConfigBtn.disabled = false;
+            }
+        }
+
+        generateFieldConfigBtn.addEventListener('click', generateFieldConfigJson);
+
+        downloadFieldConfigBtn.addEventListener('click', () => {
+            if (!lastFieldConfig) return;
+            const blob = new Blob([JSON.stringify(lastFieldConfig, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'field_config.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        });
+
+        async function sanitizePdfOnServer() {
+            if (!lastPreparedPdfFile || !lastFieldConfig) {
+                throw new Error('Prepared PDF and field config are required');
+            }
+
+            const formData = new FormData();
+            formData.append('pdf', lastPreparedPdfFile);
+            formData.append('fieldConfig', JSON.stringify(lastFieldConfig));
+
+            const response = await fetch('/api/sanitize-pdf', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                let message = 'Failed to sanitize PDF';
+                try {
+                    const data = JSON.parse(text);
+                    message = data.error || message;
+                } catch (_) {
+                    if (text) message = text;
+                }
+                throw new Error(message);
+            }
+
+            const blob = await response.blob();
+            const renamedCount = Number(response.headers.get('X-Renamed-Count') || '0');
+            return { blob, renamedCount };
+        }
+
+        async function storeSanitizedPdfOnServer(pdfFile) {
+            const formData = new FormData();
+            formData.append('pdf', pdfFile);
+            const response = await fetch('/api/auto-form/store-pdf', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            let data = {};
+            try {
+                data = responseText ? JSON.parse(responseText) : {};
+            } catch (_) {
+                if (!response.ok) {
+                    throw new Error(
+                        response.status === 404
+                            ? 'PDF store API not found — restart the server (node server.js) and try Step 5 again.'
+                            : (responseText.slice(0, 120) || `Failed to register sanitized PDF (HTTP ${response.status})`)
+                    );
+                }
+            }
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'Failed to register sanitized PDF for preview');
+            }
+            return data.pdfToken;
+        }
+
+        async function handleSanitizePdf() {
+            step5Error.textContent = '';
+            sanitizePdfSuccess.classList.remove('visible');
+            step5Results.classList.remove('visible');
+            resetSanitizeResults();
+            sanitizePdfLoading.style.display = 'block';
+            sanitizePdfBtn.disabled = true;
+            step5Status.textContent = '5';
+            step5Status.classList.remove('complete', 'error');
+
+            try {
+                const { blob, renamedCount } = await sanitizePdfOnServer();
+                revokeSanitizedPdfBlobUrl();
+                sanitizedPdfBlobUrl = URL.createObjectURL(blob);
+                sanitizedPdfFile = new File(
+                    [blob],
+                    (lastPreparedPdfFile?.name || 'form').replace(/\.pdf$/i, '') + '_sanitized.pdf',
+                    { type: 'application/pdf' }
+                );
+                await extractAndRenderSanitizedPdf(sanitizedPdfFile);
+                lastPdfToken = await storeSanitizedPdfOnServer(sanitizedPdfFile);
+                if (lastFormConfig) {
+                    lastFormConfig.pdfToken = lastPdfToken;
+                    if (formConfigJsonEl.textContent) {
+                        formConfigJsonEl.textContent = JSON.stringify(lastFormConfig, null, 2);
+                    }
+                }
+                markStep5Complete(renamedCount);
+            } catch (err) {
+                console.error('Sanitize PDF error:', err);
+                step5Error.textContent = err.message || 'Failed to sanitize PDF.';
+                markStep5Error();
+            } finally {
+                sanitizePdfLoading.style.display = 'none';
+                sanitizePdfBtn.disabled = false;
+            }
+        }
+
+        sanitizePdfBtn.addEventListener('click', handleSanitizePdf);
+
+        downloadSanitizedPdfBtn.addEventListener('click', () => {
+            if (!sanitizedPdfBlobUrl || !sanitizedPdfFile) return;
+            const link = document.createElement('a');
+            link.href = sanitizedPdfBlobUrl;
+            link.download = sanitizedPdfFile.name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        function getSelectedHtmlMode() {
+            return document.querySelector('input[name="form-html-mode"]:checked')?.value || 'dev';
+        }
+
+        function applyFormConfigMetadata(formConfig) {
+            if (!formConfig) return formConfig;
+            formConfig.htmlMode = getSelectedHtmlMode();
+            if (lastPdfToken) formConfig.pdfToken = lastPdfToken;
+            return formConfig;
+        }
+
+        document.querySelectorAll('input[name="form-html-mode"]').forEach((input) => {
+            input.addEventListener('change', () => {
+                if (lastFormConfig) {
+                    applyFormConfigMetadata(lastFormConfig);
+                    if (formConfigJsonEl.textContent) {
+                        formConfigJsonEl.textContent = JSON.stringify(lastFormConfig, null, 2);
+                    }
+                }
+            });
+        });
+
+        async function generateFormConfigJson() {
+            if (!lastFieldConfig || !lastExtractionPayload) {
+                step6Error.textContent = 'Field config and extraction data are required. Complete Steps 3–5 first.';
+                return;
+            }
+            if (!step5Complete) {
+                step6Error.textContent = 'Complete Step 5 (sanitized PDF) before generating form config.';
+                return;
+            }
+
+            step6Error.textContent = '';
+            const formProgress = createTimedProgress(
+                formConfigProgress,
+                formConfigProgressBar,
+                formConfigProgressLabel,
+                'Generating form config with ChatGPT…',
+                FORM_CONFIG_PROGRESS_MS
+            );
+            generateFormConfigBtn.disabled = true;
+            step6Status.textContent = '6';
+            step6Status.classList.remove('complete', 'error');
+            step6Results.classList.remove('visible');
+
+            try {
+                const displayMode = document.querySelector('input[name="form-display-mode"]:checked')?.value || 'all_at_once';
+                const response = await fetch('/api/generate-form-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fieldConfig: lastFieldConfig,
+                        extractedDocumentContent: lastExtractionPayload.extractedDocumentContent,
+                        displayMode,
+                        userProfile: lastUserProfile || {}
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Failed to generate form config');
+                }
+
+                lastFormConfig = applyFormConfigMetadata(data.formConfig);
+                formConfigJsonEl.textContent = JSON.stringify(lastFormConfig, null, 2);
+                await formProgress.finish();
+                markStep6Complete();
+            } catch (err) {
+                console.error('Form config generation error:', err);
+                formProgress.cancel();
+                step6Error.textContent = err.message || 'Failed to generate form config.';
+                markStep6Error();
+            } finally {
+                generateFormConfigBtn.disabled = false;
+            }
+        }
+
+        generateFormConfigBtn.addEventListener('click', generateFormConfigJson);
+
+        downloadFormConfigBtn.addEventListener('click', () => {
+            if (!lastFormConfig) return;
+            const blob = new Blob([JSON.stringify(lastFormConfig, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'form_config.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        });
+
+        function generateFormHtml() {
+            if (!lastFormConfig) {
+                step8Error.textContent = 'Generate form_config.json in Step 6 first.';
+                return null;
+            }
+            if (!window.FormHtmlRenderer) {
+                step8Error.textContent = 'Form HTML renderer failed to load.';
+                return null;
+            }
+            return FormHtmlRenderer.build(lastFormConfig, lastUserProfile || {}, {
+                firebaseConfig,
+                htmlMode: getSelectedHtmlMode(),
+                pdfToken: lastPdfToken || lastFormConfig.pdfToken || null
+            });
+        }
+
+        function generateAndPreviewFormHtml() {
+            step8Error.textContent = '';
+            step8Status.textContent = '8';
+            step8Status.classList.remove('complete', 'error');
+
+            try {
+                const html = generateFormHtml();
+                if (!html) return;
+
+                lastGeneratedFormHtml = html;
+                setStep8HtmlButtonsEnabled(true);
+                showFormHtmlPreview(html);
+                markStep8Complete();
+            } catch (err) {
+                console.error('Form HTML generation error:', err);
+                step8Error.textContent = err.message || 'Failed to generate form HTML.';
+                markStep8Error();
+            }
+        }
+
+        function downloadGeneratedFormHtml() {
+            if (!lastGeneratedFormHtml) {
+                step8Error.textContent = 'Generate form HTML first.';
+                return;
+            }
+            step8Error.textContent = '';
+            const slug = (lastFormConfig?.formTitle || 'form')
+                .replace(/[^a-z0-9]+/gi, '-')
+                .replace(/^-|-$/g, '')
+                .toLowerCase() || 'form';
+            const blob = new Blob([lastGeneratedFormHtml], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${slug}.html`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        generateFormHtmlBtn.addEventListener('click', generateAndPreviewFormHtml);
+        viewFormHtmlBtn.addEventListener('click', toggleStep8HtmlSourceView);
+        downloadFormHtmlBtn.addEventListener('click', downloadGeneratedFormHtml);
+
+        window.addEventListener('message', (event) => {
+            if (!event.data || event.data.type !== 'formstar-profile-update') return;
+            const next = { ...(lastUserProfile || {}) };
+            next[event.data.key] = event.data.value;
+            if (event.data.description) {
+                next[event.data.key + '_description'] = event.data.description;
+            }
+            refreshUserProfileDisplay(next);
+            if (currentUser) {
+                db.collection('users').doc(currentUser.uid).update({
+                    [event.data.key]: event.data.value,
+                    [event.data.key + '_description']: event.data.description || ''
+                }).catch((err) => console.error('Profile sync error:', err));
+            }
+        });
+
+        addProfileEntryBtn.addEventListener('click', openAddProfileEntryModal);
+        closeAddProfileEntryModal.addEventListener('click', closeAddProfileEntryModalFn);
+        cancelAddProfileEntry.addEventListener('click', closeAddProfileEntryModalFn);
+        addProfileEntryModal.addEventListener('click', (e) => {
+            if (e.target === addProfileEntryModal) closeAddProfileEntryModalFn();
+        });
+        addProfileEntryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            addProfileEntryError.textContent = '';
+            const key = profileEntryNameInput.value.trim();
+            const value = profileEntryAnswerInput.value.trim();
+            const description = profileEntryDescriptionInput.value.trim();
+            try {
+                await saveProfileEntry(key, value, description);
+                closeAddProfileEntryModalFn();
+            } catch (err) {
+                addProfileEntryError.textContent = err.message || 'Failed to save entry.';
+            }
+        });
+        profileEntriesList.addEventListener('click', async (e) => {
+            const editBtn = e.target.closest('[data-edit-profile-key]');
+            if (editBtn) {
+                openEditProfileEntryModal(editBtn.getAttribute('data-edit-profile-key'));
+                return;
+            }
+            const btn = e.target.closest('[data-delete-profile-key]');
+            if (!btn) return;
+            const key = btn.getAttribute('data-delete-profile-key');
+            if (!key || !confirm(`Delete profile entry "${key}"?`)) return;
+            try {
+                await deleteProfileEntry(key);
+            } catch (err) {
+                alert(err.message || 'Failed to delete entry.');
+            }
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.textContent = '';
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Signing in…';
+
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (err) {
+                loginError.textContent = err.message || 'Sign in failed. Please try again.';
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign In';
+            }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            await auth.signOut();
+        });
+
+        auth.onAuthStateChanged(async (user) => {
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Sign In';
+
+            if (user) {
+                await onSignedIn(user);
+            } else {
+                resetStepUI();
+            }
+        });
+    </script>
+</body>
+</html>

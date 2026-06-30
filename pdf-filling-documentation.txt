@@ -1,0 +1,246 @@
+FormStar PDF Filling — How It Works
+====================================
+
+This document explains how FormStar turns HTML form answers into filled PDF
+documents, why every PDF field must have a unique name, and how the Auto-Form-
+Creator unlock pipeline prepares government PDFs for that model.
+
+
+1. End-to-end flow (production forms like SC-100)
+-------------------------------------------------
+
+  User fills HTML survey
+        |
+        v
+  Browser collects answers into FormData
+  (every input/checkbox has a `name` attribute)
+        |
+        v
+  POST /edit_pdf?pdf=sc100.pdf
+  (body = form field names → values)
+        |
+        v
+  server.js loads the PDF with pdf-lib
+        |
+        v
+  For each PDF form field, look up req.body[fieldName]
+        |
+        v
+  Set text / check / select radio / dropdown
+        |
+        v
+  Return filled PDF bytes to the browser
+
+
+2. The /edit_pdf endpoint (server.js)
+--------------------------------------
+
+Route: POST /edit_pdf
+Query: ?pdf=<filename>   (e.g. sc100.pdf)
+Body:  standard HTML form fields (parsed by express)
+
+PDF source:
+  - Uploaded file in req.files.pdf, OR
+  - A file under public/Forms/ (matched case-insensitively; prefers the
+    folder inferred from the Referer URL, e.g. SC-100 for sc-100.html)
+
+Filling logic (simplified):
+
+  form.getFields().forEach(field => {
+    const key   = field.getName();      // PDF internal field name
+    const value = req.body[key];        // must match HTML input `name`
+    if (value === undefined) return;    // skip — nothing submitted
+
+    switch (field type) {
+      PDFTextField   → field.setText(value)
+      PDFCheckBox    → shouldCheck(value) ? check() : uncheck()
+      PDFRadioGroup  → field.select(mapRadioValue(field, value))
+      PDFDropdown    → field.select(value)
+    }
+  });
+
+Checkbox truthy values (shouldCheck):
+  "on", "true", "yes", "1", "checked"  → checked
+  anything else / missing              → unchecked
+
+Radio groups use mapRadioValue() to translate HTML values ("on", "Yes", etc.)
+into the PDF radio option strings returned by field.getOptions().
+
+
+3. Why field names must be unique (1:1 mapping)
+------------------------------------------------
+
+The server matches answers to PDF widgets by **exact field name string**.
+
+  HTML:  <input name="form1[0].#subform[0].LastName[0]" value="Smith">
+  PDF:   field.getName() === "form1[0].#subform[0].LastName[0]"
+  Server: req.body["form1[0].#subform[0].LastName[0]"] → setText("Smith")
+
+If two PDF widgets share the same name (common with XFA radio groups):
+  - pdf.js extraction shows {{MorF[0]}} three times
+  - pdf-lib exposes ONE PDFRadioGroup named MorF[0]
+  - HTML can only send ONE value for that name
+  - The server cannot independently check "Male" vs "Female" vs "Unknown"
+
+FormStar's model requires:
+  ONE HTML input name  ↔  ONE PDF field name  ↔  ONE widget target
+
+That is why Auto-Form-Creator runs duplicate-name resolution during unlock.
+
+
+4. How SC-100 maps questions to PDF fields
+-------------------------------------------
+
+SC-100 (public/Forms/SC-100/sc-100.html) is a generated survey. Each visible
+question creates inputs whose `name` (or `id`) corresponds to a PDF field.
+
+Patterns used:
+
+  A) Direct text inputs
+     User-visible fields use names like:
+       please_explain_why_you_are_suing_at_this_location
+     These are wired to PDF text fields via the form builder / hidden field
+     logic so the submitted FormData includes the correct PDF field names.
+
+  B) Checkbox questions
+     Checkbox options get unique names, often suffixed with _1, _2, _3 for
+     repeating defendant/plaintiff blocks, e.g.:
+       are_they_a_business_or_public_entity_are_they_a_public_entity_yes_1
+     On submit, checked boxes send name=on; unchecked boxes are omitted.
+
+  C) Radio / single-select → hidden checkboxes
+     HTML radio groups share a `name` (only one selected). PDFs often use
+     separate checkbox fields per option instead of a radio group.
+
+     SC-100 uses createHiddenCheckboxForRadio(radioId, radioName, radioValue):
+       - When user selects a radio option, a hidden checkbox is inserted in
+         #hidden_pdf_fields with:
+           id   = radioId   (unique node id, e.g. question path)
+           name = radioId   (same as id — unique per option)
+           checked = true
+       - When another option is selected, the old hidden checkbox is removed.
+       - The hidden checkbox name is what /edit_pdf receives, mapped to a
+         specific PDF checkbox field name defined in the form configuration.
+
+  D) #hidden_pdf_fields container
+     Holds inputs that are not visible to the user but must be submitted:
+       - User profile autofill (user_fullname, user_street_hidden, …)
+       - Calculation-driven checkboxes (suing_over_2500, military_check, …)
+       - Linked checkbox aggregates (linkedCheckboxes config)
+       - Address composites (_street, _city, _state, _zip → _address)
+       - Radio-to-checkbox bridges (createHiddenCheckboxForRadio)
+
+  E) linkedCheckboxes / inverseCheckboxes
+     JavaScript sets master hidden checkboxes when any child option is checked,
+     so one PDF field can reflect "any defendant is military" style logic.
+
+  F) Submit → /edit_pdf
+     On checkout/submit, the page builds FormData from the entire <form>,
+     including hidden fields, and POSTs to:
+       /edit_pdf?pdf=sc100.pdf
+     The server fills sc100.pdf and returns the completed document.
+
+
+5. Auto-Form-Creator unlock + duplicate-name fix
+-------------------------------------------------
+
+Government XFA PDFs (e.g. xfa-test.pdf) ship with hybrid XFA + AcroForm data.
+Browsers and pdf-lib cannot fill XFA reliably. The unlock pipeline:
+
+  Step A — unlock-pdf-handler.js
+    1. pdf-lib: delete /XFA from AcroForm (primary method)
+    2. Fallback: pdftk drop_xfa
+    3. Fallback: ghostscript pdfwrite
+
+  Step B — pdf-field-deduplicator.js (automatic after unlock)
+    Detect PDFRadioGroup fields with multiple widget children (Kids).
+    For each widget in the group:
+      - Create a new PDFCheckBox with a unique name:
+          <originalName>__<index>_<optionValue>
+        Example:
+          form1[0].#subform[0].MorF[0]__1_1
+          form1[0].#subform[0].MorF[0]__2_2
+          form1[0].#subform[0].MorF[0]__3_2
+      - Place it at the same page coordinates as the original widget
+      - Remove the original radio group from the AcroForm field tree
+
+    Result: each former radio option is an independent checkbox the server
+    can check individually when the HTML form sends name=on for that field.
+
+  API: POST /api/unlock-pdf  (multipart field: pdf)
+  API: POST /api/prepare-pdf-fields  (dedupe only — runs automatically in Step 3)
+  Response headers:
+    X-Unlock-Method, X-Field-Count, X-Field-Renames, X-Split-Radio-Groups
+
+
+6. Field extraction (Auto-Form-Creator Step 3)
+-----------------------------------------------
+
+public/Auto-Form-Creator/pdf-extractor.js uses pdf.js to walk each page's
+annotations and emit markers embedded in a text reconstruction:
+
+  Text fields:    [[fieldName]]
+  Checkboxes:     {{fieldName}}   (only fields where pdf.js reports checkBox: true)
+
+Push buttons (Print, Reset, Submit) and radio widgets are excluded from
+extraction. pdf.js distinguishes them via PDF /Ff flags on Btn fields:
+  checkBox: true    → include as {{field}}
+  pushButton: true  → skip (not a fillable answer field)
+  radioButton: true → skip until split into checkboxes by prepare-pdf-fields
+
+Every widget instance is listed (no deduplication). After unlock + rename,
+three former MorF radio widgets appear as three distinct {{...}} names.
+
+These markers become placeholders when building a new FormStar HTML form:
+  [[name]] → text input with name="name"
+  {{name}} → checkbox with name="name"
+
+
+7. Building a new form from an unlocked PDF
+--------------------------------------------
+
+  1. Unlock PDF          → POST /api/unlock-pdf
+  2. Extract fields      → PdfFieldExtractor.extract()
+  3. For each [[field]]  → add text question; input name = exact field name
+  4. For each {{field}}  → add checkbox question; input name = exact field name
+  5. Store PDF alongside HTML under public/Forms/<FormName>/
+  6. On submit, POST FormData to /edit_pdf?pdf=<yourfile.pdf>
+
+Rules:
+  - Never reuse the same `name` for two inputs that should control different
+    PDF widgets.
+  - For mutually exclusive choices, use either:
+      (a) separate checkboxes with unique names (preferred after unlock), or
+      (b) SC-100 style radio → hidden checkbox bridge with unique hidden names.
+  - Checked checkboxes must submit a truthy value ("on" is default for HTML).
+
+
+8. File reference
+-----------------
+
+  server.js                          /edit_pdf, shouldCheck, mapRadioValue
+  unlock-pdf-handler.js              XFA unlock API
+  pdf-field-deduplicator.js          Radio group → unique checkboxes
+  public/Auto-Form-Creator/
+    demo.html                        Shareholder demo (unlock + extract)
+    pdf-extractor.js                 Client-side field extraction
+  public/Forms/SC-100/sc-100.html    Reference production form
+  public/idk.js                      Form builder hidden PDF field generator
+
+
+9. Quick debugging checklist
+-----------------------------
+
+  PDF field not filling?
+    - Compare PDF field name (extractor output) vs HTML input `name`
+    - Confirm the field is in FormData (browser devtools → Network → payload)
+    - Check server console: "No data for field: …" means name mismatch
+    - For checkboxes: must send "on" / "true" / "C "1" to check
+
+  Duplicate names in extraction?
+    - Re-run unlock; radio groups should be split automatically
+    - Download unlocked PDF and re-extract in Step 3
+
+  Radio not working after unlock?
+    - Radio groups are converted to checkboxes; treat each option as its own
+      {{uniqueName}} checkbox in the HTML form, not as a radio group.
