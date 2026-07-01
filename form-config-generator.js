@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const { fetchOpenAiWithRetry } = require('./openai-fetch');
 const { enrichFormConfigAutopopulate, isLikelyAutopopulatableField } = require('./form-autopopulate');
+const { ensureFormCatalogMetadata } = require('./form-catalog-metadata');
+const { saveCurrentData } = require('./auto-form-current-data');
 
 const FORM_CONFIG_PROMPT_PATH = path.join(
   __dirname,
@@ -124,6 +126,163 @@ function injectMissingFieldQuestions(formConfig, fieldConfig, missingNames) {
   return formConfig;
 }
 
+function consolidateSections(formConfig, targetCount = 3, hardMax = 4) {
+  if (!formConfig || !Array.isArray(formConfig.sections)) return formConfig;
+
+  let sections = formConfig.sections.map((section) => ({
+    sectionId: section.sectionId,
+    sectionName: section.sectionName || 'Section',
+    questions: [...(section.questions || [])],
+  }));
+
+  if (sections.length <= targetCount) return formConfig;
+
+  while (sections.length > hardMax) {
+    let bestIdx = 0;
+    let bestSize = Infinity;
+    for (let i = 0; i < sections.length - 1; i += 1) {
+      const size = sections[i].questions.length + sections[i + 1].questions.length;
+      if (size < bestSize) {
+        bestSize = size;
+        bestIdx = i;
+      }
+    }
+    const left = sections[bestIdx];
+    const right = sections[bestIdx + 1];
+    const mergedName = left.sectionName === right.sectionName
+      ? left.sectionName
+      : `${left.sectionName} & ${right.sectionName}`;
+    sections.splice(bestIdx, 2, {
+      sectionId: left.sectionId,
+      sectionName: mergedName,
+      questions: [...left.questions, ...right.questions],
+    });
+  }
+
+  while (sections.length > targetCount) {
+    let bestIdx = 0;
+    let bestSize = Infinity;
+    for (let i = 0; i < sections.length - 1; i += 1) {
+      const size = sections[i].questions.length + sections[i + 1].questions.length;
+      if (size < bestSize) {
+        bestSize = size;
+        bestIdx = i;
+      }
+    }
+    const left = sections[bestIdx];
+    const right = sections[bestIdx + 1];
+    const mergedName = left.sectionName === right.sectionName
+      ? left.sectionName
+      : `${left.sectionName} & ${right.sectionName}`;
+    sections.splice(bestIdx, 2, {
+      sectionId: left.sectionId,
+      sectionName: mergedName,
+      questions: [...left.questions, ...right.questions],
+    });
+  }
+
+  sections.forEach((section, idx) => {
+    section.sectionId = idx + 1;
+  });
+  formConfig.sections = sections;
+  formConfig.sectionCounter = sections.length + 1;
+  return formConfig;
+}
+
+function checkboxGroupPrefix(nameId) {
+  if (!nameId) return '';
+  const id = String(nameId).toLowerCase();
+  const knownSuffixes = [
+    '_male', '_female', '_nonbinary', '_nonbinary_unspecified', '_doj', '_fbi',
+    '_yes', '_no',
+  ];
+  for (const suffix of knownSuffixes) {
+    if (id.endsWith(suffix)) return id.slice(0, -suffix.length);
+  }
+  const parts = id.split('_');
+  if (parts.length > 1) return parts.slice(0, -1).join('_');
+  return id;
+}
+
+function inferMergedCheckboxQuestionText(group) {
+  const texts = group.map((q) => String(q.text || '').trim()).filter(Boolean);
+  const lower = texts.join(' ').toLowerCase();
+  if (/sex|gender/.test(lower)) return 'What is your sex?';
+  if (/level of service|service level/.test(lower)) return 'What is the level of service?';
+  if (texts.length === 1) return texts[0].replace(/\?$/, '?');
+  const first = texts[0].replace(/\?$/, '').trim();
+  if (first.length < 80) return `${first}?`;
+  return 'Please select all that apply';
+}
+
+function mergeFragmentedCheckboxGroups(formConfig) {
+  if (!formConfig?.sections) return formConfig;
+
+  for (const section of formConfig.sections) {
+    const questions = section.questions || [];
+    let i = 0;
+    while (i < questions.length) {
+      const q = questions[i];
+      const opts = q.options || [];
+      if (q.type === 'checkbox' && opts.length === 1) {
+        const prefix = checkboxGroupPrefix(opts[0].nameId || q.nameId);
+        const group = [q];
+        let j = i + 1;
+        while (j < questions.length) {
+          const next = questions[j];
+          const nextOpts = next.options || [];
+          if (next.type !== 'checkbox' || nextOpts.length !== 1) break;
+          const nextPrefix = checkboxGroupPrefix(nextOpts[0].nameId || next.nameId);
+          if (prefix && nextPrefix && prefix === nextPrefix) {
+            group.push(next);
+            j += 1;
+          } else {
+            break;
+          }
+        }
+        if (group.length > 1) {
+          const merged = {
+            ...group[0],
+            questionId: group[0].questionId,
+            text: inferMergedCheckboxQuestionText(group),
+            type: 'checkbox',
+            nameId: undefined,
+            options: group.flatMap((item) => item.options || []),
+            needsExplanation: group.some((item) => item.needsExplanation),
+            explanation: group.find((item) => item.explanation)?.explanation || '',
+          };
+          questions.splice(i, group.length, merged);
+          continue;
+        }
+      }
+      i += 1;
+    }
+    section.questions = questions;
+  }
+  return formConfig;
+}
+
+function normalizeQuestionExplanations(formConfig) {
+  if (!formConfig?.sections) return formConfig;
+
+  for (const section of formConfig.sections) {
+    for (const question of section.questions || []) {
+      if (question.needsExplanation == null) {
+        question.needsExplanation = Boolean(question.explanation);
+      }
+      if (!question.needsExplanation) {
+        question.explanation = '';
+        continue;
+      }
+      question.explanation = String(question.explanation || '').trim();
+      if (!question.explanation) {
+        question.needsExplanation = false;
+      }
+    }
+  }
+  return formConfig;
+}
+
 function validateFormConfig(formConfig, fieldConfig) {
   if (!formConfig || typeof formConfig !== 'object') {
     throw new Error('Model response is not a JSON object');
@@ -202,7 +361,11 @@ async function generateFormConfig(payload, openAiApiKey) {
   }
 
   const validated = validateFormConfig(config, fieldConfig);
-  return enrichFormConfigAutopopulate(validated, userProfile, displayMode, fieldConfig);
+  const consolidated = consolidateSections(validated, 3, 4);
+  const merged = mergeFragmentedCheckboxGroups(consolidated);
+  const normalized = normalizeQuestionExplanations(merged);
+  const enriched = enrichFormConfigAutopopulate(normalized, userProfile, displayMode, fieldConfig);
+  return ensureFormCatalogMetadata(enriched, fieldConfig);
 }
 
 function createHandleGenerateFormConfig(openAiApiKey) {
@@ -226,6 +389,17 @@ function createHandleGenerateFormConfig(openAiApiKey) {
         sectionCount: formConfig.sections?.length || 0,
         autopopulateCount: formConfig.autopopulateFields?.length || 0,
       });
+
+      try {
+        saveCurrentData({
+          label: 'step-6-form-config',
+          fieldConfig,
+          formConfig,
+          extractedDocumentContent,
+        });
+      } catch (dumpErr) {
+        console.warn('[generate-form-config] Current data dump failed:', dumpErr.message);
+      }
     } catch (error) {
       console.error('[generate-form-config] Error:', error);
       res.status(500).json({

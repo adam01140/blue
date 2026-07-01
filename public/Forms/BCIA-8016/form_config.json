@@ -1,0 +1,1692 @@
+{
+  "formTitle": "Request for Live Scan Service",
+  "formName": "BCIA 8016",
+  "formId": "bcia8016",
+  "formDescription": "Form for requesting Live Scan service from the California Department of Justice.",
+  "formFolderName": "BCIA-8016",
+  "defendant": "N/A",
+  "displayMode": "one_at_a_time",
+  "sections": [
+    {
+      "sectionId": 1,
+      "sectionName": "Contributing Agency Information",
+      "questions": [
+        {
+          "questionId": 1,
+          "text": "What is the ORI (Code assigned by DOJ)?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "ori_code",
+          "placeholder": "ORI Code",
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 2,
+          "text": "What is the Authorized Applicant Type?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "authorized_applicant_type",
+          "placeholder": "Authorized Applicant Type",
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 3,
+          "text": "What is the Type of License/Certification/Permit?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "type_of_license_certification_permit",
+          "placeholder": "Type of License/Certification/Permit",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "type_of_license_certification_permit",
+            "profileDescription": "Type of License/Certification/Permit OR Working Title",
+            "availableInProfile": true,
+            "currentProfileValue": "123"
+          }
+        },
+        {
+          "questionId": 4,
+          "text": "What is the Agency Authorized to Receive Criminal Record Information?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "agency_authorized_to_receive_criminal_record",
+          "placeholder": "Agency Name",
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 5,
+          "text": "What is the Mail Code (five-digit code assigned by DOJ)?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "mail_code",
+          "placeholder": "Mail Code",
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 6,
+          "text": "What is the Street Address or P.O. Box?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "street_address",
+          "placeholder": "Street Address or P.O. Box",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "street",
+            "profileDescription": "User's home address",
+            "availableInProfile": true,
+            "currentProfileValue": "921 Sloat Road31"
+          }
+        },
+        {
+          "questionId": 7,
+          "text": "What is the City?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "agency_city",
+          "placeholder": "City",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "city",
+            "profileDescription": "User's city",
+            "availableInProfile": true,
+            "currentProfileValue": "Salinas"
+          }
+        },
+        {
+          "questionId": 8,
+          "text": "What is the ZIP Code?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "agency_zip_code",
+          "placeholder": "ZIP Code",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "zip",
+            "profileDescription": "User's ZIP Code",
+            "availableInProfile": true,
+            "currentProfileValue": "93907"
+          }
+        },
+        {
+          "questionId": 9,
+          "text": "What is the Contact Telephone Number?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "contact_telephone_number",
+          "placeholder": "Contact Telephone Number",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "phone",
+            "profileDescription": "User's phone number",
+            "availableInProfile": true,
+            "currentProfileValue": "+13912893812"
+          }
+        },
+        {
+          "questionId": 10,
+          "text": "What is the Contact Name (mandatory for all school submissions)?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "contact_name",
+          "placeholder": "Contact Name",
+          "autopopulate": {
+            "enabled": false
+          }
+        }
+      ]
+    },
+    {
+      "sectionId": 2,
+      "sectionName": "Applicant Information",
+      "questions": [
+        {
+          "questionId": 11,
+          "text": "What is your First Name?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_first_name",
+          "placeholder": "First Name",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "firstName",
+            "profileDescription": "User's legal first name",
+            "availableInProfile": true,
+            "currentProfileValue": "Adam"
+          }
+        },
+        {
+          "questionId": 12,
+          "text": "What is your Last Name?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_last_name",
+          "placeholder": "Last Name",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "lastName",
+            "profileDescription": "User's legal last name",
+            "availableInProfile": true,
+            "currentProfileValue": "Chaabane"
+          }
+        },
+        {
+          "questionId": 13,
+          "text": "What is your Suffix?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_suffix",
+          "placeholder": "Suffix",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "applicant_suffix_0",
+            "profileDescription": "User's suffix",
+            "availableInProfile": true,
+            "currentProfileValue": "test suffix"
+          }
+        },
+        {
+          "questionId": 14,
+          "text": "What is your Date of Birth?",
+          "type": "date",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "date_of_birth",
+          "placeholder": "Date of Birth",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "date_of_birth",
+            "profileDescription": "User's date of birth",
+            "availableInProfile": true,
+            "currentProfileValue": "2026-05-26"
+          }
+        },
+        {
+          "questionId": 15,
+          "text": "What is your Driver's License Number?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "drivers_license_number",
+          "placeholder": "Driver's License Number",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "drivers_license_number",
+            "profileDescription": "Driver's License Number",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 16,
+          "text": "What is your Weight?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "weight",
+          "placeholder": "Weight",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "weight",
+            "profileDescription": "User's weight",
+            "availableInProfile": true,
+            "currentProfileValue": "160"
+          }
+        },
+        {
+          "questionId": 17,
+          "text": "What is your Height?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "height",
+          "placeholder": "Height",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "height",
+            "profileDescription": "User's height",
+            "availableInProfile": true,
+            "currentProfileValue": "67"
+          }
+        },
+        {
+          "questionId": 18,
+          "text": "What is your Eye Color?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "eye_color",
+          "placeholder": "Eye Color",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "eye_color",
+            "profileDescription": "Eye Color",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 19,
+          "text": "What is your Hair Color?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "hair_color",
+          "placeholder": "Hair Color",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "hair_color",
+            "profileDescription": "Hair Color",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 20,
+          "text": "What is your Place of Birth (State or Country)?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "place_of_birth",
+          "placeholder": "Place of Birth",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "place_of_birth",
+            "profileDescription": "Place of Birth (State or Country)",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 21,
+          "text": "What is your Social Security Number?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "social_security_number",
+          "placeholder": "Social Security Number",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "social_security_number",
+            "profileDescription": "Social Security Number",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 22,
+          "text": "What is your Misc. Number (Other Identification Number)?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "miscellaneous_number",
+          "placeholder": "Misc. Number",
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 23,
+          "text": "What is your Other Name (First Name)?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "other_name_first_name",
+          "placeholder": "Other First Name",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "other_name_first_name",
+            "profileDescription": "First Name",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 24,
+          "text": "What is your Other Name (Last Name)?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "other_name_last_name",
+          "placeholder": "Other Last Name",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "other_name_last_name",
+            "profileDescription": "Last Name",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 25,
+          "text": "What is your Other Name Suffix?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "other_name_suffix",
+          "placeholder": "Other Name Suffix",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "other_name_suffix",
+            "profileDescription": "Suffix",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 26,
+          "text": "What is your Your Number?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "your_number",
+          "placeholder": "Your Number",
+          "autopopulate": {
+            "enabled": false
+          }
+        }
+      ]
+    },
+    {
+      "sectionId": 3,
+      "sectionName": "Employer Information",
+      "questions": [
+        {
+          "questionId": 27,
+          "text": "What is your Employer Name?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_name",
+          "placeholder": "Employer Name",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "employer_name",
+            "profileDescription": "Employer Name",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 28,
+          "text": "What is your Employer Street Address or P.O. Box?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_street_address",
+          "placeholder": "Employer Street Address or P.O. Box",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "employer_street_address",
+            "profileDescription": "Employer Street Address or P.O. Box",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 29,
+          "text": "What is your Employer City?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_city",
+          "placeholder": "Employer City",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "employer_city",
+            "profileDescription": "City",
+            "availableInProfile": true,
+            "currentProfileValue": "Salinas"
+          }
+        },
+        {
+          "questionId": 30,
+          "text": "What is your Employer ZIP Code?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_zip_code",
+          "placeholder": "Employer ZIP Code",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "employer_zip_code",
+            "profileDescription": "ZIP Code",
+            "availableInProfile": true,
+            "currentProfileValue": "93907"
+          }
+        },
+        {
+          "questionId": 31,
+          "text": "What is your Employer Telephone Number (optional)?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_telephone_number",
+          "placeholder": "Employer Telephone Number",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "phone",
+            "profileDescription": "Telephone Number (optional)",
+            "availableInProfile": true,
+            "currentProfileValue": "+13912893812"
+          }
+        },
+        {
+          "questionId": 32,
+          "text": "What is your Employer Mail Code (five-digit code assigned by DOJ)?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "employer_mail_code",
+          "placeholder": "Employer Mail Code",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "employer_mail_code",
+            "profileDescription": "Mail Code (five digit code assigned by DOJ)",
+            "availableInProfile": false
+          }
+        }
+      ]
+    },
+    {
+      "sectionId": 4,
+      "sectionName": "Applicant Signature and Service Level",
+      "questions": [
+        {
+          "questionId": 33,
+          "text": "What is the Date of your Signature?",
+          "type": "date",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "applicant_signature_date",
+          "placeholder": "Signature Date",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "applicant_signature_date",
+            "profileDescription": "Date",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 34,
+          "text": "What is the Level of Service?",
+          "type": "checkbox",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "DOJ",
+              "nameId": "level_of_service_doj",
+              "value": "DOJ"
+            },
+            {
+              "label": "FBI",
+              "nameId": "level_of_service_fbi",
+              "value": "FBI"
+            }
+          ],
+          "labels": [],
+          "nameId": "level_of_service",
+          "placeholder": "",
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 35,
+          "text": "If re-submission, list original ATI number:",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "nameId": "original_ati_number",
+          "placeholder": "Original ATI Number",
+          "autopopulate": {
+            "enabled": false
+          }
+        },
+        {
+          "questionId": 36,
+          "text": "What is your billing number (agency billing number)?",
+          "type": "money",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "placeholder": "Billing Number (Agency Billing Number)",
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "billing_number",
+            "profileDescription": "Billing Number (Agency Billing Number)"
+          },
+          "nameId": "billing_number"
+        },
+        {
+          "questionId": 37,
+          "text": "What is your home address street address or p.o. box?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "placeholder": "Home Address Street Address or P.O. Box",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "home_street_address",
+            "profileDescription": "Home Address Street Address or P.O. Box",
+            "availableInProfile": true,
+            "currentProfileValue": "921 Sloat Road31"
+          },
+          "nameId": "home_street_address"
+        },
+        {
+          "questionId": 38,
+          "text": "What is your city?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "placeholder": "City",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "applicant_home_city",
+            "profileDescription": "City",
+            "availableInProfile": true,
+            "currentProfileValue": "Salinas"
+          },
+          "nameId": "applicant_home_city"
+        },
+        {
+          "questionId": 39,
+          "text": "What is your zip code?",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "placeholder": "ZIP Code",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "applicant_home_zip_code",
+            "profileDescription": "ZIP Code",
+            "availableInProfile": true,
+            "currentProfileValue": "93907"
+          },
+          "nameId": "applicant_home_zip_code"
+        },
+        {
+          "questionId": 40,
+          "text": "Male",
+          "type": "checkbox",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Male",
+              "nameId": "applicant_sex_male",
+              "value": "Male",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "applicant_sex_male",
+                "profileDescription": "Male",
+                "availableInProfile": true,
+                "currentProfileValue": "Male"
+              }
+            }
+          ],
+          "labels": [],
+          "placeholder": "Male",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "applicant_sex_male",
+            "profileDescription": "Male",
+            "availableInProfile": true,
+            "currentProfileValue": "Male"
+          }
+        },
+        {
+          "questionId": 41,
+          "text": "Female",
+          "type": "checkbox",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Female",
+              "nameId": "applicant_sex_female",
+              "value": "Female",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "applicant_sex_female",
+                "profileDescription": "Female",
+                "availableInProfile": false
+              }
+            }
+          ],
+          "labels": [],
+          "placeholder": "Female",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "applicant_sex_female",
+            "profileDescription": "Female",
+            "availableInProfile": false
+          }
+        },
+        {
+          "questionId": 42,
+          "text": "Nonbinary/Unspecified",
+          "type": "checkbox",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [
+            {
+              "label": "Nonbinary/Unspecified",
+              "nameId": "applicant_sex_nonbinary",
+              "value": "Nonbinary/Unspecified",
+              "autopopulate": {
+                "enabled": true,
+                "profileKey": "applicant_sex_nonbinary",
+                "profileDescription": "Nonbinary/Unspecified",
+                "availableInProfile": false
+              }
+            }
+          ],
+          "labels": [],
+          "placeholder": "Nonbinary/Unspecified",
+          "autopopulate": {
+            "enabled": true,
+            "profileKey": "applicant_sex_nonbinary",
+            "profileDescription": "Nonbinary/Unspecified",
+            "availableInProfile": false
+          }
+        }
+      ]
+    }
+  ],
+  "hiddenFields": [],
+  "sectionCounter": 5,
+  "questionCounter": 43,
+  "autopopulateFields": [
+    {
+      "questionText": "What is the Type of License/Certification/Permit?",
+      "nameId": "type_of_license_certification_permit",
+      "profileKey": "type_of_license_certification_permit",
+      "profileDescription": "Type of License/Certification/Permit OR Working Title",
+      "availableInProfile": true,
+      "currentProfileValue": "123"
+    },
+    {
+      "questionText": "What is the Street Address or P.O. Box?",
+      "nameId": "street_address",
+      "profileKey": "street",
+      "profileDescription": "User's home address",
+      "availableInProfile": true,
+      "currentProfileValue": "921 Sloat Road31"
+    },
+    {
+      "questionText": "What is the City?",
+      "nameId": "agency_city",
+      "profileKey": "city",
+      "profileDescription": "User's city",
+      "availableInProfile": true,
+      "currentProfileValue": "Salinas"
+    },
+    {
+      "questionText": "What is the ZIP Code?",
+      "nameId": "agency_zip_code",
+      "profileKey": "zip",
+      "profileDescription": "User's ZIP Code",
+      "availableInProfile": true,
+      "currentProfileValue": "93907"
+    },
+    {
+      "questionText": "What is the Contact Telephone Number?",
+      "nameId": "contact_telephone_number",
+      "profileKey": "phone",
+      "profileDescription": "User's phone number",
+      "availableInProfile": true,
+      "currentProfileValue": "+13912893812"
+    },
+    {
+      "questionText": "What is your First Name?",
+      "nameId": "applicant_first_name",
+      "profileKey": "firstName",
+      "profileDescription": "User's legal first name",
+      "availableInProfile": true,
+      "currentProfileValue": "Adam"
+    },
+    {
+      "questionText": "What is your Last Name?",
+      "nameId": "applicant_last_name",
+      "profileKey": "lastName",
+      "profileDescription": "User's legal last name",
+      "availableInProfile": true,
+      "currentProfileValue": "Chaabane"
+    },
+    {
+      "questionText": "What is your Suffix?",
+      "nameId": "applicant_suffix",
+      "profileKey": "applicant_suffix_0",
+      "profileDescription": "User's suffix",
+      "availableInProfile": true,
+      "currentProfileValue": "test suffix"
+    },
+    {
+      "questionText": "What is your Date of Birth?",
+      "nameId": "date_of_birth",
+      "profileKey": "date_of_birth",
+      "profileDescription": "User's date of birth",
+      "availableInProfile": true,
+      "currentProfileValue": "2026-05-26"
+    },
+    {
+      "questionText": "What is your Driver's License Number?",
+      "nameId": "drivers_license_number",
+      "profileKey": "drivers_license_number",
+      "profileDescription": "Driver's License Number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Weight?",
+      "nameId": "weight",
+      "profileKey": "weight",
+      "profileDescription": "User's weight",
+      "availableInProfile": true,
+      "currentProfileValue": "160"
+    },
+    {
+      "questionText": "What is your Height?",
+      "nameId": "height",
+      "profileKey": "height",
+      "profileDescription": "User's height",
+      "availableInProfile": true,
+      "currentProfileValue": "67"
+    },
+    {
+      "questionText": "What is your Eye Color?",
+      "nameId": "eye_color",
+      "profileKey": "eye_color",
+      "profileDescription": "Eye Color",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Hair Color?",
+      "nameId": "hair_color",
+      "profileKey": "hair_color",
+      "profileDescription": "Hair Color",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Place of Birth (State or Country)?",
+      "nameId": "place_of_birth",
+      "profileKey": "place_of_birth",
+      "profileDescription": "Place of Birth (State or Country)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Social Security Number?",
+      "nameId": "social_security_number",
+      "profileKey": "social_security_number",
+      "profileDescription": "Social Security Number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Other Name (First Name)?",
+      "nameId": "other_name_first_name",
+      "profileKey": "other_name_first_name",
+      "profileDescription": "First Name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Other Name (Last Name)?",
+      "nameId": "other_name_last_name",
+      "profileKey": "other_name_last_name",
+      "profileDescription": "Last Name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Other Name Suffix?",
+      "nameId": "other_name_suffix",
+      "profileKey": "other_name_suffix",
+      "profileDescription": "Suffix",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Employer Name?",
+      "nameId": "employer_name",
+      "profileKey": "employer_name",
+      "profileDescription": "Employer Name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Employer Street Address or P.O. Box?",
+      "nameId": "employer_street_address",
+      "profileKey": "employer_street_address",
+      "profileDescription": "Employer Street Address or P.O. Box",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Employer City?",
+      "nameId": "employer_city",
+      "profileKey": "employer_city",
+      "profileDescription": "City",
+      "availableInProfile": true,
+      "currentProfileValue": "Salinas"
+    },
+    {
+      "questionText": "What is your Employer ZIP Code?",
+      "nameId": "employer_zip_code",
+      "profileKey": "employer_zip_code",
+      "profileDescription": "ZIP Code",
+      "availableInProfile": true,
+      "currentProfileValue": "93907"
+    },
+    {
+      "questionText": "What is your Employer Telephone Number (optional)?",
+      "nameId": "employer_telephone_number",
+      "profileKey": "phone",
+      "profileDescription": "Telephone Number (optional)",
+      "availableInProfile": true,
+      "currentProfileValue": "+13912893812"
+    },
+    {
+      "questionText": "What is your Employer Mail Code (five-digit code assigned by DOJ)?",
+      "nameId": "employer_mail_code",
+      "profileKey": "employer_mail_code",
+      "profileDescription": "Mail Code (five digit code assigned by DOJ)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is the Date of your Signature?",
+      "nameId": "applicant_signature_date",
+      "profileKey": "applicant_signature_date",
+      "profileDescription": "Date",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your home address street address or p.o. box?",
+      "nameId": "home_street_address",
+      "profileKey": "home_street_address",
+      "profileDescription": "Home Address Street Address or P.O. Box",
+      "availableInProfile": true,
+      "currentProfileValue": "921 Sloat Road31"
+    },
+    {
+      "questionText": "What is your city?",
+      "nameId": "applicant_home_city",
+      "profileKey": "applicant_home_city",
+      "profileDescription": "City",
+      "availableInProfile": true,
+      "currentProfileValue": "Salinas"
+    },
+    {
+      "questionText": "What is your zip code?",
+      "nameId": "applicant_home_zip_code",
+      "profileKey": "applicant_home_zip_code",
+      "profileDescription": "ZIP Code",
+      "availableInProfile": true,
+      "currentProfileValue": "93907"
+    },
+    {
+      "questionText": "Male",
+      "nameId": "applicant_sex_male",
+      "profileKey": "applicant_sex_male",
+      "profileDescription": "Male",
+      "availableInProfile": true,
+      "currentProfileValue": "Male"
+    },
+    {
+      "questionText": "Male — Male",
+      "nameId": "applicant_sex_male",
+      "profileKey": "applicant_sex_male",
+      "profileDescription": "Male",
+      "availableInProfile": true,
+      "currentProfileValue": "Male"
+    },
+    {
+      "questionText": "Female",
+      "nameId": "applicant_sex_female",
+      "profileKey": "applicant_sex_female",
+      "profileDescription": "Female",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Female — Female",
+      "nameId": "applicant_sex_female",
+      "profileKey": "applicant_sex_female",
+      "profileDescription": "Female",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Nonbinary/Unspecified",
+      "nameId": "applicant_sex_nonbinary",
+      "profileKey": "applicant_sex_nonbinary",
+      "profileDescription": "Nonbinary/Unspecified",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Nonbinary/Unspecified — Nonbinary/Unspecified",
+      "nameId": "applicant_sex_nonbinary",
+      "profileKey": "applicant_sex_nonbinary",
+      "profileDescription": "Nonbinary/Unspecified",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    }
+  ],
+  "autopopulateAvailable": [
+    {
+      "questionText": "What is the Type of License/Certification/Permit?",
+      "nameId": "type_of_license_certification_permit",
+      "profileKey": "type_of_license_certification_permit",
+      "profileDescription": "Type of License/Certification/Permit OR Working Title",
+      "availableInProfile": true,
+      "currentProfileValue": "123"
+    },
+    {
+      "questionText": "What is the Street Address or P.O. Box?",
+      "nameId": "street_address",
+      "profileKey": "street",
+      "profileDescription": "User's home address",
+      "availableInProfile": true,
+      "currentProfileValue": "921 Sloat Road31"
+    },
+    {
+      "questionText": "What is the City?",
+      "nameId": "agency_city",
+      "profileKey": "city",
+      "profileDescription": "User's city",
+      "availableInProfile": true,
+      "currentProfileValue": "Salinas"
+    },
+    {
+      "questionText": "What is the ZIP Code?",
+      "nameId": "agency_zip_code",
+      "profileKey": "zip",
+      "profileDescription": "User's ZIP Code",
+      "availableInProfile": true,
+      "currentProfileValue": "93907"
+    },
+    {
+      "questionText": "What is the Contact Telephone Number?",
+      "nameId": "contact_telephone_number",
+      "profileKey": "phone",
+      "profileDescription": "User's phone number",
+      "availableInProfile": true,
+      "currentProfileValue": "+13912893812"
+    },
+    {
+      "questionText": "What is your First Name?",
+      "nameId": "applicant_first_name",
+      "profileKey": "firstName",
+      "profileDescription": "User's legal first name",
+      "availableInProfile": true,
+      "currentProfileValue": "Adam"
+    },
+    {
+      "questionText": "What is your Last Name?",
+      "nameId": "applicant_last_name",
+      "profileKey": "lastName",
+      "profileDescription": "User's legal last name",
+      "availableInProfile": true,
+      "currentProfileValue": "Chaabane"
+    },
+    {
+      "questionText": "What is your Suffix?",
+      "nameId": "applicant_suffix",
+      "profileKey": "applicant_suffix_0",
+      "profileDescription": "User's suffix",
+      "availableInProfile": true,
+      "currentProfileValue": "test suffix"
+    },
+    {
+      "questionText": "What is your Date of Birth?",
+      "nameId": "date_of_birth",
+      "profileKey": "date_of_birth",
+      "profileDescription": "User's date of birth",
+      "availableInProfile": true,
+      "currentProfileValue": "2026-05-26"
+    },
+    {
+      "questionText": "What is your Weight?",
+      "nameId": "weight",
+      "profileKey": "weight",
+      "profileDescription": "User's weight",
+      "availableInProfile": true,
+      "currentProfileValue": "160"
+    },
+    {
+      "questionText": "What is your Height?",
+      "nameId": "height",
+      "profileKey": "height",
+      "profileDescription": "User's height",
+      "availableInProfile": true,
+      "currentProfileValue": "67"
+    },
+    {
+      "questionText": "What is your Employer City?",
+      "nameId": "employer_city",
+      "profileKey": "employer_city",
+      "profileDescription": "City",
+      "availableInProfile": true,
+      "currentProfileValue": "Salinas"
+    },
+    {
+      "questionText": "What is your Employer ZIP Code?",
+      "nameId": "employer_zip_code",
+      "profileKey": "employer_zip_code",
+      "profileDescription": "ZIP Code",
+      "availableInProfile": true,
+      "currentProfileValue": "93907"
+    },
+    {
+      "questionText": "What is your Employer Telephone Number (optional)?",
+      "nameId": "employer_telephone_number",
+      "profileKey": "phone",
+      "profileDescription": "Telephone Number (optional)",
+      "availableInProfile": true,
+      "currentProfileValue": "+13912893812"
+    },
+    {
+      "questionText": "What is your home address street address or p.o. box?",
+      "nameId": "home_street_address",
+      "profileKey": "home_street_address",
+      "profileDescription": "Home Address Street Address or P.O. Box",
+      "availableInProfile": true,
+      "currentProfileValue": "921 Sloat Road31"
+    },
+    {
+      "questionText": "What is your city?",
+      "nameId": "applicant_home_city",
+      "profileKey": "applicant_home_city",
+      "profileDescription": "City",
+      "availableInProfile": true,
+      "currentProfileValue": "Salinas"
+    },
+    {
+      "questionText": "What is your zip code?",
+      "nameId": "applicant_home_zip_code",
+      "profileKey": "applicant_home_zip_code",
+      "profileDescription": "ZIP Code",
+      "availableInProfile": true,
+      "currentProfileValue": "93907"
+    },
+    {
+      "questionText": "Male",
+      "nameId": "applicant_sex_male",
+      "profileKey": "applicant_sex_male",
+      "profileDescription": "Male",
+      "availableInProfile": true,
+      "currentProfileValue": "Male"
+    },
+    {
+      "questionText": "Male — Male",
+      "nameId": "applicant_sex_male",
+      "profileKey": "applicant_sex_male",
+      "profileDescription": "Male",
+      "availableInProfile": true,
+      "currentProfileValue": "Male"
+    }
+  ],
+  "autopopulateMissing": [
+    {
+      "questionText": "What is your Driver's License Number?",
+      "nameId": "drivers_license_number",
+      "profileKey": "drivers_license_number",
+      "profileDescription": "Driver's License Number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Eye Color?",
+      "nameId": "eye_color",
+      "profileKey": "eye_color",
+      "profileDescription": "Eye Color",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Hair Color?",
+      "nameId": "hair_color",
+      "profileKey": "hair_color",
+      "profileDescription": "Hair Color",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Place of Birth (State or Country)?",
+      "nameId": "place_of_birth",
+      "profileKey": "place_of_birth",
+      "profileDescription": "Place of Birth (State or Country)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Social Security Number?",
+      "nameId": "social_security_number",
+      "profileKey": "social_security_number",
+      "profileDescription": "Social Security Number",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Other Name (First Name)?",
+      "nameId": "other_name_first_name",
+      "profileKey": "other_name_first_name",
+      "profileDescription": "First Name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Other Name (Last Name)?",
+      "nameId": "other_name_last_name",
+      "profileKey": "other_name_last_name",
+      "profileDescription": "Last Name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Other Name Suffix?",
+      "nameId": "other_name_suffix",
+      "profileKey": "other_name_suffix",
+      "profileDescription": "Suffix",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Employer Name?",
+      "nameId": "employer_name",
+      "profileKey": "employer_name",
+      "profileDescription": "Employer Name",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Employer Street Address or P.O. Box?",
+      "nameId": "employer_street_address",
+      "profileKey": "employer_street_address",
+      "profileDescription": "Employer Street Address or P.O. Box",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is your Employer Mail Code (five-digit code assigned by DOJ)?",
+      "nameId": "employer_mail_code",
+      "profileKey": "employer_mail_code",
+      "profileDescription": "Mail Code (five digit code assigned by DOJ)",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "What is the Date of your Signature?",
+      "nameId": "applicant_signature_date",
+      "profileKey": "applicant_signature_date",
+      "profileDescription": "Date",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Female",
+      "nameId": "applicant_sex_female",
+      "profileKey": "applicant_sex_female",
+      "profileDescription": "Female",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Female — Female",
+      "nameId": "applicant_sex_female",
+      "profileKey": "applicant_sex_female",
+      "profileDescription": "Female",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Nonbinary/Unspecified",
+      "nameId": "applicant_sex_nonbinary",
+      "profileKey": "applicant_sex_nonbinary",
+      "profileDescription": "Nonbinary/Unspecified",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    },
+    {
+      "questionText": "Nonbinary/Unspecified — Nonbinary/Unspecified",
+      "nameId": "applicant_sex_nonbinary",
+      "profileKey": "applicant_sex_nonbinary",
+      "profileDescription": "Nonbinary/Unspecified",
+      "availableInProfile": false,
+      "currentProfileValue": null
+    }
+  ],
+  "htmlMode": "normal",
+  "templateSource": "default",
+  "pdfToken": "282b9884-6720-4084-aee0-8871fbd50edc"
+}

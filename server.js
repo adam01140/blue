@@ -187,6 +187,8 @@ const { handleSanitizePdf } = require('./pdf-field-sanitizer');
 const { createHandleGenerateFormConfig } = require('./form-config-generator');
 const { enrichFormConfigAutopopulate } = require('./form-autopopulate');
 const { handleStoreAutoFormPdf, handleFillAutoFormPdf } = require('./auto-form-pdf-handler');
+const { createHandlePublishAutoForm } = require('./auto-form-publish-handler');
+const { createHandleSaveCurrentData } = require('./auto-form-current-data');
 app.post('/api/unlock-pdf', handleUnlockPdf);
 app.post('/api/prepare-pdf-fields', handlePreparePdfFields);
 app.post('/api/generate-field-config', createHandleGenerateFieldConfig(OPENAI_API_KEY));
@@ -213,6 +215,8 @@ app.post('/api/enrich-autopopulate', (req, res) => {
 
 app.post('/api/auto-form/store-pdf', handleStoreAutoFormPdf);
 app.post('/api/auto-form/fill-pdf/:pdfToken', handleFillAutoFormPdf);
+app.post('/api/auto-form/publish', createHandlePublishAutoForm(db));
+app.post('/api/auto-form/save-current-data', createHandleSaveCurrentData());
 
 // Admin authentication endpoint
 app.post('/api/admin-login', (req, res) => {

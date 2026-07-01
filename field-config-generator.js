@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { fetchOpenAiWithRetry } = require('./openai-fetch');
+const { saveCurrentData } = require('./auto-form-current-data');
 
 const FIELD_CONFIG_PROMPT_PATH = path.join(
   __dirname,
@@ -123,6 +124,18 @@ function createHandleGenerateFieldConfig(openAiApiKey) {
         fieldConfig: config,
         fieldCount: config.fields.length,
       });
+
+      try {
+        saveCurrentData({
+          label: 'step-4-field-config',
+          fieldConfig: config,
+          extractedDocumentContent,
+          textFields,
+          checkboxFields,
+        });
+      } catch (dumpErr) {
+        console.warn('[generate-field-config] Current data dump failed:', dumpErr.message);
+      }
     } catch (error) {
       console.error('[generate-field-config] Error:', error);
       res.status(500).json({

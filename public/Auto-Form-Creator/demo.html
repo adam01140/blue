@@ -75,6 +75,23 @@
             background: rgba(255,255,255,0.22);
         }
 
+        .demo-header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .demo-hard-reset-btn {
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .demo-hard-reset-btn:hover {
+            background: rgba(231, 76, 60, 0.35);
+            border-color: rgba(255, 180, 180, 0.45);
+        }
+
         .demo-main {
             width: 70%;
             max-width: none;
@@ -366,6 +383,68 @@
 
         .btn-add-form:hover {
             background: #f0f7ff;
+        }
+
+        .publish-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px 20px;
+            margin-bottom: 20px;
+        }
+
+        .publish-form-grid .form-group-full {
+            grid-column: 1 / -1;
+        }
+
+        .publish-form-grid label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        .publish-form-grid input,
+        .publish-form-grid textarea,
+        .publish-form-grid select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font: inherit;
+            box-sizing: border-box;
+        }
+
+        .publish-form-grid textarea {
+            min-height: 88px;
+            resize: vertical;
+        }
+
+        .publish-form-grid small {
+            display: block;
+            margin-top: 6px;
+            color: var(--gray);
+            font-size: 0.82rem;
+        }
+
+        .publish-success {
+            margin-top: 16px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            font-size: 0.92rem;
+        }
+
+        .publish-success a {
+            color: #047857;
+            font-weight: 700;
+        }
+
+        @media (max-width: 800px) {
+            .publish-form-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .modal-overlay {
@@ -1079,7 +1158,10 @@
                 <h1>Auto-Form Creator</h1>
                 <p>Interactive demo — walkthrough for shareholders</p>
             </div>
-            <a href="iframe-test.html" class="demo-test-btn">Test</a>
+            <div class="demo-header-actions">
+                <button type="button" class="demo-test-btn demo-hard-reset-btn" id="hard-reset-btn" title="Clear saved progress and start over">Hard reset</button>
+                <a href="iframe-test.html" class="demo-test-btn">Test</a>
+            </div>
         </div>
     </header>
 
@@ -1505,6 +1587,30 @@
                     </label>
                 </fieldset>
 
+                <fieldset class="display-mode-options" id="form-template-fieldset">
+                    <legend style="font-weight:700;margin-bottom:8px;">Form HTML template</legend>
+                    <label class="display-mode-option">
+                        <input type="radio" name="form-template-source" value="default" checked>
+                        <div>
+                            <strong>Default template (example.html)</strong>
+                            <span>FormStar header, footer, fonts, section stepper, and navigation from <code>example.html</code>.</span>
+                        </div>
+                    </label>
+                    <label class="display-mode-option">
+                        <input type="radio" name="form-template-source" value="custom">
+                        <div>
+                            <strong>Custom template</strong>
+                            <span>Upload your own HTML shell. Must include the <code>__AUTO_FORM_BODY__</code> placeholder where questions are injected.</span>
+                        </div>
+                    </label>
+                    <div id="custom-template-upload" style="display:none;margin-top:12px;">
+                        <label class="upload-zone" id="custom-template-upload-zone" style="display:block;padding:16px;border:2px dashed var(--border);border-radius:12px;text-align:center;cursor:pointer;">
+                            <input type="file" id="custom-template-input" accept=".html,.htm,text/html" hidden>
+                            <span id="custom-template-label">Choose custom template HTML or drag &amp; drop</span>
+                        </label>
+                    </div>
+                </fieldset>
+
                 <button type="button" class="btn-download" id="generate-form-config-btn" disabled>
                     Generate form_config.json with ChatGPT
                 </button>
@@ -1643,6 +1749,75 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- Step 9: Publish form to site -->
+        <section class="step step-locked" id="step-9">
+            <div class="step-header">
+                <div class="step-status" id="step-9-status" aria-label="Step 9 status">9</div>
+                <div>
+                    <h2 class="step-title">Step 9 — Add Form to Site</h2>
+                    <p class="step-description">
+                        Creates a new folder under <code>public/Forms/</code> with your generated HTML, sanitized PDF,
+                        styles, and logo — then registers the form in the Admin Form Manager database.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step-body">
+                <p id="step-9-lock-msg" style="color:var(--gray);font-style:italic;margin:0 0 16px;">
+                    Complete Step 8 (generate form HTML) to publish this form.
+                </p>
+
+                <div class="publish-form-grid" id="publish-form-grid" hidden>
+                    <div class="form-group">
+                        <label for="publish-form-name">📝 Name *</label>
+                        <input type="text" id="publish-form-name" required placeholder="e.g. SC-100">
+                    </div>
+                    <div class="form-group">
+                        <label for="publish-form-id">🏷️ ID *</label>
+                        <input type="text" id="publish-form-id" required placeholder="e.g. sc100" pattern="[a-z0-9]+">
+                    </div>
+                    <div class="form-group form-group-full">
+                        <label for="publish-form-description">📄 Description</label>
+                        <textarea id="publish-form-description" placeholder="Plaintiff's Claim form for suing a defendant"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="publish-form-url-base">🔗 URL Base</label>
+                        <input type="text" id="publish-form-url-base" placeholder="SC-100/sc-100">
+                    </div>
+                    <div class="form-group">
+                        <label for="publish-form-folder">📁 Folder Name</label>
+                        <input type="text" id="publish-form-folder" placeholder="SC-100">
+                    </div>
+                    <div class="form-group form-group-full">
+                        <label for="publish-form-counties">🗺️ Counties *</label>
+                        <select id="publish-form-counties" multiple size="6" required></select>
+                        <small>Hold Ctrl/Cmd to select multiple counties. Monterey is selected by default.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="publish-form-defendant">⚖️ Defendant</label>
+                        <select id="publish-form-defendant">
+                            <option value="N/A">N/A</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="publish-form-status">📌 Status</label>
+                        <select id="publish-form-status">
+                            <option value="Public" selected>Public</option>
+                            <option value="Archived">Archived</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-download btn-generate-form" id="publish-form-btn" disabled>
+                    Add to Database
+                </button>
+                <div class="error-message" id="step-9-error"></div>
+                <div class="publish-success" id="step-9-success" hidden></div>
             </div>
         </section>
     </main>
@@ -1784,6 +1959,23 @@
         const formHtmlSourceEl = document.getElementById('form-html-source');
         const copyFormHtmlBtn = document.getElementById('copy-form-html-btn');
         const step8PreviewHeader = document.getElementById('step-8-preview-header');
+
+        const step9 = document.getElementById('step-9');
+        const step9Status = document.getElementById('step-9-status');
+        const step9LockMsg = document.getElementById('step-9-lock-msg');
+        const step9Error = document.getElementById('step-9-error');
+        const step9Success = document.getElementById('step-9-success');
+        const publishFormGrid = document.getElementById('publish-form-grid');
+        const publishFormBtn = document.getElementById('publish-form-btn');
+        const publishFormName = document.getElementById('publish-form-name');
+        const publishFormId = document.getElementById('publish-form-id');
+        const publishFormDescription = document.getElementById('publish-form-description');
+        const publishFormUrlBase = document.getElementById('publish-form-url-base');
+        const publishFormFolder = document.getElementById('publish-form-folder');
+        const publishFormCounties = document.getElementById('publish-form-counties');
+        const publishFormDefendant = document.getElementById('publish-form-defendant');
+        const publishFormStatus = document.getElementById('publish-form-status');
+
         const profileEntryModalTitle = document.getElementById('profile-entry-modal-title');
         const profileEntryNameInput = document.getElementById('profile-entry-name');
         const profileEntryAnswerInput = document.getElementById('profile-entry-answer');
@@ -1808,11 +2000,268 @@
         let step8ShowingHtmlSource = false;
         let profileEntryEditingKey = null;
         let currentUser = null;
+        let customFormTemplateHtml = null;
+        let customFormTemplateName = null;
+        let defaultFormTemplateReady = false;
+
+        const customTemplateUpload = document.getElementById('custom-template-upload');
+        const customTemplateInput = document.getElementById('custom-template-input');
+        const customTemplateUploadZone = document.getElementById('custom-template-upload-zone');
+        const customTemplateLabel = document.getElementById('custom-template-label');
 
         const FORM_PREVIEW_SHELL = '/Auto-Form-Creator/form-preview-shell.html';
         const FORM_PREVIEW_STORAGE_KEY = 'formstarPreviewHtml';
+        const DEMO_STATE_KEY = 'autoFormCreatorDemoState';
+        const DEMO_PDF_MAX_B64_CHARS = 2.5 * 1024 * 1024;
         const CHATGPT_PROGRESS_MS = 60000;
         const FORM_CONFIG_PROGRESS_MS = 120000;
+
+        const COUNTY_LIST = [
+            'Alameda', 'Alpine', 'Amador', 'Butte', 'Calaveras', 'Colusa', 'Contra Costa', 'Del Norte',
+            'El Dorado', 'Fresno', 'Glenn', 'Humboldt', 'Imperial', 'Inyo', 'Kern', 'Kings', 'Lake',
+            'Lassen', 'Los Angeles', 'Madera', 'Marin', 'Mariposa', 'Mendocino', 'Merced', 'Modoc',
+            'Mono', 'Monterey', 'Napa', 'Nevada', 'Orange', 'Placer', 'Plumas', 'Riverside', 'Sacramento',
+            'San Benito', 'San Bernardino', 'San Diego', 'San Francisco', 'San Joaquin', 'San Luis Obispo',
+            'San Mateo', 'Santa Barbara', 'Santa Clara', 'Santa Cruz', 'Shasta', 'Sierra', 'Siskiyou',
+            'Solano', 'Sonoma', 'Stanislaus', 'Sutter', 'Tehama', 'Trinity', 'Tulare', 'Tuolumne',
+            'Ventura', 'Yolo', 'Yuba'
+        ];
+
+        function arrayBufferToBase64(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.length; i += 1) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+
+        function base64ToArrayBuffer(b64) {
+            const binary = atob(b64);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i += 1) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        function clearDemoState() {
+            try {
+                localStorage.removeItem(DEMO_STATE_KEY);
+                document.cookie = 'afc_demo_state=; path=/; max-age=0; SameSite=Lax';
+            } catch (err) {
+                console.warn('Failed to clear demo state', err);
+            }
+        }
+
+        async function saveDemoState() {
+            if (!step1Complete) return;
+            try {
+                let sanitizedPdfBase64 = null;
+                let sanitizedPdfFileName = null;
+                if (sanitizedPdfFile) {
+                    const buf = await sanitizedPdfFile.arrayBuffer();
+                    const b64 = arrayBufferToBase64(buf);
+                    if (b64.length < DEMO_PDF_MAX_B64_CHARS) {
+                        sanitizedPdfBase64 = b64;
+                        sanitizedPdfFileName = sanitizedPdfFile.name;
+                    }
+                }
+
+                const state = {
+                    v: 1,
+                    savedAt: new Date().toISOString(),
+                    steps: {
+                        step2: step2Complete,
+                        step3: step3Complete,
+                        step4: step4Status.classList.contains('complete'),
+                        step5: step5Complete,
+                        step6: step6Status.classList.contains('complete'),
+                        step7: step7Status.classList.contains('complete'),
+                        step8: step8Status.classList.contains('complete'),
+                    },
+                    lastExtractionPayload,
+                    lastFieldConfig,
+                    lastFormConfig,
+                    lastGeneratedFormHtml,
+                    lastPdfToken,
+                    sanitizeRenamedCount: sanitizePdfSuccessText?.textContent || '',
+                    sanitizedPdfBase64,
+                    sanitizedPdfFileName,
+                    displayMode: document.querySelector('input[name="form-display-mode"]:checked')?.value || 'all_at_once',
+                    htmlMode: getSelectedHtmlMode(),
+                    templateSource: getSelectedTemplateSource(),
+                    fieldConfigJson: fieldConfigJsonEl.textContent || '',
+                    formConfigJson: formConfigJsonEl.textContent || '',
+                    step3Ui: {
+                        pdfFullContentHtml: pdfFullContent.innerHTML || '',
+                        pdfTextFieldsText: pdfTextFields.textContent || '',
+                        pdfCheckboxFieldsText: pdfCheckboxFields.textContent || '',
+                        textFieldCountText: textFieldCount.textContent || '',
+                        checkboxFieldCountText: checkboxFieldCount.textContent || '',
+                    },
+                    step5Ui: {
+                        sanitizeFullContentHtml: sanitizeFullContent.innerHTML || '',
+                        sanitizeTextFieldsText: sanitizeTextFields.textContent || '',
+                        sanitizeCheckboxFieldsText: sanitizeCheckboxFields.textContent || '',
+                        sanitizeTextFieldCountText: sanitizeTextFieldCount.textContent || '',
+                        sanitizeCheckboxFieldCountText: sanitizeCheckboxFieldCount.textContent || '',
+                    },
+                };
+
+                localStorage.setItem(DEMO_STATE_KEY, JSON.stringify(state));
+                document.cookie = 'afc_demo_state=1; path=/; max-age=2592000; SameSite=Lax';
+            } catch (err) {
+                console.warn('Failed to save demo state', err);
+            }
+        }
+
+        function scheduleSaveDemoState() {
+            saveDemoState().catch((err) => console.warn('Demo state save error', err));
+        }
+
+        async function saveCurrentDataDump(label) {
+            try {
+                await fetch('/api/auto-form/save-current-data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        label: label || 'demo-update',
+                        fieldConfig: lastFieldConfig,
+                        formConfig: lastFormConfig,
+                        formHtml: lastGeneratedFormHtml,
+                        extractedDocumentContent: lastExtractionPayload?.extractedDocumentContent || '',
+                        textFields: lastExtractionPayload?.textFields || [],
+                        checkboxFields: lastExtractionPayload?.checkboxFields || [],
+                    }),
+                });
+            } catch (err) {
+                console.warn('Current data dump failed:', err);
+            }
+        }
+
+        async function restoreDemoState() {
+            const raw = localStorage.getItem(DEMO_STATE_KEY);
+            if (!raw) return false;
+
+            let state;
+            try {
+                state = JSON.parse(raw);
+            } catch (err) {
+                console.warn('Invalid saved demo state', err);
+                return false;
+            }
+            if (!state || state.v !== 1) return false;
+
+            if (state.displayMode) {
+                const modeInput = document.querySelector(`input[name="form-display-mode"][value="${state.displayMode}"]`);
+                if (modeInput) modeInput.checked = true;
+            }
+            if (state.htmlMode) {
+                const htmlInput = document.querySelector(`input[name="form-html-mode"][value="${state.htmlMode}"]`);
+                if (htmlInput) htmlInput.checked = true;
+            }
+            if (state.templateSource) {
+                const templateInput = document.querySelector(`input[name="form-template-source"][value="${state.templateSource}"]`);
+                if (templateInput) templateInput.checked = true;
+                updateCustomTemplateUploadVisibility();
+            }
+
+            lastExtractionPayload = state.lastExtractionPayload || null;
+            lastFieldConfig = state.lastFieldConfig || null;
+            lastFormConfig = state.lastFormConfig || null;
+            lastGeneratedFormHtml = state.lastGeneratedFormHtml || null;
+            lastPdfToken = state.lastPdfToken || lastPdfToken;
+
+            if (state.steps?.step2) {
+                markStep2Complete();
+            }
+
+            if (state.steps?.step3 && state.lastExtractionPayload) {
+                if (state.step3Ui) {
+                    pdfFullContent.innerHTML = state.step3Ui.pdfFullContentHtml || '';
+                    pdfTextFields.textContent = state.step3Ui.pdfTextFieldsText || '';
+                    pdfCheckboxFields.textContent = state.step3Ui.pdfCheckboxFieldsText || '';
+                    textFieldCount.textContent = state.step3Ui.textFieldCountText || '';
+                    checkboxFieldCount.textContent = state.step3Ui.checkboxFieldCountText || '';
+                }
+                markStep3Complete(state.lastExtractionPayload);
+            }
+
+            if (state.steps?.step4 && state.lastFieldConfig) {
+                fieldConfigJsonEl.textContent = state.fieldConfigJson || JSON.stringify(state.lastFieldConfig, null, 2);
+                markStep4Complete();
+            }
+
+            if (state.steps?.step5 && state.sanitizedPdfBase64 && state.sanitizedPdfFileName) {
+                const blob = new Blob([base64ToArrayBuffer(state.sanitizedPdfBase64)], { type: 'application/pdf' });
+                revokeSanitizedPdfBlobUrl();
+                sanitizedPdfBlobUrl = URL.createObjectURL(blob);
+                sanitizedPdfFile = new File([blob], state.sanitizedPdfFileName, { type: 'application/pdf' });
+                if (state.step5Ui) {
+                    sanitizeFullContent.innerHTML = state.step5Ui.sanitizeFullContentHtml || '';
+                    sanitizeTextFields.textContent = state.step5Ui.sanitizeTextFieldsText || '';
+                    sanitizeCheckboxFields.textContent = state.step5Ui.sanitizeCheckboxFieldsText || '';
+                    sanitizeTextFieldCount.textContent = state.step5Ui.sanitizeTextFieldCountText || '';
+                    sanitizeCheckboxFieldCount.textContent = state.step5Ui.sanitizeCheckboxFieldCountText || '';
+                }
+                const renamedMatch = String(state.sanitizeRenamedCount || '').match(/(\d+)/);
+                const renamedCount = renamedMatch ? Number(renamedMatch[1]) : 0;
+                markStep5Complete(renamedCount);
+            } else if (state.steps?.step5 && state.lastPdfToken) {
+                lastPdfToken = state.lastPdfToken;
+                step5Status.textContent = '✓';
+                step5Status.classList.add('complete');
+                step5Results.classList.add('visible');
+                sanitizePdfSuccess.classList.add('visible');
+                if (state.sanitizeRenamedCount) sanitizePdfSuccessText.textContent = state.sanitizeRenamedCount;
+                step5Complete = true;
+                unlockStep6();
+            }
+
+            if (state.steps?.step6 && state.lastFormConfig) {
+                formConfigJsonEl.textContent = state.formConfigJson || JSON.stringify(state.lastFormConfig, null, 2);
+                markStep6Complete();
+            }
+
+            if (state.steps?.step8 && state.lastGeneratedFormHtml) {
+                step8Results.classList.add('visible');
+                markStep8Complete();
+                showFormHtmlPreview(state.lastGeneratedFormHtml);
+            } else if (state.steps?.step6) {
+                unlockStep8();
+                generateFormHtmlBtn.disabled = !lastFormConfig;
+            }
+
+            if (state.steps?.step8) {
+                unlockStep9();
+                populateStep9Fields();
+            }
+
+            return true;
+        }
+
+        function hardResetDemo() {
+            if (!window.confirm('Clear all saved Auto-Form Creator progress and start over?')) return;
+            clearDemoState();
+            step2Complete = false;
+            step3Complete = false;
+            step5Complete = false;
+            lastExtractionPayload = null;
+            lastFieldConfig = null;
+            lastFormConfig = null;
+            lastGeneratedFormHtml = null;
+            lastPdfToken = null;
+            lastPreparedPdfFile = null;
+            revokeSanitizedPdfBlobUrl();
+            sanitizedPdfFile = null;
+            revokeUnlockedBlobUrl();
+            unlockedPdfFile = null;
+            lockStep2();
+            if (currentUser) {
+                markStepComplete();
+            }
+        }
 
         const PROFILE_ENTRY_DEFAULT_DESCRIPTIONS = {
             uid: 'Firebase user ID',
@@ -2214,7 +2663,211 @@
                     doc.close();
                 }
             }
+            lockStep9();
         }
+
+        function initPublishCountySelect() {
+            if (!publishFormCounties || publishFormCounties.options.length) return;
+            COUNTY_LIST.forEach((county) => {
+                const option = document.createElement('option');
+                option.value = county;
+                option.textContent = county;
+                if (county === 'Monterey') option.selected = true;
+                publishFormCounties.appendChild(option);
+            });
+        }
+
+        function slugifyFormId(value) {
+            return String(value || 'form')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '')
+                .slice(0, 48) || 'form';
+        }
+
+        function toFolderName(name) {
+            return String(name || 'New-Form')
+                .trim()
+                .replace(/[^a-zA-Z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .replace(/-+/g, '-');
+        }
+
+        function inferDefendantFromFieldConfig(fieldConfig) {
+            const fields = fieldConfig?.fields || [];
+            const haystack = fields
+                .map((f) => `${f.newName || ''} ${f.label || ''}`.toLowerCase())
+                .join(' ');
+            if (/\b(defendant|respondent|against whom|party served)\b/.test(haystack)) {
+                return 'Yes';
+            }
+            return 'N/A';
+        }
+
+        function derivePublishDefaults(formConfig, fieldConfig) {
+            const title = formConfig?.formTitle || fieldConfig?.formTitle || 'Generated Form';
+            const name = formConfig?.formName || title;
+            const formId = formConfig?.formId || slugifyFormId(name);
+            const folderName = formConfig?.formFolderName || toFolderName(name);
+            const htmlBase = folderName.toLowerCase();
+            const description = formConfig?.formDescription
+                || `Complete the ${title} online with your saved FormStar profile.`;
+            const defendant = formConfig?.defendant || inferDefendantFromFieldConfig(fieldConfig);
+            return {
+                name,
+                formId,
+                description,
+                folderName,
+                htmlFileName: `${htmlBase}.html`,
+                pdfFileName: `${formId}.pdf`,
+                urlBase: `${folderName}/${htmlBase}`,
+                defendant,
+                counties: ['Monterey'],
+                status: 'Public',
+            };
+        }
+
+        function syncPublishUrlBase() {
+            const folder = (publishFormFolder?.value || '').trim() || toFolderName(publishFormName?.value);
+            const htmlBase = folder.toLowerCase();
+            if (publishFormUrlBase) {
+                publishFormUrlBase.value = folder ? `${folder}/${htmlBase}` : '';
+            }
+        }
+
+        function populateStep9Fields() {
+            if (!lastFormConfig) return;
+            initPublishCountySelect();
+            const defaults = derivePublishDefaults(lastFormConfig, lastFieldConfig);
+
+            publishFormName.value = defaults.name;
+            publishFormId.value = defaults.formId;
+            publishFormDescription.value = defaults.description;
+            publishFormFolder.value = defaults.folderName;
+            publishFormUrlBase.value = defaults.urlBase;
+            publishFormDefendant.value = defaults.defendant;
+            publishFormStatus.value = defaults.status;
+
+            Array.from(publishFormCounties.options).forEach((opt) => {
+                opt.selected = defaults.counties.includes(opt.value);
+            });
+
+            publishFormGrid.hidden = false;
+            publishFormBtn.disabled = !(lastGeneratedFormHtml && sanitizedPdfFile);
+            step9Success.hidden = true;
+            step9Error.textContent = '';
+        }
+
+        function unlockStep9() {
+            step9.classList.remove('step-locked');
+            step9LockMsg.style.display = 'none';
+            populateStep9Fields();
+        }
+
+        function lockStep9() {
+            step9.classList.add('step-locked');
+            step9LockMsg.style.display = 'block';
+            step9Status.textContent = '9';
+            step9Status.classList.remove('complete', 'error');
+            step9Error.textContent = '';
+            step9Success.hidden = true;
+            publishFormBtn.disabled = true;
+            if (publishFormGrid) publishFormGrid.hidden = true;
+        }
+
+        function markStep9Complete(result) {
+            step9Status.textContent = '✓';
+            step9Status.classList.add('complete');
+            step9Status.setAttribute('aria-label', 'Step 9 complete');
+            publishFormBtn.disabled = true;
+            step9Success.hidden = false;
+            const folderLabel = publishFormFolder?.value?.trim() || result.formId || 'Forms';
+            step9Success.innerHTML = `Form published successfully. Folder: <strong>public/Forms/${escapeHtml(folderLabel)}</strong> — `
+                + `<a href="${escapeHtml(result.formUrl)}" target="_blank" rel="noopener">Open form</a> · `
+                + `<a href="${escapeHtml(result.adminUrl)}" target="_blank" rel="noopener">Admin Form Manager</a>`;
+            loadSystemForms().catch((err) => console.error('Failed to refresh forms list:', err));
+        }
+
+        async function publishFormToSite() {
+            step9Error.textContent = '';
+            step9Success.hidden = true;
+
+            if (!lastGeneratedFormHtml) {
+                step9Error.textContent = 'Generate form HTML in Step 8 first.';
+                return;
+            }
+            if (!sanitizedPdfFile) {
+                step9Error.textContent = 'Sanitized PDF from Step 5 is required.';
+                return;
+            }
+
+            const name = publishFormName.value.trim();
+            const formId = slugifyFormId(publishFormId.value.trim());
+            const description = publishFormDescription.value.trim();
+            const folderName = toFolderName(publishFormFolder.value.trim() || name);
+            const urlBase = publishFormUrlBase.value.trim();
+            const htmlBase = urlBase.split('/').pop() || folderName.toLowerCase();
+            const htmlFileName = htmlBase.endsWith('.html') ? htmlBase.toLowerCase() : `${htmlBase.toLowerCase()}.html`;
+            const pdfFileName = `${formId}.pdf`;
+            const counties = Array.from(publishFormCounties.selectedOptions).map((opt) => opt.value);
+            const defendant = publishFormDefendant.value || 'N/A';
+            const status = publishFormStatus.value || 'Public';
+
+            if (!name || !formId || !description) {
+                step9Error.textContent = 'Name, ID, and description are required.';
+                return;
+            }
+            if (!counties.length) {
+                step9Error.textContent = 'Select at least one county.';
+                return;
+            }
+
+            publishFormBtn.disabled = true;
+            step9Status.textContent = '9';
+            step9Status.classList.remove('complete', 'error');
+
+            try {
+                const fd = new FormData();
+                fd.append('pdf', sanitizedPdfFile, pdfFileName);
+                fd.append('formHtml', lastGeneratedFormHtml);
+                fd.append('formConfig', JSON.stringify(lastFormConfig || {}));
+                fd.append('fieldConfig', JSON.stringify(lastFieldConfig || {}));
+                fd.append('name', name);
+                fd.append('formId', formId);
+                fd.append('description', description);
+                fd.append('folderName', folderName);
+                fd.append('htmlFileName', htmlFileName);
+                fd.append('pdfFileName', pdfFileName);
+                fd.append('defendant', defendant);
+                fd.append('status', status);
+                fd.append('counties', JSON.stringify(counties));
+
+                const response = await fetch('/api/auto-form/publish', {
+                    method: 'POST',
+                    body: fd,
+                });
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Failed to publish form');
+                }
+                markStep9Complete(data);
+            } catch (err) {
+                console.error('Publish error:', err);
+                step9Error.textContent = err.message || 'Failed to publish form.';
+                step9Status.textContent = '!';
+                step9Status.classList.add('error');
+                publishFormBtn.disabled = false;
+            }
+        }
+
+        publishFormBtn.addEventListener('click', publishFormToSite);
+        publishFormName?.addEventListener('input', () => {
+            if (!publishFormFolder.value.trim()) {
+                publishFormFolder.value = toFolderName(publishFormName.value);
+            }
+            syncPublishUrlBase();
+        });
+        publishFormFolder?.addEventListener('input', syncPublishUrlBase);
+        publishFormId?.addEventListener('input', syncPublishUrlBase);
 
         function setStep8PreviewMode(showHtmlSource) {
             step8ShowingHtmlSource = showHtmlSource;
@@ -2300,6 +2953,7 @@
             step2Status.setAttribute('aria-label', 'Step 2 complete');
             step2Complete = true;
             unlockStep3();
+            scheduleSaveDemoState();
         }
 
         function markStep3Complete(extractionPayload) {
@@ -2310,6 +2964,8 @@
             step3Complete = true;
             lastExtractionPayload = extractionPayload;
             unlockStep4();
+            scheduleSaveDemoState();
+            saveCurrentDataDump('step-3-extraction');
         }
 
         function markStep4Complete() {
@@ -2318,6 +2974,8 @@
             step4Status.setAttribute('aria-label', 'Step 4 complete');
             step4Results.classList.add('visible');
             unlockStep5();
+            scheduleSaveDemoState();
+            saveCurrentDataDump('step-4-field-config');
         }
 
         function markStep5Complete(renamedCount) {
@@ -2329,6 +2987,7 @@
             sanitizePdfSuccessText.textContent = `✓ PDF sanitized (${renamedCount} field name${renamedCount === 1 ? '' : 's'} renamed)`;
             step5Complete = true;
             unlockStep6();
+            scheduleSaveDemoState();
         }
 
         function markStep5Error() {
@@ -2345,6 +3004,8 @@
             unlockStep7();
             markStep7Complete();
             unlockStep8();
+            scheduleSaveDemoState();
+            saveCurrentDataDump('step-6-form-config');
         }
 
         function markStep6Error() {
@@ -2542,6 +3203,10 @@
             step8Status.classList.add('complete');
             step8Status.setAttribute('aria-label', 'Step 8 complete');
             step8Results.classList.add('visible');
+            unlockStep9();
+            populateStep9Fields();
+            scheduleSaveDemoState();
+            saveCurrentDataDump('step-8-generated-html');
         }
 
         function markStep8Error() {
@@ -2858,6 +3523,7 @@
                     loadSystemForms()
                 ]);
                 markStepComplete();
+                await restoreDemoState();
             } catch (err) {
                 console.error('Step 1 data load error:', err);
                 loginError.textContent = 'Signed in, but failed to load profile or forms. Check console for details.';
@@ -3112,11 +3778,100 @@
             return document.querySelector('input[name="form-html-mode"]:checked')?.value || 'dev';
         }
 
+        function getSelectedTemplateSource() {
+            return document.querySelector('input[name="form-template-source"]:checked')?.value || 'default';
+        }
+
+        function getActiveTemplateHtml() {
+            if (getSelectedTemplateSource() === 'custom') {
+                if (!customFormTemplateHtml) {
+                    throw new Error('Upload a custom HTML template or switch to the default template.');
+                }
+                return customFormTemplateHtml;
+            }
+            if (!defaultFormTemplateReady && window.FormHtmlRenderer) {
+                throw new Error('Default form template is still loading — try again in a moment.');
+            }
+            return null;
+        }
+
+        function updateCustomTemplateUploadVisibility() {
+            const isCustom = getSelectedTemplateSource() === 'custom';
+            if (customTemplateUpload) customTemplateUpload.style.display = isCustom ? 'block' : 'none';
+        }
+
         function applyFormConfigMetadata(formConfig) {
             if (!formConfig) return formConfig;
             formConfig.htmlMode = getSelectedHtmlMode();
+            formConfig.templateSource = getSelectedTemplateSource();
+            if (customFormTemplateName) formConfig.templateFileName = customFormTemplateName;
             if (lastPdfToken) formConfig.pdfToken = lastPdfToken;
             return formConfig;
+        }
+
+        document.querySelectorAll('input[name="form-template-source"]').forEach((input) => {
+            input.addEventListener('change', () => {
+                updateCustomTemplateUploadVisibility();
+                if (lastFormConfig) {
+                    applyFormConfigMetadata(lastFormConfig);
+                    if (formConfigJsonEl.textContent) {
+                        formConfigJsonEl.textContent = JSON.stringify(lastFormConfig, null, 2);
+                    }
+                }
+            });
+        });
+
+        function loadCustomTemplateFile(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                const text = String(reader.result || '');
+                if (!text.includes('__AUTO_FORM_BODY__')) {
+                    step6Error.textContent = 'Custom template must contain the __AUTO_FORM_BODY__ placeholder.';
+                    customFormTemplateHtml = null;
+                    customFormTemplateName = null;
+                    if (customTemplateLabel) customTemplateLabel.textContent = 'Choose custom template HTML or drag & drop';
+                    return;
+                }
+                customFormTemplateHtml = text;
+                customFormTemplateName = file.name;
+                step6Error.textContent = '';
+                if (customTemplateLabel) customTemplateLabel.textContent = `✓ ${file.name}`;
+            };
+            reader.onerror = () => {
+                step6Error.textContent = 'Failed to read template file.';
+            };
+            reader.readAsText(file);
+        }
+
+        if (customTemplateInput) {
+            customTemplateInput.addEventListener('change', (e) => {
+                const file = e.target.files?.[0];
+                loadCustomTemplateFile(file);
+            });
+        }
+
+        if (customTemplateUploadZone) {
+            customTemplateUploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                customTemplateUploadZone.style.borderColor = 'var(--blue)';
+            });
+            customTemplateUploadZone.addEventListener('dragleave', () => {
+                customTemplateUploadZone.style.borderColor = 'var(--border)';
+            });
+            customTemplateUploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                customTemplateUploadZone.style.borderColor = 'var(--border)';
+                const file = e.dataTransfer?.files?.[0];
+                loadCustomTemplateFile(file);
+            });
+            customTemplateUploadZone.addEventListener('click', () => customTemplateInput?.click());
+        }
+
+        if (window.FormHtmlRenderer?.preloadDefaultTemplate) {
+            FormHtmlRenderer.preloadDefaultTemplate()
+                .then(() => { defaultFormTemplateReady = true; })
+                .catch((err) => console.error('Failed to preload form template:', err));
         }
 
         document.querySelectorAll('input[name="form-html-mode"]').forEach((input) => {
@@ -3212,7 +3967,8 @@
             return FormHtmlRenderer.build(lastFormConfig, lastUserProfile || {}, {
                 firebaseConfig,
                 htmlMode: getSelectedHtmlMode(),
-                pdfToken: lastPdfToken || lastFormConfig.pdfToken || null
+                pdfToken: lastPdfToken || lastFormConfig.pdfToken || null,
+                templateHtml: getActiveTemplateHtml()
             });
         }
 
@@ -3334,6 +4090,8 @@
         logoutBtn.addEventListener('click', async () => {
             await auth.signOut();
         });
+
+        document.getElementById('hard-reset-btn')?.addEventListener('click', hardResetDemo);
 
         auth.onAuthStateChanged(async (user) => {
             loginBtn.disabled = false;

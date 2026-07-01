@@ -1,8 +1,16 @@
 /**
- * Builds a standalone HTML form preview from form_config.json + user profile.
+ * Builds standalone HTML forms from form_config.json + FormStar template shell.
+ * Default template: form-template.html (derived from example.html).
  */
 (function (global) {
   'use strict';
+
+  const PLACEHOLDER_BODY = '__AUTO_FORM_BODY__';
+  const PLACEHOLDER_TITLE = '__FORM_TITLE__';
+  const PLACEHOLDER_RUNTIME = '__AUTO_FORM_RUNTIME_SCRIPTS__';
+  const DEFAULT_TEMPLATE_URL = '/Auto-Form-Creator/form-template.html';
+
+  let cachedDefaultTemplate = null;
 
   function esc(str) {
     return String(str ?? '')
@@ -20,7 +28,7 @@
     if (!devMode || !block?.autopopulate?.enabled) return '';
     const badge = block.autopopulate.availableInProfile ? 'autofill-ready' : 'autofill-learn';
     const badgeText = block.autopopulate.availableInProfile ? 'Autofill available' : 'Will save to profile';
-    return `<div class="autopopulate-badge ${badge}">${badgeText}</div>`;
+    return `<div class="autopopulate-badge ${badge}" style="margin-top:10px;font-size:0.78rem;font-weight:700;padding:4px 10px;border-radius:999px;display:inline-block;background:${badge === 'autofill-ready' ? '#d1fae5' : '#fef3c7'};color:${badge === 'autofill-ready' ? '#065f46' : '#92400e'};">${badgeText}</div>`;
   }
 
   function getAutofillValue(block, userProfile) {
@@ -44,18 +52,19 @@
     const pd = question.autopopulate?.profileDescription
       ? ` data-profile-description="${esc(question.autopopulate.profileDescription)}"`
       : '';
+    const qid = question.questionId != null ? ` data-question-id="${esc(question.questionId)}"` : '';
 
     if (type === 'bigParagraph') {
-      return `<textarea id="${esc(nameId)}" name="${esc(nameId)}" rows="4" placeholder="${esc(question.placeholder || '')}"${ap}${pk}${pd}>${val}</textarea>`;
+      return `<textarea class="address-input" id="${esc(nameId)}" name="${esc(nameId)}" rows="4" placeholder="${esc(question.placeholder || '')}"${ap}${pk}${pd}${qid} style="width:80%;max-width:400px;height:auto;">${val}</textarea>`;
     }
     if (type === 'date') {
-      return `<input type="date" id="${esc(nameId)}" name="${esc(nameId)}" value="${val}"${ap}${pk}${pd}>`;
+      return `<input type="date" class="address-input" id="${esc(nameId)}" name="${esc(nameId)}" value="${val}"${ap}${pk}${pd}${qid}>`;
     }
     if (type === 'phone') {
-      return `<input type="tel" id="${esc(nameId)}" name="${esc(nameId)}" value="${val}" placeholder="${esc(question.placeholder || '')}"${ap}${pk}${pd}>`;
+      return `<input type="tel" class="address-input" id="${esc(nameId)}" name="${esc(nameId)}" value="${val}" placeholder="${esc(question.placeholder || '')}"${ap}${pk}${pd}${qid}>`;
     }
     if (type === 'money') {
-      return `<input type="number" step="0.01" id="${esc(nameId)}" name="${esc(nameId)}" value="${val}" placeholder="${esc(question.placeholder || '')}"${ap}${pk}${pd}>`;
+      return `<input type="number" step="0.01" class="address-input" id="${esc(nameId)}" name="${esc(nameId)}" value="${val}" placeholder="${esc(question.placeholder || '')}"${ap}${pk}${pd}${qid}>`;
     }
     if (type === 'dropdown') {
       const opts = (question.options || []).map((o) => {
@@ -64,17 +73,18 @@
         const selected = String(val).toLowerCase() === String(v).toLowerCase() ? ' selected' : '';
         return `<option value="${esc(v)}"${selected}>${esc(label)}</option>`;
       }).join('');
-      return `<select id="${esc(nameId)}" name="${esc(nameId)}"${ap}${pk}${pd}><option value="" disabled${val ? '' : ' selected'}>Select…</option>${opts}</select>`;
+      return `<select class="address-select" id="${esc(nameId)}" name="${esc(nameId)}"${ap}${pk}${pd}${qid}><option value="" disabled${val ? '' : ' selected'}>Select an option</option>${opts}</select>`;
     }
     if (type === 'checkbox') {
       return (question.options || []).map((opt) => {
+        const optName = opt.nameId || nameId;
         const checked = val && String(val).toLowerCase() === String(opt.value || opt.label).toLowerCase() ? ' checked' : '';
         const optAp = opt.autopopulate?.enabled ? ' data-autopopulate="true"' : ap;
         const optPk = opt.autopopulate?.profileKey ? ` data-profile-key="${esc(opt.autopopulate.profileKey)}"` : pk;
         const optPd = opt.autopopulate?.profileDescription
           ? ` data-profile-description="${esc(opt.autopopulate.profileDescription)}"`
           : pd;
-        return `<label class="checkbox-option"><input type="checkbox" name="${esc(opt.nameId)}" value="${esc(opt.value || opt.label)}"${checked}${optAp}${optPk}${optPd}> ${esc(opt.label)}</label>`;
+        return `<label class="checkbox-option" style="display:block;margin:8px 0;"><input type="checkbox" name="${esc(optName)}" value="${esc(opt.value || opt.label)}"${checked}${optAp}${optPk}${optPd}> ${esc(opt.label)}</label>`;
       }).join('');
     }
     if (type === 'multipleTextboxes') {
@@ -86,57 +96,152 @@
           ? ` data-profile-description="${esc(tb.autopopulate.profileDescription)}"`
           : '';
         const tbBadge = autopopulateBadgeHtml(tb, devMode);
-        return `<div class="textbox-group"><label for="${esc(tb.nameId)}">${esc(tb.label || tb.nameId)}</label><input type="text" id="${esc(tb.nameId)}" name="${esc(tb.nameId)}" value="${tbVal}" placeholder="${esc(tb.placeholder || '')}"${tbAp}${tbPk}${tbPd}>${tbBadge}</div>`;
+        return `<div class="address-field textbox-group"><label for="${esc(tb.nameId)}">${esc(tb.label || tb.nameId)}</label><input type="text" class="address-input" id="${esc(tb.nameId)}" name="${esc(tb.nameId)}" value="${tbVal}" placeholder="${esc(tb.placeholder || '')}"${tbAp}${tbPk}${tbPd}>${tbBadge}</div>`;
       }).join('');
     }
-    return `<input type="text" id="${esc(nameId)}" name="${esc(nameId)}" value="${val}" placeholder="${esc(question.placeholder || '')}"${ap}${pk}${pd}>`;
+    return `<input type="text" class="address-input" id="${esc(nameId)}" name="${esc(nameId)}" value="${val}" placeholder="${esc(question.placeholder || '')}"${ap}${pk}${pd}${qid}>`;
   }
 
-  function buildFirebaseHead(firebaseConfig) {
-    if (!firebaseConfig) return '';
-    return `
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"><\/script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"><\/script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"><\/script>`;
+  function buildStepperStylesHtml() {
+    return `<style id="auto-form-stepper-styles">
+.stepper-progress-bar{display:flex;align-items:center;justify-content:center;margin:12px auto 0;width:100%;max-width:700px;background:none;gap:0}
+.stepper-step{display:flex;flex-direction:column;align-items:center;position:relative;z-index:2;min-width:90px;flex-shrink:0}
+.stepper-circle{width:32px;height:32px;border-radius:50%;background:#e0e7ef;color:#2c3e50;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;border:2px solid #4f8cff;transition:background .3s,color .3s,border .3s}
+.stepper-step.active .stepper-circle,.stepper-step.completed .stepper-circle{background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%);color:#fff;border:2px solid #38d39f}
+.stepper-label{margin-top:8px;font-size:15px;color:#2c3e50;font-weight:600;text-align:center;min-width:80px}
+.stepper-step.completed .stepper-label{color:#38d39f}
+.stepper-step.active .stepper-label{color:#4f8cff}
+.stepper-line{flex:1 1 40px;min-width:24px;height:4px;background:#e0e7ef;margin:0;position:relative;z-index:1;align-self:flex-start;margin-top:14px;transition:background .5s cubic-bezier(.4,1.4,.6,1)}
+.stepper-line.filled{background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%)}
+.section{display:none}
+.section.active{display:block}
+.question-header{display:flex;align-items:flex-start;justify-content:center;gap:10px;margin-bottom:8px}
+.question-header .question-text{margin:0;flex:1;text-align:center}
+.question-info-wrap{position:relative;flex-shrink:0;margin-top:2px}
+.question-info-btn{width:22px;height:22px;border-radius:50%;border:1.5px solid #4f8cff;background:#eef4ff;color:#1d4ed8;font-size:13px;font-weight:800;line-height:1;cursor:pointer;padding:0;display:inline-flex;align-items:center;justify-content:center;font-family:Georgia,serif}
+.question-info-btn:hover,.question-info-btn:focus{background:#4f8cff;color:#fff;outline:none}
+.question-info-tooltip{display:none;position:absolute;left:50%;transform:translateX(-50%);top:calc(100% + 8px);min-width:220px;max-width:320px;padding:10px 12px;background:#1f2937;color:#f9fafb;border-radius:10px;font-size:13px;line-height:1.45;font-weight:500;text-align:left;box-shadow:0 8px 24px rgba(15,23,42,.22);z-index:20}
+.question-info-tooltip::before{content:'';position:absolute;top:-6px;left:50%;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid #1f2937}
+.question-info-wrap.open .question-info-tooltip{display:block}
+.checkbox-group-label{display:block;margin:0 0 12px;font-weight:600;color:#1f3a60;text-align:center}
+</style>`;
   }
 
-  function buildFirebaseAuthPanel() {
-    return `
-<div class="auth-panel" id="auth-panel">
-  <div class="auth-panel-inner">
-    <strong id="auth-status">Sign in to load and save your profile autofill</strong>
-    <form id="standalone-login-form" class="auth-form">
-      <input type="email" id="standalone-login-email" placeholder="Email" required autocomplete="username">
-      <input type="password" id="standalone-login-password" placeholder="Password" required autocomplete="current-password">
-      <button type="submit">Sign In</button>
-    </form>
-    <button type="button" id="standalone-logout-btn" class="auth-logout" style="display:none;">Sign Out</button>
-    <div class="auth-error" id="standalone-auth-error"></div>
-  </div>
-</div>`;
+  function buildStepperHtml(sections) {
+    if (!sections || sections.length < 2) return '';
+    const steps = sections.map((section, idx) => {
+      const stepNum = section.sectionId != null ? section.sectionId : idx + 1;
+      const label = esc(section.sectionName || `Section ${stepNum}`);
+      const stepHtml = `<div class="stepper-step" data-step="${stepNum}"><div class="stepper-circle">${stepNum}</div><div class="stepper-label">${label}</div></div>`;
+      if (idx < sections.length - 1) {
+        return stepHtml + '<div class="stepper-line"></div>';
+      }
+      return stepHtml;
+    }).join('');
+    return `<div class="stepper-progress-bar" id="stepperProgressBar">${steps}</div>`;
   }
 
-  function buildRuntimeScript(firebaseConfig, devMode) {
+  function buildQuestionHeaderHtml(question, questionText) {
+    const needsExplanation = question.needsExplanation && String(question.explanation || '').trim();
+    let html = '<div class="question-header">';
+    html += `<h3 class="question-text">${esc(questionText)}</h3>`;
+    if (needsExplanation) {
+      const tip = esc(question.explanation);
+      html += `<div class="question-info-wrap">`;
+      html += `<button type="button" class="question-info-btn" aria-label="More information about this question" aria-describedby="question-info-${esc(question.questionId)}">i</button>`;
+      html += `<div class="question-info-tooltip" id="question-info-${esc(question.questionId)}" role="tooltip">${tip}</div>`;
+      html += `</div>`;
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function buildQuestionContainer(question, globalIndex, sectionId, questionIndexInSection, userProfile, devMode, oneAtATime) {
+    const questionId = question.questionId != null ? question.questionId : globalIndex;
+    const questionText = devMode ? question.text : stripQuestionNumber(question.text);
+    const visibilityClasses = [];
+    if (oneAtATime && questionIndexInSection > 1) {
+      visibilityClasses.push('question-step-hidden');
+    }
+    const hiddenClass = visibilityClasses.length ? ' ' + visibilityClasses.join(' ') : '';
+
+    let html = `<div id="question-container-${globalIndex}" data-question-id="${esc(questionId)}" class="question-container question-item${hiddenClass}" data-section="${esc(sectionId)}" data-question-index="${questionIndexInSection}">`;
+    html += buildQuestionHeaderHtml(question, questionText);
+    if (question.type === 'checkbox' && (question.options || []).length > 1) {
+      html += `<div class="checkbox-group checkbox-group-${esc(questionId)}">`;
+    }
+    html += renderInput(question, userProfile, devMode);
+    if (question.type === 'checkbox' && (question.options || []).length > 1) {
+      html += '</div>';
+    }
+    if (devMode && question.autopopulate?.enabled && question.type !== 'multipleTextboxes') {
+      html += autopopulateBadgeHtml(question, devMode);
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function buildSectionsHtml(formConfig, userProfile, devMode) {
+    const sections = formConfig.sections || [];
+    const oneAtATime = formConfig.displayMode === 'one_at_a_time';
+    let globalIndex = 0;
+    let html = buildStepperStylesHtml() + buildStepperHtml(sections);
+
+    sections.forEach((section, sectionIdx) => {
+      const sectionId = section.sectionId != null ? section.sectionId : sectionIdx + 1;
+      const sectionActive = sectionIdx === 0 ? ' active' : '';
+      const sectionName = esc(section.sectionName || `Section ${sectionId}`);
+      const questions = section.questions || [];
+      const isLastSection = sectionIdx === sections.length - 1;
+
+      html += `<div id="section${sectionId}" class="section${sectionActive}">`;
+      html += `<center><h1 class="section-title">${sectionName}</h1>`;
+
+      questions.forEach((question, qIdx) => {
+        globalIndex += 1;
+        html += buildQuestionContainer(
+          question,
+          globalIndex,
+          sectionId,
+          qIdx + 1,
+          userProfile,
+          devMode,
+          oneAtATime
+        );
+      });
+
+      html += `<div class="question-nav" data-section-index="${sectionId}">`;
+      html += `<button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="${sectionId}">&larr;</button>`;
+      html += `<button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="${sectionId}">&rarr;</button>`;
+      html += '</div>';
+      html += '<br><br>';
+      html += '<div class="navigation-buttons" style="display:none;">';
+      if (isLastSection) {
+        html += '<button type="submit" class="next-button">Submit</button>';
+      } else {
+        html += '<button type="button" onclick="goBack()">Back</button>';
+      }
+      html += '</div></div>';
+    });
+
+    return html;
+  }
+
+  function buildRuntimeScripts(firebaseConfig, devMode, pdfToken, userProfile, displayMode) {
     const configJson = firebaseConfig ? JSON.stringify(firebaseConfig) : 'null';
+    const profileJson = JSON.stringify(userProfile || {});
+    const tokenJson = JSON.stringify(pdfToken || null);
     const devModeLiteral = devMode ? 'true' : 'false';
+    const displayModeLiteral = JSON.stringify(displayMode || 'all_at_once');
+
     return `
+<script>
 (function(){
-  var userProfile = __PROFILE_JSON__;
+  var userProfile = ${profileJson};
   var firebaseConfig = ${configJson};
   var devMode = ${devModeLiteral};
-  var toast = document.getElementById('profile-toast');
-  var toastTimer = null;
-  var auth = null;
-  var db = null;
-  var currentUser = null;
-
-  function showToast(msg) {
-    if (!devMode || !toast) return;
-    toast.textContent = msg || 'Profile updated';
-    toast.classList.add('visible');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ toast.classList.remove('visible'); }, 1800);
-  }
+  var pdfToken = ${tokenJson};
+  var displayMode = ${displayModeLiteral};
 
   function fieldValue(el) {
     if (el.type === 'checkbox') return el.checked ? el.value : '';
@@ -154,6 +259,8 @@
       badge.textContent = 'Autofill available';
       badge.classList.remove('autofill-learn');
       badge.classList.add('autofill-ready');
+      badge.style.background = '#d1fae5';
+      badge.style.color = '#065f46';
     }
   }
 
@@ -164,8 +271,6 @@
       var val = userProfile[key];
       if (el.type === 'checkbox') {
         el.checked = String(val).toLowerCase() === String(el.value).toLowerCase();
-      } else if (el.tagName === 'SELECT') {
-        el.value = val;
       } else {
         el.value = val;
       }
@@ -182,15 +287,16 @@
     if (val === '') return;
     userProfile[key] = val;
     if (!userProfile[key + '_description']) userProfile[key + '_description'] = desc;
-    showToast('Saved: ' + desc);
     if (window.parent !== window) {
       window.parent.postMessage({ type: 'formstar-profile-update', key: key, value: val, description: desc }, '*');
     }
-    if (persist && db && currentUser) {
+    if (persist && typeof firebase !== 'undefined' && firebase.auth && firebase.firestore) {
+      var user = firebase.auth().currentUser;
+      if (!user) return;
       var updates = {};
       updates[key] = val;
       updates[key + '_description'] = userProfile[key + '_description'] || desc;
-      db.collection('users').doc(currentUser.uid).set(updates, { merge: true }).catch(function(err) {
+      firebase.firestore().collection('users').doc(user.uid).set(updates, { merge: true }).catch(function(err) {
         console.error('Profile save error:', err);
       });
     }
@@ -202,101 +308,21 @@
     el.addEventListener('blur', function(){ syncProfileFromInput(el, true); });
   });
 
-  function initFirebase() {
-    if (!firebaseConfig || typeof firebase === 'undefined') return;
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    auth = firebase.auth();
-    db = firebase.firestore();
-
-    var authPanel = document.getElementById('auth-panel');
-    var authStatus = document.getElementById('auth-status');
-    var loginForm = document.getElementById('standalone-login-form');
-    var logoutBtn = document.getElementById('standalone-logout-btn');
-    var authError = document.getElementById('standalone-auth-error');
-
-    function setSignedIn(user) {
-      currentUser = user;
-      if (authPanel) authPanel.classList.toggle('signed-in', !!user);
-      if (loginForm) loginForm.style.display = user ? 'none' : 'flex';
-      if (logoutBtn) logoutBtn.style.display = user ? 'inline-block' : 'none';
-      if (authStatus) {
-        authStatus.textContent = user
-          ? 'Signed in as ' + (user.email || user.uid)
-          : 'Sign in to load and save your profile autofill';
-      }
-    }
-
-    auth.onAuthStateChanged(function(user) {
-      setSignedIn(user);
-      if (!user || !db) return;
-      db.collection('users').doc(user.uid).get().then(function(doc) {
+  if (firebaseConfig && typeof firebase !== 'undefined' && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  if (typeof firebase !== 'undefined' && firebase.auth) {
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (!user || !firebase.firestore) return;
+      firebase.firestore().collection('users').doc(user.uid).get().then(function(doc) {
         if (doc.exists) {
           userProfile = Object.assign({}, userProfile, doc.data() || {});
           applyProfileToForm();
         }
-      }).catch(function(err) {
-        console.error('Profile load error:', err);
       });
     });
-
-    if (loginForm) {
-      loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        if (authError) authError.textContent = '';
-        var email = document.getElementById('standalone-login-email').value.trim();
-        var password = document.getElementById('standalone-login-password').value;
-        auth.signInWithEmailAndPassword(email, password).catch(function(err) {
-          if (authError) authError.textContent = err.message || 'Sign in failed';
-        });
-      });
-    }
-
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', function() {
-        auth.signOut();
-      });
-    }
   }
-
-  initFirebase();
   applyProfileToForm();
-
-  var containers = Array.from(document.querySelectorAll('.question-container'));
-  var current = 0;
-  var prevBtn = document.getElementById('prev-btn');
-  var nextBtn = document.getElementById('next-btn');
-  var indicator = document.getElementById('step-indicator');
-
-  function showQuestion(idx) {
-    containers.forEach(function(c, i){ c.classList.toggle('hidden', i !== idx); });
-    current = idx;
-    if (prevBtn) prevBtn.disabled = idx <= 0;
-    if (nextBtn) nextBtn.disabled = idx >= containers.length - 1;
-    if (indicator) {
-      indicator.textContent = devMode
-        ? 'Question ' + (idx + 1) + ' of ' + containers.length
-        : '';
-    }
-  }
-
-  if (prevBtn && nextBtn && containers.length > 1) {
-    prevBtn.addEventListener('click', function(){ if (current > 0) showQuestion(current - 1); });
-    nextBtn.addEventListener('click', function(){ if (current < containers.length - 1) showQuestion(current + 1); });
-    showQuestion(0);
-  }
-})();`;
-  }
-
-  function buildSubmitScript(pdfToken) {
-    const tokenJson = JSON.stringify(pdfToken || null);
-    return `
-(function(){
-  var pdfToken = ${tokenJson};
-  var submitBtn = document.getElementById('submit-form-btn');
-  var submitStatus = document.getElementById('submit-status');
-  var previewSection = document.getElementById('pdf-preview-section');
-  var previewFrame = document.getElementById('filled-pdf-preview');
-  var previewUrl = null;
 
   function formatDateForServer(dateString) {
     if (!dateString) return '';
@@ -307,18 +333,12 @@
     return dateString;
   }
 
-  function setSubmitStatus(msg, isError) {
-    if (!submitStatus) return;
-    submitStatus.textContent = msg || '';
-    submitStatus.className = isError ? 'submit-status error' : 'submit-status';
-  }
-
   function collectFormData() {
-    var form = document.getElementById('generated-form');
+    var form = document.getElementById('customForm');
     var fd = new FormData();
     if (!form) return fd;
     form.querySelectorAll('input, textarea, select').forEach(function(el) {
-      if (!el.name || el.disabled || el.id === 'submit-form-btn') return;
+      if (!el.name || el.disabled || el.type === 'file') return;
       if (el.type === 'checkbox') {
         if (el.checked) fd.append(el.name, 'on');
       } else if (el.type === 'radio') {
@@ -332,14 +352,202 @@
     return fd;
   }
 
-  async function submitForm() {
-    if (!pdfToken) {
-      setSubmitStatus('PDF template not available. Re-run Step 5 in the Auto-Form Creator demo.', true);
+  function updateStepperProgress() {
+    var stepper = document.getElementById('stepperProgressBar');
+    if (!stepper) return;
+    var activeSection = document.querySelector('.section.active');
+    var activeStep = 1;
+    if (activeSection && activeSection.id) {
+      var m = activeSection.id.match(/^section(\\d+)$/);
+      if (m) activeStep = parseInt(m[1], 10);
+    }
+    stepper.querySelectorAll('.stepper-step').forEach(function(step, idx) {
+      step.classList.remove('active', 'completed');
+      if (idx + 1 < activeStep) step.classList.add('completed');
+      else if (idx + 1 === activeStep) step.classList.add('active');
+    });
+    stepper.querySelectorAll('.stepper-line').forEach(function(line, idx) {
+      if (idx < activeStep - 1) line.classList.add('filled');
+      else line.classList.remove('filled');
+    });
+  }
+
+  function wireStepperClicks() {
+    var stepper = document.getElementById('stepperProgressBar');
+    if (!stepper) return;
+    stepper.querySelectorAll('.stepper-step').forEach(function(step) {
+      step.style.cursor = 'pointer';
+      step.addEventListener('click', function() {
+        var stepNum = step.getAttribute('data-step');
+        if (!stepNum) return;
+        if (typeof window.navigateSection === 'function') {
+          window.navigateSection(parseInt(stepNum, 10));
+        } else {
+          document.querySelectorAll('.section').forEach(function(sec) { sec.classList.remove('active'); });
+          var target = document.getElementById('section' + stepNum);
+          if (target) target.classList.add('active');
+          updateStepperProgress();
+        }
+      });
+    });
+  }
+
+  window.currentSectionNumber = 1;
+  window.sectionStack = [];
+
+  window.updateProgressBar = updateStepperProgress;
+
+  window.navigateSection = function(sectionNumber, isBackNavigation) {
+    var sections = document.querySelectorAll('.section');
+    var thankYou = document.getElementById('thankYouMessage');
+    var form = document.getElementById('customForm');
+    sections.forEach(function(sec) { sec.classList.remove('active'); });
+    if (thankYou) thankYou.style.display = 'none';
+    if (form) form.style.display = 'block';
+    if (sectionNumber === 'end') {
+      if (form) form.style.display = 'none';
+      if (thankYou) thankYou.style.display = 'block';
+      window.currentSectionNumber = 'end';
+      updateStepperProgress();
       return;
     }
-    setSubmitStatus('Generating filled PDF…');
-    if (submitBtn) submitBtn.disabled = true;
+    var num = parseInt(sectionNumber, 10);
+    if (isNaN(num)) return;
+    var maxSection = sections.length;
+    if (num < 1) num = 1;
+    if (num > maxSection) num = maxSection;
+    if (!isBackNavigation && typeof window.currentSectionNumber === 'number' && window.currentSectionNumber !== num) {
+      window.sectionStack.push(window.currentSectionNumber);
+    }
+    var target = document.getElementById('section' + num);
+    if (target) target.classList.add('active');
+    else if (sections[num - 1]) sections[num - 1].classList.add('active');
+    window.currentSectionNumber = num;
+    updateStepperProgress();
+    var sectionId = 'section' + num;
+    if (window.questionNavControllers && typeof window.questionNavControllers[sectionId] === 'function') {
+      window.questionNavControllers[sectionId](0);
+    }
+  };
 
+  window.goBack = function() {
+    if (window.sectionStack.length > 0) {
+      var prev = window.sectionStack.pop();
+      var prevNum = typeof prev === 'string' ? parseInt(prev, 10) : prev;
+      if (!isNaN(prevNum) && prevNum >= 1) {
+        window.navigateSection(prevNum, true);
+        return;
+      }
+    }
+    if (typeof window.currentSectionNumber === 'number' && window.currentSectionNumber > 1) {
+      window.navigateSection(window.currentSectionNumber - 1, true);
+    }
+  };
+
+  window.validateAndProceed = function() {
+    return false;
+  };
+
+  function wireQuestionInfoIcons() {
+    document.querySelectorAll('.question-info-btn').forEach(function(btn) {
+      var wrap = btn.closest('.question-info-wrap');
+      if (!wrap || btn.dataset.infoWired === 'true') return;
+      btn.dataset.infoWired = 'true';
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var isOpen = wrap.classList.contains('open');
+        document.querySelectorAll('.question-info-wrap.open').forEach(function(el) { el.classList.remove('open'); });
+        if (!isOpen) wrap.classList.add('open');
+      });
+      btn.addEventListener('mouseenter', function() { wrap.classList.add('open'); });
+      btn.addEventListener('mouseleave', function() {
+        setTimeout(function() {
+          if (!wrap.matches(':hover')) wrap.classList.remove('open');
+        }, 120);
+      });
+      wrap.addEventListener('mouseleave', function() { wrap.classList.remove('open'); });
+    });
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.question-info-wrap')) {
+        document.querySelectorAll('.question-info-wrap.open').forEach(function(el) { el.classList.remove('open'); });
+      }
+    });
+  }
+
+  window.goBackToForm = function() {
+    var thankYou = document.getElementById('thankYouMessage');
+    var questions = document.getElementById('questions');
+    var form = document.getElementById('customForm');
+    if (thankYou) thankYou.style.display = 'none';
+    if (questions) questions.style.display = '';
+    if (form) form.style.display = 'block';
+    var previewSection = document.getElementById('pdf-preview-section');
+    if (previewSection) previewSection.hidden = true;
+    if (typeof window.navigateSection === 'function') {
+      var sections = document.querySelectorAll('.section');
+      var lastNum = sections.length || 1;
+      window.navigateSection(lastNum, true);
+    }
+  };
+
+  function showAutoFormThankYou(previewUrl) {
+    window.__lastFilledPdfUrl = previewUrl;
+    var form = document.getElementById('customForm');
+    var thankYou = document.getElementById('thankYouMessage');
+    var questions = document.getElementById('questions');
+    if (form) form.style.display = 'none';
+    if (questions) questions.style.display = 'none';
+    if (thankYou) {
+      thankYou.style.display = 'block';
+      var viewBtn = document.getElementById('autoFormViewPdfBtn');
+      if (!viewBtn) {
+        viewBtn = document.createElement('button');
+        viewBtn.id = 'autoFormViewPdfBtn';
+        viewBtn.type = 'button';
+        viewBtn.textContent = 'View Form';
+        viewBtn.style.cssText = 'font-size:1.2em;margin-bottom:16px;background:#2980b9;color:#fff;border:none;border-radius:8px;padding:12px 28px;cursor:pointer;font-weight:700;';
+        viewBtn.addEventListener('click', function() {
+          var previewSection = document.getElementById('pdf-preview-section');
+          var previewFrame = document.getElementById('filled-pdf-preview');
+          if (previewFrame && window.__lastFilledPdfUrl) previewFrame.src = window.__lastFilledPdfUrl;
+          if (previewSection) {
+            previewSection.hidden = false;
+            previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+        thankYou.insertBefore(viewBtn, thankYou.firstChild);
+      }
+    }
+    if (typeof window.updateProgressBar === 'function') window.updateProgressBar();
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    wireQuestionInfoIcons();
+    updateStepperProgress();
+    wireStepperClicks();
+    var observer = new MutationObserver(updateStepperProgress);
+    document.querySelectorAll('.section').forEach(function(sec) {
+      observer.observe(sec, { attributes: true, attributeFilter: ['class'] });
+    });
+    if (displayMode === 'all_at_once') {
+      setTimeout(function() {
+        document.querySelectorAll('.question-container.question-item').forEach(function(el) {
+          el.classList.remove('question-step-hidden');
+        });
+        document.querySelectorAll('.question-nav').forEach(function(nav) {
+          nav.style.display = 'none';
+        });
+      }, 150);
+    }
+  });
+
+  window.__autoFormHandleSubmit = async function(event) {
+    if (event) event.preventDefault();
+    if (!pdfToken) {
+      alert('PDF template not available. Re-run Step 5 in the Auto-Form Creator demo.');
+      return false;
+    }
     try {
       var fd = collectFormData();
       var res = await fetch('/api/auto-form/fill-pdf/' + encodeURIComponent(pdfToken), {
@@ -347,41 +555,46 @@
         body: fd,
         credentials: 'include'
       });
-
       if (!res.ok) {
         var errText = await res.text();
         var errMsg = 'HTTP ' + res.status;
-        try {
-          var errJson = JSON.parse(errText);
-          if (errJson.error) errMsg = errJson.error;
-        } catch (ignore) {
-          if (errText) errMsg = errText;
-        }
+        try { var errJson = JSON.parse(errText); if (errJson.error) errMsg = errJson.error; } catch (ignore) { if (errText) errMsg = errText; }
         throw new Error(errMsg);
       }
-
       var blob = await res.blob();
       if (!blob.size) throw new Error('Received empty PDF');
-
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-      previewUrl = URL.createObjectURL(blob);
+      var previewSection = document.getElementById('pdf-preview-section');
+      var previewFrame = document.getElementById('filled-pdf-preview');
+      var previewUrl = URL.createObjectURL(blob);
       if (previewFrame) previewFrame.src = previewUrl;
-      if (previewSection) previewSection.hidden = false;
-      setSubmitStatus('');
-      if (previewSection) previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      showAutoFormThankYou(previewUrl);
     } catch (err) {
       console.error('Submit error:', err);
-      setSubmitStatus(err.message || 'Failed to generate PDF preview', true);
-    } finally {
-      if (submitBtn) submitBtn.disabled = false;
+      alert(err.message || 'Failed to generate PDF preview');
     }
+    return false;
+  };
+})();
+<\/script>`;
   }
 
-  if (submitBtn) {
-    submitBtn.addEventListener('click', submitForm);
-    if (!pdfToken) submitBtn.title = 'PDF template not registered — complete Step 5 in the demo first';
+  function applyTemplate(templateHtml, replacements) {
+    let html = templateHtml;
+    Object.keys(replacements).forEach((key) => {
+      html = html.split(key).join(replacements[key]);
+    });
+    return html;
   }
-})();`;
+
+  function resolveTemplate(options) {
+    const templateHtml = options.templateHtml || cachedDefaultTemplate;
+    if (!templateHtml) {
+      throw new Error('Form template not loaded. Wait for the default template to load or upload a custom template.');
+    }
+    if (!templateHtml.includes(PLACEHOLDER_BODY)) {
+      throw new Error('Template must contain the placeholder ' + PLACEHOLDER_BODY);
+    }
+    return templateHtml;
   }
 
   function buildFormHtml(formConfig, userProfile, options) {
@@ -389,126 +602,48 @@
     const firebaseConfig = options.firebaseConfig || null;
     const htmlMode = options.htmlMode || formConfig.htmlMode || 'dev';
     const devMode = htmlMode !== 'normal';
-    const displayMode = formConfig.displayMode === 'one_at_a_time' ? 'one_at_a_time' : 'all_at_once';
-    const title = esc(formConfig.formTitle || 'Generated Form');
     const pdfToken = options.pdfToken || formConfig.pdfToken || null;
-    const profileJson = JSON.stringify(userProfile || {});
+    const title = esc(formConfig.formTitle || 'Generated Form');
+    const templateHtml = resolveTemplate(options);
 
-    let questionIndex = 0;
-    let body = '';
+    const bodyHtml = buildSectionsHtml(formConfig, userProfile || {}, devMode);
+    const runtimeScripts = buildRuntimeScripts(
+      firebaseConfig,
+      devMode,
+      pdfToken,
+      userProfile,
+      formConfig.displayMode
+    );
 
-    for (const section of formConfig.sections || []) {
-      body += `<section class="form-section"><h2 class="section-title">${esc(section.sectionName || 'Section')}</h2>`;
-
-      for (const question of section.questions || []) {
-        questionIndex += 1;
-        const hiddenClass = displayMode === 'one_at_a_time' && questionIndex > 1 ? ' hidden' : '';
-        const questionText = devMode ? question.text : stripQuestionNumber(question.text);
-        body += `<div class="question-container${hiddenClass}" id="question-container-${questionIndex}" data-question-index="${questionIndex}">`;
-        body += `<label><h3>${esc(questionText)}</h3></label>`;
-        body += renderInput(question, userProfile, devMode);
-        if (devMode && question.autopopulate?.enabled && question.type !== 'multipleTextboxes') {
-          body += autopopulateBadgeHtml(question, devMode);
-        }
-        body += '</div>';
-      }
-      body += '</section>';
-    }
-
-    const stepperIndicator = devMode
-      ? `<span id="step-indicator">Question 1 of ${questionIndex}</span>`
-      : '<span id="step-indicator" class="step-indicator-hidden" aria-hidden="true"></span>';
-    const stepperNav = displayMode === 'one_at_a_time'
-      ? `<div class="stepper-nav"><button type="button" id="prev-btn" disabled>Previous</button>${stepperIndicator}<button type="button" id="next-btn"${questionIndex <= 1 ? ' disabled' : ''}>Next</button></div>`
-      : '';
-    const submitSection = `
-      <div class="form-submit-row">
-        <button type="button" id="submit-form-btn" class="submit-form-btn"${pdfToken ? '' : ' disabled'}>Submit</button>
-        <span class="submit-status" id="submit-status"></span>
-      </div>`;
-
-    const runtimeScript = buildRuntimeScript(firebaseConfig, devMode).replace('__PROFILE_JSON__', profileJson);
-    const submitScript = buildSubmitScript(pdfToken);
-    const authPanel = devMode && firebaseConfig ? buildFirebaseAuthPanel() : '';
-    const formSubtitle = devMode
-      ? `<p class="form-subtitle">${displayMode === 'one_at_a_time' ? 'One question at a time' : 'All questions visible'}</p>`
-      : '';
-    const profileToast = devMode
-      ? '<div class="profile-toast" id="profile-toast">Profile updated</div>'
-      : '';
-    const bodyClass = devMode ? '' : ' class="normal-mode"';
-
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${title}</title>
-${buildFirebaseHead(firebaseConfig)}
-<style>
-  * { box-sizing: border-box; }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 24px; background: #f4f7fb; color: #2c3e50; }
-  body.normal-mode .auth-panel, body.normal-mode .autopopulate-badge, body.normal-mode .profile-toast { display: none !important; }
-  .form-wrap { max-width: 720px; margin: 0 auto; }
-  h1 { margin: 0 0 8px; color: #1e4996; }
-  body.normal-mode h1 { margin-bottom: 24px; }
-  .form-subtitle { color: #546e7a; margin-bottom: 24px; }
-  .auth-panel { background: #fff; border: 1px solid #c5ddf8; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
-  .auth-panel-inner { display: flex; flex-direction: column; gap: 10px; }
-  .auth-panel.signed-in { background: #f0fdf4; border-color: #bbf7d0; }
-  .auth-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .auth-form input { flex: 1 1 160px; padding: 8px 10px; border: 2px solid #dbeafe; border-radius: 8px; font: inherit; }
-  .auth-form button, .auth-logout { padding: 8px 14px; border: none; border-radius: 8px; background: #1e4996; color: #fff; font-weight: 700; cursor: pointer; font: inherit; }
-  .auth-logout { background: #546e7a; }
-  .auth-error { color: #b91c1c; font-size: 0.85rem; }
-  .form-section { margin-bottom: 28px; }
-  .section-title { font-size: 1.1rem; color: #1e4996; border-bottom: 2px solid #dbeafe; padding-bottom: 8px; }
-  .question-container { background: #fff; border: 1px solid #c5ddf8; border-radius: 12px; padding: 20px; margin: 14px 0; }
-  .question-container.hidden { display: none; }
-  .question-container h3 { margin: 0 0 12px; font-size: 1rem; font-weight: 600; }
-  input[type=text], input[type=tel], input[type=date], input[type=number], input[type=email], input[type=password], textarea, select {
-    width: 100%; padding: 10px 12px; border: 2px solid #dbeafe; border-radius: 8px; font: inherit;
-  }
-  .textbox-group { margin-bottom: 10px; }
-  .textbox-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; }
-  .checkbox-option { display: block; margin: 8px 0; }
-  .autopopulate-badge { margin-top: 10px; font-size: 0.78rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; display: inline-block; }
-  .autofill-ready { background: #d1fae5; color: #065f46; }
-  .autofill-learn { background: #fef3c7; color: #92400e; }
-  .stepper-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 20px 0; }
-  .stepper-nav button { padding: 10px 18px; border: none; border-radius: 8px; background: #1e4996; color: #fff; font-weight: 700; cursor: pointer; }
-  .stepper-nav button:disabled { opacity: 0.4; cursor: not-allowed; }
-  .step-indicator-hidden { display: none; }
-  .profile-toast { position: fixed; bottom: 16px; right: 16px; background: #1e4996; color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 0.85rem; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 1000; }
-  .profile-toast.visible { opacity: 1; }
-  .form-submit-row { margin: 28px 0 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
-  .submit-form-btn { padding: 12px 28px; border: none; border-radius: 10px; background: #1e4996; color: #fff; font: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; }
-  .submit-form-btn:hover:not(:disabled) { background: #163a78; }
-  .submit-form-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .submit-status { font-size: 0.88rem; color: #546e7a; }
-  .submit-status.error { color: #b91c1c; font-weight: 600; }
-  .pdf-preview-section { margin-top: 28px; }
-  .pdf-preview-title { margin: 0 0 12px; font-size: 1.05rem; color: #1e4996; }
-  .filled-pdf-frame { width: 100%; min-height: 720px; border: 1px solid #c5ddf8; border-radius: 12px; background: #fff; }
-</style>
-</head>
-<body${bodyClass}>
-<div class="form-wrap">
-  ${authPanel}
-  <h1>${title}</h1>
-  ${formSubtitle}
-  <form id="generated-form">${body}${stepperNav}${submitSection}</form>
-  <div class="pdf-preview-section" id="pdf-preview-section" hidden>
-    <h2 class="pdf-preview-title">Filled PDF Preview</h2>
-    <iframe id="filled-pdf-preview" class="filled-pdf-frame" title="Filled PDF preview"></iframe>
-  </div>
-</div>
-${profileToast}
-<script>${runtimeScript}<\/script>
-<script>${submitScript}<\/script>
-</body>
-</html>`;
+    return applyTemplate(templateHtml, {
+      [PLACEHOLDER_TITLE]: title,
+      [PLACEHOLDER_BODY]: bodyHtml,
+      [PLACEHOLDER_RUNTIME]: runtimeScripts
+    });
   }
 
-  global.FormHtmlRenderer = { build: buildFormHtml };
+  function preloadDefaultTemplate(url) {
+    url = url || DEFAULT_TEMPLATE_URL;
+    return fetch(url)
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to load form template (' + res.status + ')');
+        return res.text();
+      })
+      .then((text) => {
+        cachedDefaultTemplate = text;
+        return text;
+      });
+  }
+
+  function setDefaultTemplate(html) {
+    cachedDefaultTemplate = html;
+  }
+
+  global.FormHtmlRenderer = {
+    build: buildFormHtml,
+    preloadDefaultTemplate,
+    setDefaultTemplate,
+    PLACEHOLDER_BODY,
+    DEFAULT_TEMPLATE_URL
+  };
 })(typeof window !== 'undefined' ? window : globalThis);
