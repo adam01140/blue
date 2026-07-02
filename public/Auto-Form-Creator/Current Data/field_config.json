@@ -5,173 +5,98 @@
       "id": "form1[0].#subform[0].ORI[0]",
       "newName": "ori_code",
       "type": "text",
-      "label": "ORI",
-      "context": {
-        "page": 1,
-        "sectionHint": "Agency",
-        "nearestLabel": null
-      }
+      "label": "ORI Code"
     },
     {
       "id": "form1[0].#subform[0].authorizedapptype[0]",
       "newName": "authorized_applicant_type",
       "type": "text",
-      "label": "Authorized Applicant Type",
-      "context": {
-        "page": 1,
-        "sectionHint": "Agency",
-        "nearestLabel": "Authorized Applicant Type"
-      }
+      "label": "Authorized Applicant Type"
     },
     {
       "id": "form1[0].#subform[0].typeof[0]",
-      "newName": "type_of_license_certification_permit",
+      "newName": "license_certification_permit_working_title",
       "type": "text",
-      "label": "Code assigned by DOJ",
-      "context": {
-        "page": 1,
-        "sectionHint": "Agency",
-        "nearestLabel": "Code assigned by DOJ"
-      }
+      "label": "Type of License/Certification/Permit or Working Title"
     },
     {
       "id": "form1[0].#subform[0].agencyauthorized[0]",
-      "newName": "agency_authorized_to_receive_criminal_record_information",
+      "newName": "agency_authorized_to_receive_records",
       "type": "text",
-      "label": "Agency Authorized to Receive Criminal Record Information",
-      "context": {
-        "page": 1,
-        "sectionHint": "Agency",
-        "nearestLabel": null
-      }
+      "label": "Agency Authorized to Receive Criminal Record Information"
     },
     {
       "id": "form1[0].#subform[0].mailcode[0]",
-      "newName": "mail_code",
+      "newName": "agency_mail_code",
       "type": "text",
-      "label": "Mail Code",
-      "context": {
-        "page": 1,
-        "sectionHint": "Agency",
-        "nearestLabel": "Agency Authorized to Receive Criminal Record Information"
-      }
+      "label": "Mail Code"
     },
     {
       "id": "form1[0].#subform[0].streetaddress[0]",
-      "newName": "agency_street_address_or_po_box",
+      "newName": "agency_street_address",
       "type": "text",
-      "label": "Street Address or P.O. Box",
-      "context": {
-        "page": 1,
-        "sectionHint": "Agency",
-        "nearestLabel": "Street Address or P.O. Box"
-      }
+      "label": "Street Address or P.O. Box"
     },
     {
       "id": "form1[0].#subform[0].contactname[0]",
-      "newName": "contact_name",
+      "newName": "agency_contact_name",
       "type": "text",
-      "label": "Contact Name",
-      "context": {
-        "page": 1,
-        "sectionHint": "Agency",
-        "nearestLabel": "Agency Authorized to Receive Criminal Record Information"
-      }
+      "label": "Contact Name"
     },
     {
       "id": "form1[0].#subform[0].city[0]",
       "newName": "agency_city",
       "type": "text",
-      "label": "Agency City",
-      "context": {
-        "page": 1,
-        "sectionHint": "Agency",
-        "nearestLabel": "City"
-      }
+      "label": "City"
     },
     {
       "id": "form1[0].#subform[0].zip[0]",
       "newName": "agency_zip_code",
       "type": "text",
-      "label": "Agency ZIP Code",
-      "context": {
-        "page": 1,
-        "sectionHint": "Agency",
-        "nearestLabel": "State"
-      }
+      "label": "ZIP Code"
     },
     {
       "id": "form1[0].#subform[0].PhoneNum[0]",
-      "newName": "contact_telephone_number",
+      "newName": "agency_contact_telephone_number",
       "type": "text",
-      "label": "Contact Telephone Number",
-      "context": {
-        "page": 1,
-        "sectionHint": "Agency",
-        "nearestLabel": "Contact Telephone Number"
-      }
+      "label": "Contact Telephone Number"
     },
     {
       "id": "form1[0].#subform[0].firstname[0]",
       "newName": "applicant_first_name",
       "type": "text",
-      "label": "First Name",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "First Name"
-      }
+      "label": "First Name"
     },
     {
       "id": "form1[0].#subform[0].suffix[0]",
       "newName": "applicant_suffix",
       "type": "text",
-      "label": "Middle Initial",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Middle Initial"
-      }
+      "label": "Suffix"
     },
     {
       "id": "form1[0].#subform[0].lastname[0]",
       "newName": "applicant_last_name",
       "type": "text",
-      "label": "Last Name",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Applicant Information"
-      }
+      "label": "Last Name"
     },
     {
       "id": "form1[0].#subform[0].suffix[1]",
       "newName": "other_name_suffix",
       "type": "text",
-      "label": "Suffix",
+      "label": "Suffix (AKA or Alias)",
       "conditional": {
         "onlyWhen": "has_alias",
         "gateQuestion": "Do you have an alias?"
-      },
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Middle Initial"
       }
     },
     {
       "id": "form1[0].#subform[0].last[0]",
       "newName": "other_name_last",
       "type": "text",
-      "label": "Other Name: (AKA or Alias)",
+      "label": "Last Name (AKA or Alias)",
       "conditional": {
         "onlyWhen": "has_alias",
         "gateQuestion": "Do you have an alias?"
-      },
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Other Name: (AKA or Alias)"
       }
     },
     {
@@ -182,177 +107,97 @@
       "conditional": {
         "onlyWhen": "has_alias",
         "gateQuestion": "Do you have an alias?"
-      },
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "First Name"
       }
     },
     {
       "id": "form1[0].#subform[0].DOB[0]",
-      "newName": "date_of_birth",
+      "newName": "applicant_date_of_birth",
       "type": "text",
-      "label": "Date of Birth",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": null
-      }
+      "label": "Date of Birth"
     },
     {
       "id": "form1[0].#subform[0].DLnumber[0]",
-      "newName": "drivers_license_number",
+      "newName": "applicant_drivers_license_number",
       "type": "text",
-      "label": "Driver's License Number",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Driver's License Number"
-      }
+      "label": "Driver's License Number"
     },
     {
       "id": "form1[0].#subform[0].weight[0]",
-      "newName": "weight",
+      "newName": "applicant_weight",
       "type": "text",
-      "label": "Weight",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Weight"
-      }
+      "label": "Weight"
     },
     {
       "id": "form1[0].#subform[0].eye[0]",
-      "newName": "eye_color",
+      "newName": "applicant_eye_color",
       "type": "text",
-      "label": "Eye Color",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Weight"
-      }
+      "label": "Eye Color"
     },
     {
       "id": "form1[0].#subform[0].height[0]",
-      "newName": "height",
+      "newName": "applicant_height",
       "type": "text",
-      "label": "Height",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Height"
-      }
+      "label": "Height"
     },
     {
       "id": "form1[0].#subform[0].hair[0]",
-      "newName": "hair_color",
+      "newName": "applicant_hair_color",
       "type": "text",
-      "label": "Hair Color",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Eye Color"
-      }
+      "label": "Hair Color"
     },
     {
       "id": "form1[0].#subform[0].billingnumber[0]",
-      "newName": "billing_number",
+      "newName": "agency_billing_number",
       "type": "text",
-      "label": "Billing Number",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Billing"
-      }
+      "label": "Billing Number"
     },
     {
       "id": "form1[0].#subform[0].POB[0]",
-      "newName": "place_of_birth",
+      "newName": "applicant_place_of_birth",
       "type": "text",
-      "label": "Place of Birth (State or Country)",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Height"
-      }
+      "label": "Place of Birth"
     },
     {
       "id": "form1[0].#subform[0].SSN[0]",
-      "newName": "social_security_number",
+      "newName": "applicant_social_security_number",
       "type": "text",
-      "label": "Social Security Number",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Place of Birth (State or Country)"
-      }
+      "label": "Social Security Number"
     },
     {
       "id": "form1[0].#subform[0].miscnumber[0]",
-      "newName": "miscellaneous_number",
+      "newName": "applicant_misc_identification_number",
       "type": "text",
-      "label": "Miscellaneous Number",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Number"
-      }
+      "label": "Miscellaneous Identification Number"
     },
     {
       "id": "form1[0].#subform[0].streetorPO[0]",
-      "newName": "home_street_address_or_po_box",
+      "newName": "applicant_home_street_address",
       "type": "text",
-      "label": "Home Address",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Address"
-      }
+      "label": "Home Street Address or P.O. Box"
     },
     {
       "id": "form1[0].#subform[0].city[1]",
       "newName": "applicant_home_city",
       "type": "text",
-      "label": "Home City",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "City"
-      }
+      "label": "Home City"
     },
     {
       "id": "form1[0].#subform[0].zip[1]",
       "newName": "applicant_home_zip_code",
       "type": "text",
-      "label": "Home ZIP Code",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "State"
-      }
+      "label": "Home ZIP Code"
     },
     {
       "id": "form1[0].#subform[0].DateTimeField1[0]",
       "newName": "applicant_signature_date",
       "type": "text",
-      "label": "Applicant Signature Date",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Applicant Signature"
-      }
+      "label": "Applicant Signature Date"
     },
     {
       "id": "form1[0].#subform[0].yournumber[0]",
       "newName": "oca_number",
       "type": "text",
-      "label": "OCA Number",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Your Number"
-      }
+      "label": "OCA Number"
     },
     {
       "id": "form1[0].#subform[0].origATI[0]",
@@ -362,11 +207,6 @@
       "conditional": {
         "onlyWhen": "resubmission",
         "gateQuestion": "Is this a resubmission?"
-      },
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "If re-submission, list original ATI"
       }
     },
     {
@@ -374,21 +214,19 @@
       "newName": "employer_name",
       "type": "text",
       "label": "Employer Name",
-      "context": {
-        "page": 1,
-        "sectionHint": "Employer",
-        "nearestLabel": "Employer Name"
+      "conditional": {
+        "onlyWhen": "employer_response_required",
+        "gateQuestion": "Is employer information required for this submission?"
       }
     },
     {
       "id": "form1[0].#subform[0].address[0]",
-      "newName": "employer_street_address_or_po_box",
+      "newName": "employer_street_address",
       "type": "text",
       "label": "Street Address or P.O. Box",
-      "context": {
-        "page": 1,
-        "sectionHint": "Employer",
-        "nearestLabel": "Street Address or P.O. Box"
+      "conditional": {
+        "onlyWhen": "employer_response_required",
+        "gateQuestion": "Is employer information required for this submission?"
       }
     },
     {
@@ -396,32 +234,29 @@
       "newName": "employer_telephone_number",
       "type": "text",
       "label": "Telephone Number",
-      "context": {
-        "page": 1,
-        "sectionHint": "Employer",
-        "nearestLabel": null
+      "conditional": {
+        "onlyWhen": "employer_response_required",
+        "gateQuestion": "Is employer information required for this submission?"
       }
     },
     {
       "id": "form1[0].#subform[0].city[2]",
       "newName": "employer_city",
       "type": "text",
-      "label": "Employer City",
-      "context": {
-        "page": 1,
-        "sectionHint": "Employer",
-        "nearestLabel": "City"
+      "label": "City",
+      "conditional": {
+        "onlyWhen": "employer_response_required",
+        "gateQuestion": "Is employer information required for this submission?"
       }
     },
     {
       "id": "form1[0].#subform[0].zip[2]",
       "newName": "employer_zip_code",
       "type": "text",
-      "label": "Employer ZIP Code",
-      "context": {
-        "page": 1,
-        "sectionHint": "Employer",
-        "nearestLabel": "State"
+      "label": "ZIP Code",
+      "conditional": {
+        "onlyWhen": "employer_response_required",
+        "gateQuestion": "Is employer information required for this submission?"
       }
     },
     {
@@ -429,66 +264,40 @@
       "newName": "employer_mail_code",
       "type": "text",
       "label": "Mail Code",
-      "context": {
-        "page": 1,
-        "sectionHint": "Employer",
-        "nearestLabel": "ZIP Code"
+      "conditional": {
+        "onlyWhen": "employer_response_required",
+        "gateQuestion": "Is employer information required for this submission?"
       }
     },
     {
       "id": "form1[0].#subform[0].MorF[0]__1_1",
       "newName": "applicant_sex_male",
       "type": "checkbox",
-      "label": "Sex",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Sex"
-      }
+      "label": "Male"
     },
     {
       "id": "form1[0].#subform[0].MorF[0]__2_2",
       "newName": "applicant_sex_female",
       "type": "checkbox",
-      "label": "Male",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Male"
-      }
+      "label": "Female"
     },
     {
       "id": "form1[0].#subform[0].MorF[0]__3_2",
-      "newName": "applicant_sex_nonbinary",
+      "newName": "applicant_sex_nonbinary_unspecified",
       "type": "checkbox",
-      "label": "Female",
-      "context": {
-        "page": 1,
-        "sectionHint": "Applicant",
-        "nearestLabel": "Female"
-      }
+      "label": "Nonbinary/Unspecified"
     },
     {
       "id": "form1[0].#subform[0].DOJ[0]",
       "newName": "level_of_service_doj",
       "type": "checkbox",
-      "label": "DOJ",
-      "context": {
-        "page": 1,
-        "sectionHint": "Service",
-        "nearestLabel": "Applicant Signature"
-      }
+      "label": "DOJ"
     },
     {
       "id": "form1[0].#subform[0].FBI[0]",
       "newName": "level_of_service_fbi",
       "type": "checkbox",
-      "label": "FBI",
-      "context": {
-        "page": 1,
-        "sectionHint": "Service",
-        "nearestLabel": "DOJ"
-      }
+      "label": "FBI"
     }
   ]
 }

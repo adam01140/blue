@@ -103,11 +103,30 @@
     if (block.autopopulate.availableInProfile && block.autopopulate.currentProfileValue != null) {
       return block.autopopulate.currentProfileValue;
     }
-    const key = block.autopopulate.profileKey;
-    if (key && userProfile && userProfile[key] != null && String(userProfile[key]).trim() !== '') {
-      return userProfile[key];
+    const keys = [block.autopopulate.profileKey, block.nameId].filter(Boolean);
+    for (const key of keys) {
+      if (userProfile && userProfile[key] != null && String(userProfile[key]).trim() !== '') {
+        return userProfile[key];
+      }
     }
     return '';
+  }
+
+  function inferCheckboxSelectionMode(question) {
+    const mode = String(question?.checkboxSelectionMode || '').toLowerCase();
+    if (mode === 'single' || mode === 'multiple') return mode;
+    const blob = `${question?.text || ''} ${(question?.options || []).map((o) => o.label || o.nameId || '').join(' ')}`.toLowerCase();
+    if (/sex|gender|male|female|nonbinary/.test(blob)) return 'single';
+    return 'multiple';
+  }
+
+  function deriveStateUiFieldId(pdfCombineInto, questionId) {
+    if (!pdfCombineInto) return `address_state_${questionId}`;
+    return String(pdfCombineInto)
+      .replace(/_zip_code$/i, '_state')
+      .replace(/_zip$/i, '_state')
+      .replace(/zip_code$/i, 'state')
+      || `address_state_${questionId}`;
   }
 
   function renderInput(question, userProfile, devMode) {
@@ -151,7 +170,12 @@
     if (type === 'checkbox') {
       return (question.options || []).map((opt) => {
         const optName = opt.nameId || nameId;
-        const checked = val && String(val).toLowerCase() === String(opt.value || opt.label).toLowerCase() ? ' checked' : '';
+        const optVal = getAutofillValue(opt, userProfile);
+        const expected = String(opt.value || opt.label).toLowerCase();
+        const isChecked = optVal != null && String(optVal).trim() !== ''
+          && (String(optVal).toLowerCase() === expected
+            || (optVal === true || optVal === 'on' || optVal === '1'));
+        const checked = isChecked ? ' checked' : '';
         const optAp = opt.autopopulate?.enabled ? ' data-autopopulate="true"' : ap;
         const optPk = opt.autopopulate?.profileKey ? ` data-profile-key="${esc(opt.autopopulate.profileKey)}"` : pk;
         const optPd = opt.autopopulate?.profileDescription
@@ -169,7 +193,18 @@
           ? ` data-profile-description="${esc(tb.autopopulate.profileDescription)}"`
           : '';
         const tbBadge = autopopulateBadgeHtml(tb, devMode);
-        return `<div class="address-field textbox-group"><label for="${esc(tb.nameId)}">${esc(tb.label || tb.nameId)}</label><input type="text" class="address-input" id="${esc(tb.nameId)}" name="${esc(tb.nameId)}" value="${tbVal}" placeholder="${esc(tb.placeholder || '')}"${tbAp}${tbPk}${tbPd}>${tbBadge}</div>`;
+        const placeholder = String(tb.placeholder || '').trim();
+        const labelHtml = placeholder
+          ? ''
+          : `<label for="${esc(tb.nameId || tb.pdfCombineInto || 'field')}">${esc(tb.label || tb.nameId)}</label>`;
+        const combineInto = tb.pdfCombineInto
+          ? ` data-pdf-combine-into="${esc(tb.pdfCombineInto)}" data-address-part="state"`
+          : '';
+        const fieldId = tb.nameId || deriveStateUiFieldId(tb.pdfCombineInto, question.questionId);
+        const nameAttr = tb.nameId
+          ? ` id="${esc(tb.nameId)}" name="${esc(tb.nameId)}"`
+          : ` id="${esc(fieldId)}" data-address-ui="state"`;
+        return `<div class="address-field textbox-group">${labelHtml}<input type="text" class="address-input"${nameAttr} value="${tbVal}" placeholder="${esc(placeholder)}"${combineInto}${tbAp}${tbPk}${tbPd}>${tbBadge}</div>`;
       }).join('');
     }
     return `<input type="text" class="address-input" id="${esc(nameId)}" name="${esc(nameId)}" value="${val}" placeholder="${esc(question.placeholder || '')}"${ap}${pk}${pd}${qid}>`;
@@ -225,6 +260,13 @@
 .auto-form-help-send-btn{padding:0 18px!important;margin:0!important;width:auto!important;border:none!important;border-radius:10px!important;background:#4f8cff!important;color:#fff!important;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;display:inline-flex!important;align-items:center;justify-content:center;box-shadow:none!important}
 .auto-form-help-send-btn:disabled{background:#cbd5e1!important;cursor:not-allowed}
 .auto-form-help-autofill-btn{margin:0!important;width:auto!important}
+.auto-form-thank-you{text-align:center;width:100%;max-width:737px;margin:0 auto;box-sizing:border-box;padding:8px 0 24px}
+.auto-form-thank-you-title{margin:0 0 20px;font-size:1.6rem;color:#2c3e50;line-height:1.3}
+.auto-form-view-pdf-btn{display:block;margin:0 auto 20px;font-size:1.2em;background:#2980b9;color:#fff;border:none;border-radius:8px;padding:12px 28px;cursor:pointer;font-weight:700}
+.auto-form-view-pdf-btn:hover{background:#1f6fa3}
+.thank-you-pdf-preview-wrap{width:100%;max-width:100%;margin:0 auto 24px;box-sizing:border-box}
+.thank-you-pdf-preview-wrap iframe,#filled-pdf-preview{width:100%;max-width:100%;min-height:2880px;border:1px solid #bcd8ff;border-radius:12px;background:#fff;display:block}
+.auto-form-thank-you-back{font-size:1.2em;margin-top:8px}
 </style>`;
   }
 
@@ -301,7 +343,9 @@
       html += renderMirrorInput(question);
     } else {
       if (question.type === 'checkbox' && (question.options || []).length > 1) {
-        html += `<div class="checkbox-group checkbox-group-${esc(questionId)}">`;
+        const selectionMode = inferCheckboxSelectionMode(question);
+        const exclusiveClass = selectionMode === 'single' ? ' checkbox-group-exclusive' : '';
+        html += `<div class="checkbox-group checkbox-group-${esc(questionId)}${exclusiveClass}" data-checkbox-selection="${esc(selectionMode)}">`;
       }
       html += renderInput(question, userProfile, devMode);
       if (question.type === 'checkbox' && (question.options || []).length > 1) {
@@ -664,6 +708,7 @@
   }
 
   function refreshAllQuestionNav() {
+    wireExclusiveCheckboxGroups();
     if (!window.questionNavControllers) return;
     Object.keys(window.questionNavControllers).forEach(function(sectionId) {
       var controller = window.questionNavControllers[sectionId];
@@ -675,6 +720,23 @@
 
   window.refreshAllQuestionNav = refreshAllQuestionNav;
 
+  function wireExclusiveCheckboxGroups() {
+    document.querySelectorAll('.checkbox-group-exclusive').forEach(function(group) {
+      if (group.dataset.exclusiveWired === 'true') return;
+      group.dataset.exclusiveWired = 'true';
+      group.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+        cb.addEventListener('change', function() {
+          if (!this.checked) return;
+          group.querySelectorAll('input[type="checkbox"]').forEach(function(other) {
+            if (other !== cb) other.checked = false;
+          });
+          scheduleSaveFormAnswers();
+          refreshAllQuestionNav();
+        });
+      });
+    });
+  }
+
   function wireFormAnswerPersistence() {
     var form = document.getElementById('customForm');
     if (!form || form.dataset.answerPersistWired === 'true') return;
@@ -685,23 +747,50 @@
     });
   }
 
+  function mergeStateZipParts(state, zip) {
+    state = String(state || '').trim();
+    zip = String(zip || '').trim();
+    if (state && zip) return state + ' ' + zip;
+    return state || zip;
+  }
+
   function collectFormData() {
     syncAllLinkedFields();
     var form = document.getElementById('customForm');
     var fd = new FormData();
     if (!form) return fd;
+    var values = {};
+
     form.querySelectorAll('input, textarea, select').forEach(function(el) {
-      if (!el.name || el.disabled || el.type === 'file') return;
+      if (el.disabled || el.type === 'file') return;
       if (el.type === 'checkbox') {
-        if (el.checked) fd.append(el.name, 'on');
-      } else if (el.type === 'radio') {
-        if (el.checked) fd.append(el.name, el.value);
-      } else {
-        var value = el.value;
-        if (el.type === 'date' && value) value = formatDateForServer(value);
-        if (value != null && String(value).trim() !== '') fd.append(el.name, value);
+        if (el.checked && el.name) values[el.name] = 'on';
+        return;
       }
+      if (el.type === 'radio') {
+        if (el.checked && el.name) values[el.name] = el.value;
+        return;
+      }
+      if (!el.name) return;
+      var value = el.value;
+      if (el.type === 'date' && value) value = formatDateForServer(value);
+      values[el.name] = value;
     });
+
+    form.querySelectorAll('[data-pdf-combine-into]').forEach(function(el) {
+      var target = el.getAttribute('data-pdf-combine-into');
+      if (!target) return;
+      var statePart = fieldValue(el);
+      var zipPart = values[target] != null ? String(values[target]) : '';
+      var merged = mergeStateZipParts(statePart, zipPart);
+      if (merged !== '') values[target] = merged;
+    });
+
+    Object.keys(values).forEach(function(key) {
+      var value = values[key];
+      if (value != null && String(value).trim() !== '') fd.append(key, value);
+    });
+
     return fd;
   }
 
@@ -1175,8 +1264,10 @@
     if (thankYou) thankYou.style.display = 'none';
     if (questions) questions.style.display = '';
     if (form) form.style.display = 'block';
-    var previewSection = document.getElementById('pdf-preview-section');
-    if (previewSection) previewSection.hidden = true;
+    var previewWrap = document.getElementById('thank-you-pdf-preview-wrap');
+    var previewFrame = document.getElementById('filled-pdf-preview');
+    if (previewWrap) previewWrap.hidden = true;
+    if (previewFrame) previewFrame.removeAttribute('src');
     if (typeof window.navigateSection === 'function') {
       var sections = document.querySelectorAll('.section');
       var lastNum = sections.length || 1;
@@ -1270,24 +1361,32 @@
     if (thankYou) {
       thankYou.style.setProperty('display', 'block', 'important');
       thankYou.setAttribute('aria-hidden', 'false');
+
+      var previewWrap = document.getElementById('thank-you-pdf-preview-wrap');
+      var previewFrame = document.getElementById('filled-pdf-preview');
+      if (previewFrame && previewUrl) {
+        previewFrame.src = previewUrl;
+      }
+      if (previewWrap) {
+        previewWrap.hidden = false;
+        previewWrap.style.display = 'block';
+      }
+
       var viewBtn = document.getElementById('autoFormViewPdfBtn');
-      if (!viewBtn) {
-        viewBtn = document.createElement('button');
-        viewBtn.id = 'autoFormViewPdfBtn';
-        viewBtn.type = 'button';
-        viewBtn.textContent = 'View Form';
-        viewBtn.style.cssText = 'font-size:1.2em;margin-bottom:16px;background:#2980b9;color:#fff;border:none;border-radius:8px;padding:12px 28px;cursor:pointer;font-weight:700;';
+      if (viewBtn && !viewBtn.dataset.autoFormWired) {
+        viewBtn.dataset.autoFormWired = 'true';
         viewBtn.addEventListener('click', function() {
-          var previewSection = document.getElementById('pdf-preview-section');
-          var previewFrame = document.getElementById('filled-pdf-preview');
-          if (previewFrame && window.__lastFilledPdfUrl) previewFrame.src = window.__lastFilledPdfUrl;
-          if (previewSection) {
-            previewSection.hidden = false;
-            previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (previewFrame && window.__lastFilledPdfUrl) {
+            previewFrame.src = window.__lastFilledPdfUrl;
+          }
+          if (previewWrap) {
+            previewWrap.hidden = false;
+            previewWrap.style.display = 'block';
+            previewWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         });
-        thankYou.insertBefore(viewBtn, thankYou.firstChild);
       }
+
       thankYou.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     window.currentSectionNumber = 'end';
@@ -1343,10 +1442,7 @@
       }
       var blob = await res.blob();
       if (!blob.size) throw new Error('Received empty PDF');
-      var previewSection = document.getElementById('pdf-preview-section');
-      var previewFrame = document.getElementById('filled-pdf-preview');
       var previewUrl = URL.createObjectURL(blob);
-      if (previewFrame) previewFrame.src = previewUrl;
       showAutoFormThankYou(previewUrl);
     } catch (err) {
       console.error('Submit error:', err);

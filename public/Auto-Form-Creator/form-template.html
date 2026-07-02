@@ -1359,21 +1359,6 @@ __AUTO_FORM_BODY__
 
               if (!value) {
                 allStandardSatisfied = false;
-              } else {
-                // Special validation for zip codes: must have exactly 5 digits
-                if (elId.includes('_zip')) {
-                  const digitsOnly = value.replace(/[^0-9]/g, '');
-                  if (digitsOnly.length !== 5) {
-                    allStandardSatisfied = false;
-                  }
-                }
-                // Special validation for phone numbers: must have exactly 10 digits
-                if (elId.includes('_phone_number') || elId.includes('phone_number_')) {
-                  const digitsOnly = value.replace(/[^0-9]/g, '');
-                  if (digitsOnly.length !== 10) {
-                    allStandardSatisfied = false;
-                  }
-                }
               }
             } else if (type === 'radio') {
               const group = radioGroups[el.name || el.id] || [];
@@ -1463,21 +1448,6 @@ __AUTO_FORM_BODY__
                   const value = (inp.value || '').trim();
                   if (!value) {
                     allStandardSatisfied = false;
-                  } else {
-                    // Special validation for zip codes: must have exactly 5 digits
-                    if (inpId.includes('_zip')) {
-                      const digitsOnly = value.replace(/[^0-9]/g, '');
-                      if (digitsOnly.length !== 5) {
-                        allStandardSatisfied = false;
-                      }
-                    }
-                    // Special validation for phone numbers: must have exactly 10 digits
-                    if (inpId.includes('_phone_number') || inpId.includes('phone_number_')) {
-                      const digitsOnly = value.replace(/[^0-9]/g, '');
-                      if (digitsOnly.length !== 10) {
-                        allStandardSatisfied = false;
-                      }
-                    }
                   }
                 } else if (type === 'radio') {
                   const group = radioGroups[inp.name || inp.id] || [];
@@ -2123,32 +2093,13 @@ __AUTO_FORM_BODY__
               // Helper function to check if input is properly filled (with special rules for zip/phone)
               function isInputProperlyFilled(input) {
                 const value = input.value ? input.value.trim() : '';
-                const inputId = (input.id || input.name || '').toLowerCase();
-                
-                // Empty value is never filled
-                if (!value) {
-                  console.log('[DISABLED NEXT BTN] Input is empty:', inputId);
-                  return false;
+                if (input.hasAttribute('data-address-ui') && input.getAttribute('data-address-ui') === 'state') {
+                  return value.length > 0;
                 }
-                
-                // Zip code validation: must have exactly 5 digits
-                if (inputId.includes('_zip')) {
-                  const digitsOnly = value.replace(/[^0-9]/g, '');
-                  const isFilled = digitsOnly.length === 5;
-                  console.log('[DISABLED NEXT BTN] Zip validation for', inputId, '- digits:', digitsOnly.length, '- filled:', isFilled);
-                  return isFilled;
+                if (input.hasAttribute('data-pdf-combine-into')) {
+                  return value.length > 0;
                 }
-                
-                // Phone number validation: must have exactly 10 digits
-                if (inputId.includes('_phone_number') || inputId.includes('phone_number_')) {
-                  const digitsOnly = value.replace(/[^0-9]/g, '');
-                  const isFilled = digitsOnly.length === 10;
-                  console.log('[DISABLED NEXT BTN] Phone validation for', inputId, '- digits:', digitsOnly.length, '- filled:', isFilled);
-                  return isFilled;
-                }
-                
-                // Default: any non-empty value is filled
-                return true;
+                return value.length > 0;
               }
               
               // Check regular inputs first
@@ -2401,7 +2352,17 @@ __AUTO_FORM_BODY__
     };
   </script>
   </form>
-<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><span style="font-size: 0.75em; color: #666;">Your paperwork is now ready, please proceed to checkout</span><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Checkout</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='/Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button><br><button id="debugDownloadPdfBtn" onclick="downloadAllPdfs()" style="font-size: 1.2em; display: none;">Download PDF</button><br id="debugDownloadPdfBr" style="display: none;"><br id="debugPreviewPdfsBr" style="display: none;"><button id="debugPreviewPdfsBtn" onclick="showPreviewPdfsModal()" style="font-size: 1.2em; display: none;">Preview PDFs</button><br></div>
+<div id="thankYouMessage" class="thank-you-message auto-form-thank-you" style="display: none;" aria-hidden="true">
+  <h2 class="auto-form-thank-you-title">Thank you for completing the survey</h2>
+  <button type="button" id="autoFormViewPdfBtn" class="auto-form-view-pdf-btn">View Form</button>
+  <div id="thank-you-pdf-preview-wrap" class="thank-you-pdf-preview-wrap" hidden>
+    <iframe id="filled-pdf-preview" title="Filled PDF preview"></iframe>
+  </div>
+  <button type="button" onclick="goBackToForm()" class="auto-form-thank-you-back">Back</button>
+  <div id="checklistDisplay" style="display: none;"><h3>Your Personalized Checklist</h3><div id="checklistItems"></div></div>
+  <button id="debugDownloadPdfBtn" onclick="downloadAllPdfs()" style="display: none;">Download PDF</button>
+  <button id="debugPreviewPdfsBtn" onclick="showPreviewPdfsModal()" style="display: none;">Preview PDFs</button>
+</div>
 </div>
 </section>
 </div>
@@ -2449,10 +2410,6 @@ document.addEventListener('DOMContentLoaded', function() {
     <p>Please sign in to continue filling out this form.</p>
     <a href="/Pages/account.html" class="signin-modal-button">Sign In</a>
   </div>
-</div>
-<div class="pdf-preview-section" id="pdf-preview-section" hidden style="max-width:737px;margin:24px auto;padding:0 20px;">
-  <h2 class="section-title" style="text-align:center;">Filled PDF Preview</h2>
-  <iframe id="filled-pdf-preview" title="Filled PDF preview" style="width:100%;min-height:720px;border:1px solid #bcd8ff;border-radius:12px;background:#fff;"></iframe>
 </div>
 __AUTO_FORM_RUNTIME_SCRIPTS__
 </body>

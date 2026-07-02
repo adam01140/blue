@@ -227,14 +227,14 @@
         <div class="editor-card">
             <h2>Paste Form HTML</h2>
             <p class="hint">
-                Copy the HTML from Step 8 (Download HTML or view page source), paste it below, then click
-                <strong>Render Full Screen</strong>. If you are already signed in on this site, Firebase autofill
-                should work automatically. Otherwise use the sign-in panel inside the rendered form.
+                Opens <code>Current Data/generated-form.html</code> automatically when available.
+                You can also paste HTML from Step 8, then click <strong>Render Full Screen</strong>.
             </p>
             <textarea id="html-input" placeholder="Paste your full generated HTML document here…"></textarea>
             <div class="editor-actions">
                 <button type="button" class="btn btn-primary" id="render-btn">Render Full Screen</button>
                 <button type="button" class="btn btn-secondary" id="load-session-btn">Load Last Generated</button>
+                <button type="button" class="btn btn-secondary" id="load-current-data-btn">Reload Current Data</button>
                 <button type="button" class="btn btn-secondary" id="clear-btn">Clear</button>
             </div>
             <div class="error-msg" id="error-msg"></div>
@@ -254,9 +254,11 @@
     <script>
         const STORAGE_KEY = 'formstarPreviewHtml';
         const PREVIEW_SHELL = '/Auto-Form-Creator/form-preview-shell.html';
+        const CURRENT_DATA_FORM_URL = '/Auto-Form-Creator/Current%20Data/generated-form.html';
         const htmlInput = document.getElementById('html-input');
         const renderBtn = document.getElementById('render-btn');
         const loadSessionBtn = document.getElementById('load-session-btn');
+        const loadCurrentDataBtn = document.getElementById('load-current-data-btn');
         const clearBtn = document.getElementById('clear-btn');
         const errorMsg = document.getElementById('error-msg');
         const previewFrame = document.getElementById('preview-frame');
@@ -307,12 +309,36 @@
         loadSessionBtn.addEventListener('click', () => {
             const stored = sessionStorage.getItem(STORAGE_KEY);
             if (!stored) {
-                setError('No generated HTML found. Generate form HTML in the demo first, or paste manually.');
+                setError('No generated HTML found in session. Run Step 8 in the demo or use Reload Current Data.');
                 return;
             }
             htmlInput.value = stored;
             setError('');
             renderHtml(stored);
+        });
+
+        async function loadCurrentDataForm(autoRender) {
+            try {
+                const res = await fetch(CURRENT_DATA_FORM_URL, { cache: 'no-store' });
+                if (!res.ok) {
+                    throw new Error('No generated-form.html in Current Data yet. Complete Step 8 in the demo first.');
+                }
+                const html = await res.text();
+                if (!html.trim() || !/<html[\s>]/i.test(html)) {
+                    throw new Error('Current Data/generated-form.html is empty or invalid.');
+                }
+                htmlInput.value = html;
+                setError('');
+                if (autoRender) renderHtml(html);
+                return true;
+            } catch (err) {
+                if (!autoRender) setError(err.message || 'Failed to load Current Data form.');
+                return false;
+            }
+        }
+
+        loadCurrentDataBtn.addEventListener('click', () => {
+            loadCurrentDataForm(true);
         });
 
         clearBtn.addEventListener('click', () => {
@@ -331,6 +357,12 @@
         if (storedOnLoad) {
             htmlInput.value = storedOnLoad;
         }
+
+        loadCurrentDataForm(true).then((loaded) => {
+            if (!loaded && storedOnLoad) {
+                renderHtml(storedOnLoad);
+            }
+        });
     </script>
 </body>
 </html>

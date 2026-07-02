@@ -737,6 +737,34 @@
             flex-shrink: 0;
         }
 
+        .result-panel-header .profile-header-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .result-panel-header .btn-reset-profile {
+            background: #fff;
+            color: #e74c3c;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .result-panel-header .btn-reset-profile:hover {
+            background: #fdf0f0;
+        }
+
+        .result-panel-header .btn-reset-profile:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
         .profile-entries-list {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1227,7 +1255,10 @@
                 <div class="result-panel">
                     <div class="result-panel-header">
                         User Profile Entries
-                        <button type="button" class="btn-download" id="add-profile-entry-btn" style="margin-left:auto;">+ Add Entry</button>
+                        <div class="profile-header-actions">
+                            <button type="button" class="btn-reset-profile" id="reset-profile-btn" disabled>Reset Profile</button>
+                            <button type="button" class="btn-download" id="add-profile-entry-btn">+ Add Entry</button>
+                        </div>
                     </div>
                     <div class="result-panel-body">
                         <div class="profile-entries-list" id="profile-entries-list">
@@ -1249,6 +1280,34 @@
                 </div>
             </div>
         </section>
+
+        <!-- Import Field Config Modal -->
+        <div class="modal-overlay" id="import-field-config-modal">
+            <div class="modal-card" style="max-width:720px;">
+                <div class="modal-header">
+                    <h3>Import field_config.json</h3>
+                    <button type="button" class="modal-close" id="close-import-field-config-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="margin:0 0 14px;color:var(--gray);">
+                        Paste JSON or choose a <code>field_config.json</code> file. This skips ChatGPT and loads your config directly.
+                    </p>
+                    <div class="form-group">
+                        <label for="import-field-config-file">Upload JSON file</label>
+                        <input type="file" id="import-field-config-file" accept=".json,application/json">
+                    </div>
+                    <div class="form-group">
+                        <label for="import-field-config-text">Or paste JSON</label>
+                        <textarea id="import-field-config-text" rows="12" placeholder='{ "formTitle": "...", "fields": [ ... ] }'></textarea>
+                    </div>
+                    <div class="error-message" id="import-field-config-error"></div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-primary" id="confirm-import-field-config-btn">Import</button>
+                        <button type="button" class="btn-secondary" id="cancel-import-field-config">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Add Form Modal -->
         <div class="modal-overlay" id="add-form-modal">
@@ -1452,6 +1511,9 @@
                 <button type="button" class="btn-download" id="generate-field-config-btn" disabled>
                     Generate field_config.json with ChatGPT
                 </button>
+                <button type="button" class="btn-secondary" id="import-field-config-btn" disabled style="margin-left:10px;">
+                    Import field_config.json
+                </button>
 
                 <div class="timed-progress" id="field-config-progress">
                     <div class="timed-progress-label" id="field-config-progress-label">Generating field config with ChatGPT…</div>
@@ -1559,14 +1621,14 @@
                 <fieldset class="display-mode-options" id="form-display-mode-fieldset">
                     <legend style="font-weight:700;margin-bottom:8px;">Form layout</legend>
                     <label class="display-mode-option">
-                        <input type="radio" name="form-display-mode" value="all_at_once" checked>
+                        <input type="radio" name="form-display-mode" value="all_at_once">
                         <div>
                             <strong>All questions visible at once</strong>
                             <span>Single scrollable page with every question shown together.</span>
                         </div>
                     </label>
                     <label class="display-mode-option">
-                        <input type="radio" name="form-display-mode" value="one_at_a_time">
+                        <input type="radio" name="form-display-mode" value="one_at_a_time" checked>
                         <div>
                             <strong>One question at a time</strong>
                             <span>Step-through wizard — user sees one question per screen.</span>
@@ -1577,14 +1639,14 @@
                 <fieldset class="display-mode-options" id="form-html-mode-fieldset">
                     <legend style="font-weight:700;margin-bottom:8px;">HTML output mode</legend>
                     <label class="display-mode-option">
-                        <input type="radio" name="form-html-mode" value="dev" checked>
+                        <input type="radio" name="form-html-mode" value="dev">
                         <div>
                             <strong>Dev mode</strong>
                             <span>Show sign-in bar, autofill badges, and question numbers — for testing and demos.</span>
                         </div>
                     </label>
                     <label class="display-mode-option">
-                        <input type="radio" name="form-html-mode" value="normal">
+                        <input type="radio" name="form-html-mode" value="normal" checked>
                         <div>
                             <strong>Normal mode</strong>
                             <span>Clean production form — no auth bar, no autofill badges, plain question text only.</span>
@@ -1881,6 +1943,7 @@
         const userJsonEl = document.getElementById('user-json');
         const profileEntriesList = document.getElementById('profile-entries-list');
         const addProfileEntryBtn = document.getElementById('add-profile-entry-btn');
+        const resetProfileBtn = document.getElementById('reset-profile-btn');
         const addProfileEntryModal = document.getElementById('add-profile-entry-modal');
         const addProfileEntryForm = document.getElementById('add-profile-entry-form');
         const addProfileEntryError = document.getElementById('add-profile-entry-error');
@@ -1918,6 +1981,14 @@
         const step4Error = document.getElementById('step-4-error');
         const step4Results = document.getElementById('step-4-results');
         const generateFieldConfigBtn = document.getElementById('generate-field-config-btn');
+        const importFieldConfigBtn = document.getElementById('import-field-config-btn');
+        const importFieldConfigModal = document.getElementById('import-field-config-modal');
+        const closeImportFieldConfigModal = document.getElementById('close-import-field-config-modal');
+        const cancelImportFieldConfigBtn = document.getElementById('cancel-import-field-config');
+        const confirmImportFieldConfigBtn = document.getElementById('confirm-import-field-config-btn');
+        const importFieldConfigFileInput = document.getElementById('import-field-config-file');
+        const importFieldConfigText = document.getElementById('import-field-config-text');
+        const importFieldConfigError = document.getElementById('import-field-config-error');
         const fieldConfigProgress = document.getElementById('field-config-progress');
         const fieldConfigProgressBar = document.getElementById('field-config-progress-bar');
         const fieldConfigProgressLabel = document.getElementById('field-config-progress-label');
@@ -2077,12 +2148,13 @@
             try {
                 let sanitizedPdfBase64 = null;
                 let sanitizedPdfFileName = null;
-                if (sanitizedPdfFile) {
-                    const buf = await sanitizedPdfFile.arrayBuffer();
+                const pdfFileForState = sanitizedPdfFile;
+                if (pdfFileForState) {
+                    const buf = await pdfFileForState.arrayBuffer();
                     const b64 = arrayBufferToBase64(buf);
                     if (b64.length < DEMO_PDF_MAX_B64_CHARS) {
                         sanitizedPdfBase64 = b64;
-                        sanitizedPdfFileName = sanitizedPdfFile.name;
+                        sanitizedPdfFileName = pdfFileForState.name || 'sanitized.pdf';
                     }
                 }
 
@@ -2106,7 +2178,7 @@
                     sanitizeRenamedCount: sanitizePdfSuccessText?.textContent || '',
                     sanitizedPdfBase64,
                     sanitizedPdfFileName,
-                    displayMode: document.querySelector('input[name="form-display-mode"]:checked')?.value || 'all_at_once',
+                    displayMode: document.querySelector('input[name="form-display-mode"]:checked')?.value || 'one_at_a_time',
                     htmlMode: getSelectedHtmlMode(),
                     templateSource: getSelectedTemplateSource(),
                     fieldConfigJson: fieldConfigJsonEl.textContent || '',
@@ -2253,6 +2325,12 @@
                 }
                 const renamedMatch = String(state.sanitizeRenamedCount || '').match(/(\d+)/);
                 const renamedCount = renamedMatch ? Number(renamedMatch[1]) : 0;
+                try {
+                    lastPdfToken = await storeSanitizedPdfOnServer(sanitizedPdfFile, state.lastPdfToken || null);
+                    if (lastFormConfig) lastFormConfig.pdfToken = lastPdfToken;
+                } catch (storeErr) {
+                    console.warn('Failed to re-register sanitized PDF on server:', storeErr);
+                }
                 markStep5Complete(renamedCount);
             } else if (state.steps?.step5 && state.lastPdfToken) {
                 lastPdfToken = state.lastPdfToken;
@@ -2267,7 +2345,7 @@
 
             if (state.steps?.step6 && state.lastFormConfig) {
                 formConfigJsonEl.textContent = state.formConfigJson || JSON.stringify(state.lastFormConfig, null, 2);
-                markStep6Complete();
+                await markStep6Complete();
             }
 
             if (state.steps?.step8 && state.lastGeneratedFormHtml) {
@@ -2307,6 +2385,31 @@
             if (currentUser) {
                 markStepComplete();
             }
+        }
+
+        const PROFILE_RESET_PRESERVED_KEYS = new Set([
+            'uid',
+            'email',
+            'firstName',
+            'lastName',
+            'phone',
+            'street',
+            'city',
+            'state',
+            'zip',
+            'agreedToTerms',
+            'agreementDate',
+            'createdAt',
+            'signature',
+        ]);
+
+        function shouldPreserveProfileKey(key) {
+            if (PROFILE_RESET_PRESERVED_KEYS.has(key)) return true;
+            if (key.endsWith('_description')) {
+                const baseKey = key.slice(0, -'_description'.length);
+                return PROFILE_RESET_PRESERVED_KEYS.has(baseKey);
+            }
+            return false;
         }
 
         const PROFILE_ENTRY_DEFAULT_DESCRIPTIONS = {
@@ -2598,6 +2701,7 @@
             step4.classList.remove('step-locked');
             step4LockMsg.style.display = 'none';
             generateFieldConfigBtn.disabled = false;
+            importFieldConfigBtn.disabled = false;
         }
 
         function lockStep4() {
@@ -2609,6 +2713,7 @@
             step4Error.textContent = '';
             fieldConfigProgress.classList.remove('visible');
             generateFieldConfigBtn.disabled = true;
+            importFieldConfigBtn.disabled = true;
             fieldConfigJsonEl.textContent = '';
             lastFieldConfig = null;
             step3Complete = false;
@@ -3078,12 +3183,13 @@
             step6Status.classList.add('complete');
             step6Status.setAttribute('aria-label', 'Step 6 complete');
             step6Results.classList.add('visible');
-            renderAutopopulateResults();
-            unlockStep7();
-            markStep7Complete();
-            unlockStep8();
-            scheduleSaveDemoState();
-            saveCurrentDataDump('step-6-form-config');
+            return refreshAutopopulateAnalysis().then(function() {
+                unlockStep7();
+                markStep7Complete();
+                unlockStep8();
+                scheduleSaveDemoState();
+                saveCurrentDataDump('step-6-form-config');
+            });
         }
 
         function markStep6Error() {
@@ -3147,6 +3253,9 @@
             lastUserProfile = profile;
             userJsonEl.textContent = JSON.stringify(profile, null, 2);
             renderProfileEntries(profile);
+            if (resetProfileBtn) {
+                resetProfileBtn.disabled = !currentUser;
+            }
         }
 
         async function refreshAutopopulateAnalysis() {
@@ -3159,7 +3268,7 @@
                         formConfig: lastFormConfig,
                         fieldConfig: lastFieldConfig,
                         userProfile: lastUserProfile || {},
-                        displayMode: lastFormConfig.displayMode || 'all_at_once'
+                        displayMode: lastFormConfig.displayMode || 'one_at_a_time'
                     })
                 });
                 const data = await response.json();
@@ -3194,6 +3303,36 @@
             const next = { ...(lastUserProfile || {}) };
             delete next[key];
             delete next[key + '_description'];
+            refreshUserProfileDisplay(next);
+            await refreshAutopopulateAnalysis();
+        }
+
+        async function resetUserProfile() {
+            if (!currentUser) throw new Error('Not signed in');
+            const profile = lastUserProfile || {};
+            const keysToDelete = Object.keys(profile).filter((key) => !shouldPreserveProfileKey(key));
+            if (!keysToDelete.length) {
+                window.alert('Profile already contains only core account fields.');
+                return;
+            }
+            const confirmed = window.confirm(
+                'Reset profile to core account fields only?\n\n'
+                + 'This will delete ' + keysToDelete.length + ' extra entr'
+                + (keysToDelete.length === 1 ? 'y' : 'ies')
+                + ' (form-learned data, aliases, etc.) and keep uid, email, name, address, and signature.'
+            );
+            if (!confirmed) return;
+
+            const updates = {};
+            keysToDelete.forEach((key) => {
+                updates[key] = firebase.firestore.FieldValue.delete();
+            });
+            await db.collection('users').doc(currentUser.uid).update(updates);
+
+            const next = {};
+            Object.keys(profile).forEach((key) => {
+                if (shouldPreserveProfileKey(key)) next[key] = profile[key];
+            });
             refreshUserProfileDisplay(next);
             await refreshAutopopulateAnalysis();
         }
@@ -3694,6 +3833,22 @@
             }
         }
 
+        async function ensurePdfRegisteredOnServer() {
+            const pdfFile = sanitizedPdfFile || lastPreparedPdfFile;
+            if (!pdfFile) return lastPdfToken || lastFormConfig?.pdfToken || null;
+
+            const preferredToken = lastPdfToken || lastFormConfig?.pdfToken || null;
+            lastPdfToken = await storeSanitizedPdfOnServer(pdfFile, preferredToken);
+            if (lastFormConfig) {
+                lastFormConfig.pdfToken = lastPdfToken;
+                if (formConfigJsonEl.textContent) {
+                    formConfigJsonEl.textContent = JSON.stringify(lastFormConfig, null, 2);
+                }
+            }
+            scheduleSaveDemoState();
+            return lastPdfToken;
+        }
+
         async function ensurePdfTokenForVision() {
             if (lastPdfToken) return lastPdfToken;
             if (lastPreparedPdfFile) {
@@ -3702,6 +3857,58 @@
                 return lastPdfToken;
             }
             throw new Error('PDF not available on server. Re-run Step 3.');
+        }
+
+        function validateImportedFieldConfig(config) {
+            if (!config || typeof config !== 'object') {
+                throw new Error('field_config.json must be a JSON object.');
+            }
+            if (!Array.isArray(config.fields) || !config.fields.length) {
+                throw new Error('field_config.json must include a non-empty "fields" array.');
+            }
+            for (const field of config.fields) {
+                if (!field?.id || !field?.newName) {
+                    throw new Error('Each field must include "id" and "newName".');
+                }
+            }
+            return config;
+        }
+
+        function applyImportedFieldConfig(config) {
+            const validated = validateImportedFieldConfig(config);
+            invalidateFormConfigAndHtml();
+            lastFieldConfig = validated;
+            fieldConfigJsonEl.textContent = JSON.stringify(validated, null, 2);
+            markStep4Complete();
+        }
+
+        function openImportFieldConfigModal() {
+            importFieldConfigError.textContent = '';
+            importFieldConfigText.value = '';
+            importFieldConfigFileInput.value = '';
+            importFieldConfigModal.classList.add('visible');
+        }
+
+        function closeImportFieldConfigModalFn() {
+            importFieldConfigModal.classList.remove('visible');
+        }
+
+        async function importFieldConfigFromModal() {
+            importFieldConfigError.textContent = '';
+            try {
+                let raw = importFieldConfigText.value.trim();
+                if (!raw && importFieldConfigFileInput.files[0]) {
+                    raw = await importFieldConfigFileInput.files[0].text();
+                }
+                if (!raw) {
+                    throw new Error('Paste JSON or choose a file to import.');
+                }
+                const parsed = JSON.parse(raw);
+                applyImportedFieldConfig(parsed);
+                closeImportFieldConfigModalFn();
+            } catch (err) {
+                importFieldConfigError.textContent = err.message || 'Failed to import field_config.json.';
+            }
         }
 
         async function generateFieldConfigJson() {
@@ -3754,6 +3961,23 @@
         }
 
         generateFieldConfigBtn.addEventListener('click', generateFieldConfigJson);
+        importFieldConfigBtn.addEventListener('click', openImportFieldConfigModal);
+        confirmImportFieldConfigBtn.addEventListener('click', importFieldConfigFromModal);
+        cancelImportFieldConfigBtn.addEventListener('click', closeImportFieldConfigModalFn);
+        closeImportFieldConfigModal.addEventListener('click', closeImportFieldConfigModalFn);
+        importFieldConfigModal.addEventListener('click', (e) => {
+            if (e.target === importFieldConfigModal) closeImportFieldConfigModalFn();
+        });
+        importFieldConfigFileInput.addEventListener('change', async () => {
+            const file = importFieldConfigFileInput.files[0];
+            if (!file) return;
+            try {
+                importFieldConfigText.value = await file.text();
+                importFieldConfigError.textContent = '';
+            } catch (err) {
+                importFieldConfigError.textContent = err.message || 'Failed to read JSON file.';
+            }
+        });
 
         downloadFieldConfigBtn.addEventListener('click', () => {
             if (!lastFieldConfig) return;
@@ -3799,9 +4023,10 @@
             return { blob, renamedCount };
         }
 
-        async function storeSanitizedPdfOnServer(pdfFile) {
+        async function storeSanitizedPdfOnServer(pdfFile, preferredToken) {
             const formData = new FormData();
             formData.append('pdf', pdfFile);
+            if (preferredToken) formData.append('pdfToken', preferredToken);
             const response = await fetch('/api/auto-form/store-pdf', {
                 method: 'POST',
                 body: formData
@@ -3876,7 +4101,7 @@
         });
 
         function getSelectedHtmlMode() {
-            return document.querySelector('input[name="form-html-mode"]:checked')?.value || 'dev';
+            return document.querySelector('input[name="form-html-mode"]:checked')?.value || 'normal';
         }
 
         function getSelectedTemplateSource() {
@@ -4010,7 +4235,7 @@
             step6Results.classList.remove('visible');
 
             try {
-                const displayMode = document.querySelector('input[name="form-display-mode"]:checked')?.value || 'all_at_once';
+                const displayMode = document.querySelector('input[name="form-display-mode"]:checked')?.value || 'one_at_a_time';
                 const pdfToken = await ensurePdfTokenForVision();
                 const response = await fetch('/api/generate-form-config', {
                     method: 'POST',
@@ -4054,7 +4279,7 @@
                     step6Error.textContent = 'Form config has only one section. Restart node server.js and run Step 6 again.';
                 }
                 await formProgress.finish();
-                markStep6Complete();
+                await markStep6Complete();
             } catch (err) {
                 console.error('Form config generation error:', err);
                 formProgress.cancel();
@@ -4099,12 +4324,13 @@
             });
         }
 
-        function generateAndPreviewFormHtml() {
+        async function generateAndPreviewFormHtml() {
             step8Error.textContent = '';
             step8Status.textContent = '8';
             step8Status.classList.remove('complete', 'error');
 
             try {
+                await ensurePdfRegisteredOnServer();
                 const html = generateFormHtml();
                 if (!html) return;
 
@@ -4161,6 +4387,13 @@
         });
 
         addProfileEntryBtn.addEventListener('click', openAddProfileEntryModal);
+        resetProfileBtn.addEventListener('click', async () => {
+            try {
+                await resetUserProfile();
+            } catch (err) {
+                window.alert(err.message || 'Failed to reset profile.');
+            }
+        });
         closeAddProfileEntryModal.addEventListener('click', closeAddProfileEntryModalFn);
         cancelAddProfileEntry.addEventListener('click', closeAddProfileEntryModalFn);
         addProfileEntryModal.addEventListener('click', (e) => {

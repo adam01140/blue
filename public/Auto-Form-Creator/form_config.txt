@@ -151,10 +151,12 @@ RULES:
    TARGET: exactly 3 sections whenever possible (ideal UX). At most 4 only if the form has
    clearly unrelated major parts. Never fewer than 2 sections.
    Merge related PDF blocks (e.g. applicant sex checkboxes into Applicant section).
-   SECTION NAMES: ≤3 words, ideally ONE word. These appear in the stepper bar.
-   - GOOD: "Applicant", "Agency", "Employer", "Operator", "Legal"
-   - BAD: "Contributing Agency Information", "Authorized Agency ORI and Mail Code Details"
-   Shorten: "Applicant Information" → "Applicant", "Employer Information" → "Employer".
+   SECTION NAMES: Clear, self-explanatory labels for the stepper bar (≤3 words).
+   - Prefer TWO words when one word alone is vague: "Additional Info", "Submission Details", "Employer Info"
+   - GOOD: "Applicant", "Agency", "Employer", "Additional Info", "Submission Details"
+   - BAD: "Additional", "Other", "Misc", "Info" (too vague alone — use "Additional Info" instead)
+   - BAD: "Contributing Agency Information", "Authorized Agency ORI and Mail Code Details" (too long)
+   Shorten long headers but keep meaning: "Applicant Information" → "Applicant", "Employer Information" → "Employer".
 4. Write questions per the CRITICAL section above — never vague, never garbage, never "your your".
 5. PREFER DROPDOWNS OVER FREE-TEXT when the answer comes from a small, known set of options.
    Examples: day/night, Yes/No citizenship, eye color, state lists.
@@ -162,13 +164,16 @@ RULES:
    { "label": "Display label", "value": "Value written to PDF" } — value must match PDF expectations.
 6. For standalone checkbox PDF fields (single checkbox), use type "checkbox" with one option:
    { "label": "<field label>", "nameId": "<newName>", "value": "<label>" }
-7. CHECKBOX GROUPS — mutually exclusive sets (sex, DOJ/FBI service level):
-   ONE question type "checkbox" with ALL options in a single options array.
+7. CHECKBOX GROUPS — decide single vs multiple selection:
+   - Set checkboxSelectionMode on the question:
+     "single" = pick exactly one (sex/gender, yes/no style exclusive choices)
+     "multiple" = mark all that apply (DOJ + FBI service level, multi-select statutes)
+   - ONE question type "checkbox" with ALL related options in a single options array.
    NEVER create separate questions per checkbox option.
    Question text describes the group; option labels stay short:
-   - Sex (Male/Female/Nonbinary): "Please select your sex"
-   - Service level (DOJ/FBI): "Please select your level of service"
-   - Other multi-select: "Please select all that apply"
+   - Sex (Male/Female/Nonbinary): checkboxSelectionMode "single", text "Please select your sex"
+   - Service level (DOJ/FBI): checkboxSelectionMode "multiple", text "Please select your level of service"
+   - Other multi-select: checkboxSelectionMode "multiple", text "Please select all that apply"
    Each option: { "label": "Male", "nameId": "applicant_sex_male", "value": "Male" }
 8. QUESTION EXPLANATIONS — REQUIRED ON EVERY QUESTION (including gate dropdowns):
    - needsExplanation=true on EVERY question — no exceptions, no empty explanation strings.
@@ -179,6 +184,23 @@ RULES:
    - GOOD (gate): "Choose Yes or No to determine whether the following question applies to you."
    - NEVER put acronyms, parentheticals, or legal jargon in question text — only in explanation.
 9. Combine street+city+state+zip into one multipleTextboxes question when they belong together.
+   ADDRESS BLOCK RULES (CRITICAL):
+   - ALWAYS use exactly FOUR separate textboxes: Street, City, State, ZIP Code.
+   - NEVER combine State and ZIP into one textbox (BAD placeholder: "State and ZIP Code").
+   - Each textbox maps to its own field_config newName when one exists.
+   - When field_config has a zip field but NO separate state field for that address block
+     (common when the PDF prints "State ZIP Code" beside a single widget):
+     * Still include a separate State textbox with autopopulate profileKey "state".
+     * Omit nameId on the State textbox (profile-only UI) — the renderer assigns a UI id like
+       agency_state (NEVER include "zip" in the state box id/name).
+     * Set pdfCombineInto on the State textbox to the zip field's nameId so submit merges
+       "CA 93907" style values into the single PDF zip widget.
+   - Zip textbox nameId must match the field_config zip newName (e.g. agency_zip_code) and
+     must end in _zip_code — never use combined names like agency_state_zip_code.
+   For each textbox in multipleTextboxes:
+   - Set placeholder to the short user-facing hint (e.g. "Street address", "City", "State", "ZIP Code").
+   - The label field is internal metadata only — the rendered form shows placeholder text, not label text beside the input.
+   - Always provide a non-empty placeholder on every textbox.
 10. Use type "date" for DOB and date fields; "phone" for phone fields.
 11. Number questionId sequentially across all sections starting at 1.
 12. Set sectionCounter to max(sectionId)+1 and questionCounter to max(questionId)+1.
@@ -229,40 +251,55 @@ PRE-OUTPUT CHECKLIST (verify before returning JSON):
   □ No "your your" double possessive in any question
   □ Every question has needsExplanation=true and a full-sentence explanation
   □ Checkbox groups are merged (one question per group, not one per option)
+  □ Address multipleTextboxes use FOUR boxes (street, city, state, zip) — never one combined state+zip box
   □ Conditional fields have gate dropdowns immediately before them with correct logic
   □ Signature/today dates have autoTodayDate: true
-  □ Section names are ≤3 words; ideally 3 sections total
+  □ Section names are clear (≤3 words); avoid vague single words like "Additional" — use "Additional Info"
   □ Linked mirrors identified for duplicate name/address/date fields
 
 Return ONLY the JSON object.
 
 FEW-SHOT EXAMPLES (quality bar — match this style):
 
-Address block (multipleTextboxes — one question, not three):
+Address block (multipleTextboxes — one question, FOUR textboxes, never merge state+zip):
 {
   "questionId": 12,
   "text": "What is your home address?",
   "needsExplanation": true,
-  "explanation": "Enter your complete home address including street, city, and ZIP code as it should appear on the form.",
+  "explanation": "Enter your complete home address including street, city, state, and ZIP code as it should appear on the form.",
   "type": "multipleTextboxes",
   "textboxes": [
-    { "label": "Street", "nameId": "home_street_address_or_po_box" },
-    { "label": "City", "nameId": "applicant_home_city" },
-    { "label": "ZIP Code", "nameId": "applicant_home_zip_code" }
+    { "label": "Street Address or P.O. Box", "nameId": "home_street_address_or_po_box", "placeholder": "Street address" },
+    { "label": "City", "nameId": "applicant_home_city", "placeholder": "City" },
+    { "label": "State", "placeholder": "State", "autopopulate": { "enabled": true, "profileKey": "state", "profileDescription": "User's home state" }, "pdfCombineInto": "applicant_home_zip_code" },
+    { "label": "ZIP Code", "nameId": "applicant_home_zip_code", "placeholder": "ZIP Code" }
   ]
 }
 
-Sex checkbox group (ONE question, all options):
+Sex checkbox group (ONE question, all options — single selection only):
 {
   "questionId": 8,
   "text": "Please select your sex",
   "needsExplanation": true,
   "explanation": "Select the option that best describes your sex as required on the official form.",
   "type": "checkbox",
+  "checkboxSelectionMode": "single",
   "options": [
     { "label": "Male", "nameId": "applicant_sex_male", "value": "Male" },
     { "label": "Female", "nameId": "applicant_sex_female", "value": "Female" },
     { "label": "Nonbinary/Unspecified", "nameId": "applicant_sex_nonbinary", "value": "Nonbinary/Unspecified" }
+  ]
+}
+
+Service level checkbox group (mark all that apply):
+{
+  "questionId": 25,
+  "text": "Please select your level of service",
+  "type": "checkbox",
+  "checkboxSelectionMode": "multiple",
+  "options": [
+    { "label": "DOJ", "nameId": "level_of_service_doj", "value": "DOJ" },
+    { "label": "FBI", "nameId": "level_of_service_fbi", "value": "FBI" }
   ]
 }
 
