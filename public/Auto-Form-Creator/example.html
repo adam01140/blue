@@ -97,7 +97,7 @@
             color: #fff;
             text-decoration: none;
             font-weight: 700;
-            font-size: 1.18em;
+            font-size: 0.9em;
             letter-spacing: 0.02em;
             padding: 2px 8px;
             transition: color 0.2s, background 0.2s, box-shadow 0.2s, font-size 0.2s ease, letter-spacing 0.2s ease;
@@ -473,23 +473,23 @@
         /* Desktop nav: progressively smaller text/gaps before hamburger layout */
         @media (max-width: 1240px) {
             nav.desktop-nav { gap: 28px; }
-            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 1.08em; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.84em; }
             .nav-chevron { width: 13px; height: 13px; margin-left: 5px; }
         }
         @media (max-width: 1120px) {
             nav.desktop-nav { gap: 20px; }
-            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 1em; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.8em; }
             .dropdown-menu { top: 36px; }
             .dropdown-menu a { font-size: 1em; padding: 10px 22px; }
         }
         @media (max-width: 1040px) {
             nav.desktop-nav { gap: 14px; }
-            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.92em; letter-spacing: 0.015em; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.76em; letter-spacing: 0.015em; }
             .nav-chevron { width: 12px; height: 12px; margin-left: 4px; }
         }
         @media (max-width: 1000px) {
             nav.desktop-nav { gap: 9px; }
-            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.85em; letter-spacing: 0.01em; padding: 2px 4px; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.72em; letter-spacing: 0.01em; padding: 2px 4px; }
             .nav-chevron { width: 11px; height: 11px; margin-left: 3px; }
             .dropdown-menu { min-width: 188px; top: 34px; }
             .dropdown-menu a { font-size: 0.94em; padding: 9px 18px; }
@@ -1219,6 +1219,25 @@ document.addEventListener("DOMContentLoaded", function() {
           });
           return indices;
         }
+        function resolveShouldSubmit(activeContainer, currentPos, visibleTotal) {
+          const isLastSectionInForm = sectionIdx === sectionElements.length - 1;
+          const isLastVisibleInSection = currentPos === visibleTotal - 1 && currentPos !== -1;
+          return answerTriggersEnd(activeContainer) || (isLastSectionInForm && isLastVisibleInSection);
+        }
+        function requestAutoFormSubmit() {
+          if (typeof checkAuthBeforeNavigate === 'function') {
+            checkAuthBeforeNavigate(function() {
+              if (typeof window.__autoFormRequestSubmit === 'function') {
+                window.__autoFormRequestSubmit();
+              } else {
+                const formEl = document.getElementById('customForm');
+                if (formEl && typeof formEl.requestSubmit === 'function') formEl.requestSubmit();
+              }
+            });
+          } else if (typeof window.__autoFormRequestSubmit === 'function') {
+            window.__autoFormRequestSubmit();
+          }
+        }
         function getVisibleIndicesForSectionElement(targetSectionEl) {
 
           const items = Array.from(targetSectionEl.querySelectorAll('.question-container.question-item'));
@@ -1742,6 +1761,33 @@ document.addEventListener("DOMContentLoaded", function() {
           const visibleIndices = getVisibleIndices();
 
           if (!visibleIndices.length) {
+            if (activeIndex >= 0 && activeIndex < questionItems.length) {
+              questionItems.forEach(function(item, idx) {
+                if (idx === activeIndex) {
+                  item.classList.remove('question-step-hidden');
+                } else {
+                  item.classList.add('question-step-hidden');
+                }
+              });
+              const activeContainer = questionItems[activeIndex];
+              const activeQuestionId = activeContainer ? (activeContainer.getAttribute('data-question-id') || activeContainer.id || 'unknown') : 'unknown';
+              const activeQuestionTextEl = activeContainer ? activeContainer.querySelector('.question-text') : null;
+              const activeQuestionText = activeQuestionTextEl ? activeQuestionTextEl.textContent.trim() : '';
+              const isAnswered = isQuestionAnswered(activeContainer);
+              const shouldSubmit = resolveShouldSubmit(activeContainer, 0, 1);
+              cachedNextSectionInfo = null;
+              cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
+              updateButtons(
+                false,
+                false,
+                false,
+                null,
+                cachedPrevSectionInfo,
+                { shouldSubmit, isAnswered, questionId: activeQuestionId, questionText: activeQuestionText, currentPos: 0, visibleTotal: 1 }
+              );
+              isUpdating = false;
+              return;
+            }
 
             questionItems.forEach(function(item) {
               item.classList.add('question-step-hidden');
@@ -1768,15 +1814,9 @@ document.addEventListener("DOMContentLoaded", function() {
           }
 
           questionItems.forEach(function(item, idx) {
-            const questionId = item.getAttribute('data-question-id') || item.id || 'unknown';
-            const hasHiddenClass = item.classList.contains('hidden');
-            if (idx === targetIdx && !hasHiddenClass) {
-
+            if (idx === targetIdx) {
               item.classList.remove('question-step-hidden');
             } else {
-              if (idx === targetIdx && hasHiddenClass) {
-
-              }
               item.classList.add('question-step-hidden');
             }
           });
@@ -1795,7 +1835,7 @@ document.addEventListener("DOMContentLoaded", function() {
           const activeQuestionTextEl = activeContainer ? activeContainer.querySelector('.question-text') : null;
           const activeQuestionText = activeQuestionTextEl ? activeQuestionTextEl.textContent.trim() : '';
           attachSubmitModeListeners(activeContainer, targetIdx);
-          const shouldSubmit = answerTriggersEnd(activeContainer);
+          const shouldSubmit = resolveShouldSubmit(activeContainer, currentPos, visibleTotal);
           const isAnswered = isQuestionAnswered(activeContainer);
           const hasPrevQuestion = currentPos > 0;
 
@@ -1930,6 +1970,14 @@ document.addEventListener("DOMContentLoaded", function() {
           const visibleIndices = getVisibleIndices();
 
           if (!visibleIndices.length || activeIndex === -1) {
+            if (direction > 0 && activeIndex >= 0 && activeIndex < questionItems.length) {
+              const activeContainer = questionItems[activeIndex];
+              const shouldSubmit = resolveShouldSubmit(activeContainer, 0, 1);
+              if (shouldSubmit && activeContainer && isQuestionAnswered(activeContainer)) {
+                requestAutoFormSubmit();
+                return;
+              }
+            }
 
             if (direction > 0 && cachedNextSectionInfo) {
 
@@ -2009,7 +2057,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     };
                     goToNextSection();
                   } else {
-
+                    const activeContainer = questionItems[activeIndex];
+                    const shouldSubmit = resolveShouldSubmit(activeContainer, currentPos, visibleIndices.length);
+                    if (shouldSubmit && activeContainer && isQuestionAnswered(activeContainer)) {
+                      requestAutoFormSubmit();
+                    }
                   }
                 }
               }
@@ -2029,6 +2081,10 @@ document.addEventListener("DOMContentLoaded", function() {
           const visibleIndices = getVisibleIndices();
 
           if (!visibleIndices.length) {
+            if (activeIndex >= 0 && activeIndex < questionItems.length) {
+              activateIndex(activeIndex);
+              return;
+            }
 
             // If no visible questions found, try to show the first question anyway
             // This handles cases where questions don't have the 'hidden' class but might be hidden by CSS
@@ -2233,19 +2289,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             if (nextBtn.dataset.advanceMode === 'submit') {
-
-              // Check authentication before submitting
-              checkAuthBeforeNavigate(function() {
-
-              const formEl = document.getElementById('customForm');
-              if (formEl) {
-                if (typeof formEl.requestSubmit === 'function') {
-                  formEl.requestSubmit();
-                } else {
-                  formEl.submit();
-                }
-              }
-              });
+              requestAutoFormSubmit();
               return;
             }
 
@@ -2283,6 +2327,11 @@ document.addEventListener("DOMContentLoaded", function() {
           if (!evt || !evt.detail || !evt.detail.sectionId || evt.detail.sectionId === sectionId) {
             refreshNav();
           }
+        });
+        questionItems.forEach(function(item) {
+          item.addEventListener('refreshNavigation', function() {
+            refreshNav(activeIndex === -1 ? 0 : activeIndex);
+          });
         });
         window.questionNavControllers[sectionId] = refreshNav;
         const visibleIndices = getVisibleIndices();

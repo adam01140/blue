@@ -3,7 +3,33 @@ const path = require('path');
 const { fetchOpenAiWithRetry } = require('./openai-fetch');
 const { enrichFormConfigAutopopulate, isLikelyAutopopulatableField } = require('./form-autopopulate');
 const { ensureFormCatalogMetadata } = require('./form-catalog-metadata');
+const { applyLinkedFields } = require('./form-linked-fields');
 const { saveCurrentData } = require('./auto-form-current-data');
+
+const { buildFormConfigSkeleton } = require('./form-config-skeleton');
+const {
+  resolvePdfPageImages,
+  buildPdfVisionUserContent,
+} = require('./pdf-vision-context');
+const formQuestionText = require('./form-question-text');
+const { buildStructuredFieldMap, enrichFieldConfig } = require('./structured-field-context');
+const { inferFieldDomain } = require('./field-domain');
+
+const FORM_CONFIG_MODEL = 'gpt-4o';
+const FORM_CONFIG_POLISH_MODEL = 'gpt-4o';
+
+const POLISH_SECTION_PROMPT = `You improve ONLY the "explanation" field on survey questions for government/legal forms.
+
+Structure is FINAL — do NOT change sectionName, question text, types, nameIds, options, logic, or textboxes.
+
+You receive PDF page images for context. Write clear explanations that state WHOSE information is being collected:
+- Agency fields → the contributing agency (not the applicant's personal info)
+- Applicant fields → the person applying
+- Employer fields → the employer (not the applicant's home address)
+
+Each explanation must be at least one full sentence (minimum 12 words) and disambiguate common confusion (e.g. agency address vs home address).
+
+Return ONLY the section JSON object with updated explanations.`;
 
 const FORM_CONFIG_PROMPT_PATH = path.join(
   __dirname,
@@ -50,6 +76,404 @@ function getMissingNameIds(formConfig, fieldConfig) {
   return [...requiredNewNames].filter((name) => !covered.has(name));
 }
 
+const FIELD_ACRONYMS = new Set(['ati', 'oca', 'ori', 'doj', 'fbi', 'ssn', 'zip', 'cdl']);
+
+const VAGUE_LABELS = new Set([
+  'number', 'your number', 'code', 'your code', 'id', 'your id',
+  'misc number', 'misc. number', 'identifier',
+]);
+
+const VAGUE_QUESTION_PATTERNS = [
+  /^what is your (a |an )?number\??$/i,
+  /^what is the (a |an )?number\??$/i,
+  /^what is your (a |an )?code\??$/i,
+  /^what is the (a |an )?code\??$/i,
+  /^what is your (a |an )?id\??$/i,
+  /^what is the (a |an )?id\??$/i,
+  /^what is your your /i,
+];
+
+const CONDITIONAL_NAME_PATTERNS = [
+  /original/i,
+  /prior_/i,
+  /previous_/i,
+  /resubmi/i,
+  /re_submi/i,
+  /replacement/i,
+  /^if_/i,
+];
+
+const ALIAS_FIELD_PATTERNS = [
+  /other_(first|last|middle)_name/i,
+  /\balias\b/i,
+  /^aka_/i,
+  /other_name/i,
+];
+
+const GARBAGE_LABEL_PATTERNS = [
+  /page\s*\d+\s*of\s*\d+/gi,
+  /state\s+of\s+[a-z]+/gi,
+  /department\s+of\s+justice/gi,
+  /request\s+for\s+live\s+scan/gi,
+  /applicant\s+submission/gi,
+  /\bpage\s*\d+\b/gi,
+];
+
+const AUTO_TODAY_DATE_PATTERNS = [
+  /today.?s?.?date/i,
+  /current.?date/i,
+  /signature.?date/i,
+  /date.?signed/i,
+  /signing.?date/i,
+  /date.?of.?signature/i,
+];
+
+function isGarbageText(text) {
+  const normalized = String(text || '').trim();
+  return !normalized
+    || normalized.length > 80
+    || /page\s*\d/i.test(normalized)
+    || /department\s+of\s+justice/i.test(normalized)
+    || /state\s+of\s+/i.test(normalized)
+    || /request\s+for\s+/i.test(normalized);
+}
+
+function sanitizeFieldLabel(label, newName) {
+  let text = String(label || '').trim();
+  for (const pattern of GARBAGE_LABEL_PATTERNS) {
+    text = text.replace(pattern, ' ');
+  }
+  text = text.replace(/\s+/g, ' ').trim();
+
+  if (isGarbageText(text)) {
+    const fallback = formatFieldNameAsLabel(newName);
+    return fallback || text.slice(0, 80);
+  }
+  return text;
+}
+
+function formatFieldNameAsLabel(newName) {
+  if (!newName) return '';
+  return String(newName)
+    .split('_')
+    .filter(Boolean)
+    .map((word) => (FIELD_ACRONYMS.has(word.toLowerCase()) ? word.toUpperCase() : titleCaseWord(word)))
+    .join(' ');
+}
+
+function isVagueLabel(label) {
+  const normalized = String(label || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  return !normalized || VAGUE_LABELS.has(normalized);
+}
+
+function extractLabelFromDocument(field, extractedDocumentContent) {
+  const doc = String(extractedDocumentContent || '');
+  const fieldId = field?.id;
+  if (!doc || !fieldId) return '';
+
+  const marker = `[[${fieldId}]]`;
+  const idx = doc.indexOf(marker);
+  if (idx < 0) return '';
+
+  const before = doc.slice(Math.max(0, idx - 80), idx);
+  const lines = before.split(/\n/).map((line) => line.trim()).filter(Boolean);
+  const lastLine = lines[lines.length - 1] || before.trim();
+  const match = lastLine.match(/([A-Za-z][A-Za-z0-9\s.,\-/()]{1,48})$/);
+  const raw = match ? match[1].trim().replace(/\s+/g, ' ') : '';
+  return sanitizeFieldLabel(raw, field?.newName);
+}
+
+function resolveSpecificFieldLabel(field, extractedDocumentContent = '') {
+  const configLabel = sanitizeFieldLabel(field?.label, field?.newName);
+  if (configLabel && !isVagueLabel(configLabel) && !isGarbageText(configLabel)) return configLabel;
+
+  const docLabel = extractLabelFromDocument(field, extractedDocumentContent);
+  if (docLabel && !isVagueLabel(docLabel) && !isGarbageText(docLabel)) return docLabel;
+
+  const fromName = formatFieldNameAsLabel(field?.newName);
+  if (fromName && !isVagueLabel(fromName)) return fromName;
+
+  return configLabel || docLabel || fromName;
+}
+
+function buildQuestionTextForField(field, extractedDocumentContent = '') {
+  const label = resolveSpecificFieldLabel(field, extractedDocumentContent);
+  if (!label) return 'Please provide this information?';
+
+  if (/^(what|when|where|who|how|is|are|do|does|please)\b/i.test(label)) {
+    return label.endsWith('?') ? label : `${label}?`;
+  }
+  if (/^your\s+/i.test(label)) {
+    const withQuestion = label.endsWith('?') ? label : `${label}?`;
+    return withQuestion.replace(/\byour\s+your\b/gi, 'your');
+  }
+
+  const lowerLabel = label.charAt(0).toLowerCase() + label.slice(1);
+  if (/number|code|id|amount|date|phone/i.test(label)) {
+    return `What is your ${lowerLabel}?`.replace(/\byour\s+your\b/gi, 'your');
+  }
+  return `What is your ${lowerLabel}?`.replace(/\byour\s+your\b/gi, 'your');
+}
+
+function isVagueQuestionText(text, field, extractedDocumentContent = '') {
+  const normalized = String(text || '').trim();
+  if (!normalized) return true;
+  if (VAGUE_QUESTION_PATTERNS.some((pattern) => pattern.test(normalized))) return true;
+
+  const specificLabel = resolveSpecificFieldLabel(field, extractedDocumentContent);
+  if (!specificLabel || isVagueLabel(specificLabel)) return false;
+
+  const keywords = specificLabel
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((word) => word.length > 2 && !['your', 'the', 'and', 'for'].includes(word));
+
+  if (!keywords.length) return false;
+  const textLower = normalized.toLowerCase();
+  return !keywords.some((word) => textLower.includes(word));
+}
+
+function normalizeVagueQuestionText(formConfig, fieldConfig, extractedDocumentContent = '') {
+  if (!formConfig?.sections) return formConfig;
+
+  const fieldMap = new Map((fieldConfig?.fields || []).map((field) => [field.newName, field]));
+
+  for (const section of formConfig.sections) {
+    for (const question of section.questions || []) {
+      const nameId = question.nameId
+        || question.options?.[0]?.nameId
+        || question.textboxes?.[0]?.nameId;
+      const field = nameId ? fieldMap.get(nameId) : null;
+      if (!field || question.type === 'checkbox') continue;
+
+      question.text = String(question.text || '')
+        .replace(/\byour\s+your\b/gi, 'your')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const questionTextIsGarbage = isGarbageText(question.text);
+      const label = resolveSpecificFieldLabel(field, extractedDocumentContent);
+      const labelIsGarbage = isGarbageText(label);
+
+      if (labelIsGarbage || questionTextIsGarbage || isVagueQuestionText(question.text, field, extractedDocumentContent)) {
+        question.text = buildQuestionTextForField(field, extractedDocumentContent);
+      }
+    }
+  }
+
+  return formConfig;
+}
+
+function inferConditionalGateQuestion(field) {
+  if (field?.conditional?.gateQuestion) {
+    return String(field.conditional.gateQuestion).trim();
+  }
+
+  const label = String(field?.label || '').trim();
+  const name = String(field?.newName || '').trim();
+  const blob = `${label} ${name}`.toLowerCase();
+
+  const ifMatch = label.match(/^if\s+(.+?)(?:,|:|\s+list|\s+enter)/i);
+  if (ifMatch) {
+    const condition = ifMatch[1].trim().toLowerCase();
+    if (/re-?submission|resubmi/.test(condition)) return 'Is this a resubmission?';
+    if (/replacement/.test(condition)) return 'Are you requesting a replacement?';
+    if (/applicable|apply/.test(condition)) return 'Does this apply to you?';
+    return `Is this for ${condition}?`;
+  }
+
+  if (/original.*ati|ati.*original/.test(blob)) return 'Is this a resubmission?';
+  if (/alias|aka|other_(first|last|middle)_name/.test(blob)) return 'Do you have an alias?';
+  if (field?.conditional?.onlyWhen === 'has_alias') return 'Do you have an alias?';
+  if (/original|prior|previous|resubmi|replacement/.test(blob)) return 'Does this apply to your submission?';
+  return 'Does this apply?';
+}
+
+function isAliasField(field, question) {
+  const blob = `${field?.newName || ''} ${field?.label || ''} ${question?.text || ''}`;
+  return ALIAS_FIELD_PATTERNS.some((pattern) => pattern.test(blob));
+}
+
+function isConditionalField(field, question) {
+  if (field?.conditional) return true;
+
+  const label = String(field?.label || question?.text || '').trim();
+  const name = String(field?.newName || '').trim();
+  const blob = `${label} ${name}`;
+
+  if (/^if\s+/i.test(label) || /^if\s+/i.test(String(question?.text || ''))) return true;
+  return CONDITIONAL_NAME_PATTERNS.some((pattern) => pattern.test(blob));
+}
+
+function createGateQuestion(gateText) {
+  return {
+    questionId: 0,
+    text: gateText.endsWith('?') ? gateText : `${gateText}?`,
+    needsExplanation: false,
+    explanation: '',
+    type: 'dropdown',
+    logic: { enabled: false, prevQuestion: '', prevAnswer: '' },
+    jump: { enabled: false, option: '', to: '' },
+    options: [
+      { label: 'Yes', value: 'Yes' },
+      { label: 'No', value: 'No' },
+    ],
+    labels: [],
+    placeholder: '',
+    autopopulate: { enabled: false },
+  };
+}
+
+function renumberQuestions(formConfig) {
+  if (!formConfig?.sections) return formConfig;
+
+  const idMap = new Map();
+  let nextId = 1;
+
+  for (const section of formConfig.sections) {
+    for (const question of section.questions || []) {
+      idMap.set(question.questionId, nextId);
+      question.questionId = nextId;
+      nextId += 1;
+    }
+  }
+
+  const remapId = (value) => {
+    const parsed = parseInt(String(value || ''), 10);
+    if (!Number.isFinite(parsed)) return value;
+    return idMap.has(parsed) ? String(idMap.get(parsed)) : value;
+  };
+
+  for (const section of formConfig.sections) {
+    for (const question of section.questions || []) {
+      if (question.logic?.enabled && question.logic.prevQuestion) {
+        question.logic.prevQuestion = remapId(question.logic.prevQuestion);
+      }
+      if (question.jump?.enabled && question.jump.to) {
+        question.jump.to = remapId(question.jump.to);
+      }
+    }
+  }
+
+  if (Array.isArray(formConfig.linkedFieldGroups)) {
+    for (const group of formConfig.linkedFieldGroups) {
+      if (group.primaryQuestionId != null) {
+        group.primaryQuestionId = idMap.get(group.primaryQuestionId) || group.primaryQuestionId;
+      }
+    }
+  }
+
+  formConfig.questionCounter = nextId;
+  return formConfig;
+}
+
+function gateAlreadyPresent(questions, index) {
+  if (index < 1) return false;
+  const prev = questions[index - 1];
+  return Boolean(prev && prev.type === 'dropdown' && !prev.nameId);
+}
+
+function findExistingGateQuestion(questions, pattern) {
+  return (questions || []).find(
+    (q) => q.type === 'dropdown' && !q.nameId && pattern.test(String(q.text || ''))
+  );
+}
+
+function ensureConditionalGateQuestions(formConfig, fieldConfig) {
+  if (!formConfig?.sections) return formConfig;
+
+  const fieldMap = new Map((fieldConfig?.fields || []).map((field) => [field.newName, field]));
+  let inserted = false;
+
+  for (const section of formConfig.sections) {
+    const questions = section.questions || [];
+    let aliasGateQuestion = findExistingGateQuestion(questions, /alias/i);
+
+    for (let i = 0; i < questions.length; i += 1) {
+      const question = questions[i];
+      if (!question.nameId || question.linkedFieldRole === 'mirror') continue;
+      if (question.logic?.enabled && question.logic.prevQuestion && gateAlreadyPresent(questions, i)) {
+        continue;
+      }
+
+      const field = fieldMap.get(question.nameId);
+
+      if (isAliasField(field, question)) {
+        const existingAliasGate = aliasGateQuestion || findExistingGateQuestion(questions, /alias/i);
+        if (existingAliasGate) {
+          aliasGateQuestion = existingAliasGate;
+          if (!question.logic?.enabled) {
+            question.logic = {
+              enabled: true,
+              prevQuestion: String(existingAliasGate.questionId),
+              prevAnswer: 'Yes',
+            };
+          }
+          continue;
+        }
+
+        question.text = buildQuestionTextForField(field);
+        question.text = String(question.text || '')
+          .replace(/^if\s+.+?,\s*(?:list|enter|provide)\s+/i, '')
+          .replace(/^if\s+.+?,\s*/i, '')
+          .trim();
+        if (question.text && !question.text.endsWith('?')) {
+          question.text = `${question.text}?`;
+        }
+
+        if (aliasGateQuestion) {
+          question.logic = {
+            enabled: true,
+            prevQuestion: String(aliasGateQuestion.questionId),
+            prevAnswer: 'Yes',
+          };
+          continue;
+        }
+
+        const gateQuestion = createGateQuestion('Do you have an alias?');
+        questions.splice(i, 0, gateQuestion);
+        aliasGateQuestion = gateQuestion;
+        question.logic = {
+          enabled: true,
+          prevQuestion: String(gateQuestion.questionId),
+          prevAnswer: 'Yes',
+        };
+        inserted = true;
+        i += 1;
+        continue;
+      }
+
+      if (!isConditionalField(field, question)) continue;
+      if (question.logic?.enabled && findExistingGateQuestion(questions, /resubmi|applicable|replacement/i)) continue;
+
+      if (field) {
+        question.text = buildQuestionTextForField(field);
+      }
+      question.text = String(question.text || '')
+        .replace(/^if\s+.+?,\s*(?:list|enter|provide)\s+/i, '')
+        .replace(/^if\s+.+?,\s*/i, '')
+        .trim();
+      if (question.text && !question.text.endsWith('?')) {
+        question.text = `${question.text}?`;
+      }
+
+      const gateText = inferConditionalGateQuestion(field || { label: question.text, newName: question.nameId });
+      const gateQuestion = createGateQuestion(gateText);
+      questions.splice(i, 0, gateQuestion);
+      question.logic = {
+        enabled: true,
+        prevQuestion: '0',
+        prevAnswer: 'Yes',
+      };
+      inserted = true;
+      i += 1;
+    }
+    section.questions = questions;
+  }
+
+  return inserted ? renumberQuestions(formConfig) : formConfig;
+}
+
 function inferQuestionType(field) {
   if (field.type === 'checkbox') return 'checkbox';
   const hint = `${field.newName} ${field.label || ''}`;
@@ -77,7 +501,7 @@ function injectMissingFieldQuestions(formConfig, fieldConfig, missingNames) {
   if (!targetSection) {
     targetSection = {
       sectionId: maxSectionId + 1 || 1,
-      sectionName: 'Additional Fields',
+      sectionName: 'Other',
       questions: [],
     };
     formConfig.sections = formConfig.sections || [];
@@ -93,11 +517,11 @@ function injectMissingFieldQuestions(formConfig, fieldConfig, missingNames) {
 
     maxQuestionId += 1;
     const questionType = inferQuestionType(field);
-    const label = field.label || nameId.replace(/_/g, ' ');
+    const label = resolveSpecificFieldLabel(field);
 
     const question = {
       questionId: maxQuestionId,
-      text: questionType === 'checkbox' ? label : `What is your ${label.toLowerCase()}?`,
+      text: questionType === 'checkbox' ? label : buildQuestionTextForField(field),
       type: questionType,
       logic: { enabled: false, prevQuestion: '', prevAnswer: '' },
       jump: { enabled: false, option: '', to: '' },
@@ -126,7 +550,115 @@ function injectMissingFieldQuestions(formConfig, fieldConfig, missingNames) {
   return formConfig;
 }
 
-function consolidateSections(formConfig, targetCount = 3, hardMax = 4) {
+const SECTION_NAME_ALIASES = {
+  'applicant information': 'Applicant',
+  'applicant info': 'Applicant',
+  'contributing agency information': 'Agency',
+  'contributing agency': 'Agency',
+  'agency information': 'Agency',
+  'employer information': 'Employer',
+  'service level': 'Service',
+  'applicant sex': 'Applicant',
+  'signature block': 'Signature',
+  'declarations': 'Legal',
+  'additional fields': 'Other',
+};
+
+const SECTION_NAME_STOP_WORDS = new Set([
+  'information', 'info', 'details', 'section', 'data', 'the', 'and', 'of', 'for', 'your', 'please', 'enter',
+]);
+
+function titleCaseWord(word) {
+  if (!word) return '';
+  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+}
+
+function shortenSectionName(name, maxWords = 3) {
+  const raw = String(name || 'Section').trim();
+  if (!raw) return 'Section';
+
+  if (raw.includes(' & ')) {
+    const parts = raw.split(' & ').map((part) => shortenSectionName(part, 1));
+    const unique = [];
+    for (const part of parts) {
+      if (part && !unique.includes(part)) unique.push(part);
+    }
+    return unique.slice(0, maxWords).join(' & ') || 'Info';
+  }
+
+  const lower = raw.toLowerCase().replace(/\s+/g, ' ');
+  if (SECTION_NAME_ALIASES[lower]) return SECTION_NAME_ALIASES[lower];
+
+  const words = lower.replace(/[^a-z0-9\s-]/g, '').split(/\s+/).filter(Boolean);
+  const meaningful = words.filter((word) => !SECTION_NAME_STOP_WORDS.has(word));
+  const picked = (meaningful.length ? meaningful : words).slice(0, maxWords);
+  if (!picked.length) return 'Section';
+  return picked.map(titleCaseWord).join(' ');
+}
+
+function mergeSectionNames(leftName, rightName) {
+  const left = shortenSectionName(leftName, 1);
+  const right = shortenSectionName(rightName, 1);
+  if (left === right) return left;
+  return `${left} & ${right}`;
+}
+
+function shortenSectionNames(formConfig) {
+  if (!formConfig?.sections) return formConfig;
+  for (const section of formConfig.sections) {
+    section.sectionName = shortenSectionName(section.sectionName, 3);
+  }
+  return formConfig;
+}
+
+function ensureMinimumSections(formConfig, minCount = 2) {
+  if (!formConfig?.sections || formConfig.sections.length >= minCount) return formConfig;
+
+  const only = formConfig.sections[0];
+  const questions = [...(only?.questions || [])];
+  if (questions.length < minCount) return formConfig;
+
+  const splitAt = Math.ceil(questions.length / minCount);
+  const chunks = [];
+  for (let i = 0; i < questions.length; i += splitAt) {
+    chunks.push(questions.slice(i, i + splitAt));
+  }
+
+  const defaultNames = ['Agency', 'Applicant', 'Employer', 'Service', 'Other'];
+  formConfig.sections = chunks.map((chunk, idx) => ({
+    sectionId: idx + 1,
+    sectionName: defaultNames[idx] || `Section ${idx + 1}`,
+    questions: chunk,
+  }));
+
+  return renumberQuestions(formConfig);
+}
+
+function countFormQuestions(formConfig) {
+  let total = 0;
+  for (const section of formConfig?.sections || []) {
+    total += (section.questions || []).length;
+  }
+  return total;
+}
+
+function ensureAdequateSectionLayout(formConfig, fieldConfig) {
+  if (!formConfig?.sections?.length) return formConfig;
+
+  const fieldCount = (fieldConfig?.fields || []).length;
+  const sectionCount = formConfig.sections.length;
+  const questionCount = countFormQuestions(formConfig);
+  const minSections = fieldCount >= 12 || questionCount >= 12 ? 3 : 2;
+
+  if (sectionCount >= minSections) return formConfig;
+
+  console.warn(
+    `[generate-form-config] Only ${sectionCount} section(s) for ${fieldCount} fields / ${questionCount} questions — forcing ${minSections} sections`
+  );
+  return ensureMinimumSections(formConfig, minSections);
+}
+
+function consolidateSections(formConfig, targetCount = 3, hardMax = 4, minCount = 2) {
   if (!formConfig || !Array.isArray(formConfig.sections)) return formConfig;
 
   let sections = formConfig.sections.map((section) => ({
@@ -135,7 +667,11 @@ function consolidateSections(formConfig, targetCount = 3, hardMax = 4) {
     questions: [...(section.questions || [])],
   }));
 
-  if (sections.length <= targetCount) return formConfig;
+  if (sections.length <= targetCount) {
+    formConfig.sections = sections;
+    formConfig.sectionCounter = sections.length + 1;
+    return ensureMinimumSections(formConfig, minCount);
+  }
 
   while (sections.length > hardMax) {
     let bestIdx = 0;
@@ -149,9 +685,7 @@ function consolidateSections(formConfig, targetCount = 3, hardMax = 4) {
     }
     const left = sections[bestIdx];
     const right = sections[bestIdx + 1];
-    const mergedName = left.sectionName === right.sectionName
-      ? left.sectionName
-      : `${left.sectionName} & ${right.sectionName}`;
+    const mergedName = mergeSectionNames(left.sectionName, right.sectionName);
     sections.splice(bestIdx, 2, {
       sectionId: left.sectionId,
       sectionName: mergedName,
@@ -171,9 +705,7 @@ function consolidateSections(formConfig, targetCount = 3, hardMax = 4) {
     }
     const left = sections[bestIdx];
     const right = sections[bestIdx + 1];
-    const mergedName = left.sectionName === right.sectionName
-      ? left.sectionName
-      : `${left.sectionName} & ${right.sectionName}`;
+    const mergedName = mergeSectionNames(left.sectionName, right.sectionName);
     sections.splice(bestIdx, 2, {
       sectionId: left.sectionId,
       sectionName: mergedName,
@@ -186,7 +718,7 @@ function consolidateSections(formConfig, targetCount = 3, hardMax = 4) {
   });
   formConfig.sections = sections;
   formConfig.sectionCounter = sections.length + 1;
-  return formConfig;
+  return ensureMinimumSections(formConfig, minCount);
 }
 
 function checkboxGroupPrefix(nameId) {
@@ -204,15 +736,30 @@ function checkboxGroupPrefix(nameId) {
   return id;
 }
 
-function inferMergedCheckboxQuestionText(group) {
-  const texts = group.map((q) => String(q.text || '').trim()).filter(Boolean);
-  const lower = texts.join(' ').toLowerCase();
-  if (/sex|gender/.test(lower)) return 'What is your sex?';
-  if (/level of service|service level/.test(lower)) return 'What is the level of service?';
-  if (texts.length === 1) return texts[0].replace(/\?$/, '?');
-  const first = texts[0].replace(/\?$/, '').trim();
-  if (first.length < 80) return `${first}?`;
-  return 'Please select all that apply';
+function isBareCheckboxOptionText(text, options = []) {
+  const normalized = String(text || '').trim().replace(/\?+$/, '').toLowerCase();
+  if (!normalized) return true;
+  if (options.some((opt) => String(opt.label || '').trim().toLowerCase() === normalized)) return true;
+  if (normalized.length <= 24 && /^(male|female|nonbinary|doj|fbi|yes|no)$/i.test(normalized)) return true;
+  return false;
+}
+
+function inferCheckboxGroupQuestionText(group) {
+  const optionLabels = group.flatMap((q) => (q.options || []).map((opt) => opt.label)).filter(Boolean);
+  const nameIds = group.flatMap((q) => (q.options || []).map((opt) => opt.nameId)).filter(Boolean);
+  const blob = [...optionLabels, ...nameIds, ...group.map((q) => q.text)].join(' ').toLowerCase();
+
+  if (/male|female|nonbinary|sex|gender|morf/.test(blob)) {
+    return 'Please select your sex';
+  }
+  if (/doj|fbi|level.?of.?service|service.?level/.test(blob)) {
+    return 'Please select your level of service';
+  }
+  if (optionLabels.length > 1) {
+    return 'Please select all that apply';
+  }
+  const label = optionLabels[0] || group[0]?.text || 'this option';
+  return `Please confirm: ${String(label).replace(/\?+$/, '')}`;
 }
 
 function mergeFragmentedCheckboxGroups(formConfig) {
@@ -244,7 +791,7 @@ function mergeFragmentedCheckboxGroups(formConfig) {
           const merged = {
             ...group[0],
             questionId: group[0].questionId,
-            text: inferMergedCheckboxQuestionText(group),
+            text: inferCheckboxGroupQuestionText(group),
             type: 'checkbox',
             nameId: undefined,
             options: group.flatMap((item) => item.options || []),
@@ -262,21 +809,193 @@ function mergeFragmentedCheckboxGroups(formConfig) {
   return formConfig;
 }
 
-function normalizeQuestionExplanations(formConfig) {
+function normalizeCheckboxGroupQuestions(formConfig) {
+  const merged = mergeFragmentedCheckboxGroups(formConfig);
+  if (!merged?.sections) return merged;
+
+  for (const section of merged.sections) {
+    for (const question of section.questions || []) {
+      if (question.type !== 'checkbox') continue;
+      const options = question.options || [];
+      if (isBareCheckboxOptionText(question.text, options)) {
+        question.text = inferCheckboxGroupQuestionText([question]);
+      }
+    }
+  }
+
+  return merged;
+}
+
+function toExplanationPhrase(detail) {
+  const cleaned = String(detail || '').trim().replace(/[.!?]+$/, '');
+  if (!cleaned) return '';
+  if (/^this\b/i.test(cleaned)) {
+    return /[.!?]$/.test(cleaned) ? cleaned : `${cleaned}.`;
+  }
+  if (/^(a|an|the)\b/i.test(cleaned)) return `This is ${cleaned}.`;
+  return `This is ${cleaned}.`;
+}
+
+function stripInlineQuestionDetails(formConfig) {
   if (!formConfig?.sections) return formConfig;
 
   for (const section of formConfig.sections) {
     for (const question of section.questions || []) {
-      if (question.needsExplanation == null) {
-        question.needsExplanation = Boolean(question.explanation);
+      let text = String(question.text || '').trim();
+      if (!text) continue;
+
+      const extracted = [];
+      const cleaned = text
+        .replace(/\s*\(([^)]+)\)/g, (_, inner) => {
+          const detail = String(inner || '').trim();
+          if (detail) extracted.push(detail);
+          return ' ';
+        })
+        .replace(/\s+/g, ' ')
+        .replace(/\s+\?/g, '?')
+        .trim();
+
+      if (!extracted.length) continue;
+
+      let shortText = cleaned;
+      if (!shortText.endsWith('?')) {
+        shortText = shortText.replace(/[.!]+$/, '').trim();
+        shortText = shortText.endsWith('?') ? shortText : `${shortText}?`;
       }
-      if (!question.needsExplanation) {
-        question.explanation = '';
-        continue;
+
+      question.text = shortText;
+      const movedBlurbs = extracted.map(toExplanationPhrase).filter(Boolean).join(' ');
+      const existing = String(question.explanation || '').trim();
+      question.explanation = existing
+        ? `${existing} ${movedBlurbs}`.trim()
+        : movedBlurbs;
+      question.needsExplanation = Boolean(question.explanation);
+    }
+  }
+
+  return formConfig;
+}
+
+function stripQuestionTextForExplanation(text) {
+  return String(text || '')
+    .replace(/^\s*\d+[\.\)\:\-]\s*/, '')
+    .replace(/^what is your /i, '')
+    .replace(/^please (enter|provide|select) /i, '')
+    .replace(/\?+$/, '')
+    .trim();
+}
+
+function isFragmentExplanation(text) {
+  const t = String(text || '').trim();
+  if (!t) return true;
+  const words = t.split(/\s+/).length;
+  if (words < 6) return true;
+  if (/^this is\b/i.test(t) && words < 9) return true;
+  if (/^this is (aka|an alias)\b/i.test(t)) return true;
+  if (/this is aka or alias/i.test(t)) return true;
+  return false;
+}
+
+function buildExplanationForQuestion(question, field, extractedDocumentContent = '') {
+  const label = resolveSpecificFieldLabel(field, extractedDocumentContent)
+    || stripQuestionTextForExplanation(question.text)
+    || formatFieldNameAsLabel(field?.newName);
+  const nameBlob = `${field?.newName || ''} ${label}`.toLowerCase();
+
+  if (/alias|aka|other_(first|last|middle)_name/.test(nameBlob)) {
+    if (/last/i.test(nameBlob)) {
+      return 'Please enter the last name you use as an alias, if different from your legal name.';
+    }
+    if (/first/i.test(nameBlob)) {
+      return 'Please enter the first name you use as an alias, if different from your legal name.';
+    }
+    if (/middle/i.test(nameBlob)) {
+      return 'Please enter the middle name you use as an alias, if different from your legal name.';
+    }
+    return 'Please enter any name you use as an alias, if different from your legal name.';
+  }
+  if (/mail.?code/i.test(nameBlob)) {
+    return 'This is the five-digit mail code assigned to your agency by the Department of Justice.';
+  }
+  if (/\bori\b/i.test(nameBlob)) {
+    return 'This is your agency\'s Originating Agency Identifier code assigned by the DOJ.';
+  }
+  if (/\boca\b/i.test(nameBlob)) {
+    return 'This is your Operator Control Agency number used to track live scan submissions.';
+  }
+  if (/\bati\b/i.test(nameBlob)) {
+    return 'This is your Applicant Tracking Identifier number from your live scan submission.';
+  }
+  if (/resubmi|original.*ati/i.test(nameBlob)) {
+    return 'Enter the ATI number from your original submission if you are resubmitting a live scan.';
+  }
+  if (question.autoTodayDate) {
+    return 'This date is automatically set to today\'s date for your convenience.';
+  }
+  if (question.type === 'date') {
+    return `Enter the date for ${label.toLowerCase()} as shown on your records. Use the calendar picker or type MM/DD/YYYY.`;
+  }
+  if (question.type === 'phone') {
+    return `Enter a phone number where you can be reached regarding ${label.toLowerCase()}.`;
+  }
+  if (question.type === 'checkbox') {
+    return 'Select the option or options that best apply to your situation.';
+  }
+  if (question.type === 'dropdown' && !question.nameId) {
+    return 'Choose Yes or No to determine whether the following question applies to you.';
+  }
+  return `Please provide your ${label.toLowerCase()} exactly as it should appear on the completed form.`;
+}
+
+function isAutoTodayDateField(field, question) {
+  const blob = `${field?.newName || ''} ${field?.label || ''} ${question?.text || ''}`;
+  return AUTO_TODAY_DATE_PATTERNS.some((pattern) => pattern.test(blob));
+}
+
+function markAutoTodayDateFields(formConfig, fieldConfig) {
+  if (!formConfig?.sections) return formConfig;
+
+  const fieldMap = new Map((fieldConfig?.fields || []).map((field) => [field.newName, field]));
+
+  for (const section of formConfig.sections) {
+    for (const question of section.questions || []) {
+      if (question.linkedFieldRole === 'mirror') continue;
+      const nameId = question.nameId
+        || question.options?.[0]?.nameId
+        || question.textboxes?.[0]?.nameId;
+      const field = nameId ? fieldMap.get(nameId) : null;
+      if (!isAutoTodayDateField(field, question)) continue;
+
+      question.autoTodayDate = true;
+      if (question.type === 'text' || !question.type) {
+        question.type = 'date';
       }
+    }
+  }
+
+  return formConfig;
+}
+
+function normalizeQuestionExplanations(formConfig, fieldConfig, extractedDocumentContent = '') {
+  if (!formConfig?.sections) return formConfig;
+
+  const fieldMap = new Map((fieldConfig?.fields || []).map((field) => [field.newName, field]));
+
+  for (const section of formConfig.sections) {
+    for (const question of section.questions || []) {
+      question.needsExplanation = true;
+
+      const nameId = question.nameId
+        || question.options?.[0]?.nameId
+        || question.textboxes?.[0]?.nameId;
+      const field = nameId ? fieldMap.get(nameId) : null;
+
       question.explanation = String(question.explanation || '').trim();
+      if (isFragmentExplanation(question.explanation)) {
+        question.explanation = buildExplanationForQuestion(question, field, extractedDocumentContent);
+      }
       if (!question.explanation) {
-        question.needsExplanation = false;
+        question.explanation = buildExplanationForQuestion(question, field, extractedDocumentContent);
       }
     }
   }
@@ -299,11 +1018,12 @@ function validateFormConfig(formConfig, fieldConfig) {
   return formConfig;
 }
 
-async function callOpenAiForFormConfig(openAiApiKey, payload, extraInstruction) {
+async function callOpenAiForFormConfig(openAiApiKey, payload, extraInstruction, pageImages = []) {
   const systemPrompt = loadFormConfigPrompt();
-  const userContent = extraInstruction
+  const textPayload = extraInstruction
     ? `${JSON.stringify(payload, null, 2)}\n\nIMPORTANT: ${extraInstruction}`
     : JSON.stringify(payload, null, 2);
+  const userContent = buildPdfVisionUserContent(textPayload, pageImages);
 
   const response = await fetchOpenAiWithRetry('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -336,36 +1056,262 @@ async function callOpenAiForFormConfig(openAiApiKey, payload, extraInstruction) 
   return extractJsonFromModelResponse(content);
 }
 
-async function generateFormConfig(payload, openAiApiKey) {
-  const { fieldConfig, displayMode = 'all_at_once', userProfile = {} } = payload;
-  if (!fieldConfig?.fields?.length) {
-    throw new Error('fieldConfig.fields is required');
+function applyDeterministicQuestionWording(formConfig, fieldConfig, payload = {}) {
+  const { extractedDocumentContent = '', structuredFields = [] } = payload;
+  const fieldMap = new Map((fieldConfig?.fields || []).map((field) => [field.newName, field]));
+  const contextMap = buildStructuredFieldMap(structuredFields);
+
+  for (const section of formConfig?.sections || []) {
+    for (const question of section.questions || []) {
+      if (question.type === 'multipleTextboxes' && question.textboxes?.length) {
+        const primary = fieldMap.get(question.textboxes[0].nameId);
+        if (primary) {
+          const ctx = contextMap.get(primary.id);
+          const domain = inferFieldDomain(primary);
+          question.text = formQuestionText.buildAddressQuestionText(domain);
+        }
+        continue;
+      }
+
+      if (question.type === 'checkbox' && (question.options?.length || 0) > 1) {
+        continue;
+      }
+
+      if (!question.nameId || !fieldMap.has(question.nameId)) continue;
+
+      const field = fieldMap.get(question.nameId);
+      const ctx = contextMap.get(field.id);
+      question.text = formQuestionText.buildQuestionTextForField(field, extractedDocumentContent, ctx);
+      question.placeholder = formQuestionText.resolveSpecificFieldLabel(field, extractedDocumentContent, ctx);
+      question.needsExplanation = true;
+    }
   }
 
-  let config = await callOpenAiForFormConfig(openAiApiKey, payload);
+  return formConfig;
+}
+
+function applyDeterministicExplanations(formConfig, fieldConfig, payload = {}) {
+  const { extractedDocumentContent = '', structuredFields = [] } = payload;
+  const fieldMap = new Map((fieldConfig?.fields || []).map((field) => [field.newName, field]));
+  const contextMap = buildStructuredFieldMap(structuredFields);
+
+  for (const section of formConfig?.sections || []) {
+    for (const question of section.questions || []) {
+      if (question.type === 'multipleTextboxes' && question.textboxes?.length) {
+        const primary = fieldMap.get(question.textboxes[0].nameId);
+        if (primary) {
+          const ctx = contextMap.get(primary.id);
+          const domain = inferFieldDomain(primary);
+          question.explanation = formQuestionText.buildExplanationForQuestion(
+            { ...question, _addressDomain: domain },
+            primary,
+            extractedDocumentContent,
+            ctx
+          );
+        }
+        continue;
+      }
+
+      if (question.type === 'checkbox' && (question.options?.length || 0) > 1) {
+        const primary = fieldMap.get(question.options[0]?.nameId);
+        if (primary) {
+          question.explanation = formQuestionText.buildExplanationForQuestion(
+            question,
+            primary,
+            extractedDocumentContent,
+            contextMap.get(primary.id)
+          );
+        }
+        continue;
+      }
+
+      if (!question.nameId || !fieldMap.has(question.nameId)) continue;
+
+      const field = fieldMap.get(question.nameId);
+      const ctx = contextMap.get(field.id);
+      question.explanation = formQuestionText.buildExplanationForQuestion(
+        question,
+        field,
+        extractedDocumentContent,
+        ctx
+      );
+      question.needsExplanation = true;
+    }
+  }
+
+  return formConfig;
+}
+
+function postProcessFormConfig(formConfig, fieldConfig, payload = {}) {
+  const {
+    extractedDocumentContent = '',
+    displayMode = 'all_at_once',
+    userProfile = {},
+    structuredFields = [],
+  } = payload;
+
+  let config = formConfig;
   let missing = getMissingNameIds(config, fieldConfig);
-
-  if (missing.length > 0) {
-    console.warn(`[generate-form-config] Retrying — ${missing.length} field(s) missing from model output`);
-    config = await callOpenAiForFormConfig(
-      openAiApiKey,
-      payload,
-      `You MUST include every field_config.fields newName exactly once. Missing from prior output: ${missing.join(', ')}`
-    );
-    missing = getMissingNameIds(config, fieldConfig);
-  }
-
   if (missing.length > 0) {
     console.warn(`[generate-form-config] Injecting ${missing.length} missing field question(s)`);
     config = injectMissingFieldQuestions(config, fieldConfig, missing);
   }
 
   const validated = validateFormConfig(config, fieldConfig);
-  const consolidated = consolidateSections(validated, 3, 4);
-  const merged = mergeFragmentedCheckboxGroups(consolidated);
-  const normalized = normalizeQuestionExplanations(merged);
-  const enriched = enrichFormConfigAutopopulate(normalized, userProfile, displayMode, fieldConfig);
-  return ensureFormCatalogMetadata(enriched, fieldConfig);
+  const consolidated = consolidateSections(validated, 3, 4, 2);
+  const fieldCount = (fieldConfig?.fields || []).length;
+  const minSectionTarget = fieldCount >= 12 ? 3 : 2;
+  const minSections = ensureMinimumSections(consolidated, minSectionTarget);
+  const shortSections = shortenSectionNames(minSections);
+  const checkboxNormalized = normalizeCheckboxGroupQuestions(shortSections);
+  const conditionalGated = ensureConditionalGateQuestions(checkboxNormalized, fieldConfig);
+  const vagueNormalized = normalizeVagueQuestionText(
+    conditionalGated,
+    fieldConfig,
+    extractedDocumentContent
+  );
+  const strippedQuestions = stripInlineQuestionDetails(vagueNormalized);
+  const autoDateMarked = markAutoTodayDateFields(strippedQuestions, fieldConfig);
+  const normalized = normalizeQuestionExplanations(autoDateMarked, fieldConfig, extractedDocumentContent);
+  const linked = applyLinkedFields(normalized, fieldConfig);
+  const enriched = enrichFormConfigAutopopulate(linked, userProfile, displayMode, fieldConfig);
+  const clarified = applyDeterministicQuestionWording(enriched, fieldConfig, {
+    extractedDocumentContent,
+    structuredFields,
+  });
+  const explained = applyDeterministicExplanations(clarified, fieldConfig, {
+    extractedDocumentContent,
+    structuredFields,
+  });
+  return ensureFormCatalogMetadata(explained, fieldConfig);
+}
+
+async function polishSectionWithAI(section, openAiApiKey, fieldConfig, pageImages = []) {
+  if (!openAiApiKey || !section?.questions?.length) return section;
+
+  try {
+    const userContent = buildPdfVisionUserContent(
+      JSON.stringify({
+        sectionName: section.sectionName,
+        sectionId: section.sectionId,
+        questions: section.questions,
+        formTitle: fieldConfig?.formTitle,
+      }, null, 2),
+      pageImages
+    );
+
+    const response = await fetchOpenAiWithRetry('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${openAiApiKey}`,
+      },
+      body: JSON.stringify({
+        model: FORM_CONFIG_POLISH_MODEL,
+        messages: [
+          { role: 'system', content: POLISH_SECTION_PROMPT },
+          { role: 'user', content: userContent },
+        ],
+        temperature: 0.2,
+        response_format: { type: 'json_object' },
+      }),
+    });
+
+    if (!response.ok) return section;
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
+    if (!content) return section;
+
+    const polished = extractJsonFromModelResponse(content);
+    if (!polished?.questions?.length) return section;
+
+    const byId = new Map(polished.questions.map((q) => [q.questionId, q]));
+    const mergedQuestions = section.questions.map((original) => {
+      const update = byId.get(original.questionId);
+      if (!update) return original;
+      return {
+        ...original,
+        explanation: String(update.explanation || original.explanation || '').trim() || original.explanation,
+        needsExplanation: true,
+      };
+    });
+
+    return {
+      ...section,
+      questions: mergedQuestions,
+    };
+  } catch (err) {
+    console.warn(`[generate-form-config] Section polish failed (${section.sectionName}):`, err.message);
+    return section;
+  }
+}
+
+async function polishFormConfigWithAI(formConfig, fieldConfig, openAiApiKey, pageImages = []) {
+  if (!openAiApiKey || !formConfig?.sections?.length) return formConfig;
+
+  const polishedSections = [];
+  for (const section of formConfig.sections) {
+    polishedSections.push(await polishSectionWithAI(section, openAiApiKey, fieldConfig, pageImages));
+  }
+
+  return { ...formConfig, sections: polishedSections };
+}
+
+async function generateFormConfig(payload, openAiApiKey) {
+  const {
+    fieldConfig,
+    structuredFields = [],
+    extractedDocumentContent = '',
+    displayMode = 'all_at_once',
+    userProfile = {},
+    pdfToken = '',
+    pdfBase64 = '',
+    skipVision = true,
+    skipPolish = false,
+  } = payload;
+
+  if (!fieldConfig?.fields?.length) {
+    throw new Error('fieldConfig.fields is required');
+  }
+
+  const enrichedFieldConfig = enrichFieldConfig(
+    fieldConfig,
+    structuredFields,
+    extractedDocumentContent
+  );
+
+  let pageImages = [];
+  if (openAiApiKey) {
+    pageImages = await resolvePdfPageImages(
+      { pdfToken, pdfBase64 },
+      { required: !skipPolish, logPrefix: '[generate-form-config]' }
+    );
+  }
+
+  let config = buildFormConfigSkeleton(enrichedFieldConfig, {
+    structuredFields,
+    extractedDocumentContent,
+    displayMode,
+  });
+
+  config = postProcessFormConfig(config, enrichedFieldConfig, {
+    extractedDocumentContent,
+    displayMode,
+    userProfile,
+    structuredFields,
+  });
+
+  if (!skipPolish && openAiApiKey) {
+    if (!pageImages.length) {
+      throw new Error('PDF page images are required for form config AI polish. Re-run Step 3.');
+    }
+    config = await polishFormConfigWithAI(config, enrichedFieldConfig, openAiApiKey, pageImages);
+  }
+
+  config = ensureAdequateSectionLayout(config, enrichedFieldConfig);
+
+  return config;
 }
 
 function createHandleGenerateFormConfig(openAiApiKey) {
@@ -374,12 +1320,21 @@ function createHandleGenerateFormConfig(openAiApiKey) {
       const {
         fieldConfig,
         extractedDocumentContent = '',
+        structuredFields = [],
         displayMode = 'all_at_once',
         userProfile = {},
+        pdfToken = '',
       } = req.body || {};
 
       const formConfig = await generateFormConfig(
-        { fieldConfig, extractedDocumentContent, displayMode, userProfile },
+        {
+          fieldConfig,
+          extractedDocumentContent,
+          structuredFields,
+          displayMode,
+          userProfile,
+          pdfToken,
+        },
         openAiApiKey
       );
 
@@ -396,6 +1351,7 @@ function createHandleGenerateFormConfig(openAiApiKey) {
           fieldConfig,
           formConfig,
           extractedDocumentContent,
+          structuredFields,
         });
       } catch (dumpErr) {
         console.warn('[generate-form-config] Current data dump failed:', dumpErr.message);
@@ -413,7 +1369,16 @@ function createHandleGenerateFormConfig(openAiApiKey) {
 module.exports = {
   generateFormConfig,
   createHandleGenerateFormConfig,
+  postProcessFormConfig,
   validateFormConfig,
   injectMissingFieldQuestions,
   getMissingNameIds,
+  normalizeCheckboxGroupQuestions,
+  normalizeVagueQuestionText,
+  ensureConditionalGateQuestions,
+  renumberQuestions,
+  resolveSpecificFieldLabel,
+  buildQuestionTextForField,
+  sanitizeFieldLabel,
+  markAutoTodayDateFields,
 };

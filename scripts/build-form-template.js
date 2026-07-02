@@ -24,18 +24,13 @@ head = head.replace('<title>Example Form</title>', '<title>__FORM_TITLE__</title
 head = head.replace(/href="generate\.css"/g, 'href="/Forms/CSS/generate.css"');
 head = head.replace(/href="generate2\.css"/g, 'href="/Forms/CSS/generate2.css"');
 head = head.replace(/src="cart\.js"/g, 'src="/Pages/cart.js"');
+head = head.replace(/src="\.\.\/\.\.\/CountyLookup\//g, 'src="/CountyLookup/');
 head = head.replace(
   '<form id="customForm" onsubmit="return showThankYouMessage(event);">',
   '<form id="customForm" onsubmit="return window.__autoFormHandleSubmit ? window.__autoFormHandleSubmit(event) : false;">'
 );
 
 let navScript = lines.slice(navStart - 1, navEnd).join('\n');
-navScript = navScript.replace(
-  'const shouldSubmit = answerTriggersEnd(activeContainer);',
-  `const isLastSectionInForm = sectionIdx === sectionElements.length - 1;
-          const isLastVisibleInSection = currentPos === visibleTotal - 1 && currentPos !== -1;
-          const shouldSubmit = answerTriggersEnd(activeContainer) || (isLastSectionInForm && isLastVisibleInSection);`
-);
 
 let tail = lines.slice(tailStart - 1, tailEnd).join('\n');
 
@@ -100,6 +95,10 @@ const template = [
   tail,
   chromeScript
 ].join('\n');
+
+if (!template.includes('.hidden { display: none !important; }')) {
+  throw new Error('form-template is missing `.hidden { display: none !important; }` (required for nav skip of mirror questions)');
+}
 
 fs.writeFileSync(outPath, template, 'utf8');
 console.log('Wrote', outPath, '(' + template.length + ' chars)');

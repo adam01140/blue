@@ -253,6 +253,7 @@
 
     <script>
         const STORAGE_KEY = 'formstarPreviewHtml';
+        const PREVIEW_SHELL = '/Auto-Form-Creator/form-preview-shell.html';
         const htmlInput = document.getElementById('html-input');
         const renderBtn = document.getElementById('render-btn');
         const loadSessionBtn = document.getElementById('load-session-btn');
@@ -264,6 +265,15 @@
 
         function setError(message) {
             errorMsg.textContent = message || '';
+        }
+
+        let previewBlobUrl = null;
+
+        function revokePreviewBlobUrl() {
+            if (previewBlobUrl) {
+                URL.revokeObjectURL(previewBlobUrl);
+                previewBlobUrl = null;
+            }
         }
 
         function renderHtml(html) {
@@ -278,10 +288,10 @@
             }
 
             setError('');
-            const doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
-            doc.open();
-            doc.write(trimmed);
-            doc.close();
+            revokePreviewBlobUrl();
+            previewFrame.removeAttribute('srcdoc');
+            sessionStorage.setItem(STORAGE_KEY, trimmed);
+            previewFrame.src = PREVIEW_SHELL + '?t=' + Date.now();
 
             document.body.classList.add('fullscreen-mode');
         }

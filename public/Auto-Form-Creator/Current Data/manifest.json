@@ -1,0 +1,13 @@
+{
+  "savedAt": "2026-07-02T19:37:18.248Z",
+  "label": "step-8-generated-html",
+  "files": [
+    "checkbox-fields.txt",
+    "extracted-document-content.txt",
+    "field_config.json",
+    "form_config.json",
+    "generated-form.html",
+    "structured-fields.json",
+    "text-fields.txt"
+  ]
+}

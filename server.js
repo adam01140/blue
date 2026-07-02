@@ -55,8 +55,14 @@ const execAsync      = promisify(exec);
 dotenv.config();
 
 const app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Auto-form and AI generation routes accept larger JSON payloads (configs, extraction text).
+const AUTO_FORM_BODY_LIMIT = '50mb';
+app.use('/api/auto-form', bodyParser.json({ limit: AUTO_FORM_BODY_LIMIT }));
+app.use('/api/auto-form', bodyParser.urlencoded({ extended: true, limit: AUTO_FORM_BODY_LIMIT }));
+app.use('/api/generate-field-config', bodyParser.json({ limit: AUTO_FORM_BODY_LIMIT }));
+app.use('/api/generate-form-config', bodyParser.json({ limit: AUTO_FORM_BODY_LIMIT }));
+app.use(bodyParser.json({ limit: '2mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '2mb' }));
 app.use(fileUpload());          // parses multipart/form‑data (fields ➜ req.body, files ➜ req.files)
 app.use(cors());
 
@@ -189,6 +195,7 @@ const { enrichFormConfigAutopopulate } = require('./form-autopopulate');
 const { handleStoreAutoFormPdf, handleFillAutoFormPdf } = require('./auto-form-pdf-handler');
 const { createHandlePublishAutoForm } = require('./auto-form-publish-handler');
 const { createHandleSaveCurrentData } = require('./auto-form-current-data');
+const { createHandleHelpAnswer } = require('./auto-form-help-handler');
 app.post('/api/unlock-pdf', handleUnlockPdf);
 app.post('/api/prepare-pdf-fields', handlePreparePdfFields);
 app.post('/api/generate-field-config', createHandleGenerateFieldConfig(OPENAI_API_KEY));
@@ -217,6 +224,7 @@ app.post('/api/auto-form/store-pdf', handleStoreAutoFormPdf);
 app.post('/api/auto-form/fill-pdf/:pdfToken', handleFillAutoFormPdf);
 app.post('/api/auto-form/publish', createHandlePublishAutoForm(db));
 app.post('/api/auto-form/save-current-data', createHandleSaveCurrentData());
+app.post('/api/auto-form/help-answer', createHandleHelpAnswer(OPENAI_API_KEY));
 
 // Admin authentication endpoint
 app.post('/api/admin-login', (req, res) => {

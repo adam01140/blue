@@ -22,7 +22,7 @@ async function handleStoreAutoFormPdf(req, res) {
     cleanupExpiredPdfs();
     const pdfToken = crypto.randomUUID();
     pdfStore.set(pdfToken, {
-      bytes: req.files.pdf.data,
+      bytes: Uint8Array.from(req.files.pdf.data),
       name: req.files.pdf.name || 'sanitized.pdf',
       createdAt: Date.now(),
     });
@@ -59,7 +59,14 @@ async function handleFillAutoFormPdf(req, res) {
   }
 }
 
+function getPdfEntry(pdfToken) {
+  if (!pdfToken) return null;
+  cleanupExpiredPdfs();
+  return pdfStore.get(pdfToken) || null;
+}
+
 module.exports = {
   handleStoreAutoFormPdf,
   handleFillAutoFormPdf,
+  getPdfEntry,
 };

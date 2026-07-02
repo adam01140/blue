@@ -22,30 +22,41 @@ function saveCurrentData(payload) {
 
   const savedAt = new Date().toISOString();
   const label = payload.label || 'update';
+  const writtenFiles = [];
 
   if (payload.fieldConfig) {
     writeJsonFile('field_config.json', payload.fieldConfig);
+    writtenFiles.push('field_config.json');
   }
   if (payload.formConfig) {
     writeJsonFile('form_config.json', payload.formConfig);
+    writtenFiles.push('form_config.json');
   }
   if (payload.formHtml) {
     writeTextFile('generated-form.html', payload.formHtml);
+    writtenFiles.push('generated-form.html');
   }
   if (payload.extractedDocumentContent) {
     writeTextFile('extracted-document-content.txt', payload.extractedDocumentContent);
+    writtenFiles.push('extracted-document-content.txt');
   }
   if (Array.isArray(payload.textFields)) {
     writeTextFile(
       'text-fields.txt',
       payload.textFields.map((f) => f.marker || f.name || JSON.stringify(f)).join('\n')
     );
+    writtenFiles.push('text-fields.txt');
   }
   if (Array.isArray(payload.checkboxFields)) {
     writeTextFile(
       'checkbox-fields.txt',
       payload.checkboxFields.map((f) => f.marker || f.name || JSON.stringify(f)).join('\n')
     );
+    writtenFiles.push('checkbox-fields.txt');
+  }
+  if (Array.isArray(payload.structuredFields) && payload.structuredFields.length) {
+    writeJsonFile('structured-fields.json', payload.structuredFields);
+    writtenFiles.push('structured-fields.json');
   }
 
   const manifest = {
@@ -55,7 +66,7 @@ function saveCurrentData(payload) {
   };
   writeJsonFile('manifest.json', manifest);
 
-  return { savedAt, dir: CURRENT_DATA_DIR, files: manifest.files };
+  return { savedAt, label, dir: CURRENT_DATA_DIR, files: manifest.files, writtenFiles };
 }
 
 function createHandleSaveCurrentData() {

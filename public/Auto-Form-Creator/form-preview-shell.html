@@ -12,6 +12,8 @@
         document.body.textContent = 'No form preview available. Generate form HTML from the demo first.';
         return;
     }
+    // Same-origin document.write keeps /Forms/CSS/* and other absolute asset paths working.
+    // Blob URLs break stylesheet loading (opaque origin → unstyled header, cart, form).
     document.open();
     document.write(html);
     document.close();

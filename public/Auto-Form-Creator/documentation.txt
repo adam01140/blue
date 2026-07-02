@@ -108,12 +108,16 @@ Step 3 — Extract Fields
   - Client pdf-extractor.js extracts:
       [[field_name]] for text fields
       {{field_name}} for checkboxes
+      structuredFields[] per-field: page, nearestLabel, sectionHint, position
+  - extractedDocumentContent with --- PAGE N --- breaks (cleaner AI context)
   - Also extracts document layout text for AI context
   - POST /api/prepare-pdf-fields deduplicates radio groups into unique checkboxes
 
 Step 4 — Generate field_config.json
   - ChatGPT via POST /api/generate-field-config (~60s progress bar)
   - Prompt: public/Auto-Form-Creator/field_config.txt
+  - Uses structuredFields.nearestLabel for accurate labels
+  - Server enrichFieldConfig() fixes vague labels, adds conditionals, renames your_number→oca_number
   - Output maps every PDF field id → semantic newName, type, label
   - Example: form1[0].#subform[0].city[0] → applicant_home_city
 
@@ -125,13 +129,14 @@ Step 5 — Sanitize PDF
   - pdfToken is stored in lastFormConfig.pdfToken for HTML generation
 
 Step 6 — Generate form_config.json
-  - ChatGPT via POST /api/generate-form-config (~120s progress bar)
-  - Prompt: public/Auto-Form-Creator/form_config.txt
-  - Output: sections/questions with nameId, type, autopopulate flags
-  - Options:
-      Form layout: all_at_once | one_at_a_time
-      HTML output mode: dev | normal  (stored as htmlMode on form_config)
-  - Retry + injectMissingFieldQuestions fallback if ChatGPT omits fields
+  - POST /api/generate-form-config (~120s progress bar)
+  - Pipeline (deterministic + AI polish):
+      1. buildFormConfigSkeleton() — sections, address blocks, checkbox groups, gates
+      2. Optional vision section hints (pdfBase64 → gpt-4o-mini page images)
+      3. gpt-4o polishes question text + explanations per section (structure unchanged)
+      4. postProcessFormConfig() — validation, linked fields, autopopulate
+  - Legacy prompt file: public/Auto-Form-Creator/form_config.txt (reference / few-shot)
+  - Retry + injectMissingFieldQuestions fallback if fields omitted
   - enrichFormConfigAutopopulate() adds autopopulateAvailable/Missing arrays
 
 Step 7 — User Info Fields (autopopulate analysis)
@@ -378,7 +383,11 @@ Server / pipeline:
   pdf-field-deduplicator.js                   — radio group → unique checkboxes
   pdf-field-sanitizer.js                      — rename fields, fix checkbox widgets
   field-config-generator.js                   — Step 4 OpenAI
-  form-config-generator.js                    — Step 6 OpenAI + retry/inject
+  form-config-generator.js                    — Step 6 skeleton + gpt-4o polish + post-process
+  form-config-skeleton.js                     — deterministic form_config builder
+  form-question-text.js                       — label/question/explanation helpers
+  structured-field-context.js                 — per-field context enrichment
+  pdf-section-analyzer.js                     — vision section hints
   form-autopopulate.js                        — autofill heuristics + enrichment
   auto-form-pdf-handler.js                    — pdfToken store/fill
   pdf-form-filler.js                          — pdf-lib fill implementation

@@ -1,9 +1,19 @@
 const fs = require('fs');
 const path = require('path');
+const { pathToFileURL } = require('url');
 
 async function main() {
   const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-  pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+  const workerPath = path.join(
+    __dirname,
+    '..',
+    'node_modules',
+    'pdfjs-dist',
+    'legacy',
+    'build',
+    'pdf.worker.min.mjs'
+  );
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).href;
 
   const pdfPath = process.argv[2] || path.join(__dirname, '../public/Auto-Form-Creator/unlocked-test.pdf');
   const data = new Uint8Array(fs.readFileSync(pdfPath));

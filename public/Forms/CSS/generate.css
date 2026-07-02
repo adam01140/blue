@@ -89,7 +89,7 @@
                 color: #fff;
                 text-decoration: none;
                 font-weight: 700;
-                font-size: 1.18em;
+                font-size: 0.9em;
                 letter-spacing: 0.02em;
                 padding: 2px 8px;
                 transition: color 0.2s, background 0.2s, box-shadow 0.2s;
@@ -275,7 +275,7 @@ nav a {
   color: #fff;
   text-decoration: none;
   font-weight: 700;
-  font-size: 1.18em;
+  font-size: 0.9em;
   letter-spacing: 0.02em;
   padding: 2px 8px;
   transition: color 0.2s, background 0.2s, box-shadow 0.2s;

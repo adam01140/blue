@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test:auto-form": "node auto-form-quality-test.js",
+    "test:auto-form-e2e": "node auto-form-e2e.js --skip-openai"
   },
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.100",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -15,6 +18,7 @@
     "node-fetch": "^2.7.0",
     "nodemailer": "^6.9.14",
     "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.10.38",
     "stripe": "^18.2.1"
   }
 }

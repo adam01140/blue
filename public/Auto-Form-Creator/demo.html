@@ -1058,15 +1058,20 @@
             font-weight: 700;
             cursor: pointer;
             white-space: nowrap;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
         }
 
         .btn-download:hover {
             background: #219a52;
         }
 
-        .btn-download:disabled {
+        .btn-download:disabled,
+        a.btn-download[aria-disabled="true"] {
             opacity: 0.5;
             cursor: not-allowed;
+            pointer-events: none;
         }
 
         .upload-icon {
@@ -1623,6 +1628,7 @@
                     <div class="timed-progress-eta">Estimated time ~2 min</div>
                 </div>
                 <div class="error-message" id="step-6-error"></div>
+                <p id="step-6-section-summary" class="step-section-summary" style="display:none;margin:8px 0 0;color:var(--gray);"></p>
             </div>
 
             <div class="step-results" id="step-6-results">
@@ -1730,6 +1736,15 @@
                     <button type="button" class="btn-download" id="download-form-html-btn" disabled>
                         Download HTML
                     </button>
+                    <a
+                        href="http://localhost:3000/Auto-Form-Creator/iframe-test.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="btn-download"
+                        id="test-form-html-btn"
+                        aria-disabled="true"
+                        tabindex="-1"
+                    >Test</a>
                 </div>
                 <div class="error-message" id="step-8-error"></div>
             </div>
@@ -1929,6 +1944,7 @@
         const step6Status = document.getElementById('step-6-status');
         const step6LockMsg = document.getElementById('step-6-lock-msg');
         const step6Error = document.getElementById('step-6-error');
+        const step6SectionSummary = document.getElementById('step-6-section-summary');
         const step6Results = document.getElementById('step-6-results');
         const generateFormConfigBtn = document.getElementById('generate-form-config-btn');
         const formConfigProgress = document.getElementById('form-config-progress');
@@ -1953,6 +1969,7 @@
         const generateFormHtmlBtn = document.getElementById('generate-form-html-btn');
         const viewFormHtmlBtn = document.getElementById('view-form-html-btn');
         const downloadFormHtmlBtn = document.getElementById('download-form-html-btn');
+        const testFormHtmlBtn = document.getElementById('test-form-html-btn');
         const formPreviewIframe = document.getElementById('form-preview-iframe');
         const formPreviewWrap = document.getElementById('form-preview-wrap');
         const formHtmlSourceWrap = document.getElementById('form-html-source-wrap');
@@ -2011,6 +2028,7 @@
 
         const FORM_PREVIEW_SHELL = '/Auto-Form-Creator/form-preview-shell.html';
         const FORM_PREVIEW_STORAGE_KEY = 'formstarPreviewHtml';
+        let formPreviewBlobUrl = null;
         const DEMO_STATE_KEY = 'autoFormCreatorDemoState';
         const DEMO_PDF_MAX_B64_CHARS = 2.5 * 1024 * 1024;
         const CHATGPT_PROGRESS_MS = 60000;
@@ -2120,21 +2138,49 @@
             saveDemoState().catch((err) => console.warn('Demo state save error', err));
         }
 
+        function buildCurrentDataPayload(label) {
+            const payload = { label: label || 'demo-update' };
+            switch (label) {
+                case 'step-3-extraction':
+                    payload.extractedDocumentContent = lastExtractionPayload?.extractedDocumentContent || '';
+                    payload.textFields = lastExtractionPayload?.textFields || [];
+                    payload.checkboxFields = lastExtractionPayload?.checkboxFields || [];
+                    payload.structuredFields = lastExtractionPayload?.structuredFields || [];
+                    break;
+                case 'step-4-field-config':
+                    payload.fieldConfig = lastFieldConfig;
+                    break;
+                case 'step-6-form-config':
+                    payload.formConfig = lastFormConfig;
+                    break;
+                case 'step-8-generated-html':
+                    payload.formHtml = lastGeneratedFormHtml;
+                    break;
+                default:
+                    if (lastFieldConfig) payload.fieldConfig = lastFieldConfig;
+                    if (lastFormConfig) payload.formConfig = lastFormConfig;
+                    if (lastGeneratedFormHtml) payload.formHtml = lastGeneratedFormHtml;
+                    if (lastExtractionPayload) {
+                        payload.extractedDocumentContent = lastExtractionPayload.extractedDocumentContent || '';
+                        payload.textFields = lastExtractionPayload.textFields || [];
+                        payload.checkboxFields = lastExtractionPayload.checkboxFields || [];
+                        payload.structuredFields = lastExtractionPayload.structuredFields || [];
+                    }
+            }
+            return payload;
+        }
+
         async function saveCurrentDataDump(label) {
             try {
-                await fetch('/api/auto-form/save-current-data', {
+                const res = await fetch('/api/auto-form/save-current-data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        label: label || 'demo-update',
-                        fieldConfig: lastFieldConfig,
-                        formConfig: lastFormConfig,
-                        formHtml: lastGeneratedFormHtml,
-                        extractedDocumentContent: lastExtractionPayload?.extractedDocumentContent || '',
-                        textFields: lastExtractionPayload?.textFields || [],
-                        checkboxFields: lastExtractionPayload?.checkboxFields || [],
-                    }),
+                    body: JSON.stringify(buildCurrentDataPayload(label)),
                 });
+                if (!res.ok) {
+                    const errText = await res.text().catch(() => '');
+                    console.warn(`Current data dump failed (${res.status}):`, errText || res.statusText);
+                }
             } catch (err) {
                 console.warn('Current data dump failed:', err);
             }
@@ -2600,6 +2646,21 @@
             generateFormConfigBtn.disabled = false;
         }
 
+        function invalidateFormConfigAndHtml() {
+            lastFormConfig = null;
+            lastGeneratedFormHtml = null;
+            formConfigJsonEl.textContent = '';
+            step6Results.classList.remove('visible');
+            step6Status.textContent = '6';
+            step6Status.classList.remove('complete', 'error');
+            if (step6SectionSummary) {
+                step6SectionSummary.style.display = 'none';
+                step6SectionSummary.textContent = '';
+            }
+            lockStep8();
+            setStep8HtmlButtonsEnabled(false);
+        }
+
         function lockStep6() {
             step6.classList.add('step-locked');
             step6LockMsg.style.display = 'block';
@@ -2607,6 +2668,10 @@
             step6Status.classList.remove('complete', 'error');
             step6Results.classList.remove('visible');
             step6Error.textContent = '';
+            if (step6SectionSummary) {
+                step6SectionSummary.style.display = 'none';
+                step6SectionSummary.textContent = '';
+            }
             formConfigProgress.classList.remove('visible');
             generateFormConfigBtn.disabled = true;
             formConfigJsonEl.textContent = '';
@@ -2634,6 +2699,17 @@
         function setStep8HtmlButtonsEnabled(enabled) {
             viewFormHtmlBtn.disabled = !enabled;
             downloadFormHtmlBtn.disabled = !enabled;
+            if (testFormHtmlBtn) {
+                if (enabled) {
+                    testFormHtmlBtn.href = 'http://localhost:3000/Auto-Form-Creator/iframe-test.html';
+                    testFormHtmlBtn.setAttribute('aria-disabled', 'false');
+                    testFormHtmlBtn.tabIndex = 0;
+                } else {
+                    testFormHtmlBtn.removeAttribute('href');
+                    testFormHtmlBtn.setAttribute('aria-disabled', 'true');
+                    testFormHtmlBtn.tabIndex = -1;
+                }
+            }
         }
 
         function unlockStep8() {
@@ -2656,12 +2732,9 @@
             setStep8PreviewMode(false);
             if (formHtmlSourceEl) formHtmlSourceEl.textContent = '';
             if (formPreviewIframe) {
-                const doc = formPreviewIframe.contentDocument || formPreviewIframe.contentWindow?.document;
-                if (doc) {
-                    doc.open();
-                    doc.write('');
-                    doc.close();
-                }
+                revokeFormPreviewBlobUrl();
+                formPreviewIframe.removeAttribute('srcdoc');
+                formPreviewIframe.src = 'about:blank';
             }
             lockStep9();
         }
@@ -2881,16 +2954,21 @@
             }
         }
 
+        function revokeFormPreviewBlobUrl() {
+            if (formPreviewBlobUrl) {
+                URL.revokeObjectURL(formPreviewBlobUrl);
+                formPreviewBlobUrl = null;
+            }
+        }
+
         function showFormHtmlPreview(html) {
             sessionStorage.setItem(FORM_PREVIEW_STORAGE_KEY, html);
             setStep8PreviewMode(false);
             if (formHtmlSourceEl) formHtmlSourceEl.textContent = html;
-            const doc = formPreviewIframe.contentDocument || formPreviewIframe.contentWindow?.document;
-            if (doc) {
-                doc.open();
-                doc.write(html);
-                doc.close();
-            }
+            if (!formPreviewIframe) return;
+            revokeFormPreviewBlobUrl();
+            formPreviewIframe.removeAttribute('srcdoc');
+            formPreviewIframe.src = FORM_PREVIEW_SHELL + '?t=' + Date.now();
         }
 
         function toggleStep8HtmlSourceView() {
@@ -3595,10 +3673,18 @@
                 });
 
                 markStep3Complete({
-                    extractedDocumentContent: pdfFullContent.innerText.trim(),
+                    extractedDocumentContent: extracted.extractedDocumentContent || pdfFullContent.innerText.trim(),
                     textFields: extracted.textFields,
-                    checkboxFields: extracted.checkboxFields
+                    checkboxFields: extracted.checkboxFields,
+                    structuredFields: extracted.structuredFields || []
                 });
+
+                try {
+                    lastPdfToken = await storeSanitizedPdfOnServer(preparedFile);
+                    scheduleSaveDemoState();
+                } catch (storeErr) {
+                    console.warn('Failed to store PDF for AI vision:', storeErr);
+                }
             } catch (err) {
                 console.error('PDF extraction error:', err);
                 pdfError.textContent = 'Error processing PDF: ' + (err.message || 'Unknown error');
@@ -3608,6 +3694,16 @@
             }
         }
 
+        async function ensurePdfTokenForVision() {
+            if (lastPdfToken) return lastPdfToken;
+            if (lastPreparedPdfFile) {
+                lastPdfToken = await storeSanitizedPdfOnServer(lastPreparedPdfFile);
+                scheduleSaveDemoState();
+                return lastPdfToken;
+            }
+            throw new Error('PDF not available on server. Re-run Step 3.');
+        }
+
         async function generateFieldConfigJson() {
             if (!lastExtractionPayload) {
                 step4Error.textContent = 'No extraction data available. Complete Step 3 first.';
@@ -3615,6 +3711,7 @@
             }
 
             step4Error.textContent = '';
+            invalidateFormConfigAndHtml();
             const fieldProgress = createTimedProgress(
                 fieldConfigProgress,
                 fieldConfigProgressBar,
@@ -3627,10 +3724,14 @@
             step4Results.classList.remove('visible');
 
             try {
+                const pdfToken = await ensurePdfTokenForVision();
                 const response = await fetch('/api/generate-field-config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(lastExtractionPayload)
+                    body: JSON.stringify({
+                        ...lastExtractionPayload,
+                        pdfToken
+                    })
                 });
 
                 const data = await response.json();
@@ -3910,24 +4011,48 @@
 
             try {
                 const displayMode = document.querySelector('input[name="form-display-mode"]:checked')?.value || 'all_at_once';
+                const pdfToken = await ensurePdfTokenForVision();
                 const response = await fetch('/api/generate-form-config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         fieldConfig: lastFieldConfig,
                         extractedDocumentContent: lastExtractionPayload.extractedDocumentContent,
+                        structuredFields: lastExtractionPayload.structuredFields || [],
                         displayMode,
-                        userProfile: lastUserProfile || {}
+                        userProfile: lastUserProfile || {},
+                        pdfToken
                     })
                 });
 
-                const data = await response.json();
+                const responseText = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (_) {
+                    throw new Error(
+                        response.status === 413
+                            ? 'Request too large. Restart the server and re-run Step 5 before Step 6.'
+                            : (responseText.slice(0, 200) || `Server error (${response.status})`)
+                    );
+                }
                 if (!response.ok || !data.success) {
                     throw new Error(data.error || 'Failed to generate form config');
                 }
 
                 lastFormConfig = applyFormConfigMetadata(data.formConfig);
                 formConfigJsonEl.textContent = JSON.stringify(lastFormConfig, null, 2);
+                const sectionCount = data.sectionCount || (lastFormConfig.sections || []).length;
+                const sectionNames = (lastFormConfig.sections || []).map((s) => s.sectionName).join(', ');
+                if (step6SectionSummary) {
+                    step6SectionSummary.style.display = 'block';
+                    step6SectionSummary.textContent = sectionCount >= 2
+                        ? `Built ${sectionCount} sections: ${sectionNames}`
+                        : `Warning: only ${sectionCount} section was built. Restart the server and re-run Step 6.`;
+                }
+                if (sectionCount < 2) {
+                    step6Error.textContent = 'Form config has only one section. Restart node server.js and run Step 6 again.';
+                }
                 await formProgress.finish();
                 markStep6Complete();
             } catch (err) {
@@ -3968,6 +4093,8 @@
                 firebaseConfig,
                 htmlMode: getSelectedHtmlMode(),
                 pdfToken: lastPdfToken || lastFormConfig.pdfToken || null,
+                fieldConfig: lastFieldConfig || null,
+                extractedDocumentContent: lastExtractionPayload?.extractedDocumentContent || '',
                 templateHtml: getActiveTemplateHtml()
             });
         }

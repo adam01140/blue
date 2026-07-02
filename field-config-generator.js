@@ -2,6 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const { fetchOpenAiWithRetry } = require('./openai-fetch');
 const { saveCurrentData } = require('./auto-form-current-data');
+const {
+  enrichFieldConfig,
+} = require('./structured-field-context');
+const {
+  resolvePdfPageImages,
+  buildPdfVisionUserContent,
+} = require('./pdf-vision-context');
 
 const FIELD_CONFIG_PROMPT_PATH = path.join(
   __dirname,
@@ -57,9 +64,12 @@ function validateFieldConfig(config, inputFieldIds) {
   return config;
 }
 
-async function callOpenAiForFieldConfig(openAiApiKey, extractionPayload) {
+async function callOpenAiForFieldConfig(openAiApiKey, extractionPayload, pageImages = []) {
   const systemPrompt = loadFieldConfigPrompt();
-  const userMessage = JSON.stringify(extractionPayload, null, 2);
+  const userContent = buildPdfVisionUserContent(
+    JSON.stringify(extractionPayload, null, 2),
+    pageImages
+  );
 
   const response = await fetchOpenAiWithRetry('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -71,7 +81,7 @@ async function callOpenAiForFieldConfig(openAiApiKey, extractionPayload) {
       model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: userMessage },
+        { role: 'user', content: userContent },
       ],
       temperature: 0.2,
       response_format: { type: 'json_object' },
@@ -92,7 +102,7 @@ async function callOpenAiForFieldConfig(openAiApiKey, extractionPayload) {
   return extractJsonFromModelResponse(content);
 }
 
-async function generateFieldConfig(extractionPayload, openAiApiKey) {
+async function generateFieldConfig(extractionPayload, openAiApiKey, options = {}) {
   const textFieldIds = (extractionPayload.textFields || []).map((f) => f.name);
   const checkboxFieldIds = (extractionPayload.checkboxFields || []).map((f) => f.name);
   const inputFieldIds = [...textFieldIds, ...checkboxFieldIds];
@@ -101,8 +111,37 @@ async function generateFieldConfig(extractionPayload, openAiApiKey) {
     throw new Error('No text or checkbox fields provided for field config generation');
   }
 
-  const config = await callOpenAiForFieldConfig(openAiApiKey, extractionPayload);
-  return validateFieldConfig(config, inputFieldIds);
+  const promptPayload = {
+    extractedDocumentContent: extractionPayload.extractedDocumentContent || '',
+    textFields: extractionPayload.textFields || [],
+    checkboxFields: extractionPayload.checkboxFields || [],
+    structuredFields: (extractionPayload.structuredFields || []).map((sf) => ({
+      id: sf.id,
+      type: sf.type,
+      page: sf.page,
+      nearestLabel: sf.nearestLabel,
+      sectionHint: sf.sectionHint,
+    })),
+  };
+
+  let pageImages = [];
+  if (openAiApiKey && !options.skipPdfImages) {
+    pageImages = await resolvePdfPageImages(
+      {
+        pdfToken: extractionPayload.pdfToken,
+        pdfBase64: extractionPayload.pdfBase64,
+      },
+      { required: true, logPrefix: '[generate-field-config]' }
+    );
+  }
+
+  const config = await callOpenAiForFieldConfig(openAiApiKey, promptPayload, pageImages);
+  const validated = validateFieldConfig(config, inputFieldIds);
+  return enrichFieldConfig(
+    validated,
+    extractionPayload.structuredFields || [],
+    extractionPayload.extractedDocumentContent || ''
+  );
 }
 
 function createHandleGenerateFieldConfig(openAiApiKey) {
@@ -112,10 +151,20 @@ function createHandleGenerateFieldConfig(openAiApiKey) {
         extractedDocumentContent = '',
         textFields = [],
         checkboxFields = [],
+        structuredFields = [],
+        pdfToken = '',
+        pdfBase64 = '',
       } = req.body || {};
 
       const config = await generateFieldConfig(
-        { extractedDocumentContent, textFields, checkboxFields },
+        {
+          extractedDocumentContent,
+          textFields,
+          checkboxFields,
+          structuredFields,
+          pdfToken,
+          pdfBase64,
+        },
         openAiApiKey
       );
 
@@ -132,6 +181,7 @@ function createHandleGenerateFieldConfig(openAiApiKey) {
           extractedDocumentContent,
           textFields,
           checkboxFields,
+          structuredFields,
         });
       } catch (dumpErr) {
         console.warn('[generate-field-config] Current data dump failed:', dumpErr.message);
