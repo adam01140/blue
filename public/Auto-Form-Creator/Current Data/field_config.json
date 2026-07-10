@@ -1,303 +1,143 @@
 {
-  "formTitle": "Request for Live Scan Service",
+  "formTitle": "W-9 Request for Taxpayer Identification Number and Certification",
   "fields": [
     {
-      "id": "form1[0].#subform[0].ORI[0]",
-      "newName": "ori_code",
+      "id": "topmostSubform[0].Page1[0].f1_01[0]",
+      "newName": "entity_name",
       "type": "text",
-      "label": "ORI Code"
+      "label": "Name of Entity/Individual"
     },
     {
-      "id": "form1[0].#subform[0].authorizedapptype[0]",
-      "newName": "authorized_applicant_type",
+      "id": "topmostSubform[0].Page1[0].f1_02[0]",
+      "newName": "business_name",
       "type": "text",
-      "label": "Authorized Applicant Type"
+      "label": "Business Name/Disregarded Entity Name"
     },
     {
-      "id": "form1[0].#subform[0].typeof[0]",
-      "newName": "license_certification_permit_working_title",
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].f1_03[0]",
+      "newName": "tax_classification_other",
       "type": "text",
-      "label": "Type of License/Certification/Permit or Working Title"
+      "label": "Other Tax Classification"
     },
     {
-      "id": "form1[0].#subform[0].agencyauthorized[0]",
-      "newName": "agency_authorized_to_receive_records",
+      "id": "topmostSubform[0].Page1[0].f1_05[0]",
+      "newName": "exempt_payee_code",
       "type": "text",
-      "label": "Agency Authorized to Receive Criminal Record Information"
+      "label": "Exempt Payee Code (if any)"
     },
     {
-      "id": "form1[0].#subform[0].mailcode[0]",
-      "newName": "agency_mail_code",
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].f1_04[0]",
+      "newName": "tax_classification_code",
       "type": "text",
-      "label": "Mail Code"
+      "label": "Tax Classification Code"
     },
     {
-      "id": "form1[0].#subform[0].streetaddress[0]",
-      "newName": "agency_street_address",
+      "id": "topmostSubform[0].Page1[0].f1_06[0]",
+      "newName": "fatca_code",
       "type": "text",
-      "label": "Street Address or P.O. Box"
+      "label": "FATCA Reporting Code (if any)"
     },
     {
-      "id": "form1[0].#subform[0].contactname[0]",
-      "newName": "agency_contact_name",
+      "id": "topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_07[0]",
+      "newName": "address",
       "type": "text",
-      "label": "Contact Name"
+      "label": "Address (number, street, and apt. or suite no.)"
     },
     {
-      "id": "form1[0].#subform[0].city[0]",
-      "newName": "agency_city",
+      "id": "topmostSubform[0].Page1[0].f1_09[0]",
+      "newName": "additional_address_info",
       "type": "text",
-      "label": "City"
+      "label": "Additional Address Information"
     },
     {
-      "id": "form1[0].#subform[0].zip[0]",
-      "newName": "agency_zip_code",
+      "id": "topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_08[0]",
+      "newName": "city_state_zip",
       "type": "text",
-      "label": "ZIP Code"
+      "label": "City, State, and ZIP Code"
     },
     {
-      "id": "form1[0].#subform[0].PhoneNum[0]",
-      "newName": "agency_contact_telephone_number",
+      "id": "topmostSubform[0].Page1[0].f1_10[0]",
+      "newName": "account_number",
       "type": "text",
-      "label": "Contact Telephone Number"
+      "label": "List Account Number(s) Here (optional)"
     },
     {
-      "id": "form1[0].#subform[0].firstname[0]",
-      "newName": "applicant_first_name",
+      "id": "topmostSubform[0].Page1[0].f1_11[0]",
+      "newName": "tin_part1",
       "type": "text",
-      "label": "First Name"
+      "label": "Taxpayer Identification Number (Part I)"
     },
     {
-      "id": "form1[0].#subform[0].suffix[0]",
-      "newName": "applicant_suffix",
+      "id": "topmostSubform[0].Page1[0].f1_12[0]",
+      "newName": "tin_part2",
       "type": "text",
-      "label": "Suffix"
+      "label": "Taxpayer Identification Number (Part II)"
     },
     {
-      "id": "form1[0].#subform[0].lastname[0]",
-      "newName": "applicant_last_name",
+      "id": "topmostSubform[0].Page1[0].f1_13[0]",
+      "newName": "tin_part3",
       "type": "text",
-      "label": "Last Name"
+      "label": "Taxpayer Identification Number (Part III)"
     },
     {
-      "id": "form1[0].#subform[0].suffix[1]",
-      "newName": "other_name_suffix",
+      "id": "topmostSubform[0].Page1[0].f1_14[0]",
+      "newName": "name_on_tax_return",
       "type": "text",
-      "label": "Suffix (AKA or Alias)",
-      "conditional": {
-        "onlyWhen": "has_alias",
-        "gateQuestion": "Do you have an alias?"
-      }
+      "label": "What Name and Number to Give the Requester"
     },
     {
-      "id": "form1[0].#subform[0].last[0]",
-      "newName": "other_name_last",
+      "id": "topmostSubform[0].Page1[0].f1_15[0]",
+      "newName": "additional_name_info",
       "type": "text",
-      "label": "Last Name (AKA or Alias)",
-      "conditional": {
-        "onlyWhen": "has_alias",
-        "gateQuestion": "Do you have an alias?"
-      }
+      "label": "Additional Name Information"
     },
     {
-      "id": "form1[0].#subform[0].first[0]",
-      "newName": "other_name_first",
-      "type": "text",
-      "label": "First Name (AKA or Alias)",
-      "conditional": {
-        "onlyWhen": "has_alias",
-        "gateQuestion": "Do you have an alias?"
-      }
-    },
-    {
-      "id": "form1[0].#subform[0].DOB[0]",
-      "newName": "applicant_date_of_birth",
-      "type": "text",
-      "label": "Date of Birth"
-    },
-    {
-      "id": "form1[0].#subform[0].DLnumber[0]",
-      "newName": "applicant_drivers_license_number",
-      "type": "text",
-      "label": "Driver's License Number"
-    },
-    {
-      "id": "form1[0].#subform[0].weight[0]",
-      "newName": "applicant_weight",
-      "type": "text",
-      "label": "Weight"
-    },
-    {
-      "id": "form1[0].#subform[0].eye[0]",
-      "newName": "applicant_eye_color",
-      "type": "text",
-      "label": "Eye Color"
-    },
-    {
-      "id": "form1[0].#subform[0].height[0]",
-      "newName": "applicant_height",
-      "type": "text",
-      "label": "Height"
-    },
-    {
-      "id": "form1[0].#subform[0].hair[0]",
-      "newName": "applicant_hair_color",
-      "type": "text",
-      "label": "Hair Color"
-    },
-    {
-      "id": "form1[0].#subform[0].billingnumber[0]",
-      "newName": "agency_billing_number",
-      "type": "text",
-      "label": "Billing Number"
-    },
-    {
-      "id": "form1[0].#subform[0].POB[0]",
-      "newName": "applicant_place_of_birth",
-      "type": "text",
-      "label": "Place of Birth"
-    },
-    {
-      "id": "form1[0].#subform[0].SSN[0]",
-      "newName": "applicant_social_security_number",
-      "type": "text",
-      "label": "Social Security Number"
-    },
-    {
-      "id": "form1[0].#subform[0].miscnumber[0]",
-      "newName": "applicant_misc_identification_number",
-      "type": "text",
-      "label": "Miscellaneous Identification Number"
-    },
-    {
-      "id": "form1[0].#subform[0].streetorPO[0]",
-      "newName": "applicant_home_street_address",
-      "type": "text",
-      "label": "Home Street Address or P.O. Box"
-    },
-    {
-      "id": "form1[0].#subform[0].city[1]",
-      "newName": "applicant_home_city",
-      "type": "text",
-      "label": "Home City"
-    },
-    {
-      "id": "form1[0].#subform[0].zip[1]",
-      "newName": "applicant_home_zip_code",
-      "type": "text",
-      "label": "Home ZIP Code"
-    },
-    {
-      "id": "form1[0].#subform[0].DateTimeField1[0]",
-      "newName": "applicant_signature_date",
-      "type": "text",
-      "label": "Applicant Signature Date"
-    },
-    {
-      "id": "form1[0].#subform[0].yournumber[0]",
-      "newName": "oca_number",
-      "type": "text",
-      "label": "OCA Number"
-    },
-    {
-      "id": "form1[0].#subform[0].origATI[0]",
-      "newName": "original_ati_number",
-      "type": "text",
-      "label": "Original ATI Number",
-      "conditional": {
-        "onlyWhen": "resubmission",
-        "gateQuestion": "Is this a resubmission?"
-      }
-    },
-    {
-      "id": "form1[0].#subform[0].emplname[0]",
-      "newName": "employer_name",
-      "type": "text",
-      "label": "Employer Name",
-      "conditional": {
-        "onlyWhen": "employer_response_required",
-        "gateQuestion": "Is employer information required for this submission?"
-      }
-    },
-    {
-      "id": "form1[0].#subform[0].address[0]",
-      "newName": "employer_street_address",
-      "type": "text",
-      "label": "Street Address or P.O. Box",
-      "conditional": {
-        "onlyWhen": "employer_response_required",
-        "gateQuestion": "Is employer information required for this submission?"
-      }
-    },
-    {
-      "id": "form1[0].#subform[0].PhoneNum[1]",
-      "newName": "employer_telephone_number",
-      "type": "text",
-      "label": "Telephone Number",
-      "conditional": {
-        "onlyWhen": "employer_response_required",
-        "gateQuestion": "Is employer information required for this submission?"
-      }
-    },
-    {
-      "id": "form1[0].#subform[0].city[2]",
-      "newName": "employer_city",
-      "type": "text",
-      "label": "City",
-      "conditional": {
-        "onlyWhen": "employer_response_required",
-        "gateQuestion": "Is employer information required for this submission?"
-      }
-    },
-    {
-      "id": "form1[0].#subform[0].zip[2]",
-      "newName": "employer_zip_code",
-      "type": "text",
-      "label": "ZIP Code",
-      "conditional": {
-        "onlyWhen": "employer_response_required",
-        "gateQuestion": "Is employer information required for this submission?"
-      }
-    },
-    {
-      "id": "form1[0].#subform[0].mailcode[1]",
-      "newName": "employer_mail_code",
-      "type": "text",
-      "label": "Mail Code",
-      "conditional": {
-        "onlyWhen": "employer_response_required",
-        "gateQuestion": "Is employer information required for this submission?"
-      }
-    },
-    {
-      "id": "form1[0].#subform[0].MorF[0]__1_1",
-      "newName": "applicant_sex_male",
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[0]",
+      "newName": "tax_classification_individual",
       "type": "checkbox",
-      "label": "Male"
+      "label": "Individual/Sole Proprietor"
     },
     {
-      "id": "form1[0].#subform[0].MorF[0]__2_2",
-      "newName": "applicant_sex_female",
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[1]",
+      "newName": "tax_classification_corporation",
       "type": "checkbox",
-      "label": "Female"
+      "label": "C Corporation"
     },
     {
-      "id": "form1[0].#subform[0].MorF[0]__3_2",
-      "newName": "applicant_sex_nonbinary_unspecified",
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[2]",
+      "newName": "tax_classification_s_corporation",
       "type": "checkbox",
-      "label": "Nonbinary/Unspecified"
+      "label": "S Corporation"
     },
     {
-      "id": "form1[0].#subform[0].DOJ[0]",
-      "newName": "level_of_service_doj",
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[3]",
+      "newName": "tax_classification_partnership",
       "type": "checkbox",
-      "label": "DOJ"
+      "label": "Partnership"
     },
     {
-      "id": "form1[0].#subform[0].FBI[0]",
-      "newName": "level_of_service_fbi",
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[4]",
+      "newName": "tax_classification_trust_estate",
       "type": "checkbox",
-      "label": "FBI"
+      "label": "Trust/Estate"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[5]",
+      "newName": "tax_classification_llc",
+      "type": "checkbox",
+      "label": "LLC"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_1[6]",
+      "newName": "tax_classification_other_option",
+      "type": "checkbox",
+      "label": "Other"
+    },
+    {
+      "id": "topmostSubform[0].Page1[0].Boxes3a-b_ReadOrder[0].c1_2[0]",
+      "newName": "foreign_partners_check",
+      "type": "checkbox",
+      "label": "Check if you have foreign partners"
     }
   ]
 }

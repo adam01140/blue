@@ -11,6 +11,15 @@ function toUint8Array(bytes) {
   return new Uint8Array(bytes);
 }
 
+function installCanvasGlobals(canvasModule) {
+  const { Path2D, DOMMatrix, ImageData } = canvasModule;
+  // pdfjs-dist polyfills these via process.getBuiltinModule (Node 20.16+). On Node 18
+  // that API is missing, so rendering fails with "Path2D is not defined" unless we set them.
+  if (!globalThis.Path2D && Path2D) globalThis.Path2D = Path2D;
+  if (!globalThis.DOMMatrix && DOMMatrix) globalThis.DOMMatrix = DOMMatrix;
+  if (!globalThis.ImageData && ImageData) globalThis.ImageData = ImageData;
+}
+
 function loadCanvasModule() {
   if (!canvasModulePromise) {
     canvasModulePromise = import('@napi-rs/canvas').catch((error) => {
@@ -36,12 +45,15 @@ function configurePdfJsWorker(pdfjsLib) {
 
 async function loadPdfJs() {
   if (!pdfjsLibPromise) {
-    pdfjsLibPromise = import('pdfjs-dist/legacy/build/pdf.mjs')
-      .then(configurePdfJsWorker)
-      .catch((error) => {
-        pdfjsLibPromise = null;
-        throw error;
-      });
+    pdfjsLibPromise = (async () => {
+      const canvasModule = await loadCanvasModule();
+      installCanvasGlobals(canvasModule);
+      const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+      return configurePdfJsWorker(pdfjsLib);
+    })().catch((error) => {
+      pdfjsLibPromise = null;
+      throw error;
+    });
   }
   return pdfjsLibPromise;
 }

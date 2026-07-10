@@ -1,21 +1,16 @@
 {
-  "formTitle": "Request for Live Scan Service",
-  "formName": "BCIA 8016",
-  "formId": "bcia8016",
-  "formDescription": "California Request for Live Scan Service form used to collect agency, applicant, and submission details for fingerprint background check processing.",
-  "formFolderName": "BCIA-8016",
-  "defendant": "No",
+  "formTitle": "W-9 Request for Taxpayer Identification Number and Certification",
   "displayMode": "one_at_a_time",
   "sections": [
     {
       "sectionId": 1,
-      "sectionName": "Agency",
+      "sectionName": "Applicant",
       "questions": [
         {
           "questionId": 1,
-          "text": "What is your ORI code?",
+          "text": "What is your entity’s name on line 2.)?",
           "needsExplanation": true,
-          "explanation": "Enter the ORI code assigned by the DOJ for the agency requesting the live scan.",
+          "explanation": "Provide the name of your entity as it should appear on the form, specifically on line 2 in the Applicant Information section.",
           "type": "text",
           "logic": {
             "enabled": false,
@@ -29,8 +24,8 @@
           },
           "options": [],
           "labels": [],
-          "nameId": "ori_code",
-          "placeholder": "ORI code",
+          "placeholder": "entity’s name on line 2.)",
+          "nameId": "entity_name",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
@@ -42,9 +37,9 @@
         },
         {
           "questionId": 2,
-          "text": "What is the authorized applicant type?",
+          "text": "What is your of the following seven boxes?",
           "needsExplanation": true,
-          "explanation": "Enter the applicant type authorized for this live scan request, as provided by the requesting agency.",
+          "explanation": "Indicate your selection from the seven boxes as it should appear in the Applicant Information section of the form.",
           "type": "text",
           "logic": {
             "enabled": false,
@@ -58,8 +53,8 @@
           },
           "options": [],
           "labels": [],
-          "nameId": "authorized_applicant_type",
-          "placeholder": "Applicant type",
+          "placeholder": "of the following seven boxes",
+          "nameId": "business_name",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
@@ -71,10 +66,10 @@
         },
         {
           "questionId": 3,
-          "text": "What license or working title applies?",
+          "text": "Please select all that apply",
           "needsExplanation": true,
-          "explanation": "Enter the license, certification, permit, or working title for this submission. If the DOJ assigned an exact title, use that exact wording.",
-          "type": "text",
+          "explanation": "Choose all classifications that accurately describe your tax status from the options provided.",
+          "type": "checkbox",
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -85,25 +80,42 @@
             "option": "",
             "to": ""
           },
-          "options": [],
+          "options": [
+            {
+              "label": "Individual/Sole Proprietor",
+              "nameId": "tax_classification_individual",
+              "value": "Individual/Sole Proprietor",
+              "autopopulate": {
+                "enabled": false,
+                "profileKey": "tax_classification_individual",
+                "profileDescription": "Individual/Sole Proprietor"
+              }
+            },
+            {
+              "label": "C Corporation",
+              "nameId": "tax_classification_corporation",
+              "value": "C Corporation",
+              "autopopulate": {
+                "enabled": false,
+                "profileKey": "tax_classification_corporation",
+                "profileDescription": "C Corporation"
+              }
+            }
+          ],
           "labels": [],
-          "nameId": "license_certification_permit_working_title",
-          "placeholder": "License or title",
+          "placeholder": "",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
-          "autoTodayDate": false,
           "autopopulate": {
-            "enabled": false,
-            "profileKey": "",
-            "profileDescription": ""
+            "enabled": false
           }
         },
         {
           "questionId": 4,
-          "text": "What agency may receive the records?",
+          "text": "Please confirm: C corporation",
           "needsExplanation": true,
-          "explanation": "Enter the full name of the agency authorized to receive the criminal record information from this live scan.",
-          "type": "text",
+          "explanation": "Confirm if your entity is classified as a C corporation by selecting this option.",
+          "type": "checkbox",
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -114,10 +126,20 @@
             "option": "",
             "to": ""
           },
-          "options": [],
+          "options": [
+            {
+              "label": "C corporation",
+              "nameId": "tax_classification_s_corporation",
+              "value": "C corporation",
+              "autopopulate": {
+                "enabled": false,
+                "profileKey": "",
+                "profileDescription": ""
+              }
+            }
+          ],
           "labels": [],
-          "nameId": "agency_authorized_to_receive_records",
-          "placeholder": "Agency name",
+          "placeholder": "C corporation",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
@@ -129,10 +151,10 @@
         },
         {
           "questionId": 5,
-          "text": "What is the agency Mail Code?",
+          "text": "Please confirm: S corporation",
           "needsExplanation": true,
-          "explanation": "Enter the five-digit Mail Code assigned by the DOJ for the agency receiving the records.",
-          "type": "text",
+          "explanation": "Confirm if your entity is classified as an S corporation by selecting this option.",
+          "type": "checkbox",
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -143,10 +165,20 @@
             "option": "",
             "to": ""
           },
-          "options": [],
+          "options": [
+            {
+              "label": "S corporation",
+              "nameId": "tax_classification_partnership",
+              "value": "S corporation",
+              "autopopulate": {
+                "enabled": false,
+                "profileKey": "",
+                "profileDescription": ""
+              }
+            }
+          ],
           "labels": [],
-          "nameId": "agency_mail_code",
-          "placeholder": "Mail Code",
+          "placeholder": "S corporation",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
@@ -158,10 +190,10 @@
         },
         {
           "questionId": 6,
-          "text": "What is the agency address?",
+          "text": "Please confirm: Partnership",
           "needsExplanation": true,
-          "explanation": "Enter the complete mailing address for the agency authorized to receive the records.",
-          "type": "multipleTextboxes",
+          "explanation": "Confirm if your entity is classified as a Partnership by selecting this option.",
+          "type": "checkbox",
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -172,81 +204,20 @@
             "option": "",
             "to": ""
           },
-          "options": [],
-          "labels": [],
-          "nameId": null,
-          "placeholder": "",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": false,
-            "profileKey": "",
-            "profileDescription": ""
-          },
-          "textboxes": [
+          "options": [
             {
-              "label": "Street Address or P.O. Box",
-              "nameId": "agency_street_address",
-              "placeholder": "Street address",
-              "autopopulate": {
-                "enabled": false,
-                "profileKey": "",
-                "profileDescription": ""
-              }
-            },
-            {
-              "label": "City",
-              "nameId": "agency_city",
-              "placeholder": "City",
-              "autopopulate": {
-                "enabled": false,
-                "profileKey": "",
-                "profileDescription": ""
-              }
-            },
-            {
-              "label": "State",
-              "placeholder": "State",
-              "pdfCombineInto": "agency_zip_code",
-              "autopopulate": {
-                "enabled": false,
-                "profileKey": "",
-                "profileDescription": ""
-              }
-            },
-            {
-              "label": "ZIP Code",
-              "nameId": "agency_zip_code",
-              "placeholder": "ZIP Code",
+              "label": "Partnership",
+              "nameId": "tax_classification_trust_estate",
+              "value": "Partnership",
               "autopopulate": {
                 "enabled": false,
                 "profileKey": "",
                 "profileDescription": ""
               }
             }
-          ]
-        },
-        {
-          "questionId": 7,
-          "text": "Who is the agency contact?",
-          "needsExplanation": true,
-          "explanation": "Enter the contact person for the requesting agency. This is mandatory for school submissions.",
-          "type": "text",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [],
+          ],
           "labels": [],
-          "nameId": "agency_contact_name",
-          "placeholder": "Contact name",
+          "placeholder": "Partnership",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
@@ -257,11 +228,11 @@
           }
         },
         {
-          "questionId": 8,
-          "text": "What is the agency contact phone number?",
+          "questionId": 7,
+          "text": "Please confirm: Other",
           "needsExplanation": true,
-          "explanation": "Enter the telephone number for the agency contact person listed on this form.",
-          "type": "phone",
+          "explanation": "Confirm if your entity falls under a classification not listed by selecting 'Other'.",
+          "type": "checkbox",
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -272,10 +243,20 @@
             "option": "",
             "to": ""
           },
-          "options": [],
+          "options": [
+            {
+              "label": "Other",
+              "nameId": "tax_classification_other_checkbox",
+              "value": "Other",
+              "autopopulate": {
+                "enabled": false,
+                "profileKey": "",
+                "profileDescription": ""
+              }
+            }
+          ],
           "labels": [],
-          "nameId": "agency_contact_telephone_number",
-          "placeholder": "Contact phone",
+          "placeholder": "Other",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
@@ -289,14 +270,14 @@
     },
     {
       "sectionId": 2,
-      "sectionName": "Applicant",
+      "sectionName": "Employer",
       "questions": [
         {
-          "questionId": 9,
-          "text": "What is your legal name?",
+          "questionId": 8,
+          "text": "What is your other Tax Classification?",
           "needsExplanation": true,
-          "explanation": "Enter your legal name exactly as it should appear on the live scan request.",
-          "type": "multipleTextboxes",
+          "explanation": "Enter the employer's other tax classification as it should appear on the completed form.",
+          "type": "text",
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -309,8 +290,8 @@
           },
           "options": [],
           "labels": [],
-          "nameId": null,
-          "placeholder": "",
+          "placeholder": "Other Tax Classification",
+          "nameId": "tax_classification_other",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
@@ -318,51 +299,43 @@
             "enabled": false,
             "profileKey": "",
             "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 9,
+          "text": "What is your exempt payee code?",
+          "needsExplanation": true,
+          "explanation": "Enter the employer's exempt payee code, if applicable, as it should appear on the form.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
           },
-          "textboxes": [
-            {
-              "label": "First Name",
-              "nameId": "applicant_first_name",
-              "placeholder": "First name",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "firstName",
-                "profileDescription": "User's legal first name",
-                "availableInProfile": true,
-                "currentProfileValue": "Adam"
-              }
-            },
-            {
-              "label": "Last Name",
-              "nameId": "applicant_last_name",
-              "placeholder": "Last name",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "lastName",
-                "profileDescription": "User's legal last name",
-                "availableInProfile": true,
-                "currentProfileValue": "Chaabane"
-              }
-            },
-            {
-              "label": "Suffix",
-              "nameId": "applicant_suffix",
-              "placeholder": "Suffix",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "suffix",
-                "profileDescription": "User's legal name suffix",
-                "availableInProfile": false
-              }
-            }
-          ]
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "placeholder": "Exempt payee code (if any)",
+          "nameId": "exempt_payee_code",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
         },
         {
           "questionId": 10,
-          "text": "Do you have an alias?",
+          "text": "Please confirm: Print or type",
           "needsExplanation": true,
-          "explanation": "Choose Yes if you have used another legal name, AKA, maiden name, or alias.",
-          "type": "dropdown",
+          "explanation": "Select whether the employer's information should be printed or typed on the form.",
+          "type": "checkbox",
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -375,97 +348,33 @@
           },
           "options": [
             {
-              "label": "Yes",
-              "value": "Yes"
-            },
-            {
-              "label": "No",
-              "value": "No"
+              "label": "Print or type",
+              "nameId": "tax_classification_llc",
+              "value": "Print or type",
+              "autopopulate": {
+                "enabled": false,
+                "profileKey": "",
+                "profileDescription": ""
+              }
             }
           ],
           "labels": [],
-          "nameId": null,
-          "placeholder": "Select Yes or No",
+          "placeholder": "Print or type",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
           "autopopulate": {
-            "enabled": true,
-            "profileKey": "has_alias",
-            "profileDescription": "Whether the user has used another name or alias",
-            "availableInProfile": false
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
           }
         },
         {
           "questionId": 11,
-          "text": "What alias have you used?",
+          "text": "What is your box for the tax classification of its owner?",
           "needsExplanation": true,
-          "explanation": "Enter the other name you have used, including first name, last name, and suffix if any.",
-          "type": "multipleTextboxes",
-          "logic": {
-            "enabled": true,
-            "prevQuestion": "10",
-            "prevAnswer": "Yes"
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [],
-          "labels": [],
-          "nameId": null,
-          "placeholder": "",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": false,
-            "profileKey": "",
-            "profileDescription": ""
-          },
-          "textboxes": [
-            {
-              "label": "First Name",
-              "nameId": "other_name_first",
-              "placeholder": "First name",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "alias_first_name",
-                "profileDescription": "User's alias first name",
-                "availableInProfile": false
-              }
-            },
-            {
-              "label": "Last Name",
-              "nameId": "other_name_last",
-              "placeholder": "Last name",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "alias_last_name",
-                "profileDescription": "User's alias last name",
-                "availableInProfile": false
-              }
-            },
-            {
-              "label": "Suffix",
-              "nameId": "other_name_suffix",
-              "placeholder": "Suffix",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "alias_suffix",
-                "profileDescription": "User's alias name suffix",
-                "availableInProfile": false
-              }
-            }
-          ]
-        },
-        {
-          "questionId": 12,
-          "text": "What is your date of birth?",
-          "needsExplanation": true,
-          "explanation": "Enter your birth date as it appears on your official identification documents.",
-          "type": "date",
+          "explanation": "Enter the employer's box for the tax classification of its owner as it should appear on the form.",
+          "type": "text",
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -478,25 +387,52 @@
           },
           "options": [],
           "labels": [],
-          "nameId": "applicant_date_of_birth",
-          "placeholder": "Date of birth",
+          "placeholder": "box for the tax classification of its owner",
+          "nameId": "tax_classification_code",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
           "autopopulate": {
-            "enabled": true,
-            "profileKey": "date_of_birth",
-            "profileDescription": "User's date of birth",
-            "availableInProfile": false
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 12,
+          "text": "What is your code?",
+          "needsExplanation": true,
+          "explanation": "Enter the employer's code, if applicable, as it should appear on the completed form.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "placeholder": "code (if any)",
+          "nameId": "fatca_exemption_code",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
           }
         },
         {
           "questionId": 13,
-          "text": "Please select your sex",
+          "text": "Please confirm: Foreign Partners",
           "needsExplanation": true,
-          "explanation": "Select the option that best describes your sex as required on the official form.",
+          "explanation": "Select if the employer has foreign partners, as applicable to the situation.",
           "type": "checkbox",
-          "checkboxSelectionMode": "single",
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -509,42 +445,18 @@
           },
           "options": [
             {
-              "label": "Male",
-              "nameId": "applicant_sex_male",
-              "value": "Male",
+              "label": "Foreign Partners",
+              "nameId": "foreign_partners_checkbox",
+              "value": "Foreign Partners",
               "autopopulate": {
-                "enabled": true,
-                "profileKey": "sex",
-                "profileDescription": "User's sex",
-                "availableInProfile": false
-              }
-            },
-            {
-              "label": "Female",
-              "nameId": "applicant_sex_female",
-              "value": "Female",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "sex",
-                "profileDescription": "User's sex",
-                "availableInProfile": false
-              }
-            },
-            {
-              "label": "Nonbinary/Unspecified",
-              "nameId": "applicant_sex_nonbinary_unspecified",
-              "value": "Nonbinary/Unspecified",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "sex",
-                "profileDescription": "User's sex",
-                "availableInProfile": false
+                "enabled": false,
+                "profileKey": "",
+                "profileDescription": ""
               }
             }
           ],
           "labels": [],
-          "nameId": null,
-          "placeholder": "",
+          "placeholder": "Foreign Partners",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
@@ -556,9 +468,9 @@
         },
         {
           "questionId": 14,
-          "text": "What is your driver's license number?",
+          "text": "What is your city, state, and ZIP code?",
           "needsExplanation": true,
-          "explanation": "Enter the driver's license number from your current government-issued identification.",
+          "explanation": "Enter the employer's city, state, and ZIP code as it should appear on the form.",
           "type": "text",
           "logic": {
             "enabled": false,
@@ -572,314 +484,8 @@
           },
           "options": [],
           "labels": [],
-          "nameId": "applicant_drivers_license_number",
-          "placeholder": "Driver's license number",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": true,
-            "profileKey": "drivers_license_number",
-            "profileDescription": "User's driver's license number",
-            "availableInProfile": false
-          }
-        },
-        {
-          "questionId": 15,
-          "text": "What is your height?",
-          "needsExplanation": true,
-          "explanation": "Enter your height in the format requested by the live scan agency, such as feet and inches.",
-          "type": "text",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [],
-          "labels": [],
-          "nameId": "applicant_height",
-          "placeholder": "Height",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": true,
-            "profileKey": "height",
-            "profileDescription": "User's height",
-            "availableInProfile": false
-          }
-        },
-        {
-          "questionId": 16,
-          "text": "What is your weight?",
-          "needsExplanation": true,
-          "explanation": "Enter your current weight in pounds as required for the live scan request.",
-          "type": "text",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [],
-          "labels": [],
-          "nameId": "applicant_weight",
-          "placeholder": "Weight",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": true,
-            "profileKey": "weight",
-            "profileDescription": "User's weight",
-            "availableInProfile": false
-          }
-        },
-        {
-          "questionId": 17,
-          "text": "What is your eye color?",
-          "needsExplanation": true,
-          "explanation": "Select the eye color that best matches your official identification record.",
-          "type": "dropdown",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [
-            {
-              "label": "Black",
-              "value": "Black"
-            },
-            {
-              "label": "Blue",
-              "value": "Blue"
-            },
-            {
-              "label": "Brown",
-              "value": "Brown"
-            },
-            {
-              "label": "Gray",
-              "value": "Gray"
-            },
-            {
-              "label": "Green",
-              "value": "Green"
-            },
-            {
-              "label": "Hazel",
-              "value": "Hazel"
-            },
-            {
-              "label": "Other",
-              "value": "Other"
-            }
-          ],
-          "labels": [],
-          "nameId": "applicant_eye_color",
-          "placeholder": "Select eye color",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": true,
-            "profileKey": "eye_color",
-            "profileDescription": "User's eye color",
-            "availableInProfile": false
-          }
-        },
-        {
-          "questionId": 18,
-          "text": "What is your hair color?",
-          "needsExplanation": true,
-          "explanation": "Select the hair color that best matches your current appearance or official identification record.",
-          "type": "dropdown",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [
-            {
-              "label": "Bald",
-              "value": "Bald"
-            },
-            {
-              "label": "Black",
-              "value": "Black"
-            },
-            {
-              "label": "Blond",
-              "value": "Blond"
-            },
-            {
-              "label": "Brown",
-              "value": "Brown"
-            },
-            {
-              "label": "Gray",
-              "value": "Gray"
-            },
-            {
-              "label": "Red",
-              "value": "Red"
-            },
-            {
-              "label": "Sandy",
-              "value": "Sandy"
-            },
-            {
-              "label": "White",
-              "value": "White"
-            },
-            {
-              "label": "Other",
-              "value": "Other"
-            }
-          ],
-          "labels": [],
-          "nameId": "applicant_hair_color",
-          "placeholder": "Select hair color",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": true,
-            "profileKey": "hair_color",
-            "profileDescription": "User's hair color",
-            "availableInProfile": false
-          }
-        },
-        {
-          "questionId": 19,
-          "text": "What is your place of birth?",
-          "needsExplanation": true,
-          "explanation": "Enter the state or country where you were born, as requested on the official form.",
-          "type": "text",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [],
-          "labels": [],
-          "nameId": "applicant_place_of_birth",
-          "placeholder": "State or country",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": true,
-            "profileKey": "place_of_birth",
-            "profileDescription": "User's place of birth",
-            "availableInProfile": false
-          }
-        },
-        {
-          "questionId": 20,
-          "text": "What is your SSN?",
-          "needsExplanation": true,
-          "explanation": "Enter your Social Security number if it is required for this live scan submission.",
-          "type": "text",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [],
-          "labels": [],
-          "nameId": "applicant_social_security_number",
-          "placeholder": "SSN",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": true,
-            "profileKey": "social_security_number",
-            "profileDescription": "User's Social Security number",
-            "availableInProfile": false
-          }
-        },
-        {
-          "questionId": 21,
-          "text": "What is your other identification number?",
-          "needsExplanation": true,
-          "explanation": "Enter any other identification number requested by the agency for this applicant submission.",
-          "type": "text",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [],
-          "labels": [],
-          "nameId": "applicant_misc_identification_number",
-          "placeholder": "Other ID number",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": true,
-            "profileKey": "misc_identification_number",
-            "profileDescription": "User's miscellaneous identification number",
-            "availableInProfile": false
-          }
-        },
-        {
-          "questionId": 22,
-          "text": "What is your home address?",
-          "needsExplanation": true,
-          "explanation": "Enter your complete home address including street, city, state, and ZIP code as it should appear on the form.",
-          "type": "multipleTextboxes",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [],
-          "labels": [],
-          "nameId": null,
-          "placeholder": "",
+          "placeholder": "City, state, and ZIP code",
+          "nameId": "address",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
@@ -887,64 +493,14 @@
             "enabled": false,
             "profileKey": "",
             "profileDescription": ""
-          },
-          "textboxes": [
-            {
-              "label": "Home Street Address or P.O. Box",
-              "nameId": "applicant_home_street_address",
-              "placeholder": "Street address",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "street",
-                "profileDescription": "User's home street address",
-                "availableInProfile": true,
-                "currentProfileValue": "921 Sloat Road31"
-              }
-            },
-            {
-              "label": "Home City",
-              "nameId": "applicant_home_city",
-              "placeholder": "City",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "city",
-                "profileDescription": "User's home city",
-                "availableInProfile": true,
-                "currentProfileValue": "Salinas"
-              }
-            },
-            {
-              "label": "State",
-              "placeholder": "State",
-              "pdfCombineInto": "applicant_home_zip_code",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "state",
-                "profileDescription": "User's home state",
-                "availableInProfile": true,
-                "currentProfileValue": "CA"
-              }
-            },
-            {
-              "label": "Home ZIP Code",
-              "nameId": "applicant_home_zip_code",
-              "placeholder": "ZIP Code",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "zip",
-                "profileDescription": "User's home ZIP code",
-                "availableInProfile": true,
-                "currentProfileValue": "93907"
-              }
-            }
-          ]
+          }
         },
         {
-          "questionId": 23,
-          "text": "What is the applicant signature date?",
+          "questionId": 15,
+          "text": "What is your apt. or suite no.). See instructions?",
           "needsExplanation": true,
-          "explanation": "This date will be filled automatically with today's date when you submit the form.",
-          "type": "date",
+          "explanation": "Enter the employer's apartment or suite number as it should appear on the completed form.",
+          "type": "text",
           "logic": {
             "enabled": false,
             "prevQuestion": "",
@@ -957,11 +513,11 @@
           },
           "options": [],
           "labels": [],
-          "nameId": "applicant_signature_date",
-          "placeholder": "Signature date",
+          "placeholder": "apt. or suite no.). See instructions",
+          "nameId": "apt_suite_number",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
-          "autoTodayDate": true,
+          "autoTodayDate": false,
           "autopopulate": {
             "enabled": false,
             "profileKey": "",
@@ -972,13 +528,13 @@
     },
     {
       "sectionId": 3,
-      "sectionName": "Submission Details",
+      "sectionName": "Other",
       "questions": [
         {
-          "questionId": 24,
-          "text": "What is the agency billing number?",
+          "questionId": 16,
+          "text": "What is your city, state, and ZIP code?",
           "needsExplanation": true,
-          "explanation": "Enter the billing number provided by the agency for this live scan transaction, if one applies.",
+          "explanation": "Enter the city, state, and ZIP code for your home address as the applicant.",
           "type": "text",
           "logic": {
             "enabled": false,
@@ -992,242 +548,28 @@
           },
           "options": [],
           "labels": [],
-          "nameId": "agency_billing_number",
-          "placeholder": "Billing number",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": false,
-            "profileKey": "",
-            "profileDescription": ""
-          }
-        },
-        {
-          "questionId": 25,
-          "text": "What is your OCA number?",
-          "needsExplanation": true,
-          "explanation": "Enter the agency identifying number, often called the OCA number, if the requesting agency provided one.",
-          "type": "text",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [],
-          "labels": [],
-          "nameId": "oca_number",
-          "placeholder": "OCA number",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": false,
-            "profileKey": "",
-            "profileDescription": ""
-          }
-        },
-        {
-          "questionId": 26,
-          "text": "Please select your level of service",
-          "needsExplanation": true,
-          "explanation": "Select each level of background check service requested by the agency for this submission.",
-          "type": "checkbox",
-          "checkboxSelectionMode": "multiple",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [
-            {
-              "label": "DOJ",
-              "nameId": "level_of_service_doj",
-              "value": "DOJ",
-              "autopopulate": {
-                "enabled": false,
-                "profileKey": "",
-                "profileDescription": ""
-              }
-            },
-            {
-              "label": "FBI",
-              "nameId": "level_of_service_fbi",
-              "value": "FBI",
-              "autopopulate": {
-                "enabled": false,
-                "profileKey": "",
-                "profileDescription": ""
-              }
-            }
-          ],
-          "labels": [],
-          "nameId": null,
-          "placeholder": "",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": false,
-            "profileKey": "",
-            "profileDescription": ""
-          }
-        },
-        {
-          "questionId": 27,
-          "text": "Is this a resubmission?",
-          "needsExplanation": true,
-          "explanation": "Choose Yes if you are resubmitting a prior live scan and need to provide the original ATI number.",
-          "type": "dropdown",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [
-            {
-              "label": "Yes",
-              "value": "Yes"
-            },
-            {
-              "label": "No",
-              "value": "No"
-            }
-          ],
-          "labels": [],
-          "nameId": null,
-          "placeholder": "Select Yes or No",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": false,
-            "profileKey": "",
-            "profileDescription": ""
-          }
-        },
-        {
-          "questionId": 28,
-          "text": "What is your original ATI number?",
-          "needsExplanation": true,
-          "explanation": "Enter the ATI number from your original live scan submission and be prepared to provide proof of rejection.",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "prevQuestion": "27",
-            "prevAnswer": "Yes"
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [],
-          "labels": [],
-          "nameId": "original_ati_number",
-          "placeholder": "Original ATI number",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": false,
-            "profileKey": "",
-            "profileDescription": ""
-          }
-        },
-        {
-          "questionId": 29,
-          "text": "Is employer information required?",
-          "needsExplanation": true,
-          "explanation": "Choose Yes if the requesting agency or statute requires an employer response section for this live scan.",
-          "type": "dropdown",
-          "logic": {
-            "enabled": false,
-            "prevQuestion": "",
-            "prevAnswer": ""
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [
-            {
-              "label": "Yes",
-              "value": "Yes"
-            },
-            {
-              "label": "No",
-              "value": "No"
-            }
-          ],
-          "labels": [],
-          "nameId": null,
-          "placeholder": "Select Yes or No",
-          "linkedToNameId": null,
-          "linkedFieldRole": "primary",
-          "autoTodayDate": false,
-          "autopopulate": {
-            "enabled": false,
-            "profileKey": "",
-            "profileDescription": ""
-          }
-        },
-        {
-          "questionId": 30,
-          "text": "What is the employer name?",
-          "needsExplanation": true,
-          "explanation": "Enter the employer name only if this additional response section is required for your submission.",
-          "type": "text",
-          "logic": {
-            "enabled": true,
-            "prevQuestion": "29",
-            "prevAnswer": "Yes"
-          },
-          "jump": {
-            "enabled": false,
-            "option": "",
-            "to": ""
-          },
-          "options": [],
-          "labels": [],
-          "nameId": "employer_name",
-          "placeholder": "Employer name",
+          "placeholder": "City, state, and ZIP code",
+          "nameId": "city_state_zip",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
           "autopopulate": {
             "enabled": true,
-            "profileKey": "employer_name",
-            "profileDescription": "User's employer name",
+            "profileKey": "city_state_zip",
+            "profileDescription": "City, state, and ZIP code",
             "availableInProfile": false
           }
         },
         {
-          "questionId": 31,
-          "text": "What is the employer address?",
+          "questionId": 17,
+          "text": "What is your list account number here?",
           "needsExplanation": true,
-          "explanation": "Enter the employer's complete mailing address including street, city, state, and ZIP code.",
-          "type": "multipleTextboxes",
+          "explanation": "Enter your list account number(s) here as the applicant, if applicable.",
+          "type": "text",
           "logic": {
-            "enabled": true,
-            "prevQuestion": "29",
-            "prevAnswer": "Yes"
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
           },
           "jump": {
             "enabled": false,
@@ -1236,8 +578,8 @@
           },
           "options": [],
           "labels": [],
-          "nameId": null,
-          "placeholder": "",
+          "placeholder": "List account number(s) here (optional)",
+          "nameId": "account_number",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
@@ -1245,66 +587,18 @@
             "enabled": false,
             "profileKey": "",
             "profileDescription": ""
-          },
-          "textboxes": [
-            {
-              "label": "Street Address or P.O. Box",
-              "nameId": "employer_street_address",
-              "placeholder": "Street address",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "employer_street",
-                "profileDescription": "User's employer street address",
-                "availableInProfile": false
-              }
-            },
-            {
-              "label": "City",
-              "nameId": "employer_city",
-              "placeholder": "City",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "employer_city",
-                "profileDescription": "User's employer city",
-                "availableInProfile": true,
-                "currentProfileValue": "Salinas"
-              }
-            },
-            {
-              "label": "State",
-              "placeholder": "State",
-              "pdfCombineInto": "employer_zip_code",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "employer_state",
-                "profileDescription": "User's employer state",
-                "availableInProfile": false
-              }
-            },
-            {
-              "label": "ZIP Code",
-              "nameId": "employer_zip_code",
-              "placeholder": "ZIP Code",
-              "autopopulate": {
-                "enabled": true,
-                "profileKey": "employer_zip",
-                "profileDescription": "User's employer ZIP code",
-                "availableInProfile": true,
-                "currentProfileValue": "93907"
-              }
-            }
-          ]
+          }
         },
         {
-          "questionId": 32,
-          "text": "What is the employer phone number?",
+          "questionId": 18,
+          "text": "What is your or?",
           "needsExplanation": true,
-          "explanation": "Enter the employer telephone number if it is available for this additional response section.",
-          "type": "phone",
+          "explanation": "Provide the required information as the applicant, ensuring accuracy for the form.",
+          "type": "text",
           "logic": {
-            "enabled": true,
-            "prevQuestion": "29",
-            "prevAnswer": "Yes"
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
           },
           "jump": {
             "enabled": false,
@@ -1313,29 +607,27 @@
           },
           "options": [],
           "labels": [],
-          "nameId": "employer_telephone_number",
-          "placeholder": "Employer phone",
+          "placeholder": "or",
+          "nameId": "tin_part1",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
           "autopopulate": {
-            "enabled": true,
-            "profileKey": "employer_phone",
-            "profileDescription": "User's employer telephone number",
-            "availableInProfile": true,
-            "currentProfileValue": "8317606958"
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
           }
         },
         {
-          "questionId": 33,
-          "text": "What is the employer Mail Code?",
+          "questionId": 19,
+          "text": "What is your –?",
           "needsExplanation": true,
-          "explanation": "Enter the five-digit DOJ Mail Code for the employer, if the agency requires one.",
+          "explanation": "Provide the required information as the applicant, ensuring accuracy for the form.",
           "type": "text",
           "logic": {
-            "enabled": true,
-            "prevQuestion": "29",
-            "prevAnswer": "Yes"
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
           },
           "jump": {
             "enabled": false,
@@ -1344,8 +636,95 @@
           },
           "options": [],
           "labels": [],
-          "nameId": "employer_mail_code",
-          "placeholder": "Mail Code",
+          "placeholder": "–",
+          "nameId": "tin_part2",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 20,
+          "text": "What is your for Part I, later. For other?",
+          "needsExplanation": true,
+          "explanation": "Provide the required information as the applicant, ensuring accuracy for the form.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "placeholder": "for Part I, later. For other",
+          "nameId": "tin_part3",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 21,
+          "text": "What Name and?",
+          "needsExplanation": true,
+          "explanation": "Provide the required name information as the applicant, ensuring accuracy for the form.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "placeholder": "What Name and",
+          "nameId": "name_for_tin",
+          "linkedToNameId": null,
+          "linkedFieldRole": "primary",
+          "autoTodayDate": false,
+          "autopopulate": {
+            "enabled": false,
+            "profileKey": "",
+            "profileDescription": ""
+          }
+        },
+        {
+          "questionId": 22,
+          "text": "What is your –?",
+          "needsExplanation": true,
+          "explanation": "Provide the required information as the applicant, ensuring accuracy for the form.",
+          "type": "text",
+          "logic": {
+            "enabled": false,
+            "prevQuestion": "",
+            "prevAnswer": ""
+          },
+          "jump": {
+            "enabled": false,
+            "option": "",
+            "to": ""
+          },
+          "options": [],
+          "labels": [],
+          "placeholder": "–",
+          "nameId": "additional_name_info",
           "linkedToNameId": null,
           "linkedFieldRole": "primary",
           "autoTodayDate": false,
@@ -1359,480 +738,35 @@
     }
   ],
   "hiddenFields": [],
-  "linkedFieldGroups": [],
   "sectionCounter": 4,
-  "questionCounter": 34,
-  "htmlMode": "normal",
-  "templateSource": "default",
-  "pdfToken": "ae6b7dd3-2b5d-4e68-baeb-8ec1c5754b87",
+  "questionCounter": 23,
   "autopopulateFields": [
     {
-      "questionText": "What is your legal name? — First Name",
-      "nameId": "applicant_first_name",
-      "profileKey": "firstName",
-      "profileDescription": "User's legal first name",
-      "availableInProfile": true,
-      "currentProfileValue": "Adam"
-    },
-    {
-      "questionText": "What is your legal name? — Last Name",
-      "nameId": "applicant_last_name",
-      "profileKey": "lastName",
-      "profileDescription": "User's legal last name",
-      "availableInProfile": true,
-      "currentProfileValue": "Chaabane"
-    },
-    {
-      "questionText": "What is your legal name? — Suffix",
-      "nameId": "applicant_suffix",
-      "profileKey": "suffix",
-      "profileDescription": "User's legal name suffix",
+      "questionText": "What is your city, state, and ZIP code?",
+      "nameId": "city_state_zip",
+      "profileKey": "city_state_zip",
+      "profileDescription": "City, state, and ZIP code",
       "availableInProfile": false,
       "currentProfileValue": null
-    },
-    {
-      "questionText": "Do you have an alias?",
-      "nameId": "has_alias",
-      "profileKey": "has_alias",
-      "profileDescription": "Whether the user has used another name or alias",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What alias have you used? — First Name",
-      "nameId": "other_name_first",
-      "profileKey": "alias_first_name",
-      "profileDescription": "User's alias first name",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What alias have you used? — Last Name",
-      "nameId": "other_name_last",
-      "profileKey": "alias_last_name",
-      "profileDescription": "User's alias last name",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What alias have you used? — Suffix",
-      "nameId": "other_name_suffix",
-      "profileKey": "alias_suffix",
-      "profileDescription": "User's alias name suffix",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your date of birth?",
-      "nameId": "applicant_date_of_birth",
-      "profileKey": "date_of_birth",
-      "profileDescription": "User's date of birth",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "Please select your sex — Male",
-      "nameId": "applicant_sex_male",
-      "profileKey": "sex",
-      "profileDescription": "User's sex",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "Please select your sex — Female",
-      "nameId": "applicant_sex_female",
-      "profileKey": "sex",
-      "profileDescription": "User's sex",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "Please select your sex — Nonbinary/Unspecified",
-      "nameId": "applicant_sex_nonbinary_unspecified",
-      "profileKey": "sex",
-      "profileDescription": "User's sex",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your driver's license number?",
-      "nameId": "applicant_drivers_license_number",
-      "profileKey": "drivers_license_number",
-      "profileDescription": "User's driver's license number",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your height?",
-      "nameId": "applicant_height",
-      "profileKey": "height",
-      "profileDescription": "User's height",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your weight?",
-      "nameId": "applicant_weight",
-      "profileKey": "weight",
-      "profileDescription": "User's weight",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your eye color?",
-      "nameId": "applicant_eye_color",
-      "profileKey": "eye_color",
-      "profileDescription": "User's eye color",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your hair color?",
-      "nameId": "applicant_hair_color",
-      "profileKey": "hair_color",
-      "profileDescription": "User's hair color",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your place of birth?",
-      "nameId": "applicant_place_of_birth",
-      "profileKey": "place_of_birth",
-      "profileDescription": "User's place of birth",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your SSN?",
-      "nameId": "applicant_social_security_number",
-      "profileKey": "social_security_number",
-      "profileDescription": "User's Social Security number",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your other identification number?",
-      "nameId": "applicant_misc_identification_number",
-      "profileKey": "misc_identification_number",
-      "profileDescription": "User's miscellaneous identification number",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your home address? — Home Street Address or P.O. Box",
-      "nameId": "applicant_home_street_address",
-      "profileKey": "street",
-      "profileDescription": "User's home street address",
-      "availableInProfile": true,
-      "currentProfileValue": "921 Sloat Road31"
-    },
-    {
-      "questionText": "What is your home address? — Home City",
-      "nameId": "applicant_home_city",
-      "profileKey": "city",
-      "profileDescription": "User's home city",
-      "availableInProfile": true,
-      "currentProfileValue": "Salinas"
-    },
-    {
-      "questionText": "What is your home address? — State",
-      "nameId": "state",
-      "profileKey": "state",
-      "profileDescription": "User's home state",
-      "availableInProfile": true,
-      "currentProfileValue": "CA"
-    },
-    {
-      "questionText": "What is your home address? — Home ZIP Code",
-      "nameId": "applicant_home_zip_code",
-      "profileKey": "zip",
-      "profileDescription": "User's home ZIP code",
-      "availableInProfile": true,
-      "currentProfileValue": "93907"
-    },
-    {
-      "questionText": "What is the employer name?",
-      "nameId": "employer_name",
-      "profileKey": "employer_name",
-      "profileDescription": "User's employer name",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is the employer address? — Street Address or P.O. Box",
-      "nameId": "employer_street_address",
-      "profileKey": "employer_street",
-      "profileDescription": "User's employer street address",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is the employer address? — City",
-      "nameId": "employer_city",
-      "profileKey": "employer_city",
-      "profileDescription": "User's employer city",
-      "availableInProfile": true,
-      "currentProfileValue": "Salinas"
-    },
-    {
-      "questionText": "What is the employer address? — State",
-      "nameId": "employer_state",
-      "profileKey": "employer_state",
-      "profileDescription": "User's employer state",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is the employer address? — ZIP Code",
-      "nameId": "employer_zip_code",
-      "profileKey": "employer_zip",
-      "profileDescription": "User's employer ZIP code",
-      "availableInProfile": true,
-      "currentProfileValue": "93907"
-    },
-    {
-      "questionText": "What is the employer phone number?",
-      "nameId": "employer_telephone_number",
-      "profileKey": "employer_phone",
-      "profileDescription": "User's employer telephone number",
-      "availableInProfile": true,
-      "currentProfileValue": "8317606958"
     }
   ],
-  "autopopulateAvailable": [
-    {
-      "questionText": "What is your legal name? — First Name",
-      "nameId": "applicant_first_name",
-      "profileKey": "firstName",
-      "profileDescription": "User's legal first name",
-      "availableInProfile": true,
-      "currentProfileValue": "Adam"
-    },
-    {
-      "questionText": "What is your legal name? — Last Name",
-      "nameId": "applicant_last_name",
-      "profileKey": "lastName",
-      "profileDescription": "User's legal last name",
-      "availableInProfile": true,
-      "currentProfileValue": "Chaabane"
-    },
-    {
-      "questionText": "What is your home address? — Home Street Address or P.O. Box",
-      "nameId": "applicant_home_street_address",
-      "profileKey": "street",
-      "profileDescription": "User's home street address",
-      "availableInProfile": true,
-      "currentProfileValue": "921 Sloat Road31"
-    },
-    {
-      "questionText": "What is your home address? — Home City",
-      "nameId": "applicant_home_city",
-      "profileKey": "city",
-      "profileDescription": "User's home city",
-      "availableInProfile": true,
-      "currentProfileValue": "Salinas"
-    },
-    {
-      "questionText": "What is your home address? — State",
-      "nameId": "state",
-      "profileKey": "state",
-      "profileDescription": "User's home state",
-      "availableInProfile": true,
-      "currentProfileValue": "CA"
-    },
-    {
-      "questionText": "What is your home address? — Home ZIP Code",
-      "nameId": "applicant_home_zip_code",
-      "profileKey": "zip",
-      "profileDescription": "User's home ZIP code",
-      "availableInProfile": true,
-      "currentProfileValue": "93907"
-    },
-    {
-      "questionText": "What is the employer address? — City",
-      "nameId": "employer_city",
-      "profileKey": "employer_city",
-      "profileDescription": "User's employer city",
-      "availableInProfile": true,
-      "currentProfileValue": "Salinas"
-    },
-    {
-      "questionText": "What is the employer address? — ZIP Code",
-      "nameId": "employer_zip_code",
-      "profileKey": "employer_zip",
-      "profileDescription": "User's employer ZIP code",
-      "availableInProfile": true,
-      "currentProfileValue": "93907"
-    },
-    {
-      "questionText": "What is the employer phone number?",
-      "nameId": "employer_telephone_number",
-      "profileKey": "employer_phone",
-      "profileDescription": "User's employer telephone number",
-      "availableInProfile": true,
-      "currentProfileValue": "8317606958"
-    }
-  ],
+  "autopopulateAvailable": [],
   "autopopulateMissing": [
     {
-      "questionText": "What is your legal name? — Suffix",
-      "nameId": "applicant_suffix",
-      "profileKey": "suffix",
-      "profileDescription": "User's legal name suffix",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "Do you have an alias?",
-      "nameId": "has_alias",
-      "profileKey": "has_alias",
-      "profileDescription": "Whether the user has used another name or alias",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What alias have you used? — First Name",
-      "nameId": "other_name_first",
-      "profileKey": "alias_first_name",
-      "profileDescription": "User's alias first name",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What alias have you used? — Last Name",
-      "nameId": "other_name_last",
-      "profileKey": "alias_last_name",
-      "profileDescription": "User's alias last name",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What alias have you used? — Suffix",
-      "nameId": "other_name_suffix",
-      "profileKey": "alias_suffix",
-      "profileDescription": "User's alias name suffix",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your date of birth?",
-      "nameId": "applicant_date_of_birth",
-      "profileKey": "date_of_birth",
-      "profileDescription": "User's date of birth",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "Please select your sex — Male",
-      "nameId": "applicant_sex_male",
-      "profileKey": "sex",
-      "profileDescription": "User's sex",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "Please select your sex — Female",
-      "nameId": "applicant_sex_female",
-      "profileKey": "sex",
-      "profileDescription": "User's sex",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "Please select your sex — Nonbinary/Unspecified",
-      "nameId": "applicant_sex_nonbinary_unspecified",
-      "profileKey": "sex",
-      "profileDescription": "User's sex",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your driver's license number?",
-      "nameId": "applicant_drivers_license_number",
-      "profileKey": "drivers_license_number",
-      "profileDescription": "User's driver's license number",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your height?",
-      "nameId": "applicant_height",
-      "profileKey": "height",
-      "profileDescription": "User's height",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your weight?",
-      "nameId": "applicant_weight",
-      "profileKey": "weight",
-      "profileDescription": "User's weight",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your eye color?",
-      "nameId": "applicant_eye_color",
-      "profileKey": "eye_color",
-      "profileDescription": "User's eye color",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your hair color?",
-      "nameId": "applicant_hair_color",
-      "profileKey": "hair_color",
-      "profileDescription": "User's hair color",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your place of birth?",
-      "nameId": "applicant_place_of_birth",
-      "profileKey": "place_of_birth",
-      "profileDescription": "User's place of birth",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your SSN?",
-      "nameId": "applicant_social_security_number",
-      "profileKey": "social_security_number",
-      "profileDescription": "User's Social Security number",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is your other identification number?",
-      "nameId": "applicant_misc_identification_number",
-      "profileKey": "misc_identification_number",
-      "profileDescription": "User's miscellaneous identification number",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is the employer name?",
-      "nameId": "employer_name",
-      "profileKey": "employer_name",
-      "profileDescription": "User's employer name",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is the employer address? — Street Address or P.O. Box",
-      "nameId": "employer_street_address",
-      "profileKey": "employer_street",
-      "profileDescription": "User's employer street address",
-      "availableInProfile": false,
-      "currentProfileValue": null
-    },
-    {
-      "questionText": "What is the employer address? — State",
-      "nameId": "employer_state",
-      "profileKey": "employer_state",
-      "profileDescription": "User's employer state",
+      "questionText": "What is your city, state, and ZIP code?",
+      "nameId": "city_state_zip",
+      "profileKey": "city_state_zip",
+      "profileDescription": "City, state, and ZIP code",
       "availableInProfile": false,
       "currentProfileValue": null
     }
-  ]
+  ],
+  "formName": "W-9 Request for Taxpayer Identification Number and Certification",
+  "formDescription": "Complete the W-9 Request for Taxpayer Identification Number and Certification online with your saved FormStar profile.",
+  "formId": "w9requestfortaxpayeridentificationnumberandcerti",
+  "formFolderName": "W-9-Request-for-Taxpayer-Identification-Number-and-Certification",
+  "defendant": "N/A",
+  "htmlMode": "normal",
+  "templateSource": "default",
+  "pdfToken": "d98fc4d1-fdfa-48c7-96e2-8efa9a56648d"
 }

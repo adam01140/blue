@@ -1,6 +1,6 @@
 {
-  "savedAt": "2026-07-02T23:40:53.045Z",
-  "label": "step-8-generated-html",
+  "savedAt": "2026-07-10T20:15:01.993Z",
+  "label": "step-4-field-config",
   "files": [
     "checkbox-fields.txt",
     "extracted-document-content.txt",
@@ -8,6 +8,7 @@
     "form_config.json",
     "generated-form.html",
     "structured-fields.json",
-    "text-fields.txt"
+    "text-fields.txt",
+    "_test_prepared.pdf"
   ]
 }

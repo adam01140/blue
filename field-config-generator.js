@@ -3,9 +3,6 @@ const path = require('path');
 const { fetchOpenAiWithRetry } = require('./openai-fetch');
 const { saveCurrentData } = require('./auto-form-current-data');
 const {
-  enrichFieldConfig,
-} = require('./structured-field-context');
-const {
   resolvePdfPageImages,
   buildPdfVisionUserContent,
 } = require('./pdf-vision-context');
@@ -102,7 +99,7 @@ async function callOpenAiForFieldConfig(openAiApiKey, extractionPayload, pageIma
   return extractJsonFromModelResponse(content);
 }
 
-async function generateFieldConfig(extractionPayload, openAiApiKey, options = {}) {
+async function generateFieldConfig(extractionPayload, openAiApiKey) {
   const textFieldIds = (extractionPayload.textFields || []).map((f) => f.name);
   const checkboxFieldIds = (extractionPayload.checkboxFields || []).map((f) => f.name);
   const inputFieldIds = [...textFieldIds, ...checkboxFieldIds];
@@ -119,29 +116,22 @@ async function generateFieldConfig(extractionPayload, openAiApiKey, options = {}
       id: sf.id,
       type: sf.type,
       page: sf.page,
-      nearestLabel: sf.nearestLabel,
-      sectionHint: sf.sectionHint,
     })),
+    requiredFieldCount: inputFieldIds.length,
+    requiredTextFieldCount: textFieldIds.length,
+    requiredCheckboxFieldCount: checkboxFieldIds.length,
   };
 
-  let pageImages = [];
-  if (openAiApiKey && !options.skipPdfImages) {
-    pageImages = await resolvePdfPageImages(
-      {
-        pdfToken: extractionPayload.pdfToken,
-        pdfBase64: extractionPayload.pdfBase64,
-      },
-      { required: true, logPrefix: '[generate-field-config]' }
-    );
-  }
+  const pageImages = await resolvePdfPageImages(
+    {
+      pdfToken: extractionPayload.pdfToken,
+      pdfBase64: extractionPayload.pdfBase64,
+    },
+    { required: true, logPrefix: '[generate-field-config]' }
+  );
 
   const config = await callOpenAiForFieldConfig(openAiApiKey, promptPayload, pageImages);
-  const validated = validateFieldConfig(config, inputFieldIds);
-  return enrichFieldConfig(
-    validated,
-    extractionPayload.structuredFields || [],
-    extractionPayload.extractedDocumentContent || ''
-  );
+  return validateFieldConfig(config, inputFieldIds);
 }
 
 function createHandleGenerateFieldConfig(openAiApiKey) {

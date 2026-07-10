@@ -73,7 +73,52 @@ function getMissingNameIds(formConfig, fieldConfig) {
     }
   }
 
+  for (const hidden of formConfig.hiddenFields || []) {
+    if (hidden?.nameId) covered.add(hidden.nameId);
+  }
+
   return [...requiredNewNames].filter((name) => !covered.has(name));
+}
+
+function fieldConfigEntriesForNames(fieldConfig, names) {
+  const wanted = new Set(names);
+  return (fieldConfig?.fields || []).filter((f) => wanted.has(f.newName));
+}
+
+function buildMissingFieldsRetryInstruction(missing, fieldConfig, totalCount) {
+  const details = fieldConfigEntriesForNames(fieldConfig, missing).map((f) => ({
+    newName: f.newName,
+    type: f.type,
+    label: f.label,
+    conditional: f.conditional || null,
+  }));
+
+  return [
+    `Your previous response omitted ${missing.length} required nameId(s).`,
+    `Each MUST appear exactly once (question.nameId, textboxes[].nameId, or options[].nameId).`,
+    `Missing field_config entries: ${JSON.stringify(details, null, 2)}`,
+    `Return a corrected complete form_config.json covering ALL ${totalCount} fields.`,
+    `Do NOT skip small auxiliary text boxes (e.g. LLC tax classification code, "specify other" lines) — they are separate fields even when beside checkbox groups.`,
+  ].join('\n');
+}
+
+function buildPatchFormConfigInstruction(formConfig, missing, fieldConfig) {
+  const details = fieldConfigEntriesForNames(fieldConfig, missing);
+  const slimConfig = {
+    formTitle: formConfig.formTitle,
+    displayMode: formConfig.displayMode,
+    sections: formConfig.sections,
+    sectionCounter: formConfig.sectionCounter,
+    questionCounter: formConfig.questionCounter,
+  };
+
+  return [
+    `PATCH MODE: Merge missing fields into the existing form_config below.`,
+    `Add one question per missing field. Keep all existing questions unchanged except renumber questionId if needed.`,
+    `Missing fields to add: ${JSON.stringify(details, null, 2)}`,
+    `Existing form_config (extend this — do not replace unrelated content):`,
+    JSON.stringify(slimConfig, null, 2),
+  ].join('\n\n');
 }
 
 const FIELD_ACRONYMS = new Set(['ati', 'oca', 'ori', 'doj', 'fbi', 'ssn', 'zip', 'cdl']);
@@ -1032,12 +1077,13 @@ async function callOpenAiForFormConfig(openAiApiKey, payload, extraInstruction, 
       Authorization: `Bearer ${openAiApiKey}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userContent },
       ],
       temperature: 0.2,
+      max_tokens: 16384,
       response_format: { type: 'json_object' },
     }),
   });
@@ -1261,57 +1307,58 @@ async function polishFormConfigWithAI(formConfig, fieldConfig, openAiApiKey, pag
 async function generateFormConfig(payload, openAiApiKey) {
   const {
     fieldConfig,
-    structuredFields = [],
     extractedDocumentContent = '',
     displayMode = 'all_at_once',
     userProfile = {},
     pdfToken = '',
     pdfBase64 = '',
-    skipVision = true,
-    skipPolish = false,
   } = payload;
 
   if (!fieldConfig?.fields?.length) {
     throw new Error('fieldConfig.fields is required');
   }
 
-  const enrichedFieldConfig = enrichFieldConfig(
-    fieldConfig,
-    structuredFields,
-    extractedDocumentContent
+  const pageImages = await resolvePdfPageImages(
+    { pdfToken, pdfBase64 },
+    { required: true, logPrefix: '[generate-form-config]' }
   );
 
-  let pageImages = [];
-  if (openAiApiKey) {
-    pageImages = await resolvePdfPageImages(
-      { pdfToken, pdfBase64 },
-      { required: !skipPolish, logPrefix: '[generate-form-config]' }
-    );
-  }
-
-  let config = buildFormConfigSkeleton(enrichedFieldConfig, {
-    structuredFields,
-    extractedDocumentContent,
-    displayMode,
-  });
-
-  config = postProcessFormConfig(config, enrichedFieldConfig, {
+  const requiredNameIds = (fieldConfig.fields || []).map((f) => f.newName);
+  const promptPayload = {
+    fieldConfig,
     extractedDocumentContent,
     displayMode,
     userProfile,
-    structuredFields,
-  });
+    requiredFieldCount: fieldConfig.fields.length,
+    requiredNameIds,
+  };
 
-  if (!skipPolish && openAiApiKey) {
-    if (!pageImages.length) {
-      throw new Error('PDF page images are required for form config AI polish. Re-run Step 3.');
+  let config;
+  let missing = [];
+  const maxAttempts = 4;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    let extraInstruction = null;
+    if (missing.length > 0) {
+      extraInstruction = attempt < maxAttempts
+        ? buildMissingFieldsRetryInstruction(missing, fieldConfig, requiredNameIds.length)
+        : buildPatchFormConfigInstruction(config, missing, fieldConfig);
     }
-    config = await polishFormConfigWithAI(config, enrichedFieldConfig, openAiApiKey, pageImages);
+
+    config = await callOpenAiForFormConfig(openAiApiKey, promptPayload, extraInstruction, pageImages);
+    missing = getMissingNameIds(config, fieldConfig);
+    if (missing.length === 0) {
+      validateFormConfig(config, fieldConfig);
+      return config;
+    }
+    console.warn(
+      `[generate-form-config] Attempt ${attempt}/${maxAttempts}: missing ${missing.length} nameId(s): ${missing.slice(0, 5).join(', ')}${missing.length > 5 ? '…' : ''}`
+    );
   }
 
-  config = ensureAdequateSectionLayout(config, enrichedFieldConfig);
-
-  return config;
+  throw new Error(
+    `form_config missing nameId for: ${missing.slice(0, 3).join(', ')}${missing.length > 3 ? '…' : ''} (${missing.length} total after ${maxAttempts} attempts)`
+  );
 }
 
 function createHandleGenerateFormConfig(openAiApiKey) {
@@ -1320,20 +1367,20 @@ function createHandleGenerateFormConfig(openAiApiKey) {
       const {
         fieldConfig,
         extractedDocumentContent = '',
-        structuredFields = [],
         displayMode = 'all_at_once',
         userProfile = {},
         pdfToken = '',
+        pdfBase64 = '',
       } = req.body || {};
 
       const formConfig = await generateFormConfig(
         {
           fieldConfig,
           extractedDocumentContent,
-          structuredFields,
           displayMode,
           userProfile,
           pdfToken,
+          pdfBase64,
         },
         openAiApiKey
       );
@@ -1351,7 +1398,6 @@ function createHandleGenerateFormConfig(openAiApiKey) {
           fieldConfig,
           formConfig,
           extractedDocumentContent,
-          structuredFields,
         });
       } catch (dumpErr) {
         console.warn('[generate-form-config] Current data dump failed:', dumpErr.message);

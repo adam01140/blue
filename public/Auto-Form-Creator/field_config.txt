@@ -12,18 +12,18 @@ You receive extracted PDF form data from Step 3:
   - extractedDocumentContent — layout text with inline markers and page breaks (--- PAGE N ---)
   - textFields — array of text field objects (each has a name matching [[...]] markers)
   - checkboxFields — array of checkbox field objects (each has a name matching {{...}} markers)
-  - structuredFields — per-field context: id, type, page, nearestLabel, sectionHint
+  - structuredFields — per-field context: id, type, page only
   - requiredFieldCount — exact number of field objects you must output
   - requiredTextFieldCount — exact number of text fields
   - requiredCheckboxFieldCount — exact number of checkbox fields (verify each one individually)
-  - page images — every PDF page attached as an image (page 1 first)
+  - PDF page images — every page of the source PDF attached below (page 1 first). Use these as your PRIMARY source for labels, sections, and layout.
 
 Source priority for labels and sections:
-  1. Page images (primary)
-  2. structuredFields.nearestLabel
-  3. Short text adjacent to the field marker in extractedDocumentContent
+  1. PDF page images (primary)
+  2. Short text adjacent to the field marker in extractedDocumentContent
+  3. structuredFields page number for ordering context only
 
-Use sectionHint to disambiguate repeated labels (City → Agency City vs Home City vs Employer City).
+Do NOT output sectionHint, nearestLabel, or a "context" object on field entries.
 
 
 ================================================================================
@@ -205,20 +205,50 @@ Keep labels concise — long definitions belong in Step 6, not here:
 
 
 ================================================================================
-RULE 7 — CONDITIONAL FIELDS
+RULE 7 — CONDITIONAL FIELDS (CRITICAL — DO NOT SKIP)
 ================================================================================
 
-Add "conditional": { "onlyWhen": "short_snake_case", "gateQuestion": "Plain Yes/No question" }
-when a field only applies in some situations. Step 6 uses this for gate dropdowns.
+Conditional logic is one of the MOST IMPORTANT parts of your job. Government PDFs
+often print optional fields inline ("If different from above", "If applicable",
+"Mailing address (if different from home address)"). Users should NOT be forced to
+answer questions that may not apply to them.
 
-ALWAYS add conditional for:
+When ANY field might only apply in some situations, you MUST add:
+  "conditional": { "onlyWhen": "short_snake_case", "gateQuestion": "Plain Yes/No question" }
+
+Step 6 will insert a gate dropdown BEFORE the dependent field(s). You may need a gate
+question that does not exist as its own PDF field — that is correct and expected.
+
+WHEN IN DOUBT, ADD CONDITIONAL. It is better to gate an optional block than to show
+every "if applicable" field to every user.
+
+ALWAYS add conditional when the PDF or extractedDocumentContent shows patterns like:
+  - "if different (from above|from home|from residence)"
+  - "if different from mailing address" / "if not same as above"
+  - "mailing address (if different...)" / "alternate address"
+  - "if applicable" / "if yes" / "when required" / "only if"
+  - "if re-submission" / "original ATI" / resubmission blocks
+  - alias / AKA / other name / maiden name
+  - optional employer, spouse, dependent, or second-party blocks
+  - "if yes, complete below" / "skip if no"
+  - replacement, prior case, amendment, supplemental sections
+  - any field grouped under a heading that implies it is situational
+
+ALWAYS add conditional for (required patterns):
   - Resubmission / original ATI (original_ati_number, "If re-submission" fields)
     → { "onlyWhen": "resubmission", "gateQuestion": "Is this a resubmission?" }
   - Alias / AKA (other_name_first, other_name_last, aka_* fields)
     → { "onlyWhen": "has_alias", "gateQuestion": "Do you have an alias?" }
-  - Replacement card, prior case, "If applicable" — infer a sensible gateQuestion
+  - Mailing address different from home/residence (mailing_*, alternate_* address fields)
+    → { "onlyWhen": "mailing_address_different", "gateQuestion": "Is your mailing address different from your home address?" }
+  - Any second address block labeled "if different from above/home/residence"
+    → infer gateQuestion from the PDF wording (e.g. "Is your mailing address different from your home address?")
 
-Do NOT add conditional to always-required fields (legal name, DOB, ORI code, etc.).
+Do NOT add conditional to clearly always-required fields (legal name, DOB, primary
+home address when the form requires it for everyone, ORI code when always mandatory, etc.).
+
+When multiple dependent fields share one condition (e.g. all mailing address lines),
+use the SAME onlyWhen and gateQuestion on each field in that group.
 
 
 ================================================================================
@@ -235,6 +265,9 @@ Text fields:
     + conditional: { "onlyWhen": "resubmission", "gateQuestion": "Is this a resubmission?" }
   form1[0].#subform[0].first[0]      → other_name_first, label "First Name (AKA or Alias)"
     + conditional: { "onlyWhen": "has_alias", "gateQuestion": "Do you have an alias?" }
+  mailing_street[0] (PDF label "Mailing address if different from above")
+    → mailing_street_address, label "Mailing Street Address"
+    + conditional: { "onlyWhen": "mailing_address_different", "gateQuestion": "Is your mailing address different from your home address?" }
 
 Checkbox fields (all required — never omit any):
   form1[0].#subform[0].MorF[0]__1_1 → applicant_sex_male,      label "Male"
@@ -261,7 +294,8 @@ FINAL CHECKLIST (run before returning)
   □ No checkbox group collapsed into a single field
   □ No label contains PAGE, STATE OF, DEPARTMENT OF, or form title text
   □ No vague label without disambiguation
-  □ Alias and resubmission/ATI fields have conditional objects
+  □ Alias, resubmission/ATI, and ALL "if different/applicable/optional" fields have conditional objects
+  □ Mailing/alternate address blocks gated when PDF implies "if different from above/home"
   □ All newName values unique
 
 Return ONLY the JSON object.

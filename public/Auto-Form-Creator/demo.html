@@ -1497,8 +1497,8 @@
                 <div>
                     <h2 class="step-title">Step 4 — Generate Field Config</h2>
                     <p class="step-description">
-                        Uses <code>field_config.txt</code> instructions and ChatGPT to map every extracted
-                        PDF field to a clean semantic name in <code>field_config.json</code>.
+                        Uses <code>field_config.txt</code> and ChatGPT (with every PDF page as an image) to map fields
+                        in <code>field_config.json</code> exactly as returned — no server-side rewriting.
                     </p>
                 </div>
             </div>
@@ -1607,8 +1607,8 @@
                 <div>
                     <h2 class="step-title">Step 6 — Generate Form Config</h2>
                     <p class="step-description">
-                        Uses <code>form_config.txt</code> instructions and ChatGPT to build
-                        <code>form_config.json</code> — the FormStar survey definition wired to sanitized field names.
+                        Uses <code>form_config.txt</code> and ChatGPT (with every PDF page as an image) to produce
+                        <code>form_config.json</code> exactly as returned — no server-side rewriting.
                     </p>
                 </div>
             </div>
@@ -1778,8 +1778,8 @@
                 <div>
                     <h2 class="step-title">Step 8 — Generate Form HTML</h2>
                     <p class="step-description">
-                        Builds the live HTML form with autofill from the signed-in user's profile.
-                        Answers to profile-linked fields update the user info JSON for future forms.
+                        ChatGPT generates the complete HTML form using form_config.json and PDF page images.
+                        Autofill uses the signed-in user's profile when the AI enables it on questions.
                     </p>
                 </div>
             </div>
@@ -3259,26 +3259,8 @@
         }
 
         async function refreshAutopopulateAnalysis() {
-            if (!lastFormConfig || !lastFieldConfig) return;
-            try {
-                const response = await fetch('/api/enrich-autopopulate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        formConfig: lastFormConfig,
-                        fieldConfig: lastFieldConfig,
-                        userProfile: lastUserProfile || {},
-                        displayMode: lastFormConfig.displayMode || 'one_at_a_time'
-                    })
-                });
-                const data = await response.json();
-                if (response.ok && data.success) {
-                    lastFormConfig = data.formConfig;
-                    renderAutopopulateResults();
-                }
-            } catch (err) {
-                console.error('Autopopulate refresh error:', err);
-            }
+            if (!lastFormConfig) return;
+            renderAutopopulateResults();
         }
 
         async function saveProfileEntry(key, value, description) {
@@ -3385,10 +3367,29 @@
             return tr;
         }
 
+        function computeAutopopulateAnalysis(formConfig, userProfile) {
+            const fields = formConfig?.autopopulateFields || [];
+            const available = [];
+            const missing = [];
+            for (const field of fields) {
+                const key = field.profileKey;
+                const hasValue = key
+                    && userProfile
+                    && userProfile[key] != null
+                    && String(userProfile[key]).trim() !== '';
+                const row = {
+                    ...field,
+                    availableInProfile: hasValue,
+                    currentProfileValue: hasValue ? userProfile[key] : null,
+                };
+                if (hasValue) available.push(row);
+                else missing.push(row);
+            }
+            return { available, missing, all: fields };
+        }
+
         function renderAutopopulateResults() {
-            const available = lastFormConfig?.autopopulateAvailable || [];
-            const missing = lastFormConfig?.autopopulateMissing || [];
-            const all = lastFormConfig?.autopopulateFields || [];
+            const { available, missing, all } = computeAutopopulateAnalysis(lastFormConfig, lastUserProfile || {});
 
             autopopulateAvailableBody.innerHTML = '';
             autopopulateMissingBody.innerHTML = '';
@@ -4127,11 +4128,6 @@
         }
 
         function applyFormConfigMetadata(formConfig) {
-            if (!formConfig) return formConfig;
-            formConfig.htmlMode = getSelectedHtmlMode();
-            formConfig.templateSource = getSelectedTemplateSource();
-            if (customFormTemplateName) formConfig.templateFileName = customFormTemplateName;
-            if (lastPdfToken) formConfig.pdfToken = lastPdfToken;
             return formConfig;
         }
 
@@ -4243,7 +4239,6 @@
                     body: JSON.stringify({
                         fieldConfig: lastFieldConfig,
                         extractedDocumentContent: lastExtractionPayload.extractedDocumentContent,
-                        structuredFields: lastExtractionPayload.structuredFields || [],
                         displayMode,
                         userProfile: lastUserProfile || {},
                         pdfToken
@@ -4265,18 +4260,15 @@
                     throw new Error(data.error || 'Failed to generate form config');
                 }
 
-                lastFormConfig = applyFormConfigMetadata(data.formConfig);
+                lastFormConfig = data.formConfig;
                 formConfigJsonEl.textContent = JSON.stringify(lastFormConfig, null, 2);
                 const sectionCount = data.sectionCount || (lastFormConfig.sections || []).length;
                 const sectionNames = (lastFormConfig.sections || []).map((s) => s.sectionName).join(', ');
                 if (step6SectionSummary) {
                     step6SectionSummary.style.display = 'block';
-                    step6SectionSummary.textContent = sectionCount >= 2
-                        ? `Built ${sectionCount} sections: ${sectionNames}`
-                        : `Warning: only ${sectionCount} section was built. Restart the server and re-run Step 6.`;
-                }
-                if (sectionCount < 2) {
-                    step6Error.textContent = 'Form config has only one section. Restart node server.js and run Step 6 again.';
+                    step6SectionSummary.textContent = sectionCount >= 1
+                        ? `Generated ${sectionCount} section${sectionCount === 1 ? '' : 's'}: ${sectionNames}`
+                        : 'Warning: no sections were returned.';
                 }
                 await formProgress.finish();
                 await markStep6Complete();
@@ -4305,43 +4297,58 @@
             URL.revokeObjectURL(url);
         });
 
-        function generateFormHtml() {
-            if (!lastFormConfig) {
-                step8Error.textContent = 'Generate form_config.json in Step 6 first.';
-                return null;
-            }
-            if (!window.FormHtmlRenderer) {
-                step8Error.textContent = 'Form HTML renderer failed to load.';
-                return null;
-            }
-            return FormHtmlRenderer.build(lastFormConfig, lastUserProfile || {}, {
-                firebaseConfig,
-                htmlMode: getSelectedHtmlMode(),
-                pdfToken: lastPdfToken || lastFormConfig.pdfToken || null,
-                fieldConfig: lastFieldConfig || null,
-                extractedDocumentContent: lastExtractionPayload?.extractedDocumentContent || '',
-                templateHtml: getActiveTemplateHtml()
-            });
-        }
-
         async function generateAndPreviewFormHtml() {
             step8Error.textContent = '';
             step8Status.textContent = '8';
             step8Status.classList.remove('complete', 'error');
+            generateFormHtmlBtn.disabled = true;
 
             try {
+                if (!lastFormConfig) {
+                    step8Error.textContent = 'Generate form_config.json in Step 6 first.';
+                    return;
+                }
                 await ensurePdfRegisteredOnServer();
-                const html = generateFormHtml();
-                if (!html) return;
+                const pdfToken = await ensurePdfTokenForVision();
+                const response = await fetch('/api/generate-form-html', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        formConfig: lastFormConfig,
+                        fieldConfig: lastFieldConfig,
+                        extractedDocumentContent: lastExtractionPayload?.extractedDocumentContent || '',
+                        userProfile: lastUserProfile || {},
+                        pdfToken,
+                        htmlMode: getSelectedHtmlMode(),
+                        firebaseConfig,
+                    }),
+                });
 
-                lastGeneratedFormHtml = html;
+                const responseText = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (_) {
+                    throw new Error(
+                        response.status === 413
+                            ? 'Request too large. Restart the server and re-run Step 5 before Step 8.'
+                            : (responseText.slice(0, 200) || `Server error (${response.status})`)
+                    );
+                }
+                if (!response.ok || !data.success || !data.html) {
+                    throw new Error(data.error || 'Failed to generate form HTML');
+                }
+
+                lastGeneratedFormHtml = data.html;
                 setStep8HtmlButtonsEnabled(true);
-                showFormHtmlPreview(html);
+                showFormHtmlPreview(data.html);
                 markStep8Complete();
             } catch (err) {
                 console.error('Form HTML generation error:', err);
                 step8Error.textContent = err.message || 'Failed to generate form HTML.';
                 markStep8Error();
+            } finally {
+                generateFormHtmlBtn.disabled = !lastFormConfig;
             }
         }
 

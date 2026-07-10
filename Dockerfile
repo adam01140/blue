@@ -1,5 +1,5 @@
 # Use Node.js LTS as base image
-FROM node:18-slim
+FROM node:20-slim
 
 # Install LaTeX and required packages
 # Using texlive-latex-base for basic LaTeX support

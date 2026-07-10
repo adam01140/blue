@@ -61,6 +61,7 @@ app.use('/api/auto-form', bodyParser.json({ limit: AUTO_FORM_BODY_LIMIT }));
 app.use('/api/auto-form', bodyParser.urlencoded({ extended: true, limit: AUTO_FORM_BODY_LIMIT }));
 app.use('/api/generate-field-config', bodyParser.json({ limit: AUTO_FORM_BODY_LIMIT }));
 app.use('/api/generate-form-config', bodyParser.json({ limit: AUTO_FORM_BODY_LIMIT }));
+app.use('/api/generate-form-html', bodyParser.json({ limit: AUTO_FORM_BODY_LIMIT }));
 app.use(bodyParser.json({ limit: '2mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '2mb' }));
 app.use(fileUpload());          // parses multipart/form‑data (fields ➜ req.body, files ➜ req.files)
@@ -191,6 +192,7 @@ const { handleUnlockPdf, handlePreparePdfFields } = require('./unlock-pdf-handle
 const { createHandleGenerateFieldConfig } = require('./field-config-generator');
 const { handleSanitizePdf } = require('./pdf-field-sanitizer');
 const { createHandleGenerateFormConfig } = require('./form-config-generator');
+const { createHandleGenerateFormHtml } = require('./form-html-generator');
 const { enrichFormConfigAutopopulate } = require('./form-autopopulate');
 const { handleStoreAutoFormPdf, handleFillAutoFormPdf } = require('./auto-form-pdf-handler');
 const { createHandlePublishAutoForm } = require('./auto-form-publish-handler');
@@ -201,6 +203,7 @@ app.post('/api/prepare-pdf-fields', handlePreparePdfFields);
 app.post('/api/generate-field-config', createHandleGenerateFieldConfig(OPENAI_API_KEY));
 app.post('/api/sanitize-pdf', handleSanitizePdf);
 app.post('/api/generate-form-config', createHandleGenerateFormConfig(OPENAI_API_KEY));
+app.post('/api/generate-form-html', createHandleGenerateFormHtml(OPENAI_API_KEY));
 app.post('/api/enrich-autopopulate', (req, res) => {
   try {
     const { formConfig, fieldConfig, userProfile, displayMode } = req.body || {};

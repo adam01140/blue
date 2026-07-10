@@ -13,6 +13,11 @@ You receive:
   - extractedDocumentContent: layout text showing how fields appear on the government form
   - displayMode: "all_at_once" or "one_at_a_time" — how the HTML form should present questions
   - userProfile: the signed-in user's known profile data (may be partial)
+  - requiredFieldCount: exact number of PDF fields that must be covered via nameId
+  - PDF page images: every page of the source PDF attached below (page 1 first). Use these as your PRIMARY visual context for section grouping, labels, and question order.
+
+Do NOT include sectionHint, nearestLabel, or extraction "context" metadata anywhere in your output.
+Return your form_config.json exactly as you intend it to be used — it will not be rewritten by the server.
 
 Your job is to produce form_config.json — a FormStar survey definition that collects the
 same information in a user-friendly question flow. Every answer must map to a PDF field
@@ -22,6 +27,42 @@ Also analyze EVERY question for autopopulation potential — personal/demographi
 could be reused across many forms (name, address, phone, DOB, aliases, employer info,
 yes/no facts like "do you have a sister", etc.). Agency-specific or one-time fields
 (ORI code, billing number, processing IDs) should NOT be autopopulatable.
+
+═══════════════════════════════════════════════════════════════════
+CRITICAL — CONDITIONAL LOGIC (HIGHEST UX PRIORITY AFTER COMPLETENESS)
+═══════════════════════════════════════════════════════════════════
+
+Do NOT overwhelm users with questions that might not apply to them. Government PDFs
+squeeze optional fields onto one page; your online form should hide those until relevant.
+
+WHENEVER a field might be conditional — even slightly — you MUST:
+  1. Ask the primary/base question first (e.g. home address).
+  2. Insert a Yes/No GATE question immediately before dependent fields.
+  3. Show dependent fields ONLY when the user answers Yes (logic.prevAnswer = "Yes").
+
+Gate questions do NOT need a PDF field or nameId. It is correct to add extra questions
+that exist only in the online survey (e.g. "Is your mailing address different from your
+home address?") when the PDF only labels the follow-up block "if different from above".
+
+CANONICAL EXAMPLE — home vs mailing address:
+  PDF shows: "Home Address: ___" then later "Mailing address (if different from above): ___"
+
+  Your form_config flow:
+    Q1: "What is your home address?" (multipleTextboxes, always shown, maps to home fields)
+    Q2: "Is your mailing address different from your home address?" (dropdown Yes/No, NO nameId)
+    Q3: "What is your mailing address?" (multipleTextboxes, logic → Q2 = Yes, maps to mailing fields)
+
+  NEVER show Q3 unless Q2 is Yes. Do NOT embed "if different from above" in Q3's question text.
+
+Apply the same pattern whenever field_config.conditional exists OR the PDF/extracted text
+implies optional/situational data:
+  - alias / AKA blocks
+  - resubmission / original ATI
+  - "if applicable", "if yes", "only if", "when required"
+  - optional employer/spouse/dependent sections
+  - second address, alternate contact, supplemental lines
+
+When in doubt, add a gate. Fewer visible questions = better UX.
 
 OUTPUT FORMAT (return ONLY valid JSON):
 
@@ -144,6 +185,25 @@ AUTOPOPULATE RULES:
 6. For checkbox options, autopopulate can go on each option when appropriate.
 
 RULES:
+
+═══════════════════════════════════════════════════════════════════
+RULE 1 — COMPLETENESS (HIGHEST PRIORITY — HARD REJECT IF VIOLATED)
+═══════════════════════════════════════════════════════════════════
+
+Every single field_config.fields[].newName MUST appear exactly once in your output.
+The server validates this before accepting your response.
+
+  - requiredNameIds in the input lists every nameId you must cover.
+  - requiredFieldCount === field_config.fields.length — verify before returning.
+  - Each newName appears as question.nameId, OR textboxes[].nameId, OR options[].nameId.
+  - Checkbox PDF fields: include each option's nameId inside a checkbox group's options array.
+  - Do NOT skip "small" fields (account numbers, tax codes, TIN segments, exempt codes, etc.).
+  - Do NOT merge unrelated fields into one question unless they are truly one UI control.
+
+Before returning JSON, verify:
+  □ Every requiredNameId from the input appears exactly once in your sections
+  □ No requiredNameId is missing (common misses: tax_classification_code, tin_part2, account_number)
+
 1. Every field_config.fields entry MUST appear exactly once as a question nameId (or inside
    multipleTextboxes.textboxes[].nameId or checkbox options[].nameId).
 2. nameId values MUST exactly match field_config newName strings — this wires HTML → sanitized PDF.
@@ -175,6 +235,15 @@ RULES:
    - Service level (DOJ/FBI): checkboxSelectionMode "multiple", text "Please select your level of service"
    - Other multi-select: checkboxSelectionMode "multiple", text "Please select all that apply"
    Each option: { "label": "Male", "nameId": "applicant_sex_male", "value": "Male" }
+
+   AUXILIARY TEXT FIELDS BESIDE CHECKBOX GROUPS (do not omit):
+   - Small text boxes printed next to checkbox options are SEPARATE field_config entries
+     with their own nameId — not part of the checkbox options array.
+   - Examples: LLC tax classification letter/code box (tax_classification_code), "Other"
+     specification line (tax_classification_other), exempt/FATCA code boxes.
+   - Add a dedicated text question for each, often with logic gated on the related checkbox
+     (e.g. show tax_classification_code only when LLC is selected).
+   - NEVER skip these because you already added the checkbox group question.
 8. QUESTION EXPLANATIONS — REQUIRED ON EVERY QUESTION (including gate dropdowns):
    - needsExplanation=true on EVERY question — no exceptions, no empty explanation strings.
    - explanation = one or more complete sentences (minimum ~8 words, not a fragment).
@@ -204,16 +273,31 @@ RULES:
 10. Use type "date" for DOB and date fields; "phone" for phone fields.
 11. Number questionId sequentially across all sections starting at 1.
 12. Set sectionCounter to max(sectionId)+1 and questionCounter to max(questionId)+1.
-13. CONDITIONAL FIELDS — gate dropdown BEFORE dependent fields (do this in your output, not later):
-    When field_config.conditional exists OR the field is situational (alias, resubmission ATI, etc.):
+13. CONDITIONAL FIELDS — gate dropdown BEFORE dependent fields (MANDATORY when applicable):
+    This is critical UX. Never show optional PDF blocks to every user.
+
+    Trigger a gate when field_config.conditional exists OR the PDF label/text implies the
+    field is situational ("if different", "if applicable", "mailing if different", etc.).
+
     a) Insert a dropdown gate question IMMEDIATELY BEFORE the dependent field(s) in the same section.
-    b) Gate question: type "dropdown", NO nameId, options [{label:"Yes",value:"Yes"},{label:"No",value:"No"}],
+    b) Gate question: type "dropdown", NO nameId (gate may not exist on the PDF — that is OK),
+       options [{label:"Yes",value:"Yes"},{label:"No",value:"No"}],
        logic.enabled=false, needsExplanation=true, explanation about choosing Yes/No.
-    c) Dependent field: logic.enabled=true, logic.prevQuestion="<gate questionId as string>",
-       logic.prevAnswer="Yes", question text WITHOUT "If ..." prefix.
-    d) ONE gate for alias group: "Do you have an alias?" then both other_name_first AND other_name_last
-       with logic pointing to the same gate (shown only when Yes).
-    e) Resubmission: gate "Is this a resubmission?" before original_ati_number.
+    c) Dependent field(s): logic.enabled=true, logic.prevQuestion="<gate questionId as string>",
+       logic.prevAnswer="Yes", question text WITHOUT "If ..." / "when different" prefixes.
+    d) ONE gate per condition — multiple dependent fields share the same gate:
+       - Alias: "Do you have an alias?" → other_name_first AND other_name_last (both logic → gate)
+       - Mailing address: "Is your mailing address different from your home address?" → all mailing_* fields
+       - Resubmission: "Is this a resubmission?" → original_ati_number
+    e) Order matters: base question FIRST (home address), gate SECOND, conditional block THIRD.
+
+    Mailing address example (full flow):
+    { "questionId": 10, "text": "What is your home address?", "type": "multipleTextboxes", ... home nameIds ... }
+    { "questionId": 11, "text": "Is your mailing address different from your home address?",
+      "type": "dropdown", "nameId": null, "options": [{"label":"Yes","value":"Yes"},{"label":"No","value":"No"}], ... }
+    { "questionId": 12, "text": "What is your mailing address?", "type": "multipleTextboxes",
+      "logic": { "enabled": true, "prevQuestion": "11", "prevAnswer": "Yes" }, ... mailing nameIds ... }
+
     Gate question JSON example:
     {
       "questionId": 27,
@@ -252,7 +336,9 @@ PRE-OUTPUT CHECKLIST (verify before returning JSON):
   □ Every question has needsExplanation=true and a full-sentence explanation
   □ Checkbox groups are merged (one question per group, not one per option)
   □ Address multipleTextboxes use FOUR boxes (street, city, state, zip) — never one combined state+zip box
-  □ Conditional fields have gate dropdowns immediately before them with correct logic
+  □ Every situational/optional PDF field has a gate dropdown immediately before it (logic.prevAnswer = Yes)
+  □ Home-then-gate-then-mailing pattern used when PDF says "if different from above/home"
+  □ Gate questions have nameId null (extra survey-only questions are allowed and encouraged)
   □ Signature/today dates have autoTodayDate: true
   □ Section names are clear (≤3 words); avoid vague single words like "Additional" — use "Additional Info"
   □ Linked mirrors identified for duplicate name/address/date fields
@@ -307,6 +393,13 @@ Resubmission gate + conditional field:
 Gate: { "questionId": 27, "text": "Is this a resubmission?", "type": "dropdown", "nameId": null, ... }
 Then: { "questionId": 28, "text": "What is your original ATI number?", "nameId": "original_ati_number",
   "logic": { "enabled": true, "prevQuestion": "27", "prevAnswer": "Yes" } }
+
+Home vs mailing address (conditional block):
+{ "questionId": 14, "text": "What is your home address?", "type": "multipleTextboxes", ... }
+{ "questionId": 15, "text": "Is your mailing address different from your home address?",
+  "type": "dropdown", "nameId": null, "options": [{"label":"Yes","value":"Yes"},{"label":"No","value":"No"}] }
+{ "questionId": 16, "text": "What is your mailing address?", "type": "multipleTextboxes",
+  "logic": { "enabled": true, "prevQuestion": "15", "prevAnswer": "Yes" }, ... mailing nameIds ... }
 
 BAD output to avoid:
   "text": "What is your bCIA 8016 STATE OF CALIFORNIA...?"

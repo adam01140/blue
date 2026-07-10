@@ -204,6 +204,20 @@ async function sanitizePdfFields(pdfBytes, fieldConfig) {
   const keptFieldRefs = [];
   const keptNames = new Set();
 
+  // Resolve all field refs before mutating the AcroForm tree. XFA-style PDFs (e.g. IRS W-9)
+  // use deep parent/Kids hierarchies; ensureTopLevelField breaks form.getField() for siblings
+  // still addressed by their original hierarchical names.
+  const fieldRefById = new Map();
+  for (const mapping of fieldConfig.fields) {
+    const { id } = mapping;
+    if (!id) continue;
+    try {
+      fieldRefById.set(id, form.getField(id).acroField.ref);
+    } catch (err) {
+      failed.push({ id, reason: err.message });
+    }
+  }
+
   for (const mapping of fieldConfig.fields) {
     const { id, newName } = mapping;
     if (!id || !newName) {
@@ -211,13 +225,19 @@ async function sanitizePdfFields(pdfBytes, fieldConfig) {
       continue;
     }
 
+    if (failed.some((entry) => entry.id === id)) {
+      continue;
+    }
+
     oldIds.add(id);
     keptNames.add(newName);
 
     try {
-      const field = form.getField(id);
-      const fieldRef = field.acroField.ref;
-      const dict = field.acroField.dict;
+      const fieldRef = fieldRefById.get(id);
+      if (!fieldRef) {
+        throw new Error(`Field not found: ${id}`);
+      }
+      const dict = context.lookup(fieldRef);
 
       ensureTopLevelField(context, fieldsRef, fieldRef);
 
