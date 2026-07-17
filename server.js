@@ -194,7 +194,7 @@ const { handleSanitizePdf } = require('./pdf-field-sanitizer');
 const { createHandleGenerateFormConfig } = require('./form-config-generator');
 const { createHandleGenerateFormHtml } = require('./form-html-generator');
 const { enrichFormConfigAutopopulate } = require('./form-autopopulate');
-const { handleStoreAutoFormPdf, handleFillAutoFormPdf } = require('./auto-form-pdf-handler');
+const { handleStoreAutoFormPdf, handleFillAutoFormPdf, rehydratePdfStore } = require('./auto-form-pdf-handler');
 const { createHandlePublishAutoForm } = require('./auto-form-publish-handler');
 const { createHandleSaveCurrentData } = require('./auto-form-current-data');
 const { createHandleHelpAnswer } = require('./auto-form-help-handler');
@@ -1526,7 +1526,9 @@ async function checkLaTeXInstallation() {
 }
 
 const PORT = process.env.PORT || 3000;
+rehydratePdfStore();
 app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
+  rehydratePdfStore();
   await checkLaTeXInstallation();
 });

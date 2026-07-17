@@ -1618,42 +1618,6 @@
                     Complete Step 5 (sanitized PDF) to unlock form config generation.
                 </p>
 
-                <fieldset class="display-mode-options" id="form-display-mode-fieldset">
-                    <legend style="font-weight:700;margin-bottom:8px;">Form layout</legend>
-                    <label class="display-mode-option">
-                        <input type="radio" name="form-display-mode" value="all_at_once">
-                        <div>
-                            <strong>All questions visible at once</strong>
-                            <span>Single scrollable page with every question shown together.</span>
-                        </div>
-                    </label>
-                    <label class="display-mode-option">
-                        <input type="radio" name="form-display-mode" value="one_at_a_time" checked>
-                        <div>
-                            <strong>One question at a time</strong>
-                            <span>Step-through wizard — user sees one question per screen.</span>
-                        </div>
-                    </label>
-                </fieldset>
-
-                <fieldset class="display-mode-options" id="form-html-mode-fieldset">
-                    <legend style="font-weight:700;margin-bottom:8px;">HTML output mode</legend>
-                    <label class="display-mode-option">
-                        <input type="radio" name="form-html-mode" value="dev">
-                        <div>
-                            <strong>Dev mode</strong>
-                            <span>Show sign-in bar, autofill badges, and question numbers — for testing and demos.</span>
-                        </div>
-                    </label>
-                    <label class="display-mode-option">
-                        <input type="radio" name="form-html-mode" value="normal" checked>
-                        <div>
-                            <strong>Normal mode</strong>
-                            <span>Clean production form — no auth bar, no autofill badges, plain question text only.</span>
-                        </div>
-                    </label>
-                </fieldset>
-
                 <fieldset class="display-mode-options" id="form-template-fieldset">
                     <legend style="font-weight:700;margin-bottom:8px;">Form HTML template</legend>
                     <label class="display-mode-option">
@@ -1776,54 +1740,52 @@
             <div class="step-header">
                 <div class="step-status" id="step-8-status" aria-label="Step 8 status">8</div>
                 <div>
-                    <h2 class="step-title">Step 8 — Generate Form HTML</h2>
+                    <h2 class="step-title">Step 8 — Form Previews</h2>
                     <p class="step-description">
-                        ChatGPT generates the complete HTML form using form_config.json and PDF page images.
-                        Autofill uses the signed-in user's profile when the AI enables it on questions.
+                        After Step 6, both layouts are built automatically: a scrollable all-at-once form first,
+                        then a step-through wizard derived from the same config. Open either preview in a new tab.
                     </p>
                 </div>
             </div>
 
             <div class="step-body">
                 <p id="step-8-lock-msg" style="color:var(--gray);font-style:italic;margin:0 0 16px;">
-                    Complete Step 6 to generate the form preview.
+                    Complete Step 6 to build both form previews.
+                </p>
+                <p id="step-8-generating-msg" style="display:none;color:var(--blue);font-weight:600;margin:0 0 16px;">
+                    Building both form layouts…
                 </p>
                 <div class="step8-actions">
-                    <button type="button" class="btn-download btn-generate-form" id="generate-form-html-btn" disabled>
-                        Generate Form HTML
-                    </button>
-                    <button type="button" class="btn-download" id="view-form-html-btn" disabled>
-                        View HTML
-                    </button>
-                    <button type="button" class="btn-download" id="download-form-html-btn" disabled>
-                        Download HTML
-                    </button>
                     <a
-                        href="http://localhost:3000/Auto-Form-Creator/iframe-test.html"
+                        href="/Auto-Form-Creator/Current%20Data/all-at-once-generated-form.html"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="btn-download"
-                        id="test-form-html-btn"
+                        class="btn-download btn-generate-form"
+                        id="preview-all-at-once-btn"
                         aria-disabled="true"
                         tabindex="-1"
-                    >Test</a>
+                    >Preview all at once</a>
+                    <a
+                        href="/Auto-Form-Creator/Current%20Data/one-at-a-time-generated-form.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="btn-download btn-generate-form"
+                        id="preview-one-at-a-time-btn"
+                        aria-disabled="true"
+                        tabindex="-1"
+                    >Preview one at a time</a>
                 </div>
                 <div class="error-message" id="step-8-error"></div>
             </div>
 
             <div class="step-results" id="step-8-results">
-                <div class="result-panel" data-copyable id="step-8-preview-panel">
-                    <div class="result-panel-header" id="step-8-preview-header">Live Form Preview</div>
-                    <div class="result-panel-body form-preview-panel-body">
-                        <div id="form-preview-wrap">
-                            <iframe class="form-preview-frame" id="form-preview-iframe" title="Generated form preview"></iframe>
-                        </div>
-                        <div class="form-html-source-wrap" id="form-html-source-wrap" hidden>
-                            <div class="form-html-source-toolbar">
-                                <button type="button" class="btn-copy-source" id="copy-form-html-btn" title="Copy HTML" aria-label="Copy HTML"></button>
-                            </div>
-                            <pre class="form-html-source" id="form-html-source"></pre>
-                        </div>
+                <div class="result-panel">
+                    <div class="result-panel-header">Generated files</div>
+                    <div class="result-panel-body">
+                        <ul style="margin:0;padding-left:20px;line-height:1.8;">
+                            <li><code>Current Data/all-at-once-generated-form.html</code> — scrollable single page</li>
+                            <li><code>Current Data/one-at-a-time-generated-form.html</code> — wizard (derived from all-at-once config)</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -1844,7 +1806,7 @@
 
             <div class="step-body">
                 <p id="step-9-lock-msg" style="color:var(--gray);font-style:italic;margin:0 0 16px;">
-                    Complete Step 8 (generate form HTML) to publish this form.
+                    Complete Step 8 to publish this form.
                 </p>
 
                 <div class="publish-form-grid" id="publish-form-grid" hidden>
@@ -2036,17 +1998,10 @@
         const step8Status = document.getElementById('step-8-status');
         const step8LockMsg = document.getElementById('step-8-lock-msg');
         const step8Error = document.getElementById('step-8-error');
+        const step8GeneratingMsg = document.getElementById('step-8-generating-msg');
         const step8Results = document.getElementById('step-8-results');
-        const generateFormHtmlBtn = document.getElementById('generate-form-html-btn');
-        const viewFormHtmlBtn = document.getElementById('view-form-html-btn');
-        const downloadFormHtmlBtn = document.getElementById('download-form-html-btn');
-        const testFormHtmlBtn = document.getElementById('test-form-html-btn');
-        const formPreviewIframe = document.getElementById('form-preview-iframe');
-        const formPreviewWrap = document.getElementById('form-preview-wrap');
-        const formHtmlSourceWrap = document.getElementById('form-html-source-wrap');
-        const formHtmlSourceEl = document.getElementById('form-html-source');
-        const copyFormHtmlBtn = document.getElementById('copy-form-html-btn');
-        const step8PreviewHeader = document.getElementById('step-8-preview-header');
+        const previewAllAtOnceBtn = document.getElementById('preview-all-at-once-btn');
+        const previewOneAtATimeBtn = document.getElementById('preview-one-at-a-time-btn');
 
         const step9 = document.getElementById('step-9');
         const step9Status = document.getElementById('step-9-status');
@@ -2084,8 +2039,10 @@
         let unlockedPdfFile = null;
         let unlockedPdfBlobUrl = null;
         let lastUserProfile = null;
+        let lastGeneratedFormHtmlAllAtOnce = null;
+        let lastGeneratedFormHtmlOneAtATime = null;
         let lastGeneratedFormHtml = null;
-        let step8ShowingHtmlSource = false;
+        let step8Generating = false;
         let profileEntryEditingKey = null;
         let currentUser = null;
         let customFormTemplateHtml = null;
@@ -2097,6 +2054,8 @@
         const customTemplateUploadZone = document.getElementById('custom-template-upload-zone');
         const customTemplateLabel = document.getElementById('custom-template-label');
 
+        const ALL_AT_ONCE_PREVIEW_URL = '/Auto-Form-Creator/Current%20Data/all-at-once-generated-form.html';
+        const ONE_AT_A_TIME_PREVIEW_URL = '/Auto-Form-Creator/Current%20Data/one-at-a-time-generated-form.html';
         const FORM_PREVIEW_SHELL = '/Auto-Form-Creator/form-preview-shell.html';
         const FORM_PREVIEW_STORAGE_KEY = 'formstarPreviewHtml';
         let formPreviewBlobUrl = null;
@@ -2173,13 +2132,13 @@
                     lastExtractionPayload,
                     lastFieldConfig,
                     lastFormConfig,
+                    lastGeneratedFormHtmlAllAtOnce,
+                    lastGeneratedFormHtmlOneAtATime,
                     lastGeneratedFormHtml,
                     lastPdfToken,
                     sanitizeRenamedCount: sanitizePdfSuccessText?.textContent || '',
                     sanitizedPdfBase64,
                     sanitizedPdfFileName,
-                    displayMode: document.querySelector('input[name="form-display-mode"]:checked')?.value || 'one_at_a_time',
-                    htmlMode: getSelectedHtmlMode(),
                     templateSource: getSelectedTemplateSource(),
                     fieldConfigJson: fieldConfigJsonEl.textContent || '',
                     formConfigJson: formConfigJsonEl.textContent || '',
@@ -2226,11 +2185,15 @@
                     payload.formConfig = lastFormConfig;
                     break;
                 case 'step-8-generated-html':
-                    payload.formHtml = lastGeneratedFormHtml;
+                    payload.formHtmlAllAtOnce = lastGeneratedFormHtmlAllAtOnce;
+                    payload.formHtmlOneAtATime = lastGeneratedFormHtmlOneAtATime;
+                    payload.formConfig = lastFormConfig;
                     break;
                 default:
                     if (lastFieldConfig) payload.fieldConfig = lastFieldConfig;
                     if (lastFormConfig) payload.formConfig = lastFormConfig;
+                    if (lastGeneratedFormHtmlAllAtOnce) payload.formHtmlAllAtOnce = lastGeneratedFormHtmlAllAtOnce;
+                    if (lastGeneratedFormHtmlOneAtATime) payload.formHtmlOneAtATime = lastGeneratedFormHtmlOneAtATime;
                     if (lastGeneratedFormHtml) payload.formHtml = lastGeneratedFormHtml;
                     if (lastExtractionPayload) {
                         payload.extractedDocumentContent = lastExtractionPayload.extractedDocumentContent || '';
@@ -2271,14 +2234,6 @@
             }
             if (!state || state.v !== 1) return false;
 
-            if (state.displayMode) {
-                const modeInput = document.querySelector(`input[name="form-display-mode"][value="${state.displayMode}"]`);
-                if (modeInput) modeInput.checked = true;
-            }
-            if (state.htmlMode) {
-                const htmlInput = document.querySelector(`input[name="form-html-mode"][value="${state.htmlMode}"]`);
-                if (htmlInput) htmlInput.checked = true;
-            }
             if (state.templateSource) {
                 const templateInput = document.querySelector(`input[name="form-template-source"][value="${state.templateSource}"]`);
                 if (templateInput) templateInput.checked = true;
@@ -2288,7 +2243,9 @@
             lastExtractionPayload = state.lastExtractionPayload || null;
             lastFieldConfig = state.lastFieldConfig || null;
             lastFormConfig = state.lastFormConfig || null;
-            lastGeneratedFormHtml = state.lastGeneratedFormHtml || null;
+            lastGeneratedFormHtmlAllAtOnce = state.lastGeneratedFormHtmlAllAtOnce || state.lastGeneratedFormHtml || null;
+            lastGeneratedFormHtmlOneAtATime = state.lastGeneratedFormHtmlOneAtATime || null;
+            lastGeneratedFormHtml = lastGeneratedFormHtmlAllAtOnce;
             lastPdfToken = state.lastPdfToken || lastPdfToken;
 
             if (state.steps?.step2) {
@@ -2348,13 +2305,18 @@
                 await markStep6Complete();
             }
 
-            if (state.steps?.step8 && state.lastGeneratedFormHtml) {
+            if (state.steps?.step8 && (state.lastGeneratedFormHtmlAllAtOnce || state.lastGeneratedFormHtml)) {
                 step8Results.classList.add('visible');
                 markStep8Complete();
-                showFormHtmlPreview(state.lastGeneratedFormHtml);
+            } else if (state.steps?.step6 && state.lastFormConfig) {
+                unlockStep8();
+                generateBothFormHtmlVariants().catch((err) => {
+                    console.error('Failed to rebuild form previews:', err);
+                    step8Error.textContent = err.message || 'Failed to build form previews.';
+                    markStep8Error();
+                });
             } else if (state.steps?.step6) {
                 unlockStep8();
-                generateFormHtmlBtn.disabled = !lastFormConfig;
             }
 
             if (state.steps?.step8) {
@@ -2374,6 +2336,8 @@
             lastExtractionPayload = null;
             lastFieldConfig = null;
             lastFormConfig = null;
+            lastGeneratedFormHtmlAllAtOnce = null;
+            lastGeneratedFormHtmlOneAtATime = null;
             lastGeneratedFormHtml = null;
             lastPdfToken = null;
             lastPreparedPdfFile = null;
@@ -2495,14 +2459,6 @@
         }
 
         initPanelCopyButtons();
-
-        if (copyFormHtmlBtn) {
-            setCopyButtonState(copyFormHtmlBtn, false);
-            copyFormHtmlBtn.addEventListener('click', async () => {
-                const text = formHtmlSourceEl?.textContent || lastGeneratedFormHtml || '';
-                await copyTextWithButtonFeedback(copyFormHtmlBtn, text);
-            });
-        }
 
         function createTimedProgress(containerEl, barEl, labelEl, labelText, durationMs = CHATGPT_PROGRESS_MS) {
             let timer = null;
@@ -2753,6 +2709,8 @@
 
         function invalidateFormConfigAndHtml() {
             lastFormConfig = null;
+            lastGeneratedFormHtmlAllAtOnce = null;
+            lastGeneratedFormHtmlOneAtATime = null;
             lastGeneratedFormHtml = null;
             formConfigJsonEl.textContent = '';
             step6Results.classList.remove('visible');
@@ -2763,7 +2721,6 @@
                 step6SectionSummary.textContent = '';
             }
             lockStep8();
-            setStep8HtmlButtonsEnabled(false);
         }
 
         function lockStep6() {
@@ -2801,27 +2758,30 @@
             lockStep8();
         }
 
-        function setStep8HtmlButtonsEnabled(enabled) {
-            viewFormHtmlBtn.disabled = !enabled;
-            downloadFormHtmlBtn.disabled = !enabled;
-            if (testFormHtmlBtn) {
+        function setStep8PreviewLinksEnabled(enabled) {
+            [previewAllAtOnceBtn, previewOneAtATimeBtn].forEach((btn) => {
+                if (!btn) return;
                 if (enabled) {
-                    testFormHtmlBtn.href = 'http://localhost:3000/Auto-Form-Creator/iframe-test.html';
-                    testFormHtmlBtn.setAttribute('aria-disabled', 'false');
-                    testFormHtmlBtn.tabIndex = 0;
+                    btn.setAttribute('aria-disabled', 'false');
+                    btn.tabIndex = 0;
+                    btn.style.pointerEvents = '';
+                    btn.style.opacity = '';
                 } else {
-                    testFormHtmlBtn.removeAttribute('href');
-                    testFormHtmlBtn.setAttribute('aria-disabled', 'true');
-                    testFormHtmlBtn.tabIndex = -1;
+                    btn.setAttribute('aria-disabled', 'true');
+                    btn.tabIndex = -1;
+                    btn.style.pointerEvents = 'none';
+                    btn.style.opacity = '0.55';
                 }
-            }
+            });
         }
 
         function unlockStep8() {
             step8.classList.remove('step-locked');
-            step8LockMsg.style.display = 'none';
-            generateFormHtmlBtn.disabled = !lastFormConfig;
-            setStep8HtmlButtonsEnabled(!!lastGeneratedFormHtml);
+            step8LockMsg.style.display = step8Generating ? 'none' : 'none';
+            if (!step8Generating && !lastGeneratedFormHtmlAllAtOnce) {
+                step8LockMsg.style.display = lastFormConfig ? 'none' : 'block';
+            }
+            setStep8PreviewLinksEnabled(!!(lastGeneratedFormHtmlAllAtOnce && lastGeneratedFormHtmlOneAtATime));
         }
 
         function lockStep8() {
@@ -2831,16 +2791,12 @@
             step8Status.classList.remove('complete', 'error');
             step8Results.classList.remove('visible');
             step8Error.textContent = '';
-            generateFormHtmlBtn.disabled = true;
-            setStep8HtmlButtonsEnabled(false);
+            if (step8GeneratingMsg) step8GeneratingMsg.style.display = 'none';
+            step8Generating = false;
+            setStep8PreviewLinksEnabled(false);
+            lastGeneratedFormHtmlAllAtOnce = null;
+            lastGeneratedFormHtmlOneAtATime = null;
             lastGeneratedFormHtml = null;
-            setStep8PreviewMode(false);
-            if (formHtmlSourceEl) formHtmlSourceEl.textContent = '';
-            if (formPreviewIframe) {
-                revokeFormPreviewBlobUrl();
-                formPreviewIframe.removeAttribute('srcdoc');
-                formPreviewIframe.src = 'about:blank';
-            }
             lockStep9();
         }
 
@@ -2930,7 +2886,7 @@
             });
 
             publishFormGrid.hidden = false;
-            publishFormBtn.disabled = !(lastGeneratedFormHtml && sanitizedPdfFile);
+            publishFormBtn.disabled = !(lastGeneratedFormHtmlAllAtOnce && sanitizedPdfFile);
             step9Success.hidden = true;
             step9Error.textContent = '';
         }
@@ -2969,7 +2925,7 @@
             step9Error.textContent = '';
             step9Success.hidden = true;
 
-            if (!lastGeneratedFormHtml) {
+            if (!lastGeneratedFormHtmlAllAtOnce) {
                 step9Error.textContent = 'Generate form HTML in Step 8 first.';
                 return;
             }
@@ -3006,7 +2962,7 @@
             try {
                 const fd = new FormData();
                 fd.append('pdf', sanitizedPdfFile, pdfFileName);
-                fd.append('formHtml', lastGeneratedFormHtml);
+                fd.append('formHtml', lastGeneratedFormHtmlAllAtOnce);
                 fd.append('formConfig', JSON.stringify(lastFormConfig || {}));
                 fd.append('fieldConfig', JSON.stringify(lastFieldConfig || {}));
                 fd.append('name', name);
@@ -3047,45 +3003,78 @@
         publishFormFolder?.addEventListener('input', syncPublishUrlBase);
         publishFormId?.addEventListener('input', syncPublishUrlBase);
 
-        function setStep8PreviewMode(showHtmlSource) {
-            step8ShowingHtmlSource = showHtmlSource;
-            if (formPreviewWrap) formPreviewWrap.hidden = showHtmlSource;
-            if (formHtmlSourceWrap) formHtmlSourceWrap.hidden = !showHtmlSource;
-            if (step8PreviewHeader) {
-                step8PreviewHeader.textContent = showHtmlSource ? 'Generated Form HTML' : 'Live Form Preview';
-            }
-            if (viewFormHtmlBtn) {
-                viewFormHtmlBtn.textContent = showHtmlSource ? 'View Preview' : 'View HTML';
-            }
+        function cloneFormConfigForLayout(formConfig, displayMode) {
+            const clone = JSON.parse(JSON.stringify(formConfig));
+            clone.displayMode = displayMode;
+            clone.htmlMode = 'normal';
+            return clone;
         }
 
-        function revokeFormPreviewBlobUrl() {
-            if (formPreviewBlobUrl) {
-                URL.revokeObjectURL(formPreviewBlobUrl);
-                formPreviewBlobUrl = null;
+        async function buildFormHtmlVariant(formConfig) {
+            const templateHtml = getActiveTemplateHtml();
+            if (templateHtml) {
+                FormHtmlRenderer.setDefaultTemplate(templateHtml);
+            } else {
+                await FormHtmlRenderer.preloadDefaultTemplate();
             }
+            return FormHtmlRenderer.build(formConfig, lastUserProfile || {}, {
+                htmlMode: 'normal',
+                pdfToken: formConfig.pdfToken,
+                fieldConfig: lastFieldConfig,
+                extractedDocumentContent: lastExtractionPayload?.extractedDocumentContent || '',
+                firebaseConfig,
+                templateHtml: templateHtml || undefined,
+            });
         }
 
-        function showFormHtmlPreview(html) {
-            sessionStorage.setItem(FORM_PREVIEW_STORAGE_KEY, html);
-            setStep8PreviewMode(false);
-            if (formHtmlSourceEl) formHtmlSourceEl.textContent = html;
-            if (!formPreviewIframe) return;
-            revokeFormPreviewBlobUrl();
-            formPreviewIframe.removeAttribute('srcdoc');
-            formPreviewIframe.src = FORM_PREVIEW_SHELL + '?t=' + Date.now();
-        }
-
-        function toggleStep8HtmlSourceView() {
-            if (!lastGeneratedFormHtml) {
-                step8Error.textContent = 'Generate form HTML first.';
-                return;
+        async function generateBothFormHtmlVariants() {
+            if (!lastFormConfig) {
+                throw new Error('Generate form_config.json in Step 6 first.');
             }
+            if (!window.FormHtmlRenderer?.build) {
+                throw new Error('Form HTML renderer is not loaded yet. Refresh and try again.');
+            }
+
             step8Error.textContent = '';
-            if (formHtmlSourceEl && !formHtmlSourceEl.textContent) {
-                formHtmlSourceEl.textContent = lastGeneratedFormHtml;
+            step8Status.textContent = '8';
+            step8Status.classList.remove('complete', 'error');
+            step8Generating = true;
+            if (step8GeneratingMsg) step8GeneratingMsg.style.display = 'block';
+            unlockStep8();
+
+            try {
+                await ensurePdfRegisteredOnServer();
+                const pdfToken = await ensurePdfTokenForVision();
+
+                lastFormConfig.pdfToken = pdfToken;
+                lastFormConfig.displayMode = 'all_at_once';
+                lastFormConfig.htmlMode = 'normal';
+
+                const allAtOnceConfig = cloneFormConfigForLayout(lastFormConfig, 'all_at_once');
+                lastGeneratedFormHtmlAllAtOnce = await buildFormHtmlVariant(allAtOnceConfig);
+
+                const oneAtATimeConfig = cloneFormConfigForLayout(lastFormConfig, 'one_at_a_time');
+                lastGeneratedFormHtmlOneAtATime = await buildFormHtmlVariant(oneAtATimeConfig);
+
+                lastGeneratedFormHtml = lastGeneratedFormHtmlAllAtOnce;
+
+                if (previewAllAtOnceBtn) {
+                    previewAllAtOnceBtn.href = `${ALL_AT_ONCE_PREVIEW_URL}?t=${Date.now()}`;
+                }
+                if (previewOneAtATimeBtn) {
+                    previewOneAtATimeBtn.href = `${ONE_AT_A_TIME_PREVIEW_URL}?t=${Date.now()}`;
+                }
+
+                setStep8PreviewLinksEnabled(true);
+                markStep8Complete();
+            } catch (err) {
+                step8Error.textContent = err.message || 'Failed to build form previews.';
+                markStep8Error();
+                throw err;
+            } finally {
+                step8Generating = false;
+                if (step8GeneratingMsg) step8GeneratingMsg.style.display = 'none';
             }
-            setStep8PreviewMode(!step8ShowingHtmlSource);
         }
 
         function revokeSanitizedPdfBlobUrl() {
@@ -3189,6 +3178,11 @@
                 unlockStep8();
                 scheduleSaveDemoState();
                 saveCurrentDataDump('step-6-form-config');
+                return generateBothFormHtmlVariants().catch(function(err) {
+                    console.error('Form HTML generation error:', err);
+                    step8Error.textContent = err.message || 'Failed to build form previews.';
+                    markStep8Error();
+                });
             });
         }
 
@@ -4101,10 +4095,6 @@
             document.body.removeChild(link);
         });
 
-        function getSelectedHtmlMode() {
-            return document.querySelector('input[name="form-html-mode"]:checked')?.value || 'normal';
-        }
-
         function getSelectedTemplateSource() {
             return document.querySelector('input[name="form-template-source"]:checked')?.value || 'default';
         }
@@ -4196,17 +4186,6 @@
                 .catch((err) => console.error('Failed to preload form template:', err));
         }
 
-        document.querySelectorAll('input[name="form-html-mode"]').forEach((input) => {
-            input.addEventListener('change', () => {
-                if (lastFormConfig) {
-                    applyFormConfigMetadata(lastFormConfig);
-                    if (formConfigJsonEl.textContent) {
-                        formConfigJsonEl.textContent = JSON.stringify(lastFormConfig, null, 2);
-                    }
-                }
-            });
-        });
-
         async function generateFormConfigJson() {
             if (!lastFieldConfig || !lastExtractionPayload) {
                 step6Error.textContent = 'Field config and extraction data are required. Complete Steps 3–5 first.';
@@ -4231,7 +4210,6 @@
             step6Results.classList.remove('visible');
 
             try {
-                const displayMode = document.querySelector('input[name="form-display-mode"]:checked')?.value || 'one_at_a_time';
                 const pdfToken = await ensurePdfTokenForVision();
                 const response = await fetch('/api/generate-form-config', {
                     method: 'POST',
@@ -4239,7 +4217,7 @@
                     body: JSON.stringify({
                         fieldConfig: lastFieldConfig,
                         extractedDocumentContent: lastExtractionPayload.extractedDocumentContent,
-                        displayMode,
+                        displayMode: 'all_at_once',
                         userProfile: lastUserProfile || {},
                         pdfToken
                     })
@@ -4296,86 +4274,6 @@
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
         });
-
-        async function generateAndPreviewFormHtml() {
-            step8Error.textContent = '';
-            step8Status.textContent = '8';
-            step8Status.classList.remove('complete', 'error');
-            generateFormHtmlBtn.disabled = true;
-
-            try {
-                if (!lastFormConfig) {
-                    step8Error.textContent = 'Generate form_config.json in Step 6 first.';
-                    return;
-                }
-                await ensurePdfRegisteredOnServer();
-                const pdfToken = await ensurePdfTokenForVision();
-                const response = await fetch('/api/generate-form-html', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        formConfig: lastFormConfig,
-                        fieldConfig: lastFieldConfig,
-                        extractedDocumentContent: lastExtractionPayload?.extractedDocumentContent || '',
-                        userProfile: lastUserProfile || {},
-                        pdfToken,
-                        htmlMode: getSelectedHtmlMode(),
-                        firebaseConfig,
-                    }),
-                });
-
-                const responseText = await response.text();
-                let data;
-                try {
-                    data = JSON.parse(responseText);
-                } catch (_) {
-                    throw new Error(
-                        response.status === 413
-                            ? 'Request too large. Restart the server and re-run Step 5 before Step 8.'
-                            : (responseText.slice(0, 200) || `Server error (${response.status})`)
-                    );
-                }
-                if (!response.ok || !data.success || !data.html) {
-                    throw new Error(data.error || 'Failed to generate form HTML');
-                }
-
-                lastGeneratedFormHtml = data.html;
-                setStep8HtmlButtonsEnabled(true);
-                showFormHtmlPreview(data.html);
-                markStep8Complete();
-            } catch (err) {
-                console.error('Form HTML generation error:', err);
-                step8Error.textContent = err.message || 'Failed to generate form HTML.';
-                markStep8Error();
-            } finally {
-                generateFormHtmlBtn.disabled = !lastFormConfig;
-            }
-        }
-
-        function downloadGeneratedFormHtml() {
-            if (!lastGeneratedFormHtml) {
-                step8Error.textContent = 'Generate form HTML first.';
-                return;
-            }
-            step8Error.textContent = '';
-            const slug = (lastFormConfig?.formTitle || 'form')
-                .replace(/[^a-z0-9]+/gi, '-')
-                .replace(/^-|-$/g, '')
-                .toLowerCase() || 'form';
-            const blob = new Blob([lastGeneratedFormHtml], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `${slug}.html`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }
-
-        generateFormHtmlBtn.addEventListener('click', generateAndPreviewFormHtml);
-        viewFormHtmlBtn.addEventListener('click', toggleStep8HtmlSourceView);
-        downloadFormHtmlBtn.addEventListener('click', downloadGeneratedFormHtml);
 
         window.addEventListener('message', (event) => {
             if (!event.data || event.data.type !== 'formstar-profile-update') return;

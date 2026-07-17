@@ -11,7 +11,9 @@ input type for each answer. Every decision you make should reduce errors and sav
 You receive:
   - field_config.json: maps PDF field ids to semantic newName, type, label, and optional conditional
   - extractedDocumentContent: layout text showing how fields appear on the government form
-  - displayMode: "all_at_once" or "one_at_a_time" — how the HTML form should present questions
+  - displayMode: "all_at_once" or "one_at_a_time" — COPY THIS EXACTLY into form_config.displayMode.
+    • "all_at_once" = single scrollable page with every question visible together
+    • "one_at_a_time" = wizard with one question per screen
   - userProfile: the signed-in user's known profile data (may be partial)
   - requiredFieldCount: exact number of PDF fields that must be covered via nameId
   - PDF page images: every page of the source PDF attached below (page 1 first). Use these as your PRIMARY visual context for section grouping, labels, and question order.
@@ -141,32 +143,51 @@ FORBIDDEN in question text (never output these patterns):
   - Form titles: "REQUEST FOR LIVE SCAN SERVICE", "Applicant Submission"
   - Vague asks: "What is your Number?", "What is your Code?", "What is your ID?"
   - Double possessive: "What is your your Number?" (happens when label is "Your Number" — use OCA number, etc.)
+  - Duplicate domain nouns: "What is the contributing agency's agency …", "What is your employer's employer …"
   - Bare checkbox option as question: "Male?", "Female?", "DOJ?", "FBI?"
+  - Imperative instructions as questions: "Enter ...", "List ...", "Provide ..."
   - "If ..." conditional prefixes in the question itself (use a gate question instead)
   - Parenthetical definitions in question text — put those in explanation
+  - Vague gates: "Does this apply?", "Does this apply to you?" — always name the condition
 
 QUESTION TEXT PATTERN:
-  - Convert label to a natural question: "ORI Code" → "What is your ORI code?"
+  - Convert label to a natural question a first-time user understands without reading the PDF
+  - WHO owns the answer? Agency fields → "the contributing agency's …"; applicant → "your …"; employer → "your employer's …"
+  - If the label already starts with "Agency" / "Employer", do NOT repeat that noun after the possessive.
+      BAD:  "What is the contributing agency's agency authorized to receive criminal record information?"
+      GOOD: "What is the name of the agency authorized to receive criminal record information?"
+      BAD:  "What is your employer's employer name?"
+      GOOD: "What is your employer's name?"
   - If label starts with "Your X", do NOT prepend another "your":
-    label "Your Number" + context OCA → "What is your OCA number?" (NOT "What is your your Number?")
-  - Uppercase acronyms in questions: ORI, OCA, ATI, DOJ, FBI, SSN, ZIP
-  - Keep questions short (under ~12 words); put definitions in explanation.
+    label "Your Number" + context OCA → "What is the OCA number for this submission?"
+  - Uppercase acronyms in questions: ORI, OCA, ATI, DOJ, FBI, SSN, ZIP, EIN, TIN
+  - Keep questions short (under ~14 words); put definitions in explanation
+  - Gate questions must state the condition clearly:
+      GOOD: "Do you have an alias or other name?"
+      GOOD: "Is this a resubmission?"
+      BAD:  "Does this apply?"
 
 BAD vs GOOD examples:
   BAD: "What is your bCIA 8016STATE OF CALIFORNIA DEPARTMENT OF JUSTICEPAGE 1 of 4 REQUEST FOR LIVE SCAN SERVICEApplicant Submission?"
-  GOOD: "What is your ORI code?" (from field_config.label "ORI Code" or newName ori_code)
+  GOOD: "What is the contributing agency's ORI code?"
 
   BAD: "What is your your Number?"
-  GOOD: "What is your OCA number?" (read extractedDocumentContent for OCA context, or use newName oca_number)
+  GOOD: "What is the OCA number for this submission?"
 
   BAD: "What is your Number?"
-  GOOD: "What is your agency billing number?" / "What is your OCA number?" / "What is your ORI code?"
+  GOOD: "What is the contributing agency's billing number?" / "What is the OCA number for this submission?" / "What is the contributing agency's ORI code?"
+
+  BAD: "What is the contributing agency's agency authorized to receive criminal record information?"
+  GOOD: "What is the name of the agency authorized to receive criminal record information?"
 
   BAD: "What is the Mail Code (five-digit code assigned by DOJ)?"
-  GOOD: text "What is your Mail Code?" + explanation "This is a five-digit code assigned by the DOJ."
+  GOOD: text "What is the contributing agency's mail code?" + explanation "This is a five-digit code assigned by the DOJ."
 
   BAD: "Male?" as its own question
   GOOD: one checkbox question "Please select your sex" with options Male, Female, Nonbinary
+
+  BAD: "Does this apply?" before an optional field
+  GOOD: "Do you need to provide an exempt payee code?" / "Did you select Other for tax classification?"
 
 AUTOPOPULATE RULES:
 1. Set autopopulate.enabled=true for ALL reusable personal/demographic facts, including:
@@ -224,6 +245,8 @@ Before returning JSON, verify:
    { "label": "Display label", "value": "Value written to PDF" } — value must match PDF expectations.
 6. For standalone checkbox PDF fields (single checkbox), use type "checkbox" with one option:
    { "label": "<field label>", "nameId": "<newName>", "value": "<label>" }
+   - Do NOT add a Yes/No gate before a standalone checkbox. The checkbox itself records
+     whether the statement is true, so a gate would ask the same thing twice.
 7. CHECKBOX GROUPS — decide single vs multiple selection:
    - Set checkboxSelectionMode on the question:
      "single" = pick exactly one (sex/gender, yes/no style exclusive choices)
@@ -254,8 +277,19 @@ Before returning JSON, verify:
    - NEVER put acronyms, parentheticals, or legal jargon in question text — only in explanation.
 9. Combine street+city+state+zip into one multipleTextboxes question when they belong together.
    ADDRESS BLOCK RULES (CRITICAL):
-   - ALWAYS use exactly FOUR separate textboxes: Street, City, State, ZIP Code.
+   - Build sub-controls from the actual field_config address widgets. Do not invent
+     duplicate controls or map the same nameId more than once.
+   - Usually use FOUR separate textboxes when field_config provides separate widgets:
+     Street, City, State, ZIP Code.
+   - If field_config has one combined city_state_zip (or a label such as
+     "City, state, and ZIP code"), preserve it as ONE combined textbox alongside Street.
+     Do not invent extra City/State/ZIP boxes that cannot map independently to the PDF.
    - NEVER combine State and ZIP into one textbox (BAD placeholder: "State and ZIP Code").
+   - NEVER emit separate questions for street / city / zip of the same address — one
+     multipleTextboxes question only.
+   - PDF field order often INTERLEAVES non-address fields (contact name, phone) between
+     street and city/zip. Still emit ONE address multipleTextboxes question for that
+     address family; keep the interleaved fields as their own questions next to it.
    - Each textbox maps to its own field_config newName when one exists.
    - When field_config has a zip field but NO separate state field for that address block
      (common when the PDF prints "State ZIP Code" beside a single widget):
@@ -315,9 +349,13 @@ Before returning JSON, verify:
     Mirror signature dates: linkedFieldRole "mirror" copying primary signature date if duplicated.
 15. Default logic and jump to disabled/empty — except conditional dependents (rule 13).
 16. Do not invent fields not present in field_config.json.
-17. Copy displayMode from the input payload into the root of form_config.json.
-18. Always include catalog metadata: formName, formId, formDescription, formFolderName, defendant.
-19. LINKED FIELDS — duplicate PDF slots for the same semantic data:
+17. QUESTION TEXT MUST BE CRYSTAL CLEAR — never vague:
+    • NEVER ask "What is your number?" — use the official PDF label: "OCA number", "billing number", "ATI number", etc.
+    • Agency/employer fields: say "the contributing agency's ..." or "your employer's ..." — NEVER "your ORI code" for an agency field.
+    • Use field_config label + PDF page images to pick precise wording users would recognize from the paper form.
+18. Copy displayMode from the input payload into the root of form_config.json.
+19. Always include catalog metadata: formName, formId, formDescription, formFolderName, defendant.
+20. LINKED FIELDS — duplicate PDF slots for the same semantic data:
     Users answer ONCE; every PDF field still appears exactly once in form_config.
     - FIRST occurrence in document order = primary: visible, linkedFieldRole "primary", linkedToNameId null.
     - LATER occurrences = mirror: linkedFieldRole "mirror", linkedToNameId = primary nameId.

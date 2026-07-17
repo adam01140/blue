@@ -5,7 +5,11 @@
   "scripts": {
     "start": "node server.js",
     "test:auto-form": "node auto-form-quality-test.js",
-    "test:auto-form-e2e": "node auto-form-e2e.js --skip-openai"
+    "test:auto-form-e2e": "node auto-form-e2e.js --skip-openai",
+    "audit:livescan": "node scripts/pdf-generate-audit.js public/Auto-Form-Creator/livescan.pdf",
+    "audit:w9": "node scripts/pdf-generate-audit.js \"public/Auto-Form-Creator/W-9 Form.pdf\"",
+    "audit:all": "node scripts/pipeline-audit-all.js",
+    "repair": "node scripts/repair-current-form-config.js"
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.100",

@@ -12,6 +12,23 @@ const VAGUE_LABELS = new Set([
   'misc number', 'misc. number', 'identifier', 'city', 'zip code', 'zip', 'state',
 ]);
 
+const GENERIC_LABEL_WORDS = new Set([
+  'applicant', 'agency', 'employer', 'information', 'number', 'code', 'type',
+  'address', 'street', 'city', 'state', 'zip', 'telephone', 'phone', 'contact',
+  'name', 'date', 'field', 'other', 'the', 'and', 'for', 'your', 'section',
+]);
+
+const SECTION_HEADER_LABEL_PATTERNS = [
+  /^applicant\s+information$/i,
+  /^contributing\s+agency\s+information$/i,
+  /^employer\s+information$/i,
+  /^applicant\s+submission$/i,
+  /^service\s+level$/i,
+  /^level\s+of\s+service$/i,
+  /^signature\s+and\s+privacy$/i,
+  /^live\s+scan\s+transaction\s+completed$/i,
+];
+
 const GARBAGE_LABEL_PATTERNS = [
   /page\s*\d+\s*of\s*\d+/gi,
   /state\s+of\s+[a-z]+/gi,
@@ -67,6 +84,71 @@ function isVagueLabel(label) {
   return !normalized || VAGUE_LABELS.has(normalized);
 }
 
+function isSectionHeaderLabel(label) {
+  const normalized = String(label || '').trim();
+  if (!normalized) return false;
+  return SECTION_HEADER_LABEL_PATTERNS.some((pattern) => pattern.test(normalized));
+}
+
+function significantTokensFromField(field) {
+  const fromName = String(field?.newName || '')
+    .split('_')
+    .map((part) => part.toLowerCase())
+    .filter(Boolean);
+  const idMatches = String(field?.id || '').match(/[A-Za-z][A-Za-z0-9]*/g) || [];
+  const fromId = idMatches.map((part) => part.toLowerCase());
+  return [...new Set([...fromName, ...fromId])]
+    .filter((token) => token.length > 1 && !GENERIC_LABEL_WORDS.has(token));
+}
+
+function significantTokensFromLabel(label) {
+  return String(label || '')
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((token) => token.length > 2 && !GENERIC_LABEL_WORDS.has(token));
+}
+
+function tokensOverlap(nameTokens, labelTokens) {
+  if (!nameTokens.length) return true;
+  if (!labelTokens.length) return false;
+  return nameTokens.some((nameToken) => labelTokens.some((labelToken) => (
+    labelToken.includes(nameToken)
+    || nameToken.includes(labelToken)
+    || labelToken.replace(/s$/, '') === nameToken.replace(/s$/, '')
+  )));
+}
+
+function labelAlignsWithField(field, label) {
+  const configLabel = String(field?.label || '').trim().toLowerCase();
+  const testLabel = String(label || '').trim().toLowerCase();
+  if (!testLabel) return false;
+  if (isSectionHeaderLabel(label)) return false;
+
+  if (configLabel) {
+    if (testLabel === configLabel) return true;
+    // Checkbox options are short, mutually exclusive labels — never borrow a neighbor's
+    // PDF proximity label (e.g. "C corporation" for an S-corporation field).
+    if (field?.type === 'checkbox') {
+      return configLabel.includes(testLabel) || testLabel.includes(configLabel);
+    }
+    if (configLabel.includes(testLabel) || testLabel.includes(configLabel)) return true;
+  }
+
+  const nameTokens = significantTokensFromField(field);
+  const labelTokens = significantTokensFromLabel(label);
+  return tokensOverlap(nameTokens, labelTokens);
+}
+
+function questionTextMatchesField(questionText, field, resolvedLabel) {
+  const text = String(questionText || '').trim().toLowerCase();
+  const label = String(resolvedLabel || '').trim().toLowerCase();
+  if (!text || !label) return true;
+
+  const labelWords = label.split(/[^a-z0-9]+/).filter((word) => word.length > 2);
+  if (!labelWords.length) return true;
+  return labelWords.some((word) => text.includes(word));
+}
+
 function extractLabelFromDocument(field, extractedDocumentContent) {
   const doc = String(extractedDocumentContent || '');
   const fieldId = field?.id;
@@ -85,18 +167,25 @@ function extractLabelFromDocument(field, extractedDocumentContent) {
 }
 
 function resolveSpecificFieldLabel(field, extractedDocumentContent = '', structuredContext = null) {
-  const ctxLabel = structuredContext?.nearestLabel || structuredContext?.sanitizedLabel;
-  if (ctxLabel && !isVagueLabel(ctxLabel) && !isGarbageText(ctxLabel)) {
-    return sanitizeFieldLabel(ctxLabel, field?.newName);
-  }
-
   const configLabel = sanitizeFieldLabel(field?.label, field?.newName);
-  if (configLabel && !isVagueLabel(configLabel) && !isGarbageText(configLabel)) {
-    return configLabel;
-  }
+  const configIsGood = configLabel && !isVagueLabel(configLabel) && !isGarbageText(configLabel);
+
+  const ctxRaw = structuredContext?.nearestLabel || structuredContext?.sanitizedLabel;
+  const ctxLabel = ctxRaw ? sanitizeFieldLabel(ctxRaw, field?.newName) : '';
+  const ctxIsGood = ctxLabel
+    && !isVagueLabel(ctxLabel)
+    && !isGarbageText(ctxLabel)
+    && !isSectionHeaderLabel(ctxLabel);
+  const ctxAligns = ctxIsGood && labelAlignsWithField(field, ctxLabel);
+
+  if (configIsGood && !ctxAligns) return configLabel;
+  if (ctxAligns && ctxLabel.length >= (configLabel || '').length) return ctxLabel;
+  if (configIsGood) return configLabel;
 
   const docLabel = extractLabelFromDocument(field, extractedDocumentContent);
-  if (docLabel && !isVagueLabel(docLabel) && !isGarbageText(docLabel)) return docLabel;
+  if (docLabel && !isVagueLabel(docLabel) && !isGarbageText(docLabel) && labelAlignsWithField(field, docLabel)) {
+    return docLabel;
+  }
 
   const domain = inferFieldDomain(field);
   const fromName = formatFieldNameAsLabel(field?.newName);
@@ -112,67 +201,201 @@ function resolveSpecificFieldLabel(field, extractedDocumentContent = '', structu
   return configLabel || docLabel || fromName;
 }
 
-function simplifyLabelForQuestion(label) {
+function simplifyLabelForQuestion(label, field) {
   let text = String(label || '').trim().replace(/\s+/g, ' ');
+  const name = String(field?.newName || '').toLowerCase();
   if (!text) return text;
 
+  if (/your_number|oca_number|applicant_number/.test(name) || /^your number$/i.test(text)) return 'OCA number';
+  if (/\bbilling\b/i.test(name) || /billing/i.test(text)) return 'billing number';
   if (/\bori\b/i.test(text)) return 'ORI code';
-  if (/\boca\b/i.test(text) || /^your number$/i.test(text)) return 'OCA number';
-  if (/\bati\b/i.test(text) && /original/i.test(text)) return 'original ATI number';
+  if (/\boca\b/i.test(text)) return 'OCA number';
+  if (/\bati\b/i.test(text) && /original/i.test(text + name)) return 'original ATI number';
   if (/mail\s*code/i.test(text)) return 'mail code';
-  if (/billing/i.test(text)) return 'billing number';
+  if (/name of entity\/individual|entity\/individual/i.test(text + name)) {
+    return 'name as shown on your tax return';
+  }
+  if (/business name.*disregarded|disregarded entity name/i.test(text + name)) {
+    return 'business name or disregarded entity name (if different from above)';
+  }
+  if (/exempt payee code/i.test(text + name)) return 'exempt payee code';
+  if (/fatca reporting code/i.test(text + name)) return 'FATCA reporting code';
+  if (/taxpayer identification number|^tin$/i.test(text + name)) return 'taxpayer identification number (TIN)';
+  if (/employer identification number|^ein$/i.test(text + name)) return 'employer identification number (EIN)';
+  if (/tax classification code|classif.*owner|llc.*owner/i.test(text + name)) {
+    return 'LLC tax classification letter (C, S, or P)';
+  }
+  if (/other tax classification/i.test(text + name)) return 'other tax classification (specify)';
+  if (/list account number|account number.*here/i.test(text + name)) return 'account number(s) for this request (optional)';
+  if (/other tin|other taxpayer/i.test(text + name)) return 'other taxpayer identification number';
+  if (/additional name information/i.test(text + name)) return 'additional name or DBA (if applicable)';
+  if (/other_name_first|other_first_name/.test(name)) return 'other first name (alias)';
+  if (/other_name_last|other_last_name/.test(name)) return 'other last name (alias)';
+  if (/other_name_suffix|suffix.*alias/.test(name + text)) return 'suffix for your alias name';
+  if (/requester.*name.*number|name and number.*requester/i.test(text + name)) {
+    return 'name and number to give the requester';
+  }
+  if (/^name for ssn$/i.test(text) || /name_for_ssn/.test(name)) {
+    return 'name associated with this Social Security number';
+  }
 
   text = text.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
   return text;
+}
+
+function formatLabelForQuestionPhrase(label) {
+  return String(label || '')
+    .replace(/\b(ori|oca|ati|doj|fbi|ssn|zip|cdl|ein|tin|fatca|llc|dba)\b/gi, (match) => match.toUpperCase());
+}
+
+/** Lowercase for sentence flow, then restore known acronyms. */
+function phraseForQuestion(label) {
+  return formatLabelForQuestionPhrase(String(label || '').toLowerCase());
+}
+
+function buildPossessiveQuestion(possessive, label, domain) {
+  let phrase = phraseForQuestion(label).replace(/\?+$/, '').trim();
+  if (!phrase) return 'Please provide this information.';
+
+  // Avoid "the contributing agency's agency …" / "your employer's employer …"
+  if (domain === 'Agency' && /^agency\b/.test(phrase)) {
+    const rest = phrase.replace(/^agency\s+/, '');
+    if (/^(authorized|responsible|designated|named)\b/.test(rest)) {
+      return `What is the name of the agency ${rest}?`;
+    }
+    return `What is ${possessive} ${rest}?`;
+  }
+  if (domain === 'Employer' && /^employer\b/.test(phrase)) {
+    const rest = phrase.replace(/^employer\s+/, '');
+    return `What is ${possessive} ${rest}?`;
+  }
+
+  return `What is ${possessive} ${phrase}?`;
 }
 
 function buildQuestionTextForField(field, extractedDocumentContent = '', structuredContext = null) {
   const domain = inferFieldDomain(field);
   const wording = getDomainWording(domain);
   const rawLabel = resolveSpecificFieldLabel(field, extractedDocumentContent, structuredContext);
-  const label = simplifyLabelForQuestion(rawLabel);
+  const label = simplifyLabelForQuestion(rawLabel, field);
   if (!label) return 'Please provide this information.';
 
-  const lowerLabel = label.charAt(0).toLowerCase() + label.slice(1);
+  const name = String(field?.newName || '').toLowerCase();
+
+  // Tracking / submission IDs before domain wording — Agency domain would otherwise
+  // turn "Your Number" into a vague "contributing agency's applicant number".
+  if (
+    /your_number|oca_number/.test(name)
+    || /^your number$/i.test(label)
+    || /^oca number$/i.test(label)
+  ) {
+    return 'What is the OCA number for this submission?';
+  }
+  if (/original_ati/.test(name)) {
+    return 'What is your original ATI number?';
+  }
+  if (/billing_number/.test(name)) {
+    return "What is the contributing agency's billing number?";
+  }
+
+  if (/employer identification number|\bein\b/i.test(label) && !/^employer_/.test(name)) {
+    return 'What is your employer identification number (EIN)?';
+  }
+  if (/taxpayer identification number/i.test(label) && !/other/.test(name)) {
+    return 'What is your taxpayer identification number (TIN)?';
+  }
 
   if (domain === 'Agency') {
-    if (/^what is/i.test(label)) return label.endsWith('?') ? label : `${label}?`;
-    return `What is ${wording.possessive} ${lowerLabel}?`;
+    if (/^what is/i.test(label)) {
+      return formatLabelForQuestionPhrase(
+        label.replace(/\byour\b/gi, "the contributing agency's").replace(/\?\?+/g, '?')
+      ).replace(/([^.?])$/, '$1?');
+    }
+    return buildPossessiveQuestion(wording.possessive, label, 'Agency');
   }
   if (domain === 'Employer') {
-    return `What is ${wording.possessive} ${lowerLabel}?`;
+    return buildPossessiveQuestion(wording.possessive, label, 'Employer');
   }
   if (domain === 'Operator') {
-    return `What is ${wording.possessive} ${lowerLabel}?`;
+    return buildPossessiveQuestion(wording.possessive, label, 'Operator');
+  }
+
+  if (/tax_classification_code|llc.*classif/.test(name)) {
+    return 'What is the tax classification of the LLC owner (C, S, or P)?';
+  }
+  if (name === 'tax_classification_other' || /tax_classification_other$/.test(name)) {
+    return 'What is your other tax classification?';
+  }
+  if (/optional_requester|requester.*name and address|name and address.*optional/.test(name + label)) {
+    return "What is the requester's name and address (optional)?";
+  }
+  if (/name_for_ein|name and number to give the requester/i.test(name + label)) {
+    return 'What name and number should you give the requester?';
+  }
+  if (/name_for_ssn|^name for ssn$/i.test(name + label)) {
+    return 'What name is associated with this Social Security number?';
+  }
+  if (/name.*requester|requester.*name/.test(name + label) && !/optional_requester|name_for_ein/.test(name)) {
+    return 'What is the name and phone number of the person to contact about this form?';
   }
 
   if (/^(what|when|where|who|how|is|are|do|does|please)\b/i.test(label)) {
-    return label.endsWith('?') ? label : `${label}?`;
+    return label.endsWith('?') ? formatLabelForQuestionPhrase(label) : `${formatLabelForQuestionPhrase(label)}?`;
   }
   if (/^your\s+/i.test(label)) {
     const withQuestion = label.endsWith('?') ? label : `${label}?`;
-    return withQuestion.replace(/\byour\s+your\b/gi, 'your');
+    return formatLabelForQuestionPhrase(withQuestion.replace(/\byour\s+your\b/gi, 'your'));
   }
   if (/^(ORI|OCA|ATI)\s/i.test(label) || /ori code|oca number|ati number/i.test(label)) {
-    return `What is your ${label}?`.replace(/\byour\s+your\b/gi, 'your');
+    return `What is your ${formatLabelForQuestionPhrase(label)}?`.replace(/\byour\s+your\b/gi, 'your');
   }
-  return `What is your ${lowerLabel}?`.replace(/\byour\s+your\b/gi, 'your');
+  return `What is your ${phraseForQuestion(label)}?`.replace(/\byour\s+your\b/gi, 'your');
 }
 
-function buildAddressQuestionText(domain) {
-  const wording = getDomainWording(domain);
+function buildAddressQuestionText(domain, field = null) {
   if (domain === 'Agency') return 'What is the contributing agency\'s address?';
   if (domain === 'Employer') return 'What is your employer\'s address?';
-  return 'What is your home address?';
+  const blob = `${field?.newName || ''} ${field?.label || ''}`.toLowerCase();
+  if (/home/.test(blob)) return 'What is your home address?';
+  return 'What is your address?';
 }
 
 function buildExplanationForQuestion(question, field, extractedDocumentContent = '', structuredContext = null) {
   const domain = inferFieldDomain(field);
   const wording = getDomainWording(domain);
-  const label = resolveSpecificFieldLabel(field, extractedDocumentContent, structuredContext)
-    || String(question?.text || '').replace(/\?+$/, '');
-  const nameBlob = `${field?.newName || ''} ${label}`.toLowerCase();
+  const rawLabel = resolveSpecificFieldLabel(field, extractedDocumentContent, structuredContext);
+  const friendlyLabel = simplifyLabelForQuestion(rawLabel, field)
+    || String(question?.text || '').replace(/\?+$/, '').replace(/^what is (your|the[^?]+'?s?)\s+/i, '');
+  const label = friendlyLabel;
+  const nameBlob = `${field?.newName || ''} ${rawLabel} ${friendlyLabel}`.toLowerCase();
 
+  if (/tax_classification_code|llc.*classif/.test(nameBlob)) {
+    return 'If you checked LLC above, enter C for corporation, S for S corporation, or P for partnership — the tax classification of the LLC owner shown on the W-9.';
+  }
+  if (/other tax classification|tax_classification_other/.test(nameBlob)) {
+    return 'Only complete this if you selected "Other" for federal tax classification. Enter the classification exactly as it should appear on the form.';
+  }
+  if (/name as shown on your tax return|taxpayer_name|entity\/individual/.test(nameBlob)) {
+    return 'Enter the name exactly as it appears on your income tax return. For individuals, use your legal name; for entities, use the registered business name.';
+  }
+  if (/business name.*disregarded|disregarded entity/.test(nameBlob)) {
+    return 'Enter your business name or disregarded entity name if it differs from the name on line 1. Leave blank if the same.';
+  }
+  if (/exempt payee code/.test(nameBlob)) {
+    return 'Enter an exempt payee code only if you are exempt from backup withholding under IRS rules. Most individuals leave this blank.';
+  }
+  if (/fatca reporting code/.test(nameBlob)) {
+    return 'Enter a FATCA reporting code only if you are exempt from FATCA reporting. Most individuals leave this blank.';
+  }
+  if (/taxpayer identification number|\btin\b/.test(nameBlob) && !/other tin/.test(nameBlob)) {
+    return 'Enter your taxpayer identification number (SSN for individuals, EIN for businesses) exactly as it should appear on the W-9.';
+  }
+  if (/employer identification number|\bein\b/.test(nameBlob)) {
+    return 'Enter the employer identification number (EIN) for the business entity, if applicable.';
+  }
+  if (/foreign partner/.test(nameBlob)) {
+    return 'Check this box if the entity has foreign partners, owners, or beneficiaries that may require special reporting.';
+  }
   if (/alias|aka|other_(first|last|middle)_name/.test(nameBlob)) {
     return 'Enter any alias or other name you have used, if different from your legal name. This appears in the Applicant Information section of the form.';
   }
@@ -266,12 +489,16 @@ function buildExplanationForQuestion(question, field, extractedDocumentContent =
 module.exports = {
   FIELD_ACRONYMS,
   VAGUE_LABELS,
+  GENERIC_LABEL_WORDS,
   GARBAGE_LABEL_PATTERNS,
   titleCaseWord,
   formatFieldNameAsLabel,
   isGarbageText,
   sanitizeFieldLabel,
   isVagueLabel,
+  isSectionHeaderLabel,
+  labelAlignsWithField,
+  questionTextMatchesField,
   extractLabelFromDocument,
   resolveSpecificFieldLabel,
   buildQuestionTextForField,

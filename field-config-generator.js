@@ -75,12 +75,12 @@ async function callOpenAiForFieldConfig(openAiApiKey, extractionPayload, pageIma
       Authorization: `Bearer ${openAiApiKey}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4.1',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userContent },
       ],
-      temperature: 0.2,
+      temperature: 0.1,
       response_format: { type: 'json_object' },
     }),
   });

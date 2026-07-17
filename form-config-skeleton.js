@@ -21,8 +21,30 @@ const ADDRESS_CITY_RE = /\bcity\b/i;
 const ADDRESS_ZIP_RE = /\bzip\b/i;
 const ADDRESS_STATE_RE = /\bstate\b/i;
 
+function isAddressStreetField(field) {
+  const { addressPartRole } = require('./form-config-quality');
+  return addressPartRole(field.newName, field.label) === 'street';
+}
+
+function isAddressCityField(field) {
+  const { addressPartRole } = require('./form-config-quality');
+  const role = addressPartRole(field.newName, field.label);
+  return role === 'city' || role === 'cityStateZip';
+}
+
+function isAddressZipField(field) {
+  const { addressPartRole } = require('./form-config-quality');
+  return addressPartRole(field.newName, field.label) === 'zip';
+}
+
+function isAddressStateField(field) {
+  const { addressPartRole } = require('./form-config-quality');
+  return addressPartRole(field.newName, field.label) === 'state';
+}
+
 const CHECKBOX_GROUP_SUFFIXES = [
   '_male', '_female', '_nonbinary', '_nonbinary_unspecified', '_doj', '_fbi', '_yes', '_no',
+  '_s_corporation', '_trust_estate', '_other_checkbox', '_sole_proprietor',
 ];
 
 const AUTO_TODAY_DATE_PATTERNS = [
@@ -40,6 +62,8 @@ function checkboxGroupPrefix(nameId) {
   for (const suffix of CHECKBOX_GROUP_SUFFIXES) {
     if (id.endsWith(suffix)) return id.slice(0, -suffix.length);
   }
+  const semantic = id.match(/^(tax_classification|level_of_service|applicant_sex|sex)(?:_|$)/);
+  if (semantic) return semantic[1];
   const parts = id.split('_');
   if (parts.length > 1) return parts.slice(0, -1).join('_');
   return id;
@@ -68,9 +92,11 @@ function isConditionalField(field) {
   return Boolean(field?.conditional) || /original.*ati|resubmi|replacement|prior_|previous_/i.test(`${field?.newName} ${field?.label}`);
 }
 
+let nextTempQuestionId = -1;
+
 function createGateQuestion(gateText) {
   return {
-    questionId: 0,
+    questionId: nextTempQuestionId--,
     text: gateText.endsWith('?') ? gateText : `${gateText}?`,
     needsExplanation: true,
     explanation: 'Choose Yes or No to determine whether the following question applies to you.',
@@ -139,6 +165,9 @@ function inferCheckboxGroupQuestionText(prefix, options) {
   const blob = `${prefix} ${options.map((o) => o.label).join(' ')}`.toLowerCase();
   if (/male|female|nonbinary|sex|gender|morf/.test(blob)) return 'Please select your sex';
   if (/doj|fbi|level.?of.?service/.test(blob)) return 'Please select your level of service';
+  if (/tax_classification|corporation|partnership|llc|trust\/estate|sole proprietor/.test(blob)) {
+    return 'Please select your federal tax classification';
+  }
   if (options.length > 1) return 'Please select all that apply';
   return `Please confirm: ${options[0]?.label || 'this option'}`;
 }
@@ -166,36 +195,24 @@ function orderFields(fieldConfig, structuredFields) {
   }));
 }
 
-function isAddressStreetField(field) {
-  return ADDRESS_STREET_RE.test(`${field.newName} ${field.label}`);
-}
-
-function isAddressCityField(field) {
-  return ADDRESS_CITY_RE.test(`${field.newName} ${field.label}`);
-}
-
-function isAddressZipField(field) {
-  return ADDRESS_ZIP_RE.test(`${field.newName} ${field.label}`);
-}
-
-function isAddressStateField(field) {
-  return ADDRESS_STATE_RE.test(`${field.newName} ${field.label}`);
-}
-
 function tryConsumeAddressBlock(items, startIndex, extractedDocumentContent) {
   const slice = items.slice(startIndex);
   if (!slice.length || !isAddressStreetField(slice[0].field)) return null;
 
+  const { addressFamilyKey, addressPartRole } = require('./form-config-quality');
+  const family = addressFamilyKey(slice[0].field.newName, slice[0].field);
   const block = [slice[0]];
-  let i = 1;
-  while (i < slice.length && i < 4) {
+  const relativeConsumed = new Set([0]);
+
+  // Look ahead past interleaved non-address fields (contact name, phone, requester, etc.)
+  for (let i = 1; i < Math.min(slice.length, 8); i += 1) {
     const { field } = slice[i];
-    if (isAddressCityField(field) || isAddressZipField(field) || isAddressStateField(field)) {
-      block.push(slice[i]);
-      i += 1;
-    } else {
-      break;
-    }
+    const role = addressPartRole(field.newName, field.label);
+    if (!role || role === 'street') continue;
+    if (addressFamilyKey(field.newName, field) !== family) continue;
+    if (block.some((entry) => addressPartRole(entry.field.newName, entry.field.label) === role)) continue;
+    block.push(slice[i]);
+    relativeConsumed.add(i);
   }
   if (block.length < 2) return null;
 
@@ -213,7 +230,7 @@ function tryConsumeAddressBlock(items, startIndex, extractedDocumentContent) {
   const primaryField = block[0].field;
   const primaryContext = block[0].context;
   const addressDomain = inferFieldDomain(primaryField);
-  const questionText = buildAddressQuestionText(addressDomain);
+  const questionText = buildAddressQuestionText(addressDomain, primaryField);
 
   const question = {
     questionId: 0,
@@ -232,7 +249,7 @@ function tryConsumeAddressBlock(items, startIndex, extractedDocumentContent) {
     autopopulate: { enabled: false },
   };
 
-  return { question, consumed: block.length };
+  return { question, consumed: 1, skipNameIds: new Set(block.slice(1).map((entry) => entry.field.newName)) };
 }
 
 function tryConsumeCheckboxGroup(items, startIndex, extractedDocumentContent) {
@@ -293,11 +310,19 @@ function buildSectionQuestions(sectionItems, extractedDocumentContent) {
   const questions = [];
   let aliasGateQuestion = null;
   let i = 0;
+  const skipNameIds = new Set();
 
   while (i < sectionItems.length) {
+    const currentName = sectionItems[i]?.field?.newName;
+    if (currentName && skipNameIds.has(currentName)) {
+      i += 1;
+      continue;
+    }
+
     const addressBlock = tryConsumeAddressBlock(sectionItems, i, extractedDocumentContent);
     if (addressBlock) {
       questions.push(addressBlock.question);
+      for (const nameId of addressBlock.skipNameIds || []) skipNameIds.add(nameId);
       i += addressBlock.consumed;
       continue;
     }
@@ -319,7 +344,7 @@ function buildSectionQuestions(sectionItems, extractedDocumentContent) {
       const question = createBaseQuestion(field, context, extractedDocumentContent);
       question.logic = {
         enabled: true,
-        prevQuestion: '0',
+        prevQuestion: String(aliasGateQuestion.questionId),
         prevAnswer: 'Yes',
       };
       questions.push(question);
@@ -335,7 +360,7 @@ function buildSectionQuestions(sectionItems, extractedDocumentContent) {
       const question = createBaseQuestion(field, context, extractedDocumentContent);
       question.logic = {
         enabled: true,
-        prevQuestion: '0',
+        prevQuestion: String(gateQuestion.questionId),
         prevAnswer: 'Yes',
       };
       questions.push(question);
@@ -367,7 +392,7 @@ function renumberFormConfig(formConfig) {
 
   const remap = (value) => {
     const parsed = parseInt(String(value || ''), 10);
-    if (!Number.isFinite(parsed) || parsed === 0) return value;
+    if (!Number.isFinite(parsed)) return value;
     return idMap.has(parsed) ? String(idMap.get(parsed)) : value;
   };
 
@@ -400,11 +425,12 @@ function renumberFormConfig(formConfig) {
 function ensureMinimumSections(formConfig, minCount = 2) {
   if (!formConfig?.sections || formConfig.sections.length >= minCount) return formConfig;
 
-  const only = formConfig.sections[0];
-  const questions = [...(only?.questions || [])];
+  // Flatten ALL sections — never drop later sections (e.g. a 1-field Employer bucket).
+  const questions = formConfig.sections.flatMap((section) => section.questions || []);
   if (questions.length < minCount) return formConfig;
 
-  const splitAt = Math.ceil(questions.length / minCount);
+  const count = Math.min(minCount, questions.length);
+  const splitAt = Math.ceil(questions.length / count);
   const chunks = [];
   for (let i = 0; i < questions.length; i += splitAt) {
     chunks.push(questions.slice(i, i + splitAt));

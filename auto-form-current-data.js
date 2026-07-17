@@ -32,7 +32,17 @@ function saveCurrentData(payload) {
     writeJsonFile('form_config.json', payload.formConfig);
     writtenFiles.push('form_config.json');
   }
-  if (payload.formHtml) {
+  if (payload.formHtmlAllAtOnce) {
+    writeTextFile('all-at-once-generated-form.html', payload.formHtmlAllAtOnce);
+    writtenFiles.push('all-at-once-generated-form.html');
+    writeTextFile('generated-form.html', payload.formHtmlAllAtOnce);
+    if (!writtenFiles.includes('generated-form.html')) writtenFiles.push('generated-form.html');
+  }
+  if (payload.formHtmlOneAtATime) {
+    writeTextFile('one-at-a-time-generated-form.html', payload.formHtmlOneAtATime);
+    writtenFiles.push('one-at-a-time-generated-form.html');
+  }
+  if (payload.formHtml && !payload.formHtmlAllAtOnce) {
     writeTextFile('generated-form.html', payload.formHtml);
     writtenFiles.push('generated-form.html');
   }

@@ -26,14 +26,20 @@ function inferFieldDomain(field) {
   if (/\.doj\[0\]|\.fbi\[0\]/.test(id)) {
     return 'Service';
   }
-  if (/firstname|lastname|suffix\[|\.dob\[0\]|dlnumber|height|weight|\.eye\[0\]|hair|\.pob\[0\]|\.ssn\[0\]|miscnumber|streetorpo|city\[1\]|zip\[1\]|datetimefield1|yournumber|origati|morf/.test(id)) {
+  if (/\.dob\[0\]|dlnumber|height|weight|\.eye\[0\]|hair|\.pob\[0\]|\.ssn\[0\]|miscnumber|streetorpo|city\[1\]|zip\[1\]|datetimefield1|origati|morf/.test(id)) {
     return 'Applicant';
+  }
+  if (/yournumber|billingnumber/.test(id)) {
+    return 'Agency';
   }
 
   if (/^employer_/.test(name) || /^employer\b/.test(label)) return 'Employer';
   if (/level_of_service|_doj$|_fbi$/.test(name)) return 'Service';
-  if (/^applicant_|^other_name|home_|date_of_birth|drivers_license|social_security|place_of_birth|miscellaneous|oca_number|original_ati|applicant_sex|first_name|last_name|middle_initial|suffix|height|weight|hair_color|eye_color/.test(name)) {
+  if (/^applicant_|^other_name|home_|date_of_birth|drivers_license|social_security|place_of_birth|miscellaneous|original_ati|applicant_sex|first_name|last_name|middle_initial|suffix|height|weight|hair_color|eye_color/.test(name)) {
     return 'Applicant';
+  }
+  if (/your_number|oca_number|billing_number/.test(name)) {
+    return 'Agency';
   }
   if (/^agency_|^ori_code$|^mail_code$|^contact_|authorized_applicant|agency_authorized|type_of_license|billing_number/.test(name)) {
     return 'Agency';

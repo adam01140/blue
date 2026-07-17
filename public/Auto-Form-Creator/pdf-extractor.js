@@ -103,7 +103,15 @@
 
         for (const line of lines) {
             const yDist = Math.abs(line.y - fieldY);
-            if (yDist > LINE_THRESHOLD * 3) continue;
+            const sameRow = yDist <= LINE_THRESHOLD;
+            if (yDist > LINE_THRESHOLD * 2) continue;
+
+            const lineText = line.items
+                .filter((item) => item.type === 'text')
+                .map((item) => item.text)
+                .join(' ')
+                .trim();
+            if (isSectionHeaderText(lineText)) continue;
 
             const textParts = line.items
                 .filter((item) => item.type === 'text')
@@ -113,10 +121,12 @@
                 if (item.xEnd > fieldX + 5) continue;
                 const gap = fieldX - item.xEnd;
                 if (gap < -20 || gap > 250) continue;
-                const dist = yDist * 10 + Math.abs(gap);
-                if (dist < bestDist && item.text.trim()) {
+                const yWeight = sameRow ? 1 : 40;
+                const dist = yDist * yWeight + Math.abs(gap);
+                const candidate = item.text.trim();
+                if (dist < bestDist && candidate && !isSectionHeaderText(candidate)) {
                     bestDist = dist;
-                    best = item.text.trim();
+                    best = candidate;
                 }
             }
         }
@@ -124,17 +134,24 @@
         if (!best) {
             const sameLine = lines.find((ln) => Math.abs(ln.y - fieldY) < LINE_THRESHOLD);
             if (sameLine) {
-                const beforeField = sameLine.items
-                    .filter((item) => item.type === 'text' && item.xEnd <= fieldX + 5)
-                    .sort((a, b) => a.xStart - b.xStart);
-                if (beforeField.length) {
-                    best = beforeField.map((item) => item.text).join(' ').trim();
+                const lineText = sameLine.items
+                    .filter((item) => item.type === 'text')
+                    .map((item) => item.text)
+                    .join(' ')
+                    .trim();
+                if (!isSectionHeaderText(lineText)) {
+                    const beforeField = sameLine.items
+                        .filter((item) => item.type === 'text' && item.xEnd <= fieldX + 5)
+                        .sort((a, b) => a.xStart - b.xStart);
+                    if (beforeField.length) {
+                        best = beforeField.map((item) => item.text).join(' ').trim();
+                    }
                 }
             }
         }
 
         const sanitized = sanitizeLabelText(best);
-        return isGarbageLabel(sanitized) ? '' : sanitized;
+        return isGarbageLabel(sanitized) || isSectionHeaderText(sanitized) ? '' : sanitized;
     }
 
   /**

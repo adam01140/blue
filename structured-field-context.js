@@ -7,6 +7,8 @@ const {
   isVagueLabel,
   isGarbageText,
   formatFieldNameAsLabel,
+  labelAlignsWithField,
+  isSectionHeaderLabel,
 } = require('./form-question-text');
 const { inferCanonicalNewName, isOperatorField } = require('./field-name-canonicalizer');
 
@@ -140,10 +142,10 @@ function inferConditionalFromField(field, structuredContext = null) {
     return { onlyWhen: 'replacement', gateQuestion: 'Are you requesting a replacement?' };
   }
   if (CONDITIONAL_FIELD_PATTERNS.some((re) => re.test(blob))) {
-    return { onlyWhen: 'applicable', gateQuestion: 'Does this apply to your submission?' };
+    return { onlyWhen: 'applicable', gateQuestion: null };
   }
   if (/^if\s+/i.test(field?.label || '')) {
-    return { onlyWhen: 'applicable', gateQuestion: 'Does this apply to you?' };
+    return { onlyWhen: 'applicable', gateQuestion: null };
   }
   return null;
 }
@@ -196,6 +198,17 @@ function fixSemanticNewName(field, structuredContext = null) {
   return newName;
 }
 
+function trustedNearestLabel(field, rawNearestLabel) {
+  const sanitized = sanitizeNearestLabel(rawNearestLabel, field?.newName);
+  if (!sanitized || isGarbageText(sanitized) || isVagueLabel(sanitized) || isSectionHeaderLabel(sanitized)) {
+    return null;
+  }
+  if (!labelAlignsWithField(field, sanitized)) {
+    return null;
+  }
+  return sanitized;
+}
+
 function enrichFieldConfig(fieldConfig, structuredFields = [], extractedDocumentContent = '') {
   if (!fieldConfig?.fields) return fieldConfig;
 
@@ -222,10 +235,11 @@ function enrichFieldConfig(fieldConfig, structuredFields = [], extractedDocument
     }
 
     if (ctx) {
+      const trustedLabel = trustedNearestLabel(field, ctx.nearestLabel);
       field.context = {
         page: ctx.page,
         sectionHint: inferSectionHintFromField(field, ctx),
-        nearestLabel: ctx.nearestLabel,
+        nearestLabel: trustedLabel,
       };
     }
   }
@@ -245,7 +259,7 @@ function buildCompactFieldContextForPrompt(structuredFields, fieldConfig) {
       conditional: field.conditional || null,
       page: ctx?.page ?? null,
       sectionHint: ctx?.sectionHint ?? null,
-      nearestLabel: ctx?.nearestLabel ? sanitizeNearestLabel(ctx.nearestLabel, field.newName) : null,
+      nearestLabel: ctx?.nearestLabel ? trustedNearestLabel(field, ctx.nearestLabel) : null,
     };
   });
   return fields;

@@ -194,8 +194,17 @@ Replace vague labels with specific wording:
   - "Code"        → "ORI Code" or "Mail Code"
   - "ID"          → "Driver's License Number"
 
+When newName already starts with agency_/employer_/applicant_, avoid repeating that
+role word at the start of the label (keeps Step 6 questions natural):
+  - BAD:  newName agency_mail_code, label "Agency Mail Code"
+  - GOOD: newName agency_mail_code, label "Mail Code"
+  - BAD:  newName agency_authorized_to_receive_..., label "Agency Authorized to Receive Criminal Record Information"
+  - GOOD: newName agency_authorized_to_receive_..., label "Authorized to Receive Criminal Record Information"
+  - BAD:  newName employer_name, label "Employer Name"
+  - GOOD: newName employer_name, label "Name"
+
 Acronym formatting from newName:
-  - ori_code → "ORI Code"
+  - ori_code / agency_ori → "ORI Code"
   - oca_number → "OCA Number"
   - original_ati_number → "Original ATI Number"
 

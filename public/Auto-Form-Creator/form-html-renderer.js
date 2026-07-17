@@ -223,6 +223,14 @@
 .stepper-line.filled{background:linear-gradient(90deg,#4f8cff 0%,#38d39f 100%)}
 .section{display:none}
 .section.active{display:block}
+.form-all-at-once-layout .section{display:block!important;margin:0 auto 36px;max-width:760px;padding:28px 24px 32px;background:#fff;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 8px 28px rgba(44,62,80,.07)}
+.form-all-at-once-layout .section-title{margin-top:0;padding-bottom:12px;border-bottom:2px solid #e8eef5;margin-bottom:24px;font-size:1.45rem;color:#1f3a60}
+.form-all-at-once-layout .question-container{margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid #f0f3f8}
+.form-all-at-once-layout .question-container:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.form-all-at-once-layout .question-nav{display:none!important}
+.form-all-at-once-layout .stepper-progress-bar{position:sticky;top:0;z-index:30;background:#f7fafd;padding:12px 0 16px;margin-bottom:8px}
+.all-at-once-submit-bar{position:sticky;bottom:0;z-index:40;display:flex;justify-content:center;padding:18px 16px 24px;background:linear-gradient(180deg,rgba(247,250,253,0) 0%,#f7fafd 35%,#f7fafd 100%)}
+.all-at-once-submit-bar .next-button{min-width:220px;padding:14px 28px;font-size:1.05rem;border-radius:999px;border:none;background:linear-gradient(135deg,#0acffe,#495aff);color:#fff;font-weight:700;cursor:pointer;box-shadow:0 10px 24px rgba(9,132,227,.35)}
 .question-header{display:flex;align-items:flex-start;justify-content:center;gap:10px;margin-bottom:8px}
 .question-header .question-text{margin:0;flex:1;text-align:center}
 .question-info-wrap{position:relative;flex-shrink:0;margin-top:2px}
@@ -386,14 +394,18 @@
     let globalIndex = 0;
     let html = buildStepperStylesHtml() + buildStepperHtml(sections);
 
+    if (!oneAtATime) {
+      html += '<div class="form-all-at-once-layout">';
+    }
+
     sections.forEach((section, sectionIdx) => {
       const sectionId = section.sectionId != null ? section.sectionId : sectionIdx + 1;
-      const sectionActive = sectionIdx === 0 ? ' active' : '';
+      const sectionActive = oneAtATime && sectionIdx === 0 ? ' active' : '';
       const sectionName = esc(section.sectionName || `Section ${sectionId}`);
       const questions = section.questions || [];
       const isLastSection = sectionIdx === sections.length - 1;
 
-      html += `<div id="section${sectionId}" class="section${sectionActive}">`;
+      html += `<div id="section${sectionId}" class="section${sectionActive}" data-section-id="${sectionId}">`;
       html += `<h1 class="section-title">${sectionName}</h1>`;
 
       questions.forEach((question, qIdx) => {
@@ -409,19 +421,28 @@
         );
       });
 
-      html += `<div class="question-nav" data-section-index="${sectionId}">`;
-      html += `<button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="${sectionId}">&larr;</button>`;
-      html += `<button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="${sectionId}">&rarr;</button>`;
-      html += '</div>';
-      html += '<br><br>';
-      html += '<div class="navigation-buttons" style="display:none;">';
-      if (isLastSection) {
-        html += '<button type="submit" class="next-button">Submit</button>';
-      } else {
-        html += '<button type="button" onclick="goBack()">Back</button>';
+      if (oneAtATime) {
+        html += `<div class="question-nav" data-section-index="${sectionId}">`;
+        html += `<button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="${sectionId}">&larr;</button>`;
+        html += `<button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="${sectionId}">&rarr;</button>`;
+        html += '</div>';
+        html += '<br><br>';
+        html += '<div class="navigation-buttons" style="display:none;">';
+        if (isLastSection) {
+          html += '<button type="submit" class="next-button">Submit</button>';
+        } else {
+          html += '<button type="button" onclick="goBack()">Back</button>';
+        }
+        html += '</div>';
       }
-      html += '</div></div>';
+
+      html += '</div>';
     });
+
+    if (!oneAtATime) {
+      html += '<div class="all-at-once-submit-bar"><button type="submit" class="next-button">Submit Form</button></div>';
+      html += '</div>';
+    }
 
     html += buildHelpChatModalHtml();
     return html;
@@ -1288,9 +1309,20 @@
   function findGateElementByQuestionId(questionId) {
     var qid = String(questionId || '');
     if (!qid) return null;
-    var container = document.querySelector('.question-container[data-question-id="' + qid.replace(/"/g, '') + '"]');
-    if (!container) return null;
-    return container.querySelector('select.logic-gate-select, select[data-is-logic-gate="true"], select, input, textarea');
+    return document.querySelector('.question-container[data-question-id="' + qid.replace(/"/g, '') + '"]');
+  }
+
+  function getGateAnswerFromContainer(container) {
+    if (!container) return '';
+    var select = container.querySelector('select.logic-gate-select, select[data-is-logic-gate="true"], select');
+    if (select) return getControlAnswerValue(select);
+    var checked = container.querySelectorAll('input[type="checkbox"]:checked, input[type="radio"]:checked');
+    if (checked.length) {
+      return Array.from(checked).map(function(el) {
+        return (el.value || el.parentElement?.textContent || 'Yes').trim();
+      }).join('|');
+    }
+    return '';
   }
 
   function getControlAnswerValue(el) {
@@ -1304,9 +1336,11 @@
     document.querySelectorAll('.logic-gated').forEach(function(container) {
       var prevQ = container.getAttribute('data-logic-prev-question');
       var expect = (container.getAttribute('data-logic-prev-answer') || 'Yes').toLowerCase();
-      var gateEl = findGateElementByQuestionId(prevQ);
-      var val = getControlAnswerValue(gateEl).toString().toLowerCase();
-      var show = (expect === '*' && val !== '') || val === expect;
+      var gateContainer = findGateElementByQuestionId(prevQ);
+      var val = getGateAnswerFromContainer(gateContainer).toString().toLowerCase();
+      var answers = val.split('|').filter(Boolean);
+      var show = (expect === '*' && answers.length > 0)
+        || answers.some(function(answer) { return answer === expect || answer.indexOf(expect) >= 0; });
       if (show) container.classList.remove('hidden');
       else container.classList.add('hidden');
     });
@@ -1324,6 +1358,9 @@
     document.querySelectorAll('.logic-gate-select, select[data-is-logic-gate="true"]').forEach(function(el) {
       el.addEventListener('change', evaluateConditionalVisibility);
       el.addEventListener('input', evaluateConditionalVisibility);
+    });
+    document.querySelectorAll('.question-container input[type="checkbox"], .question-container input[type="radio"]').forEach(function(el) {
+      el.addEventListener('change', evaluateConditionalVisibility);
     });
     evaluateConditionalVisibility();
   }
@@ -1345,6 +1382,170 @@
 
     var currentDateHidden = document.getElementById('current_date');
     if (currentDateHidden) currentDateHidden.value = us;
+  }
+
+  function demoValueForField(el) {
+    var name = String(el.name || el.id || '').toLowerCase();
+    var type = String(el.type || '').toLowerCase();
+    var tag = String(el.tagName || '').toLowerCase();
+    var placeholder = String(el.placeholder || '').toLowerCase();
+    var blob = name + ' ' + placeholder;
+
+    if (type === 'date') return '1990-06-15';
+    if (type === 'tel' || /phone|telephone/.test(blob)) return '(555) 123-4567';
+    if (type === 'email' || /email/.test(blob)) return 'demo.user@example.com';
+    if (type === 'number' || /amount|money|fee/.test(blob)) return '25.00';
+    if (tag === 'textarea') return '123 Demo Street, Suite 100';
+
+    if (/ori/.test(blob)) return 'CA0349400';
+    if (/mail.?code/.test(blob)) return '12345';
+    if (/billing/.test(blob)) return 'BILL-90876';
+    if (/oca|your_number|your number/.test(blob)) return 'OCA-445566';
+    if (/ati/.test(blob)) return 'A1234567890';
+    if (/ssn|social.?security/.test(blob)) return '123-45-6789';
+    if (/ein|employer.?identification|tin_ein/.test(blob)) return '12-3456789';
+    if (/tin|taxpayer.?identification|tin_ssn/.test(blob)) return '123-45-6789';
+    if (/driver|dl.?number|license.?number/.test(blob)) return 'D1234567';
+    if (/zip/.test(blob)) return '94105';
+    if (/state/.test(blob) && !/statement/.test(blob)) return 'CA';
+    if (/city/.test(blob)) return 'San Francisco';
+    if (/street|address|p.?o.?\\s*box/.test(blob)) return '123 Market Street';
+    if (/first.?name|firstname/.test(blob)) return 'Jordan';
+    if (/last.?name|lastname/.test(blob)) return 'Lee';
+    if (/middle/.test(blob)) return 'A';
+    if (/suffix/.test(blob)) return 'Jr';
+    if (/contact.?name|agency.?authorized/.test(blob)) return 'Alex Rivera';
+    if (/employer.?name|emplname/.test(blob)) return 'Acme Services LLC';
+    if (/business.?name|taxpayer.?name|name.?of.?entity|name.?as.?shown/.test(blob)) return 'Jordan Lee';
+    if (/requester|name.?for/.test(blob)) return 'Alex Rivera';
+    if (/account.?number/.test(blob)) return 'ACC-778899';
+    if (/exempt.?payee/.test(blob)) return '';
+    if (/fatca/.test(blob)) return '';
+    if (/height/.test(blob)) return '5 ft 10 in';
+    if (/weight/.test(blob)) return '170';
+    if (/eye/.test(blob)) return 'BRO';
+    if (/hair/.test(blob)) return 'BLK';
+    if (/place.?of.?birth|pob/.test(blob)) return 'CA';
+    if (/misc/.test(blob)) return 'N/A';
+    if (/authorized.?applicant|applicant.?type/.test(blob)) return 'VOLUNTEER';
+    if (/type.?of.?license|working.?title|license/.test(blob)) return 'Teacher';
+    if (/classif.*code|llc.*code|tax_classification_code/.test(blob)) return 'C';
+    if (/other.?tax.?classif|tax_classification_other/.test(blob)) return 'Non-profit organization';
+    if (/dob|birth|date/.test(blob)) return '06/15/1990';
+    if (/phone|telephone/.test(blob)) return '(555) 123-4567';
+
+    return 'Demo Value';
+  }
+
+  function setControlValue(el, value) {
+    if (!el) return;
+    if (el.type === 'checkbox' || el.type === 'radio') {
+      el.checked = Boolean(value);
+    } else if (el.tagName === 'SELECT') {
+      el.value = value;
+      if (!el.value && el.options && el.options.length) {
+        for (var i = 0; i < el.options.length; i += 1) {
+          if (el.options[i].value) {
+            el.value = el.options[i].value;
+            break;
+          }
+        }
+      }
+    } else {
+      el.value = value == null ? '' : String(value);
+    }
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  function fillAllDemoFields() {
+    var filled = 0;
+
+    // Show logic-gated questions by answering Yes/selected parent options first
+    document.querySelectorAll('select.logic-gate-select, select[data-is-logic-gate="true"]').forEach(function(sel) {
+      var yesOpt = Array.from(sel.options || []).find(function(o) {
+        return String(o.value || '').toLowerCase() === 'yes';
+      });
+      setControlValue(sel, yesOpt ? yesOpt.value : (sel.options[1] && sel.options[1].value) || 'Yes');
+      filled += 1;
+    });
+
+    // Prefer a sensible single checkbox in multi-option groups
+    var checkboxGroups = {};
+    document.querySelectorAll('.question-container input[type="checkbox"]').forEach(function(cb) {
+      var container = cb.closest('.question-container');
+      var qid = container ? container.getAttribute('data-question-id') : cb.name;
+      if (!checkboxGroups[qid]) checkboxGroups[qid] = [];
+      checkboxGroups[qid].push(cb);
+    });
+    Object.keys(checkboxGroups).forEach(function(qid) {
+      var boxes = checkboxGroups[qid];
+      var prefer = boxes.find(function(cb) {
+        var label = String(cb.value || cb.parentElement && cb.parentElement.textContent || '').toLowerCase();
+        var name = String(cb.name || '').toLowerCase();
+        return /individual|sole|male(?!vol)|c corporation|^yes$/.test(label)
+          || /individual|_male$|_doj$/.test(name);
+      }) || boxes[0];
+      boxes.forEach(function(cb) {
+        setControlValue(cb, cb === prefer);
+        filled += 1;
+      });
+    });
+
+    document.querySelectorAll('.question-container select:not(.logic-gate-select):not([data-is-logic-gate="true"])').forEach(function(sel) {
+      if (sel.hasAttribute('data-linked-to')) return;
+      var yesOpt = Array.from(sel.options || []).find(function(o) {
+        return String(o.value || '').toLowerCase() === 'yes';
+      });
+      setControlValue(sel, yesOpt ? yesOpt.value : null);
+      filled += 1;
+    });
+
+    document.querySelectorAll('.question-container input[type="text"], .question-container input[type="tel"], .question-container input[type="email"], .question-container input[type="number"], .question-container input[type="date"], .question-container textarea').forEach(function(el) {
+      if (el.hasAttribute('data-linked-to')) return;
+      if (el.closest('.auto-today-date')) return;
+      var val = demoValueForField(el);
+      if (val === '') return;
+      setControlValue(el, val);
+      filled += 1;
+    });
+
+    applyAutoTodayDates();
+    if (typeof syncAllLinkedFields === 'function') syncAllLinkedFields();
+    if (typeof evaluateConditionalVisibility === 'function') evaluateConditionalVisibility();
+    if (typeof refreshAllQuestionNav === 'function') refreshAllQuestionNav();
+
+    if (window.__demoFillToastTimer) clearTimeout(window.__demoFillToastTimer);
+    var toast = document.getElementById('demoFillToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'demoFillToast';
+      toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:10060;background:#111827;color:#fff;padding:12px 18px;border-radius:999px;font:600 14px/1.2 system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.25);';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = 'Demo fill applied (' + filled + ' fields)';
+    toast.style.display = 'block';
+    window.__demoFillToastTimer = setTimeout(function() {
+      toast.style.display = 'none';
+    }, 2200);
+  }
+
+  function wireDemoFillShortcut() {
+    if (window.__demoFillShortcutWired) return;
+    window.__demoFillShortcutWired = true;
+    document.addEventListener('keydown', function(e) {
+      if (!(e.ctrlKey || e.metaKey) || !e.shiftKey) return;
+      // Ctrl/Cmd + Shift alone (second modifier keydown), not Ctrl+Shift+Letter
+      if (e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Meta') return;
+      if (e.repeat) return;
+      var tag = (e.target && e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') {
+        // Still allow from focused fields for demo convenience
+      }
+      e.preventDefault();
+      fillAllDemoFields();
+    });
+    window.__autoFormFillDemo = fillAllDemoFields;
   }
 
   function showAutoFormThankYou(previewUrl) {
@@ -1399,6 +1600,7 @@
     restoreFormAnswersFromCookies();
     wireLinkedFields();
     wireConditionalLogic();
+    wireDemoFillShortcut();
     refreshAllQuestionNav();
     wireQuestionInfoIcons();
     wireHelpMeAnswer();
@@ -1413,6 +1615,9 @@
       setTimeout(function() {
         document.querySelectorAll('.question-container.question-item').forEach(function(el) {
           el.classList.remove('question-step-hidden');
+        });
+        document.querySelectorAll('.section').forEach(function(sec) {
+          sec.classList.add('active');
         });
         document.querySelectorAll('.question-nav').forEach(function(nav) {
           nav.style.display = 'none';
@@ -1473,6 +1678,21 @@
     return templateHtml;
   }
 
+  function hideAuthChromeForNormalMode(html) {
+    const hideCss = [
+      '<style>',
+      'body.html-mode-normal .header-actions,',
+      'body.html-mode-normal #sign-in-btn,',
+      'body.html-mode-normal #logout-btn,',
+      'body.html-mode-normal #signinRequiredModal { display: none !important; }',
+      '</style>',
+    ].join('\n');
+    if (html.includes('</head>')) {
+      return html.replace('</head>', `${hideCss}\n</head>`).replace('<body', '<body class="html-mode-normal"');
+    }
+    return hideCss + html;
+  }
+
   function buildFormHtml(formConfig, userProfile, options) {
     options = options || {};
     const firebaseConfig = options.firebaseConfig || null;
@@ -1496,11 +1716,15 @@
       extractedDocumentContent
     );
 
-    return applyTemplate(templateHtml, {
+    let html = applyTemplate(templateHtml, {
       [PLACEHOLDER_TITLE]: title,
       [PLACEHOLDER_BODY]: bodyHtml,
       [PLACEHOLDER_RUNTIME]: runtimeScripts
     });
+    if (!devMode) {
+      html = hideAuthChromeForNormalMode(html);
+    }
+    return html;
   }
 
   function preloadDefaultTemplate(url) {

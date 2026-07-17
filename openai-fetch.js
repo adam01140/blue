@@ -7,6 +7,12 @@ dns.setDefaultResultOrder('ipv4first');
 
 const lookupAsync = promisify(dns.lookup);
 
+function parseRetryAfterMs(errorMessage) {
+  const match = String(errorMessage || '').match(/try again in ([\d.]+)s/i);
+  if (!match) return null;
+  return Math.ceil(parseFloat(match[1]) * 1000) + 500;
+}
+
 function isRetryableNetworkError(error) {
   const code = error?.cause?.code || error?.code || '';
   const message = String(error?.message || '');
@@ -19,6 +25,14 @@ function isRetryableNetworkError(error) {
     || message.includes('fetch failed')
     || message.includes('Request timed out')
   );
+}
+
+function isRetryableOpenAiError(error, response, bodyText) {
+  if (isRetryableNetworkError(error)) return true;
+  const status = response?.status;
+  if (status === 429 || status === 503) return true;
+  const message = String(bodyText || error?.message || '');
+  return /rate limit|try again in/i.test(message);
 }
 
 function httpsRequestWithResolvedIp(urlString, options = {}) {
@@ -71,7 +85,20 @@ async function fetchOpenAiWithRetry(url, options, retryOptions = {}) {
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
-      return await httpsRequestWithResolvedIp(url, options);
+      const response = await httpsRequestWithResolvedIp(url, options);
+      if (response.ok) return response;
+
+      const bodyText = await response.text();
+      if (isRetryableOpenAiError(null, response, bodyText) && attempt < maxAttempts) {
+        const retryMs = parseRetryAfterMs(bodyText) || baseDelayMs * attempt * 2;
+        console.warn(`[openai-fetch] Attempt ${attempt} rate limited (${response.status}). Retrying in ${retryMs}ms…`);
+        await new Promise((resolve) => setTimeout(resolve, retryMs));
+        continue;
+      }
+
+      const err = new Error(bodyText || `OpenAI request failed (${response.status})`);
+      err.responseStatus = response.status;
+      throw err;
     } catch (error) {
       lastError = error;
 
