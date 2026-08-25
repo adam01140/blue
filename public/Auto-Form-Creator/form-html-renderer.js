@@ -20,6 +20,83 @@
       .replace(/"/g, '&quot;');
   }
 
+  /** US states + DC — option values are 2-letter codes (PDF AcroForm dropdowns). */
+  const US_STATE_OPTIONS = [
+    { value: 'AL', label: 'Alabama' },
+    { value: 'AK', label: 'Alaska' },
+    { value: 'AZ', label: 'Arizona' },
+    { value: 'AR', label: 'Arkansas' },
+    { value: 'CA', label: 'California' },
+    { value: 'CO', label: 'Colorado' },
+    { value: 'CT', label: 'Connecticut' },
+    { value: 'DE', label: 'Delaware' },
+    { value: 'DC', label: 'District of Columbia' },
+    { value: 'FL', label: 'Florida' },
+    { value: 'GA', label: 'Georgia' },
+    { value: 'HI', label: 'Hawaii' },
+    { value: 'ID', label: 'Idaho' },
+    { value: 'IL', label: 'Illinois' },
+    { value: 'IN', label: 'Indiana' },
+    { value: 'IA', label: 'Iowa' },
+    { value: 'KS', label: 'Kansas' },
+    { value: 'KY', label: 'Kentucky' },
+    { value: 'LA', label: 'Louisiana' },
+    { value: 'ME', label: 'Maine' },
+    { value: 'MD', label: 'Maryland' },
+    { value: 'MA', label: 'Massachusetts' },
+    { value: 'MI', label: 'Michigan' },
+    { value: 'MN', label: 'Minnesota' },
+    { value: 'MS', label: 'Mississippi' },
+    { value: 'MO', label: 'Missouri' },
+    { value: 'MT', label: 'Montana' },
+    { value: 'NE', label: 'Nebraska' },
+    { value: 'NV', label: 'Nevada' },
+    { value: 'NH', label: 'New Hampshire' },
+    { value: 'NJ', label: 'New Jersey' },
+    { value: 'NM', label: 'New Mexico' },
+    { value: 'NY', label: 'New York' },
+    { value: 'NC', label: 'North Carolina' },
+    { value: 'ND', label: 'North Dakota' },
+    { value: 'OH', label: 'Ohio' },
+    { value: 'OK', label: 'Oklahoma' },
+    { value: 'OR', label: 'Oregon' },
+    { value: 'PA', label: 'Pennsylvania' },
+    { value: 'RI', label: 'Rhode Island' },
+    { value: 'SC', label: 'South Carolina' },
+    { value: 'SD', label: 'South Dakota' },
+    { value: 'TN', label: 'Tennessee' },
+    { value: 'TX', label: 'Texas' },
+    { value: 'UT', label: 'Utah' },
+    { value: 'VT', label: 'Vermont' },
+    { value: 'VA', label: 'Virginia' },
+    { value: 'WA', label: 'Washington' },
+    { value: 'WV', label: 'West Virginia' },
+    { value: 'WI', label: 'Wisconsin' },
+    { value: 'WY', label: 'Wyoming' },
+  ];
+
+  function isUsStateField(field) {
+    if (!field) return false;
+    const nameId = String(field.nameId || '').trim().toLowerCase();
+    const label = String(field.label || '').trim().toLowerCase();
+    const placeholder = String(field.placeholder || '').trim().toLowerCase();
+    const combinePart = String(field.combinePart || '').trim().toLowerCase();
+    if (combinePart === 'state') return true;
+    if (nameId === 'state' || /(?:^|_)state$/.test(nameId)) return true;
+    if (label === 'state' || placeholder === 'state') return true;
+    return false;
+  }
+
+  function renderUsStateSelectHtml({ id, nameAttr, value, extraAttrs }) {
+    const selected = String(value || '').trim().toUpperCase();
+    const opts = US_STATE_OPTIONS.map((s) => {
+      const isSel = selected === s.value ? ' selected' : '';
+      return `<option value="${esc(s.value)}"${isSel}>${esc(s.label)}</option>`;
+    }).join('');
+    const idAttr = id ? ` id="${esc(id)}"` : '';
+    return `<select class="address-select address-select-state"${idAttr}${nameAttr || ''} data-field-label="State" required${extraAttrs || ''}><option value="" disabled${selected ? '' : ' selected'}>Choose a state</option>${opts}</select>`;
+  }
+
   function stripQuestionNumber(text) {
     return String(text ?? '').replace(/^\s*\d+[\.\)\:\-]\s*/, '');
   }
@@ -83,6 +160,7 @@
     }
     if (type === 'multipleTextboxes') {
       return (question.textboxes || []).map((tb) => {
+        if (!tb.nameId) return '';
         const primaryRef = tb.linkedToNameId || defaultPrimary;
         return `<input type="hidden" name="${esc(tb.nameId)}" id="${esc(tb.nameId)}"${linkedAttr(primaryRef)}>`;
       }).join('');
@@ -120,15 +198,6 @@
     return 'multiple';
   }
 
-  function deriveStateUiFieldId(pdfCombineInto, questionId) {
-    if (!pdfCombineInto) return `address_state_${questionId}`;
-    return String(pdfCombineInto)
-      .replace(/_zip_code$/i, '_state')
-      .replace(/_zip$/i, '_state')
-      .replace(/zip_code$/i, 'state')
-      || `address_state_${questionId}`;
-  }
-
   function renderInput(question, userProfile, devMode) {
     const type = question.type;
     const nameId = question.nameId;
@@ -152,7 +221,17 @@
     if (type === 'money') {
       return `<input type="number" step="0.01" class="address-input" id="${esc(nameId)}" name="${esc(nameId)}" value="${val}" placeholder="${esc(question.placeholder || '')}"${ap}${pk}${pd}${qid}>`;
     }
-    if (type === 'dropdown') {
+    if (type === 'dropdown' || (type === 'text' && isUsStateField(question))) {
+      if (isUsStateField(question)) {
+        const stateId = nameId || `state_${question.questionId}`;
+        const nameAttr = nameId ? ` name="${esc(nameId)}"` : '';
+        return renderUsStateSelectHtml({
+          id: stateId,
+          nameAttr,
+          value: val,
+          extraAttrs: `${ap}${pk}${pd}${qid}`,
+        });
+      }
       const gateId = nameId || `logic_gate_${question.questionId}`;
       const nameAttr = nameId ? ` name="${esc(nameId)}"` : '';
       const gateClass = nameId ? '' : ' logic-gate-select';
@@ -167,9 +246,13 @@
       }).join('');
       return `<select class="address-select${gateClass}" id="${esc(gateId)}"${nameAttr}${gateData}${ap}${pk}${pd}${qid}><option value="" disabled${val ? '' : ' selected'}>Select an option</option>${opts}</select>`;
     }
-    if (type === 'checkbox') {
+    if (type === 'checkbox' || type === 'radio') {
+      const inputType = type === 'radio' && !(question.options || []).every((opt) => opt.nameId)
+        ? 'radio'
+        : 'checkbox';
+      const groupName = inputType === 'radio' ? esc(nameId || `q${question.questionId}_radio`) : null;
       return (question.options || []).map((opt) => {
-        const optName = opt.nameId || nameId;
+        const optName = opt.nameId || nameId || groupName;
         const optVal = getAutofillValue(opt, userProfile);
         const expected = String(opt.value || opt.label).toLowerCase();
         const isChecked = optVal != null && String(optVal).trim() !== ''
@@ -181,7 +264,10 @@
         const optPd = opt.autopopulate?.profileDescription
           ? ` data-profile-description="${esc(opt.autopopulate.profileDescription)}"`
           : pd;
-        return `<label class="checkbox-option" style="display:block;margin:8px 0;"><input type="checkbox" name="${esc(optName)}" value="${esc(opt.value || opt.label)}"${checked}${optAp}${optPk}${optPd}> ${esc(opt.label)}</label>`;
+        const nameAttr = inputType === 'radio' && !opt.nameId
+          ? ` name="${groupName}"`
+          : ` name="${esc(optName)}"`;
+        return `<label class="checkbox-option" style="display:block;margin:8px 0;"><input type="${inputType}"${nameAttr} value="${esc(opt.value || opt.label)}"${checked}${optAp}${optPk}${optPd}> ${esc(opt.label)}</label>`;
       }).join('');
     }
     if (type === 'multipleTextboxes') {
@@ -196,16 +282,49 @@
         const placeholder = String(tb.placeholder || '').trim();
         const labelHtml = placeholder
           ? ''
-          : `<label for="${esc(tb.nameId || tb.pdfCombineInto || 'field')}">${esc(tb.label || tb.nameId)}</label>`;
+          : `<label for="${esc(tb.nameId || 'field')}">${esc(tb.label || tb.nameId)}</label>`;
+        const combinePart = tb.combinePart || '';
         const combineInto = tb.pdfCombineInto
-          ? ` data-pdf-combine-into="${esc(tb.pdfCombineInto)}" data-address-part="state"`
+          ? ` data-pdf-combine-into="${esc(tb.pdfCombineInto)}" data-combine-part="${esc(combinePart)}" data-combine-order="${esc(tb.combineOrder ?? 0)}" data-combine-label="${esc(tb.label || placeholder || combinePart)}"`
           : '';
-        const fieldId = tb.nameId || deriveStateUiFieldId(tb.pdfCombineInto, question.questionId);
+        const partSlug = combinePart || String(tb.label || placeholder || 'part').toLowerCase().replace(/\s+/g, '_');
+        const fieldId = tb.nameId || `q${question.questionId}_${partSlug}`;
         const nameAttr = tb.nameId
           ? ` id="${esc(tb.nameId)}" name="${esc(tb.nameId)}"`
-          : ` id="${esc(fieldId)}" data-address-ui="state"`;
+          : ` id="${esc(fieldId)}"`;
+        if (isUsStateField(tb)) {
+          const stateSelect = renderUsStateSelectHtml({
+            id: tb.nameId || fieldId,
+            nameAttr: tb.nameId ? ` name="${esc(tb.nameId)}"` : '',
+            value: tbVal,
+            extraAttrs: `${combineInto}${tbAp}${tbPk}${tbPd}`,
+          });
+          return `<div class="address-field textbox-group">${labelHtml}${stateSelect}${tbBadge}</div>`;
+        }
         return `<div class="address-field textbox-group">${labelHtml}<input type="text" class="address-input"${nameAttr} value="${tbVal}" placeholder="${esc(placeholder)}"${combineInto}${tbAp}${tbPk}${tbPd}>${tbBadge}</div>`;
       }).join('');
+    }
+    if (question.pdfCombineInto) {
+      const combineId = question.nameId || `${question.pdfCombineInto}_${question.combinePart || question.questionId}`;
+      const combineAttr = ` data-pdf-combine-into="${esc(question.pdfCombineInto)}" data-combine-part="${esc(question.combinePart || '')}" data-combine-order="${esc(question.combineOrder ?? 0)}"`;
+      const nameAttr = question.nameId ? ` name="${esc(question.nameId)}"` : '';
+      if (isUsStateField(question)) {
+        return renderUsStateSelectHtml({
+          id: combineId,
+          nameAttr,
+          value: val,
+          extraAttrs: `${combineAttr}${ap}${pk}${pd}${qid}`,
+        });
+      }
+      return `<input type="text" class="address-input" id="${esc(combineId)}"${nameAttr} value="${val}" placeholder="${esc(question.placeholder || '')}"${combineAttr}${ap}${pk}${pd}${qid}>`;
+    }
+    if (isUsStateField(question)) {
+      return renderUsStateSelectHtml({
+        id: nameId,
+        nameAttr: ` name="${esc(nameId)}"`,
+        value: val,
+        extraAttrs: `${ap}${pk}${pd}${qid}`,
+      });
     }
     return `<input type="text" class="address-input" id="${esc(nameId)}" name="${esc(nameId)}" value="${val}" placeholder="${esc(question.placeholder || '')}"${ap}${pk}${pd}${qid}>`;
   }
@@ -798,12 +917,35 @@
       values[el.name] = value;
     });
 
+    var combineGroups = {};
     form.querySelectorAll('[data-pdf-combine-into]').forEach(function(el) {
       var target = el.getAttribute('data-pdf-combine-into');
       if (!target) return;
-      var statePart = fieldValue(el);
-      var zipPart = values[target] != null ? String(values[target]) : '';
-      var merged = mergeStateZipParts(statePart, zipPart);
+      if (!combineGroups[target]) combineGroups[target] = [];
+      combineGroups[target].push({
+        el: el,
+        value: fieldValue(el),
+        order: parseInt(el.getAttribute('data-combine-order') || '0', 10) || 0,
+        part: el.getAttribute('data-combine-part') || '',
+        ownsTarget: el.name === target
+      });
+    });
+
+    Object.keys(combineGroups).forEach(function(target) {
+      var parts = combineGroups[target]
+        .sort(function(a, b) { return a.order - b.order; })
+        .map(function(item) { return String(item.value || '').trim(); })
+        .filter(Boolean);
+      if (!parts.length) return;
+
+      var hasTargetPart = combineGroups[target].some(function(item) { return item.ownsTarget; });
+      var merged = '';
+      if (hasTargetPart) {
+        merged = parts.join(' ').replace(/\s+/g, ' ').trim();
+      } else {
+        var existingPart = values[target] != null ? String(values[target]) : '';
+        merged = mergeStateZipParts(parts.join(' '), existingPart);
+      }
       if (merged !== '') values[target] = merged;
     });
 
@@ -1127,6 +1269,134 @@
       if (field && field.newName === nameId && field.label) return field.label;
     }
     return '';
+  }
+
+  function findFieldConfigEntry(nameId) {
+    if (!nameId || !fieldConfig || !Array.isArray(fieldConfig.fields)) return null;
+    for (var fi = 0; fi < fieldConfig.fields.length; fi += 1) {
+      var field = fieldConfig.fields[fi];
+      if (field && field.newName === nameId) return field;
+    }
+    return null;
+  }
+
+  function ensureFieldMapPopupStyles() {
+    if (document.getElementById('autoFormFieldMapPopupStyles')) return;
+    var style = document.createElement('style');
+    style.id = 'autoFormFieldMapPopupStyles';
+    style.textContent = [
+      '#autoFormFieldMapPopup{position:fixed;z-index:10080;min-width:240px;max-width:min(420px,92vw);padding:12px 14px;border:1px solid #c9d4e4;border-radius:12px;background:#fff;box-shadow:0 14px 40px rgba(20,32,51,.22);font:500 13px/1.45 system-ui,sans-serif;color:#142033}',
+      '#autoFormFieldMapPopup[hidden]{display:none!important}',
+      '#autoFormFieldMapPopup .af-map-title{margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#3d4f6a}',
+      '#autoFormFieldMapPopup .af-map-row{display:grid;gap:2px;margin:0 0 10px}',
+      '#autoFormFieldMapPopup .af-map-row:last-child{margin-bottom:0}',
+      '#autoFormFieldMapPopup .af-map-label{font-size:11px;font-weight:600;color:#6b7c93}',
+      '#autoFormFieldMapPopup .af-map-value{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;word-break:break-all;color:#142033}',
+      '#autoFormFieldMapPopup .af-map-hint{margin:10px 0 0;font-size:11px;color:#6b7c93}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function getOrCreateFieldMapPopup() {
+    ensureFieldMapPopupStyles();
+    var popup = document.getElementById('autoFormFieldMapPopup');
+    if (popup) return popup;
+    popup = document.createElement('div');
+    popup.id = 'autoFormFieldMapPopup';
+    popup.hidden = true;
+    popup.setAttribute('role', 'dialog');
+    popup.setAttribute('aria-label', 'Field mapping');
+    document.body.appendChild(popup);
+    return popup;
+  }
+
+  function hideFieldMapPopup() {
+    var popup = document.getElementById('autoFormFieldMapPopup');
+    if (popup) popup.hidden = true;
+  }
+
+  function resolveHtmlFieldName(el) {
+    if (!el) return '';
+    if (el.getAttribute('data-combine-label')) return el.getAttribute('data-combine-label');
+    if (el.getAttribute('data-field-label')) return el.getAttribute('data-field-label');
+    if (el.getAttribute('placeholder')) return el.getAttribute('placeholder');
+    return el.getAttribute('name') || el.id || '';
+  }
+
+  function resolvePdfTargetNameId(el) {
+    if (!el) return '';
+    var combine = el.getAttribute('data-pdf-combine-into');
+    if (combine) return combine;
+    return el.getAttribute('name') || el.id || '';
+  }
+
+  function showFieldMapPopup(el, clientX, clientY) {
+    if (!el) return;
+    var combine = el.getAttribute('data-pdf-combine-into');
+    var combinePart = el.getAttribute('data-combine-part') || '';
+    var htmlName = resolveHtmlFieldName(el);
+    var pdfNameId = resolvePdfTargetNameId(el);
+    var entry = pdfNameId ? findFieldConfigEntry(pdfNameId) : null;
+    var pdfFieldName = (entry && entry.newName) || pdfNameId || '(unknown)';
+    var originalPdfId = entry && entry.id && entry.id !== pdfFieldName ? entry.id : '';
+    var pdfLabel = entry && entry.label ? entry.label : '';
+    var combineNote = combine
+      ? 'Merges with other parts into PDF field "' + combine + '"' + (combinePart ? ' (this part: ' + combinePart + ')' : '')
+      : '';
+
+    var popup = getOrCreateFieldMapPopup();
+    popup.innerHTML =
+      '<div class="af-map-title">Field mapping</div>' +
+      '<div class="af-map-row"><div class="af-map-label">HTML field</div><div class="af-map-value">' +
+        String(htmlName || '(unnamed)').replace(/</g, '&lt;') + '</div></div>' +
+      '<div class="af-map-row"><div class="af-map-label">PDF field</div><div class="af-map-value">' +
+        String(pdfFieldName).replace(/</g, '&lt;') + '</div></div>' +
+      (pdfLabel
+        ? '<div class="af-map-row"><div class="af-map-label">PDF label</div><div class="af-map-value">' +
+          String(pdfLabel).replace(/</g, '&lt;') + '</div></div>'
+        : '') +
+      (originalPdfId
+        ? '<div class="af-map-row"><div class="af-map-label">Original AcroForm id</div><div class="af-map-value">' +
+          String(originalPdfId).replace(/</g, '&lt;') + '</div></div>'
+        : '') +
+      (combineNote
+        ? '<div class="af-map-hint">' + String(combineNote).replace(/</g, '&lt;') + '</div>'
+        : '') +
+      '<div class="af-map-hint">Double-click a field to inspect its mapping. Click elsewhere to close.</div>';
+
+    popup.hidden = false;
+    var pad = 12;
+    var left = Math.max(pad, Math.min(clientX + 8, window.innerWidth - popup.offsetWidth - pad));
+    var top = Math.max(pad, Math.min(clientY + 8, window.innerHeight - popup.offsetHeight - pad));
+    popup.style.left = left + 'px';
+    popup.style.top = top + 'px';
+  }
+
+  function wireFieldMappingPopup() {
+    if (window.__fieldMapPopupWired) return;
+    window.__fieldMapPopupWired = true;
+
+    document.addEventListener('dblclick', function(event) {
+      var target = event.target;
+      if (!target || !target.closest) return;
+      var field = target.closest('input, textarea, select');
+      if (!field) return;
+      if (field.type === 'hidden' || field.type === 'submit' || field.type === 'button') return;
+      if (!field.closest('#customForm, .question-container, form')) return;
+      event.preventDefault();
+      showFieldMapPopup(field, event.clientX, event.clientY);
+    }, true);
+
+    document.addEventListener('click', function(event) {
+      var popup = document.getElementById('autoFormFieldMapPopup');
+      if (!popup || popup.hidden) return;
+      if (popup.contains(event.target)) return;
+      hideFieldMapPopup();
+    }, true);
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') hideFieldMapPopup();
+    }, true);
   }
 
   function openHelpModal(question) {
@@ -1601,6 +1871,7 @@
     wireLinkedFields();
     wireConditionalLogic();
     wireDemoFillShortcut();
+    wireFieldMappingPopup();
     refreshAllQuestionNav();
     wireQuestionInfoIcons();
     wireHelpMeAnswer();

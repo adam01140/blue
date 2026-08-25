@@ -33,19 +33,33 @@ function stripNameIdPrefixes(nameId) {
     .replace(/(_copy|_repeat|_duplicate|_sig|_signature|_\d+)$/, '');
 }
 
+function inferOwnershipDomain(nameId, label = '', questionText = '') {
+  const blob = `${nameId || ''} ${label || ''} ${questionText || ''}`.toLowerCase();
+  if (/employer/.test(blob)) return 'employer';
+  if (/agency|contributing|ori|mail.?code|billing/.test(blob) && !/applicant|home/.test(blob)) {
+    return 'agency';
+  }
+  if (/applicant|home_|your /.test(blob)) return 'applicant';
+  const prefix = String(nameId || '').match(/^(agency|applicant|employer|authorized)_/i);
+  if (prefix) return prefix[1].toLowerCase();
+  return 'general';
+}
+
 function inferSemanticKey(nameId, label, questionText, profileKey) {
+  const domain = inferOwnershipDomain(nameId, label, questionText);
+
   if (profileKey && String(profileKey).trim()) {
-    return `profile:${String(profileKey).trim().toLowerCase()}`;
+    return `${domain}:profile:${String(profileKey).trim().toLowerCase()}`;
   }
 
   const haystack = `${nameId} ${label} ${questionText}`;
   for (const pattern of SEMANTIC_PATTERNS) {
-    if (pattern.re.test(haystack)) return `semantic:${pattern.key}`;
+    if (pattern.re.test(haystack)) return `${domain}:semantic:${pattern.key}`;
   }
 
   const stripped = stripNameIdPrefixes(nameId);
-  if (stripped) return `nameid:${stripped}`;
-  return `nameid:${String(nameId || '').toLowerCase()}`;
+  if (stripped) return `${domain}:nameid:${stripped}`;
+  return `${domain}:nameid:${String(nameId || '').toLowerCase()}`;
 }
 
 function collectQuestionNameIds(question) {

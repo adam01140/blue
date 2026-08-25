@@ -169,6 +169,13 @@ function auditFormConfig(formConfig, fieldConfig, extraction) {
   failures.push(...quality.failures);
   warnings.push(...quality.warnings);
 
+  const { validatePdfCombineRules } = require('../form-config-quality');
+  const combineAudit = validatePdfCombineRules(formConfig, fieldConfig);
+  failures.push(...combineAudit.failures);
+
+  const { validateAddressStateMapping } = require('../form-config-quality');
+  failures.push(...validateAddressStateMapping(formConfig, fieldConfig).failures);
+
   if ((formConfig.sections || []).length < 1) {
     failures.push(`No sections in form_config`);
   }
@@ -211,6 +218,21 @@ function auditHtml(html, formConfig, fieldConfig) {
     if (!html.includes(q.nameId)) {
       warnings.push(`Question nameId "${q.nameId}" not found as literal in HTML`);
     }
+  }
+
+  if (/data-ui-only="true"/i.test(html)) {
+    failures.push('HTML contains data-ui-only fields (State must pdfCombineInto zip instead)');
+  }
+  for (const m of html.matchAll(/placeholder="State"[^>]*>/gi)) {
+    if (!/data-pdf-combine-into=/i.test(m[0])) {
+      failures.push('HTML State input missing data-pdf-combine-into');
+    }
+    if (/data-ui-only="true"/i.test(m[0])) {
+      failures.push('HTML State input is UI-only dead field');
+    }
+  }
+  if (/\(none — UI-only\)/.test(html)) {
+    failures.push('HTML mapping popup still shows UI-only dead field copy');
   }
 
   return { failures, warnings, inputCount: htmlIds.size, questionTextCount: questionTexts.length };

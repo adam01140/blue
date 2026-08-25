@@ -125,8 +125,11 @@ RULE 3 — FIELD IDS
 RULE 4 — FIELD TYPE
 ================================================================================
 
-  - type: "text" for every field listed in textFields
+  - type: "text" for ordinary textFields entries
   - type: "checkbox" for every field listed in checkboxFields
+  - type: "dropdown" when structuredFields.type is "dropdown" OR textFields[].fieldType
+    is "dropdown" (common: State combo boxes between City and ZIP on Live Scan forms).
+    Prefer newName ending in _state for address State dropdowns.
 
 
 ================================================================================
@@ -157,7 +160,10 @@ Disambiguate repeated patterns using context:
 ADDRESS / ZIP FIELDS:
   - NEVER merge state and zip into one newName like agency_state_zip_code or applicant_home_state_zip_code.
   - Each PDF zip widget gets its own newName ending in _zip_code (e.g. agency_zip_code, applicant_home_zip_code).
-  - If the PDF prints "State ZIP Code" beside a single text widget, that widget is still only the zip field.
+  - If the PDF has a separate State dropdown/combo between City and ZIP (e.g. DropDownList1),
+    map it as its own field with type "dropdown" and a *_state newName.
+  - If the PDF prints "State ZIP Code" beside a single text widget with NO separate State
+    control, that widget is only the zip field.
     Name it *_zip_code with label "ZIP Code". Step 6 adds a separate State UI box (no PDF nameId).
   - Only create a separate *_state newName when the PDF has its own distinct state AcroForm field.
   - Never put the substring "zip" inside a state-only field name.

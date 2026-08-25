@@ -59,6 +59,8 @@ const app = express();
 const AUTO_FORM_BODY_LIMIT = '50mb';
 app.use('/api/auto-form', bodyParser.json({ limit: AUTO_FORM_BODY_LIMIT }));
 app.use('/api/auto-form', bodyParser.urlencoded({ extended: true, limit: AUTO_FORM_BODY_LIMIT }));
+app.use('/api/demo-hub', bodyParser.json({ limit: AUTO_FORM_BODY_LIMIT }));
+app.use('/api/demo-hub', bodyParser.urlencoded({ extended: true, limit: AUTO_FORM_BODY_LIMIT }));
 app.use('/api/generate-field-config', bodyParser.json({ limit: AUTO_FORM_BODY_LIMIT }));
 app.use('/api/generate-form-config', bodyParser.json({ limit: AUTO_FORM_BODY_LIMIT }));
 app.use('/api/generate-form-html', bodyParser.json({ limit: AUTO_FORM_BODY_LIMIT }));
@@ -108,6 +110,8 @@ try {
 // Static files
 // ────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/vendor/pdfjs', express.static(path.join(__dirname, 'node_modules', 'pdfjs-dist', 'build')));
+app.use('/vendor/pdfjs-legacy', express.static(path.join(__dirname, 'node_modules', 'pdfjs-dist', 'legacy', 'build')));
 
 // ────────────────────────────────────────────────────────────
 // Routes
@@ -194,7 +198,7 @@ const { handleSanitizePdf } = require('./pdf-field-sanitizer');
 const { createHandleGenerateFormConfig } = require('./form-config-generator');
 const { createHandleGenerateFormHtml } = require('./form-html-generator');
 const { enrichFormConfigAutopopulate } = require('./form-autopopulate');
-const { handleStoreAutoFormPdf, handleFillAutoFormPdf, rehydratePdfStore } = require('./auto-form-pdf-handler');
+const { handleStoreAutoFormPdf, handleFillAutoFormPdf, handleDemoHubFillPdf, rehydratePdfStore } = require('./auto-form-pdf-handler');
 const { createHandlePublishAutoForm } = require('./auto-form-publish-handler');
 const { createHandleSaveCurrentData } = require('./auto-form-current-data');
 const { createHandleHelpAnswer } = require('./auto-form-help-handler');
@@ -225,6 +229,7 @@ app.post('/api/enrich-autopopulate', (req, res) => {
 
 app.post('/api/auto-form/store-pdf', handleStoreAutoFormPdf);
 app.post('/api/auto-form/fill-pdf/:pdfToken', handleFillAutoFormPdf);
+app.post('/api/demo-hub/fill-pdf/:slug', handleDemoHubFillPdf);
 app.post('/api/auto-form/publish', createHandlePublishAutoForm(db));
 app.post('/api/auto-form/save-current-data', createHandleSaveCurrentData());
 app.post('/api/auto-form/help-answer', createHandleHelpAnswer(OPENAI_API_KEY));

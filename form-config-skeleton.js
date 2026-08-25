@@ -436,10 +436,9 @@ function ensureMinimumSections(formConfig, minCount = 2) {
     chunks.push(questions.slice(i, i + splitAt));
   }
 
-  const defaultNames = ['Agency', 'Applicant', 'Employer', 'Service', 'Other'];
   formConfig.sections = chunks.map((chunk, idx) => ({
     sectionId: idx + 1,
-    sectionName: defaultNames[idx] || `Section ${idx + 1}`,
+    sectionName: `Section ${idx + 1}`,
     questions: chunk,
   }));
 

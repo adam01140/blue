@@ -5,8 +5,6 @@
 
 const { isOperatorField } = require('./field-name-canonicalizer');
 
-const DOMAIN_ORDER = ['Agency', 'Applicant', 'Employer', 'Service', 'Operator', 'Legal'];
-
 function inferFieldDomain(field) {
   const id = String(field?.id || '').toLowerCase();
   const name = String(field?.newName || '').toLowerCase();
@@ -108,35 +106,6 @@ function getDomainWording(domain) {
   }
 }
 
-function groupFieldsByDomain(orderedFields) {
-  const buckets = new Map();
-  for (const entry of orderedFields) {
-    const domain = inferFieldDomain(entry.field);
-    if (!buckets.has(domain)) buckets.set(domain, []);
-    buckets.get(domain).push(entry);
-  }
-  return buckets;
-}
-
-function mergeDomainBuckets(buckets) {
-  const sections = new Map();
-
-  const addTo = (name, items) => {
-    if (!items?.length) return;
-    if (!sections.has(name)) sections.set(name, []);
-    sections.get(name).push(...items);
-  };
-
-  addTo('Agency', buckets.get('Agency'));
-  addTo('Applicant', buckets.get('Applicant'));
-  addTo('Applicant', buckets.get('Service'));
-  addTo('Applicant', buckets.get('Legal'));
-  addTo('Employer', buckets.get('Employer'));
-  addTo('Agency', buckets.get('Operator'));
-
-  return sections;
-}
-
 function splitItemsIntoSections(items, names) {
   const chunks = [];
   const count = Math.min(Math.max(names.length, 2), 3);
@@ -157,65 +126,28 @@ function splitItemsIntoSections(items, names) {
 }
 
 function planFormSections(orderedFields) {
-  const buckets = groupFieldsByDomain(orderedFields);
-  let sections = mergeDomainBuckets(buckets);
+  if (!orderedFields?.length) return new Map();
 
-  const nonEmpty = [...sections.entries()].filter(([, items]) => items.length > 0);
-
-  if (nonEmpty.length === 0) {
-    return new Map([['General', orderedFields]]);
+  // Prefer section boundaries extracted from the PDF itself. This is document-driven,
+  // not tied to any known form family.
+  const hinted = new Map();
+  for (const entry of orderedFields) {
+    const hint = String(entry?.context?.sectionHint || '').trim();
+    if (!hint || /^general$/i.test(hint)) continue;
+    if (!hinted.has(hint)) hinted.set(hint, []);
+    hinted.get(hint).push(entry);
   }
+  if (hinted.size >= 2) return hinted;
 
-  if (nonEmpty.length === 1) {
-    const [name, items] = nonEmpty[0];
-    const domains = [...new Set(items.map((e) => inferFieldDomain(e.field)))];
-    if (domains.length >= 2) {
-      const rebuilt = new Map();
-      for (const domain of DOMAIN_ORDER) {
-        const slice = items.filter((e) => inferFieldDomain(e.field) === domain);
-        if (!slice.length) continue;
-        const sectionName = domain === 'Service' || domain === 'Legal' ? 'Applicant' : domain;
-        if (!rebuilt.has(sectionName)) rebuilt.set(sectionName, []);
-        rebuilt.get(sectionName).push(...slice);
-      }
-      sections = rebuilt;
-    } else {
-      const defaultNames = name === 'Agency'
-        ? ['Agency', 'Applicant', 'Employer']
-        : ['Applicant', 'Employer', 'Other'];
-      return splitItemsIntoSections(items, defaultNames);
-    }
-  }
-
-  if (sections.size > 4) {
-    const operator = sections.get('Agency')?.filter((e) => inferFieldDomain(e.field) === 'Operator') || [];
-    const agency = sections.get('Agency')?.filter((e) => inferFieldDomain(e.field) !== 'Operator') || [];
-    sections.set('Agency', agency);
-    if (operator.length) sections.set('Agency', [...(sections.get('Agency') || []), ...operator]);
-  }
-
-  const ordered = new Map();
-  for (const name of ['Agency', 'Applicant', 'Employer']) {
-    if (sections.has(name) && sections.get(name).length) {
-      ordered.set(name, sections.get(name));
-    }
-  }
-  for (const [name, items] of sections.entries()) {
-    if (!ordered.has(name) && items.length) ordered.set(name, items);
-  }
-
-  if (ordered.size < 2 && orderedFields.length >= 2) {
-    const all = orderedFields;
-    return splitItemsIntoSections(all, ['Agency', 'Applicant']);
-  }
-
-  return ordered;
+  // If the PDF has no useful headings, preserve document order and split evenly.
+  // Later quality code derives each title from that chunk's own field labels.
+  const targetCount = orderedFields.length >= 12 ? 3 : 2;
+  const names = Array.from({ length: targetCount }, (_, idx) => `Section ${idx + 1}`);
+  return splitItemsIntoSections(orderedFields, names);
 }
 
 module.exports = {
-  DOMAIN_ORDER,
   inferFieldDomain,
   getDomainWording,
-  groupFieldsByDomain,
   planFormSections,
 };

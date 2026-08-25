@@ -94,8 +94,15 @@ function isFillableCheckboxField(annotation) {
   return annotation.fieldType === 'Btn' && annotation.checkBox === true;
 }
 
+function isFillableDropdownField(annotation) {
+  // PDF.js: choice widgets (list/combo) use fieldType "Ch"
+  return annotation.fieldType === 'Ch';
+}
+
 function isExtractableFormField(annotation) {
-  return annotation.fieldType === 'Tx' || isFillableCheckboxField(annotation);
+  return annotation.fieldType === 'Tx'
+    || isFillableCheckboxField(annotation)
+    || isFillableDropdownField(annotation);
 }
 
 function findNearestLabel(field, lines) {
@@ -226,6 +233,7 @@ async function extractPdfFormFieldsFromPath(pdfPath) {
         type: 'field',
         fieldType: a.fieldType,
         isCheckbox: isFillableCheckboxField(a),
+        isDropdown: isFillableDropdownField(a),
         xStart: (a.rect[0] + a.rect[2]) / 2,
         xEnd: (a.rect[0] + a.rect[2]) / 2,
         centerY: (a.rect[1] + a.rect[3]) / 2,
@@ -241,13 +249,14 @@ async function extractPdfFormFieldsFromPath(pdfPath) {
       );
 
       field.text = field.isCheckbox ? `{{${field.name}}}` : `[[${field.name}]]`;
-      const nearestLabel = findNearestLabel(field, lines);
+      const nearestLabel = findNearestLabel(field, lines)
+        || (field.isDropdown ? 'State' : '');
       const sectionHint = sectionHintForField(field.centerY, pageSectionHeaders);
 
       structuredFields.push({
         id: field.name,
         name: field.name,
-        type: field.isCheckbox ? 'checkbox' : 'text',
+        type: field.isCheckbox ? 'checkbox' : (field.isDropdown ? 'dropdown' : 'text'),
         page: pageNum,
         position: { x: Math.round(field.xStart), y: Math.round(field.centerY) },
         nearestLabel: nearestLabel || null,
@@ -264,7 +273,10 @@ async function extractPdfFormFieldsFromPath(pdfPath) {
       };
 
       if (field.isCheckbox) checkboxFields.push(enriched);
-      else textFields.push(enriched);
+      else if (field.isDropdown) {
+        // Dropdowns travel with textFields for count/coverage; type is on structuredFields.
+        textFields.push({ ...enriched, fieldType: 'dropdown' });
+      } else textFields.push(enriched);
 
       closestLine.items.push(field);
     });
@@ -307,12 +319,24 @@ async function extractPdfFormFieldsFromPath(pdfPath) {
     .map((pageText, idx) => `--- PAGE ${idx + 1} ---\n${pageText}`)
     .join('\n\n');
 
+  // AcroForm fields can have multiple widgets (same name on different pages). Map each
+  // unique field name once — pdf-lib fill/rename operates on the field, not per widget.
+  function dedupeByName(list, keyFn) {
+    const seen = new Set();
+    return list.filter((item) => {
+      const key = keyFn(item);
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
   return {
     fullContentHtml: allPagesContent.join('<div class="page-break"></div>'),
     extractedDocumentContent,
-    textFields,
-    checkboxFields,
-    structuredFields,
+    textFields: dedupeByName(textFields, (f) => f.name),
+    checkboxFields: dedupeByName(checkboxFields, (f) => f.name),
+    structuredFields: dedupeByName(structuredFields, (f) => f.id || f.name),
   };
 }
 

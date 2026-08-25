@@ -195,6 +195,64 @@ async function handleFillAutoFormPdf(req, res) {
   }
 }
 
+const DEMO_HUB_FORMS_DIR = path.join(
+  __dirname,
+  'public',
+  'Auto-Form-Creator',
+  'Demo_form_hub',
+  'forms'
+);
+
+function remapBodyToPdfFieldNames(body, fieldConfig) {
+  const out = { ...(body || {}) };
+  for (const field of fieldConfig?.fields || []) {
+    if (!field?.id || !field?.newName) continue;
+    if (body[field.newName] !== undefined && body[field.newName] !== null && body[field.newName] !== '') {
+      out[field.id] = body[field.newName];
+    }
+    // Also map when the client already sent the PDF field id.
+    if (body[field.id] !== undefined && body[field.id] !== null && body[field.id] !== '') {
+      out[field.id] = body[field.id];
+    }
+  }
+  return out;
+}
+
+async function handleDemoHubFillPdf(req, res) {
+  try {
+    const slug = String(req.params.slug || '').replace(/[^a-zA-Z0-9_-]/g, '');
+    if (!slug) {
+      return res.status(400).json({ success: false, error: 'Form slug is required' });
+    }
+
+    const formDir = path.join(DEMO_HUB_FORMS_DIR, slug);
+    const pdfPath = path.join(formDir, 'source.pdf');
+    const fieldConfigPath = path.join(formDir, 'field_config.json');
+    if (!fs.existsSync(pdfPath)) {
+      return res.status(404).json({ success: false, error: `No source.pdf for hub form "${slug}"` });
+    }
+    if (!fs.existsSync(fieldConfigPath)) {
+      return res.status(404).json({ success: false, error: `No field_config.json for hub form "${slug}"` });
+    }
+
+    const fieldConfig = JSON.parse(fs.readFileSync(fieldConfigPath, 'utf8'));
+    const pdfBytes = fs.readFileSync(pdfPath);
+    const mappedBody = remapBodyToPdfFieldNames(req.body || {}, fieldConfig);
+    const filled = await fillPdfForm(pdfBytes, mappedBody);
+
+    res
+      .set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `inline; filename="filled_${slug}.pdf"`,
+        'Cache-Control': 'no-store',
+      })
+      .send(Buffer.from(filled));
+  } catch (error) {
+    console.error('[demo-hub/fill-pdf] Error:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to fill hub PDF' });
+  }
+}
+
 function getPdfEntry(pdfToken) {
   if (!pdfToken) return null;
   cleanupExpiredPdfs();
@@ -223,6 +281,7 @@ function getPdfEntry(pdfToken) {
 module.exports = {
   handleStoreAutoFormPdf,
   handleFillAutoFormPdf,
+  handleDemoHubFillPdf,
   getPdfEntry,
   rehydratePdfStore,
   registerPdfEntry,

@@ -39,8 +39,14 @@
         return annotation.fieldType === 'Btn' && annotation.checkBox === true;
     }
 
+    function isFillableDropdownField(annotation) {
+        return annotation.fieldType === 'Ch';
+    }
+
     function isExtractableFormField(annotation) {
-        return annotation.fieldType === 'Tx' || isFillableCheckboxField(annotation);
+        return annotation.fieldType === 'Tx'
+            || isFillableCheckboxField(annotation)
+            || isFillableDropdownField(annotation);
     }
 
     function sanitizeLabelText(raw) {
@@ -228,6 +234,7 @@
                     type: 'field',
                     fieldType: a.fieldType,
                     isCheckbox: isFillableCheckboxField(a),
+                    isDropdown: isFillableDropdownField(a),
                     xStart: (a.rect[0] + a.rect[2]) / 2,
                     xEnd: (a.rect[0] + a.rect[2]) / 2,
                     centerY: (a.rect[1] + a.rect[3]) / 2,
@@ -242,13 +249,14 @@
                 , lines[0] || { y: field.centerY, items: [] });
 
                 field.text = field.isCheckbox ? `{{${field.name}}}` : `[[${field.name}]]`;
-                const nearestLabel = findNearestLabel(field, lines);
+                const nearestLabel = findNearestLabel(field, lines)
+                    || (field.isDropdown ? 'State' : '');
                 const sectionHint = sectionHintForField(field.centerY, pageSectionHeaders);
 
                 const structuredEntry = {
                     id: field.name,
                     name: field.name,
-                    type: field.isCheckbox ? 'checkbox' : 'text',
+                    type: field.isCheckbox ? 'checkbox' : (field.isDropdown ? 'dropdown' : 'text'),
                     page: pageNum,
                     position: { x: Math.round(field.xStart), y: Math.round(field.centerY) },
                     nearestLabel: nearestLabel || null,
@@ -267,6 +275,8 @@
 
                 if (field.isCheckbox) {
                     checkboxFields.push(enriched);
+                } else if (field.isDropdown) {
+                    textFields.push({ ...enriched, fieldType: 'dropdown' });
                 } else {
                     textFields.push(enriched);
                 }

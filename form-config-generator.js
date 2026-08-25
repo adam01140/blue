@@ -17,11 +17,13 @@ const { inferFieldDomain } = require('./field-domain');
 const {
   trustedStructuredContext,
   validateQuestionTextQuality,
-  applyDomainSectionTitles,
+  qualityFailuresToReviewIssues,
 } = require('./form-config-quality');
 
 const FORM_CONFIG_MODEL = process.env.FORM_CONFIG_MODEL || 'gpt-4.1';
 const FORM_CONFIG_POLISH_MODEL = process.env.FORM_CONFIG_POLISH_MODEL || 'gpt-4.1';
+const FORM_CONFIG_REVIEW_MODEL = process.env.FORM_CONFIG_REVIEW_MODEL || 'gpt-4.1';
+const FORM_CONFIG_SKIP_REVIEW = /^(1|true|yes)$/i.test(String(process.env.FORM_CONFIG_SKIP_REVIEW || ''));
 
 const POLISH_SECTION_PROMPT = `You improve ONLY the "explanation" field on survey questions for government/legal forms.
 
@@ -35,6 +37,87 @@ You receive PDF page images for context. Write clear explanations that state WHO
 Each explanation must be at least one full sentence (minimum 12 words) and disambiguate common confusion (e.g. agency address vs home address).
 
 Return ONLY the section JSON object with updated explanations.`;
+
+const FORM_CONFIG_REVIEW_PROMPT = `You are a strict UX + mapping reviewer for Auto Form Creator.
+
+You receive:
+1) field_config (each entry is ONE real PDF widget with newName/label/type)
+2) a generated form_config (online questions mapped to those widgets)
+3) PDF page images (USE THESE — printed labels often show concepts that are not separate AcroForm widgets)
+
+Your job: find problems a first-time user or engineer would catch. Be specific and actionable.
+You are the safety net after the author model. Prefer severity "error" for clear defects
+visible on the PDF or broken mapping — do not rubber-stamp incomplete address UX.
+
+HARD CONSTRAINTS (do NOT violate):
+- You may NOT invent PDF fields / new nameIds. If field_config has one widget for
+  "First name and middle initial", keeping ONE question for that nameId OR splitting into
+  UI-only parts that pdfCombineInto that SAME nameId is CORRECT.
+- Every field_config.newName must remain covered exactly once.
+- Do not recommend dropping required fields.
+
+LOOK FOR (and report as issues):
+- Awkward / instruction-like / duplicate / vague question text
+- Separate field_config entries wrongly merged into one question (when each has its own newName)
+- Address blocks: compare PDF printed labels to the online multipleTextboxes.
+  ERROR if the PDF shows State (or "State ZIP") but the online question has no State control.
+  Fix: add State textbox with nameId null, pdfCombineInto = family's zip newName,
+  combinePart "state", combineOrder 0; ZIP keeps nameId on the zip widget.
+  ERROR if State has no nameId AND no pdfCombineInto — that is a dead field that never
+  writes to the PDF (no "UI-only" State).
+  ERROR if State has a fake nameId not in field_config.
+- ERROR if a UI-only pdfCombineInto target is unrelated (e.g. priority → account_id).
+  VALID: middle_initial → first_name_and_middle_initial.
+  VALID: State → agency_zip_code when PDF prints State but AcroForm only has the zip widget.
+- Checkbox groups that should be one question with options, but were split into many questions
+- Missing or vague conditional gates; follow-ups that should be gated on a checkbox option
+- Presence-optional identity facts shown unconditionally (business/disregarded entity name, DBA,
+  spouse/dependent names, aliases) — these MUST sit behind a Yes/No "Do you have…?" gate
+- Duplicate section titles (every sectionName must be unique and distinct — never three
+  "Applicant Information" steppers)
+- Wrong WHO ownership (agency vs applicant vs employer)
+- Section titles that are vague ("Additional", "Other") or too long
+- Explanations that are empty, fragments, or copy the question
+- pdfCombineInto misused for unrelated fields (only allowed when splitting one real PDF widget
+  into semantic UI parts that merge back into that same widget)
+
+Return ONLY JSON:
+{
+  "ok": boolean,
+  "summary": "1-2 sentence verdict",
+  "issues": [
+    {
+      "severity": "error" | "warning",
+      "category": "wording|grouping|mapping|conditional|section|explanation|other",
+      "questionId": number | null,
+      "nameId": string | null,
+      "message": "what is wrong",
+      "suggestion": "how to fix without inventing PDF fields"
+    }
+  ]
+}
+
+If the form is already strong, return ok:true and issues:[]. Prefer warnings for taste; errors for clear defects.`;
+
+const FORM_CONFIG_REVISE_PROMPT = `You are the form_config author receiving peer review feedback.
+
+Revise the form_config to address EVERY error and as many warnings as practical.
+
+HARD RULES:
+- Keep EVERY field_config.newName covered exactly once (question.nameId, options[].nameId, or textboxes[].nameId).
+- NEVER invent new field_config nameIds.
+- When PDF prints State but only a zip widget exists: State textbox must use
+  pdfCombineInto on that zip newName (combinePart "state") so it writes to the PDF.
+  Never leave State with no nameId and no pdfCombineInto.
+- If a single PDF widget combines concepts, split into UI parts that pdfCombineInto that SAME nameId.
+- Every pdfCombineInto target must exist in field_config. Never merge two distinct PDF fields.
+- Preserve valid multipleTextboxes address blocks and checkbox groups.
+- Improve question text clarity; put jargon in explanations.
+- Return the FULL revised form_config JSON object (same schema as input), not a patch.
+- Include needsExplanation=true and a solid explanation on every question.
+
+You receive the original form_config, field_config, requiredNameIds, and the reviewer's issues list.
+Return ONLY the revised form_config JSON.`;
 
 const FORM_CONFIG_PROMPT_PATH = path.join(
   __dirname,
@@ -302,7 +385,10 @@ function isAliasField(field, question) {
 }
 
 function isConditionalField(field, question) {
-  const { isOptionalApplicabilityField } = require('./form-conditional-logic');
+  const { isOptionalApplicabilityField, isPresenceOptionalField } = require('./form-conditional-logic');
+  // Never assume the user has a business/entity/spouse/etc. — always gate these.
+  if (isPresenceOptionalField(field, question)) return true;
+  // Blankable "(if any)/(optional)" codes can stay ungated unless they are presence fields.
   if (isOptionalApplicabilityField(field)) return false;
 
   if (field?.conditional) return true;
@@ -312,12 +398,17 @@ function isConditionalField(field, question) {
   const blob = `${label} ${name}`;
 
   if (/^if\s+/i.test(label) || /^if\s+/i.test(String(question?.text || ''))) return true;
+  if (/if different|differs from above/i.test(blob)) return true;
   return CONDITIONAL_NAME_PATTERNS.some((pattern) => pattern.test(blob));
 }
 
+let nextTempGateId = -1;
+
 function createGateQuestion(gateText) {
+  const questionId = nextTempGateId;
+  nextTempGateId -= 1;
   return {
-    questionId: 0,
+    questionId,
     text: gateText.endsWith('?') ? gateText : `${gateText}?`,
     needsExplanation: true,
     explanation: 'Answer Yes if the following question applies to you. Answer No to skip it.',
@@ -402,7 +493,17 @@ function ensureConditionalGateQuestions(formConfig, fieldConfig) {
     for (let i = 0; i < questions.length; i += 1) {
       const question = questions[i];
       if (!question.nameId || question.linkedFieldRole === 'mirror') continue;
-      if (question.logic?.enabled && question.logic.prevQuestion && gateAlreadyPresent(questions, i)) {
+      if (gateAlreadyPresent(questions, i)) {
+        const prevGate = questions[i - 1];
+        // Keep/repair wiring to the gate immediately before this question.
+        if (!question.logic?.enabled || String(question.logic.prevQuestion) !== String(prevGate.questionId)) {
+          question.logic = {
+            enabled: true,
+            prevQuestion: String(prevGate.questionId),
+            prevAnswer: 'Yes',
+          };
+          inserted = true;
+        }
         continue;
       }
 
@@ -470,11 +571,20 @@ function ensureConditionalGateQuestions(formConfig, fieldConfig) {
       }
 
       const gateText = inferConditionalGateQuestion(field || { label: question.text, newName: question.nameId });
+      if (gateAlreadyPresent(questions, i)) {
+        const prevGate = questions[i - 1];
+        question.logic = {
+          enabled: true,
+          prevQuestion: String(prevGate.questionId),
+          prevAnswer: 'Yes',
+        };
+        continue;
+      }
       const gateQuestion = createGateQuestion(gateText);
       questions.splice(i, 0, gateQuestion);
       question.logic = {
         enabled: true,
-        prevQuestion: '0',
+        prevQuestion: String(gateQuestion.questionId),
         prevAnswer: 'Yes',
       };
       inserted = true;
@@ -563,18 +673,19 @@ function injectMissingFieldQuestions(formConfig, fieldConfig, missingNames) {
 }
 
 const SECTION_NAME_ALIASES = {
-  'applicant information': 'Applicant Information',
-  'applicant info': 'Applicant Information',
-  'contributing agency information': 'Contributing Agency Information',
-  'contributing agency': 'Contributing Agency Information',
-  'agency information': 'Contributing Agency Information',
-  'employer information': 'Employer Information',
+  'applicant information': 'Applicant',
+  'applicant info': 'Applicant',
+  'contributing agency information': 'Contributing Agency',
+  'contributing agency': 'Contributing Agency',
+  'agency information': 'Contributing Agency',
+  'employer information': 'Employer',
   'service level': 'Level of Service',
   'level of service': 'Level of Service',
-  'applicant sex': 'Applicant Information',
+  'applicant sex': 'Applicant',
   'signature block': 'Signature and Privacy',
   'declarations': 'Signature and Privacy',
-  'additional fields': 'Additional Information',
+  'additional fields': 'Additional Info',
+  'additional information': 'Additional Info',
 };
 
 const SECTION_NAME_STOP_WORDS = new Set([
@@ -638,10 +749,9 @@ function ensureMinimumSections(formConfig, minCount = 2) {
     chunks.push(questions.slice(i, i + splitAt));
   }
 
-  const defaultNames = ['Agency', 'Applicant', 'Employer', 'Service', 'Other'];
   formConfig.sections = chunks.map((chunk, idx) => ({
     sectionId: idx + 1,
-    sectionName: defaultNames[idx] || `Section ${idx + 1}`,
+    sectionName: `Section ${idx + 1}`,
     questions: chunk,
   }));
 
@@ -1212,68 +1322,41 @@ function applyDeterministicExplanations(formConfig, fieldConfig, payload = {}) {
   return formConfig;
 }
 
+/**
+ * Light structural enrich only — does NOT rewrite AI wording, sections, addresses, or gates.
+ * Missing-field inject is a last-resort safety net after AI retries; prefer AI coverage.
+ */
 function postProcessFormConfig(formConfig, fieldConfig, payload = {}) {
   const {
-    extractedDocumentContent = '',
     displayMode = 'all_at_once',
     userProfile = {},
-    structuredFields = [],
   } = payload;
 
   let config = formConfig;
   let missing = getMissingNameIds(config, fieldConfig);
   if (missing.length > 0) {
-    console.warn(`[generate-form-config] Injecting ${missing.length} missing field question(s)`);
+    console.warn(
+      `[generate-form-config] Injecting ${missing.length} missing field question(s) (AI should have covered these)`
+    );
     config = injectMissingFieldQuestions(config, fieldConfig, missing);
   }
 
-  const validated = validateFormConfig(config, fieldConfig);
-  const consolidated = consolidateSections(validated, 3, 4, 2);
-  const fieldCount = (fieldConfig?.fields || []).length;
-  const minSectionTarget = fieldCount >= 12 ? 3 : 2;
-  const minSections = ensureMinimumSections(consolidated, minSectionTarget);
-  const namedSections = shortenSectionNames(minSections);
-  const checkboxNormalized = normalizeCheckboxGroupQuestions(namedSections);
-  const conditionalGated = ensureConditionalGateQuestions(checkboxNormalized, fieldConfig);
-  const vagueNormalized = normalizeVagueQuestionText(
-    conditionalGated,
-    fieldConfig,
-    extractedDocumentContent
-  );
-  const strippedQuestions = stripInlineQuestionDetails(vagueNormalized);
-  const autoDateMarked = markAutoTodayDateFields(strippedQuestions, fieldConfig);
-  const normalized = normalizeQuestionExplanations(autoDateMarked, fieldConfig, extractedDocumentContent);
-  const linked = applyLinkedFields(normalized, fieldConfig);
-  const enriched = enrichFormConfigAutopopulate(linked, userProfile, displayMode, fieldConfig);
-  const clarified = applyDeterministicQuestionWording(enriched, fieldConfig, {
-    extractedDocumentContent,
-    structuredFields,
-  });
-  const explained = applyDeterministicExplanations(clarified, fieldConfig, {
-    extractedDocumentContent,
-    structuredFields,
-  });
-  const titled = applyDomainSectionTitles(explained, fieldConfig);
-  const { applyFullQualityPass, validateFullQuality } = require('./pipeline-quality');
-  const refined = applyFullQualityPass(titled, fieldConfig, {
-    extractedDocumentContent,
-    structuredFields,
-  });
-  const reExplained = applyDeterministicExplanations(refined, fieldConfig, {
-    extractedDocumentContent,
-    structuredFields,
-  });
-  const quality = validateFullQuality(reExplained, fieldConfig, {
-    extractedDocumentContent,
-    structuredFields,
-  });
+  config = validateFormConfig(config, fieldConfig);
+  config = normalizeCheckboxGroupQuestions(config);
+  config = markAutoTodayDateFields(config, fieldConfig);
+  config = applyLinkedFields(config, fieldConfig);
+  config = enrichFormConfigAutopopulate(config, userProfile, displayMode, fieldConfig);
+
+  const { validateFullQuality } = require('./pipeline-quality');
+  const quality = validateFullQuality(config, fieldConfig, payload);
   if (quality.failures.length) {
-    console.warn('[generate-form-config] Question text quality issues:', quality.failures.slice(0, 5));
+    console.warn('[generate-form-config] Quality failures (for AI revise):', quality.failures.slice(0, 8));
   }
   if (quality.warnings.length) {
-    console.warn('[generate-form-config] Question text quality warnings:', quality.warnings.slice(0, 5));
+    console.warn('[generate-form-config] Quality warnings:', quality.warnings.slice(0, 5));
   }
-  return ensureFormCatalogMetadata(reExplained, fieldConfig);
+
+  return ensureFormCatalogMetadata(config, fieldConfig);
 }
 
 async function polishSectionWithAI(section, openAiApiKey, fieldConfig, pageImages = []) {
@@ -1348,6 +1431,209 @@ async function polishFormConfigWithAI(formConfig, fieldConfig, openAiApiKey, pag
   return { ...formConfig, sections: polishedSections };
 }
 
+function summarizeFormConfigForReview(formConfig) {
+  const questions = [];
+  for (const section of formConfig?.sections || []) {
+    for (const question of section.questions || []) {
+      questions.push({
+        sectionId: section.sectionId,
+        sectionName: section.sectionName,
+        questionId: question.questionId,
+        text: question.text,
+        type: question.type,
+        nameId: question.nameId || null,
+        options: (question.options || []).map((opt) => ({
+          label: opt.label,
+          nameId: opt.nameId || null,
+        })),
+        textboxes: (question.textboxes || []).map((tb) => ({
+          label: tb.label || tb.placeholder || null,
+          nameId: tb.nameId || null,
+          pdfCombineInto: tb.pdfCombineInto || null,
+        })),
+        logic: question.logic || null,
+        explanation: question.explanation || '',
+      });
+    }
+  }
+  return {
+    formTitle: formConfig.formTitle || null,
+    displayMode: formConfig.displayMode || null,
+    sections: (formConfig.sections || []).map((section) => ({
+      sectionId: section.sectionId,
+      sectionName: section.sectionName,
+      questionCount: (section.questions || []).length,
+    })),
+    questions,
+  };
+}
+
+async function reviewFormConfigWithAI(formConfig, fieldConfig, openAiApiKey, pageImages = []) {
+  if (!openAiApiKey || !formConfig?.sections?.length) {
+    return { ok: true, summary: 'Review skipped', issues: [] };
+  }
+
+  const payload = {
+    fieldConfig: {
+      formTitle: fieldConfig?.formTitle,
+      fields: (fieldConfig?.fields || []).map((field) => ({
+        newName: field.newName,
+        type: field.type,
+        label: field.label,
+        conditional: field.conditional || null,
+      })),
+    },
+    formConfigSummary: summarizeFormConfigForReview(formConfig),
+  };
+
+  const response = await fetchOpenAiWithRetry('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${openAiApiKey}`,
+    },
+    body: JSON.stringify({
+      model: FORM_CONFIG_REVIEW_MODEL,
+      messages: [
+        { role: 'system', content: FORM_CONFIG_REVIEW_PROMPT },
+        { role: 'user', content: buildPdfVisionUserContent(JSON.stringify(payload, null, 2), pageImages) },
+      ],
+      temperature: 0.1,
+      max_tokens: 4096,
+      response_format: { type: 'json_object' },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error?.message || `Review API failed (${response.status})`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) return { ok: true, summary: 'Empty review response', issues: [] };
+
+  const review = extractJsonFromModelResponse(content);
+  const issues = Array.isArray(review?.issues) ? review.issues : [];
+  return {
+    ok: review?.ok !== false && issues.filter((issue) => issue?.severity === 'error').length === 0,
+    summary: String(review?.summary || '').trim() || (issues.length ? 'Issues found' : 'Looks good'),
+    issues,
+  };
+}
+
+async function reviseFormConfigWithAI(formConfig, fieldConfig, review, openAiApiKey, pageImages = []) {
+  if (!openAiApiKey || !formConfig?.sections?.length) return formConfig;
+  if (!review?.issues?.length) return formConfig;
+
+  const requiredNameIds = (fieldConfig?.fields || []).map((field) => field.newName);
+  const payload = {
+    fieldConfig,
+    requiredNameIds,
+    requiredFieldCount: requiredNameIds.length,
+    reviewSummary: review.summary || '',
+    issues: review.issues,
+    formConfig,
+  };
+
+  const response = await fetchOpenAiWithRetry('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${openAiApiKey}`,
+    },
+    body: JSON.stringify({
+      model: FORM_CONFIG_MODEL,
+      messages: [
+        { role: 'system', content: FORM_CONFIG_REVISE_PROMPT },
+        { role: 'user', content: buildPdfVisionUserContent(JSON.stringify(payload, null, 2), pageImages) },
+      ],
+      temperature: 0.1,
+      max_tokens: 16384,
+      response_format: { type: 'json_object' },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error?.message || `Revise API failed (${response.status})`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) return formConfig;
+
+  const revised = extractJsonFromModelResponse(content);
+  if (!revised?.sections?.length) return formConfig;
+
+  const missing = getMissingNameIds(revised, fieldConfig);
+  if (missing.length) {
+    console.warn(
+      `[generate-form-config] Review revision missing ${missing.length} nameId(s); keeping pre-review config`
+    );
+    return formConfig;
+  }
+
+  validateFormConfig(revised, fieldConfig);
+  return revised;
+}
+
+async function reviewAndReviseFormConfig(formConfig, fieldConfig, openAiApiKey, pageImages = [], payload = {}) {
+  if (FORM_CONFIG_SKIP_REVIEW || !openAiApiKey) return formConfig;
+
+  try {
+    const { validateFullQuality } = require('./pipeline-quality');
+    const quality = validateFullQuality(formConfig, fieldConfig, payload);
+    const validatorIssues = qualityFailuresToReviewIssues(quality.failures);
+
+    console.log('[generate-form-config] Secondary AI review…');
+    const review = await reviewFormConfigWithAI(formConfig, fieldConfig, openAiApiKey, pageImages);
+
+    // Merge validator failures into the review so the reviser must address them.
+    const seen = new Set((review.issues || []).map((i) => String(i?.message || '')));
+    const mergedIssues = [...(review.issues || [])];
+    for (const issue of validatorIssues) {
+      if (seen.has(issue.message)) continue;
+      mergedIssues.push(issue);
+      seen.add(issue.message);
+    }
+    const mergedReview = {
+      ...review,
+      ok: mergedIssues.filter((i) => i?.severity === 'error').length === 0,
+      issues: mergedIssues,
+      summary: validatorIssues.length
+        ? `${review.summary || 'Reviewed'} (+${validatorIssues.length} validator error(s))`
+        : review.summary,
+    };
+
+    const errors = mergedReview.issues.filter((issue) => issue?.severity === 'error');
+    const warnings = mergedReview.issues.filter((issue) => issue?.severity !== 'error');
+    console.log(
+      `[generate-form-config] Review: ${mergedReview.summary} (${errors.length} error(s), ${warnings.length} warning(s))`
+    );
+    for (const issue of mergedReview.issues.slice(0, 10)) {
+      console.log(
+        `  - [${issue.severity || 'warning'}] ${issue.category || 'other'}: ${issue.message || ''}`
+      );
+    }
+
+    if (!mergedReview.issues.length) return formConfig;
+
+    console.log('[generate-form-config] Revising form_config from review + validator feedback…');
+    const revised = await reviseFormConfigWithAI(
+      formConfig,
+      fieldConfig,
+      mergedReview,
+      openAiApiKey,
+      pageImages
+    );
+    return revised;
+  } catch (err) {
+    console.warn('[generate-form-config] Review/revise skipped due to error:', err.message);
+    return formConfig;
+  }
+}
+
 async function generateFormConfig(payload, openAiApiKey) {
   const {
     fieldConfig,
@@ -1396,12 +1682,27 @@ async function generateFormConfig(payload, openAiApiKey) {
       validateFormConfig(config, fieldConfig);
       config.displayMode = displayMode;
       config.htmlMode = payload.htmlMode || config.htmlMode || 'normal';
-      return postProcessFormConfig(config, fieldConfig, {
+      // Post-process first so the second reviewer sees the same UX users get
+      // (not a pre-strip draft that code later rewrites).
+      config = postProcessFormConfig(config, fieldConfig, {
         extractedDocumentContent,
         structuredFields,
         displayMode,
         userProfile,
       });
+      config = await reviewAndReviseFormConfig(config, fieldConfig, openAiApiKey, pageImages, {
+        extractedDocumentContent,
+        structuredFields,
+      });
+      // Soft enrich after AI revise (linked/autopopulate only — no wording rewrite)
+      config = postProcessFormConfig(config, fieldConfig, {
+        extractedDocumentContent,
+        structuredFields,
+        displayMode,
+        userProfile,
+      });
+      validateFormConfig(config, fieldConfig);
+      return ensureFormCatalogMetadata(config, fieldConfig);
     }
     console.warn(
       `[generate-form-config] Attempt ${attempt}/${maxAttempts}: missing ${missing.length} nameId(s): ${missing.slice(0, 5).join(', ')}${missing.length > 5 ? '…' : ''}`
@@ -1470,6 +1771,9 @@ module.exports = {
   generateFormConfig,
   createHandleGenerateFormConfig,
   postProcessFormConfig,
+  reviewFormConfigWithAI,
+  reviseFormConfigWithAI,
+  reviewAndReviseFormConfig,
   applyDeterministicExplanations,
   validateFormConfig,
   injectMissingFieldQuestions,

@@ -43,8 +43,11 @@ function validateFieldConfig(config, inputFieldIds) {
     if (!field.id || !field.newName || !field.type || !field.label) {
       throw new Error('Each field must include id, newName, type, and label');
     }
-    if (!['text', 'checkbox'].includes(field.type)) {
+    if (!['text', 'checkbox', 'dropdown'].includes(field.type)) {
       throw new Error(`Invalid field type for ${field.id}: ${field.type}`);
+    }
+    if (mappedIds.has(field.id)) {
+      throw new Error(`Duplicate field id: ${field.id}`);
     }
     if (seenNewNames.has(field.newName)) {
       throw new Error(`Duplicate newName: ${field.newName}`);

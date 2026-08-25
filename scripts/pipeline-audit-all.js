@@ -12,6 +12,7 @@ const ROOT = path.join(__dirname, '..');
 const PDFS = [
   path.join(ROOT, 'public', 'Auto-Form-Creator', 'livescan.pdf'),
   path.join(ROOT, 'public', 'Auto-Form-Creator', 'W-9 Form.pdf'),
+  path.join(ROOT, 'public', 'Auto-Form-Creator', 'W-4 Form.pdf'),
 ];
 
 const extraArgs = process.argv.slice(2).filter((arg) => arg.startsWith('--'));

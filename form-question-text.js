@@ -239,7 +239,21 @@ function simplifyLabelForQuestion(label, field) {
     return 'name associated with this Social Security number';
   }
 
-  text = text.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+  // Inline short distinguishing parentheticals ("Senior (Self) Amount" vs "(Spouse)")
+  // instead of dropping them — otherwise sibling fields collapse into duplicate questions.
+  text = text
+    .replace(/\s*\(([^)]*)\)\s*/g, (match, inner) => {
+      const qualifier = String(inner || '').trim();
+      if (!qualifier || /^(if any|if applicable|optional|see instructions?|\d{4})$/i.test(qualifier)) {
+        return ' ';
+      }
+      if (qualifier.split(/\s+/).length <= 2 && /^[a-z0-9\s'-]+$/i.test(qualifier)) {
+        return ` ${qualifier} `;
+      }
+      return ' ';
+    })
+    .replace(/\s+/g, ' ')
+    .trim();
   return text;
 }
 

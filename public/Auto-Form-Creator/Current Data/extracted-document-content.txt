@@ -1,149 +1,159 @@
 --- PAGE 1 ---
-BCIA 8016STATE OF CALIFORNIA DEPARTMENT OF JUSTICEPAGE 1 of 4
-(Rev. 03/2024)
-REQUEST FOR LIVE SCAN SERVICE
-Applicant Submission [[form1[0].#subform[0].ORI[0]]] [[form1[0].#subform[0].authorizedapptype[0]]]
-ORI (Code assigned by DOJ ) [[form1[0].#subform[0].typeof[0]]] Authorized Applicant Type
-Type of License/Certification/Permit OR Working Title (Maximum 30 characters - if assigned by DOJ, use exact title assigned )
-Contributing Agency Information:
-Agency Authorized to Receive Criminal Record Information [[form1[0].#subform[0].agencyauthorized[0]]] Mail Code (five-digit code assigned by DOJ) [[form1[0].#subform[0].mailcode[0]]]
-Street Address or P.O. Box [[form1[0].#subform[0].streetaddress[0]]] Contact Name (mandatory for all school submissions) [[form1[0].#subform[0].contactname[0]]]
-City [[form1[0].#subform[0].city[0]]] State ZIP Code [[form1[0].#subform[0].zip[0]]] Contact Telephone Number [[form1[0].#subform[0].PhoneNum[0]]]
-Applicant Information: [[form1[0].#subform[0].firstname[0]]] [[form1[0].#subform[0].suffix[0]]]
-Last Name [[form1[0].#subform[0].lastname[0]]] First Name Middle Initial Suffix
-Other Name: (AKA or Alias) [[form1[0].#subform[0].last[0]]] [[form1[0].#subform[0].first[0]]] [[form1[0].#subform[0].suffix[1]]]
-Last Name First Name Suffix
-Date of Birth [[form1[0].#subform[0].DOB[0]]] Sex {{form1[0].#subform[0].MorF[0]__1_1}} Male {{form1[0].#subform[0].MorF[0]__2_2}} Female {{form1[0].#subform[0].MorF[0]__3_2}} Nonbinary/UnspecifiedDriver's License Number [[form1[0].#subform[0].DLnumber[0]]]
-[[form1[0].#subform[0].height[0]]] [[form1[0].#subform[0].weight[0]]] [[form1[0].#subform[0].eye[0]]] [[form1[0].#subform[0].hair[0]]] BillingNumber [[form1[0].#subform[0].billingnumber[0]]]
-Height Weight Eye Color Hair Color (Agency Billing Number)
-Place of Birth (State or Country) [[form1[0].#subform[0].POB[0]]] Social Security Number [[form1[0].#subform[0].SSN[0]]] Misc.Number [[form1[0].#subform[0].miscnumber[0]]]
-(Other Identification Number)
-HomeAddress Street Address or P.O. Box [[form1[0].#subform[0].streetorPO[0]]] City [[form1[0].#subform[0].city[1]]] State ZIP Code [[form1[0].#subform[0].zip[1]]]
-I have received and read the included Privacy Notice, Privacy Act Statement, and Applicant's Privacy Rights.
-Applicant Signature Date [[form1[0].#subform[0].DateTimeField1[0]]]
-Your Number: [[form1[0].#subform[0].yournumber[0]]] Level of Service: {{form1[0].#subform[0].DOJ[0]}} DOJ {{form1[0].#subform[0].FBI[0]}} FBI
-OCA Number (Agency Identifying Number) (If the Level of Service indicates FBI, the fingerprints will be used to check
-the criminal history record information of the FBI.)
-If re-submission, list original ATI [[form1[0].#subform[0].origATI[0]]]
-number: Original ATI Number
-(Must provide proof of rejection)
-Employer (Additional response for agencies specified by statute):
-Employer Name [[form1[0].#subform[0].emplname[0]]]
-Street Address or P.O. Box [[form1[0].#subform[0].address[0]]] Telephone Number (optional) [[form1[0].#subform[0].PhoneNum[1]]]
-City [[form1[0].#subform[0].city[2]]] State ZIP Code [[form1[0].#subform[0].zip[2]]] Mail Code (five digit code assigned by DOJ) [[form1[0].#subform[0].mailcode[1]]]
-Live Scan Transaction Completed By:
-Name of Operator Date
-Transmitting Agency LSID ATI Number Amount Collected/Billed
+Employment Eligibility Verification USCIS
+Department of Homeland Security Form I-9
+U.S. Citizenship and Immigration Services OMB No.1615-0047
+Expires 05/31/2027
+START HERE: Employers must ensure the form instructions are available to employees when completing this form. Employers are liable forfailing to comply with the requirements for completing this form. See below and the Instructions.
+employees for documentation to verify information inANTI-DISCRIMINATION NOTICE: All employees can choose which acceptable documentation to present for Form I-9. Employers cannot ask Section 1, or specify which acceptable documentation employees must present for Section 2 or
+Supplement B, Reverification and Rehire. Treating employees differently based on their citizenship, immigration status, or national origin may be illegal.
+Section 1. Employee Information and Attestation:day of employment, but not before accepting a job offer. Employees must complete and sign Section 1 of Form I-9 no later than the first
+Last Name (Family Name) [[Last Name (Family Name)]] First Name (Given Name) [[First Name Given Name]] Middle Initial (if any) [[Employee Middle Initial (if any)]] Other Last Names Used (if any) [[Employee Other Last Names Used (if any)]]
+Address (Street Number and Name) [[Address Street Number and Name]] Apt. Number (if any) [[Apt Number (if any)]] City or Town [[City or Town]] State [[State]] ZIP Code [[ZIP Code]]
+Date of Birth (mm/dd/yyyy) [[Date of Birth mmddyyyy]] U.S. Social Security Number [[US Social Security Number]] Employee's Email Address [[Employees E-mail Address]] Employee's Telephone Number [[Telephone Number]]
+I am aware that federal law Check one of the following boxes to attest to your citizenship or immigration status (See page 2 and 3 of the instructions.):
+provides for imprisonment and/orfines for false statements, or the {{CB_1}} 1. A citizen of the United States
+use of false documents, in {{CB_2}} 2. A noncitizen national of the United States (See Instructions.)
+connection with the completion ofthis form. I attest, under penalty {{CB_3}} 3. A lawful permanent resident (Enter USCIS or A-Number.) [[3 A lawful permanent resident Enter USCIS or ANumber]]
+of perjury, that this information, {{CB_4}} 4. An alien authorized to work until (exp. date, if any) [[Exp Date mmddyyyy]]
+including my selection of the boxattesting to my citizenship or If you check Item Number 4., enter one of these:
+immigration status, is true and USCIS A-Number OR Form I-94 Admission Number OR Foreign Passport Number and Country of Issuance
+correct. [[USCIS ANumber]] [[Form I94 Admission Number]] [[Foreign Passport Number and Country of IssuanceRow1]]
+Signature of Employee [[Signature of Employee]] Today's Date (mm/dd/yyyy) [[Today's Date mmddyyy]]
+If a preparer and/or translator assisted you in completing Section 1, that person MUST complete the Preparer and/or Translator Certification on Page 3.
+Section 2. Employer Review and Verification:business days after the employee's first day of employment, and must physically examine Employers or their authorized representative must complete and sign, or examine consistent with an alternative procedure Section 2 within three
+authorized by the Secretary of DHS,documentation in the Additional Information box; see Instructions. documentation from List A OR a combination of documentation from List B and List C. Enter any additional
+List A OR List B AND List C
+Document Title 1 [[Document Title 1]] [[List B Document 1 Title]] [[List C Document Title 1]]
+Issuing Authority [[Issuing Authority 1]] [[List B Issuing Authority 1]] [[List C Issuing Authority 1]]
+Document Number (if any) [[Document Number 0 (if any)]] [[List B Document Number 1]] [[List C Document Number 1]]
+Expiration Date (if any) [[Expiration Date if any]] [[List B Expiration Date 1]] [[List C Expiration Date 1]]
+Document Title 2 (if any) [[Document Title 2 If any]] Additional Information
+Issuing Authority [[Issuing Authority_2]]
+Document Number (if any) [[Document Number If any_2]]
+Expiration Date (if any) [[List A. Document 2. Expiration Date (if any)]] [[Additional Information]]
+Document Title 3 (if any) [[List A. Document Title 3. If any]]
+Issuing Authority [[List A. Document 3. Enter Issuing Authority]]
+Document Number (if any) [[List A. Document 3 Number. If any]]
+Expiration Date (if any) [[Document Number if any_3]] {{CB_Alt}} Check here if you used an alternative procedure authorized by DHS to examine documents.
+Certification: I attest, under penalty of perjury, that (1) I have examined the documentation presented by the above-namedFirst Day of Employment(mm/dd/yyyy):
+employee, (2) the above-listed documentation appears to be genuine and to relate to the employee named, and (3) to thebest of my knowledge, the employee is authorized to work in the United States. [[FirstDayEmployed mmddyyyy]]
+Last Name, First Name and Title of Employer or Authorized Representative [[Last Name First Name and Title of Employer or Authorized Representative]] Signature of Employer or Authorized Representative [[Signature of Employer or AR]] Today's Date (mm/dd/yyyy) [[S2 Todays Date mmddyyyy]]
+Employer's Business or Organization Name [[Employers Business or Org Name]] Employer's Business or Organization Address, City or Town, State, ZIP Code [[Employers Business or Org Address]]
+For reverification or rehire, complete Supplement B, Reverification and Rehire on Page 4.
+Form I-9 Edition 01/20/25 Page 1 of 4
 
 --- PAGE 2 ---
-BCIA 8016STATE OF CALIFORNIA DEPARTMENT OF JUSTICEPAGE 2 of 4
-(Rev. 03/2024)
-REQUEST FOR LIVE SCAN SERVICE
-Privacy Notice
-As Required by Civil Code § 1798.17
-Collection and Use of Personal Information. The California Justice Information Services (CJIS) Division in the
-Department of Justice (DOJ) collects the information requested on this form as authorized by Business and
-Professions Code sections 4600-4621, 7574-7574.16, 26050-26059, 11340-11346, and 22440-22449; Penal
-Code sections 11100-11112, and 11077.1; Health and Safety Code sections 1522, 1416.20-1416.50,
-1569.10-1569.24, 1596.80-1596.879, 1725-1742, and 18050-18055; Family Code sections 8700-87200,
-8800-8823, and 8900-8925; Financial Code sections 1300-1301, 22100-22112, 17200-17215, and 28122-28124;
-Education Code sections 44330-44355; Welfare and Institutions Code sections 9710-9719.5, 14043-14045,
-4684-4689.8, and 16500-16523.1; and other various state statutes and regulations. The CJIS Division uses this
-information to process requests of authorized entities that want to obtain information as to the existence and
-content of a record of state or federal convictions to help determine suitability for employment, or volunteer work
-with children, elderly, or disabled; or for adoption or purposes of a license, certification, or permit. In addition, any
-personal information collected by state agencies is subject to the limitations in the Information Practices Act and
-state policy. The DOJ's general privacy policy is available at http://oag.ca.gov/privacy-policy.
-Providing Personal Information. All the personal information requested in the form must be provided. Failure to
-provide all the necessary information will result in delays and/or the rejection of your request.
-Access to Your Information. You may review the records maintained by the CJIS Division in the DOJ that
-contain your personal information, as permitted by the Information Practices Act. See below for contact
-information.
-Possible Disclosure of Personal Information. In order to process applications pertaining to Live Scan service to
-help determine the suitability of a person applying for a license, employment, or a volunteer position working with
-children, the elderly, or the disabled, we may need to share the information you give us with authorized applicant
-agencies.
-The information you provide may also be disclosed in the following circumstances:
-• With other persons or agencies where necessary to perform their legal duties, and their use of your
-information is compatible and complies with state law, such as for investigations or for licensing,
-certification, or regulatory purposes.
-• To another government agency as required by state or federal law.
-Contact Information. For questions about this notice or access to your records, you may contact the Associate
-Governmental Program Analyst at the DOJ's Keeper of Records at (916) 210-3310, by email at
-keeperofrecords@doj.ca.gov, or by mail at:
-Department of Justice
-Bureau of Criminal Information & Analysis
-Keeper of Records
-P.O. Box 903417
-Sacramento, CA 94203-4170
+LISTS OF ACCEPTABLE DOCUMENTS
+All documents containing an expiration date must be unexpired.
+* Documents extended by the issuing authority are considered unexpired.
+Employees may present one selection from List A or a
+combination of one selection from List B and one selection from List C.
+Examples of many of these documents appear in the Handbook for Employers (M-274).
+LIST A LIST B LIST C
+Documents that Establish Both Identityand Employment Authorization OR Documents that Establish IdentityAND Documents that Establish EmploymentAuthorization
+1. U.S. Passport or U.S. Passport Card 1. Driver's license or ID card issued by a State or1. A Social Security Account Number card,unless the card includes one of the following
+2. Permanent Resident Card or Alien provided it contains a photograph oroutlying possession of the United Statesrestrictions:
+Registration Receipt Card (Form I-551)information such as name, date of birth, (1) NOT VALID FOR EMPLOYMENT
+3. Foreign passport that contains a sex, height, eye color, and address (2) VALID FOR WORK ONLY WITH
+temporary I-551 stamp or temporaryI-551 printed notation on a machine-2. ID card issued by federal, state or local INS AUTHORIZATION
+readable immigrant visa government agencies or entities, provided itcontains a photograph or information such as(3) VALID FOR WORK ONLY WITH
+name, date of birth, sex, height, eye color, DHS AUTHORIZATION
+4. Employment Authorization Documentthat contains a photograph (Form I-766) and address
+2. Certification of report of birth issued by theDepartment of State (Forms DS-1350,
+5. For an individual temporarily authorized3. School ID card with a photograph FS-545, FS-240)
+to work for a specific employer becauseof his or her status or parole: 4. Voter's registration card 3. Original or certified copy of birth certificate
+a. Foreign passport; and 5. U.S. Military card or draft record issued by a State, county, municipalauthority, or territory of the United States
+b. Form I-94 or Form I-94A that has 6. Military dependent's ID card bearing an official seal
+the following: 7. U.S. Coast Guard Merchant Mariner Card4. Native American tribal document
+(1) The same name as thepassport; and 5. U.S. Citizen ID Card (Form I-197)
+(2) An endorsement of the 8. Native American tribal document
+individual's status or parole as9. Driver's license issued by a Canadian6. Citizen in the United States (Form I-179)Identification Card for Use of Resident
+long as that period of government authority
+endorsement has not yetexpired and the proposed For persons under age 18 who are7. Employment authorization document
+employment is not in conflict unable to present a document issued by the Department of HomelandSecurity
+with any restrictions orlimitations identified on the form. listed above: For examples, see Section 7 and
+10. School record or report card Section 1uscis.gov/i-9-central3 of the M-274 on.
+6. Passport from the Federated States ofMicronesia (FSM) or the Republic of the11. Clinic, doctor, or hospital record
+Marshall Islands (RMI) with Form I-94 or The Form I-766, EmploymentAuthorization Document, is a List A, Item
+Form I-94A indicating nonimmigrant 12. Day-care or nursery school record Number 4. document, not a List C
+admission under the Compact of FreeAssociation Between the United States document.
+and the FSM or RMI
+Acceptable Receipts
+May be presented in lieu of a document listed above for a temporary period.
+For receipt validity dates, see the M-274.
+● Receipt for a replacement of a lost,stolen, or damaged List A document.OR Receipt for a replacement of a lost, stolen, ordamaged List B document. Receipt for a replacement of a lost, stolen, ordamaged List C document.
+● Form I-94 issued to a lawfulpermanent resident that contains an
+I-551 stamp and a photograph of the
+individual.
+● Form I-94 with “RE” notation orrefugee stamp issued to a refugee.
+*Refer to the Employment Authorization Extensions page on I-9 Central for more information.
+Form I-9 Edition 01/20/25 Page 2 of 4
 
 --- PAGE 3 ---
-BCIA 8016STATE OF CALIFORNIA DEPARTMENT OF JUSTICEPAGE 3 of 4
-(Rev. 03/2024)
-REQUEST FOR LIVE SCAN SERVICE
-Privacy Act Statement
-Authority. The FBI's acquisition, preservation, and exchange of fingerprints and associated information is
-generally authorized under 28 U.S.C. 534. Depending on the nature of your application, supplemental authorities
-include Federal statutes, State statutes pursuant to Pub. L. 92-544, Presidential Executive Orders, and federal
-regulations. Providing your fingerprints and associated information is voluntary; however, failure to do so may
-affect completion or approval of your application.
-Principal Purpose. Certain determinations, such as employment, licensing, and security clearances, may be
-predicated on fingerprint-based background checks. Your fingerprints and associated information/biometrics may
-be provided to the employing, investigating, or otherwise responsible agency, and/or the FBI for the purpose of
-comparing your fingerprints to other fingerprints in the FBI's Next Generation Identification (NGI) system or its
-successor systems (including civil, criminal, and latent fingerprint repositories) or other available records of the
-employing, investigating, or otherwise responsible agency. The FBI may retain your fingerprints and associated
-information/biometrics in NGI after the completion of this application and, while retained, your fingerprints may
-continue to be compared against other fingerprints submitted to or retained by NGI.
-Routine Uses. During the processing of this application and for as long thereafter as your fingerprints and
-associated information/biometrics are retained in NGI, your information may be disclosed pursuant to your
-consent, and may be disclosed without your consent as permitted by the Privacy Act of 1974 and all applicable
-Routine Uses as may be published at any time in the Federal Register, including the Routine Uses for the NGI
-system and the FBI's Blanket Routine Uses. Routine uses include, but are not limited to, disclosures to:
-employing, governmental, or authorized non-governmental agencies responsible for employment, contracting,
-licensing, security clearances, and other suitability determinations; local, state, tribal, or federal law enforcement
-agencies; criminal justice agencies; and agencies responsible for national security or public safety.
+Supplement A, USCIS
+Preparer and/or Translator Certification for Section 1Form I-9
+Department of Homeland Security Supplement A
+U.S. Citizenship and Immigration Services OMB No. 1615-0047
+Expires 05/31/2027
+Last Name (Family Name) from Section 1. [[Last Name Family Name from Section 1]] First Name (Given Name) from [[First Name Given Name from Section 1]] Section 1. Middle initial (if any) from [[Middle initial if any from Section 1]] Section 1.
+Instructions: This supplement must be completed by any preparer and/or translator who assists an employee in completing Section 1
+of Form I-9. The preparer and/or translator must enter the employee's name in the spaces provided above. Each preparer or translator
+must complete, sign, and date a separate certification area. Employers must retain completed supplement sheets with the employee's
+completed Form I-9.
+I attest, under penalty of perjury, that I have assisted in the completion of Section 1 of this form and that to the best of my
+knowledge the information is true and correct.
+Signature of Preparer or Translator [[Signature of Preparer or Translator 0]] Date (mm/dd/yyyy) [[Sig Date mmddyyyy 0]]
+Last Name (Family Name) [[Preparer or Translator Last Name (Family Name) 0]] First Name (Given Name) [[Preparer or Translator First Name (Given Name) 0]] Middle Initial [[PT Middle Initial 0]] (if any)
+Address (Street Number and Name) [[Preparer or Translator Address (Street Number and Name) 0]] City or Town [[Preparer or Translator City or Town 0]] State [[Preparer State 0]] ZIP Code [[Zip Code 0]]
+I attest, under penalty of perjury, that I have assisted in the completion of Section 1 of this form and that to the best of my
+knowledge the information is true and correct.
+Signature of Preparer or Translator [[Signature of Preparer or Translator 1]] Date (mm/dd/yyyy) [[Sig Date mmddyyyy 1]]
+Last Name (Family Name) [[Preparer or Translator Last Name (Family Name) 1]] First Name (Given Name) [[Preparer or Translator Last Name (Family Name) 1]] Middle Initial [[PT Middle Initial 1]] (if any)
+Address (Street Number and Name) [[Preparer or Translator Address (Street Number and Name) 1]] City or Town [[Preparer or Translator City or Town 1]] State [[Preparer State 1]] ZIP Code [[Zip Code 1]]
+I attest, under penalty of perjury, that I have assisted in the completion of Section 1 of this form and that to the best of my
+knowledge the information is true and correct.
+Signature of Preparer or Translator [[Signature of Preparer or Translator 2]] Date (mm/dd/yyyy) [[Sig Date mmddyyyy 2]]
+Last Name (Family Name) [[Preparer or Translator Last Name (Family Name) 2]] First Name (Given Name) [[Preparer or Translator First Name (Given Name) 2]] Middle Initial [[PT Middle Initial 2]] (if any)
+Address (Street Number and Name) [[Preparer or Translator Address (Street Number and Name) 2]] City or Town [[Preparer or Translator City or Town 2]] State [[Preparer State 2]] ZIP Code [[Zip Code 2]]
+I attest, under penalty of perjury, that I have assisted in the completion of Section 1 of this form and that to the best of my
+knowledge the information is true and correct.
+Signature of Preparer or Translator [[Signature of Preparer or Translator 3]] Date (mm/dd/yyyy) [[Sig Date mmddyyyy 3]]
+Last Name (Family Name) [[Preparer or Translator Last Name (Family Name) 3]] First Name (Given Name) [[Preparer or Translator First Name (Given Name) 3]] Middle Initial [[PT Middle Initial 3]] (if any)
+Address (Street Number and Name) [[Preparer or Translator Address (Street Number and Name) 3]] City or Town [[Preparer or Translator City or Town 3]] State [[Preparer State 3]] ZIP Code [[Zip Code 3]]
+Form I-9 Edition 01/20/25 Page 3 of 4
 
 --- PAGE 4 ---
-BCIA 8016STATE OF CALIFORNIA DEPARTMENT OF JUSTICEPAGE 4 of 4
-(Rev. 03/2024)
-REQUEST FOR LIVE SCAN SERVICE
-Noncriminal Justice Applicant's Privacy Rights
-As an applicant who is the subject of a national fingerprint-based criminal history record check for a
-noncriminal justice purpose (such as an application for employment or a license, an immigration or
-naturalization matter, security clearance, or adoption), you have certain rights which are discussed below.
-• You must be provided written notification 1 that your fingerprints will be used to check the
-criminal history records of the FBI.
-• You must be provided, and acknowledge receipt of, an adequate Privacy Act Statement
-when you submit your fingerprints and associated personal information. This Privacy Act
-Statement should explain the authority for collecting your information and how your
-information will be used, retained, and shared. 2
-• If you have a criminal history record, the officials making a determination of your
-suitability for the employment, license, or other benefit must provide you the opportunity
-to complete or challenge the accuracy of the information in the record .
-• The officials must advise you that the procedures for obtaining a change, correction, or
-update of your criminal history record are set forth at Title 28, Code of Federal
-Regulations (CFR), Section 16.34.
-• If you have a criminal history record, you should be afforded a reasonable amount of time
-to correct or complete the record (or decline to do so) before the officials deny you the
-employment, license, or other benefit based on information in the criminal history record . 3
-You have the right to expect that officials receiving the results of the criminal history record check will use it
-only for authorized purposes and will not retain or disseminate it in violation of federal statute, regulation or
-executive order, or rule, procedure or standard established by the National Crime Prevention and Privacy
-Compact Council. 4
-If agency policy permits, the officials may provide you with a copy of your FBI criminal history record for
-review and possible challenge. If agency policy does not permit it to provide you a copy of the record, you
-may obtain a copy of the record by submitting fingerprints and a fee to the FBI. Information regarding this
-process may be obtained at https://www.fbi.gov/services/cjis/identity-history-summary-checks.
-If you decide to challenge the accuracy or completeness of your FBI criminal history record, you should send
-your challenge to the agency that contributed the questioned information to the FBI. Alternatively, you may
-send your challenge directly to the FBI. The FBI will then forward your challenge to the agency that
-contributed the questioned information and request the agency to verify or correct the challenged entry. Upon
-receipt of an official communication from that agency, the FBI will make any necessary changes/corrections
-to your record in accordance with the information supplied by that agency. (See 28 CFR 16.30 through
-16.34.) You can find additional information on the FBI website at https://www.fbi.gov/about-us/cjis/
-background-checks.
-1 Written notification includes electronic notification, but excludes oral notification
-2 https://www.fbi.gov/services/cjis/compact-council/privacy-act-statement
-3 See 28 CFR 50.12(b)
-4 See U.S.C. 552a(b); 28 U.S.C. 534(b); 34 U.S.C. § 40316 (formerly cited as 42 U.S.C. § 14616), Article IV(c)
+Supplement B, USCIS
+Reverification and Rehire (formerly Section 3)Form I-9
+Supplement B
+Department of Homeland Security OMB No. 1615-0047
+U.S. Citizenship and Immigration Services Expires 05/31/2027
+Last Name (Family Name) from Section 1. [[Last Name Family Name from Section 1-2]] First Name (Given Name) from [[First Name Given Name from Section 1-2]] Section 1. Middle initial (if any) from [[Middle initial if any from Section 1-2]] Section 1.
+Instructions: This supplement replaces Section 3 on the previous version of Form I-9. Only use this page if your employee requiresreverification, is rehired within three years of the date the original Form I-9 was completed, or provides proof of a legal name change. Enter
+the employee's name in the fields above. Use a new section for each reverification or rehire. Review the Form I-9 instructions beforecompleting this page. Keep this page as part of the employee's Form I-9 record. Additional guidance can be found in the
+Handbook for Employers: Guidance for Completing Form I-9 (M-274)
+Date of Rehire (if applicable)New Name (if applicable)
+Date (mm/dd/yyyy [[Date of Rehire 0]] ) Last Name (Family Name) [[Last Name 0]] First Name (Given Name) [[First Name 0]] Middle Initial [[Middle Initial 0]]
+Reverification: If the employee requires reverification, your employee can choose to present any acceptable List A or List C documentation to showcontinued employment authorization. Enter the document information in the spaces below.
+Document Title [[Document Title 0]] Document Number (if any) [[Document Number 0]] Expiration Date (if any) (mm/dd/yyyy) [[Expiration Date 0]]
+I attest, under penalty of perjury, that to the best of my knowledge, this employee is authorized to work in the United States, and if theemployee presented documentation, the documentation I examined appears to be genuine and to relate to the individual who presented it.
+Name of Employer or Authorized Representative [[Name of Emp or Auth Rep 0]] Signature of Employer or Authorized Representative [[Signature of Emp Rep 0]] Today's Date (mm/dd/yyyy) [[Todays Date 0]]
+Additional Information (Initial and date each notation.) Check here if you used an
+[[Addtl Info 0]] {{CB_Alt_0}} alternative procedure authorizedby DHS to examine documents.
+Date of Rehire (if applicable) New Name (if applicable)
+Date (mm/dd/yyyy [[Date of Rehire 1]] ) Last Name (Family Name) [[Last Name 1]] First Name (Given Name) [[First Name 1]] Middle Initial [[Middle Initial 1]]
+Reverification: If the employee requires reverification, your employee can choose to present any acceptable List A or List C documentation to showcontinued employment authorization. Enter the document information in the spaces below.
+Document Title [[Document Title 1]] Document Number (if any) [[Document Number 1]] Expiration Date (if any) (mm/dd/yyyy) [[Expiration Date 1]]
+I attest, under penalty of perjury, that to the best of my knowledge, this employee is authorized to work in the United States, and if theemployee presented documentation, the documentation I examined appears to be genuine and to relate to the individual who presented it.
+Name of Employer or Authorized Representative [[Name of Emp or Auth Rep 1]] Signature of Employer or Authorized Representative [[Signature of Emp Rep 1]] Today's Date (mm/dd/yyyy) [[Todays Date 1]]
+Additional Information (Initial and date each notation.) Check here if you used an
+[[Addtl Info 1]] {{CB_Alt_1}} alternative procedure authorizedby DHS to examine documents.
+Date of Rehire (if applicable) New Name (if applicable)
+Date (mm/dd/yyyy [[Date of Rehire 2]] ) Last Name (Family Name) [[Last Name 2]] First Name (Given Name) [[First Name 2]] Middle Initial [[Middle Initial 2]]
+Reverification: If the employee requires reverification, your employee can choose to present any acceptable List A or List C documentation to showcontinued employment authorization. Enter the document information in the spaces below.
+Document Title [[Document Title 2]] Document Number (if any) [[Document Number 2]] Expiration Date (if any) (mm/dd/yyyy) [[Expiration Date 2]]
+I attest, under penalty of perjury, that to the best of my knowledge, this employee is authorized to work in the United States, and if theemployee presented documentation, the documentation I examined appears to be genuine and to relate to the individual who presented it.
+Name of Employer or Authorized Representative [[Name of Emp or Auth Rep 2]] Signature of Employer or Authorized Representative [[Signature of Emp Rep 2]] Today's Date (mm/dd/yyyy) [[Todays Date 2]]
+Additional Information (Initial and date each notation.) Check here if you used an
+[[Addtl Info 2]] {{CB_Alt_2}} alternative procedure authorizedby DHS to examine documents.
+Form I-9 Edition 01/20/25 Page 4 of 4

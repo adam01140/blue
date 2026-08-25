@@ -207,10 +207,12 @@ async function sanitizePdfFields(pdfBytes, fieldConfig) {
   // Resolve all field refs before mutating the AcroForm tree. XFA-style PDFs (e.g. IRS W-9)
   // use deep parent/Kids hierarchies; ensureTopLevelField breaks form.getField() for siblings
   // still addressed by their original hierarchical names.
+  // Duplicate AcroForm names (multi-widget fields) appear once in pdf-lib — keep first mapping.
   const fieldRefById = new Map();
+  const processedIds = new Set();
   for (const mapping of fieldConfig.fields) {
     const { id } = mapping;
-    if (!id) continue;
+    if (!id || fieldRefById.has(id)) continue;
     try {
       fieldRefById.set(id, form.getField(id).acroField.ref);
     } catch (err) {
@@ -224,6 +226,11 @@ async function sanitizePdfFields(pdfBytes, fieldConfig) {
       failed.push({ id: id || '(missing)', reason: 'missing id or newName' });
       continue;
     }
+    if (processedIds.has(id)) {
+      skipped.push(id);
+      continue;
+    }
+    processedIds.add(id);
 
     if (failed.some((entry) => entry.id === id)) {
       continue;
@@ -271,10 +278,11 @@ async function sanitizePdfFields(pdfBytes, fieldConfig) {
   try {
     form.updateFieldAppearances();
   } catch (_) {
-    // best-effort
+    // best-effort — rich-text fields throw here on some government PDFs
   }
 
-  const saved = await pdfDoc.save();
+  // Skip appearance refresh on save: pdf-lib throws on rich-text widgets (e.g. Live Scan ORI).
+  const saved = await pdfDoc.save({ updateFieldAppearances: false });
   const verifyDoc = await PDFDocument.load(saved, { ignoreEncryption: true });
   const verifyForm = verifyDoc.getForm();
   const verifyNames = verifyForm.getFields().map((f) => f.getName());

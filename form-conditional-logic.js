@@ -10,9 +10,46 @@ const VAGUE_GATE_PATTERNS = [
   /^does this apply to your submission\??$/i,
 ];
 
+/**
+ * PDF labels marked "(if any)/(optional)/(if applicable)" that can usually stay blankable
+ * without a Yes/No gate — EXCEPT presence-assumed identity fields (see isPresenceOptionalField).
+ */
 function isOptionalApplicabilityField(field) {
   const label = String(field?.label || '');
   return /\((if applicable|if any|optional)\)/i.test(label);
+}
+
+/**
+ * Fields that assume the user has an extra entity/name/relationship.
+ * NEVER show these unconditionally — always ask a Yes/No presence gate first.
+ * Example: W-9 "business name / disregarded entity name" must not imply the user has one.
+ */
+const PRESENCE_OPTIONAL_PATTERNS = [
+  /\bbusiness[_\s-]*name\b/i,
+  /\bdisregarded[_\s-]*entity\b/i,
+  /\bdoing[_\s-]*business[_\s-]*as\b/i,
+  /\bdba\b/i,
+  /\btrade[_\s-]*name\b/i,
+  /\badditional[_\s-]*name\b/i,
+  /\bspouse[_\s-]*(name|first|last|ssn|tin)\b/i,
+  /\bdependent[_\s-]*(name|first|last)\b/i,
+  /\bpartner[_\s-]*name\b/i,
+];
+
+function isPresenceOptionalField(field, question = null) {
+  const blob = [
+    field?.newName,
+    field?.label,
+    question?.nameId,
+    question?.text,
+  ].filter(Boolean).join(' ');
+  if (!blob) return false;
+  if (PRESENCE_OPTIONAL_PATTERNS.some((pattern) => pattern.test(blob))) return true;
+  // "if different from above/line 1" secondary name lines are also presence-gated
+  if (/business|entity|dba|trade/.test(blob) && /if different|differs from/i.test(blob)) {
+    return true;
+  }
+  return false;
 }
 
 function isVagueGateText(text) {
@@ -59,8 +96,17 @@ function inferSpecificGateQuestion(field, followUpQuestion = null) {
   if (/other.*tin|tin.*other/.test(blob)) {
     return 'Are you providing a TIN that is different from your primary taxpayer identification number?';
   }
-  if (/additional.*name|dba|doing business as/.test(blob)) {
+  if (/business.?name|disregarded.?entity/.test(blob)) {
+    return 'Do you have a business name or disregarded entity name?';
+  }
+  if (/additional.*name|dba|doing business as|trade.?name/.test(blob)) {
     return 'Do you have a different business name or DBA to list?';
+  }
+  if (/spouse/.test(blob)) {
+    return 'Do you need to provide spouse information?';
+  }
+  if (/dependent/.test(blob)) {
+    return 'Do you need to provide dependent information?';
   }
 
   const ifMatch = String(field?.label || '').match(/^if\s+(.+?)(?:,|:|\s+list|\s+enter)/i);
@@ -263,6 +309,8 @@ function removeUnnecessaryOptionalGates(formConfig, fieldConfig) {
 
       const field = nextQuestion?.nameId ? fieldMap.get(nextQuestion.nameId) : null;
       if (!field || !isOptionalApplicabilityField(field)) continue;
+      // Never strip gates for presence-assumed fields (business/entity/spouse/etc.).
+      if (isPresenceOptionalField(field, nextQuestion)) continue;
       if (controlsNext) {
         nextQuestion.logic = { enabled: false, prevQuestion: '', prevAnswer: '' };
       }
@@ -336,13 +384,65 @@ function validateGateQuestionClarity(formConfig) {
   return { failures, warnings };
 }
 
+function findQuestionById(formConfig, questionId) {
+  const target = String(questionId || '');
+  for (const section of formConfig?.sections || []) {
+    for (const question of section.questions || []) {
+      if (String(question.questionId) === target) return question;
+    }
+  }
+  return null;
+}
+
+/**
+ * Presence-optional PDF fields (business/entity names, spouse, etc.) must sit behind a Yes/No gate.
+ * Never assume the user has that information.
+ */
+function validatePresenceOptionalGates(formConfig, fieldConfig) {
+  const failures = [];
+  const fieldMap = new Map((fieldConfig?.fields || []).map((field) => [field.newName, field]));
+
+  for (const section of formConfig?.sections || []) {
+    for (const question of section.questions || []) {
+      if (!question.nameId || question.linkedFieldRole === 'mirror') continue;
+      const field = fieldMap.get(question.nameId);
+      if (!isPresenceOptionalField(field, question)) continue;
+
+      if (!question.logic?.enabled || !question.logic.prevQuestion) {
+        failures.push(
+          `Presence-optional field "${question.nameId}" (Q${question.questionId}) must be gated — never assume the user has this info`
+        );
+        continue;
+      }
+
+      const gate = findQuestionById(formConfig, question.logic.prevQuestion);
+      if (!gate || gate.type !== 'dropdown' || gate.nameId) {
+        failures.push(
+          `Presence-optional field "${question.nameId}" (Q${question.questionId}) must reference a Yes/No gate dropdown`
+        );
+        continue;
+      }
+      if (!/yes/i.test(String(question.logic.prevAnswer || ''))) {
+        failures.push(
+          `Presence-optional field "${question.nameId}" (Q${question.questionId}) should show when gate answer is Yes`
+        );
+      }
+    }
+  }
+
+  return { failures, warnings: [] };
+}
+
 module.exports = {
   isOptionalApplicabilityField,
+  isPresenceOptionalField,
   isVagueGateText,
   inferSpecificGateQuestion,
   wireCheckboxFollowUpLogic,
   normalizeVagueGateQuestions,
   removeUnnecessaryOptionalGates,
   validateGateQuestionClarity,
+  validatePresenceOptionalGates,
+  PRESENCE_OPTIONAL_PATTERNS,
   VAGUE_GATE_PATTERNS,
 };

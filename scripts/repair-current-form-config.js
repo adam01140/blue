@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Apply full quality pass to cached Current Data and rebuild HTML previews.
+ * Validate Current Data form_config (no AI rewrites) and rebuild HTML previews.
  * Usage: node scripts/repair-current-form-config.js
  */
 require('dotenv').config();
@@ -8,8 +8,7 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const { saveCurrentData } = require('../auto-form-current-data');
-const { applyFullQualityPass, validateFullQuality } = require('../pipeline-quality');
-const { applyDeterministicExplanations } = require('../form-config-generator');
+const { validateFullQuality } = require('../pipeline-quality');
 
 const ROOT = path.join(__dirname, '..');
 const CURRENT_DATA = path.join(ROOT, 'public', 'Auto-Form-Creator', 'Current Data');
@@ -44,9 +43,6 @@ const extractedDocumentContent = fs.readFileSync(
 );
 
 const payload = { extractedDocumentContent, structuredFields };
-applyFullQualityPass(formConfig, fieldConfig, payload);
-applyDeterministicExplanations(formConfig, fieldConfig, payload);
-
 const quality = validateFullQuality(formConfig, fieldConfig, payload);
 
 console.log('Quality failures:', quality.failures.length);
@@ -59,7 +55,7 @@ const allAtOnce = { ...formConfig, displayMode: 'all_at_once', htmlMode: 'normal
 const oneAtATime = { ...formConfig, displayMode: 'one_at_a_time', htmlMode: 'normal' };
 
 saveCurrentData({
-  label: 'repair-current-form-config',
+  label: 'validate-current-form-config',
   fieldConfig,
   formConfig,
   formHtmlAllAtOnce: buildFormHtml(allAtOnce, fieldConfig, extractedDocumentContent, pdfToken),
@@ -67,5 +63,5 @@ saveCurrentData({
   extractedDocumentContent,
 });
 
-console.log('\nRepaired form_config saved to Current Data.');
+console.log('\nValidated form_config (no AI rewrite). Rebuild HTML from existing config.');
 process.exit(quality.failures.length ? 1 : 0);

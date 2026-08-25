@@ -1,5 +1,8 @@
-{{form1[0].#subform[0].MorF[0]__1_1}}
-{{form1[0].#subform[0].MorF[0]__2_2}}
-{{form1[0].#subform[0].MorF[0]__3_2}}
-{{form1[0].#subform[0].DOJ[0]}}
-{{form1[0].#subform[0].FBI[0]}}
+{{CB_1}}
+{{CB_2}}
+{{CB_3}}
+{{CB_4}}
+{{CB_Alt}}
+{{CB_Alt_0}}
+{{CB_Alt_1}}
+{{CB_Alt_2}}
