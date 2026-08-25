@@ -199,6 +199,7 @@ const { createHandleGenerateFormConfig } = require('./form-config-generator');
 const { createHandleGenerateFormHtml } = require('./form-html-generator');
 const { enrichFormConfigAutopopulate } = require('./form-autopopulate');
 const { handleStoreAutoFormPdf, handleFillAutoFormPdf, handleDemoHubFillPdf, rehydratePdfStore } = require('./auto-form-pdf-handler');
+const { handleCreateEntry, handleUpdateEntry, handleDeleteEntry } = require('./demo-hub-admin');
 const { createHandlePublishAutoForm } = require('./auto-form-publish-handler');
 const { createHandleSaveCurrentData } = require('./auto-form-current-data');
 const { createHandleHelpAnswer } = require('./auto-form-help-handler');
@@ -230,6 +231,9 @@ app.post('/api/enrich-autopopulate', (req, res) => {
 app.post('/api/auto-form/store-pdf', handleStoreAutoFormPdf);
 app.post('/api/auto-form/fill-pdf/:pdfToken', handleFillAutoFormPdf);
 app.post('/api/demo-hub/fill-pdf/:slug', handleDemoHubFillPdf);
+app.post('/api/demo-hub/entries', handleCreateEntry);
+app.put('/api/demo-hub/entries/:slug', handleUpdateEntry);
+app.delete('/api/demo-hub/entries/:slug', handleDeleteEntry);
 app.post('/api/auto-form/publish', createHandlePublishAutoForm(db));
 app.post('/api/auto-form/save-current-data', createHandleSaveCurrentData());
 app.post('/api/auto-form/help-answer', createHandleHelpAnswer(OPENAI_API_KEY));

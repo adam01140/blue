@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Request for Live Scan Service</title>
+    <title>Form W-4 - Employee's Withholding Certificate</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/Forms/CSS/generate.css">
     <link rel="stylesheet" href="/Forms/CSS/generate2.css">
-    <script src="../../CountyLookup/zipData.js"></script>
-    <script src="../../CountyLookup/courtData.js"></script>
-    <script src="../../CountyLookup/courtLookup.js"></script>
+    <script src="/CountyLookup/zipData.js"></script>
+    <script src="/CountyLookup/courtData.js"></script>
+    <script src="/CountyLookup/courtLookup.js"></script>
     <style>
         .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }
         .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 737px; width: 100%; }
@@ -23,6 +23,12 @@
         .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }
         .question-step-hidden { display: none !important; }
         #box { padding-top: 100px; margin: 50px; }
+        body {
+          background: #d5dde8 !important;
+        }
+        #box {
+          background: transparent;
+        }
         @media (max-width: 600px) {
             body { padding: 0 !important; }
             #box { margin: 12px !important; max-width: none !important; }
@@ -97,7 +103,7 @@
             color: #fff;
             text-decoration: none;
             font-weight: 700;
-            font-size: 1.18em;
+            font-size: 0.9em;
             letter-spacing: 0.02em;
             padding: 2px 8px;
             transition: color 0.2s, background 0.2s, box-shadow 0.2s, font-size 0.2s ease, letter-spacing 0.2s ease;
@@ -473,23 +479,23 @@
         /* Desktop nav: progressively smaller text/gaps before hamburger layout */
         @media (max-width: 1240px) {
             nav.desktop-nav { gap: 28px; }
-            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 1.08em; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.84em; }
             .nav-chevron { width: 13px; height: 13px; margin-left: 5px; }
         }
         @media (max-width: 1120px) {
             nav.desktop-nav { gap: 20px; }
-            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 1em; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.8em; }
             .dropdown-menu { top: 36px; }
             .dropdown-menu a { font-size: 1em; padding: 10px 22px; }
         }
         @media (max-width: 1040px) {
             nav.desktop-nav { gap: 14px; }
-            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.92em; letter-spacing: 0.015em; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.76em; letter-spacing: 0.015em; }
             .nav-chevron { width: 12px; height: 12px; margin-left: 4px; }
         }
         @media (max-width: 1000px) {
             nav.desktop-nav { gap: 9px; }
-            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.85em; letter-spacing: 0.01em; padding: 2px 4px; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.72em; letter-spacing: 0.01em; padding: 2px 4px; }
             .nav-chevron { width: 11px; height: 11px; margin-left: 3px; }
             .dropdown-menu { min-width: 188px; top: 34px; }
             .dropdown-menu a { font-size: 0.94em; padding: 9px 18px; }
@@ -721,6 +727,156 @@
         window.updatePhoneSplitFields(inputEl);
       };
     </script>
+    <link rel="stylesheet" href="../../Pages/sidecart-unified.css">
+    <style id="w4-form-styles">
+      #box { padding-top: 20px; margin: 0; }
+      .w4-shell {
+        width: min(960px, calc(100% - 32px));
+        margin: 40px auto 70px;
+        color: #24364b;
+        font-family: Montserrat, Arial, sans-serif;
+      }
+      .w4-hero {
+        background: #fff;
+        border: 2px solid #8fa3bd;
+        border-radius: 18px;
+        padding: 30px;
+        margin-bottom: 24px;
+        text-align: center;
+        box-shadow: 0 8px 24px rgba(29, 66, 120, 0.1);
+      }
+      .w4-hero h1 { margin: 0; color: #17395f; font-size: clamp(1.75rem, 4vw, 2.5rem); }
+      .w4-hero p { display: none; }
+      .w4-section {
+        background: #fff;
+        border: 2px solid #8fa3bd;
+        border-radius: 16px;
+        margin: 22px 0;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(30, 73, 150, 0.1);
+      }
+      .w4-section-title {
+        margin: 0;
+        padding: 20px 24px;
+        background: #dfeaf8;
+        color: #17395f;
+        font-size: 1.2rem;
+        border-bottom: 2px solid #8fa3bd;
+      }
+      .w4-section-body { padding: 12px 24px 24px; }
+      .w4-question { padding: 18px 0; border-bottom: 1px solid #c5d2e2; }
+      .w4-question:last-child { border-bottom: 0; }
+      /* Single-column questions: center label + narrower inputs */
+      .w4-section-body > .w4-question {
+        text-align: center;
+      }
+      .w4-section-body > .w4-question .w4-help {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 420px;
+      }
+      .w4-section-body > .w4-question .w4-input,
+      .w4-section-body > .w4-question .w4-select,
+      .w4-section-body > .w4-question .w4-textarea,
+      .w4-section-body > .w4-question .address-input {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: min(100%, 420px);
+        max-width: 420px;
+      }
+      .w4-grid .w4-question {
+        text-align: left;
+      }
+      .w4-grid .w4-question .w4-input,
+      .w4-grid .w4-question .address-input {
+        width: 100%;
+        max-width: none;
+        margin-left: 0;
+        margin-right: 0;
+      }
+      .w4-question label.w4-label,
+      .w4-question legend.w4-label {
+        display: block;
+        width: 100%;
+        margin: 0 0 9px;
+        color: #24364b;
+        font-weight: 700;
+        line-height: 1.45;
+      }
+      .w4-help { margin: 6px 0 10px; color: #66778b; font-size: 0.9rem; line-height: 1.5; }
+      .w4-input, .w4-select, .w4-textarea {
+        width: 100%;
+        box-sizing: border-box;
+        border: 2px solid #6f849c;
+        border-radius: 9px;
+        background: #fff;
+        color: #17283c;
+        font: inherit;
+        padding: 12px 13px;
+        min-height: 46px;
+      }
+      .w4-input:focus, .w4-select:focus, .w4-textarea:focus {
+        outline: 3px solid rgba(47, 123, 255, 0.22);
+        border-color: #2f7bff;
+      }
+      /* Beat global .address-input light borders on this form */
+      .w4-shell .address-input,
+      .w4-shell .address-select {
+        border: 2px solid #6f849c !important;
+      }
+      .w4-shell .address-input:focus,
+      .w4-shell .address-select:focus {
+        border-color: #2f7bff !important;
+        box-shadow: 0 0 0 3px rgba(47, 123, 255, 0.18);
+      }
+      .w4-input[readonly] { background: #f3f7fb; color: #31465f; font-weight: 700; }
+      .w4-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+      .w4-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+      .w4-note, .w4-warning, .w4-success {
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin: 12px 0;
+        line-height: 1.5;
+      }
+      .w4-note { background: #eef6ff; border: 1px solid #9db8dc; border-left: 4px solid #2f7bff; }
+      .w4-warning { background: #fff6e7; border: 1px solid #e0c48a; border-left: 4px solid #e69b22; }
+      .w4-success { background: #ecfbf1; border: 1px solid #9dcfb0; border-left: 4px solid #2b9b55; }
+      .w4-calculation { background: #f5f8fc; border: 2px dashed #7a91ab; border-radius: 10px; padding: 14px; margin-top: 10px; }
+      .w4-calculation strong { color: #17395f; }
+      .w4-hidden-store { display: none !important; }
+      .w4-submit-wrap { text-align: center; margin: 30px 0; }
+      .w4-submit {
+        border: 0;
+        border-radius: 10px;
+        padding: 15px 28px;
+        background: linear-gradient(135deg, #2f7bff, #0d4ed8);
+        color: #fff;
+        font: 700 1rem Montserrat, Arial, sans-serif;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(30, 73, 150, 0.24);
+      }
+      .w4-submit:disabled { cursor: wait; opacity: 0.65; }
+      .w4-error-summary {
+        display: none;
+        background: #fff0f0;
+        border: 1px solid #dc7373;
+        color: #7d1f1f;
+        border-radius: 10px;
+        padding: 15px 18px;
+        margin: 18px 0;
+        line-height: 1.5;
+      }
+      .w4-error-summary.show { display: block; }
+      .w4-subtitle { margin: 22px 0 5px; color: #24507e; font-size: 1.05rem; }
+      fieldset.w4-question { margin: 0; min-width: 0; border-left: 0; border-right: 0; border-top: 0; }
+      [hidden] { display: none !important; }
+      @media (max-width: 720px) {
+        .w4-shell { width: min(100% - 20px, 960px); margin-top: 22px; }
+        .w4-hero, .w4-section-body { padding-left: 16px; padding-right: 16px; }
+        .w4-grid, .w4-grid-3 { grid-template-columns: 1fr; gap: 0; }
+      }
+    </style>
 </head>
 <body>
 <script>window.__FORM_SKIP_SIGNIN_GATE__=true;</script>
@@ -930,21 +1086,13 @@ function dropdownMirror(selectEl, baseName){
 
     <!-- Sliding Cart Menu -->
     <div class="cart-overlay" id="cart-overlay">
-        <div class="cart-side-menu" id="cart-side-menu" style="max-height: 100vh; overflow-y: auto;">
-            <div class="cart-header" style="background:#2c3e50;color:#fff;padding:20px 0 20px 20px;display:flex;justify-content:space-between;align-items:center;">
-                <h2 style="margin:0;font-size:1.5em;font-weight:700;">🛒 Cart</h2>
-                <button class="cart-close-btn" id="cart-close-btn" style="background:none;border:none;color:#fff;font-size:1.5em;cursor:pointer;padding:0;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background 0.2s;margin-right:8px;">&times;</button>
+        <div class="cart-side-menu" id="cart-side-menu">
+            <div class="cart-header">
+                <h2>Cart</h2>
+                <button class="cart-close-btn" id="cart-close-btn" type="button" aria-label="Close cart">&times;</button>
             </div>
             <div class="cart-content" id="cart-content">
-                <div class="cart-icon-large">🛒</div>
-                <div class="cart-message" id="cart-message">Create an account to start shopping!</div>
-                <div class="cart-description" id="cart-description">
-                    To add forms to your cart and make purchases, you\'ll need to create a FormStar account. 
-                    Sign up now to access our complete library of legal forms and start simplifying your paperwork.
-                </div>
-                <a href="../Pages/account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>
                 <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>
-                <button class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;margin-top:24px;background:#2980b9;color:#fff;padding:15px 40px;font-size:1.1em;font-weight:700;border:none;border-radius:8px;cursor:pointer;">Checkout</button>
             </div>
         </div>
     </div>
@@ -1094,16 +1242,654 @@ document.addEventListener("DOMContentLoaded", function() {
     <div id="result"></div>
     <section>
     <div id="box">
-        <form id="customForm" onsubmit="return window.__autoFormHandleSubmit ? window.__autoFormHandleSubmit(event) : false;">
+        <form id="customForm">
         <!-- Hidden fields for URL parameters -->
-        <input type="hidden" id="form_zip" name="form_zip" value="">
-        <input type="hidden" id="form_county" name="form_county" value="">
-        <input type="hidden" id="form_defendant" name="form_defendant" value="">
-        <input type="hidden" id="form_ID" name="form_ID" value="">
-        <input type="hidden" id="current_date" name="current_date" value="">
-        <input type="hidden" id="court_name" name="court_name" value="">
-        <input type="hidden" id="court_address" name="court_address" value="">
-<div class="stepper-progress-bar" id="stepperProgressBar"><div class="stepper-step" data-step="1"><div class="stepper-circle">1</div><div class="stepper-label">Contributing Agency Information</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="2"><div class="stepper-circle">2</div><div class="stepper-label">Applicant Information</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="3"><div class="stepper-circle">3</div><div class="stepper-label">Employer Information</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="4"><div class="stepper-circle">4</div><div class="stepper-label">Applicant Sex</div></div><div class="stepper-line"></div><div class="stepper-step" data-step="5"><div class="stepper-circle">5</div><div class="stepper-label">Service Level</div></div></div><div id="section1" class="section active"><center><h1 class="section-title">Contributing Agency Information</h1><div id="question-container-1" data-question-id="1" class="question-container question-item" data-section="1" data-question-index="1"><label><h3 class="question-text">What is the ORI (Code assigned by DOJ)?</h3></label><input type="text" class="address-input" id="ori_code" name="ori_code" value="" placeholder="ORI Code" data-question-id="1"></div><div id="question-container-2" data-question-id="2" class="question-container question-item question-step-hidden" data-section="1" data-question-index="2"><label><h3 class="question-text">What is the Authorized Applicant Type?</h3></label><input type="text" class="address-input" id="authorized_applicant_type" name="authorized_applicant_type" value="" placeholder="Authorized Applicant Type" data-question-id="2"></div><div id="question-container-3" data-question-id="3" class="question-container question-item question-step-hidden" data-section="1" data-question-index="3"><label><h3 class="question-text">What is the Type of License/Certification/Permit OR Working Title?</h3></label><input type="text" class="address-input" id="type_of_license_certification_permit" name="type_of_license_certification_permit" value="" placeholder="Type of License/Certification/Permit" data-autopopulate="true" data-profile-key="type_of_license_certification_permit" data-profile-description="Type of License/Certification/Permit OR Working Title" data-question-id="3"></div><div id="question-container-4" data-question-id="4" class="question-container question-item question-step-hidden" data-section="1" data-question-index="4"><label><h3 class="question-text">What is the Agency Authorized to Receive Criminal Record Information?</h3></label><input type="text" class="address-input" id="agency_authorized_to_receive_criminal_record_info" name="agency_authorized_to_receive_criminal_record_info" value="" placeholder="Agency Name" data-question-id="4"></div><div id="question-container-5" data-question-id="5" class="question-container question-item question-step-hidden" data-section="1" data-question-index="5"><label><h3 class="question-text">What is the Mail Code (five-digit code assigned by DOJ)?</h3></label><input type="text" class="address-input" id="mail_code" name="mail_code" value="" placeholder="Mail Code" data-question-id="5"></div><div id="question-container-6" data-question-id="6" class="question-container question-item question-step-hidden" data-section="1" data-question-index="6"><label><h3 class="question-text">What is the Street Address or P.O. Box?</h3></label><input type="text" class="address-input" id="street_address" name="street_address" value="921 Sloat Road" placeholder="Street Address or P.O. Box" data-autopopulate="true" data-profile-key="street" data-profile-description="User's home address" data-question-id="6"></div><div id="question-container-7" data-question-id="7" class="question-container question-item question-step-hidden" data-section="1" data-question-index="7"><label><h3 class="question-text">What is the City?</h3></label><input type="text" class="address-input" id="agency_city" name="agency_city" value="Salinas" placeholder="City" data-autopopulate="true" data-profile-key="city" data-profile-description="User's home city" data-question-id="7"></div><div id="question-container-8" data-question-id="8" class="question-container question-item question-step-hidden" data-section="1" data-question-index="8"><label><h3 class="question-text">What is the ZIP Code?</h3></label><input type="text" class="address-input" id="agency_zip_code" name="agency_zip_code" value="93907" placeholder="ZIP Code" data-autopopulate="true" data-profile-key="zip" data-profile-description="User's home ZIP code" data-question-id="8"></div><div id="question-container-9" data-question-id="9" class="question-container question-item question-step-hidden" data-section="1" data-question-index="9"><label><h3 class="question-text">What is the Contact Telephone Number?</h3></label><input type="text" class="address-input" id="contact_telephone_number" name="contact_telephone_number" value="+13912893812" placeholder="Contact Telephone Number" data-autopopulate="true" data-profile-key="phone" data-profile-description="User's phone number" data-question-id="9"></div><div id="question-container-10" data-question-id="10" class="question-container question-item question-step-hidden" data-section="1" data-question-index="10"><label><h3 class="question-text">What is the Contact Name (mandatory for all school submissions)?</h3></label><input type="text" class="address-input" id="contact_name" name="contact_name" value="" placeholder="Contact Name" data-question-id="10"></div><div class="question-nav" data-section-index="1"><button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="1">&larr;</button><button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="1">&rarr;</button></div><br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section2" class="section"><center><h1 class="section-title">Applicant Information</h1><div id="question-container-11" data-question-id="11" class="question-container question-item" data-section="2" data-question-index="1"><label><h3 class="question-text">What is your First Name?</h3></label><input type="text" class="address-input" id="applicant_first_name" name="applicant_first_name" value="Adam" placeholder="First Name" data-autopopulate="true" data-profile-key="firstName" data-profile-description="User's legal first name" data-question-id="11"></div><div id="question-container-12" data-question-id="12" class="question-container question-item question-step-hidden" data-section="2" data-question-index="2"><label><h3 class="question-text">What is your Last Name?</h3></label><input type="text" class="address-input" id="applicant_last_name" name="applicant_last_name" value="Chaabane" placeholder="Last Name" data-autopopulate="true" data-profile-key="lastName" data-profile-description="User's legal last name" data-question-id="12"></div><div id="question-container-13" data-question-id="13" class="question-container question-item question-step-hidden" data-section="2" data-question-index="3"><label><h3 class="question-text">What is your Suffix?</h3></label><input type="text" class="address-input" id="applicant_suffix" name="applicant_suffix" value="test suffix" placeholder="Suffix" data-autopopulate="true" data-profile-key="applicant_suffix_0" data-profile-description="User's suffix" data-question-id="13"></div><div id="question-container-14" data-question-id="14" class="question-container question-item question-step-hidden" data-section="2" data-question-index="4"><label><h3 class="question-text">What is your Date of Birth?</h3></label><input type="date" class="address-input" id="date_of_birth" name="date_of_birth" value="2026-05-26" data-autopopulate="true" data-profile-key="date_of_birth" data-profile-description="User's date of birth" data-question-id="14"></div><div id="question-container-15" data-question-id="15" class="question-container question-item question-step-hidden" data-section="2" data-question-index="5"><label><h3 class="question-text">What is your Driver's License Number?</h3></label><input type="text" class="address-input" id="drivers_license_number" name="drivers_license_number" value="" placeholder="Driver's License Number" data-autopopulate="true" data-profile-key="drivers_license_number" data-profile-description="Driver's License Number" data-question-id="15"></div><div id="question-container-16" data-question-id="16" class="question-container question-item question-step-hidden" data-section="2" data-question-index="6"><label><h3 class="question-text">What is your Weight?</h3></label><input type="text" class="address-input" id="weight" name="weight" value="160" placeholder="Weight" data-autopopulate="true" data-profile-key="weight" data-profile-description="User's weight" data-question-id="16"></div><div id="question-container-17" data-question-id="17" class="question-container question-item question-step-hidden" data-section="2" data-question-index="7"><label><h3 class="question-text">What is your Height?</h3></label><input type="text" class="address-input" id="height" name="height" value="67" placeholder="Height" data-autopopulate="true" data-profile-key="height" data-profile-description="User's height" data-question-id="17"></div><div id="question-container-18" data-question-id="18" class="question-container question-item question-step-hidden" data-section="2" data-question-index="8"><label><h3 class="question-text">What is your Eye Color?</h3></label><input type="text" class="address-input" id="eye_color" name="eye_color" value="" placeholder="Eye Color" data-autopopulate="true" data-profile-key="eye_color" data-profile-description="Eye Color" data-question-id="18"></div><div id="question-container-19" data-question-id="19" class="question-container question-item question-step-hidden" data-section="2" data-question-index="9"><label><h3 class="question-text">What is your Hair Color?</h3></label><input type="text" class="address-input" id="hair_color" name="hair_color" value="" placeholder="Hair Color" data-autopopulate="true" data-profile-key="hair_color" data-profile-description="Hair Color" data-question-id="19"></div><div id="question-container-20" data-question-id="20" class="question-container question-item question-step-hidden" data-section="2" data-question-index="10"><label><h3 class="question-text">What is your Place of Birth (State or Country)?</h3></label><input type="text" class="address-input" id="place_of_birth" name="place_of_birth" value="" placeholder="Place of Birth" data-autopopulate="true" data-profile-key="place_of_birth" data-profile-description="Place of Birth (State or Country)" data-question-id="20"></div><div id="question-container-21" data-question-id="21" class="question-container question-item question-step-hidden" data-section="2" data-question-index="11"><label><h3 class="question-text">What is your Social Security Number?</h3></label><input type="text" class="address-input" id="social_security_number" name="social_security_number" value="" placeholder="Social Security Number" data-autopopulate="true" data-profile-key="social_security_number" data-profile-description="Social Security Number" data-question-id="21"></div><div id="question-container-22" data-question-id="22" class="question-container question-item question-step-hidden" data-section="2" data-question-index="12"><label><h3 class="question-text">What is your Misc. Number (Other Identification Number)?</h3></label><input type="text" class="address-input" id="misc_number" name="misc_number" value="" placeholder="Misc. Number" data-autopopulate="true" data-profile-key="misc_number" data-profile-description="Misc. Number (Other Identification Number)" data-question-id="22"></div><div id="question-container-23" data-question-id="23" class="question-container question-item question-step-hidden" data-section="2" data-question-index="13"><label><h3 class="question-text">What is your Home Address Street Address or P.O. Box?</h3></label><input type="text" class="address-input" id="home_street_address" name="home_street_address" value="921 Sloat Road" placeholder="Home Address" data-autopopulate="true" data-profile-key="street" data-profile-description="User's home address" data-question-id="23"></div><div id="question-container-24" data-question-id="24" class="question-container question-item question-step-hidden" data-section="2" data-question-index="14"><label><h3 class="question-text">What is your Home City?</h3></label><input type="text" class="address-input" id="applicant_home_city" name="applicant_home_city" value="Salinas" placeholder="City" data-autopopulate="true" data-profile-key="city" data-profile-description="User's home city" data-question-id="24"></div><div id="question-container-25" data-question-id="25" class="question-container question-item question-step-hidden" data-section="2" data-question-index="15"><label><h3 class="question-text">What is your Home ZIP Code?</h3></label><input type="text" class="address-input" id="applicant_home_zip_code" name="applicant_home_zip_code" value="93907" placeholder="ZIP Code" data-autopopulate="true" data-profile-key="zip" data-profile-description="User's home ZIP code" data-question-id="25"></div><div id="question-container-26" data-question-id="26" class="question-container question-item question-step-hidden" data-section="2" data-question-index="16"><label><h3 class="question-text">What is your Signature Date?</h3></label><input type="date" class="address-input" id="applicant_signature_date" name="applicant_signature_date" value="" data-autopopulate="true" data-profile-key="applicant_signature_date" data-profile-description="Date" data-question-id="26"></div><div id="question-container-27" data-question-id="27" class="question-container question-item question-step-hidden" data-section="2" data-question-index="17"><label><h3 class="question-text">What is your Your Number?</h3></label><input type="text" class="address-input" id="your_number" name="your_number" value="" placeholder="Your Number" data-question-id="27"></div><div id="question-container-28" data-question-id="28" class="question-container question-item question-step-hidden" data-section="2" data-question-index="18"><label><h3 class="question-text">What is the Original ATI Number?</h3></label><input type="text" class="address-input" id="original_ati_number" name="original_ati_number" value="" placeholder="Original ATI Number" data-question-id="28"></div><div class="question-nav" data-section-index="2"><button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="2">&larr;</button><button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="2">&rarr;</button></div><br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section3" class="section"><center><h1 class="section-title">Employer Information</h1><div id="question-container-29" data-question-id="29" class="question-container question-item" data-section="3" data-question-index="1"><label><h3 class="question-text">What is the Employer Name?</h3></label><input type="text" class="address-input" id="employer_name" name="employer_name" value="" placeholder="Employer Name" data-autopopulate="true" data-profile-key="employer_name" data-profile-description="Employer Name" data-question-id="29"></div><div id="question-container-30" data-question-id="30" class="question-container question-item question-step-hidden" data-section="3" data-question-index="2"><label><h3 class="question-text">What is the Employer Street Address or P.O. Box?</h3></label><input type="text" class="address-input" id="employer_street_address" name="employer_street_address" value="" placeholder="Employer Address" data-autopopulate="true" data-profile-key="employer_street_address" data-profile-description="Street Address or P.O. Box" data-question-id="30"></div><div id="question-container-31" data-question-id="31" class="question-container question-item question-step-hidden" data-section="3" data-question-index="3"><label><h3 class="question-text">What is the Employer City?</h3></label><input type="text" class="address-input" id="employer_city" name="employer_city" value="Salinas" placeholder="City" data-autopopulate="true" data-profile-key="employer_city" data-profile-description="City" data-question-id="31"></div><div id="question-container-32" data-question-id="32" class="question-container question-item question-step-hidden" data-section="3" data-question-index="4"><label><h3 class="question-text">What is the Employer ZIP Code?</h3></label><input type="text" class="address-input" id="employer_zip_code" name="employer_zip_code" value="93907" placeholder="ZIP Code" data-autopopulate="true" data-profile-key="employer_zip_code" data-profile-description="ZIP Code" data-question-id="32"></div><div id="question-container-33" data-question-id="33" class="question-container question-item question-step-hidden" data-section="3" data-question-index="5"><label><h3 class="question-text">What is the Employer Telephone Number (optional)?</h3></label><input type="text" class="address-input" id="employer_phone_number" name="employer_phone_number" value="+13912893812" placeholder="Employer Phone Number" data-autopopulate="true" data-profile-key="phone" data-profile-description="Telephone Number (optional)" data-question-id="33"></div><div id="question-container-34" data-question-id="34" class="question-container question-item question-step-hidden" data-section="3" data-question-index="6"><label><h3 class="question-text">What is the Employer Mail Code (five digit code assigned by DOJ)?</h3></label><input type="text" class="address-input" id="employer_mail_code" name="employer_mail_code" value="" placeholder="Employer Mail Code" data-autopopulate="true" data-profile-key="employer_mail_code" data-profile-description="Mail Code (five digit code assigned by DOJ)" data-question-id="34"></div><div class="question-nav" data-section-index="3"><button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="3">&larr;</button><button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="3">&rarr;</button></div><br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section4" class="section"><center><h1 class="section-title">Applicant Sex</h1><div id="question-container-35" data-question-id="35" class="question-container question-item" data-section="4" data-question-index="1"><label><h3 class="question-text">What is your sex?</h3></label><label class="checkbox-option" style="display:block;margin:8px 0;"><input type="checkbox" name="applicant_sex_male" value="Male" data-autopopulate="true" data-profile-key="applicant_sex_male" data-profile-description="Male"> Male</label><label class="checkbox-option" style="display:block;margin:8px 0;"><input type="checkbox" name="applicant_sex_female" value="Female" data-autopopulate="true" data-profile-key="applicant_sex_female" data-profile-description="Female"> Female</label><label class="checkbox-option" style="display:block;margin:8px 0;"><input type="checkbox" name="applicant_sex_nonbinary" value="Nonbinary/Unspecified" data-autopopulate="true" data-profile-key="applicant_sex_nonbinary" data-profile-description="Nonbinary/Unspecified"> Nonbinary/Unspecified</label></div><div class="question-nav" data-section-index="4"><button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="4">&larr;</button><button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="4">&rarr;</button></div><br><br><div class="navigation-buttons" style="display:none;"><button type="button" onclick="goBack()">Back</button></div></div><div id="section5" class="section"><center><h1 class="section-title">Service Level</h1><div id="question-container-36" data-question-id="36" class="question-container question-item" data-section="5" data-question-index="1"><label><h3 class="question-text">What is the level of service?</h3></label><label class="checkbox-option" style="display:block;margin:8px 0;"><input type="checkbox" name="level_of_service_doj" value="DOJ"> DOJ</label><label class="checkbox-option" style="display:block;margin:8px 0;"><input type="checkbox" name="level_of_service_fbi" value="FBI"> FBI</label></div><div id="question-container-37" data-question-id="37" class="question-container question-item question-step-hidden" data-section="5" data-question-index="2"><label><h3 class="question-text">What is your suffix?</h3></label><input type="text" class="address-input" id="other_name_suffix" name="other_name_suffix" value="" placeholder="Suffix" data-autopopulate="true" data-profile-key="other_name_suffix" data-profile-description="Suffix" data-question-id="37"></div><div id="question-container-38" data-question-id="38" class="question-container question-item question-step-hidden" data-section="5" data-question-index="3"><label><h3 class="question-text">What is your last name?</h3></label><input type="text" class="address-input" id="other_name_last_name" name="other_name_last_name" value="" placeholder="Last Name" data-autopopulate="true" data-profile-key="other_name_last_name" data-profile-description="Last Name" data-question-id="38"></div><div id="question-container-39" data-question-id="39" class="question-container question-item question-step-hidden" data-section="5" data-question-index="4"><label><h3 class="question-text">What is your first name?</h3></label><input type="text" class="address-input" id="other_name_first_name" name="other_name_first_name" value="" placeholder="First Name" data-autopopulate="true" data-profile-key="other_name_first_name" data-profile-description="First Name" data-question-id="39"></div><div id="question-container-40" data-question-id="40" class="question-container question-item question-step-hidden" data-section="5" data-question-index="5"><label><h3 class="question-text">What is your billing number?</h3></label><input type="number" step="0.01" class="address-input" id="billing_number" name="billing_number" value="" placeholder="Billing Number" data-profile-key="billing_number" data-profile-description="Billing Number" data-question-id="40"></div><div class="question-nav" data-section-index="5"><button type="button" class="question-nav-btn question-prev" aria-label="Previous question" data-section="5">&larr;</button><button type="button" class="question-nav-btn question-next" aria-label="Next question" data-section="5">&rarr;</button></div><br><br><div class="navigation-buttons" style="display:none;"><button type="submit" class="next-button">Submit</button></div></div>
+        <input type="hidden" id="form_zip" name="form_zip" value="" disabled>
+        <input type="hidden" id="form_county" name="form_county" value="" disabled>
+        <input type="hidden" id="form_defendant" name="form_defendant" value="" disabled>
+        <input type="hidden" id="form_ID" name="form_ID" value="" disabled>
+        <input type="hidden" id="current_date" name="current_date" value="" disabled>
+        <input type="hidden" id="court_name" name="court_name" value="" disabled>
+        <input type="hidden" id="court_address" name="court_address" value="" disabled>
+
+        <div class="w4-hidden-store" aria-hidden="true">
+          <input type="checkbox" id="filing_status_single_or_married_separately" name="filing_status_single_or_married_separately">
+          <input type="checkbox" id="filing_status_married_jointly_or_surviving_spouse" name="filing_status_married_jointly_or_surviving_spouse">
+          <input type="checkbox" id="filing_status_head_of_household" name="filing_status_head_of_household">
+          <input type="checkbox" id="multiple_jobs_or_spouse_works" name="multiple_jobs_or_spouse_works">
+          <input type="checkbox" id="exempt_from_withholding" name="exempt_from_withholding">
+        </div>
+
+        <main class="w4-shell">
+          <div class="w4-hero">
+            <h1>Form W-4</h1>
+          </div>
+
+          <div id="w4_error_summary" class="w4-error-summary" role="alert" tabindex="-1"></div>
+
+          <section class="w4-section" id="employee_information_section">
+            <h2 class="w4-section-title">1. Your information</h2>
+            <div class="w4-section-body">
+              <div class="w4-grid">
+                <div class="w4-question">
+                  <label class="w4-label" for="first_name_and_middle_initial">What is your first name and middle initial?</label>
+                  <input class="w4-input address-input" type="text" id="first_name_and_middle_initial" name="first_name_and_middle_initial" autocomplete="given-name" required>
+                </div>
+                <div class="w4-question">
+                  <label class="w4-label" for="last_name">What is your last name?</label>
+                  <input class="w4-input address-input" type="text" id="last_name" name="last_name" autocomplete="family-name" required>
+                </div>
+              </div>
+
+              <div class="w4-question">
+                <label class="w4-label" for="social_security_number">What is your Social Security number?</label>
+                <p class="w4-help">Enter nine digits. Dashes will be added automatically.</p>
+                <input class="w4-input address-input" type="text" id="social_security_number" name="social_security_number" inputmode="numeric" autocomplete="off" maxlength="11" placeholder="123-45-6789" required>
+              </div>
+
+              <div class="w4-question">
+                <label class="w4-label" for="street_address">What is your street address?</label>
+                <input class="w4-input address-input" type="text" id="street_address" name="street_address" autocomplete="street-address" required>
+              </div>
+
+              <div class="w4-question">
+                <label class="w4-label" for="city_state_zip_code">What are your city, state, and ZIP code?</label>
+                <input class="w4-input address-input" type="text" id="city_state_zip_code" name="city_state_zip_code" placeholder="Santa Cruz, CA 95060" required>
+              </div>
+
+              <div class="w4-note">If your name does not match your Social Security card, contact the Social Security Administration at 800-772-1213 or visit www.ssa.gov.</div>
+            </div>
+          </section>
+
+          <section class="w4-section" id="exemption_section">
+            <h2 class="w4-section-title">2. Exemption from withholding</h2>
+            <div class="w4-section-body">
+              <div class="w4-question">
+                <label class="w4-label" for="exempt_2025">Did you have no federal income tax liability for 2025?</label>
+                <p class="w4-help">This generally means your total federal income tax was zero, or you were not required to file because your income was below the filing threshold.</p>
+                <select class="w4-select" id="exempt_2025" required>
+                  <option value="">Select Yes or No</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+
+              <div class="w4-question" id="exempt_2026_wrap" hidden>
+                <label class="w4-label" for="exempt_2026">Do you expect to have no federal income tax liability for 2026?</label>
+                <select class="w4-select" id="exempt_2026">
+                  <option value="">Select Yes or No</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+
+              <div class="w4-question" id="claim_exemption_wrap" hidden>
+                <label class="w4-label" for="claim_exemption">Do you want to claim exemption from federal income tax withholding for 2026?</label>
+                <select class="w4-select" id="claim_exemption">
+                  <option value="">Select Yes or No</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+
+              <div class="w4-warning" id="exempt_notice" hidden>You are claiming exemption. The downloaded W-4 will skip filing status and Steps 2 through 4. You must submit a new Form W-4 for 2027.</div>
+            </div>
+          </section>
+
+          <div id="normal_withholding_route">
+            <section class="w4-section" id="filing_status_section">
+              <h2 class="w4-section-title">3. Filing status</h2>
+              <div class="w4-section-body">
+                <div class="w4-question">
+                  <label class="w4-label" for="filing_status_ui">Which filing status do you expect to use on your 2026 federal tax return?</label>
+                  <select class="w4-select" id="filing_status_ui">
+                    <option value="">Choose one filing status</option>
+                    <option value="single">Single</option>
+                    <option value="married_separate">Married filing separately</option>
+                    <option value="married_joint">Married filing jointly</option>
+                    <option value="surviving_spouse">Qualifying surviving spouse</option>
+                    <option value="head">Head of household</option>
+                  </select>
+                </div>
+
+                <div class="w4-question" id="head_eligibility_wrap" hidden>
+                  <label class="w4-label" for="head_eligibility">Are you unmarried and paying more than half the cost of keeping up a home for yourself and a qualifying person?</label>
+                  <select class="w4-select" id="head_eligibility">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                  <div class="w4-warning" id="head_not_eligible" hidden>Based on that answer, select a different filing status.</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="w4-section" id="multiple_jobs_section">
+              <h2 class="w4-section-title">4. Multiple jobs or working spouse</h2>
+              <div class="w4-section-body">
+                <div class="w4-question">
+                  <label class="w4-label" for="more_than_one_job">Do you have more than one job at the same time?</label>
+                  <select class="w4-select" id="more_than_one_job">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+
+                <div class="w4-question" id="spouse_works_wrap" hidden>
+                  <label class="w4-label" for="spouse_works">Does your spouse also work?</label>
+                  <select class="w4-select" id="spouse_works">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+
+                <div class="w4-question" id="step2_method_wrap" hidden>
+                  <label class="w4-label" for="step2_method">How would you like to account for the income from the other job or jobs?</label>
+                  <select class="w4-select" id="step2_method">
+                    <option value="">Choose one method</option>
+                    <option value="estimator">Use the IRS withholding estimator</option>
+                    <option value="worksheet">Use the Multiple Jobs Worksheet in this form</option>
+                    <option value="checkbox">Use the two-jobs checkbox</option>
+                  </select>
+                </div>
+
+                <div class="w4-note" id="estimator_note" hidden>Use the estimator at www.irs.gov/W4App. Return here and enter the amounts it recommends in Steps 3 and 4.</div>
+
+                <div class="w4-question" id="two_jobs_confirm_wrap" hidden>
+                  <label class="w4-label" for="two_jobs_confirm">Are there exactly two jobs in total?</label>
+                  <select class="w4-select" id="two_jobs_confirm">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                  <div class="w4-warning" id="two_jobs_invalid" hidden>The checkbox method can only be used when there are exactly two jobs. Choose the estimator or worksheet method instead.</div>
+                </div>
+
+                <div class="w4-question" id="highest_paying_wrap" hidden>
+                  <label class="w4-label" for="highest_paying_form">Is this W-4 for the highest-paying job?</label>
+                  <p class="w4-help">Steps 3, 4(a), and 4(b) should normally be completed on only the highest-paying job's W-4.</p>
+                  <select class="w4-select" id="highest_paying_form">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+
+                <div class="w4-warning" id="highest_paying_note" hidden>Steps 3, 4(a), and 4(b) are being skipped on this W-4. You may still request extra withholding in Step 4(c).</div>
+              </div>
+            </section>
+
+            <section class="w4-section" id="credits_section">
+              <h2 class="w4-section-title">5. Dependents and other tax credits</h2>
+              <div class="w4-section-body">
+                <div class="w4-question">
+                  <label class="w4-label" for="credit_income_limit">Will your total 2026 income be $200,000 or less, or $400,000 or less if married filing jointly?</label>
+                  <select class="w4-select" id="credit_income_limit">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+
+                <div class="w4-question" id="claim_credits_wrap" hidden>
+                  <label class="w4-label" for="claim_credits">Do you expect to claim qualifying children, other dependents, or other tax credits?</label>
+                  <select class="w4-select" id="claim_credits">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+
+                <div id="credits_details" hidden>
+                  <div class="w4-question">
+                    <label class="w4-label" for="qualifying_children_count">How many qualifying children under age 17 will you claim?</label>
+                    <input class="w4-input" type="number" id="qualifying_children_count" min="0" step="1" value="0">
+                    <div class="w4-calculation">Children multiplied by $2,200:</div>
+                    <input class="w4-input" type="text" id="qualifying_children_amount" name="qualifying_children_amount" readonly>
+                  </div>
+
+                  <div class="w4-question">
+                    <label class="w4-label" for="other_dependents_count">How many other qualifying dependents will you claim?</label>
+                    <input class="w4-input" type="number" id="other_dependents_count" min="0" step="1" value="0">
+                    <div class="w4-calculation">Other dependents multiplied by $500:</div>
+                    <input class="w4-input" type="text" id="other_dependents_amount" name="other_dependents_amount" readonly>
+                  </div>
+
+                  <div class="w4-question">
+                    <label class="w4-label" for="other_credits_helper">What is the total amount of any other tax credits you expect to claim?</label>
+                    <p class="w4-help">Enter 0 if you do not expect any other credits.</p>
+                    <input class="w4-input" type="number" id="other_credits_helper" min="0" step="0.01" value="0">
+                    <div class="w4-calculation"><strong>Total credits entered on Step 3:</strong></div>
+                    <input class="w4-input" type="text" id="total_credits_amount" name="total_credits_amount" readonly>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="w4-section" id="adjustments_section">
+              <h2 class="w4-section-title">6. Other adjustments</h2>
+              <div class="w4-section-body">
+                <div id="step4_ab_wrap">
+                  <div class="w4-question">
+                    <label class="w4-label" for="other_income_apply">Do you expect income outside your jobs that will not already have federal tax withheld?</label>
+                    <p class="w4-help">Examples include interest, dividends, and retirement income. Do not include income from jobs or self-employment.</p>
+                    <select class="w4-select" id="other_income_apply">
+                      <option value="">Select Yes or No</option>
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+
+                  <div class="w4-question" id="other_income_amount_wrap" hidden>
+                    <label class="w4-label" for="other_income_amount">How much other income do you expect in 2026?</label>
+                    <input class="w4-input" type="number" id="other_income_amount" name="other_income_amount" min="0" step="0.01">
+                  </div>
+
+                  <div class="w4-question">
+                    <label class="w4-label" for="deductions_apply">Do you want qualifying deductions to reduce the amount withheld from your pay?</label>
+                    <select class="w4-select" id="deductions_apply">
+                      <option value="">Select Yes or No</option>
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+
+                  <div class="w4-question" id="deductions_method_wrap" hidden>
+                    <label class="w4-label" for="deductions_method">Do you already know the result from the Deductions Worksheet?</label>
+                    <select class="w4-select" id="deductions_method">
+                      <option value="">Choose one option</option>
+                      <option value="known">Yes, I already know the amount</option>
+                      <option value="guide">No, guide me through the worksheet</option>
+                    </select>
+                  </div>
+
+                  <div class="w4-question" id="deductions_amount_wrap" hidden>
+                    <label class="w4-label" for="deductions_amount">What deduction amount should be entered in Step 4(b)?</label>
+                    <input class="w4-input" type="number" id="deductions_amount" name="deductions_amount" min="0" step="0.01">
+                  </div>
+                </div>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="extra_withholding_apply">Do you want additional federal income tax withheld from each paycheck?</label>
+                  <select class="w4-select" id="extra_withholding_apply">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+
+                <div class="w4-question" id="extra_withholding_amount_wrap" hidden>
+                  <label class="w4-label" for="extra_withholding_amount">How much additional federal income tax should be withheld from each paycheck?</label>
+                  <input class="w4-input" type="number" id="extra_withholding_amount" name="extra_withholding_amount" min="0" step="0.01">
+                </div>
+              </div>
+            </section>
+
+            <section class="w4-section" id="multiple_jobs_worksheet_section" hidden>
+              <h2 class="w4-section-title">Multiple Jobs Worksheet</h2>
+              <div class="w4-section-body">
+                <div class="w4-warning">Complete this worksheet on only the W-4 for the highest-paying job.</div>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="multiple_jobs_complex">Are there more than three jobs, or do more than one of the jobs pay over $120,000 per year?</label>
+                  <select class="w4-select" id="multiple_jobs_complex">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+
+                <div class="w4-warning" id="multiple_jobs_complex_note" hidden>Use the IRS estimator or Publication 505 instead of this worksheet.</div>
+
+                <div id="multiple_jobs_standard_wrap" hidden>
+                  <div class="w4-question">
+                    <label class="w4-label" for="multiple_jobs_count">Are there two or three jobs in total?</label>
+                    <select class="w4-select" id="multiple_jobs_count">
+                      <option value="">Choose the number of jobs</option>
+                      <option value="2">Two jobs</option>
+                      <option value="3">Three jobs</option>
+                    </select>
+                  </div>
+
+                  <div class="w4-question" id="multiple_jobs_line_1_wrap" hidden>
+                    <label class="w4-label" for="multiple_jobs_line_1_amount">Using the page 5 table for your filing status, what amount appears where the two jobs' salary ranges meet?</label>
+                    <input class="w4-input" type="number" id="multiple_jobs_line_1_amount" name="multiple_jobs_line_1_amount" min="0" step="0.01">
+                  </div>
+
+                  <div id="multiple_jobs_three_wrap" hidden>
+                    <div class="w4-question">
+                      <label class="w4-label" for="multiple_jobs_line_2a_amount">Using the page 5 table, what amount applies to the two highest-paying jobs?</label>
+                      <input class="w4-input" type="number" id="multiple_jobs_line_2a_amount" name="multiple_jobs_line_2a_amount" min="0" step="0.01">
+                    </div>
+                    <div class="w4-question">
+                      <label class="w4-label" for="multiple_jobs_line_2b_amount">After combining the pay from the two highest-paying jobs, what table amount applies when compared with the third job?</label>
+                      <input class="w4-input" type="number" id="multiple_jobs_line_2b_amount" name="multiple_jobs_line_2b_amount" min="0" step="0.01">
+                    </div>
+                    <div class="w4-question">
+                      <label class="w4-label" for="multiple_jobs_line_2c_amount">Total from lines 2(a) and 2(b)</label>
+                      <input class="w4-input" type="text" id="multiple_jobs_line_2c_amount" name="multiple_jobs_line_2c_amount" readonly>
+                    </div>
+                  </div>
+
+                  <div class="w4-question" id="multiple_jobs_pay_wrap" hidden>
+                    <label class="w4-label" for="pay_periods_ui">How many paychecks does the highest-paying job provide each year?</label>
+                    <select class="w4-select" id="pay_periods_ui">
+                      <option value="">Choose a pay schedule</option>
+                      <option value="52">Weekly, 52 paychecks</option>
+                      <option value="26">Every two weeks, 26 paychecks</option>
+                      <option value="24">Twice a month, 24 paychecks</option>
+                      <option value="12">Monthly, 12 paychecks</option>
+                      <option value="other">Other schedule</option>
+                    </select>
+                    <div id="pay_periods_other_wrap" hidden style="margin-top:10px;">
+                      <label class="w4-label" for="pay_periods_other">How many paychecks are there each year?</label>
+                      <input class="w4-input" type="number" id="pay_periods_other" min="1" step="1">
+                    </div>
+                    <input class="w4-input" type="text" id="multiple_jobs_pay_periods_per_year" name="multiple_jobs_pay_periods_per_year" readonly style="margin-top:10px;">
+                  </div>
+
+                  <div class="w4-question" id="multiple_jobs_line_4_wrap" hidden>
+                    <label class="w4-label" for="multiple_jobs_line_4_amount">Worksheet amount for each paycheck</label>
+                    <input class="w4-input" type="text" id="multiple_jobs_line_4_amount" name="multiple_jobs_line_4_amount" readonly>
+                  </div>
+
+                  <div class="w4-question" id="worksheet_additional_wrap" hidden>
+                    <label class="w4-label" for="worksheet_additional_choice">Do you want any additional amount withheld beyond the worksheet result?</label>
+                    <select class="w4-select" id="worksheet_additional_choice">
+                      <option value="">Select Yes or No</option>
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+
+                  <div class="w4-question" id="worksheet_additional_amount_wrap" hidden>
+                    <label class="w4-label" for="worksheet_additional_amount">How much more should be withheld from each paycheck?</label>
+                    <input class="w4-input" type="number" id="worksheet_additional_amount" min="0" step="0.01">
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="w4-section" id="deductions_worksheet_section" hidden>
+              <h2 class="w4-section-title">Deductions Worksheet</h2>
+              <div class="w4-section-body">
+                <h3 class="w4-subtitle">Tips, overtime, and vehicle-loan interest</h3>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="tips_apply">Do you expect qualified tips and meet the income limit shown in the W-4 instructions?</label>
+                  <select class="w4-select" id="tips_apply">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+                <div class="w4-question" id="tips_amount_wrap" hidden>
+                  <label class="w4-label" for="qualified_tips_amount">What is your estimated qualified-tip deduction, up to $25,000?</label>
+                  <input class="w4-input" type="number" id="qualified_tips_amount" name="qualified_tips_amount" min="0" max="25000" step="0.01">
+                </div>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="overtime_apply">Do you expect qualified overtime compensation and meet the income limit shown in the W-4 instructions?</label>
+                  <select class="w4-select" id="overtime_apply">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+                <div class="w4-question" id="overtime_amount_wrap" hidden>
+                  <label class="w4-label" for="qualified_overtime_compensation_amount">What is your estimated deduction for the qualifying portion of your overtime compensation?</label>
+                  <input class="w4-input" type="number" id="qualified_overtime_compensation_amount" name="qualified_overtime_compensation_amount" min="0" step="0.01">
+                </div>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="vehicle_interest_apply">Do you expect qualified passenger-vehicle loan interest and meet the worksheet's income limit?</label>
+                  <select class="w4-select" id="vehicle_interest_apply">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+                <div class="w4-question" id="vehicle_interest_amount_wrap" hidden>
+                  <label class="w4-label" for="qualified_passenger_vehicle_loan_interest_amount">What is your estimated qualified passenger-vehicle loan-interest deduction, up to $10,000?</label>
+                  <input class="w4-input" type="number" id="qualified_passenger_vehicle_loan_interest_amount" name="qualified_passenger_vehicle_loan_interest_amount" min="0" max="10000" step="0.01">
+                </div>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="deductions_line_2_total">Total for qualified tips, overtime, and vehicle-loan interest</label>
+                  <input class="w4-input" type="text" id="deductions_line_2_total" name="deductions_line_2_total" readonly>
+                </div>
+
+                <h3 class="w4-subtitle">Age 65 or older</h3>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="senior_income_limit">Is your total income below $75,000, or below $150,000 if married filing jointly?</label>
+                  <select class="w4-select" id="senior_income_limit">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+                <div id="senior_questions" hidden>
+                  <div class="w4-question">
+                    <label class="w4-label" for="senior_self_choice">Will you be age 65 or older by the end of 2026?</label>
+                    <select class="w4-select" id="senior_self_choice">
+                      <option value="">Select Yes or No</option>
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+                  <div class="w4-question" id="senior_spouse_question" hidden>
+                    <label class="w4-label" for="senior_spouse_choice">Will your spouse be age 65 or older by the end of 2026 and have a Social Security number valid for employment?</label>
+                    <select class="w4-select" id="senior_spouse_choice">
+                      <option value="">Select Yes or No</option>
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+                </div>
+                <input class="w4-hidden-store" type="text" id="senior_self_amount" name="senior_self_amount">
+                <input class="w4-hidden-store" type="text" id="senior_spouse_amount" name="senior_spouse_amount">
+                <div class="w4-question">
+                  <label class="w4-label" for="senior_total_amount">Total senior amount</label>
+                  <input class="w4-input" type="text" id="senior_total_amount" name="senior_total_amount" readonly>
+                </div>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="other_adjustments_apply">Do you expect deductible student-loan interest, IRA contributions, educator expenses, alimony, or other qualifying adjustments?</label>
+                  <select class="w4-select" id="other_adjustments_apply">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+                <div class="w4-question" id="other_adjustments_amount_wrap" hidden>
+                  <label class="w4-label" for="other_adjustments_amount">What is the estimated total of those adjustments?</label>
+                  <input class="w4-input" type="number" id="other_adjustments_amount" name="other_adjustments_amount" min="0" step="0.01">
+                </div>
+
+                <h3 class="w4-subtitle">Itemized deductions</h3>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="medical_apply">Do you expect deductible medical and dental expenses above 7.5% of your total income?</label>
+                  <select class="w4-select" id="medical_apply">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+                <div class="w4-question" id="medical_amount_wrap" hidden>
+                  <label class="w4-label" for="medical_and_dental_expenses_amount">What is the amount above 7.5% of your total income?</label>
+                  <input class="w4-input" type="number" id="medical_and_dental_expenses_amount" name="medical_and_dental_expenses_amount" min="0" step="0.01">
+                </div>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="state_tax_apply">Do you expect deductible state and local taxes?</label>
+                  <select class="w4-select" id="state_tax_apply">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+                <div class="w4-question" id="state_tax_amount_wrap" hidden>
+                  <label class="w4-label" for="state_and_local_taxes_amount">What qualifying state and local tax amount will you claim?</label>
+                  <input class="w4-input" type="number" id="state_and_local_taxes_amount" name="state_and_local_taxes_amount" min="0" step="0.01">
+                </div>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="mortgage_apply">Do you expect deductible home-mortgage interest or mortgage-insurance premiums?</label>
+                  <select class="w4-select" id="mortgage_apply">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+                <div class="w4-question" id="mortgage_amount_wrap" hidden>
+                  <label class="w4-label" for="home_mortgage_interest_amount">What qualifying home-mortgage interest amount will you claim?</label>
+                  <input class="w4-input" type="number" id="home_mortgage_interest_amount" name="home_mortgage_interest_amount" min="0" step="0.01">
+                </div>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="charity_itemized_apply">Do you expect charitable contributions above 0.5% of your total income?</label>
+                  <select class="w4-select" id="charity_itemized_apply">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+                <div class="w4-question" id="charity_itemized_amount_wrap" hidden>
+                  <label class="w4-label" for="charitable_gifts_amount">What is the qualifying amount above 0.5% of your total income?</label>
+                  <input class="w4-input" type="number" id="charitable_gifts_amount" name="charitable_gifts_amount" min="0" step="0.01">
+                </div>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="other_itemized_apply">Do you expect any other itemized deductions?</label>
+                  <select class="w4-select" id="other_itemized_apply">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+                <div class="w4-question" id="other_itemized_amount_wrap" hidden>
+                  <label class="w4-label" for="other_itemized_deductions_amount">What is the total amount of your other itemized deductions?</label>
+                  <input class="w4-input" type="number" id="other_itemized_deductions_amount" name="other_itemized_deductions_amount" min="0" step="0.01">
+                </div>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="itemized_deductions_total">Total itemized deductions</label>
+                  <input class="w4-input" type="text" id="itemized_deductions_total" name="itemized_deductions_total" readonly>
+                </div>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="total_income_amount">What is your estimated total income for 2026?</label>
+                  <input class="w4-input" type="number" id="total_income_amount" name="total_income_amount" min="0" step="0.01">
+                </div>
+
+                <div class="w4-grid">
+                  <div class="w4-question">
+                    <label class="w4-label" for="income_minus_senior_total">Income remaining after the senior amount</label>
+                    <input class="w4-input" type="text" id="income_minus_senior_total" name="income_minus_senior_total" readonly>
+                  </div>
+                  <div class="w4-question">
+                    <label class="w4-label" for="itemized_deductions_limit">Itemized-deduction limit for your filing status</label>
+                    <input class="w4-input" type="text" id="itemized_deductions_limit" name="itemized_deductions_limit" readonly>
+                  </div>
+                </div>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="adjusted_itemized_deductions">Adjusted itemized deductions</label>
+                  <input class="w4-input" type="text" id="adjusted_itemized_deductions" name="adjusted_itemized_deductions" readonly>
+                </div>
+
+                <h3 class="w4-subtitle">Standard-deduction comparison</h3>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="standard_deduction_amount">Standard deduction for your filing status</label>
+                  <input class="w4-input" type="text" id="standard_deduction_amount" name="standard_deduction_amount" readonly>
+                </div>
+
+                <div class="w4-question">
+                  <label class="w4-label" for="cash_gifts_apply">Do you plan to take the standard deduction and claim qualifying cash gifts to charities?</label>
+                  <select class="w4-select" id="cash_gifts_apply">
+                    <option value="">Select Yes or No</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+                <div class="w4-question" id="cash_gifts_amount_wrap" hidden>
+                  <label class="w4-label" for="cash_gifts_to_charities_amount">What qualifying cash-gift amount will you claim?</label>
+                  <input class="w4-input" type="number" id="cash_gifts_to_charities_amount" name="cash_gifts_to_charities_amount" min="0" step="0.01">
+                </div>
+
+                <div class="w4-grid-3">
+                  <div class="w4-question">
+                    <label class="w4-label" for="standard_deduction_plus_cash_gifts">Standard deduction plus cash gifts</label>
+                    <input class="w4-input" type="text" id="standard_deduction_plus_cash_gifts" name="standard_deduction_plus_cash_gifts" readonly>
+                  </div>
+                  <div class="w4-question">
+                    <label class="w4-label" for="deductions_line_14_amount">Worksheet line 14</label>
+                    <input class="w4-input" type="text" id="deductions_line_14_amount" name="deductions_line_14_amount" readonly>
+                  </div>
+                  <div class="w4-question">
+                    <label class="w4-label" for="deductions_worksheet_total">Final worksheet total</label>
+                    <input class="w4-input" type="text" id="deductions_worksheet_total" name="deductions_worksheet_total" readonly>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <section class="w4-section" id="signature_section">
+            <h2 class="w4-section-title">7. Review and signature</h2>
+            <div class="w4-section-body">
+              <div class="w4-warning">The PDF does not contain fillable signature or signing-date fields. After downloading it, you must manually sign and date Step 5 before giving it to your employer.</div>
+              <div class="w4-question">
+                <label style="display:flex;gap:10px;align-items:flex-start;line-height:1.5;">
+                  <input type="checkbox" id="signature_acknowledgment" required style="margin-top:4px;">
+                  <span>I understand that I must review, sign, and date the downloaded W-4.</span>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="w4-section" id="employer_section">
+            <h2 class="w4-section-title">8. Employer-only information</h2>
+            <div class="w4-section-body">
+              <div class="w4-question">
+                <label class="w4-label" for="employer_role">Are you the employer or authorized payroll staff member?</label>
+                <select class="w4-select" id="employer_role" required>
+                  <option value="">Select Yes or No</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+
+              <div id="employer_fields" hidden>
+                <div class="w4-question">
+                  <label class="w4-label" for="employer_name_and_address">What is the employer's name and address?</label>
+                  <textarea class="w4-textarea" id="employer_name_and_address" name="employer_name_and_address" rows="3"></textarea>
+                </div>
+                <div class="w4-grid">
+                  <div class="w4-question">
+                    <label class="w4-label" for="employment_date_ui">What is the employee's first date of employment?</label>
+                    <input class="w4-input" type="date" id="employment_date_ui">
+                    <input type="hidden" id="first_date_of_employment" name="first_date_of_employment">
+                  </div>
+                  <div class="w4-question">
+                    <label class="w4-label" for="employer_identification_number">What is the employer's nine-digit Employer Identification Number?</label>
+                    <input class="w4-input" type="text" id="employer_identification_number" name="employer_identification_number" inputmode="numeric" maxlength="10" placeholder="12-3456789">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div class="w4-submit-wrap">
+            <button class="w4-submit" id="w4_submit_button" type="submit">Submit Form</button>
+            <div id="w4_submit_status" class="w4-help" aria-live="polite"></div>
+          </div>
+        </main>
   <script>
     function formAuthAllowsProgress() {
       if (typeof window !== 'undefined' && window.__FORM_SKIP_SIGNIN_GATE__) return true;
@@ -1189,6 +1975,25 @@ document.addEventListener("DOMContentLoaded", function() {
             }
           });
           return indices;
+        }
+        function resolveShouldSubmit(activeContainer, currentPos, visibleTotal) {
+          const isLastSectionInForm = sectionIdx === sectionElements.length - 1;
+          const isLastVisibleInSection = currentPos === visibleTotal - 1 && currentPos !== -1;
+          return answerTriggersEnd(activeContainer) || (isLastSectionInForm && isLastVisibleInSection);
+        }
+        function requestAutoFormSubmit() {
+          if (typeof checkAuthBeforeNavigate === 'function') {
+            checkAuthBeforeNavigate(function() {
+              if (typeof window.__autoFormRequestSubmit === 'function') {
+                window.__autoFormRequestSubmit();
+              } else {
+                const formEl = document.getElementById('customForm');
+                if (formEl && typeof formEl.requestSubmit === 'function') formEl.requestSubmit();
+              }
+            });
+          } else if (typeof window.__autoFormRequestSubmit === 'function') {
+            window.__autoFormRequestSubmit();
+          }
         }
         function getVisibleIndicesForSectionElement(targetSectionEl) {
 
@@ -1340,21 +2145,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
               if (!value) {
                 allStandardSatisfied = false;
-              } else {
-                // Special validation for zip codes: must have exactly 5 digits
-                if (elId.includes('_zip')) {
-                  const digitsOnly = value.replace(/[^0-9]/g, '');
-                  if (digitsOnly.length !== 5) {
-                    allStandardSatisfied = false;
-                  }
-                }
-                // Special validation for phone numbers: must have exactly 10 digits
-                if (elId.includes('_phone_number') || elId.includes('phone_number_')) {
-                  const digitsOnly = value.replace(/[^0-9]/g, '');
-                  if (digitsOnly.length !== 10) {
-                    allStandardSatisfied = false;
-                  }
-                }
               }
             } else if (type === 'radio') {
               const group = radioGroups[el.name || el.id] || [];
@@ -1444,21 +2234,6 @@ document.addEventListener("DOMContentLoaded", function() {
                   const value = (inp.value || '').trim();
                   if (!value) {
                     allStandardSatisfied = false;
-                  } else {
-                    // Special validation for zip codes: must have exactly 5 digits
-                    if (inpId.includes('_zip')) {
-                      const digitsOnly = value.replace(/[^0-9]/g, '');
-                      if (digitsOnly.length !== 5) {
-                        allStandardSatisfied = false;
-                      }
-                    }
-                    // Special validation for phone numbers: must have exactly 10 digits
-                    if (inpId.includes('_phone_number') || inpId.includes('phone_number_')) {
-                      const digitsOnly = value.replace(/[^0-9]/g, '');
-                      if (digitsOnly.length !== 10) {
-                        allStandardSatisfied = false;
-                      }
-                    }
                   }
                 } else if (type === 'radio') {
                   const group = radioGroups[inp.name || inp.id] || [];
@@ -1713,6 +2488,33 @@ document.addEventListener("DOMContentLoaded", function() {
           const visibleIndices = getVisibleIndices();
 
           if (!visibleIndices.length) {
+            if (activeIndex >= 0 && activeIndex < questionItems.length) {
+              questionItems.forEach(function(item, idx) {
+                if (idx === activeIndex) {
+                  item.classList.remove('question-step-hidden');
+                } else {
+                  item.classList.add('question-step-hidden');
+                }
+              });
+              const activeContainer = questionItems[activeIndex];
+              const activeQuestionId = activeContainer ? (activeContainer.getAttribute('data-question-id') || activeContainer.id || 'unknown') : 'unknown';
+              const activeQuestionTextEl = activeContainer ? activeContainer.querySelector('.question-text') : null;
+              const activeQuestionText = activeQuestionTextEl ? activeQuestionTextEl.textContent.trim() : '';
+              const isAnswered = isQuestionAnswered(activeContainer);
+              const shouldSubmit = resolveShouldSubmit(activeContainer, 0, 1);
+              cachedNextSectionInfo = null;
+              cachedPrevSectionInfo = findPrevSectionWithVisibleQuestions();
+              updateButtons(
+                false,
+                false,
+                false,
+                null,
+                cachedPrevSectionInfo,
+                { shouldSubmit, isAnswered, questionId: activeQuestionId, questionText: activeQuestionText, currentPos: 0, visibleTotal: 1 }
+              );
+              isUpdating = false;
+              return;
+            }
 
             questionItems.forEach(function(item) {
               item.classList.add('question-step-hidden');
@@ -1739,15 +2541,9 @@ document.addEventListener("DOMContentLoaded", function() {
           }
 
           questionItems.forEach(function(item, idx) {
-            const questionId = item.getAttribute('data-question-id') || item.id || 'unknown';
-            const hasHiddenClass = item.classList.contains('hidden');
-            if (idx === targetIdx && !hasHiddenClass) {
-
+            if (idx === targetIdx) {
               item.classList.remove('question-step-hidden');
             } else {
-              if (idx === targetIdx && hasHiddenClass) {
-
-              }
               item.classList.add('question-step-hidden');
             }
           });
@@ -1766,7 +2562,7 @@ document.addEventListener("DOMContentLoaded", function() {
           const activeQuestionTextEl = activeContainer ? activeContainer.querySelector('.question-text') : null;
           const activeQuestionText = activeQuestionTextEl ? activeQuestionTextEl.textContent.trim() : '';
           attachSubmitModeListeners(activeContainer, targetIdx);
-          const shouldSubmit = answerTriggersEnd(activeContainer);
+          const shouldSubmit = resolveShouldSubmit(activeContainer, currentPos, visibleTotal);
           const isAnswered = isQuestionAnswered(activeContainer);
           const hasPrevQuestion = currentPos > 0;
 
@@ -1901,6 +2697,14 @@ document.addEventListener("DOMContentLoaded", function() {
           const visibleIndices = getVisibleIndices();
 
           if (!visibleIndices.length || activeIndex === -1) {
+            if (direction > 0 && activeIndex >= 0 && activeIndex < questionItems.length) {
+              const activeContainer = questionItems[activeIndex];
+              const shouldSubmit = resolveShouldSubmit(activeContainer, 0, 1);
+              if (shouldSubmit && activeContainer && isQuestionAnswered(activeContainer)) {
+                requestAutoFormSubmit();
+                return;
+              }
+            }
 
             if (direction > 0 && cachedNextSectionInfo) {
 
@@ -1980,7 +2784,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     };
                     goToNextSection();
                   } else {
-
+                    const activeContainer = questionItems[activeIndex];
+                    const shouldSubmit = resolveShouldSubmit(activeContainer, currentPos, visibleIndices.length);
+                    if (shouldSubmit && activeContainer && isQuestionAnswered(activeContainer)) {
+                      requestAutoFormSubmit();
+                    }
                   }
                 }
               }
@@ -2000,6 +2808,10 @@ document.addEventListener("DOMContentLoaded", function() {
           const visibleIndices = getVisibleIndices();
 
           if (!visibleIndices.length) {
+            if (activeIndex >= 0 && activeIndex < questionItems.length) {
+              activateIndex(activeIndex);
+              return;
+            }
 
             // If no visible questions found, try to show the first question anyway
             // This handles cases where questions don't have the 'hidden' class but might be hidden by CSS
@@ -2067,32 +2879,13 @@ document.addEventListener("DOMContentLoaded", function() {
               // Helper function to check if input is properly filled (with special rules for zip/phone)
               function isInputProperlyFilled(input) {
                 const value = input.value ? input.value.trim() : '';
-                const inputId = (input.id || input.name || '').toLowerCase();
-                
-                // Empty value is never filled
-                if (!value) {
-                  console.log('[DISABLED NEXT BTN] Input is empty:', inputId);
-                  return false;
+                if (input.hasAttribute('data-address-ui') && input.getAttribute('data-address-ui') === 'state') {
+                  return value.length > 0;
                 }
-                
-                // Zip code validation: must have exactly 5 digits
-                if (inputId.includes('_zip')) {
-                  const digitsOnly = value.replace(/[^0-9]/g, '');
-                  const isFilled = digitsOnly.length === 5;
-                  console.log('[DISABLED NEXT BTN] Zip validation for', inputId, '- digits:', digitsOnly.length, '- filled:', isFilled);
-                  return isFilled;
+                if (input.hasAttribute('data-pdf-combine-into')) {
+                  return value.length > 0;
                 }
-                
-                // Phone number validation: must have exactly 10 digits
-                if (inputId.includes('_phone_number') || inputId.includes('phone_number_')) {
-                  const digitsOnly = value.replace(/[^0-9]/g, '');
-                  const isFilled = digitsOnly.length === 10;
-                  console.log('[DISABLED NEXT BTN] Phone validation for', inputId, '- digits:', digitsOnly.length, '- filled:', isFilled);
-                  return isFilled;
-                }
-                
-                // Default: any non-empty value is filled
-                return true;
+                return value.length > 0;
               }
               
               // Check regular inputs first
@@ -2204,19 +2997,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             if (nextBtn.dataset.advanceMode === 'submit') {
-
-              // Check authentication before submitting
-              checkAuthBeforeNavigate(function() {
-
-              const formEl = document.getElementById('customForm');
-              if (formEl) {
-                if (typeof formEl.requestSubmit === 'function') {
-                  formEl.requestSubmit();
-                } else {
-                  formEl.submit();
-                }
-              }
-              });
+              requestAutoFormSubmit();
               return;
             }
 
@@ -2254,6 +3035,11 @@ document.addEventListener("DOMContentLoaded", function() {
           if (!evt || !evt.detail || !evt.detail.sectionId || evt.detail.sectionId === sectionId) {
             refreshNav();
           }
+        });
+        questionItems.forEach(function(item) {
+          item.addEventListener('refreshNavigation', function() {
+            refreshNav(activeIndex === -1 ? 0 : activeIndex);
+          });
         });
         window.questionNavControllers[sectionId] = refreshNav;
         const visibleIndices = getVisibleIndices();
@@ -2324,19 +3110,619 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   </script>
   <div id="hidden_pdf_fields">
-<input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden">
-<input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden">
-<input type="hidden" id="user_fullname"         name="user_fullname">
-<input type="hidden" id="user_email_hidden"     name="user_email_hidden">
-<input type="hidden" id="user_phone_hidden"     name="user_phone_hidden">
-<input type="hidden" id="user_street_hidden"    name="user_street_hidden">
-<input type="hidden" id="user_city_hidden"      name="user_city_hidden">
-<input type="hidden" id="user_state_hidden"     name="user_state_hidden">
-<input type="hidden" id="user_zip_hidden"       name="user_zip_hidden">
-<input type="hidden" id="user_full_address"     name="user_full_address">
-<input type="hidden" id="user_full_address_hidden" name="user_full_address_hidden">
-<input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked style="display: none;">
+<input type="hidden" id="user_firstname_hidden" name="user_firstname_hidden" disabled>
+<input type="hidden" id="user_lastname_hidden"  name="user_lastname_hidden" disabled>
+<input type="hidden" id="user_fullname"         name="user_fullname" disabled>
+<input type="hidden" id="user_email_hidden"     name="user_email_hidden" disabled>
+<input type="hidden" id="user_phone_hidden"     name="user_phone_hidden" disabled>
+<input type="hidden" id="user_street_hidden"    name="user_street_hidden" disabled>
+<input type="hidden" id="user_city_hidden"      name="user_city_hidden" disabled>
+<input type="hidden" id="user_state_hidden"     name="user_state_hidden" disabled>
+<input type="hidden" id="user_zip_hidden"       name="user_zip_hidden" disabled>
+<input type="hidden" id="user_full_address"     name="user_full_address" disabled>
+<input type="hidden" id="user_full_address_hidden" name="user_full_address_hidden" disabled>
+<input type="checkbox" id="example_form_default_checkbox" name="example_form_default_checkbox" checked disabled style="display: none;">
 </div>
+  <script id="w4-form-logic">
+  (function() {
+    const byId = (id) => document.getElementById(id);
+    const value = (id) => byId(id) ? byId(id).value : '';
+    const numberValue = (id) => {
+      const raw = value(id);
+      if (raw === '') return 0;
+      const parsed = Number(String(raw).replace(/[$,]/g, ''));
+      return Number.isFinite(parsed) ? parsed : 0;
+    };
+    const money = (amount) => {
+      const rounded = Math.round((Number(amount) || 0) * 100) / 100;
+      return rounded.toFixed(2);
+    };
+    const show = (id, shouldShow) => {
+      const element = byId(id);
+      if (element) element.hidden = !shouldShow;
+    };
+    const setCheckbox = (id, checked) => {
+      const checkbox = byId(id);
+      if (checkbox) checkbox.checked = !!checked;
+    };
+    const setValue = (id, nextValue) => {
+      const element = byId(id);
+      if (element) element.value = nextValue;
+    };
+    const clearValue = (id) => setValue(id, '');
+    const clearContainer = (id) => {
+      const container = byId(id);
+      if (!container) return;
+      container.querySelectorAll('input, textarea, select').forEach((control) => {
+        if (control.type === 'checkbox' || control.type === 'radio') control.checked = false;
+        else if (control.tagName === 'SELECT') control.selectedIndex = 0;
+        else control.value = '';
+      });
+    };
+    const selectedStatus = () => value('filing_status_ui');
+    const isMarriedJointly = () => selectedStatus() === 'married_joint';
+    const exemptionClaimed = () => value('claim_exemption') === 'yes' && value('exempt_2025') === 'yes' && value('exempt_2026') === 'yes';
+
+    function updateExemption() {
+      const priorYes = value('exempt_2025') === 'yes';
+      show('exempt_2026_wrap', priorYes);
+      if (!priorYes) {
+        setValue('exempt_2026', '');
+        setValue('claim_exemption', '');
+      }
+
+      const currentYes = priorYes && value('exempt_2026') === 'yes';
+      show('claim_exemption_wrap', currentYes);
+      if (!currentYes) setValue('claim_exemption', '');
+
+      const claimed = exemptionClaimed();
+      setCheckbox('exempt_from_withholding', claimed);
+      show('exempt_notice', claimed);
+      show('normal_withholding_route', !claimed);
+      if (claimed) {
+        clearContainer('normal_withholding_route');
+        setCheckbox('filing_status_single_or_married_separately', false);
+        setCheckbox('filing_status_married_jointly_or_surviving_spouse', false);
+        setCheckbox('filing_status_head_of_household', false);
+        setCheckbox('multiple_jobs_or_spouse_works', false);
+      }
+    }
+
+    function updateFilingStatus() {
+      const status = selectedStatus();
+      const head = status === 'head';
+      show('head_eligibility_wrap', head);
+      if (!head) {
+        setValue('head_eligibility', '');
+        show('head_not_eligible', false);
+      } else {
+        show('head_not_eligible', value('head_eligibility') === 'no');
+      }
+
+      const headAllowed = head && value('head_eligibility') === 'yes';
+      setCheckbox('filing_status_single_or_married_separately', status === 'single' || status === 'married_separate');
+      setCheckbox('filing_status_married_jointly_or_surviving_spouse', status === 'married_joint' || status === 'surviving_spouse');
+      setCheckbox('filing_status_head_of_household', headAllowed);
+
+      show('senior_spouse_question', isMarriedJointly() && value('senior_income_limit') === 'yes');
+      if (!isMarriedJointly()) setValue('senior_spouse_choice', '');
+
+      const overtime = byId('qualified_overtime_compensation_amount');
+      if (overtime) overtime.max = isMarriedJointly() ? '25000' : '12500';
+      const stateTaxes = byId('state_and_local_taxes_amount');
+      if (stateTaxes) stateTaxes.max = status === 'married_separate' ? '20200' : '40400';
+      const cashGifts = byId('cash_gifts_to_charities_amount');
+      if (cashGifts) cashGifts.max = isMarriedJointly() ? '2000' : '1000';
+    }
+
+    function step2Applies() {
+      if (value('more_than_one_job') === 'yes') return true;
+      return value('more_than_one_job') === 'no' && isMarriedJointly() && value('spouse_works') === 'yes';
+    }
+
+    function updateMultipleJobsRoute() {
+      const moreJobs = value('more_than_one_job');
+      const askSpouse = moreJobs === 'no' && isMarriedJointly();
+      show('spouse_works_wrap', askSpouse);
+      if (!askSpouse) setValue('spouse_works', '');
+
+      const applies = step2Applies();
+      show('step2_method_wrap', applies);
+      if (!applies) setValue('step2_method', '');
+
+      const method = value('step2_method');
+      show('estimator_note', applies && method === 'estimator');
+      show('two_jobs_confirm_wrap', applies && method === 'checkbox');
+      if (method !== 'checkbox') setValue('two_jobs_confirm', '');
+
+      const checkboxValid = method === 'checkbox' && value('two_jobs_confirm') === 'yes';
+      show('two_jobs_invalid', method === 'checkbox' && value('two_jobs_confirm') === 'no');
+      setCheckbox('multiple_jobs_or_spouse_works', checkboxValid);
+
+      const usableMethod = applies && (method === 'estimator' || method === 'worksheet' || checkboxValid);
+      show('highest_paying_wrap', usableMethod);
+      if (!usableMethod) setValue('highest_paying_form', '');
+
+      const skipHigherJobSections = usableMethod && value('highest_paying_form') === 'no';
+      show('highest_paying_note', skipHigherJobSections);
+      show('credits_section', !skipHigherJobSections);
+      show('step4_ab_wrap', !skipHigherJobSections);
+
+      if (skipHigherJobSections) {
+        clearValue('qualifying_children_amount');
+        clearValue('other_dependents_amount');
+        clearValue('total_credits_amount');
+        clearValue('other_income_amount');
+        clearValue('deductions_amount');
+      }
+
+      const worksheetActive = usableMethod && method === 'worksheet' && value('highest_paying_form') === 'yes';
+      show('multiple_jobs_worksheet_section', worksheetActive);
+      if (!worksheetActive) {
+        clearContainer('multiple_jobs_worksheet_section');
+        const extra = byId('extra_withholding_amount');
+        if (extra) {
+          extra.readOnly = false;
+          if (extra.dataset.worksheetGenerated === 'true') {
+            extra.value = '';
+            delete extra.dataset.worksheetGenerated;
+            setValue('extra_withholding_apply', '');
+            show('extra_withholding_amount_wrap', false);
+          }
+        }
+      }
+    }
+
+    function updateCredits() {
+      const stepVisible = !byId('credits_section').hidden;
+      const underLimit = stepVisible && value('credit_income_limit') === 'yes';
+      show('claim_credits_wrap', underLimit);
+      if (!underLimit) setValue('claim_credits', '');
+
+      const claim = underLimit && value('claim_credits') === 'yes';
+      show('credits_details', claim);
+      if (!claim) {
+        clearValue('qualifying_children_amount');
+        clearValue('other_dependents_amount');
+        clearValue('total_credits_amount');
+        return;
+      }
+
+      const children = Math.max(0, Math.floor(numberValue('qualifying_children_count')));
+      const dependents = Math.max(0, Math.floor(numberValue('other_dependents_count')));
+      const childAmount = children * 2200;
+      const dependentAmount = dependents * 500;
+      const otherCredits = Math.max(0, numberValue('other_credits_helper'));
+      setValue('qualifying_children_amount', money(childAmount));
+      setValue('other_dependents_amount', money(dependentAmount));
+      setValue('total_credits_amount', money(childAmount + dependentAmount + otherCredits));
+    }
+
+    function updateStep4() {
+      const stepABVisible = !byId('step4_ab_wrap').hidden;
+
+      const otherIncome = stepABVisible && value('other_income_apply') === 'yes';
+      show('other_income_amount_wrap', otherIncome);
+      if (!otherIncome) clearValue('other_income_amount');
+
+      const deductions = stepABVisible && value('deductions_apply') === 'yes';
+      show('deductions_method_wrap', deductions);
+      if (!deductions) {
+        setValue('deductions_method', '');
+        clearValue('deductions_amount');
+      }
+
+      const method = value('deductions_method');
+      const showDeductionAmount = deductions && (method === 'known' || method === 'guide');
+      show('deductions_amount_wrap', showDeductionAmount);
+      show('deductions_worksheet_section', deductions && method === 'guide');
+
+      const deductionAmount = byId('deductions_amount');
+      if (deductionAmount) {
+        deductionAmount.readOnly = method === 'guide';
+        if (method !== 'guide' && deductionAmount.dataset.worksheetGenerated === 'true') {
+          deductionAmount.value = '';
+          delete deductionAmount.dataset.worksheetGenerated;
+        }
+      }
+      if (method !== 'known' && method !== 'guide') clearValue('deductions_amount');
+      if (!(deductions && method === 'guide')) clearContainer('deductions_worksheet_section');
+
+      const extraYes = value('extra_withholding_apply') === 'yes';
+      show('extra_withholding_amount_wrap', extraYes);
+      if (!extraYes) clearValue('extra_withholding_amount');
+    }
+
+    function updateMultipleJobsWorksheet() {
+      const section = byId('multiple_jobs_worksheet_section');
+      if (!section || section.hidden) return;
+
+      const complex = value('multiple_jobs_complex');
+      show('multiple_jobs_complex_note', complex === 'yes');
+      show('multiple_jobs_standard_wrap', complex === 'no');
+      if (complex !== 'no') {
+        clearContainer('multiple_jobs_standard_wrap');
+        return;
+      }
+
+      const jobCount = value('multiple_jobs_count');
+      show('multiple_jobs_line_1_wrap', jobCount === '2');
+      show('multiple_jobs_three_wrap', jobCount === '3');
+      show('multiple_jobs_pay_wrap', jobCount === '2' || jobCount === '3');
+      if (jobCount !== '2') clearValue('multiple_jobs_line_1_amount');
+      if (jobCount !== '3') {
+        clearValue('multiple_jobs_line_2a_amount');
+        clearValue('multiple_jobs_line_2b_amount');
+        clearValue('multiple_jobs_line_2c_amount');
+      } else {
+        const line2a = numberValue('multiple_jobs_line_2a_amount');
+        const line2b = numberValue('multiple_jobs_line_2b_amount');
+        if (value('multiple_jobs_line_2a_amount') !== '' && value('multiple_jobs_line_2b_amount') !== '') {
+          setValue('multiple_jobs_line_2c_amount', money(line2a + line2b));
+        } else {
+          clearValue('multiple_jobs_line_2c_amount');
+        }
+      }
+
+      const payChoice = value('pay_periods_ui');
+      show('pay_periods_other_wrap', payChoice === 'other');
+      if (payChoice !== 'other') clearValue('pay_periods_other');
+      const periods = payChoice === 'other' ? numberValue('pay_periods_other') : Number(payChoice || 0);
+      setValue('multiple_jobs_pay_periods_per_year', periods > 0 ? String(periods) : '');
+
+      const annualRaw = jobCount === '2' ? value('multiple_jobs_line_1_amount') : value('multiple_jobs_line_2c_amount');
+      const annual = jobCount === '2' ? numberValue('multiple_jobs_line_1_amount') : numberValue('multiple_jobs_line_2c_amount');
+      const canCalculate = annualRaw !== '' && periods > 0;
+      show('multiple_jobs_line_4_wrap', canCalculate);
+      show('worksheet_additional_wrap', canCalculate);
+
+      if (!canCalculate) {
+        clearValue('multiple_jobs_line_4_amount');
+        setValue('worksheet_additional_choice', '');
+        show('worksheet_additional_amount_wrap', false);
+        return;
+      }
+
+      const line4 = annual / periods;
+      setValue('multiple_jobs_line_4_amount', money(line4));
+      const additionalChoice = value('worksheet_additional_choice');
+      show('worksheet_additional_amount_wrap', additionalChoice === 'yes');
+      if (additionalChoice !== 'yes') clearValue('worksheet_additional_amount');
+
+      if (additionalChoice === 'yes' || additionalChoice === 'no') {
+        const additional = additionalChoice === 'yes' ? numberValue('worksheet_additional_amount') : 0;
+        setValue('extra_withholding_apply', 'yes');
+        show('extra_withholding_amount_wrap', true);
+        setValue('extra_withholding_amount', money(line4 + additional));
+        byId('extra_withholding_amount').readOnly = true;
+        byId('extra_withholding_amount').dataset.worksheetGenerated = 'true';
+      }
+    }
+
+    function toggleAmount(selectId, wrapId, inputId) {
+      const yes = value(selectId) === 'yes';
+      show(wrapId, yes);
+      if (!yes) clearValue(inputId);
+    }
+
+    function updateDeductionsWorksheet() {
+      const section = byId('deductions_worksheet_section');
+      if (!section || section.hidden) return;
+
+      toggleAmount('tips_apply', 'tips_amount_wrap', 'qualified_tips_amount');
+      toggleAmount('overtime_apply', 'overtime_amount_wrap', 'qualified_overtime_compensation_amount');
+      toggleAmount('vehicle_interest_apply', 'vehicle_interest_amount_wrap', 'qualified_passenger_vehicle_loan_interest_amount');
+
+      const line2 = numberValue('qualified_tips_amount') + numberValue('qualified_overtime_compensation_amount') + numberValue('qualified_passenger_vehicle_loan_interest_amount');
+      setValue('deductions_line_2_total', money(line2));
+
+      const seniorEligible = value('senior_income_limit') === 'yes';
+      show('senior_questions', seniorEligible);
+      if (!seniorEligible) {
+        setValue('senior_self_choice', '');
+        setValue('senior_spouse_choice', '');
+      }
+      show('senior_spouse_question', seniorEligible && isMarriedJointly());
+      if (!isMarriedJointly()) setValue('senior_spouse_choice', '');
+
+      const selfSenior = seniorEligible && value('senior_self_choice') === 'yes' ? 6000 : 0;
+      const spouseSenior = seniorEligible && isMarriedJointly() && value('senior_spouse_choice') === 'yes' ? 6000 : 0;
+      setValue('senior_self_amount', selfSenior ? money(selfSenior) : '');
+      setValue('senior_spouse_amount', spouseSenior ? money(spouseSenior) : '');
+      setValue('senior_total_amount', money(selfSenior + spouseSenior));
+
+      toggleAmount('other_adjustments_apply', 'other_adjustments_amount_wrap', 'other_adjustments_amount');
+      toggleAmount('medical_apply', 'medical_amount_wrap', 'medical_and_dental_expenses_amount');
+      toggleAmount('state_tax_apply', 'state_tax_amount_wrap', 'state_and_local_taxes_amount');
+      toggleAmount('mortgage_apply', 'mortgage_amount_wrap', 'home_mortgage_interest_amount');
+      toggleAmount('charity_itemized_apply', 'charity_itemized_amount_wrap', 'charitable_gifts_amount');
+      toggleAmount('other_itemized_apply', 'other_itemized_amount_wrap', 'other_itemized_deductions_amount');
+
+      const itemized = numberValue('medical_and_dental_expenses_amount') + numberValue('state_and_local_taxes_amount') + numberValue('home_mortgage_interest_amount') + numberValue('charitable_gifts_amount') + numberValue('other_itemized_deductions_amount');
+      setValue('itemized_deductions_total', money(itemized));
+
+      const totalIncomeRaw = value('total_income_amount');
+      const totalIncome = numberValue('total_income_amount');
+      if (totalIncomeRaw !== '') {
+        const incomeAfterSenior = Math.max(0, totalIncome - selfSenior - spouseSenior);
+        setValue('income_minus_senior_total', money(incomeAfterSenior));
+
+        let limit = 0;
+        const status = selectedStatus();
+        if (status === 'married_joint' || status === 'surviving_spouse') limit = 768700;
+        else if (status === 'married_separate') limit = 384350;
+        else if (status === 'single' || status === 'head') limit = 640600;
+
+        if (selfSenior + spouseSenior > totalIncome) {
+          clearValue('itemized_deductions_limit');
+          setValue('adjusted_itemized_deductions', money(0));
+        } else if (limit > 0) {
+          setValue('itemized_deductions_limit', money(limit));
+          setValue('adjusted_itemized_deductions', money(limit > incomeAfterSenior ? itemized : itemized * 0.94));
+        }
+      } else {
+        clearValue('income_minus_senior_total');
+        clearValue('itemized_deductions_limit');
+        clearValue('adjusted_itemized_deductions');
+      }
+
+      let standard = 0;
+      const status = selectedStatus();
+      if (status === 'married_joint' || status === 'surviving_spouse') standard = 32200;
+      else if (status === 'head') standard = 24150;
+      else if (status === 'single' || status === 'married_separate') standard = 16100;
+      setValue('standard_deduction_amount', standard ? money(standard) : '');
+
+      toggleAmount('cash_gifts_apply', 'cash_gifts_amount_wrap', 'cash_gifts_to_charities_amount');
+      const cashGifts = numberValue('cash_gifts_to_charities_amount');
+      const line13 = standard + cashGifts;
+      setValue('standard_deduction_plus_cash_gifts', standard ? money(line13) : '');
+
+      const adjusted = numberValue('adjusted_itemized_deductions');
+      const line14 = adjusted > line13 ? Math.max(0, adjusted - standard) : cashGifts;
+      setValue('deductions_line_14_amount', money(line14));
+
+      const worksheetTotal = line2 + selfSenior + spouseSenior + numberValue('other_adjustments_amount') + line14;
+      setValue('deductions_worksheet_total', money(worksheetTotal));
+      setValue('deductions_amount', money(worksheetTotal));
+      byId('deductions_amount').dataset.worksheetGenerated = 'true';
+    }
+
+    function updateEmployer() {
+      const employer = value('employer_role') === 'yes';
+      show('employer_fields', employer);
+      if (!employer) {
+        clearValue('employer_name_and_address');
+        clearValue('employment_date_ui');
+        clearValue('first_date_of_employment');
+        clearValue('employer_identification_number');
+      }
+      const dateValue = value('employment_date_ui');
+      if (dateValue) {
+        const parts = dateValue.split('-');
+        setValue('first_date_of_employment', parts.length === 3 ? parts[1] + '/' + parts[2] + '/' + parts[0] : '');
+      } else {
+        clearValue('first_date_of_employment');
+      }
+    }
+
+    function updateAll() {
+      updateExemption();
+      if (!exemptionClaimed()) {
+        updateFilingStatus();
+        updateMultipleJobsRoute();
+        updateCredits();
+        updateStep4();
+        updateMultipleJobsWorksheet();
+        updateDeductionsWorksheet();
+      }
+      updateEmployer();
+    }
+
+    function formatSsn() {
+      const input = byId('social_security_number');
+      if (!input) return;
+      const digits = input.value.replace(/\D/g, '').slice(0, 9);
+      let formatted = digits.slice(0, 3);
+      if (digits.length > 3) formatted += '-' + digits.slice(3, 5);
+      if (digits.length > 5) formatted += '-' + digits.slice(5);
+      input.value = formatted;
+    }
+
+    function formatEin() {
+      const input = byId('employer_identification_number');
+      if (!input) return;
+      const digits = input.value.replace(/\D/g, '').slice(0, 9);
+      input.value = digits.length > 2 ? digits.slice(0, 2) + '-' + digits.slice(2) : digits;
+    }
+
+    function requireAnswer(errors, id, message) {
+      if (!value(id)) errors.push(message);
+    }
+
+    function requirePositiveOrZeroAmount(errors, id, message) {
+      if (value(id) === '' || numberValue(id) < 0) errors.push(message);
+    }
+
+    function validateForm() {
+      const errors = [];
+      requireAnswer(errors, 'first_name_and_middle_initial', 'Enter your first name and middle initial.');
+      requireAnswer(errors, 'last_name', 'Enter your last name.');
+      requireAnswer(errors, 'street_address', 'Enter your street address.');
+      requireAnswer(errors, 'city_state_zip_code', 'Enter your city, state, and ZIP code.');
+      if (value('social_security_number').replace(/\D/g, '').length !== 9) errors.push('Enter a valid nine-digit Social Security number.');
+
+      requireAnswer(errors, 'exempt_2025', 'Answer the 2025 exemption question.');
+      if (value('exempt_2025') === 'yes') requireAnswer(errors, 'exempt_2026', 'Answer the 2026 exemption question.');
+      if (value('exempt_2025') === 'yes' && value('exempt_2026') === 'yes') requireAnswer(errors, 'claim_exemption', 'Choose whether you want to claim exemption.');
+
+      if (!exemptionClaimed()) {
+        requireAnswer(errors, 'filing_status_ui', 'Choose your expected filing status.');
+        if (selectedStatus() === 'head' && value('head_eligibility') !== 'yes') errors.push('Confirm that you qualify for head-of-household status or choose another filing status.');
+
+        requireAnswer(errors, 'more_than_one_job', 'Answer whether you have more than one job.');
+        if (value('more_than_one_job') === 'no' && isMarriedJointly()) requireAnswer(errors, 'spouse_works', 'Answer whether your spouse works.');
+
+        if (step2Applies()) {
+          requireAnswer(errors, 'step2_method', 'Choose a method for handling multiple jobs.');
+          if (value('step2_method') === 'checkbox' && value('two_jobs_confirm') !== 'yes') errors.push('The two-jobs checkbox requires exactly two jobs. Choose another method if that does not apply.');
+          if (value('step2_method')) requireAnswer(errors, 'highest_paying_form', 'Answer whether this W-4 is for the highest-paying job.');
+        }
+
+        if (!byId('credits_section').hidden) {
+          requireAnswer(errors, 'credit_income_limit', 'Answer the Step 3 income-limit question.');
+          if (value('credit_income_limit') === 'yes') requireAnswer(errors, 'claim_credits', 'Answer whether you expect to claim dependents or other credits.');
+        }
+
+        if (!byId('step4_ab_wrap').hidden) {
+          requireAnswer(errors, 'other_income_apply', 'Answer whether you expect other income.');
+          if (value('other_income_apply') === 'yes') requirePositiveOrZeroAmount(errors, 'other_income_amount', 'Enter your expected other-income amount.');
+          requireAnswer(errors, 'deductions_apply', 'Answer whether you want to claim deductions.');
+          if (value('deductions_apply') === 'yes') {
+            requireAnswer(errors, 'deductions_method', 'Choose how to complete the Deductions Worksheet.');
+            if (value('deductions_method') === 'known') requirePositiveOrZeroAmount(errors, 'deductions_amount', 'Enter your Step 4(b) deduction amount.');
+          }
+        }
+
+        requireAnswer(errors, 'extra_withholding_apply', 'Answer whether you want extra withholding.');
+        if (value('extra_withholding_apply') === 'yes') requirePositiveOrZeroAmount(errors, 'extra_withholding_amount', 'Enter the extra amount to withhold from each paycheck.');
+
+        if (!byId('multiple_jobs_worksheet_section').hidden) {
+          requireAnswer(errors, 'multiple_jobs_complex', 'Answer the Multiple Jobs Worksheet complexity question.');
+          if (value('multiple_jobs_complex') === 'yes') errors.push('Use the IRS estimator or Publication 505 instead of the Multiple Jobs Worksheet.');
+          if (value('multiple_jobs_complex') === 'no') {
+            requireAnswer(errors, 'multiple_jobs_count', 'Choose whether there are two or three jobs.');
+            if (value('multiple_jobs_count') === '2') requirePositiveOrZeroAmount(errors, 'multiple_jobs_line_1_amount', 'Enter the table amount for the two jobs.');
+            if (value('multiple_jobs_count') === '3') {
+              requirePositiveOrZeroAmount(errors, 'multiple_jobs_line_2a_amount', 'Enter the worksheet line 2(a) amount.');
+              requirePositiveOrZeroAmount(errors, 'multiple_jobs_line_2b_amount', 'Enter the worksheet line 2(b) amount.');
+            }
+            requireAnswer(errors, 'pay_periods_ui', 'Choose the highest-paying job\'s pay schedule.');
+            if (value('pay_periods_ui') === 'other' && numberValue('pay_periods_other') < 1) errors.push('Enter the number of paychecks per year.');
+            requireAnswer(errors, 'worksheet_additional_choice', 'Answer whether you want additional withholding beyond the worksheet result.');
+            if (value('worksheet_additional_choice') === 'yes') requirePositiveOrZeroAmount(errors, 'worksheet_additional_amount', 'Enter the amount to add to the worksheet result.');
+          }
+        }
+
+        if (!byId('deductions_worksheet_section').hidden) {
+          ['tips_apply','overtime_apply','vehicle_interest_apply','senior_income_limit','other_adjustments_apply','medical_apply','state_tax_apply','mortgage_apply','charity_itemized_apply','other_itemized_apply','cash_gifts_apply'].forEach((id) => requireAnswer(errors, id, 'Complete every Yes or No question in the Deductions Worksheet.'));
+          if (value('senior_income_limit') === 'yes') {
+            requireAnswer(errors, 'senior_self_choice', 'Answer whether you will be age 65 or older.');
+            if (isMarriedJointly()) requireAnswer(errors, 'senior_spouse_choice', 'Answer the spouse age-65 question.');
+          }
+          const conditionalAmounts = [
+            ['tips_apply','qualified_tips_amount','Enter the qualified-tip amount.'],
+            ['overtime_apply','qualified_overtime_compensation_amount','Enter the qualified-overtime amount.'],
+            ['vehicle_interest_apply','qualified_passenger_vehicle_loan_interest_amount','Enter the qualified vehicle-loan-interest amount.'],
+            ['other_adjustments_apply','other_adjustments_amount','Enter the other-adjustments amount.'],
+            ['medical_apply','medical_and_dental_expenses_amount','Enter the medical and dental amount.'],
+            ['state_tax_apply','state_and_local_taxes_amount','Enter the state and local tax amount.'],
+            ['mortgage_apply','home_mortgage_interest_amount','Enter the home-mortgage-interest amount.'],
+            ['charity_itemized_apply','charitable_gifts_amount','Enter the itemized charitable-gifts amount.'],
+            ['other_itemized_apply','other_itemized_deductions_amount','Enter the other itemized-deductions amount.'],
+            ['cash_gifts_apply','cash_gifts_to_charities_amount','Enter the cash-gifts amount.']
+          ];
+          conditionalAmounts.forEach(([choiceId, amountId, message]) => {
+            if (value(choiceId) === 'yes') requirePositiveOrZeroAmount(errors, amountId, message);
+          });
+          requirePositiveOrZeroAmount(errors, 'total_income_amount', 'Enter your estimated total income for the Deductions Worksheet.');
+        }
+      }
+
+      if (!byId('signature_acknowledgment').checked) errors.push('Confirm that you understand the downloaded W-4 must be signed and dated.');
+      requireAnswer(errors, 'employer_role', 'Answer whether you are completing the employer-only section.');
+      if (value('employer_role') === 'yes') {
+        requireAnswer(errors, 'employer_name_and_address', 'Enter the employer name and address.');
+        requireAnswer(errors, 'employment_date_ui', 'Enter the employee\'s first date of employment.');
+        if (value('employer_identification_number').replace(/\D/g, '').length !== 9) errors.push('Enter a valid nine-digit employer EIN.');
+      }
+
+      return [...new Set(errors)];
+    }
+
+    function displayErrors(errors) {
+      const box = byId('w4_error_summary');
+      if (!box) return;
+      if (!errors.length) {
+        box.classList.remove('show');
+        box.innerHTML = '';
+        return;
+      }
+      box.innerHTML = '<strong>Please fix the following:</strong><ul>' + errors.map((error) => '<li>' + error + '</li>').join('') + '</ul>';
+      box.classList.add('show');
+      box.focus();
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = byId('customForm');
+      if (!form) return;
+
+      form.querySelectorAll('select, input, textarea').forEach((control) => {
+        if (control.id === 'social_security_number') control.addEventListener('input', formatSsn);
+        else if (control.id === 'employer_identification_number') control.addEventListener('input', formatEin);
+        control.addEventListener('change', updateAll);
+        control.addEventListener('input', updateAll);
+      });
+
+      updateAll();
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        updateAll();
+        const errors = validateForm();
+        displayErrors(errors);
+        if (errors.length) return;
+
+        const submitButton = byId('w4_submit_button');
+        const status = byId('w4_submit_status');
+        submitButton.disabled = true;
+        status.textContent = 'Creating your filled W-4...';
+
+        const fd = new FormData();
+        e.target.querySelectorAll('input, textarea, select').forEach((el) => {
+          if (!el.name || el.disabled) return;
+          if (el.type === 'checkbox' || el.type === 'radio') {
+            if (el.checked) fd.append(el.name, el.type === 'checkbox' ? 'on' : (el.value || 'on'));
+            return;
+          }
+          const v = (el.value || '').trim();
+          if (v) fd.append(el.name, v);
+        });
+
+        try {
+          const res = await fetch('/edit_pdf?pdf=' + encodeURIComponent('test'), {
+            method: 'POST',
+            body: fd,
+            credentials: 'include'
+          });
+
+          if (!res.ok) {
+            alert('Fill failed: ' + (await res.text()));
+            status.textContent = 'The PDF could not be created. Please try again.';
+            return;
+          }
+
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'W4_2026_filled.pdf';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          status.textContent = 'Your filled W-4 was downloaded. Remember to sign and date it.';
+        } catch (error) {
+          alert('Fill failed: ' + error.message);
+          status.textContent = 'The PDF could not be created. Make sure this page is open through localhost.';
+        } finally {
+          submitButton.disabled = false;
+        }
+      });
+    });
+  })();
+  </script>
   <script>
     window.showLoginRequiredModal = function() {
       const modal = document.getElementById('loginRequiredModal');
@@ -2352,59 +3738,20 @@ document.addEventListener("DOMContentLoaded", function() {
     };
   </script>
   </form>
-<div id="thankYouMessage" class="thank-you-message" style="display: none;">Thank you for completing the survey<br><span style="font-size: 0.75em; color: #666;">Your paperwork is now ready, please proceed to checkout</span><br><br><div id="checklistDisplay" style="margin: 20px 0; padding: 20px; background: #f8faff; border: 2px solid #2980b9; border-radius: 10px; display: none;"><h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Your Personalized Checklist</h3><div id="checklistItems"></div></div><button onclick="showCartModal()" style="font-size: 1.2em;">Checkout</button><br><br><button onclick="goBackToForm()" style="font-size: 1.2em;">Back</button><br><br><button onclick="window.location.href='/Pages/forms.html'" style="font-size: 1.2em;">Exit Survey</button><br><button id="debugDownloadPdfBtn" onclick="downloadAllPdfs()" style="font-size: 1.2em; display: none;">Download PDF</button><br id="debugDownloadPdfBr" style="display: none;"><br id="debugPreviewPdfsBr" style="display: none;"><button id="debugPreviewPdfsBtn" onclick="showPreviewPdfsModal()" style="font-size: 1.2em; display: none;">Preview PDFs</button><br></div>
+<div id="thankYouMessage" class="thank-you-message auto-form-thank-you" style="display: none;" aria-hidden="true">
+  <h2 class="auto-form-thank-you-title">Thank you for completing the survey</h2>
+  <button type="button" id="autoFormViewPdfBtn" class="auto-form-view-pdf-btn">View Form</button>
+  <div id="thank-you-pdf-preview-wrap" class="thank-you-pdf-preview-wrap" hidden>
+    <iframe id="filled-pdf-preview" title="Filled PDF preview"></iframe>
+  </div>
+  <button type="button" onclick="goBackToForm()" class="auto-form-thank-you-back">Back</button>
+  <div id="checklistDisplay" style="display: none;"><h3>Your Personalized Checklist</h3><div id="checklistItems"></div></div>
+  <button id="debugDownloadPdfBtn" onclick="downloadAllPdfs()" style="display: none;">Download PDF</button>
+  <button id="debugPreviewPdfsBtn" onclick="showPreviewPdfsModal()" style="display: none;">Preview PDFs</button>
+</div>
 </div>
 </section>
 </div>
-<!-- PDF Preview Modals -->
-<style>
-.modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-.modal-content { background-color: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); position: relative; }
-#previewPdfsListModal .modal-content { max-width: 600px; max-height: 80vh; overflow-y: auto; padding: 30px; }
-#previewPdfFullscreenModal .modal-content { width: 98vw; max-width: 1600px; max-height: 98vh; padding: 0; }
-</style>
-<div id="previewPdfsListModal" class="modal" style="display: none; z-index: 10000;" onclick="if(event.target === this) closePreviewPdfsListModal();">
-  <div class="modal-content" onclick="event.stopPropagation();">
-    <span class="close" onclick="closePreviewPdfsListModal()" style="position: absolute; top: 10px; right: 18px; font-size: 2rem; font-weight: bold; color: #333; cursor: pointer; z-index: 10;">&times;</span>
-    <h2 style="margin-top: 0; color: #2c3e50;">Available PDFs</h2>
-    <div id="previewPdfsList" style="margin-top: 20px;"></div>
-  </div>
-</div>
-<div id="previewPdfFullscreenModal" class="modal" style="display: none; z-index: 10001;" onclick="if(event.target === this) closePreviewPdfFullscreen();">
-  <div class="modal-content" onclick="event.stopPropagation();">
-    <span class="close" onclick="closePreviewPdfFullscreen()" style="position: absolute; top: 10px; right: 18px; font-size: 2rem; font-weight: bold; color: #fff; cursor: pointer; z-index: 10; background: rgba(0,0,0,0.5); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">&times;</span>
-    <iframe id="previewPdfIframe" style="width: 100%; height: 98vh; border: none;"></iframe>
-  </div>
-</div>
-<!-- Professional Footer Section -->
-<div class="pro-footer">
-    <div class="pro-footer-col address-col">
-        <div class="pro-footer-logo">
-            <img src="logo.png" alt="Form-Star Logo" style="max-width:120px;max-height:80px;">
-        </div>
-        <div class="pro-footer-title">Form-Star</div>
-        <div class="pro-footer-contact">
-            <a href="tel:18008508370">1-800-850-8370</a> &nbsp; 
-            <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
-        </div>
-    </div>
-    <div class="pro-footer-col nav-col">
-        <div class="pro-footer-title">Navigation</div>
-        <a href="../../index.html">Home</a>
-        <a href="../../Pages/FreeForm.html">Forms</a>
-        <a href="../../Pages/FAQ.html">FAQ</a>
-        <a href="../../Pages/about.html">About Us</a>
-        <a href="../../Pages/contact.html">Contact Us</a>
-    </div>
-    <div class="pro-footer-col company-col">
-        <div class="pro-footer-title company-title">About Form-Star</div>
-        <div class="pro-footer-desc">Form-Star consists of a group of proven professionals with over 70 years of combined legal, technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify paperwork for everyone.</div>
-    </div>
-</div>
-
-<footer>
-    &copy; 2026 Form-Star. All rights reserved.
-</footer>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -2450,219 +3797,36 @@ document.addEventListener('DOMContentLoaded', function() {
     <a href="/Pages/account.html" class="signin-modal-button">Sign In</a>
   </div>
 </div>
-<div class="pdf-preview-section" id="pdf-preview-section" hidden style="max-width:737px;margin:24px auto;padding:0 20px;">
-  <h2 class="section-title" style="text-align:center;">Filled PDF Preview</h2>
-  <iframe id="filled-pdf-preview" title="Filled PDF preview" style="width:100%;min-height:720px;border:1px solid #bcd8ff;border-radius:12px;background:#fff;"></iframe>
+
+<!-- Professional Footer Section -->
+<div class="pro-footer">
+    <div class="pro-footer-col address-col">
+        <div class="pro-footer-logo">
+            <img src="logo.png" alt="Form-Star Logo" style="max-width:120px;max-height:80px;">
+        </div>
+        <div class="pro-footer-title">Form-Star</div>
+        <div class="pro-footer-contact">
+            <a href="tel:18008508370">1-800-850-8370</a> &nbsp;
+            <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
+        </div>
+    </div>
+    <div class="pro-footer-col nav-col">
+        <div class="pro-footer-title">Navigation</div>
+        <a href="../../index.html">Home</a>
+        <a href="../../Pages/FreeForm.html">Forms</a>
+        <a href="../../Pages/FAQ.html">FAQ</a>
+        <a href="../../Pages/about.html">About Us</a>
+        <a href="../../Pages/contact.html">Contact Us</a>
+    </div>
+    <div class="pro-footer-col company-col">
+        <div class="pro-footer-title company-title">About Form-Star</div>
+        <div class="pro-footer-desc">Form-Star consists of a group of proven professionals with over 70 years of combined legal, technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify paperwork for everyone.</div>
+    </div>
 </div>
 
-<script>
-(function(){
-  var userProfile = {"uid":"bXTyxjXLXZWRfzeGK3V7j4zRzRl2","email":"test@gmail.com","firstName":"Adam","lastName":"Chaabane","phone":"+13912893812","street":"921 Sloat Road","city":"Salinas","state":"CA","zip":"93907","agreedToTerms":true,"agreementDate":"2026-06-30","createdAt":"2026-06-30T16:26:45.445Z","signature":"adam","applicant_sex_male":"Male","date_of_birth_description":"Date of Birth","height":"67","weight_description":"Weight","applicant_suffix_0":"test suffix","date_of_birth":"2026-05-26","height_description":"Height","weight":"160","applicant_sex_male_description":"Male","applicant_suffix_0_description":"Suffix"};
-  var firebaseConfig = {"apiKey":"AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04","authDomain":"formwiz-3f4fd.firebaseapp.com","projectId":"formwiz-3f4fd","storageBucket":"formwiz-3f4fd.firebasestorage.app","messagingSenderId":"404259212529","appId":"1:404259212529:web:15a33bce82383b21cfed50","measurementId":"G-P07YEN0HPD"};
-  var devMode = false;
-  var pdfToken = "54b68ca4-73f3-4e40-9970-80681073273a";
-  var displayMode = "one_at_a_time";
-
-  function fieldValue(el) {
-    if (el.type === 'checkbox') return el.checked ? el.value : '';
-    return el.value;
-  }
-
-  function updateAutofillBadge(el) {
-    if (!devMode || !el.hasAttribute('data-autopopulate')) return;
-    var val = fieldValue(el);
-    var container = el.closest('.textbox-group') || el.closest('.question-container');
-    if (!container) return;
-    var badge = container.querySelector('.autopopulate-badge');
-    if (!badge) return;
-    if (String(val).trim() !== '') {
-      badge.textContent = 'Autofill available';
-      badge.classList.remove('autofill-learn');
-      badge.classList.add('autofill-ready');
-      badge.style.background = '#d1fae5';
-      badge.style.color = '#065f46';
-    }
-  }
-
-  function applyProfileToForm() {
-    document.querySelectorAll('[data-profile-key]').forEach(function(el) {
-      var key = el.getAttribute('data-profile-key');
-      if (!key || userProfile[key] == null) return;
-      var val = userProfile[key];
-      if (el.type === 'checkbox') {
-        el.checked = String(val).toLowerCase() === String(el.value).toLowerCase();
-      } else {
-        el.value = val;
-      }
-      updateAutofillBadge(el);
-    });
-  }
-
-  function syncProfileFromInput(el, persist) {
-    var key = el.getAttribute('data-profile-key');
-    if (!key) return;
-    var desc = el.getAttribute('data-profile-description') || key;
-    var val = fieldValue(el);
-    updateAutofillBadge(el);
-    if (val === '') return;
-    userProfile[key] = val;
-    if (!userProfile[key + '_description']) userProfile[key + '_description'] = desc;
-    if (window.parent !== window) {
-      window.parent.postMessage({ type: 'formstar-profile-update', key: key, value: val, description: desc }, '*');
-    }
-    if (persist && typeof firebase !== 'undefined' && firebase.auth && firebase.firestore) {
-      var user = firebase.auth().currentUser;
-      if (!user) return;
-      var updates = {};
-      updates[key] = val;
-      updates[key + '_description'] = userProfile[key + '_description'] || desc;
-      firebase.firestore().collection('users').doc(user.uid).set(updates, { merge: true }).catch(function(err) {
-        console.error('Profile save error:', err);
-      });
-    }
-  }
-
-  document.querySelectorAll('[data-autopopulate]').forEach(function(el) {
-    el.addEventListener('input', function(){ updateAutofillBadge(el); });
-    el.addEventListener('change', function(){ syncProfileFromInput(el, true); });
-    el.addEventListener('blur', function(){ syncProfileFromInput(el, true); });
-  });
-
-  if (firebaseConfig && typeof firebase !== 'undefined' && !firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-  if (typeof firebase !== 'undefined' && firebase.auth) {
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (!user || !firebase.firestore) return;
-      firebase.firestore().collection('users').doc(user.uid).get().then(function(doc) {
-        if (doc.exists) {
-          userProfile = Object.assign({}, userProfile, doc.data() || {});
-          applyProfileToForm();
-        }
-      });
-    });
-  }
-  applyProfileToForm();
-
-  function formatDateForServer(dateString) {
-    if (!dateString) return '';
-    var parts = dateString.split('-');
-    if (parts.length === 3 && parts[0].length === 4) {
-      return parts[1] + '/' + parts[2] + '/' + parts[0];
-    }
-    return dateString;
-  }
-
-  function collectFormData() {
-    var form = document.getElementById('customForm');
-    var fd = new FormData();
-    if (!form) return fd;
-    form.querySelectorAll('input, textarea, select').forEach(function(el) {
-      if (!el.name || el.disabled || el.type === 'file') return;
-      if (el.type === 'checkbox') {
-        if (el.checked) fd.append(el.name, 'on');
-      } else if (el.type === 'radio') {
-        if (el.checked) fd.append(el.name, el.value);
-      } else {
-        var value = el.value;
-        if (el.type === 'date' && value) value = formatDateForServer(value);
-        if (value != null && String(value).trim() !== '') fd.append(el.name, value);
-      }
-    });
-    return fd;
-  }
-
-  function updateStepperProgress() {
-    var stepper = document.getElementById('stepperProgressBar');
-    if (!stepper) return;
-    var activeSection = document.querySelector('.section.active');
-    var activeStep = 1;
-    if (activeSection && activeSection.id) {
-      var m = activeSection.id.match(/^section(\d+)$/);
-      if (m) activeStep = parseInt(m[1], 10);
-    }
-    stepper.querySelectorAll('.stepper-step').forEach(function(step, idx) {
-      step.classList.remove('active', 'completed');
-      if (idx + 1 < activeStep) step.classList.add('completed');
-      else if (idx + 1 === activeStep) step.classList.add('active');
-    });
-    stepper.querySelectorAll('.stepper-line').forEach(function(line, idx) {
-      if (idx < activeStep - 1) line.classList.add('filled');
-      else line.classList.remove('filled');
-    });
-  }
-
-  function wireStepperClicks() {
-    var stepper = document.getElementById('stepperProgressBar');
-    if (!stepper) return;
-    stepper.querySelectorAll('.stepper-step').forEach(function(step) {
-      step.style.cursor = 'pointer';
-      step.addEventListener('click', function() {
-        var stepNum = step.getAttribute('data-step');
-        if (!stepNum) return;
-        document.querySelectorAll('.section').forEach(function(sec) { sec.classList.remove('active'); });
-        var target = document.getElementById('section' + stepNum);
-        if (target) target.classList.add('active');
-        updateStepperProgress();
-      });
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    updateStepperProgress();
-    wireStepperClicks();
-    var observer = new MutationObserver(updateStepperProgress);
-    document.querySelectorAll('.section').forEach(function(sec) {
-      observer.observe(sec, { attributes: true, attributeFilter: ['class'] });
-    });
-    if (displayMode === 'all_at_once') {
-      setTimeout(function() {
-        document.querySelectorAll('.question-container.question-item').forEach(function(el) {
-          el.classList.remove('question-step-hidden');
-        });
-        document.querySelectorAll('.question-nav').forEach(function(nav) {
-          nav.style.display = 'none';
-        });
-      }, 150);
-    }
-  });
-
-  window.__autoFormHandleSubmit = async function(event) {
-    if (event) event.preventDefault();
-    if (!pdfToken) {
-      alert('PDF template not available. Re-run Step 5 in the Auto-Form Creator demo.');
-      return false;
-    }
-    try {
-      var fd = collectFormData();
-      var res = await fetch('/api/auto-form/fill-pdf/' + encodeURIComponent(pdfToken), {
-        method: 'POST',
-        body: fd,
-        credentials: 'include'
-      });
-      if (!res.ok) {
-        var errText = await res.text();
-        var errMsg = 'HTTP ' + res.status;
-        try { var errJson = JSON.parse(errText); if (errJson.error) errMsg = errJson.error; } catch (ignore) { if (errText) errMsg = errText; }
-        throw new Error(errMsg);
-      }
-      var blob = await res.blob();
-      if (!blob.size) throw new Error('Received empty PDF');
-      var previewSection = document.getElementById('pdf-preview-section');
-      var previewFrame = document.getElementById('filled-pdf-preview');
-      var previewUrl = URL.createObjectURL(blob);
-      if (previewFrame) previewFrame.src = previewUrl;
-      if (previewSection) {
-        previewSection.hidden = false;
-        previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    } catch (err) {
-      console.error('Submit error:', err);
-      alert(err.message || 'Failed to generate PDF preview');
-    }
-    return false;
-  };
-})();
-</script>
+<footer>
+    &copy; 2026 Form-Star. All rights reserved.
+</footer>
+    <script src="../../Pages/sidecart-unified.js"></script>
 </body>
 </html>

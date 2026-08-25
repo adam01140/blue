@@ -358,6 +358,160 @@
 
     .error { color: #9b1c1c; }
 
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 16px;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--card);
+      color: var(--ink);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover { background: var(--accent-soft); border-color: #b8c7de; text-decoration: none; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn.primary:hover { filter: brightness(1.05); background: var(--accent); }
+    .btn.danger { color: #9b1c1c; border-color: #f0c2c2; background: #fff5f5; }
+    .btn.danger:hover { background: #ffe8e8; }
+    .btn.ghost { background: transparent; }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .form-header-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .hub-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .hub-modal[hidden] { display: none !important; }
+
+    .hub-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.48);
+    }
+
+    .hub-modal-panel {
+      position: relative;
+      width: min(560px, 100%);
+      max-height: min(92vh, 820px);
+      overflow: auto;
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+      padding: 22px 22px 18px;
+    }
+
+    .hub-modal-panel h2 {
+      margin: 0 0 6px;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hub-modal-panel .modal-sub {
+      margin: 0 0 18px;
+      color: var(--ink-soft);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .hub-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .hub-form label {
+      display: grid;
+      gap: 6px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .hub-form label span.req { color: #b42318; }
+
+    .hub-form input[type="text"],
+    .hub-form textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 400;
+      background: #fff;
+    }
+
+    .hub-form textarea { min-height: 72px; resize: vertical; }
+
+    .hub-form input[type="file"] {
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 400;
+    }
+
+    .file-hint {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--ink-soft);
+    }
+
+    .file-hint.present { color: var(--stamp); }
+
+    .modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 8px;
+      padding-top: 8px;
+    }
+
+    .modal-error {
+      margin: 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #fff5f5;
+      color: #9b1c1c;
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+
+    .modal-error[hidden] { display: none !important; }
+
     @media (max-width: 980px) {
       .preview-split {
         grid-template-columns: 1fr;
@@ -381,16 +535,217 @@
           focus a field to highlight the matching widget.
         </p>
       </div>
-      <div class="stamp-pill" id="stampMeta">Approved forms</div>
+      <div class="hero-actions">
+        <button type="button" class="btn primary" id="addFormBtn">Add form</button>
+        <a class="btn" href="/Auto-Form-Creator/demo.html">Demo</a>
+        <a class="btn" href="/Forms/Example/example.html">Example</a>
+        <div class="stamp-pill" id="stampMeta">Approved forms</div>
+      </div>
     </header>
 
     <nav class="nav" id="nav" aria-label="Forms"></nav>
     <main id="forms"></main>
   </div>
 
+  <div class="hub-modal" id="entryModal" hidden>
+    <div class="hub-modal-backdrop" data-close-modal></div>
+    <div class="hub-modal-panel" role="dialog" aria-modal="true" aria-labelledby="entryModalTitle">
+      <h2 id="entryModalTitle">Add form</h2>
+      <p class="modal-sub" id="entryModalSub">
+        Upload a PDF plus at least one HTML version (all-at-once and/or one-at-a-time).
+      </p>
+      <form class="hub-form" id="entryForm">
+        <input type="hidden" id="entryMode" value="create">
+        <input type="hidden" id="entrySlug" value="">
+        <label>
+          Title <span class="req">*</span>
+          <input type="text" id="entryTitle" name="title" required placeholder="e.g. Form I-9">
+        </label>
+        <label>
+          Description
+          <textarea id="entryDescription" name="description" placeholder="Short summary (optional)"></textarea>
+        </label>
+        <label>
+          PDF form <span class="req" id="pdfRequiredMark">*</span>
+          <input type="file" id="entryPdf" name="pdf" accept=".pdf,application/pdf">
+          <span class="file-hint" id="pdfHint">Required for new entries</span>
+        </label>
+        <label>
+          HTML — all at once
+          <input type="file" id="entryHtmlAll" name="htmlAll" accept=".html,.htm,text/html">
+          <span class="file-hint" id="htmlAllHint">Optional if one-at-a-time is uploaded</span>
+        </label>
+        <label>
+          HTML — one at a time
+          <input type="file" id="entryHtmlOne" name="htmlOne" accept=".html,.htm,text/html">
+          <span class="file-hint" id="htmlOneHint">Optional if all-at-once is uploaded</span>
+        </label>
+        <p class="modal-error" id="entryError" hidden></p>
+        <div class="modal-actions">
+          <button type="button" class="btn ghost" data-close-modal>Cancel</button>
+          <button type="submit" class="btn primary" id="entrySubmitBtn">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script type="module">
     import * as pdfjsLib from '/vendor/pdfjs/pdf.min.mjs';
     pdfjsLib.GlobalWorkerOptions.workerSrc = '/vendor/pdfjs/pdf.worker.min.mjs';
+
+    let hubManifest = null;
+
+    function openEntryModal(mode, form = null) {
+      const modal = document.getElementById('entryModal');
+      const titleEl = document.getElementById('entryModalTitle');
+      const subEl = document.getElementById('entryModalSub');
+      const formEl = document.getElementById('entryForm');
+      const errorEl = document.getElementById('entryError');
+      formEl.reset();
+      errorEl.hidden = true;
+      errorEl.textContent = '';
+      document.getElementById('entryMode').value = mode;
+      document.getElementById('entrySlug').value = form?.id || '';
+      document.getElementById('entryTitle').value = form?.title || '';
+      document.getElementById('entryDescription').value = form?.description || '';
+
+      const pdfRequired = document.getElementById('pdfRequiredMark');
+      const pdfHint = document.getElementById('pdfHint');
+      const htmlAllHint = document.getElementById('htmlAllHint');
+      const htmlOneHint = document.getElementById('htmlOneHint');
+
+      if (mode === 'edit' && form) {
+        titleEl.textContent = 'Edit form';
+        subEl.textContent = 'Replace any file you want to change. Leave a file blank to keep the current one.';
+        pdfRequired.hidden = true;
+        pdfHint.textContent = form.sourcePdf
+          ? `Current: ${form.sourcePdf.split('/').pop()} — upload to replace`
+          : 'No PDF on file — upload required';
+        pdfHint.classList.toggle('present', Boolean(form.sourcePdf));
+        htmlAllHint.textContent = form.formHtml
+          ? `Current: ${form.formHtml.split('/').pop()} — upload to replace`
+          : 'Not set — upload to add';
+        htmlAllHint.classList.toggle('present', Boolean(form.formHtml));
+        htmlOneHint.textContent = form.formHtmlOneAtATime
+          ? `Current: ${form.formHtmlOneAtATime.split('/').pop()} — upload to replace`
+          : 'Not set — upload to add';
+        htmlOneHint.classList.toggle('present', Boolean(form.formHtmlOneAtATime));
+        document.getElementById('entrySubmitBtn').textContent = 'Save changes';
+      } else {
+        titleEl.textContent = 'Add form';
+        subEl.textContent = 'Upload a PDF plus at least one HTML version (all-at-once and/or one-at-a-time).';
+        pdfRequired.hidden = false;
+        pdfHint.textContent = 'Required for new entries';
+        pdfHint.classList.remove('present');
+        htmlAllHint.textContent = 'Optional if one-at-a-time is uploaded';
+        htmlAllHint.classList.remove('present');
+        htmlOneHint.textContent = 'Optional if all-at-once is uploaded';
+        htmlOneHint.classList.remove('present');
+        document.getElementById('entrySubmitBtn').textContent = 'Add form';
+      }
+      modal.hidden = false;
+      document.getElementById('entryTitle').focus();
+    }
+
+    function closeEntryModal() {
+      document.getElementById('entryModal').hidden = true;
+    }
+
+    function wireAdminUi() {
+      document.getElementById('addFormBtn')?.addEventListener('click', () => openEntryModal('create'));
+      document.querySelectorAll('[data-close-modal]').forEach((el) => {
+        el.addEventListener('click', closeEntryModal);
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !document.getElementById('entryModal').hidden) {
+          closeEntryModal();
+        }
+      });
+
+      document.getElementById('entryForm')?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const errorEl = document.getElementById('entryError');
+        const submitBtn = document.getElementById('entrySubmitBtn');
+        errorEl.hidden = true;
+        errorEl.textContent = '';
+
+        const mode = document.getElementById('entryMode').value;
+        const slug = document.getElementById('entrySlug').value;
+        const title = document.getElementById('entryTitle').value.trim();
+        const description = document.getElementById('entryDescription').value.trim();
+        const pdfFile = document.getElementById('entryPdf').files[0];
+        const htmlAllFile = document.getElementById('entryHtmlAll').files[0];
+        const htmlOneFile = document.getElementById('entryHtmlOne').files[0];
+
+        if (!title) {
+          errorEl.textContent = 'Title is required.';
+          errorEl.hidden = false;
+          return;
+        }
+        if (mode === 'create') {
+          if (!pdfFile) {
+            errorEl.textContent = 'PDF upload is required.';
+            errorEl.hidden = false;
+            return;
+          }
+          if (!htmlAllFile && !htmlOneFile) {
+            errorEl.textContent = 'Upload at least one HTML file (all-at-once and/or one-at-a-time).';
+            errorEl.hidden = false;
+            return;
+          }
+        }
+
+        const body = new FormData();
+        body.append('title', title);
+        body.append('description', description);
+        if (pdfFile) body.append('pdf', pdfFile);
+        if (htmlAllFile) body.append('htmlAll', htmlAllFile);
+        if (htmlOneFile) body.append('htmlOne', htmlOneFile);
+
+        submitBtn.disabled = true;
+        const prevLabel = submitBtn.textContent;
+        submitBtn.textContent = 'Saving…';
+        try {
+          const url = mode === 'edit'
+            ? `/api/demo-hub/entries/${encodeURIComponent(slug)}`
+            : '/api/demo-hub/entries';
+          const res = await fetch(url, {
+            method: mode === 'edit' ? 'PUT' : 'POST',
+            body,
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || `Save failed (${res.status})`);
+          }
+          closeEntryModal();
+          await loadHub();
+          if (data.entry?.id) {
+            location.hash = data.entry.id;
+          }
+        } catch (err) {
+          errorEl.textContent = err.message || String(err);
+          errorEl.hidden = false;
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = prevLabel;
+        }
+      });
+    }
+
+    async function deleteEntry(form) {
+      if (!form?.id) return;
+      const ok = window.confirm(`Delete "${form.title}" from the hub? This cannot be undone.`);
+      if (!ok) return;
+      const res = await fetch(`/api/demo-hub/entries/${encodeURIComponent(form.id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        window.alert(data.error || `Delete failed (${res.status})`);
+        return;
+      }
+      await loadHub();
+    }
 
     async function loadHub() {
       const formsEl = document.getElementById('forms');
@@ -401,11 +756,13 @@
         const res = await fetch('./manifest.json', { cache: 'no-store' });
         if (!res.ok) throw new Error('Could not load manifest.json');
         const manifest = await res.json();
+        hubManifest = manifest;
         const forms = manifest.forms || [];
 
         stampMeta.textContent = `${forms.length} stamp-approved form${forms.length === 1 ? '' : 's'}`;
         if (!forms.length) {
-          formsEl.innerHTML = '<div class="empty">No approved forms in the hub yet.</div>';
+          navEl.innerHTML = '';
+          formsEl.innerHTML = '<div class="empty">No approved forms in the hub yet. Click <strong>Add form</strong> to upload one.</div>';
           return;
         }
 
@@ -414,17 +771,25 @@
         )).join('');
 
         formsEl.innerHTML = forms.map((form) => {
-          const pdfUrl = encodeURI(form.sourcePdf);
-          const htmlUrl = encodeURI(form.formHtml);
+          const pdfUrl = form.sourcePdf ? encodeURI(form.sourcePdf) : '';
+          const htmlUrl = form.formHtml ? encodeURI(form.formHtml) : '';
           const oneUrl = form.formHtmlOneAtATime ? encodeURI(form.formHtmlOneAtATime) : '';
+          const defaultHtml = htmlUrl || oneUrl;
           const fieldMapUrl = form.fieldMap ? encodeURI(form.fieldMap) : '';
+          const canLiveFill = Boolean(form.sourcePdf && form.fieldMap);
           return `
             <article class="form-card" id="${escapeAttr(form.id)}" data-form-id="${escapeAttr(form.id)}">
               <header class="form-header">
-                <h2>${escapeHtml(form.title)}</h2>
+                <div class="form-header-top">
+                  <h2>${escapeHtml(form.title)}</h2>
+                  <div class="card-actions">
+                    <button type="button" class="btn" data-edit-form="${escapeAttr(form.id)}">Edit</button>
+                    <button type="button" class="btn danger" data-delete-form="${escapeAttr(form.id)}">Delete</button>
+                  </div>
+                </div>
                 <div class="meta">
                   <span class="chip approved">Stamp approved</span>
-                  <span class="chip live">Live PDF fill</span>
+                  ${canLiveFill ? '<span class="chip live">Live PDF fill</span>' : '<span class="chip">Preview only</span>'}
                   <span class="chip">${escapeHtml(String(form.sections || 0))} sections</span>
                   <span class="chip">${escapeHtml(String(form.questions || 0))} questions</span>
                   <span class="chip">${escapeHtml(form.approvedAt || '—')}</span>
@@ -434,7 +799,7 @@
               <section class="panel">
                 <p class="hint">
                   Side-by-side preview: type in the form on the right and the PDF on the left
-                  <strong>fills live</strong>. Focus a field to highlight its PDF widget.
+                  <strong>fills live</strong> when field mapping is available. Focus a field to highlight its PDF widget.
                 </p>
                 <div class="preview-split">
                   <div class="preview-pane">
@@ -442,7 +807,7 @@
                       <h3>Source PDF</h3>
                       <div class="links">
                         <span class="live-status" data-live-status>Ready</span>
-                        <a href="${pdfUrl}" target="_blank" rel="noopener">Open PDF</a>
+                        ${pdfUrl ? `<a href="${pdfUrl}" target="_blank" rel="noopener">Open PDF</a>` : '<span class="live-status error">No PDF</span>'}
                       </div>
                     </div>
                     <div
@@ -452,19 +817,21 @@
                       data-field-map="${fieldMapUrl}"
                       data-form-slug="${escapeAttr(form.id)}"
                     >
-                      <div class="pdf-loading">Loading PDF…</div>
+                      <div class="pdf-loading">${pdfUrl ? 'Loading PDF…' : 'No PDF uploaded'}</div>
                     </div>
                   </div>
                   <div class="preview-pane">
                     <div class="panel-label">
                       <h3>Generated HTML form</h3>
                       <div class="view-toggle" role="group" aria-label="Form view">
-                        <a class="toggle-btn active" href="${htmlUrl}" data-view-src="${htmlUrl}" rel="noopener">All-at-once</a>
-                        ${oneUrl ? `<a class="toggle-btn" href="${oneUrl}" data-view-src="${oneUrl}" rel="noopener">One-at-a-time</a>` : ''}
+                        ${htmlUrl ? `<a class="toggle-btn${!oneUrl || defaultHtml === htmlUrl ? ' active' : ''}" href="${htmlUrl}" data-view-src="${htmlUrl}" rel="noopener">All-at-once</a>` : ''}
+                        ${oneUrl ? `<a class="toggle-btn${!htmlUrl || defaultHtml === oneUrl ? ' active' : ''}" href="${oneUrl}" data-view-src="${oneUrl}" rel="noopener">One-at-a-time</a>` : ''}
                       </div>
                     </div>
                     <div class="frame-wrap html">
-                      <iframe class="form-iframe" title="${escapeAttr(form.title)} HTML form" src="${htmlUrl}" loading="lazy"></iframe>
+                      ${defaultHtml
+                        ? `<iframe class="form-iframe" title="${escapeAttr(form.title)} HTML form" src="${defaultHtml}" loading="lazy"></iframe>`
+                        : '<div class="empty">No HTML uploaded</div>'}
                     </div>
                   </div>
                 </div>
@@ -472,6 +839,21 @@
             </article>
           `;
         }).join('');
+
+        formsEl.querySelectorAll('[data-edit-form]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-edit-form');
+            const form = forms.find((f) => f.id === id);
+            if (form) openEntryModal('edit', form);
+          });
+        });
+        formsEl.querySelectorAll('[data-delete-form]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-delete-form');
+            const form = forms.find((f) => f.id === id);
+            if (form) deleteEntry(form);
+          });
+        });
 
         await Promise.all(
           [...formsEl.querySelectorAll('.form-card')].map((card) => initFormCard(card))
@@ -499,10 +881,12 @@
       }
 
       const controller = createPdfViewer(viewerEl, fieldMap);
-      await controller.load(pdfUrl);
-      wireFormFocus(iframe, controller);
-      wireLiveFill(iframe, controller, formSlug, statusEl);
-      wireViewToggle(card, iframe);
+      if (pdfUrl) await controller.load(pdfUrl);
+      if (iframe) {
+        wireFormFocus(iframe, controller);
+        if (pdfUrl) wireLiveFill(iframe, controller, formSlug, statusEl);
+        wireViewToggle(card, iframe);
+      }
     }
 
     function wireViewToggle(card, iframe) {
@@ -828,6 +1212,7 @@
       return escapeHtml(value).replace(/'/g, '&#39;');
     }
 
+    wireAdminUi();
     loadHub();
   </script>
 </body>

@@ -236,7 +236,10 @@ async function sanitizePdfFields(pdfBytes, fieldConfig) {
       continue;
     }
 
-    oldIds.add(id);
+    // Only treat as a "legacy" name when we actually rename away from it.
+    if (id !== newName) {
+      oldIds.add(id);
+    }
     keptNames.add(newName);
 
     try {
@@ -297,7 +300,7 @@ async function sanitizePdfFields(pdfBytes, fieldConfig) {
     }
   }
 
-  const legacyLeft = verifyNames.filter((name) => oldIds.has(name));
+  const legacyLeft = verifyNames.filter((name) => oldIds.has(name) && !keptNames.has(name));
   if (legacyLeft.length > 0) {
     throw new Error(
       `Sanitized PDF still contains ${legacyLeft.length} original field name(s), e.g. ${legacyLeft[0]}`

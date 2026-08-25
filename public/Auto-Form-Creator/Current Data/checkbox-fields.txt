@@ -1,8 +1,6 @@
-{{CB_1}}
-{{CB_2}}
-{{CB_3}}
-{{CB_4}}
-{{CB_Alt}}
-{{CB_Alt_0}}
-{{CB_Alt_1}}
-{{CB_Alt_2}}
+{{CheckBox61}}
+{{CheckBox6}}
+{{CheckBx6}}
+{{ChckBox6}}
+{{Chck6}}
+{{Ck6}}

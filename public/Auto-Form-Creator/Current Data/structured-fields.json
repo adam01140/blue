@@ -1,1666 +1,210 @@
 [
   {
-    "id": "First Name Given Name",
-    "name": "First Name Given Name",
+    "id": "NoticeHeader1",
+    "name": "NoticeHeader1",
     "type": "text",
     "page": 1,
     "position": {
-      "x": 273,
-      "y": 612
-    },
-    "nearestLabel": "Last Name (Family Name)",
-    "sanitizedLabel": "Last Name (Family Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Employee Middle Initial (if any)",
-    "name": "Employee Middle Initial (if any)",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 381,
-      "y": 612
-    },
-    "nearestLabel": "First Name (Given Name)",
-    "sanitizedLabel": "First Name (Given Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Employee Other Last Names Used (if any)",
-    "name": "Employee Other Last Names Used (if any)",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 498,
-      "y": 612
-    },
-    "nearestLabel": "Middle Initial (if any)",
-    "sanitizedLabel": "Middle Initial (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Last Name (Family Name)",
-    "name": "Last Name (Family Name)",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 121,
-      "y": 612
+      "x": 305,
+      "y": 772
     },
     "nearestLabel": null,
     "sanitizedLabel": null,
-    "sectionHint": "General"
+    "sectionHint": "Respondent Other (Specify)"
   },
   {
-    "id": "Apt Number (if any)",
-    "name": "Apt Number (if any)",
+    "id": "user_fullname",
+    "name": "user_fullname",
     "type": "text",
     "page": 1,
     "position": {
-      "x": 266,
-      "y": 587
-    },
-    "nearestLabel": "Address (Street Number and Name)",
-    "sanitizedLabel": "Address (Street Number and Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "City or Town",
-    "name": "City or Town",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 381,
-      "y": 587
-    },
-    "nearestLabel": "City or Town",
-    "sanitizedLabel": "City or Town",
-    "sectionHint": "General"
-  },
-  {
-    "id": "State",
-    "name": "State",
-    "type": "dropdown",
-    "page": 1,
-    "position": {
-      "x": 482,
-      "y": 587
-    },
-    "nearestLabel": "State",
-    "sanitizedLabel": "State",
-    "sectionHint": "General"
-  },
-  {
-    "id": "ZIP Code",
-    "name": "ZIP Code",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 543,
-      "y": 587
-    },
-    "nearestLabel": "ZIP Code",
-    "sanitizedLabel": "ZIP Code",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Address Street Number and Name",
-    "name": "Address Street Number and Name",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 135,
-      "y": 587
+      "x": 283,
+      "y": 736
     },
     "nearestLabel": null,
     "sanitizedLabel": null,
-    "sectionHint": "General"
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
   },
   {
-    "id": "Date of Birth mmddyyyy",
-    "name": "Date of Birth mmddyyyy",
+    "id": "text",
+    "name": "text",
     "type": "text",
     "page": 1,
     "position": {
-      "x": 91,
-      "y": 561
+      "x": 294,
+      "y": 649
     },
     "nearestLabel": null,
     "sanitizedLabel": null,
-    "sectionHint": "General"
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
   },
   {
-    "id": "Employees E-mail Address",
-    "name": "Employees E-mail Address",
+    "id": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_1",
+    "name": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_1",
     "type": "text",
     "page": 1,
     "position": {
-      "x": 357,
-      "y": 561
+      "x": 294,
+      "y": 619
     },
-    "nearestLabel": "U.S. Social Security Number",
-    "sanitizedLabel": "U.S. Social Security Number",
-    "sectionHint": "General"
+    "nearestLabel": null,
+    "sanitizedLabel": null,
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
   },
   {
-    "id": "Telephone Number",
-    "name": "Telephone Number",
+    "id": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_2",
+    "name": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_2",
     "type": "text",
     "page": 1,
     "position": {
-      "x": 516,
-      "y": 561
+      "x": 295,
+      "y": 597
     },
-    "nearestLabel": "Employee's Email Address",
-    "sanitizedLabel": "Employee's Email Address",
-    "sectionHint": "General"
+    "nearestLabel": null,
+    "sanitizedLabel": null,
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
   },
   {
-    "id": "US Social Security Number",
-    "name": "US Social Security Number",
+    "id": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_3",
+    "name": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_3",
     "type": "text",
     "page": 1,
     "position": {
-      "x": 203,
-      "y": 560
+      "x": 295,
+      "y": 577
     },
-    "nearestLabel": "Date of Birth (mm/dd/yyyy)",
-    "sanitizedLabel": "Date of Birth (mm/dd/yyyy)",
-    "sectionHint": "General"
+    "nearestLabel": null,
+    "sanitizedLabel": null,
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
   },
   {
-    "id": "CB_1",
-    "name": "CB_1",
+    "id": "current_date",
+    "name": "current_date",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 130,
+      "y": 171
+    },
+    "nearestLabel": null,
+    "sanitizedLabel": null,
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
+  },
+  {
+    "id": "user_fullname",
+    "name": "user_fullname",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 169,
+      "y": 131
+    },
+    "nearestLabel": null,
+    "sanitizedLabel": null,
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
+  },
+  {
+    "id": "CheckBox61",
+    "name": "CheckBox61",
     "type": "checkbox",
     "page": 1,
     "position": {
-      "x": 186,
-      "y": 528
+      "x": 320,
+      "y": 94
     },
-    "nearestLabel": "I am aware that federal law",
-    "sanitizedLabel": "I am aware that federal law",
-    "sectionHint": "General"
+    "nearestLabel": null,
+    "sanitizedLabel": null,
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
   },
   {
-    "id": "CB_2",
-    "name": "CB_2",
+    "id": "CheckBox6",
+    "name": "CheckBox6",
     "type": "checkbox",
     "page": 1,
     "position": {
-      "x": 186,
-      "y": 516
+      "x": 395,
+      "y": 94
     },
-    "nearestLabel": "use of false documents, in",
-    "sanitizedLabel": "use of false documents, in",
-    "sectionHint": "General"
+    "nearestLabel": "Attorney for",
+    "sanitizedLabel": "Attorney for",
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
   },
   {
-    "id": "CB_3",
-    "name": "CB_3",
+    "id": "CheckBx6",
+    "name": "CheckBx6",
     "type": "checkbox",
     "page": 1,
     "position": {
-      "x": 186,
-      "y": 504
+      "x": 452,
+      "y": 94
     },
-    "nearestLabel": "use of false documents, in",
-    "sanitizedLabel": "use of false documents, in",
-    "sectionHint": "General"
+    "nearestLabel": "Plaintiff",
+    "sanitizedLabel": "Plaintiff",
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
   },
   {
-    "id": "3 A lawful permanent resident Enter USCIS or ANumber",
-    "name": "3 A lawful permanent resident Enter USCIS or ANumber",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 483,
-      "y": 504
-    },
-    "nearestLabel": "A lawful permanent resident (Enter USCIS or A-Number.)",
-    "sanitizedLabel": "A lawful permanent resident (Enter USCIS or A-Number.)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "CB_4",
-    "name": "CB_4",
+    "id": "ChckBox6",
+    "name": "ChckBox6",
     "type": "checkbox",
     "page": 1,
     "position": {
-      "x": 187,
-      "y": 492
+      "x": 520,
+      "y": 94
     },
-    "nearestLabel": "attesting to my citizenship or",
-    "sanitizedLabel": "attesting to my citizenship or",
-    "sectionHint": "General"
+    "nearestLabel": "Petitioner",
+    "sanitizedLabel": "Petitioner",
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
   },
   {
-    "id": "Exp Date mmddyyyy",
-    "name": "Exp Date mmddyyyy",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 420,
-      "y": 491
-    },
-    "nearestLabel": "(exp. date, if any)",
-    "sanitizedLabel": "(exp. date, if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "USCIS ANumber",
-    "name": "USCIS ANumber",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 222,
-      "y": 450
-    },
-    "nearestLabel": "correct",
-    "sanitizedLabel": "correct",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Form I94 Admission Number",
-    "name": "Form I94 Admission Number",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 330,
-      "y": 450
-    },
-    "nearestLabel": "correct",
-    "sanitizedLabel": "correct",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Foreign Passport Number and Country of IssuanceRow1",
-    "name": "Foreign Passport Number and Country of IssuanceRow1",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 486,
-      "y": 450
-    },
-    "nearestLabel": "OR",
-    "sanitizedLabel": "OR",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Today's Date mmddyyy",
-    "name": "Today's Date mmddyyy",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 423,
-      "y": 427
-    },
-    "nearestLabel": "Signature of Employee",
-    "sanitizedLabel": "Signature of Employee",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Signature of Employee",
-    "name": "Signature of Employee",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 204,
-      "y": 427
-    },
-    "nearestLabel": "Signature of Employee",
-    "sanitizedLabel": "Signature of Employee",
-    "sectionHint": "General"
-  },
-  {
-    "id": "List B Document 1 Title",
-    "name": "List B Document 1 Title",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 348,
-      "y": 351
-    },
-    "nearestLabel": "Document Title 1",
-    "sanitizedLabel": "Document Title 1",
-    "sectionHint": "General"
-  },
-  {
-    "id": "List C Document Title 1",
-    "name": "List C Document Title 1",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 498,
-      "y": 351
-    },
-    "nearestLabel": "AND",
-    "sanitizedLabel": "AND",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Document Title 1",
-    "name": "Document Title 1",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 195,
-      "y": 351
-    },
-    "nearestLabel": "Document Title 1",
-    "sanitizedLabel": "Document Title 1",
-    "sectionHint": "General"
-  },
-  {
-    "id": "List C Issuing Authority 1",
-    "name": "List C Issuing Authority 1",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 498,
-      "y": 333
-    },
-    "nearestLabel": "Issuing Authority",
-    "sanitizedLabel": "Issuing Authority",
-    "sectionHint": "General"
-  },
-  {
-    "id": "List B Issuing Authority 1",
-    "name": "List B Issuing Authority 1",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 349,
-      "y": 333
-    },
-    "nearestLabel": "Issuing Authority",
-    "sanitizedLabel": "Issuing Authority",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Issuing Authority 1",
-    "name": "Issuing Authority 1",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 195,
-      "y": 333
-    },
-    "nearestLabel": "Issuing Authority",
-    "sanitizedLabel": "Issuing Authority",
-    "sectionHint": "General"
-  },
-  {
-    "id": "List B Document Number 1",
-    "name": "List B Document Number 1",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 348,
-      "y": 315
-    },
-    "nearestLabel": "Document Number (if any)",
-    "sanitizedLabel": "Document Number (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "List C Document Number 1",
-    "name": "List C Document Number 1",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 498,
-      "y": 315
-    },
-    "nearestLabel": "Document Number (if any)",
-    "sanitizedLabel": "Document Number (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Document Number 0 (if any)",
-    "name": "Document Number 0 (if any)",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 195,
-      "y": 315
-    },
-    "nearestLabel": "Document Number (if any)",
-    "sanitizedLabel": "Document Number (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "List B Expiration Date 1",
-    "name": "List B Expiration Date 1",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 348,
-      "y": 297
-    },
-    "nearestLabel": "Expiration Date (if any)",
-    "sanitizedLabel": "Expiration Date (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "List C Expiration Date 1",
-    "name": "List C Expiration Date 1",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 498,
-      "y": 297
-    },
-    "nearestLabel": "Additional Information",
-    "sanitizedLabel": "Additional Information",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Expiration Date if any",
-    "name": "Expiration Date if any",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 195,
-      "y": 297
-    },
-    "nearestLabel": "Expiration Date (if any)",
-    "sanitizedLabel": "Expiration Date (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Document Title 2 If any",
-    "name": "Document Title 2 If any",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 195,
-      "y": 279
-    },
-    "nearestLabel": "Document Title 2 (if any)",
-    "sanitizedLabel": "Document Title 2 (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Issuing Authority_2",
-    "name": "Issuing Authority_2",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 195,
-      "y": 261
-    },
-    "nearestLabel": "Issuing Authority",
-    "sanitizedLabel": "Issuing Authority",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Document Number If any_2",
-    "name": "Document Number If any_2",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 195,
-      "y": 243
-    },
-    "nearestLabel": "Document Number (if any)",
-    "sanitizedLabel": "Document Number (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "List A.  Document 2. Expiration Date (if any)",
-    "name": "List A.  Document 2. Expiration Date (if any)",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 195,
-      "y": 225
-    },
-    "nearestLabel": "Expiration Date (if any)",
-    "sanitizedLabel": "Expiration Date (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Additional Information",
-    "name": "Additional Information",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 421,
-      "y": 217
-    },
-    "nearestLabel": "Expiration Date (if any)",
-    "sanitizedLabel": "Expiration Date (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "List A.   Document Title 3.  If any",
-    "name": "List A.   Document Title 3.  If any",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 195,
-      "y": 207
-    },
-    "nearestLabel": "Document Title 3 (if any)",
-    "sanitizedLabel": "Document Title 3 (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "List A. Document 3.  Enter Issuing Authority",
-    "name": "List A. Document 3.  Enter Issuing Authority",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 195,
-      "y": 189
-    },
-    "nearestLabel": "Issuing Authority",
-    "sanitizedLabel": "Issuing Authority",
-    "sectionHint": "General"
-  },
-  {
-    "id": "List A.  Document 3 Number.  If any",
-    "name": "List A.  Document 3 Number.  If any",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 195,
-      "y": 170
-    },
-    "nearestLabel": "Document Number (if any)",
-    "sanitizedLabel": "Document Number (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Document Number if any_3",
-    "name": "Document Number if any_3",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 195,
-      "y": 153
-    },
-    "nearestLabel": "Expiration Date (if any)",
-    "sanitizedLabel": "Expiration Date (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "CB_Alt",
-    "name": "CB_Alt",
+    "id": "Chck6",
+    "name": "Chck6",
     "type": "checkbox",
     "page": 1,
     "position": {
-      "x": 272,
-      "y": 152
-    },
-    "nearestLabel": "Expiration Date (if any)",
-    "sanitizedLabel": "Expiration Date (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "FirstDayEmployed mmddyyyy",
-    "name": "FirstDayEmployed mmddyyyy",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 505,
-      "y": 119
-    },
-    "nearestLabel": "to work in the United States",
-    "sanitizedLabel": "to work in the United States",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Last Name First Name and Title of Employer or Authorized Representative",
-    "name": "Last Name First Name and Title of Employer or Authorized Representative",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 162,
-      "y": 89
+      "x": 320,
+      "y": 80
     },
     "nearestLabel": null,
     "sanitizedLabel": null,
-    "sectionHint": "General"
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
   },
   {
-    "id": "Signature of Employer or AR",
-    "name": "Signature of Employer or AR",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 390,
-      "y": 89
-    },
-    "nearestLabel": "Title of Employer or Authorized Representative",
-    "sanitizedLabel": "Title of Employer or Authorized Representative",
-    "sectionHint": "General"
-  },
-  {
-    "id": "S2 Todays Date mmddyyyy",
-    "name": "S2 Todays Date mmddyyyy",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 529,
-      "y": 89
-    },
-    "nearestLabel": "Signature of Employer or Authorized Representative",
-    "sanitizedLabel": "Signature of Employer or Authorized Representative",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Employers Business or Org Name",
-    "name": "Employers Business or Org Name",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 138,
-      "y": 60
-    },
-    "nearestLabel": null,
-    "sanitizedLabel": null,
-    "sectionHint": "General"
-  },
-  {
-    "id": "Employers Business or Org Address",
-    "name": "Employers Business or Org Address",
-    "type": "text",
-    "page": 1,
-    "position": {
-      "x": 410,
-      "y": 60
-    },
-    "nearestLabel": null,
-    "sanitizedLabel": null,
-    "sectionHint": "General"
-  },
-  {
-    "id": "Last Name Family Name from Section 1",
-    "name": "Last Name Family Name from Section 1",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 147,
-      "y": 670
-    },
-    "nearestLabel": "from",
-    "sanitizedLabel": "from",
-    "sectionHint": "General"
-  },
-  {
-    "id": "First Name Given Name from Section 1",
-    "name": "First Name Given Name from Section 1",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 348,
-      "y": 670
-    },
-    "nearestLabel": "(Given Name)",
-    "sanitizedLabel": "(Given Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Middle initial if any from Section 1",
-    "name": "Middle initial if any from Section 1",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 507,
-      "y": 670
-    },
-    "nearestLabel": "Section 1",
-    "sanitizedLabel": "Section 1",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Signature of Preparer or Translator 0",
-    "name": "Signature of Preparer or Translator 0",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 226,
-      "y": 552
-    },
-    "nearestLabel": "Signature of Preparer or Translator",
-    "sanitizedLabel": "Signature of Preparer or Translator",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Sig Date mmddyyyy 0",
-    "name": "Sig Date mmddyyyy 0",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 493,
-      "y": 552
-    },
-    "nearestLabel": "(mm/dd/yyyy)",
-    "sanitizedLabel": "(mm/dd/yyyy)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator First Name (Given Name) 0",
-    "name": "Preparer or Translator First Name (Given Name) 0",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 382,
-      "y": 519
-    },
-    "nearestLabel": "(Given Name)",
-    "sanitizedLabel": "(Given Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "PT Middle Initial 0",
-    "name": "PT Middle Initial 0",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 535,
-      "y": 519
-    },
-    "nearestLabel": "(Given Name)",
-    "sanitizedLabel": "(Given Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator Last Name (Family Name) 0",
-    "name": "Preparer or Translator Last Name (Family Name) 0",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 154,
-      "y": 519
-    },
-    "nearestLabel": "(Family Name)",
-    "sanitizedLabel": "(Family Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator City or Town 0",
-    "name": "Preparer or Translator City or Town 0",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 373,
-      "y": 490
-    },
-    "nearestLabel": "City or Town",
-    "sanitizedLabel": "City or Town",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer State 0",
-    "name": "Preparer State 0",
-    "type": "dropdown",
-    "page": 3,
-    "position": {
-      "x": 472,
-      "y": 490
-    },
-    "nearestLabel": "State",
-    "sanitizedLabel": "State",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Zip Code 0",
-    "name": "Zip Code 0",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 536,
-      "y": 490
-    },
-    "nearestLabel": "ZIP Code",
-    "sanitizedLabel": "ZIP Code",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator Address (Street Number and Name) 0",
-    "name": "Preparer or Translator Address (Street Number and Name) 0",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 166,
-      "y": 490
-    },
-    "nearestLabel": "Address",
-    "sanitizedLabel": "Address",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Signature of Preparer or Translator 1",
-    "name": "Signature of Preparer or Translator 1",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 226,
-      "y": 427
-    },
-    "nearestLabel": "Signature of Preparer or Translator",
-    "sanitizedLabel": "Signature of Preparer or Translator",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Sig Date mmddyyyy 1",
-    "name": "Sig Date mmddyyyy 1",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 493,
-      "y": 427
-    },
-    "nearestLabel": "(mm/dd/yyyy)",
-    "sanitizedLabel": "(mm/dd/yyyy)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator Last Name (Family Name) 1",
-    "name": "Preparer or Translator Last Name (Family Name) 1",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 154,
-      "y": 393
-    },
-    "nearestLabel": "(Family Name)",
-    "sanitizedLabel": "(Family Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "PT Middle Initial 1",
-    "name": "PT Middle Initial 1",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 535,
-      "y": 393
-    },
-    "nearestLabel": "(Given Name)",
-    "sanitizedLabel": "(Given Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator City or Town 1",
-    "name": "Preparer or Translator City or Town 1",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 373,
-      "y": 364
-    },
-    "nearestLabel": "City or Town",
-    "sanitizedLabel": "City or Town",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer State 1",
-    "name": "Preparer State 1",
-    "type": "dropdown",
-    "page": 3,
-    "position": {
-      "x": 472,
-      "y": 364
-    },
-    "nearestLabel": "City or Town",
-    "sanitizedLabel": "City or Town",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Zip Code 1",
-    "name": "Zip Code 1",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 536,
-      "y": 364
-    },
-    "nearestLabel": "ZIP Code",
-    "sanitizedLabel": "ZIP Code",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator Address (Street Number and Name) 1",
-    "name": "Preparer or Translator Address (Street Number and Name) 1",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 166,
-      "y": 364
-    },
-    "nearestLabel": "Address",
-    "sanitizedLabel": "Address",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Signature of Preparer or Translator 2",
-    "name": "Signature of Preparer or Translator 2",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 226,
-      "y": 300
-    },
-    "nearestLabel": "Signature of Preparer or Translator",
-    "sanitizedLabel": "Signature of Preparer or Translator",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Sig Date mmddyyyy 2",
-    "name": "Sig Date mmddyyyy 2",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 493,
-      "y": 300
-    },
-    "nearestLabel": "(mm/dd/yyyy)",
-    "sanitizedLabel": "(mm/dd/yyyy)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator Last Name (Family Name) 2",
-    "name": "Preparer or Translator Last Name (Family Name) 2",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 154,
-      "y": 267
-    },
-    "nearestLabel": "(Family Name)",
-    "sanitizedLabel": "(Family Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator First Name (Given Name) 2",
-    "name": "Preparer or Translator First Name (Given Name) 2",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 382,
-      "y": 267
-    },
-    "nearestLabel": "(Given Name)",
-    "sanitizedLabel": "(Given Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "PT Middle Initial 2",
-    "name": "PT Middle Initial 2",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 535,
-      "y": 267
-    },
-    "nearestLabel": "(Given Name)",
-    "sanitizedLabel": "(Given Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer State 2",
-    "name": "Preparer State 2",
-    "type": "dropdown",
-    "page": 3,
-    "position": {
-      "x": 473,
-      "y": 238
-    },
-    "nearestLabel": "City or Town",
-    "sanitizedLabel": "City or Town",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator Address (Street Number and Name) 2",
-    "name": "Preparer or Translator Address (Street Number and Name) 2",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 165,
-      "y": 238
-    },
-    "nearestLabel": "Address",
-    "sanitizedLabel": "Address",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator City or Town 2",
-    "name": "Preparer or Translator City or Town 2",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 374,
-      "y": 238
-    },
-    "nearestLabel": "City or Town",
-    "sanitizedLabel": "City or Town",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Zip Code 2",
-    "name": "Zip Code 2",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 536,
-      "y": 238
-    },
-    "nearestLabel": "ZIP Code",
-    "sanitizedLabel": "ZIP Code",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Signature of Preparer or Translator 3",
-    "name": "Signature of Preparer or Translator 3",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 226,
-      "y": 174
-    },
-    "nearestLabel": "Signature of Preparer or Translator",
-    "sanitizedLabel": "Signature of Preparer or Translator",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Sig Date mmddyyyy 3",
-    "name": "Sig Date mmddyyyy 3",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 493,
-      "y": 174
-    },
-    "nearestLabel": "(mm/dd/yyyy)",
-    "sanitizedLabel": "(mm/dd/yyyy)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator Last Name (Family Name) 3",
-    "name": "Preparer or Translator Last Name (Family Name) 3",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 154,
-      "y": 141
-    },
-    "nearestLabel": "(Family Name)",
-    "sanitizedLabel": "(Family Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator First Name (Given Name) 3",
-    "name": "Preparer or Translator First Name (Given Name) 3",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 382,
-      "y": 141
-    },
-    "nearestLabel": "(Given Name)",
-    "sanitizedLabel": "(Given Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "PT Middle Initial 3",
-    "name": "PT Middle Initial 3",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 535,
-      "y": 141
-    },
-    "nearestLabel": "(Given Name)",
-    "sanitizedLabel": "(Given Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer State 3",
-    "name": "Preparer State 3",
-    "type": "dropdown",
-    "page": 3,
-    "position": {
-      "x": 472,
-      "y": 112
-    },
-    "nearestLabel": "State",
-    "sanitizedLabel": "State",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator City or Town 3",
-    "name": "Preparer or Translator City or Town 3",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 373,
-      "y": 112
-    },
-    "nearestLabel": "City or Town",
-    "sanitizedLabel": "City or Town",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Zip Code 3",
-    "name": "Zip Code 3",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 536,
-      "y": 112
-    },
-    "nearestLabel": "ZIP Code",
-    "sanitizedLabel": "ZIP Code",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Preparer or Translator Address (Street Number and Name) 3",
-    "name": "Preparer or Translator Address (Street Number and Name) 3",
-    "type": "text",
-    "page": 3,
-    "position": {
-      "x": 166,
-      "y": 112
-    },
-    "nearestLabel": "Address",
-    "sanitizedLabel": "Address",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Last Name Family Name from Section 1-2",
-    "name": "Last Name Family Name from Section 1-2",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 149,
-      "y": 668
-    },
-    "nearestLabel": "from",
-    "sanitizedLabel": "from",
-    "sectionHint": "General"
-  },
-  {
-    "id": "First Name Given Name from Section 1-2",
-    "name": "First Name Given Name from Section 1-2",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 351,
-      "y": 668
-    },
-    "nearestLabel": "(Given Name)",
-    "sanitizedLabel": "(Given Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Middle initial if any from Section 1-2",
-    "name": "Middle initial if any from Section 1-2",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 510,
-      "y": 668
-    },
-    "nearestLabel": "Section 1",
-    "sanitizedLabel": "Section 1",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Last Name 0",
-    "name": "Last Name 0",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 239,
-      "y": 566
-    },
-    "nearestLabel": "Last Name (Family Name)",
-    "sanitizedLabel": "Last Name (Family Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "First Name 0",
-    "name": "First Name 0",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 429,
-      "y": 566
-    },
-    "nearestLabel": "Last Name (Family Name)",
-    "sanitizedLabel": "Last Name (Family Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Middle Initial 0",
-    "name": "Middle Initial 0",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 548,
-      "y": 566
-    },
-    "nearestLabel": "First Name (Given Name)",
-    "sanitizedLabel": "First Name (Given Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Date of Rehire 0",
-    "name": "Date of Rehire 0",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 86,
-      "y": 566
-    },
-    "nearestLabel": "Date",
-    "sanitizedLabel": "Date",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Document Title 0",
-    "name": "Document Title 0",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 141,
-      "y": 516
-    },
-    "nearestLabel": "Document Title",
-    "sanitizedLabel": "Document Title",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Document Number 0",
-    "name": "Document Number 0",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 345,
-      "y": 516
-    },
-    "nearestLabel": "Document Number (if any)",
-    "sanitizedLabel": "Document Number (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Expiration Date 0",
-    "name": "Expiration Date 0",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 513,
-      "y": 516
-    },
-    "nearestLabel": "Document Number (if any)",
-    "sanitizedLabel": "Document Number (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Name of Emp or Auth Rep 0",
-    "name": "Name of Emp or Auth Rep 0",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 140,
-      "y": 460
-    },
-    "nearestLabel": null,
-    "sanitizedLabel": null,
-    "sectionHint": "General"
-  },
-  {
-    "id": "Signature of Emp Rep 0",
-    "name": "Signature of Emp Rep 0",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 357,
-      "y": 460
-    },
-    "nearestLabel": "Name of Employer or Authorized Representative",
-    "sanitizedLabel": "Name of Employer or Authorized Representative",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Todays Date 0",
-    "name": "Todays Date 0",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 521,
-      "y": 460
-    },
-    "nearestLabel": "Today's Date",
-    "sanitizedLabel": "Today's Date",
-    "sectionHint": "General"
-  },
-  {
-    "id": "CB_Alt_0",
-    "name": "CB_Alt_0",
+    "id": "Ck6",
+    "name": "Ck6",
     "type": "checkbox",
-    "page": 4,
+    "page": 1,
     "position": {
-      "x": 460,
-      "y": 431
+      "x": 395,
+      "y": 79
     },
-    "nearestLabel": "Additional Information (Initial and date each notation.)",
-    "sanitizedLabel": "Additional Information (Initial and date each notation.)",
-    "sectionHint": "General"
+    "nearestLabel": "Attorney for",
+    "sanitizedLabel": "Attorney for",
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
   },
   {
-    "id": "Addtl Info 0",
-    "name": "Addtl Info 0",
+    "id": "FillText13",
+    "name": "FillText13",
     "type": "text",
-    "page": 4,
+    "page": 1,
     "position": {
-      "x": 246,
-      "y": 427
+      "x": 491,
+      "y": 67
+    },
+    "nearestLabel": "ATTACHED DECLARATION",
+    "sanitizedLabel": "ATTACHED DECLARATION",
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
+  },
+  {
+    "id": "NoticeFooter1",
+    "name": "NoticeFooter1",
+    "type": "text",
+    "page": 1,
+    "position": {
+      "x": 152,
+      "y": 15
     },
     "nearestLabel": null,
     "sanitizedLabel": null,
-    "sectionHint": "General"
-  },
-  {
-    "id": "Date of Rehire 1",
-    "name": "Date of Rehire 1",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 86,
-      "y": 380
-    },
-    "nearestLabel": "Date",
-    "sanitizedLabel": "Date",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Last Name 1",
-    "name": "Last Name 1",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 239,
-      "y": 380
-    },
-    "nearestLabel": "Last Name (Family Name)",
-    "sanitizedLabel": "Last Name (Family Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "First Name 1",
-    "name": "First Name 1",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 429,
-      "y": 380
-    },
-    "nearestLabel": "Last Name (Family Name)",
-    "sanitizedLabel": "Last Name (Family Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Middle Initial 1",
-    "name": "Middle Initial 1",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 549,
-      "y": 380
-    },
-    "nearestLabel": "First Name (Given Name)",
-    "sanitizedLabel": "First Name (Given Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Document Number 1",
-    "name": "Document Number 1",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 344,
-      "y": 329
-    },
-    "nearestLabel": "Document Number (if any)",
-    "sanitizedLabel": "Document Number (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Expiration Date 1",
-    "name": "Expiration Date 1",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 513,
-      "y": 329
-    },
-    "nearestLabel": "Document Number (if any)",
-    "sanitizedLabel": "Document Number (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Signature of Emp Rep 1",
-    "name": "Signature of Emp Rep 1",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 356,
-      "y": 275
-    },
-    "nearestLabel": "Name of Employer or Authorized Representative",
-    "sanitizedLabel": "Name of Employer or Authorized Representative",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Todays Date 1",
-    "name": "Todays Date 1",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 521,
-      "y": 275
-    },
-    "nearestLabel": "Today's Date",
-    "sanitizedLabel": "Today's Date",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Name of Emp or Auth Rep 1",
-    "name": "Name of Emp or Auth Rep 1",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 142,
-      "y": 275
-    },
-    "nearestLabel": null,
-    "sanitizedLabel": null,
-    "sectionHint": "General"
-  },
-  {
-    "id": "CB_Alt_1",
-    "name": "CB_Alt_1",
-    "type": "checkbox",
-    "page": 4,
-    "position": {
-      "x": 460,
-      "y": 246
-    },
-    "nearestLabel": "Additional Information (Initial and date each notation.)",
-    "sanitizedLabel": "Additional Information (Initial and date each notation.)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Addtl Info 1",
-    "name": "Addtl Info 1",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 246,
-      "y": 241
-    },
-    "nearestLabel": null,
-    "sanitizedLabel": null,
-    "sectionHint": "General"
-  },
-  {
-    "id": "Date of Rehire 2",
-    "name": "Date of Rehire 2",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 86,
-      "y": 194
-    },
-    "nearestLabel": "Date",
-    "sanitizedLabel": "Date",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Last Name 2",
-    "name": "Last Name 2",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 240,
-      "y": 194
-    },
-    "nearestLabel": "Last Name (Family Name)",
-    "sanitizedLabel": "Last Name (Family Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "First Name 2",
-    "name": "First Name 2",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 429,
-      "y": 194
-    },
-    "nearestLabel": "Last Name (Family Name)",
-    "sanitizedLabel": "Last Name (Family Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Middle Initial 2",
-    "name": "Middle Initial 2",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 549,
-      "y": 194
-    },
-    "nearestLabel": "First Name (Given Name)",
-    "sanitizedLabel": "First Name (Given Name)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Document Title 2",
-    "name": "Document Title 2",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 140,
-      "y": 143
-    },
-    "nearestLabel": "Document Title",
-    "sanitizedLabel": "Document Title",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Document Number 2",
-    "name": "Document Number 2",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 344,
-      "y": 143
-    },
-    "nearestLabel": "Document Number (if any)",
-    "sanitizedLabel": "Document Number (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Expiration Date 2",
-    "name": "Expiration Date 2",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 512,
-      "y": 143
-    },
-    "nearestLabel": "Document Number (if any)",
-    "sanitizedLabel": "Document Number (if any)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Name of Emp or Auth Rep 2",
-    "name": "Name of Emp or Auth Rep 2",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 141,
-      "y": 89
-    },
-    "nearestLabel": null,
-    "sanitizedLabel": null,
-    "sectionHint": "General"
-  },
-  {
-    "id": "Signature of Emp Rep 2",
-    "name": "Signature of Emp Rep 2",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 356,
-      "y": 89
-    },
-    "nearestLabel": "Name of Employer or Authorized Representative",
-    "sanitizedLabel": "Name of Employer or Authorized Representative",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Todays Date 2",
-    "name": "Todays Date 2",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 521,
-      "y": 89
-    },
-    "nearestLabel": "Today's Date",
-    "sanitizedLabel": "Today's Date",
-    "sectionHint": "General"
-  },
-  {
-    "id": "CB_Alt_2",
-    "name": "CB_Alt_2",
-    "type": "checkbox",
-    "page": 4,
-    "position": {
-      "x": 461,
-      "y": 59
-    },
-    "nearestLabel": "Additional Information (Initial and date each notation.)",
-    "sanitizedLabel": "Additional Information (Initial and date each notation.)",
-    "sectionHint": "General"
-  },
-  {
-    "id": "Addtl Info 2",
-    "name": "Addtl Info 2",
-    "type": "text",
-    "page": 4,
-    "position": {
-      "x": 246,
-      "y": 55
-    },
-    "nearestLabel": null,
-    "sanitizedLabel": null,
-    "sectionHint": "General"
+    "sectionHint": "CASE NUMBER: PLAINTIFF/PETITIONER"
   }
 ]

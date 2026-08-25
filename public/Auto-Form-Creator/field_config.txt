@@ -75,8 +75,8 @@ Before returning JSON, verify:
   □ Count: fields.length === textFields.length + checkboxFields.length
   □ Every textFields[].name appears as exactly one fields[].id
   □ Every checkboxFields[].name appears as exactly one fields[].id
-  □ No duplicate id values
-  □ No duplicate newName values
+  □ No duplicate id values (if the same AcroForm name appears multiple times on the PDF, output it ONCE — shared fill value)
+  □ No duplicate newName values across different ids
 
 
 ================================================================================
@@ -311,6 +311,6 @@ FINAL CHECKLIST (run before returning)
   □ No vague label without disambiguation
   □ Alias, resubmission/ATI, and ALL "if different/applicable/optional" fields have conditional objects
   □ Mailing/alternate address blocks gated when PDF implies "if different from above/home"
-  □ All newName values unique
+  □ All newName values unique across different field ids (same id repeated in the PDF still maps once)
 
 Return ONLY the JSON object.

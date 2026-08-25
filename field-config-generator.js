@@ -25,6 +25,30 @@ function extractJsonFromModelResponse(text) {
   return JSON.parse(candidate);
 }
 
+function dedupeFieldsByName(fields) {
+  const seen = new Set();
+  const out = [];
+  for (const field of fields || []) {
+    const name = typeof field === 'string' ? field : field?.name;
+    if (!name || seen.has(name)) continue;
+    seen.add(name);
+    out.push(typeof field === 'string' ? field : field);
+  }
+  return out;
+}
+
+function dedupeStructuredFieldsById(fields) {
+  const seen = new Set();
+  const out = [];
+  for (const field of fields || []) {
+    const id = field?.id;
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    out.push(field);
+  }
+  return out;
+}
+
 function validateFieldConfig(config, inputFieldIds) {
   if (!config || typeof config !== 'object') {
     throw new Error('Model response is not a JSON object');
@@ -33,8 +57,9 @@ function validateFieldConfig(config, inputFieldIds) {
     throw new Error('field_config.json must contain a "fields" array');
   }
 
-  const seenNewNames = new Set();
-  const mappedIds = new Set();
+  const seenNewNames = new Map(); // newName -> id
+  const mappedIds = new Map(); // id -> newName
+  const normalizedFields = [];
 
   for (const field of config.fields) {
     if (!field || typeof field !== 'object') {
@@ -46,22 +71,41 @@ function validateFieldConfig(config, inputFieldIds) {
     if (!['text', 'checkbox', 'dropdown'].includes(field.type)) {
       throw new Error(`Invalid field type for ${field.id}: ${field.type}`);
     }
+
+    // Same AcroForm name can appear on the PDF multiple times (shared fill value).
+    // Keep the first mapping; reject only when the same id is remapped differently.
     if (mappedIds.has(field.id)) {
-      throw new Error(`Duplicate field id: ${field.id}`);
+      if (mappedIds.get(field.id) !== field.newName) {
+        throw new Error(
+          `Conflicting mappings for field id "${field.id}": ` +
+          `"${mappedIds.get(field.id)}" vs "${field.newName}"`
+        );
+      }
+      continue;
     }
-    if (seenNewNames.has(field.newName)) {
-      throw new Error(`Duplicate newName: ${field.newName}`);
+
+    // Different PDF fields must not collapse onto the same newName.
+    if (seenNewNames.has(field.newName) && seenNewNames.get(field.newName) !== field.id) {
+      throw new Error(
+        `Duplicate newName "${field.newName}" used by "${seenNewNames.get(field.newName)}" and "${field.id}"`
+      );
     }
-    seenNewNames.add(field.newName);
-    mappedIds.add(field.id);
+
+    seenNewNames.set(field.newName, field.id);
+    mappedIds.set(field.id, field.newName);
+    normalizedFields.push(field);
   }
 
-  const missing = inputFieldIds.filter((id) => !mappedIds.has(id));
+  const uniqueInputIds = [...new Set(inputFieldIds.filter(Boolean))];
+  const missing = uniqueInputIds.filter((id) => !mappedIds.has(id));
   if (missing.length > 0) {
     throw new Error(`Missing ${missing.length} field(s) in model output, e.g. ${missing[0]}`);
   }
 
-  return config;
+  return {
+    ...config,
+    fields: normalizedFields,
+  };
 }
 
 async function callOpenAiForFieldConfig(openAiApiKey, extractionPayload, pageImages = []) {
@@ -103,8 +147,13 @@ async function callOpenAiForFieldConfig(openAiApiKey, extractionPayload, pageIma
 }
 
 async function generateFieldConfig(extractionPayload, openAiApiKey) {
-  const textFieldIds = (extractionPayload.textFields || []).map((f) => f.name);
-  const checkboxFieldIds = (extractionPayload.checkboxFields || []).map((f) => f.name);
+  // Widgets that share an AcroForm name are the same fill target — ask the model once.
+  const textFields = dedupeFieldsByName(extractionPayload.textFields || []);
+  const checkboxFields = dedupeFieldsByName(extractionPayload.checkboxFields || []);
+  const structuredFields = dedupeStructuredFieldsById(extractionPayload.structuredFields || []);
+
+  const textFieldIds = textFields.map((f) => (typeof f === 'string' ? f : f.name));
+  const checkboxFieldIds = checkboxFields.map((f) => (typeof f === 'string' ? f : f.name));
   const inputFieldIds = [...textFieldIds, ...checkboxFieldIds];
 
   if (!inputFieldIds.length) {
@@ -113,9 +162,9 @@ async function generateFieldConfig(extractionPayload, openAiApiKey) {
 
   const promptPayload = {
     extractedDocumentContent: extractionPayload.extractedDocumentContent || '',
-    textFields: extractionPayload.textFields || [],
-    checkboxFields: extractionPayload.checkboxFields || [],
-    structuredFields: (extractionPayload.structuredFields || []).map((sf) => ({
+    textFields,
+    checkboxFields,
+    structuredFields: structuredFields.map((sf) => ({
       id: sf.id,
       type: sf.type,
       page: sf.page,
@@ -123,6 +172,9 @@ async function generateFieldConfig(extractionPayload, openAiApiKey) {
     requiredFieldCount: inputFieldIds.length,
     requiredTextFieldCount: textFieldIds.length,
     requiredCheckboxFieldCount: checkboxFieldIds.length,
+    note:
+      'If the PDF shows the same AcroForm field name more than once, include it only once. ' +
+      'All widgets with that name are filled with the same value.',
   };
 
   const pageImages = await resolvePdfPageImages(

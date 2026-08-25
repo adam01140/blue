@@ -78,7 +78,7 @@
     content.innerHTML = '' +
       '<div class="cart-icon-large">🛒</div>' +
       '<div class="cart-message" id="cart-message">Create an account to start shopping!</div>' +
-      '<div class="cart-description" id="cart-description">To add forms to your cart and make purchases, you\\'ll need to create a Form-Star account. Sign up now to access our complete library of forms and start simplifying your paperwork.</div>' +
+      '<div class="cart-description" id="cart-description">To add forms to your cart and make purchases, you\'ll need to create a Form-Star account. Sign up now to access our complete library of forms and start simplifying your paperwork.</div>' +
       '<a href="account.html" class="cart-signup-btn" id="cart-signup-btn">Sign Up</a>' +
       '<div class="cart-items-list" id="cart-items-list" style="display:none;"></div>' +
       '<button type="button" class="cart-checkout-btn" id="cart-checkout-btn" style="display:none;">Checkout</button>' +

@@ -253,6 +253,18 @@
 
         .signed-in-banner.visible { display: flex; }
 
+        .signed-in-controls {
+            display: none;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .signed-in-controls.visible {
+            display: flex;
+        }
+
         .signed-in-info {
             display: flex;
             align-items: center;
@@ -1069,6 +1081,308 @@
             display: flex;
         }
 
+        .payload-list {
+            display: grid;
+            gap: 12px;
+            margin: 0 0 18px;
+        }
+
+        .payload-entry {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 2px solid #8fa3bd;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
+        }
+
+        .payload-entry.editing {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.15);
+        }
+
+        .payload-entry-main {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .payload-entry-name {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--navy);
+            cursor: text;
+            word-break: break-word;
+        }
+
+        .payload-entry-pdf {
+            margin: 4px 0 0;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--blue);
+            cursor: text;
+            word-break: break-all;
+        }
+
+        .payload-entry-name-input,
+        .payload-entry-pdf-input {
+            width: 100%;
+            max-width: 420px;
+            font: inherit;
+            border: 2px solid var(--blue);
+            border-radius: 8px;
+            padding: 6px 10px;
+        }
+
+        .payload-entry-name-input {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .payload-entry-pdf-input {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-top: 4px;
+        }
+
+        .payload-entry-meta {
+            margin: 4px 0 0;
+            font-size: 0.82rem;
+            color: var(--gray);
+        }
+
+        .payload-entry-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .payload-entry-actions .btn-secondary {
+            margin-left: 0;
+            padding: 8px 14px;
+        }
+
+        .payload-entry-actions .btn-download {
+            margin-left: 0;
+            padding: 8px 14px;
+        }
+
+        .payload-entry-actions .btn-edit {
+            margin-left: 0;
+            padding: 8px 14px;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .payload-entry-actions .btn-edit:hover {
+            background: #2471a3;
+        }
+
+        .payload-entry-actions .btn-clone {
+            margin-left: 0;
+            padding: 8px 14px;
+            background: var(--green);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .payload-entry-actions .btn-clone:hover {
+            background: #219a52;
+        }
+
+        .payload-entry-actions .btn-danger {
+            background: #fff5f5;
+            color: #c0392b;
+            border: 1px solid #f0c2c2;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .payload-entry-actions .btn-danger:hover {
+            background: #ffe8e8;
+        }
+
+        .payload-drop-zone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            min-height: 120px;
+            padding: 22px 18px;
+            border: 2px dashed #8fa3bd;
+            border-radius: 14px;
+            background: #f8fafc;
+            cursor: pointer;
+            text-align: center;
+            transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .payload-drop-zone:hover,
+        .payload-drop-zone:focus {
+            outline: none;
+            border-color: var(--blue);
+            background: #eef6fc;
+            box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.12);
+        }
+
+        .payload-drop-zone.drag-over {
+            border-color: var(--blue);
+            background: #e3f2fd;
+        }
+
+        .payload-drop-zone.pipeline-busy,
+        .payload-drop-zone:disabled,
+        .step-locked .payload-drop-zone {
+            opacity: 0.55;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        .payload-drop-zone .upload-icon {
+            font-size: 1.6rem;
+            margin: 0;
+        }
+
+        .payload-drop-zone .upload-label {
+            font-weight: 700;
+            color: var(--navy);
+            margin: 0;
+        }
+
+        .payload-drop-zone .upload-hint {
+            margin: 0;
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+
+        .payload-toolbar {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: stretch;
+            margin: 16px 0 8px;
+        }
+
+        .payload-toolbar .btn-download {
+            margin-left: 0;
+            align-self: flex-start;
+        }
+
+        .payload-empty {
+            margin: 0 0 16px;
+            padding: 16px;
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            color: var(--gray);
+            font-size: 0.9rem;
+            background: #fbfcfe;
+        }
+
+        .pipeline-stages {
+            list-style: none;
+            margin: 16px 0 0;
+            padding: 0;
+            display: grid;
+            gap: 8px;
+        }
+
+        .pipeline-stages[hidden] {
+            display: none !important;
+        }
+
+        .pipeline-stage {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #f8fafc;
+            color: var(--gray);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .pipeline-stage::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #c5d0dc;
+            flex-shrink: 0;
+        }
+
+        .pipeline-stage.active {
+            border-color: var(--blue);
+            background: #eef6fc;
+            color: var(--navy);
+        }
+
+        .pipeline-stage.active::before {
+            background: var(--blue);
+            box-shadow: 0 0 0 4px rgba(41, 128, 185, 0.18);
+        }
+
+        .pipeline-stage.done {
+            border-color: #b8e6c8;
+            background: #eafaf1;
+            color: #1e8449;
+        }
+
+        .pipeline-stage.done::before {
+            content: '✓';
+            width: auto;
+            height: auto;
+            border-radius: 0;
+            background: transparent;
+            color: #1e8449;
+            font-size: 0.85rem;
+            line-height: 1;
+        }
+
+        .pipeline-stage.error {
+            border-color: #f0c2c2;
+            background: #fff5f5;
+            color: #c0392b;
+        }
+
+        .upload-zone.pipeline-busy {
+            opacity: 0.55;
+            pointer-events: none;
+        }
+
+        .document-data-panels[hidden] {
+            display: none !important;
+        }
+
+        .document-data-panels {
+            margin-top: 8px;
+        }
+
         .unlock-success-text {
             color: #1e8449;
             font-weight: 600;
@@ -1220,6 +1534,11 @@
                         <span>Signed in as <strong id="signed-in-email"></strong></span>
                     </div>
                     <button type="button" class="btn-sign-out" id="logout-btn">Sign Out</button>
+                </div>
+                <div class="signed-in-controls" id="signed-in-controls">
+                    <button type="button" class="btn-secondary" id="toggle-user-data-btn">
+                        Display User Data
+                    </button>
                 </div>
 
                 <div class="login-form-wrap" id="login-form-wrap">
@@ -1383,17 +1702,16 @@
             </div>
         </div>
 
-        <!-- Step 2: Unlock XFA PDF -->
+        <!-- Step 2: Drag PDF → auto pipeline → payload entries -->
         <section class="step step-locked" id="step-2">
             <div class="step-header">
                 <div class="step-status" id="step-2-status" aria-label="Step 2 status">2</div>
                 <div>
-                    <h2 class="step-title">Step 2 — Unlock XFA Form</h2>
+                    <h2 class="step-title">Step 2 — Create Payload</h2>
                     <p class="step-description">
-                        Upload an XFA PDF and our tool automatically strips the XFA layer to reveal
-                        the underlying AcroForm fields — the same result as printing through Adobe PDF,
-                        but done instantly on the server. Duplicate field names (common on radio groups)
-                        are split into uniquely named checkboxes so each widget can be filled independently.
+                        Drag in a PDF to unlock it, extract fields, generate a field config, and add a payload
+                        entry automatically. Drop another PDF anytime to add more. Double-click an entry name
+                        or PDF filename to rename.
                     </p>
                 </div>
             </div>
@@ -1402,66 +1720,97 @@
                 <p id="step-2-lock-msg" style="color:var(--gray);font-style:italic;margin:0 0 16px;">
                     Complete Step 1 (sign in) to unlock this step.
                 </p>
+                <!-- Kept for unlockStep5 / restore compatibility -->
+                <p id="step-5-lock-msg" style="display:none;"></p>
 
-                <div class="upload-section">
-                    <div class="upload-zone" id="xfa-upload-zone" tabindex="0" role="button" aria-label="Upload PDF to unlock">
+                <div id="payload-empty" class="payload-empty" hidden>
+                    No payload entries yet. Drop a PDF below to create the first one.
+                </div>
+                <div class="payload-list" id="payload-list" aria-live="polite"></div>
+
+                <div class="payload-toolbar">
+                    <div class="payload-drop-zone upload-zone" id="xfa-upload-zone" tabindex="0" role="button" aria-label="Drop PDFs to add payloads">
                         <div class="upload-icon">📄</div>
-                        <div class="upload-label">Choose PDF or drag &amp; drop</div>
-                        <div class="upload-hint">XFA or hybrid government forms — we unlock them automatically</div>
-                        <input type="file" id="xfa-input" accept=".pdf,application/pdf" tabindex="-1">
+                        <div class="upload-label">Drop PDFs to add payloads</div>
+                        <div class="upload-hint">or click to choose one or more files — each PDF becomes its own payload</div>
+                        <input type="file" id="xfa-input" accept=".pdf,application/pdf" multiple tabindex="-1">
                     </div>
                     <div class="file-chip" id="xfa-file-chip" style="display:none;"></div>
+
+                    <button type="button" class="btn-download" id="download-payload-btn" disabled>
+                        Download full payload zip file
+                    </button>
+                    <!-- Legacy id kept for JS refs; drop zone replaces this button -->
+                    <button type="button" id="add-payload-btn" style="display:none;" tabindex="-1" aria-hidden="true">Add payload</button>
                 </div>
+
+                <ol class="pipeline-stages" id="pipeline-stages" hidden>
+                    <li data-stage="unlock" class="pipeline-stage">Unlock XFA form</li>
+                    <li data-stage="extract" class="pipeline-stage">Extract form fields</li>
+                    <li data-stage="sanitize" class="pipeline-stage">Generate sanitized PDF</li>
+                </ol>
 
                 <div class="unlock-progress" id="unlock-progress">
                     <div class="spinner"></div>
-                    <span>Unlocking PDF…</span>
+                    <span id="unlock-progress-text">Unlocking PDF…</span>
                 </div>
 
+                <div class="loading-text" id="pdf-loading" style="display:none;padding:12px 0 0;">Analyzing PDF…</div>
+
                 <div class="unlock-success" id="unlock-success">
-                    <span class="unlock-success-text">✓ PDF unlocked — download to verify before continuing</span>
+                    <span class="unlock-success-text">✓ PDF unlocked</span>
                     <button type="button" class="btn-download" id="download-unlocked-btn">Download Unlocked PDF</button>
                 </div>
 
-                <div class="error-message" id="step-2-error"></div>
-            </div>
-        </section>
-
-        <!-- Step 3: Extract fields -->
-        <section class="step step-locked" id="step-3">
-            <div class="step-header">
-                <div class="step-status" id="step-3-status" aria-label="Step 3 status">3</div>
-                <div>
-                    <h2 class="step-title">Step 3 — Extract Form Fields</h2>
-                    <p class="step-description">
-                        The unlocked PDF is analyzed to find every text field and checkbox,
-                        mapped to their positions in the layout. Text fields appear as
-                        <code>[[field]]</code> and checkboxes as <code>{{field}}</code>.
-                        Each widget gets its own entry — duplicate names are resolved during unlock.
-                    </p>
-                </div>
-            </div>
-
-            <div class="step-body">
-                <p id="step-3-lock-msg" style="color:var(--gray);font-style:italic;margin:0 0 16px;">
-                    Complete Step 2 (unlock PDF) to unlock field extraction.
-                </p>
-
-                <div class="upload-section">
-                    <p class="upload-section-title">PDF for extraction (auto-loaded from Step 2)</p>
-                    <div class="upload-zone" id="extract-upload-zone" tabindex="0" role="button" aria-label="Upload PDF for extraction">
-                        <div class="upload-icon">📄</div>
-                        <div class="upload-label">Choose PDF or drag &amp; drop here</div>
-                        <div class="upload-hint">Uses your Step 2 unlocked PDF automatically when available</div>
-                        <input type="file" id="extract-input" accept=".pdf,application/pdf" tabindex="-1">
+                <div class="timed-progress" id="field-config-progress">
+                    <div class="timed-progress-label" id="field-config-progress-label">Generating field config with ChatGPT…</div>
+                    <div class="timed-progress-track">
+                        <div class="timed-progress-bar" id="field-config-progress-bar"></div>
                     </div>
-                    <div class="file-chip" id="extract-file-chip" style="display:none;"></div>
+                    <div class="timed-progress-eta">Estimated time ~1–2 min</div>
+                </div>
+                <div class="loading-text" id="sanitize-pdf-loading" style="display:none;padding:12px 0 0;">
+                    Renaming PDF fields…
                 </div>
 
+                <!-- Kept for JS refs; download is per payload entry now -->
+                <div class="unlock-success" id="sanitize-pdf-success" style="display:none !important;" aria-hidden="true">
+                    <span class="unlock-success-text" id="sanitize-pdf-success-text">✓ PDF sanitized</span>
+                    <button type="button" class="btn-download" id="download-sanitized-pdf-btn">Download Sanitized PDF</button>
+                </div>
+
+                <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+                    <button type="button" class="btn-secondary" id="import-field-config-btn" disabled>
+                        Import field_config.json
+                    </button>
+                    <button type="button" class="btn-secondary" id="toggle-document-data-btn" disabled>
+                        Show Document Data
+                    </button>
+                    <button type="button" class="btn-download" id="generate-sanitized-pdf-btn" disabled style="display:none;">
+                        Generate sanitized PDF
+                    </button>
+                    <button type="button" class="btn-download" id="generate-field-config-btn" disabled style="display:none;">
+                        Generate field_config.json with ChatGPT
+                    </button>
+                    <button type="button" class="btn-download" id="sanitize-pdf-btn" disabled style="display:none;">
+                        Generate Sanitized PDF
+                    </button>
+                </div>
+
+                <div class="loading-text" id="download-payload-loading" style="display:none;padding:12px 0 0;">
+                    Building full payload zip…
+                </div>
+                <div class="error-message" id="step-2-error"></div>
                 <div class="error-message" id="pdf-error"></div>
-                <div class="loading-text" id="pdf-loading" style="display:none;padding:12px 0 0;">Analyzing PDF…</div>
+                <div class="error-message" id="step-4-error"></div>
+                <div class="error-message" id="step-5-payload-error"></div>
+                <div class="error-message" id="step-5-error" style="display:none;"></div>
+                <div class="unlock-success" id="download-payload-success" style="margin-top:12px;">
+                    <span class="unlock-success-text" id="download-payload-success-text">✓ Payload downloaded</span>
+                </div>
             </div>
 
+            <div id="document-data-panels" class="document-data-panels" hidden>
             <div class="step-results" id="step-3-results">
                 <div class="result-panel" data-copyable>
                     <div class="result-panel-header">Extracted Document Content</div>
@@ -1488,42 +1837,6 @@
                     </div>
                 </div>
             </div>
-        </section>
-
-        <!-- Step 4: Generate field_config.json -->
-        <section class="step step-locked" id="step-4">
-            <div class="step-header">
-                <div class="step-status" id="step-4-status" aria-label="Step 4 status">4</div>
-                <div>
-                    <h2 class="step-title">Step 4 — Generate Field Config</h2>
-                    <p class="step-description">
-                        Uses <code>field_config.txt</code> and ChatGPT (with every PDF page as an image) to map fields
-                        in <code>field_config.json</code> exactly as returned — no server-side rewriting.
-                    </p>
-                </div>
-            </div>
-
-            <div class="step-body">
-                <p id="step-4-lock-msg" style="color:var(--gray);font-style:italic;margin:0 0 16px;">
-                    Complete Step 3 (field extraction) to unlock field config generation.
-                </p>
-
-                <button type="button" class="btn-download" id="generate-field-config-btn" disabled>
-                    Generate field_config.json with ChatGPT
-                </button>
-                <button type="button" class="btn-secondary" id="import-field-config-btn" disabled style="margin-left:10px;">
-                    Import field_config.json
-                </button>
-
-                <div class="timed-progress" id="field-config-progress">
-                    <div class="timed-progress-label" id="field-config-progress-label">Generating field config with ChatGPT…</div>
-                    <div class="timed-progress-track">
-                        <div class="timed-progress-bar" id="field-config-progress-bar"></div>
-                    </div>
-                    <div class="timed-progress-eta">Estimated time ~1 min</div>
-                </div>
-                <div class="error-message" id="step-4-error"></div>
-            </div>
 
             <div class="step-results" id="step-4-results">
                 <div class="result-panel" data-copyable>
@@ -1535,41 +1848,6 @@
                         <pre class="field-list" id="field-config-json"></pre>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- Step 5: Sanitized PDF -->
-        <section class="step step-locked" id="step-5">
-            <div class="step-header">
-                <div class="step-status" id="step-5-status" aria-label="Step 5 status">5</div>
-                <div>
-                    <h2 class="step-title">Step 5 — Sanitized PDF</h2>
-                    <p class="step-description">
-                        Applies <code>field_config.json</code> to the prepared PDF, renaming every AcroForm field
-                        (e.g. <code>form1[0].#subform[0].MorF[0]__1_1</code> → <code>applicant_sex_male</code>).
-                    </p>
-                </div>
-            </div>
-
-            <div class="step-body">
-                <p id="step-5-lock-msg" style="color:var(--gray);font-style:italic;margin:0 0 16px;">
-                    Complete Step 4 (field config) to unlock PDF sanitization.
-                </p>
-
-                <button type="button" class="btn-download" id="sanitize-pdf-btn" disabled>
-                    Generate Sanitized PDF
-                </button>
-
-                <div class="loading-text" id="sanitize-pdf-loading" style="display:none;padding:12px 0 0;">
-                    Renaming PDF fields…
-                </div>
-
-                <div class="unlock-success" id="sanitize-pdf-success" style="margin-top:12px;">
-                    <span class="unlock-success-text" id="sanitize-pdf-success-text">✓ PDF sanitized</span>
-                    <button type="button" class="btn-download" id="download-sanitized-pdf-btn">Download Sanitized PDF</button>
-                </div>
-
-                <div class="error-message" id="step-5-error"></div>
             </div>
 
             <div class="step-results" id="step-5-results">
@@ -1598,10 +1876,56 @@
                     </div>
                 </div>
             </div>
+            </div>
         </section>
 
-        <!-- Step 6: Generate form_config.json -->
-        <section class="step step-locked" id="step-6">
+        <!-- Legacy step shells kept for JS lock/unlock refs -->
+        <section class="step step-locked" id="step-3" style="display:none !important;" aria-hidden="true">
+            <div class="step-header">
+                <div class="step-status" id="step-3-status" aria-label="Step 3 status">3</div>
+                <div>
+                    <h2 class="step-title">Step 3 — Extract Form Fields</h2>
+                    <p class="step-description">Merged into Step 2.</p>
+                </div>
+            </div>
+            <div class="step-body">
+                <p id="step-3-lock-msg" style="display:none;"></p>
+                <div class="upload-section" style="display:none;">
+                    <div class="upload-zone" id="extract-upload-zone" tabindex="-1" aria-hidden="true">
+                        <input type="file" id="extract-input" accept=".pdf,application/pdf" tabindex="-1">
+                    </div>
+                    <div class="file-chip" id="extract-file-chip" style="display:none;"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="step step-locked" id="step-4" style="display:none !important;" aria-hidden="true">
+            <div class="step-header">
+                <div class="step-status" id="step-4-status" aria-label="Step 4 status">4</div>
+                <div>
+                    <h2 class="step-title">Step 4 — Generate Sanitized PDF</h2>
+                    <p class="step-description">Merged into Step 2.</p>
+                </div>
+            </div>
+            <div class="step-body">
+                <p id="step-4-lock-msg" style="display:none;"></p>
+            </div>
+        </section>
+
+        <!-- Former Step 3 / step-5 shell — payload UI now lives in Step 2 -->
+        <section class="step step-locked" id="step-5" style="display:none !important;" aria-hidden="true">
+            <div class="step-header">
+                <div class="step-status" id="step-5-status" aria-label="Step 5 status">5</div>
+                <div>
+                    <h2 class="step-title">Step 5 — Download Payload</h2>
+                    <p class="step-description">Merged into Step 2.</p>
+                </div>
+            </div>
+            <div class="step-body"></div>
+        </section>
+
+        <!-- Steps 6–9 hidden: pipeline stops at payload download -->
+        <section class="step step-locked" id="step-6" style="display:none !important;" aria-hidden="true">
             <div class="step-header">
                 <div class="step-status" id="step-6-status" aria-label="Step 6 status">6</div>
                 <div>
@@ -1671,7 +1995,7 @@
         </section>
 
         <!-- Step 7: User info / autopopulate fields -->
-        <section class="step step-locked" id="step-7">
+        <section class="step step-locked" id="step-7" style="display:none !important;" aria-hidden="true">
             <div class="step-header">
                 <div class="step-status" id="step-7-status" aria-label="Step 7 status">7</div>
                 <div>
@@ -1736,7 +2060,7 @@
         </section>
 
         <!-- Step 8: Generate form HTML preview -->
-        <section class="step step-locked" id="step-8">
+        <section class="step step-locked" id="step-8" style="display:none !important;" aria-hidden="true">
             <div class="step-header">
                 <div class="step-status" id="step-8-status" aria-label="Step 8 status">8</div>
                 <div>
@@ -1792,7 +2116,7 @@
         </section>
 
         <!-- Step 9: Publish form to site -->
-        <section class="step step-locked" id="step-9">
+        <section class="step step-locked" id="step-9" style="display:none !important;" aria-hidden="true">
             <div class="step-header">
                 <div class="step-status" id="step-9-status" aria-label="Step 9 status">9</div>
                 <div>
@@ -1862,6 +2186,7 @@
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="pdf-extractor.js"></script>
     <script src="form-html-renderer.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -1896,6 +2221,9 @@
         const step3Results = document.getElementById('step-3-results');
         const step3LockMsg = document.getElementById('step-3-lock-msg');
         const signedInBanner = document.getElementById('signed-in-banner');
+        const signedInControls = document.getElementById('signed-in-controls');
+        const toggleUserDataBtn = document.getElementById('toggle-user-data-btn');
+        let userDataVisible = false;
         const signedInEmail = document.getElementById('signed-in-email');
         const loginFormWrap = document.getElementById('login-form-wrap');
         const loginForm = document.getElementById('login-form');
@@ -1917,7 +2245,10 @@
         const xfaUploadZone = document.getElementById('xfa-upload-zone');
         const xfaFileChip = document.getElementById('xfa-file-chip');
         const unlockProgress = document.getElementById('unlock-progress');
+        const unlockProgressText = document.getElementById('unlock-progress-text');
         const unlockSuccess = document.getElementById('unlock-success');
+        const pipelineStagesEl = document.getElementById('pipeline-stages');
+        let pipelineRunning = false;
         const downloadUnlockedBtn = document.getElementById('download-unlocked-btn');
         const addFormBtn = document.getElementById('add-form-btn');
         const addFormModal = document.getElementById('add-form-modal');
@@ -1943,7 +2274,11 @@
         const step4Error = document.getElementById('step-4-error');
         const step4Results = document.getElementById('step-4-results');
         const generateFieldConfigBtn = document.getElementById('generate-field-config-btn');
+        const generateSanitizedPdfBtn = document.getElementById('generate-sanitized-pdf-btn');
         const importFieldConfigBtn = document.getElementById('import-field-config-btn');
+        const toggleDocumentDataBtn = document.getElementById('toggle-document-data-btn');
+        const documentDataPanels = document.getElementById('document-data-panels');
+        let documentDataVisible = false;
         const importFieldConfigModal = document.getElementById('import-field-config-modal');
         const closeImportFieldConfigModal = document.getElementById('close-import-field-config-modal');
         const cancelImportFieldConfigBtn = document.getElementById('cancel-import-field-config');
@@ -1956,6 +2291,14 @@
         const fieldConfigProgressLabel = document.getElementById('field-config-progress-label');
         const fieldConfigJsonEl = document.getElementById('field-config-json');
         const downloadFieldConfigBtn = document.getElementById('download-field-config-btn');
+        const downloadPayloadBtn = document.getElementById('download-payload-btn');
+        const addPayloadBtn = document.getElementById('add-payload-btn');
+        const payloadListEl = document.getElementById('payload-list');
+        const payloadEmptyEl = document.getElementById('payload-empty');
+        const downloadPayloadLoading = document.getElementById('download-payload-loading');
+        const downloadPayloadSuccess = document.getElementById('download-payload-success');
+        const downloadPayloadSuccessText = document.getElementById('download-payload-success-text');
+        const step5PayloadError = document.getElementById('step-5-payload-error');
 
         const step5 = document.getElementById('step-5');
         const step5Status = document.getElementById('step-5-status');
@@ -2033,8 +2376,13 @@
         let lastFieldConfig = null;
         let lastFormConfig = null;
         let lastPreparedPdfFile = null;
+        let originalUploadPdfName = null;
         let sanitizedPdfBlobUrl = null;
         let sanitizedPdfFile = null;
+        /** @type {Array<{id:string,name:string,fieldConfig:object,pdfBlob:Blob,pdfFileName:string,renamedCount:number,createdAt:string}>} */
+        let payloadEntries = [];
+        let editingPayloadId = null;
+        let payloadIdCounter = 1;
         let lastPdfToken = null;
         let unlockedPdfFile = null;
         let unlockedPdfBlobUrl = null;
@@ -2291,13 +2639,14 @@
                 markStep5Complete(renamedCount);
             } else if (state.steps?.step5 && state.lastPdfToken) {
                 lastPdfToken = state.lastPdfToken;
-                step5Status.textContent = '✓';
-                step5Status.classList.add('complete');
+                step4Status.textContent = '✓';
+                step4Status.classList.add('complete');
+                step4Results.classList.add('visible');
                 step5Results.classList.add('visible');
                 sanitizePdfSuccess.classList.add('visible');
                 if (state.sanitizeRenamedCount) sanitizePdfSuccessText.textContent = state.sanitizeRenamedCount;
                 step5Complete = true;
-                unlockStep6();
+                unlockStep5();
             }
 
             if (state.steps?.step6 && state.lastFormConfig) {
@@ -2341,11 +2690,18 @@
             lastGeneratedFormHtml = null;
             lastPdfToken = null;
             lastPreparedPdfFile = null;
+            originalUploadPdfName = null;
             revokeSanitizedPdfBlobUrl();
             sanitizedPdfFile = null;
+            payloadEntries = [];
+            editingPayloadId = null;
             revokeUnlockedBlobUrl();
             unlockedPdfFile = null;
+            resetPipelineStages();
+            setPipelineBusy(false);
+            enableDocumentDataToggle(false);
             lockStep2();
+            updatePayloadUi();
             if (currentUser) {
                 markStepComplete();
             }
@@ -2547,10 +2903,18 @@
                 ...extracted.textFields.map(f => f.name),
                 ...extracted.checkboxFields.map(f => f.name)
             ];
-            const legacyNames = allNames.filter((name) => {
+            // Only flag names that were supposed to be renamed away (id !== newName).
+            // Fields intentionally kept as-is (id === newName), e.g. court_name, are fine.
+            const keptNames = new Set(
+                (lastFieldConfig?.fields || [])
+                    .map((f) => f.newName)
+                    .filter(Boolean)
+            );
+            const legacyNames = [...new Set(allNames.filter((name) => {
                 if (!lastFieldConfig?.fields) return false;
-                return lastFieldConfig.fields.some((f) => f.id === name);
-            });
+                if (keptNames.has(name)) return false;
+                return lastFieldConfig.fields.some((f) => f.id === name && f.id !== f.newName);
+            }))];
             if (legacyNames.length > 0) {
                 throw new Error(
                     `Sanitized PDF still shows ${legacyNames.length} legacy field name(s), e.g. ${legacyNames[0]}`
@@ -2618,11 +2982,27 @@
             return profile;
         }
 
+        function setUserDataVisible(visible) {
+            userDataVisible = Boolean(visible);
+            if (userDataVisible) {
+                step1Results.classList.add('visible');
+            } else {
+                step1Results.classList.remove('visible');
+            }
+            if (toggleUserDataBtn) {
+                toggleUserDataBtn.textContent = userDataVisible
+                    ? 'Hide User Data'
+                    : 'Display User Data';
+            }
+        }
+
         function markStepComplete() {
             step1Status.textContent = '✓';
             step1Status.classList.add('complete');
             step1Status.setAttribute('aria-label', 'Step 1 complete');
-            step1Results.classList.add('visible');
+            // Keep profile/forms panels collapsed unless the user expands them.
+            if (signedInControls) signedInControls.classList.add('visible');
+            setUserDataVisible(false);
             step1Complete = true;
             unlockStep2();
         }
@@ -2630,6 +3010,7 @@
         function unlockStep2() {
             step2.classList.remove('step-locked');
             step2LockMsg.style.display = 'none';
+            updatePayloadUi();
         }
 
         function unlockStep3() {
@@ -2656,6 +3037,7 @@
         function unlockStep4() {
             step4.classList.remove('step-locked');
             step4LockMsg.style.display = 'none';
+            if (generateSanitizedPdfBtn) generateSanitizedPdfBtn.disabled = false;
             generateFieldConfigBtn.disabled = false;
             importFieldConfigBtn.disabled = false;
         }
@@ -2668,37 +3050,64 @@
             step4Results.classList.remove('visible');
             step4Error.textContent = '';
             fieldConfigProgress.classList.remove('visible');
+            if (generateSanitizedPdfBtn) generateSanitizedPdfBtn.disabled = true;
             generateFieldConfigBtn.disabled = true;
             importFieldConfigBtn.disabled = true;
-            fieldConfigJsonEl.textContent = '';
-            lastFieldConfig = null;
+            const preserveFieldConfig = Boolean(editingPayloadId && lastFieldConfig);
+            const preservedConfig = preserveFieldConfig ? lastFieldConfig : null;
+            const preservedJson = preserveFieldConfig ? fieldConfigJsonEl.textContent : '';
+            if (!preserveFieldConfig) {
+                fieldConfigJsonEl.textContent = '';
+                lastFieldConfig = null;
+            }
             step3Complete = false;
             lastExtractionPayload = null;
             lockStep5();
+            if (preserveFieldConfig) {
+                lastFieldConfig = preservedConfig;
+                fieldConfigJsonEl.textContent = preservedJson || JSON.stringify(preservedConfig, null, 2);
+            }
         }
 
         function unlockStep5() {
             step5.classList.remove('step-locked');
             step5LockMsg.style.display = 'none';
-            sanitizePdfBtn.disabled = !lastPreparedPdfFile || !lastFieldConfig;
+            updatePayloadUi();
+            sanitizePdfBtn.disabled = true;
         }
 
         function lockStep5() {
-            step5.classList.add('step-locked');
-            step5LockMsg.style.display = 'block';
-            step5Status.textContent = '5';
-            step5Status.classList.remove('complete', 'error');
+            // Clear only the in-progress sanitize working state. Keep existing payload
+            // entries visible (and preserve editingPayloadId) when adding/editing another PDF.
             step5Results.classList.remove('visible');
+            if (step5PayloadError) step5PayloadError.textContent = '';
             step5Error.textContent = '';
             sanitizePdfLoading.style.display = 'none';
             sanitizePdfBtn.disabled = true;
             sanitizePdfSuccess.classList.remove('visible');
+            if (downloadPayloadLoading) downloadPayloadLoading.style.display = 'none';
+            if (downloadPayloadSuccess) downloadPayloadSuccess.classList.remove('visible');
             revokeSanitizedPdfBlobUrl();
             sanitizedPdfFile = null;
             lastPdfToken = null;
-            step5Complete = false;
             resetSanitizeResults();
-            lockStep6();
+
+            if (payloadEntries.length > 0) {
+                step5.classList.remove('step-locked');
+                step5LockMsg.style.display = 'none';
+                step5Complete = true;
+                step5Status.textContent = '✓';
+                step5Status.classList.add('complete');
+                step5Status.classList.remove('error');
+            } else {
+                step5.classList.add('step-locked');
+                step5LockMsg.style.display = 'block';
+                step5Status.textContent = '5';
+                step5Status.classList.remove('complete', 'error');
+                step5Complete = false;
+                editingPayloadId = null;
+            }
+            updatePayloadUi();
         }
 
         function unlockStep6() {
@@ -3128,6 +3537,27 @@
             scheduleSaveDemoState();
         }
 
+        function setDocumentDataVisible(visible) {
+            documentDataVisible = Boolean(visible);
+            if (documentDataPanels) {
+                documentDataPanels.hidden = !documentDataVisible;
+            }
+            if (toggleDocumentDataBtn) {
+                toggleDocumentDataBtn.textContent = documentDataVisible
+                    ? 'Hide Document Data'
+                    : 'Show Document Data';
+            }
+        }
+
+        function enableDocumentDataToggle(enabled) {
+            if (toggleDocumentDataBtn) {
+                toggleDocumentDataBtn.disabled = !enabled;
+            }
+            if (!enabled) {
+                setDocumentDataVisible(false);
+            }
+        }
+
         function markStep3Complete(extractionPayload) {
             step3Status.textContent = '✓';
             step3Status.classList.add('complete');
@@ -3145,20 +3575,33 @@
             step4Status.classList.add('complete');
             step4Status.setAttribute('aria-label', 'Step 4 complete');
             step4Results.classList.add('visible');
-            unlockStep5();
             scheduleSaveDemoState();
             saveCurrentDataDump('step-4-field-config');
         }
 
         function markStep5Complete(renamedCount) {
-            step5Status.textContent = '✓';
-            step5Status.classList.add('complete');
-            step5Status.setAttribute('aria-label', 'Step 5 complete');
+            step4Status.textContent = '✓';
+            step4Status.classList.add('complete');
+            step4Status.setAttribute('aria-label', 'Step 4 complete');
+            step4Results.classList.add('visible');
             step5Results.classList.add('visible');
             sanitizePdfSuccess.classList.add('visible');
             sanitizePdfSuccessText.textContent = `✓ PDF sanitized (${renamedCount} field name${renamedCount === 1 ? '' : 's'} renamed)`;
+            // Success banner is hidden; download is available on each payload entry.
             step5Complete = true;
-            unlockStep6();
+            step5Status.textContent = '✓';
+            step5Status.classList.add('complete');
+            step5Status.classList.remove('error');
+            step5Status.setAttribute('aria-label', 'Step 3 complete');
+            upsertPayloadEntryFromCurrent(renamedCount);
+            unlockStep5();
+            // Consolidated pipeline: Step 2 is complete once a payload entry exists.
+            step2Status.textContent = '✓';
+            step2Status.classList.add('complete');
+            step2Status.classList.remove('error');
+            step2Status.setAttribute('aria-label', 'Step 2 complete');
+            step2Complete = true;
+            enableDocumentDataToggle(true);
             scheduleSaveDemoState();
         }
 
@@ -3436,7 +3879,11 @@
             step3Status.classList.add('error');
         }
 
-        function setupUploadZone(zoneEl, inputEl, onFile) {
+        function setupUploadZone(zoneEl, inputEl, onFile, options = {}) {
+            if (!zoneEl || !inputEl) return;
+            const onFiles = options.onFiles || null;
+            if (options.multiple) inputEl.multiple = true;
+
             zoneEl.addEventListener('click', () => inputEl.click());
             zoneEl.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -3445,8 +3892,11 @@
                 }
             });
             inputEl.addEventListener('change', () => {
-                const file = inputEl.files[0];
-                if (file) onFile(file);
+                const files = Array.from(inputEl.files || []);
+                inputEl.value = '';
+                if (!files.length) return;
+                if (onFiles) onFiles(files);
+                else if (onFile) onFile(files[0]);
             });
             zoneEl.addEventListener('dragover', (e) => {
                 e.preventDefault();
@@ -3460,9 +3910,126 @@
             zoneEl.addEventListener('drop', (e) => {
                 e.preventDefault();
                 zoneEl.classList.remove('drag-over');
-                const file = e.dataTransfer.files[0];
-                if (file) onFile(file);
+                const files = Array.from(e.dataTransfer?.files || []);
+                if (!files.length) return;
+                if (onFiles) onFiles(files);
+                else if (onFile) onFile(files[0]);
             });
+        }
+
+        let payloadPdfQueue = [];
+        let processingPayloadQueue = false;
+        let payloadBatchTotal = 0;
+        let payloadBatchIndex = 0;
+
+        function collectPdfFiles(fileList) {
+            return Array.from(fileList || []).filter((file) =>
+                file && (file.type === 'application/pdf' || /\.pdf$/i.test(file.name || ''))
+            );
+        }
+
+        async function enqueuePayloadPdfs(fileList) {
+            const pdfs = collectPdfFiles(fileList);
+            if (!pdfs.length) {
+                step2Error.textContent = 'Please upload valid PDF file(s).';
+                return;
+            }
+
+            // Edit mode: first file updates the selected entry; any extras become new payloads.
+            if (editingPayloadId) {
+                const [first, ...rest] = pdfs;
+                await handleXfaUpload(first);
+                if (!rest.length) return;
+                editingPayloadId = null;
+                payloadPdfQueue.push(...rest);
+            } else {
+                payloadPdfQueue.push(...pdfs);
+            }
+
+            if (processingPayloadQueue) {
+                payloadBatchTotal += pdfs.length;
+                return;
+            }
+
+            processingPayloadQueue = true;
+            payloadBatchTotal = payloadPdfQueue.length;
+            payloadBatchIndex = 0;
+            try {
+                while (payloadPdfQueue.length) {
+                    payloadBatchIndex += 1;
+                    const file = payloadPdfQueue.shift();
+                    const batchLabel = payloadBatchTotal > 1
+                        ? ` — file ${payloadBatchIndex} of ${payloadBatchTotal}`
+                        : '';
+                    await handleXfaUpload(file, { batchLabel });
+                }
+            } finally {
+                processingPayloadQueue = false;
+                payloadBatchTotal = 0;
+                payloadBatchIndex = 0;
+            }
+        }
+
+        function setPipelineStage(stage) {
+            if (!pipelineStagesEl) return;
+            pipelineStagesEl.hidden = false;
+            const order = ['unlock', 'extract', 'sanitize'];
+            if (!setPipelineStage._done) setPipelineStage._done = new Set();
+
+            if (stage === 'error') {
+                const current = setPipelineStage._current;
+                pipelineStagesEl.querySelectorAll('.pipeline-stage').forEach((el) => {
+                    const key = el.getAttribute('data-stage');
+                    el.classList.remove('active', 'done', 'error');
+                    if (key === current) el.classList.add('error');
+                    else if (setPipelineStage._done.has(key)) el.classList.add('done');
+                });
+                return;
+            }
+
+            setPipelineStage._current = stage;
+            const currentIdx = order.indexOf(stage);
+            pipelineStagesEl.querySelectorAll('.pipeline-stage').forEach((el) => {
+                const key = el.getAttribute('data-stage');
+                const elIdx = order.indexOf(key);
+                el.classList.remove('active', 'done', 'error');
+                if (elIdx < currentIdx) {
+                    el.classList.add('done');
+                    setPipelineStage._done.add(key);
+                } else if (elIdx === currentIdx) {
+                    el.classList.add('active');
+                }
+            });
+        }
+
+        function markPipelineStageDone(stage) {
+            if (!pipelineStagesEl) return;
+            const el = pipelineStagesEl.querySelector(`[data-stage="${stage}"]`);
+            if (el) {
+                el.classList.remove('active', 'error');
+                el.classList.add('done');
+            }
+            if (!setPipelineStage._done) setPipelineStage._done = new Set();
+            setPipelineStage._done.add(stage);
+        }
+
+        function resetPipelineStages() {
+            if (!pipelineStagesEl) return;
+            pipelineStagesEl.hidden = true;
+            pipelineStagesEl.querySelectorAll('.pipeline-stage').forEach((el) => {
+                el.classList.remove('active', 'done', 'error');
+            });
+            setPipelineStage._current = null;
+            setPipelineStage._done = new Set();
+        }
+
+        function setPipelineBusy(busy) {
+            pipelineRunning = busy;
+            if (xfaUploadZone) xfaUploadZone.classList.toggle('pipeline-busy', busy);
+            if (xfaInput) xfaInput.disabled = busy;
+            if (importFieldConfigBtn) {
+                importFieldConfigBtn.disabled = busy || !step3Complete;
+            }
         }
 
         async function unlockPdfOnServer(file) {
@@ -3494,21 +4061,47 @@
             return { blob, method, fieldCount, fieldRenames, splitRadioGroups };
         }
 
-        async function handleXfaUpload(file) {
-            if (!file || file.type !== 'application/pdf') {
+        async function handleXfaUpload(file, options = {}) {
+            if (pipelineRunning) return;
+            if (!file || (file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name || ''))) {
                 step2Error.textContent = 'Please upload a valid PDF file.';
                 return;
             }
 
+            const batchLabel = options.batchLabel || '';
+
+            // New drop adds another payload; Edit keeps editingPayloadId and prefilled config.
+            if (!editingPayloadId) {
+                softResetSteps2Through4ForNewPayload();
+            }
+
+            originalUploadPdfName = /\.pdf$/i.test(file.name) ? file.name : `${file.name}.pdf`;
+
             step2Error.textContent = '';
-            step2Status.textContent = '2';
-            step2Status.classList.remove('complete', 'error');
+            if (pdfError) pdfError.textContent = '';
+            if (step4Error) step4Error.textContent = '';
+            if (step5PayloadError) step5PayloadError.textContent = '';
+            if (downloadPayloadSuccess) downloadPayloadSuccess.classList.remove('visible');
+            if (payloadEntries.length === 0) {
+                step2Status.textContent = '2';
+                step2Status.classList.remove('complete', 'error');
+            }
             unlockSuccess.classList.remove('visible');
+            sanitizePdfSuccess.classList.remove('visible');
+            step3Results.classList.remove('visible');
+            step4Results.classList.remove('visible');
+            step5Results.classList.remove('visible');
             showFileChip(xfaFileChip, file);
+            if (batchLabel && xfaFileChip) {
+                xfaFileChip.textContent = `📎 ${file.name}${batchLabel}`;
+            }
+            setPipelineBusy(true);
+            setPipelineStage('unlock');
             unlockProgress.classList.add('visible');
+            if (unlockProgressText) unlockProgressText.textContent = `Unlocking PDF…${batchLabel}`;
 
             try {
-                const { blob, method, fieldCount, fieldRenames, splitRadioGroups } = await unlockPdfOnServer(file);
+                const { blob, method, fieldCount, fieldRenames } = await unlockPdfOnServer(file);
 
                 revokeUnlockedBlobUrl();
                 unlockedPdfFile = new File(
@@ -3523,18 +4116,46 @@
                     ? ` — ${fieldRenames} duplicate field name(s) split into unique checkboxes`
                     : '';
                 unlockSuccess.querySelector('.unlock-success-text').textContent =
-                    `✓ PDF unlocked (${fieldCount} fields via ${method}${renameNote}) — download to verify`;
+                    `✓ PDF unlocked (${fieldCount} fields via ${method}${renameNote})${batchLabel}`;
 
-                markStep2Complete();
+                markPipelineStageDone('unlock');
+                unlockProgress.classList.remove('visible');
+
+                // Internal unlock complete (hidden steps 3/4 still use these markers).
+                step2Complete = true;
+                unlockStep3();
                 showFileChip(extractFileChip, unlockedPdfFile);
-                analyzeUploadedPdf(unlockedPdfFile);
+
+                setPipelineStage('extract');
+                if (unlockProgressText) unlockProgressText.textContent = `Extracting form fields…${batchLabel}`;
+                unlockProgress.classList.add('visible');
+                await analyzeUploadedPdf(unlockedPdfFile);
+                markPipelineStageDone('extract');
+                unlockProgress.classList.remove('visible');
+
+                setPipelineStage('sanitize');
+                if (fieldConfigProgressLabel && batchLabel) {
+                    fieldConfigProgressLabel.textContent = `Generating field config with ChatGPT…${batchLabel}`;
+                }
+                await generateSanitizedPdfPipeline();
+                markPipelineStageDone('sanitize');
             } catch (err) {
-                console.error('Unlock error:', err);
-                step2Error.textContent = err.message || 'Failed to unlock PDF.';
+                console.error('PDF pipeline error:', err);
+                setPipelineStage('error');
+                const message = err.message || 'Failed to process PDF.';
+                // Avoid duplicating the same message in step-2 and step-4 error slots.
+                if (err._shownInStep4) {
+                    step2Error.textContent = '';
+                } else {
+                    step2Error.textContent = `${file.name}: ${message}`;
+                    if (step4Error) step4Error.textContent = '';
+                }
                 step2Status.textContent = '!';
                 step2Status.classList.add('error');
             } finally {
                 unlockProgress.classList.remove('visible');
+                setPipelineBusy(false);
+                if (xfaInput) xfaInput.value = '';
             }
         }
 
@@ -3548,11 +4169,21 @@
             document.body.removeChild(link);
         });
 
-        setupUploadZone(xfaUploadZone, xfaInput, handleXfaUpload);
-        setupUploadZone(extractUploadZone, extractInput, (file) => {
-            showFileChip(extractFileChip, file);
-            analyzeUploadedPdf(file);
+        setupUploadZone(xfaUploadZone, xfaInput, handleXfaUpload, {
+            multiple: true,
+            onFiles: (files) => {
+                enqueuePayloadPdfs(files).catch((err) => {
+                    console.error('Payload queue error:', err);
+                    step2Error.textContent = err.message || 'Failed to process PDF batch.';
+                });
+            },
         });
+        if (extractUploadZone && extractInput) {
+            setupUploadZone(extractUploadZone, extractInput, (file) => {
+                showFileChip(extractFileChip, file);
+                analyzeUploadedPdf(file);
+            });
+        }
 
         function renderFormsGrid(forms) {
             if (!forms.length) {
@@ -3668,7 +4299,8 @@
             step1Complete = false;
             step1Status.textContent = '1';
             step1Status.classList.remove('complete', 'error');
-            step1Results.classList.remove('visible');
+            setUserDataVisible(false);
+            if (signedInControls) signedInControls.classList.remove('visible');
             signedInBanner.classList.remove('visible');
             loginFormWrap.classList.remove('hidden');
             userJsonEl.textContent = 'Loading user data…';
@@ -3727,6 +4359,8 @@
             loginError.textContent = '';
             signedInEmail.textContent = user.email || 'Unknown';
             signedInBanner.classList.add('visible');
+            if (signedInControls) signedInControls.classList.add('visible');
+            setUserDataVisible(false);
             loginFormWrap.classList.add('hidden');
 
             try {
@@ -3776,8 +4410,9 @@
 
         async function analyzeUploadedPdf(file) {
             if (!file || file.type !== 'application/pdf') {
-                pdfError.textContent = 'Please upload a valid PDF file.';
-                return;
+                const message = 'Please upload a valid PDF file.';
+                pdfError.textContent = message;
+                throw new Error(message);
             }
 
             pdfError.textContent = '';
@@ -3823,6 +4458,7 @@
                 console.error('PDF extraction error:', err);
                 pdfError.textContent = 'Error processing PDF: ' + (err.message || 'Unknown error');
                 markStep3Error();
+                throw err;
             } finally {
                 pdfLoading.style.display = 'none';
             }
@@ -3875,6 +4511,8 @@
             lastFieldConfig = validated;
             fieldConfigJsonEl.textContent = JSON.stringify(validated, null, 2);
             markStep4Complete();
+            // After import, immediately sanitize so Step 5 payload unlocks.
+            handleSanitizePdf({ fromImport: true });
         }
 
         function openImportFieldConfigModal() {
@@ -3906,57 +4544,131 @@
             }
         }
 
-        async function generateFieldConfigJson() {
+        async function generateFieldConfigOnly() {
             if (!lastExtractionPayload) {
-                step4Error.textContent = 'No extraction data available. Complete Step 3 first.';
-                return;
+                throw new Error('No extraction data available. Complete Step 3 first.');
+            }
+            const pdfToken = await ensurePdfTokenForVision();
+            const response = await fetch('/api/generate-field-config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...lastExtractionPayload,
+                    pdfToken
+                })
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'Failed to generate field config');
+            }
+            lastFieldConfig = data.fieldConfig;
+            fieldConfigJsonEl.textContent = JSON.stringify(data.fieldConfig, null, 2);
+            markStep4Complete();
+            return data.fieldConfig;
+        }
+
+        function getPayloadSourcePdfFileName() {
+            if (originalUploadPdfName) {
+                return /\.pdf$/i.test(originalUploadPdfName)
+                    ? originalUploadPdfName
+                    : `${originalUploadPdfName}.pdf`;
+            }
+            // Fallback: strip pipeline suffixes from intermediate filenames.
+            const raw = sanitizedPdfFile?.name || lastPreparedPdfFile?.name || 'form.pdf';
+            let base = String(raw).replace(/\.pdf$/i, '');
+            base = base.replace(/(_unlocked|_prepared|_sanitized)+$/gi, '');
+            while (/(_unlocked|_prepared|_sanitized)$/i.test(base)) {
+                base = base.replace(/(_unlocked|_prepared|_sanitized)$/i, '');
+            }
+            return `${base || 'form'}.pdf`;
+        }
+
+        function buildSanitizedPdfFile(blob) {
+            return new File([blob], getPayloadSourcePdfFileName(), { type: 'application/pdf' });
+        }
+
+        async function generateSanitizedPdfPipeline() {
+            if (!lastExtractionPayload) {
+                const message = 'No extraction data available. Complete Step 2 first.';
+                step4Error.textContent = message;
+                throw new Error(message);
+            }
+            if (!lastPreparedPdfFile) {
+                const message = 'Prepared PDF missing. Re-upload the PDF in Step 2.';
+                step4Error.textContent = message;
+                throw new Error(message);
             }
 
             step4Error.textContent = '';
+            if (step5PayloadError) step5PayloadError.textContent = '';
             invalidateFormConfigAndHtml();
+            sanitizePdfSuccess.classList.remove('visible');
+            step5Results.classList.remove('visible');
+            resetSanitizeResults();
+
             const fieldProgress = createTimedProgress(
                 fieldConfigProgress,
                 fieldConfigProgressBar,
                 fieldConfigProgressLabel,
                 'Generating field config with ChatGPT…'
             );
+            if (generateSanitizedPdfBtn) generateSanitizedPdfBtn.disabled = true;
             generateFieldConfigBtn.disabled = true;
             step4Status.textContent = '4';
             step4Status.classList.remove('complete', 'error');
             step4Results.classList.remove('visible');
 
             try {
-                const pdfToken = await ensurePdfTokenForVision();
-                const response = await fetch('/api/generate-field-config', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        ...lastExtractionPayload,
-                        pdfToken
-                    })
-                });
-
-                const data = await response.json();
-                if (!response.ok || !data.success) {
-                    throw new Error(data.error || 'Failed to generate field config');
+                if (editingPayloadId && lastFieldConfig) {
+                    fieldConfigJsonEl.textContent = JSON.stringify(lastFieldConfig, null, 2);
+                    markStep4Complete();
+                    await fieldProgress.finish();
+                    fieldConfigProgressLabel.textContent = 'Updating sanitized PDF for edited payload…';
+                } else {
+                    await generateFieldConfigOnly();
+                    await fieldProgress.finish();
+                    fieldConfigProgressLabel.textContent = 'Sanitizing PDF fields…';
                 }
 
-                lastFieldConfig = data.fieldConfig;
-                fieldConfigJsonEl.textContent = JSON.stringify(data.fieldConfig, null, 2);
-                await fieldProgress.finish();
-                markStep4Complete();
+                sanitizePdfLoading.style.display = 'block';
+                const { blob, renamedCount } = await sanitizePdfOnServer();
+                revokeSanitizedPdfBlobUrl();
+                sanitizedPdfBlobUrl = URL.createObjectURL(blob);
+                sanitizedPdfFile = buildSanitizedPdfFile(blob);
+                await extractAndRenderSanitizedPdf(sanitizedPdfFile);
+                lastPdfToken = await storeSanitizedPdfOnServer(sanitizedPdfFile);
+                markStep5Complete(renamedCount);
             } catch (err) {
-                console.error('Field config generation error:', err);
+                console.error('Generate sanitized PDF error:', err);
                 fieldProgress.cancel();
-                step4Error.textContent = err.message || 'Failed to generate field config.';
+                const message = err.message || 'Failed to generate sanitized PDF.';
+                step4Error.textContent = message;
                 markStep4Error();
+                const wrapped = new Error(message);
+                wrapped._shownInStep4 = true;
+                throw wrapped;
             } finally {
+                sanitizePdfLoading.style.display = 'none';
+                if (generateSanitizedPdfBtn) generateSanitizedPdfBtn.disabled = false;
                 generateFieldConfigBtn.disabled = false;
             }
         }
 
-        generateFieldConfigBtn.addEventListener('click', generateFieldConfigJson);
+        generateFieldConfigBtn.addEventListener('click', () => {
+            generateSanitizedPdfPipeline().catch(() => {});
+        });
+        if (generateSanitizedPdfBtn) {
+            generateSanitizedPdfBtn.addEventListener('click', () => {
+                generateSanitizedPdfPipeline().catch(() => {});
+            });
+        }
         importFieldConfigBtn.addEventListener('click', openImportFieldConfigModal);
+        if (toggleDocumentDataBtn) {
+            toggleDocumentDataBtn.addEventListener('click', () => {
+                if (toggleDocumentDataBtn.disabled) return;
+                setDocumentDataVisible(!documentDataVisible);
+            });
+        }
         confirmImportFieldConfigBtn.addEventListener('click', importFieldConfigFromModal);
         cancelImportFieldConfigBtn.addEventListener('click', closeImportFieldConfigModalFn);
         closeImportFieldConfigModal.addEventListener('click', closeImportFieldConfigModalFn);
@@ -4034,7 +4746,7 @@
                 if (!response.ok) {
                     throw new Error(
                         response.status === 404
-                            ? 'PDF store API not found — restart the server (node server.js) and try Step 5 again.'
+                            ? 'PDF store API not found — restart the server (node server.js) and try Step 4 again.'
                             : (responseText.slice(0, 120) || `Failed to register sanitized PDF (HTTP ${response.status})`)
                     );
                 }
@@ -4045,55 +4757,646 @@
             return data.pdfToken;
         }
 
-        async function handleSanitizePdf() {
-            step5Error.textContent = '';
+        async function handleSanitizePdf(options = {}) {
+            step4Error.textContent = '';
+            if (step5PayloadError) step5PayloadError.textContent = '';
             sanitizePdfSuccess.classList.remove('visible');
             step5Results.classList.remove('visible');
             resetSanitizeResults();
             sanitizePdfLoading.style.display = 'block';
             sanitizePdfBtn.disabled = true;
-            step5Status.textContent = '5';
-            step5Status.classList.remove('complete', 'error');
+            if (generateSanitizedPdfBtn && !options.fromImport) generateSanitizedPdfBtn.disabled = true;
 
             try {
                 const { blob, renamedCount } = await sanitizePdfOnServer();
                 revokeSanitizedPdfBlobUrl();
                 sanitizedPdfBlobUrl = URL.createObjectURL(blob);
-                sanitizedPdfFile = new File(
-                    [blob],
-                    (lastPreparedPdfFile?.name || 'form').replace(/\.pdf$/i, '') + '_sanitized.pdf',
-                    { type: 'application/pdf' }
-                );
+                sanitizedPdfFile = buildSanitizedPdfFile(blob);
                 await extractAndRenderSanitizedPdf(sanitizedPdfFile);
                 lastPdfToken = await storeSanitizedPdfOnServer(sanitizedPdfFile);
-                if (lastFormConfig) {
-                    lastFormConfig.pdfToken = lastPdfToken;
-                    if (formConfigJsonEl.textContent) {
-                        formConfigJsonEl.textContent = JSON.stringify(lastFormConfig, null, 2);
-                    }
-                }
                 markStep5Complete(renamedCount);
             } catch (err) {
                 console.error('Sanitize PDF error:', err);
-                step5Error.textContent = err.message || 'Failed to sanitize PDF.';
-                markStep5Error();
+                step4Error.textContent = err.message || 'Failed to sanitize PDF.';
+                markStep4Error();
             } finally {
                 sanitizePdfLoading.style.display = 'none';
-                sanitizePdfBtn.disabled = false;
+                sanitizePdfBtn.disabled = true;
+                if (generateSanitizedPdfBtn) generateSanitizedPdfBtn.disabled = false;
             }
         }
 
-        sanitizePdfBtn.addEventListener('click', handleSanitizePdf);
+        sanitizePdfBtn.addEventListener('click', () => handleSanitizePdf());
 
-        downloadSanitizedPdfBtn.addEventListener('click', () => {
-            if (!sanitizedPdfBlobUrl || !sanitizedPdfFile) return;
+        if (downloadSanitizedPdfBtn) {
+            downloadSanitizedPdfBtn.addEventListener('click', () => {
+                if (!sanitizedPdfBlobUrl || !sanitizedPdfFile) return;
+                const link = document.createElement('a');
+                link.href = sanitizedPdfBlobUrl;
+                link.download = sanitizedPdfFile.name;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        }
+
+        function getPayloadFormName(fieldConfig, pdfFile, fallbackName) {
+            const raw = fieldConfig?.formTitle
+                || pdfFile?.name
+                || fallbackName
+                || 'form';
+            return String(raw)
+                .replace(/\.pdf$/i, '')
+                .replace(/[^a-zA-Z0-9._-]+/g, '_')
+                .replace(/^_+|_+$/g, '')
+                .slice(0, 64) || 'form';
+        }
+
+        function uniquePayloadName(desired, exceptId = null) {
+            let base = getPayloadFormName({ formTitle: desired }, null, desired || 'form');
+            let name = base;
+            let n = 2;
+            while (payloadEntries.some((e) => e.id !== exceptId && e.name === name)) {
+                name = `${base}_${n}`;
+                n += 1;
+            }
+            return name;
+        }
+
+        function stripCopyNumber(value) {
+            return String(value ?? '')
+                .replace(/\s*\(\d+\)\s*$/, '')
+                .replace(/\(\d+\)$/, '')
+                .trim();
+        }
+
+        function withCopyNumber(value, copyNum, { spaced = false } = {}) {
+            const stripped = stripCopyNumber(value);
+            if (!stripped) return `(${copyNum})`;
+            return spaced ? `${stripped} (${copyNum})` : `${stripped}(${copyNum})`;
+        }
+
+        function nextCopyIndexForEntry(entry) {
+            const base = stripCopyNumber(entry?.name || entry?.fieldConfig?.formTitle || 'form');
+            const baseKey = getPayloadFormName({ formTitle: base }, null, base);
+            let max = 1;
+            for (const other of payloadEntries) {
+                const otherBase = stripCopyNumber(other.name || '');
+                const otherKey = getPayloadFormName({ formTitle: otherBase }, null, otherBase);
+                if (otherKey !== baseKey && otherBase !== base) continue;
+                const match = String(other.name || '').match(/\((\d+)\)\s*$/);
+                max = Math.max(max, match ? Number(match[1]) : 1);
+            }
+            return max + 1;
+        }
+
+        function buildClonedFieldConfig(sourceConfig, copyNum) {
+            const cloned = JSON.parse(JSON.stringify(sourceConfig || {}));
+            if (cloned.formTitle) {
+                cloned.formTitle = withCopyNumber(cloned.formTitle, copyNum, { spaced: true });
+            }
+            const sourceFields = Array.isArray(sourceConfig?.fields) ? sourceConfig.fields : [];
+            cloned.fields = sourceFields.map((field) => {
+                const currentName = field.newName || field.id || '';
+                const nextName = withCopyNumber(currentName, copyNum);
+                return {
+                    ...field,
+                    // Sanitize looks up current PDF name via id, then renames to newName.
+                    id: currentName,
+                    newName: nextName,
+                    label: field.label != null && field.label !== ''
+                        ? withCopyNumber(field.label, copyNum, { spaced: true })
+                        : field.label,
+                };
+            });
+            return cloned;
+        }
+
+        async function sanitizePdfBlobWithConfig(pdfBlob, fieldConfig, fileName) {
+            const formData = new FormData();
+            formData.append('pdf', pdfBlob, fileName || 'form.pdf');
+            formData.append('fieldConfig', JSON.stringify(fieldConfig));
+            const response = await fetch('/api/sanitize-pdf', {
+                method: 'POST',
+                body: formData,
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                let message = 'Failed to clone sanitized PDF';
+                try {
+                    const data = JSON.parse(text);
+                    message = data.error || message;
+                } catch (_) {
+                    if (text) message = text.slice(0, 160);
+                }
+                throw new Error(message);
+            }
+            const blob = await response.blob();
+            const renamedCount = Number(response.headers.get('X-Renamed-Count') || '0');
+            return { blob, renamedCount };
+        }
+
+        async function clonePayloadEntry(payloadId) {
+            const entry = payloadEntries.find((e) => e.id === payloadId);
+            if (!entry?.fieldConfig || !entry.pdfBlob) {
+                if (step5PayloadError) {
+                    step5PayloadError.textContent = 'Cannot clone this payload — missing PDF or field config.';
+                }
+                return;
+            }
+
+            if (step5PayloadError) step5PayloadError.textContent = '';
+            const copyNum = nextCopyIndexForEntry(entry);
+            const sanitizeConfig = buildClonedFieldConfig(entry.fieldConfig, copyNum);
+            const displayName = withCopyNumber(
+                stripCopyNumber(entry.name || entry.fieldConfig.formTitle || 'form'),
+                copyNum,
+                { spaced: true }
+            );
+
+            try {
+                const { blob, renamedCount } = await sanitizePdfBlobWithConfig(
+                    entry.pdfBlob,
+                    sanitizeConfig,
+                    entry.pdfFileName || `${entry.name}.pdf`
+                );
+
+                // After rename, store id === newName so the clone matches the PDF.
+                const storedConfig = {
+                    ...sanitizeConfig,
+                    fields: (sanitizeConfig.fields || []).map((field) => ({
+                        ...field,
+                        id: field.newName,
+                        newName: field.newName,
+                    })),
+                };
+
+                const pdfBase = withCopyNumber(
+                    stripCopyNumber((entry.pdfFileName || `${entry.name}_sanitized.pdf`).replace(/\.pdf$/i, '')),
+                    copyNum
+                );
+                const pdfFileName = `${pdfBase}.pdf`;
+                const clonedEntry = {
+                    id: `payload_${Date.now()}_${payloadIdCounter++}`,
+                    name: uniquePayloadName(displayName),
+                    fieldConfig: storedConfig,
+                    pdfBlob: new File([blob], pdfFileName, { type: 'application/pdf' }),
+                    pdfFileName,
+                    renamedCount: renamedCount || entry.renamedCount || 0,
+                    createdAt: new Date().toISOString(),
+                    clonedFrom: entry.id,
+                };
+                payloadEntries.push(clonedEntry);
+                updatePayloadUi();
+                scheduleSaveDemoState();
+            } catch (err) {
+                console.error('Clone payload error:', err);
+                if (step5PayloadError) {
+                    step5PayloadError.textContent = err.message || 'Failed to clone payload.';
+                }
+            }
+        }
+
+        function upsertPayloadEntryFromCurrent(renamedCount) {
+            if (!sanitizedPdfFile || !lastFieldConfig) return null;
+            const pdfBlob = sanitizedPdfFile;
+            const pdfFileName = sanitizedPdfFile.name || 'sanitized.pdf';
+            const defaultName = getPayloadFormName(lastFieldConfig, sanitizedPdfFile);
+
+            if (editingPayloadId) {
+                const idx = payloadEntries.findIndex((e) => e.id === editingPayloadId);
+                if (idx >= 0) {
+                    const prev = payloadEntries[idx];
+                    payloadEntries[idx] = {
+                        ...prev,
+                        fieldConfig: JSON.parse(JSON.stringify(lastFieldConfig)),
+                        pdfBlob,
+                        pdfFileName,
+                        renamedCount: Number(renamedCount) || prev.renamedCount || 0,
+                        updatedAt: new Date().toISOString(),
+                    };
+                    editingPayloadId = null;
+                    updatePayloadUi();
+                    return payloadEntries[idx];
+                }
+            }
+
+            const entry = {
+                id: `payload_${Date.now()}_${payloadIdCounter++}`,
+                name: uniquePayloadName(defaultName),
+                fieldConfig: JSON.parse(JSON.stringify(lastFieldConfig)),
+                pdfBlob,
+                pdfFileName,
+                renamedCount: Number(renamedCount) || 0,
+                createdAt: new Date().toISOString(),
+            };
+            payloadEntries.push(entry);
+            updatePayloadUi();
+            return entry;
+        }
+
+        function updatePayloadUi() {
+            const hasEntries = payloadEntries.length > 0;
+            const stepLocked = step2.classList.contains('step-locked');
+            if (payloadEmptyEl) payloadEmptyEl.hidden = hasEntries || stepLocked;
+            if (downloadPayloadBtn) downloadPayloadBtn.disabled = !hasEntries;
+            if (!payloadListEl) return;
+
+            payloadListEl.innerHTML = payloadEntries.map((entry) => {
+                const fields = Array.isArray(entry.fieldConfig?.fields) ? entry.fieldConfig.fields.length : 0;
+                const editing = entry.id === editingPayloadId;
+                const pdfName = entry.pdfFileName || `${entry.name}.pdf`;
+                return `
+                  <article class="payload-entry${editing ? ' editing' : ''}" data-payload-id="${escapeHtml(entry.id)}">
+                    <div class="payload-entry-main">
+                      <h3 class="payload-entry-name" data-payload-name title="Double-click to rename entry">${escapeHtml(entry.name)}</h3>
+                      <p class="payload-entry-pdf" data-payload-pdf title="Double-click to rename PDF file">${escapeHtml(pdfName)}</p>
+                      <p class="payload-entry-meta">
+                        ${fields} field${fields === 1 ? '' : 's'}
+                        · ${entry.renamedCount || 0} renamed
+                        ${editing ? ' · editing — drop a PDF below to update' : ''}
+                      </p>
+                    </div>
+                    <div class="payload-entry-actions">
+                      <button type="button" class="btn-download" data-payload-download-pdf>Download PDF</button>
+                      <button type="button" class="btn-clone" data-payload-clone>Clone</button>
+                      <button type="button" class="btn-edit" data-payload-edit>Edit</button>
+                      <button type="button" class="btn-danger" data-payload-delete>Delete</button>
+                    </div>
+                  </article>
+                `;
+            }).join('');
+        }
+
+        function softResetSteps2Through4ForNewPayload() {
+            // Keep payload entries + step 3 (payload) unlocked; clear Step 2 for a new PDF run.
+            step2Complete = false;
+            step3Complete = false;
+            lastExtractionPayload = null;
+            lastFieldConfig = null;
+            lastPreparedPdfFile = null;
+            originalUploadPdfName = null;
+            lastPdfToken = null;
+            revokeUnlockedBlobUrl();
+            unlockedPdfFile = null;
+            revokeSanitizedPdfBlobUrl();
+            sanitizedPdfFile = null;
+
+            step2Error.textContent = '';
+            if (pdfError) pdfError.textContent = '';
+            if (step4Error) step4Error.textContent = '';
+            xfaInput.value = '';
+            xfaFileChip.style.display = 'none';
+            unlockProgress.classList.remove('visible');
+            unlockSuccess.classList.remove('visible');
+            sanitizePdfSuccess.classList.remove('visible');
+            fieldConfigProgress.classList.remove('visible');
+            sanitizePdfLoading.style.display = 'none';
+            if (pdfLoading) pdfLoading.style.display = 'none';
+            resetPipelineStages();
+            setPipelineBusy(false);
+            enableDocumentDataToggle(false);
+
+            step3Status.textContent = '3';
+            step3Status.classList.remove('complete', 'error');
+            step3Results.classList.remove('visible');
+            resetStep3Results();
+            step3.classList.add('step-locked');
+            if (step3LockMsg) step3LockMsg.style.display = 'block';
+
+            step4Status.textContent = '4';
+            step4Status.classList.remove('complete', 'error');
+            step4Results.classList.remove('visible');
+            step5Results.classList.remove('visible');
+            fieldConfigJsonEl.textContent = '';
+            resetSanitizeResults();
+            step4.classList.add('step-locked');
+            if (step4LockMsg) step4LockMsg.style.display = 'block';
+            if (generateSanitizedPdfBtn) generateSanitizedPdfBtn.disabled = true;
+            generateFieldConfigBtn.disabled = true;
+            importFieldConfigBtn.disabled = true;
+
+            unlockStep2();
+            step2.classList.remove('step-locked');
+            step2LockMsg.style.display = 'none';
+
+            if (payloadEntries.length > 0) {
+                step2Complete = true;
+                step2Status.textContent = '✓';
+                step2Status.classList.add('complete');
+                step2Status.classList.remove('error');
+                step5.classList.remove('step-locked');
+                if (step5LockMsg) step5LockMsg.style.display = 'none';
+                step5Complete = true;
+                step5Status.textContent = '✓';
+                step5Status.classList.add('complete');
+                step5Status.classList.remove('error');
+            } else {
+                step2Complete = false;
+                step2Status.textContent = '2';
+                step2Status.classList.remove('complete', 'error');
+            }
+
+            updatePayloadUi();
+            scheduleSaveDemoState();
+        }
+
+        function beginAddPayload() {
+            editingPayloadId = null;
+            if (step5PayloadError) step5PayloadError.textContent = '';
+            if (downloadPayloadSuccess) downloadPayloadSuccess.classList.remove('visible');
+            softResetSteps2Through4ForNewPayload();
+            xfaUploadZone?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function beginEditPayload(payloadId) {
+            const entry = payloadEntries.find((e) => e.id === payloadId);
+            if (!entry) return;
+            editingPayloadId = payloadId;
+            if (step5PayloadError) step5PayloadError.textContent = '';
+            softResetSteps2Through4ForNewPayload();
+            // Prefill field config so import/sanitize can reuse after a new PDF is prepared.
+            lastFieldConfig = JSON.parse(JSON.stringify(entry.fieldConfig));
+            fieldConfigJsonEl.textContent = JSON.stringify(lastFieldConfig, null, 2);
+            updatePayloadUi();
+            xfaUploadZone?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function deletePayloadEntry(payloadId) {
+            const entry = payloadEntries.find((e) => e.id === payloadId);
+            if (!entry) return;
+            if (!window.confirm(`Delete payload "${entry.name}"?`)) return;
+            payloadEntries = payloadEntries.filter((e) => e.id !== payloadId);
+            if (editingPayloadId === payloadId) editingPayloadId = null;
+            if (!payloadEntries.length) {
+                step5Complete = false;
+                step5Status.textContent = '5';
+                step5Status.classList.remove('complete', 'error');
+                step2Complete = false;
+                step2Status.textContent = '2';
+                step2Status.classList.remove('complete', 'error');
+            }
+            updatePayloadUi();
+            scheduleSaveDemoState();
+        }
+
+        function normalizePayloadPdfFileName(value, fallback) {
+            let name = String(value || '').trim() || fallback || 'sanitized.pdf';
+            name = name.replace(/[\\/:*?"<>|]+/g, '_').replace(/\s+/g, ' ').trim();
+            if (!/\.pdf$/i.test(name)) name += '.pdf';
+            return name.slice(0, 180) || 'sanitized.pdf';
+        }
+
+        function uniquePayloadPdfFileName(desired, exceptId = null) {
+            const fallback = 'sanitized.pdf';
+            const normalized = normalizePayloadPdfFileName(desired, fallback);
+            const base = normalized.replace(/\.pdf$/i, '');
+            let name = `${base}.pdf`;
+            let n = 2;
+            while (payloadEntries.some((e) => e.id !== exceptId && (e.pdfFileName || '') === name)) {
+                name = `${base}(${n}).pdf`;
+                n += 1;
+            }
+            return name;
+        }
+
+        function startRenamePayload(payloadId) {
+            const entry = payloadEntries.find((e) => e.id === payloadId);
+            const card = payloadListEl?.querySelector(
+                `[data-payload-id="${String(payloadId).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"]`
+            );
+            const nameEl = card?.querySelector('[data-payload-name]');
+            if (!entry || !nameEl) return;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'payload-entry-name-input';
+            input.value = entry.name;
+            nameEl.replaceWith(input);
+            input.focus();
+            input.select();
+
+            let committed = false;
+            const commit = () => {
+                if (committed) return;
+                committed = true;
+                const next = uniquePayloadName(input.value.trim() || entry.name, entry.id);
+                entry.name = next;
+                updatePayloadUi();
+                scheduleSaveDemoState();
+            };
+            input.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    commit();
+                } else if (event.key === 'Escape') {
+                    committed = true;
+                    updatePayloadUi();
+                }
+            });
+            input.addEventListener('blur', commit);
+        }
+
+        function startRenamePayloadPdf(payloadId) {
+            const entry = payloadEntries.find((e) => e.id === payloadId);
+            const card = payloadListEl?.querySelector(
+                `[data-payload-id="${String(payloadId).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"]`
+            );
+            const pdfEl = card?.querySelector('[data-payload-pdf]');
+            if (!entry || !pdfEl) return;
+            const currentName = entry.pdfFileName || `${entry.name}_sanitized.pdf`;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'payload-entry-pdf-input';
+            input.value = currentName;
+            pdfEl.replaceWith(input);
+            input.focus();
+            input.select();
+
+            let committed = false;
+            const commit = () => {
+                if (committed) return;
+                committed = true;
+                const next = uniquePayloadPdfFileName(input.value.trim() || currentName, entry.id);
+                entry.pdfFileName = next;
+                if (entry.pdfBlob) {
+                    entry.pdfBlob = new File([entry.pdfBlob], next, {
+                        type: entry.pdfBlob.type || 'application/pdf',
+                    });
+                }
+                updatePayloadUi();
+                scheduleSaveDemoState();
+            };
+            input.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    commit();
+                } else if (event.key === 'Escape') {
+                    committed = true;
+                    updatePayloadUi();
+                }
+            });
+            input.addEventListener('blur', commit);
+        }
+
+        function downloadPayloadPdf(payloadId) {
+            const entry = payloadEntries.find((e) => e.id === payloadId);
+            if (!entry?.pdfBlob) {
+                if (step5PayloadError) {
+                    step5PayloadError.textContent = 'No sanitized PDF available for this payload.';
+                }
+                return;
+            }
+            const url = URL.createObjectURL(entry.pdfBlob);
             const link = document.createElement('a');
-            link.href = sanitizedPdfBlobUrl;
-            link.download = sanitizedPdfFile.name;
+            link.href = url;
+            link.download = entry.pdfFileName || `${entry.name || 'form'}.pdf`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        });
+            URL.revokeObjectURL(url);
+        }
+
+        if (payloadListEl) {
+            payloadListEl.addEventListener('click', (event) => {
+                const card = event.target.closest('[data-payload-id]');
+                if (!card) return;
+                const id = card.getAttribute('data-payload-id');
+                if (event.target.closest('[data-payload-download-pdf]')) {
+                    downloadPayloadPdf(id);
+                    return;
+                }
+                if (event.target.closest('[data-payload-edit]')) {
+                    beginEditPayload(id);
+                    return;
+                }
+                if (event.target.closest('[data-payload-clone]')) {
+                    const btn = event.target.closest('[data-payload-clone]');
+                    if (btn) btn.disabled = true;
+                    clonePayloadEntry(id).finally(() => {
+                        if (btn) btn.disabled = false;
+                    });
+                    return;
+                }
+                if (event.target.closest('[data-payload-delete]')) {
+                    deletePayloadEntry(id);
+                }
+            });
+            payloadListEl.addEventListener('dblclick', (event) => {
+                const card = event.target.closest('[data-payload-id]');
+                if (!card) return;
+                const id = card.getAttribute('data-payload-id');
+                if (event.target.closest('[data-payload-pdf]')) {
+                    startRenamePayloadPdf(id);
+                    return;
+                }
+                if (event.target.closest('[data-payload-name]')) {
+                    startRenamePayload(id);
+                }
+            });
+        }
+
+        if (addPayloadBtn) {
+            addPayloadBtn.addEventListener('click', beginAddPayload);
+        }
+
+        async function renderPdfPagesToPngBlobs(pdfFile) {
+            if (!window.pdfjsLib) throw new Error('PDF.js is not loaded');
+            if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
+                pdfjsLib.GlobalWorkerOptions.workerSrc =
+                    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            }
+            const data = new Uint8Array(await pdfFile.arrayBuffer());
+            const pdf = await pdfjsLib.getDocument({ data }).promise;
+            const pages = [];
+            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
+                const page = await pdf.getPage(pageNum);
+                const viewport = page.getViewport({ scale: 2 });
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.floor(viewport.width);
+                canvas.height = Math.floor(viewport.height);
+                const ctx = canvas.getContext('2d');
+                await page.render({ canvasContext: ctx, viewport }).promise;
+                const blob = await new Promise((resolve, reject) => {
+                    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Failed to encode page image'))), 'image/png');
+                });
+                pages.push({ name: `page_${String(pageNum).padStart(2, '0')}.png`, blob });
+            }
+            return pages;
+        }
+
+        async function addEntryToZip(zip, entry) {
+            const folder = zip.folder(entry.name);
+            const pdfName = entry.pdfFileName || `${entry.name}_sanitized.pdf`;
+            folder.file(pdfName, entry.pdfBlob);
+            folder.file('field_config.txt', JSON.stringify(entry.fieldConfig, null, 2));
+            const pages = await renderPdfPagesToPngBlobs(entry.pdfBlob);
+            const imagesFolder = folder.folder('pages');
+            for (const page of pages) {
+                imagesFolder.file(page.name, page.blob);
+            }
+            return pages.length;
+        }
+
+        async function downloadPayloadZip() {
+            if (!payloadEntries.length) {
+                if (step5PayloadError) {
+                    step5PayloadError.textContent = 'No payload entries yet. Drop a PDF to create one.';
+                }
+                return;
+            }
+            if (typeof JSZip === 'undefined') {
+                if (step5PayloadError) step5PayloadError.textContent = 'JSZip failed to load. Refresh and try again.';
+                return;
+            }
+
+            if (step5PayloadError) step5PayloadError.textContent = '';
+            if (downloadPayloadSuccess) downloadPayloadSuccess.classList.remove('visible');
+            if (downloadPayloadLoading) downloadPayloadLoading.style.display = 'block';
+            if (downloadPayloadBtn) downloadPayloadBtn.disabled = true;
+
+            try {
+                const zip = new JSZip();
+                let totalPages = 0;
+                for (const entry of payloadEntries) {
+                    totalPages += await addEntryToZip(zip, entry);
+                }
+
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(zipBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                const stamp = new Date().toISOString().slice(0, 10);
+                link.download = payloadEntries.length === 1
+                    ? `${payloadEntries[0].name}_payload.zip`
+                    : `full_payload_${payloadEntries.length}_forms_${stamp}.zip`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                step5Status.textContent = '✓';
+                step5Status.classList.add('complete');
+                step5Status.setAttribute('aria-label', 'Step 5 complete');
+                if (downloadPayloadSuccess) downloadPayloadSuccess.classList.add('visible');
+                if (downloadPayloadSuccessText) {
+                    downloadPayloadSuccessText.textContent =
+                        `✓ Downloaded ${payloadEntries.length} payload${payloadEntries.length === 1 ? '' : 's'} (${totalPages} page image${totalPages === 1 ? '' : 's'})`;
+                }
+                scheduleSaveDemoState();
+            } catch (err) {
+                console.error('Payload zip error:', err);
+                if (step5PayloadError) step5PayloadError.textContent = err.message || 'Failed to build payload zip.';
+                step5Status.textContent = '!';
+                step5Status.classList.add('error');
+            } finally {
+                if (downloadPayloadLoading) downloadPayloadLoading.style.display = 'none';
+                if (downloadPayloadBtn) downloadPayloadBtn.disabled = !payloadEntries.length;
+            }
+        }
+
+        if (downloadPayloadBtn) {
+            downloadPayloadBtn.addEventListener('click', downloadPayloadZip);
+        }
 
         function getSelectedTemplateSource() {
             return document.querySelector('input[name="form-template-source"]:checked')?.value || 'default';
@@ -4351,6 +5654,12 @@
                 loginBtn.textContent = 'Sign In';
             }
         });
+
+        if (toggleUserDataBtn) {
+            toggleUserDataBtn.addEventListener('click', () => {
+                setUserDataVisible(!userDataVisible);
+            });
+        }
 
         logoutBtn.addEventListener('click', async () => {
             await auth.signOut();
