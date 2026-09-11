@@ -2026,6 +2026,7 @@
                 
                 <button type="submit" class="btn" id="settings-save-btn">Back</button>
                 <button type="button" id="settings-logout-btn" class="logout-button">Logout</button>
+                <button type="button" id="settings-admin-btn" class="settings-button" style="display:block; margin:14px auto 0 auto; width:100%; max-width:320px; min-width:120px; font-weight:700;" onclick="window.location.href='/Admin/AdminConsole.html'">Admin Page</button>
                 <button type="button" id="settings-delete-btn" class="delete-account-button" style="background:#e74c3c; color:#fff; margin: 14px auto 0 auto; width:100%; max-width:320px; min-width:120px; display:block; font-weight:700;">Delete Account</button>
                 <div class="error-message" id="settings-error"></div>
             </form>
@@ -2140,6 +2141,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     <script src="cart.js"></script>
     <script>window.__FORMS_INLINE_SIDECART__ = true;</script>
+    <!-- ZIP -> county -> small claims court lookup (used by the county modal and form URLs) -->
+    <script src="../CountyLookup/zipData.js"></script>
+    <script src="../CountyLookup/courtData.js"></script>
+    <script src="../CountyLookup/courtLookup.js"></script>
     <script src="../forms.js"></script>
 
 <div id="saving-overlay">

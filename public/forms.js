@@ -229,6 +229,7 @@ function renderMyForms(forms) {
                     let url = correctedUrl + separator + 'county=' + encodeURIComponent(form.countyName || '') + '&portfolioId=' + encodeURIComponent(form.id);
                     if (form.defendantName) url += '&defendantName=' + encodeURIComponent(form.defendantName);
                     if (form.zipCode) url += '&zipCode=' + encodeURIComponent(form.zipCode);
+                    url = appendCourtAddress(url, form.countyName);
                     window.location.href = url;
                 } catch (err) {
                     console.error('[FormWiz] Failed to update lastOpened:', err);
@@ -358,6 +359,20 @@ async function loadAvailableForms() {
     }
 }
 
+// Small claims court filing address for a county, from ../CountyLookup/courtData.js.
+// Returns "" when the lookup scripts are not loaded or the county is unknown.
+function getCourtAddressForCounty(countyName) {
+    if (typeof getCourtFromCounty !== 'function') return '';
+    const info = getCourtFromCounty(countyName || '');
+    return info && info.fullAddress ? info.fullAddress : '';
+}
+
+// Append court_address=<filing address> to a form URL, based on the county in it.
+function appendCourtAddress(url, countyName) {
+    const address = getCourtAddressForCounty(countyName);
+    if (!address) return url;
+    return url + (url.includes('?') ? '&' : '?') + 'court_address=' + encodeURIComponent(address);
+}
 let countyZipMap = null;
 async function loadCountyZipMap() {
     if (countyZipMap) return countyZipMap;
@@ -649,6 +664,7 @@ async function addFormToPortfolioInternal(formId, formUrl, formName, countyName,
             let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
             if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
             if (zipCode) url += '&zipCode=' + encodeURIComponent(zipCode);
+            url = appendCourtAddress(url, countyName);
             window.location.href = url;
         } else {
             // For new forms, check if it already exists for the same county
@@ -677,6 +693,7 @@ async function addFormToPortfolioInternal(formId, formUrl, formName, countyName,
                 let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
                 if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
                 if (zipCode) url += '&zipCode=' + encodeURIComponent(zipCode);
+                url = appendCourtAddress(url, countyName);
                 window.location.href = url;
             } else {
                 // Create a new form document with auto-generated ID
@@ -698,6 +715,7 @@ async function addFormToPortfolioInternal(formId, formUrl, formName, countyName,
                 let url = formUrl + separator + 'county=' + encodeURIComponent(countyName);
                 if (defendantName) url += '&defendantName=' + encodeURIComponent(defendantName);
                 if (zipCode) url += '&zipCode=' + encodeURIComponent(zipCode);
+                url = appendCourtAddress(url, countyName);
                 window.location.href = url;
             }
         }
@@ -777,6 +795,7 @@ addFormToPortfolioInternal = async function(formId, formUrl, formName, countyNam
             if (zipCode) {
                 url += '&zipCode=' + encodeURIComponent(zipCode);
             }
+            url = appendCourtAddress(url, countyName);
             window.location.href = url;
         } else {
             const formsSnapshot = await db.collection('users').doc(userId).collection('forms').get();
@@ -802,6 +821,7 @@ addFormToPortfolioInternal = async function(formId, formUrl, formName, countyNam
                 if (zipCode) {
                     url += '&zipCode=' + encodeURIComponent(zipCode);
                 }
+                url = appendCourtAddress(url, countyName);
                 window.location.href = url;
             } else {
                 const newFormRef = db.collection('users').doc(userId).collection('forms').doc();
@@ -823,6 +843,7 @@ addFormToPortfolioInternal = async function(formId, formUrl, formName, countyNam
                 if (zipCode) {
                     url += '&zipCode=' + encodeURIComponent(zipCode);
                 }
+                url = appendCourtAddress(url, countyName);
                 window.location.href = url;
             }
         }
@@ -948,6 +969,7 @@ renderMyForms = function(forms) {
                     if (form.zipCode) {
                         url += '&zipCode=' + encodeURIComponent(form.zipCode);
                     }
+                    url = appendCourtAddress(url, form.countyName);
                     window.location.href = url;
                 } catch (err) {
                     hideSavingOverlay();
@@ -2217,13 +2239,20 @@ function showCountyModal(formId, formUrl, formName) {
                 return;
             }
             
-            // Find county for this zip
-            const countyZipMap = await loadCountyZipMap();
+            // Find county for this zip. Prefer ../CountyLookup/zipData.js (population-majority
+            // county for split ZIPs, PO-box ZIPs included); fall back to county-zips.json.
             let foundCounty = null;
-            for (const [county, zips] of Object.entries(countyZipMap)) {
-                if (zips.includes(zipValue)) {
-                    foundCounty = county;
-                    break;
+            if (typeof getCountyFromZip === 'function') {
+                foundCounty = getCountyFromZip(zipValue);
+            }
+            if (!foundCounty) {
+                const countyZipMap = await loadCountyZipMap();
+                for (const [county, zips] of Object.entries(countyZipMap)) {
+                    if (zips.includes(zipValue)) {
+                        // county-zips.json keys have no spaces ("SanDiego"); admin config does.
+                        foundCounty = county.replace(/([a-z])([A-Z])/g, '$1 $2');
+                        break;
+                    }
                 }
             }
             
