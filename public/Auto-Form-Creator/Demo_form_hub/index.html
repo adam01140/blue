@@ -512,6 +512,103 @@
 
     .modal-error[hidden] { display: none !important; }
 
+    .hub-modal-panel.wide { width: min(720px, 100%); }
+
+    .wizard-steps {
+      display: flex;
+      gap: 8px;
+      margin: 0 0 16px;
+    }
+
+    .wizard-steps .step {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #eef2f7;
+      color: var(--ink-soft);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .wizard-steps .step.active {
+      background: var(--accent-soft);
+      border-color: #b8c7de;
+      color: var(--accent);
+    }
+
+    .wizard-steps .step.done {
+      background: var(--stamp-soft);
+      border-color: #b7e0c9;
+      color: var(--stamp);
+    }
+
+    .drop-zone {
+      border: 1.5px dashed #b8c7de;
+      border-radius: 12px;
+      padding: 18px 14px;
+      background: #f7f9fc;
+      text-align: center;
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--ink-soft);
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--ink);
+    }
+
+    .file-list {
+      display: grid;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .file-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      font-size: 0.86rem;
+    }
+
+    .file-list .remove-file {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: #9b1c1c;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .html-paste {
+      min-height: 220px !important;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.78rem !important;
+      line-height: 1.45;
+    }
+
+    .pdf-switcher {
+      min-width: 160px;
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font: inherit;
+      font-size: 0.82rem;
+      background: #fff;
+    }
+
+    .wizard-pane[hidden] { display: none !important; }
+
     @media (max-width: 980px) {
       .preview-split {
         grid-template-columns: 1fr;
@@ -536,7 +633,7 @@
         </p>
       </div>
       <div class="hero-actions">
-        <button type="button" class="btn primary" id="addFormBtn">Add form</button>
+        <button type="button" class="btn primary" id="addFormBtn">Add An Entry</button>
         <a class="btn" href="/Auto-Form-Creator/demo.html">Demo</a>
         <a class="btn" href="/Forms/Example/example.html">Example</a>
         <div class="stamp-pill" id="stampMeta">Approved forms</div>
@@ -549,41 +646,57 @@
 
   <div class="hub-modal" id="entryModal" hidden>
     <div class="hub-modal-backdrop" data-close-modal></div>
-    <div class="hub-modal-panel" role="dialog" aria-modal="true" aria-labelledby="entryModalTitle">
-      <h2 id="entryModalTitle">Add form</h2>
+    <div class="hub-modal-panel wide" role="dialog" aria-modal="true" aria-labelledby="entryModalTitle">
+      <h2 id="entryModalTitle">Add An Entry</h2>
       <p class="modal-sub" id="entryModalSub">
-        Upload a PDF plus at least one HTML version (all-at-once and/or one-at-a-time).
+        Step 1: upload one or more PDFs. Step 2: paste the HTML form. The entry is saved to Firebase and shown on this hub.
       </p>
+      <div class="wizard-steps" aria-hidden="true">
+        <span class="step active" data-step-indicator="1">1. Upload PDFs</span>
+        <span class="step" data-step-indicator="2">2. Paste HTML</span>
+      </div>
       <form class="hub-form" id="entryForm">
         <input type="hidden" id="entryMode" value="create">
         <input type="hidden" id="entrySlug" value="">
-        <label>
-          Title <span class="req">*</span>
-          <input type="text" id="entryTitle" name="title" required placeholder="e.g. Form I-9">
-        </label>
-        <label>
-          Description
-          <textarea id="entryDescription" name="description" placeholder="Short summary (optional)"></textarea>
-        </label>
-        <label>
-          PDF form <span class="req" id="pdfRequiredMark">*</span>
-          <input type="file" id="entryPdf" name="pdf" accept=".pdf,application/pdf">
-          <span class="file-hint" id="pdfHint">Required for new entries</span>
-        </label>
-        <label>
-          HTML — all at once
-          <input type="file" id="entryHtmlAll" name="htmlAll" accept=".html,.htm,text/html">
-          <span class="file-hint" id="htmlAllHint">Optional if one-at-a-time is uploaded</span>
-        </label>
-        <label>
-          HTML — one at a time
-          <input type="file" id="entryHtmlOne" name="htmlOne" accept=".html,.htm,text/html">
-          <span class="file-hint" id="htmlOneHint">Optional if all-at-once is uploaded</span>
-        </label>
+
+        <div class="wizard-pane" data-step-pane="1">
+          <label>
+            Title
+            <input type="text" id="entryTitle" name="title" placeholder="Optional — defaults to the HTML title or PDF name">
+          </label>
+          <label>
+            Description
+            <textarea id="entryDescription" name="description" placeholder="Short summary (optional)"></textarea>
+          </label>
+          <div>
+            <label style="margin-bottom: 8px;">PDF files <span class="req">*</span></label>
+            <input type="file" id="entryPdfs" name="pdfs" accept=".pdf,application/pdf" multiple hidden>
+            <div class="drop-zone" id="pdfDropZone" tabindex="0">
+              Drop PDFs here, or click to choose files
+            </div>
+            <p class="file-hint" id="pdfHint">Upload the source PDF set for this form.</p>
+            <ul class="file-list" id="pdfFileList"></ul>
+          </div>
+        </div>
+
+        <div class="wizard-pane" data-step-pane="2" hidden>
+          <label>
+            HTML form <span class="req">*</span>
+            <textarea id="entryHtml" class="html-paste" name="html" placeholder="Paste the full HTML file here"></textarea>
+          </label>
+          <label>
+            Or load from an .html file
+            <input type="file" id="entryHtmlFile" accept=".html,.htm,text/html">
+            <span class="file-hint" id="htmlHint">Choosing a file fills the box above. You can still edit it.</span>
+          </label>
+        </div>
+
         <p class="modal-error" id="entryError" hidden></p>
         <div class="modal-actions">
           <button type="button" class="btn ghost" data-close-modal>Cancel</button>
-          <button type="submit" class="btn primary" id="entrySubmitBtn">Save</button>
+          <button type="button" class="btn" id="entryBackBtn" hidden>Back</button>
+          <button type="button" class="btn primary" id="entryNextBtn">Next</button>
+          <button type="submit" class="btn primary" id="entrySubmitBtn" hidden>Create entry</button>
         </div>
       </form>
     </div>
@@ -594,55 +707,102 @@
     pdfjsLib.GlobalWorkerOptions.workerSrc = '/vendor/pdfjs/pdf.worker.min.mjs';
 
     let hubManifest = null;
+    let selectedPdfFiles = [];
+    let wizardStep = 1;
+
+    function setEntryError(message) {
+      const errorEl = document.getElementById('entryError');
+      if (!errorEl) return;
+      errorEl.textContent = message || '';
+      errorEl.hidden = !message;
+    }
+
+    function renderPdfFileList() {
+      const list = document.getElementById('pdfFileList');
+      const hint = document.getElementById('pdfHint');
+      if (!list) return;
+      list.innerHTML = selectedPdfFiles.map((file, index) => `
+        <li>
+          <span>${escapeHtml(file.name)} <span class="file-hint">(${Math.max(1, Math.round(file.size / 1024))} KB)</span></span>
+          <button type="button" class="remove-file" data-remove-pdf="${index}" aria-label="Remove ${escapeAttr(file.name)}">Remove</button>
+        </li>
+      `).join('');
+      list.querySelectorAll('[data-remove-pdf]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const index = Number(btn.getAttribute('data-remove-pdf'));
+          selectedPdfFiles.splice(index, 1);
+          renderPdfFileList();
+        });
+      });
+      if (hint) {
+        hint.textContent = selectedPdfFiles.length
+          ? `${selectedPdfFiles.length} PDF${selectedPdfFiles.length === 1 ? '' : 's'} selected`
+          : 'Upload the source PDF set for this form.';
+        hint.classList.toggle('present', selectedPdfFiles.length > 0);
+      }
+    }
+
+    function addPdfFiles(fileList) {
+      const incoming = [...(fileList || [])].filter((file) => {
+        const name = String(file.name || '').toLowerCase();
+        return file.type === 'application/pdf' || name.endsWith('.pdf');
+      });
+      incoming.forEach((file) => {
+        const exists = selectedPdfFiles.some((current) => (
+          current.name === file.name && current.size === file.size && current.lastModified === file.lastModified
+        ));
+        if (!exists) selectedPdfFiles.push(file);
+      });
+      renderPdfFileList();
+    }
+
+    function setWizardStep(step) {
+      wizardStep = step;
+      document.querySelectorAll('[data-step-pane]').forEach((pane) => {
+        pane.hidden = Number(pane.getAttribute('data-step-pane')) !== step;
+      });
+      document.querySelectorAll('[data-step-indicator]').forEach((el) => {
+        const n = Number(el.getAttribute('data-step-indicator'));
+        el.classList.toggle('active', n === step);
+        el.classList.toggle('done', n < step);
+      });
+      const nextBtn = document.getElementById('entryNextBtn');
+      const backBtn = document.getElementById('entryBackBtn');
+      const submitBtn = document.getElementById('entrySubmitBtn');
+      if (nextBtn) nextBtn.hidden = step !== 1;
+      if (backBtn) backBtn.hidden = step !== 2;
+      if (submitBtn) submitBtn.hidden = step !== 2;
+      setEntryError('');
+    }
 
     function openEntryModal(mode, form = null) {
       const modal = document.getElementById('entryModal');
       const titleEl = document.getElementById('entryModalTitle');
       const subEl = document.getElementById('entryModalSub');
       const formEl = document.getElementById('entryForm');
-      const errorEl = document.getElementById('entryError');
       formEl.reset();
-      errorEl.hidden = true;
-      errorEl.textContent = '';
+      selectedPdfFiles = [];
+      renderPdfFileList();
+      setEntryError('');
       document.getElementById('entryMode').value = mode;
       document.getElementById('entrySlug').value = form?.id || '';
       document.getElementById('entryTitle').value = form?.title || '';
       document.getElementById('entryDescription').value = form?.description || '';
-
-      const pdfRequired = document.getElementById('pdfRequiredMark');
-      const pdfHint = document.getElementById('pdfHint');
-      const htmlAllHint = document.getElementById('htmlAllHint');
-      const htmlOneHint = document.getElementById('htmlOneHint');
+      document.getElementById('entryHtml').value = '';
 
       if (mode === 'edit' && form) {
-        titleEl.textContent = 'Edit form';
-        subEl.textContent = 'Replace any file you want to change. Leave a file blank to keep the current one.';
-        pdfRequired.hidden = true;
-        pdfHint.textContent = form.sourcePdf
-          ? `Current: ${form.sourcePdf.split('/').pop()} — upload to replace`
-          : 'No PDF on file — upload required';
-        pdfHint.classList.toggle('present', Boolean(form.sourcePdf));
-        htmlAllHint.textContent = form.formHtml
-          ? `Current: ${form.formHtml.split('/').pop()} — upload to replace`
-          : 'Not set — upload to add';
-        htmlAllHint.classList.toggle('present', Boolean(form.formHtml));
-        htmlOneHint.textContent = form.formHtmlOneAtATime
-          ? `Current: ${form.formHtmlOneAtATime.split('/').pop()} — upload to replace`
-          : 'Not set — upload to add';
-        htmlOneHint.classList.toggle('present', Boolean(form.formHtmlOneAtATime));
+        titleEl.textContent = 'Edit entry';
+        subEl.textContent = 'Replace PDFs or pasted HTML only if you want to change them. Blank fields keep the current files.';
         document.getElementById('entrySubmitBtn').textContent = 'Save changes';
+        document.getElementById('pdfHint').textContent = (form.sourcePdfs || form.pdfs || []).length
+          ? `${(form.sourcePdfs || form.pdfs || []).length} PDF(s) on file — upload to replace`
+          : 'No PDF on file — upload required';
       } else {
-        titleEl.textContent = 'Add form';
-        subEl.textContent = 'Upload a PDF plus at least one HTML version (all-at-once and/or one-at-a-time).';
-        pdfRequired.hidden = false;
-        pdfHint.textContent = 'Required for new entries';
-        pdfHint.classList.remove('present');
-        htmlAllHint.textContent = 'Optional if one-at-a-time is uploaded';
-        htmlAllHint.classList.remove('present');
-        htmlOneHint.textContent = 'Optional if all-at-once is uploaded';
-        htmlOneHint.classList.remove('present');
-        document.getElementById('entrySubmitBtn').textContent = 'Add form';
+        titleEl.textContent = 'Add An Entry';
+        subEl.textContent = 'Step 1: upload one or more PDFs. Step 2: paste the HTML form. The entry is saved to Firebase and shown on this hub.';
+        document.getElementById('entrySubmitBtn').textContent = 'Create entry';
       }
+      setWizardStep(1);
       modal.hidden = false;
       document.getElementById('entryTitle').focus();
     }
@@ -662,49 +822,93 @@
         }
       });
 
+      const dropZone = document.getElementById('pdfDropZone');
+      const pdfInput = document.getElementById('entryPdfs');
+      dropZone?.addEventListener('click', () => pdfInput?.click());
+      dropZone?.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          pdfInput?.click();
+        }
+      });
+      pdfInput?.addEventListener('change', () => {
+        addPdfFiles(pdfInput.files);
+        pdfInput.value = '';
+      });
+      ['dragenter', 'dragover'].forEach((type) => {
+        dropZone?.addEventListener(type, (event) => {
+          event.preventDefault();
+          dropZone.classList.add('dragover');
+        });
+      });
+      ['dragleave', 'drop'].forEach((type) => {
+        dropZone?.addEventListener(type, (event) => {
+          event.preventDefault();
+          dropZone.classList.remove('dragover');
+        });
+      });
+      dropZone?.addEventListener('drop', (event) => {
+        addPdfFiles(event.dataTransfer?.files);
+      });
+
+      document.getElementById('entryHtmlFile')?.addEventListener('change', async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        document.getElementById('entryHtml').value = await file.text();
+        const hint = document.getElementById('htmlHint');
+        if (hint) {
+          hint.textContent = `Loaded ${file.name}. You can still edit the pasted HTML.`;
+          hint.classList.add('present');
+        }
+      });
+
+      document.getElementById('entryNextBtn')?.addEventListener('click', () => {
+        const mode = document.getElementById('entryMode').value;
+        if (mode === 'create' && !selectedPdfFiles.length) {
+          setEntryError('Upload at least one PDF before continuing.');
+          return;
+        }
+        setWizardStep(2);
+        document.getElementById('entryHtml').focus();
+      });
+      document.getElementById('entryBackBtn')?.addEventListener('click', () => setWizardStep(1));
+
       document.getElementById('entryForm')?.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const errorEl = document.getElementById('entryError');
         const submitBtn = document.getElementById('entrySubmitBtn');
-        errorEl.hidden = true;
-        errorEl.textContent = '';
-
         const mode = document.getElementById('entryMode').value;
         const slug = document.getElementById('entrySlug').value;
         const title = document.getElementById('entryTitle').value.trim();
         const description = document.getElementById('entryDescription').value.trim();
-        const pdfFile = document.getElementById('entryPdf').files[0];
-        const htmlAllFile = document.getElementById('entryHtmlAll').files[0];
-        const htmlOneFile = document.getElementById('entryHtmlOne').files[0];
+        const html = document.getElementById('entryHtml').value.trim();
+        setEntryError('');
 
-        if (!title) {
-          errorEl.textContent = 'Title is required.';
-          errorEl.hidden = false;
+        if (mode === 'create' && !selectedPdfFiles.length) {
+          setWizardStep(1);
+          setEntryError('Upload at least one PDF.');
           return;
         }
-        if (mode === 'create') {
-          if (!pdfFile) {
-            errorEl.textContent = 'PDF upload is required.';
-            errorEl.hidden = false;
-            return;
-          }
-          if (!htmlAllFile && !htmlOneFile) {
-            errorEl.textContent = 'Upload at least one HTML file (all-at-once and/or one-at-a-time).';
-            errorEl.hidden = false;
-            return;
-          }
+        if (mode === 'create' && !html) {
+          setEntryError('Paste the HTML form (or load an .html file).');
+          return;
+        }
+        if (mode === 'edit' && !selectedPdfFiles.length && !html && !title) {
+          setEntryError('Change the title, PDFs, or HTML before saving.');
+          return;
         }
 
         const body = new FormData();
         body.append('title', title);
         body.append('description', description);
-        if (pdfFile) body.append('pdf', pdfFile);
-        if (htmlAllFile) body.append('htmlAll', htmlAllFile);
-        if (htmlOneFile) body.append('htmlOne', htmlOneFile);
+        if (html) {
+          body.append('html', html);
+          body.append('htmlFile', new Blob([html], { type: 'text/html' }), 'form.html');
+        }
+        selectedPdfFiles.forEach((file) => body.append('pdfs', file));
 
         submitBtn.disabled = true;
         const prevLabel = submitBtn.textContent;
-        submitBtn.textContent = 'Saving…';
+        submitBtn.textContent = 'Saving to Firebase…';
         try {
           const url = mode === 'edit'
             ? `/api/demo-hub/entries/${encodeURIComponent(slug)}`
@@ -721,10 +925,10 @@
           await loadHub();
           if (data.entry?.id) {
             location.hash = data.entry.id;
+            document.getElementById(data.entry.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         } catch (err) {
-          errorEl.textContent = err.message || String(err);
-          errorEl.hidden = false;
+          setEntryError(err.message || String(err));
         } finally {
           submitBtn.disabled = false;
           submitBtn.textContent = prevLabel;
@@ -753,16 +957,24 @@
       const stampMeta = document.getElementById('stampMeta');
 
       try {
-        const res = await fetch('./manifest.json', { cache: 'no-store' });
-        if (!res.ok) throw new Error('Could not load manifest.json');
-        const manifest = await res.json();
-        hubManifest = manifest;
-        const forms = manifest.forms || [];
+        let forms = [];
+        const apiRes = await fetch('/api/demo-hub/entries', { cache: 'no-store' });
+        if (apiRes.ok) {
+          const data = await apiRes.json();
+          hubManifest = data.manifest || hubManifest;
+          forms = data.entries || [];
+        } else {
+          const res = await fetch('./manifest.json', { cache: 'no-store' });
+          if (!res.ok) throw new Error('Could not load hub entries');
+          const manifest = await res.json();
+          hubManifest = manifest;
+          forms = manifest.forms || [];
+        }
 
-        stampMeta.textContent = `${forms.length} stamp-approved form${forms.length === 1 ? '' : 's'}`;
+        stampMeta.textContent = `${forms.length} form${forms.length === 1 ? '' : 's'}`;
         if (!forms.length) {
           navEl.innerHTML = '';
-          formsEl.innerHTML = '<div class="empty">No approved forms in the hub yet. Click <strong>Add form</strong> to upload one.</div>';
+          formsEl.innerHTML = '<div class="empty">No entries in the hub yet. Click <strong>Add An Entry</strong> to upload PDFs and paste HTML.</div>';
           return;
         }
 
@@ -771,12 +983,24 @@
         )).join('');
 
         formsEl.innerHTML = forms.map((form) => {
-          const pdfUrl = form.sourcePdf ? encodeURI(form.sourcePdf) : '';
+          const pdfUrls = (form.sourcePdfs && form.sourcePdfs.length
+            ? form.sourcePdfs
+            : (form.pdfs || []).map((pdf) => pdf.url || pdf)
+          ).filter(Boolean);
+          const pdfUrl = (pdfUrls[0] || form.sourcePdf || '') ? encodeURI(pdfUrls[0] || form.sourcePdf) : '';
           const htmlUrl = form.formHtml ? encodeURI(form.formHtml) : '';
           const oneUrl = form.formHtmlOneAtATime ? encodeURI(form.formHtmlOneAtATime) : '';
           const defaultHtml = htmlUrl || oneUrl;
           const fieldMapUrl = form.fieldMap ? encodeURI(form.fieldMap) : '';
-          const canLiveFill = Boolean(form.sourcePdf && form.fieldMap);
+          const canLiveFill = Boolean((pdfUrls[0] || form.sourcePdf) && form.fieldMap);
+          const pdfSelect = pdfUrls.length > 1
+            ? `<select class="pdf-switcher" data-pdf-switcher aria-label="Choose PDF">
+                ${pdfUrls.map((url, index) => {
+                  const label = (form.pdfs && form.pdfs[index]?.name) || String(url).split('/').pop() || `PDF ${index + 1}`;
+                  return `<option value="${encodeURI(url)}">${escapeHtml(label)}</option>`;
+                }).join('')}
+              </select>`
+            : '';
           return `
             <article class="form-card" id="${escapeAttr(form.id)}" data-form-id="${escapeAttr(form.id)}">
               <header class="form-header">
@@ -788,8 +1012,9 @@
                   </div>
                 </div>
                 <div class="meta">
-                  <span class="chip approved">Stamp approved</span>
+                  <span class="chip approved">${form.storedInFirebase ? 'Saved in Firebase' : 'Stamp approved'}</span>
                   ${canLiveFill ? '<span class="chip live">Live PDF fill</span>' : '<span class="chip">Preview only</span>'}
+                  ${pdfUrls.length > 1 ? `<span class="chip">${pdfUrls.length} PDFs</span>` : ''}
                   <span class="chip">${escapeHtml(String(form.sections || 0))} sections</span>
                   <span class="chip">${escapeHtml(String(form.questions || 0))} questions</span>
                   <span class="chip">${escapeHtml(form.approvedAt || '—')}</span>
@@ -806,8 +1031,9 @@
                     <div class="panel-label">
                       <h3>Source PDF</h3>
                       <div class="links">
+                        ${pdfSelect}
                         <span class="live-status" data-live-status>Ready</span>
-                        ${pdfUrl ? `<a href="${pdfUrl}" target="_blank" rel="noopener">Open PDF</a>` : '<span class="live-status error">No PDF</span>'}
+                        ${pdfUrl ? `<a href="${pdfUrl}" target="_blank" rel="noopener" data-open-pdf>Open PDF</a>` : '<span class="live-status error">No PDF</span>'}
                       </div>
                     </div>
                     <div
@@ -882,6 +1108,13 @@
 
       const controller = createPdfViewer(viewerEl, fieldMap);
       if (pdfUrl) await controller.load(pdfUrl);
+      const switcher = card.querySelector('[data-pdf-switcher]');
+      const openPdf = card.querySelector('[data-open-pdf]');
+      switcher?.addEventListener('change', async () => {
+        const nextUrl = switcher.value;
+        if (openPdf) openPdf.setAttribute('href', nextUrl);
+        await controller.load(nextUrl);
+      });
       if (iframe) {
         wireFormFocus(iframe, controller);
         if (pdfUrl) wireLiveFill(iframe, controller, formSlug, statusEl);

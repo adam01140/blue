@@ -66,7 +66,11 @@ app.use('/api/generate-form-config', bodyParser.json({ limit: AUTO_FORM_BODY_LIM
 app.use('/api/generate-form-html', bodyParser.json({ limit: AUTO_FORM_BODY_LIMIT }));
 app.use(bodyParser.json({ limit: '2mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '2mb' }));
-app.use(fileUpload());          // parses multipart/form‑data (fields ➜ req.body, files ➜ req.files)
+app.use(fileUpload({
+  limits: { fileSize: 80 * 1024 * 1024 },
+  defCharset: 'utf8',
+  defParamCharset: 'utf8',
+}));          // parses multipart/form‑data (fields ➜ req.body, files ➜ req.files)
 app.use(cors());
 
 // ────────────────────────────────────────────────────────────
@@ -91,7 +95,8 @@ let db;
 try {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`
+    databaseURL: `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`,
+    storageBucket: `${process.env.FIREBASE_PROJECT_ID}.firebasestorage.app`,
   });
   db = admin.firestore();
   console.log('Firebase Admin initialized successfully');
@@ -199,7 +204,14 @@ const { createHandleGenerateFormConfig } = require('./form-config-generator');
 const { createHandleGenerateFormHtml } = require('./form-html-generator');
 const { enrichFormConfigAutopopulate } = require('./form-autopopulate');
 const { handleStoreAutoFormPdf, handleFillAutoFormPdf, handleDemoHubFillPdf, rehydratePdfStore } = require('./auto-form-pdf-handler');
-const { handleCreateEntry, handleUpdateEntry, handleDeleteEntry } = require('./demo-hub-admin');
+const {
+  handleCreateEntry,
+  handleUpdateEntry,
+  handleDeleteEntry,
+  handleListEntries,
+  handleGetEntryHtml,
+  handleGetEntryPdf,
+} = require('./demo-hub-admin');
 const { createHandlePublishAutoForm } = require('./auto-form-publish-handler');
 const { createHandleSaveCurrentData } = require('./auto-form-current-data');
 const { createHandleHelpAnswer } = require('./auto-form-help-handler');
@@ -231,9 +243,12 @@ app.post('/api/enrich-autopopulate', (req, res) => {
 app.post('/api/auto-form/store-pdf', handleStoreAutoFormPdf);
 app.post('/api/auto-form/fill-pdf/:pdfToken', handleFillAutoFormPdf);
 app.post('/api/demo-hub/fill-pdf/:slug', handleDemoHubFillPdf);
+app.get('/api/demo-hub/entries', handleListEntries);
 app.post('/api/demo-hub/entries', handleCreateEntry);
 app.put('/api/demo-hub/entries/:slug', handleUpdateEntry);
 app.delete('/api/demo-hub/entries/:slug', handleDeleteEntry);
+app.get('/api/demo-hub/files/:slug/html', handleGetEntryHtml);
+app.get('/api/demo-hub/files/:slug/pdf/:index', handleGetEntryPdf);
 app.post('/api/auto-form/publish', createHandlePublishAutoForm(db));
 app.post('/api/auto-form/save-current-data', createHandleSaveCurrentData());
 app.post('/api/auto-form/help-answer', createHandleHelpAnswer(OPENAI_API_KEY));

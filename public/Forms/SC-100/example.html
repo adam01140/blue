@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SC-100 Small Claims Filing Packet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/Forms/CSS/generate.css">
+    <link rel="stylesheet" href="/Forms/CSS/generate2.css">
+    <script src="/CountyLookup/zipData.js"></script>
+    <script src="/CountyLookup/courtData.js"></script>
+    <script src="/CountyLookup/courtLookup.js"></script>
+    <style>
+        .entry-container { border: 1px solid #e1e5e9 !important; border-radius: 12px; padding: 20px; margin: 10px 0; background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); transition: all 0.3s ease; display: block; width: 100%; box-sizing: border-box; }
+        .question-container { background-color: #ffffff; border: 1px solid #bcd8ff; border-radius: 16px; padding: 24px 28px; margin: 12px auto; box-shadow: 0 4px 12px rgba(30,73,150,0.08); transition: box-shadow 0.3s ease; box-sizing: border-box; max-width: 737px; width: 100%; }
+        .question-container .question-text { margin-top: 0; }
+        .question-container .question-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .question-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 56px auto 0; max-width: 737px; }
+        .question-nav-btn { width: 48px; height: 55px; border-radius: 50%; border: none; background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(30,73,150,0.22); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; line-height: 1; padding-top: 1px; }
+        .question-nav-btn.submit-mode { background: linear-gradient(135deg, #0acffe, #495aff); box-shadow: 0 10px 24px rgba(9, 132, 227, 0.35); }
+        .question-nav-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(28,126,214,0.25); }
+        .question-nav-btn:disabled { background: #dfe6f3; color: #7c8ca8; cursor: not-allowed; box-shadow: none; pointer-events: auto !important; }
+        .question-progress { font-weight: 600; color: #1f3a60; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: 0.01em; }
+        .question-step-hidden { display: none !important; }
+        #box { padding-top: 100px; margin: 50px; }
+        @media (max-width: 600px) {
+            body { padding: 0 !important; }
+            #box { margin: 12px !important; max-width: none !important; }
+            .question-container { margin: 6px auto !important; padding: 20px 18px !important; }
+            .question-nav { margin: 40px auto 0 !important; }
+        }
+        .address-field { margin: 4px auto; }
+        .address-input { width: 80%; max-width: 400px; padding: 12px 16px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; text-align: center; height: 44px; line-height: 20px; }
+        .address-input:focus, .address-select:focus, .address-select-main:focus, .address-select-trigger:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
+        .address-input::placeholder { color: #6c757d; opacity: 1; }
+        .address-select { width: 93%; max-width: 465px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding: 12px 44px 12px 16px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }
+        .address-select-main { width: 160px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; padding: 12px 24px 12px 8px; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }
+        .address-select-trigger { width: 160px; cursor: pointer; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 2px center; background-size: 12px; padding: 0; appearance: none; -webkit-appearance: none; text-align: center; height: 44px; line-height: 20px; border: 1px solid #d1d1d6 !important; border-radius: 8px; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #ffffff !important; transition: all 0.2s ease; box-sizing: border-box; overflow: visible; }
+        .address-field:first-child { margin-top: 2px; }
+        .address-field:last-child { margin-bottom: 2px; }
+        .hidden { display: none !important; }
+        .file-upload-container { margin: 20px 0; }
+        .file-upload-dropzone { border: 2px dashed #2f7bff; border-radius: 12px; padding: 40px 20px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.3s ease; }
+        .file-upload-dropzone:hover { background-color: #e9ecef; border-color: #0d4ed8; }
+        .file-upload-dropzone.file-upload-dragover { background-color: #e3f2fd; border-color: #0d4ed8; border-style: solid; }
+        .file-upload-content { pointer-events: none; }
+        .file-upload-text { margin: 8px 0; color: #2c3e50; font-size: 16px; font-weight: 500; }
+        .file-upload-link { color: #2f7bff; text-decoration: underline; cursor: pointer; pointer-events: auto; }
+        .file-upload-link:hover { color: #0d4ed8; }
+        .file-upload-hint { margin: 4px 0 0 0; color: #6c757d; font-size: 14px; }
+        .file-upload-preview { margin-top: 20px; border: 1px solid #dee2e6; border-radius: 8px; background-color: #ffffff; padding: 16px; }
+        .file-upload-preview-body { margin-bottom: 12px; }
+        .file-upload-cancel { background: #dc3545; color: white; border: none; border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s ease; }
+        .file-upload-cancel:hover { background: #c82333; }
+        .file-upload-add { background: #28a745; color: white; border: none; border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s ease; }
+        .file-upload-add:hover { background: #218838; }
+        .file-upload-item { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #dee2e6; }
+        .file-upload-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .file-upload-item-header { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 10px; width: auto; max-width: 100%; }
+        .file-upload-item-title { font-weight: 600; color: #2c3e50; font-size: 14px; flex-shrink: 0; white-space: nowrap; }
+        .file-upload-item-remove { background: #dc3545; color: white; border: none; border-radius: 4px; padding: 4px 12px; cursor: pointer; font-size: 12px; font-weight: 500; transition: background 0.2s ease; flex-shrink: 0; }
+        .file-upload-item-remove:hover { background: #c82333; }
+        .file-upload-preview-body img { max-width: 100%; max-height: 400px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .file-upload-preview-body iframe { width: 100%; height: 500px; border: 1px solid #dee2e6; border-radius: 8px; }
+        .signin-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 10000; display: none; align-items: center; justify-content: center; }
+        .signin-modal { background-color: #ffffff; border-radius: 12px; padding: 32px; max-width: 500px; width: 90%; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); text-align: center; position: relative; }
+        .signin-modal h2 { margin: 0 0 16px 0; color: #2c3e50; font-size: 24px; font-weight: 700; }
+        .signin-modal p { margin: 0 0 24px 0; color: #5a6c7d; font-size: 16px; line-height: 1.5; }
+        .signin-modal-button { background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #ffffff; border: none; padding: 14px 32px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(47, 123, 255, 0.3); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .signin-modal-button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(47, 123, 255, 0.4); }
+        .signin-modal-button:active { transform: translateY(0); }
+        
+        /* ===== HEADER AND FOOTER CSS ===== */
+        /* Header Base Styles */
+        header {
+            background-color: #2c3e50;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        header img {
+            cursor: pointer;
+        }
+        
+        /* Desktop Navigation Base Styles */
+        nav.desktop-nav {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 38px;
+            z-index: 2;
+        }
+        nav.desktop-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9em;
+            letter-spacing: 0.02em;
+            padding: 2px 8px;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s, font-size 0.2s ease, letter-spacing 0.2s ease;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+        }
+        nav.desktop-nav a:hover {
+            color: #ff7043;
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+        }
+        
+        /* Navigation Chevron (SVG Icons) */
+        .nav-chevron {
+            display: inline-block;
+            margin-left: 6px;
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+        }
+        .nav-chevron svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Header Actions (Sign In Button and Cart) */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-left: auto;
+        }
+        .sign-in-btn {
+            background: #fff;
+            color: #222;
+            font-weight: 700;
+            font-size: 1.08em;
+            border: none;
+            border-radius: 22px;
+            padding: 8px 28px;
+            margin-left: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            outline: none;
+        }
+        .sign-in-btn:hover {
+            background: #f4f4f4;
+            color: #2980b9;
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+        }
+        
+        /* Cart Icon Styles */
+        #cart-icon-link .cart-circle {
+            width: 54px !important;
+            height: 54px !important;
+            background: #2980b9;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        #cart-icon {
+            width: 32px !important;
+            height: 32px !important;
+            display: block;
+        }
+        
+        /* Desktop Dropdown Menu */
+        .nav-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 38px;
+            background: #fff;
+            min-width: 210px;
+            box-shadow: 0 4px 24px rgba(44,62,80,0.13);
+            border-radius: 10px;
+            z-index: 10;
+            padding: 12px 0;
+            flex-direction: column;
+            gap: 0;
+        }
+        .dropdown-menu a {
+            color: #222;
+            padding: 12px 28px;
+            text-decoration: none;
+            display: block;
+            font-weight: 600;
+            font-size: 1.08em;
+            border-radius: 0;
+            transition: background 0.18s, color 0.18s;
+        }
+        .dropdown-menu a:hover {
+            background: #eaf1f8;
+            color: #2980b9;
+        }
+        .nav-dropdown-wrapper.open .dropdown-menu {
+            display: flex;
+            animation: dropdownFadeIn 0.22s cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .forms-chevron {
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+        }
+        .nav-dropdown-wrapper.open .forms-chevron {
+            transform: rotate(-90deg);
+        }
+        
+        /* Desktop Navigation Visibility */
+        .desktop-nav {
+            display: flex;
+        }
+        
+        /* Mobile Menu Toggle (Hamburger Button) */
+        .mobile-menu-toggle {
+            display: none !important;
+            flex-direction: column !important;
+            justify-content: space-around !important;
+            width: 30px !important;
+            height: 30px !important;
+            background: transparent !important;
+            border: none !important;
+            cursor: pointer !important;
+            padding: 0 !important;
+            z-index: 1001 !important;
+            position: absolute !important;
+            left: 15px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+        }
+        .mobile-menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            transform-origin: 1px;
+        }
+        .mobile-menu-toggle.active span:first-child {
+            transform: rotate(45deg);
+        }
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .mobile-menu-toggle.active span:last-child {
+            transform: rotate(-45deg);
+        }
+        
+        /* Mobile Navigation Menu */
+        .mobile-nav {
+            display: none !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: -100% !important;
+            width: 85% !important;
+            max-width: 300px !important;
+            height: 100vh !important;
+            background: #2c3e50 !important;
+            flex-direction: column !important;
+            gap: 0 !important;
+            padding: 140px 20px 20px 20px !important;
+            transition: left 0.3s ease !important;
+            z-index: 1000 !important;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3) !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            transform: none !important;
+            margin: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            right: auto !important;
+        }
+        .mobile-nav.active {
+            left: 0 !important;
+            display: flex !important;
+            right: auto !important;
+            transform: none !important;
+            margin-left: 0 !important;
+            position: fixed !important;
+        }
+        
+        /* Main Navigation Links (Home, About Us, Contact Us, FAQ) */
+        .mobile-nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 0 12px 25px;
+            border-bottom: 1px solid #34495e;
+            font-size: 1.1em;
+            font-weight: 600;
+            line-height: 1.1;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            margin-top: 0;
+        }
+        
+        /* Navigation Section Container */
+        .mobile-nav-section {
+            border-bottom: 1px solid #34495e;
+        }
+        
+        /* Dropdown Toggle (Forms with ▼) */
+        .mobile-nav-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            padding: 15px 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .mobile-nav-toggle span {
+            transition: transform 0.3s ease;
+        }
+        .mobile-nav-toggle.active span {
+            transform: rotate(180deg);
+        }
+        
+        /* Submenu Container (My Forms, Free Form, etc.) */
+        .mobile-nav-submenu {
+            display: none;
+            padding-left: 20px;
+        }
+        .mobile-nav-submenu.active {
+            display: block;
+        }
+        
+        /* Submenu Items (Free Form, Immigration, Small Claims, Other) */
+        .mobile-nav-submenu a {
+            padding: 10px 0 10px 45px;
+            font-size: 1em;
+            border-bottom: 1px solid #34495e;
+            line-height: 1.1;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* CRITICAL: First Submenu Item ("My Forms") Vertical Centering */
+        .mobile-nav-submenu a:first-child {
+            border-top: 1px solid #34495e;
+            margin-top: 0px;
+            padding-top: 30px;
+            padding-bottom: 0;
+        }
+        
+        /* Logout Button Styling */
+        .mobile-nav-logout,
+        .mobile-nav-logout a,
+        #mobile-logout-btn {
+            color: #ff7043 !important;
+            font-weight: 700 !important;
+        }
+        
+        /* Mobile Overlay (Dark background when menu is open) */
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .mobile-nav-overlay.active {
+            display: block;
+        }
+        
+        /* Footer Base Styles (Desktop) */
+        .pro-footer {
+            background: #2c3e50;
+            color: #f3f7f8;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 60px;
+            padding: 48px 10vw 20px 10vw;
+            border-top: 2px solid #2c3e50;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.18em;
+            margin-top: 0;
+        }
+        .pro-footer-col {
+            flex: 1 1 320px;
+            min-width: 220px;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .address-col {
+            border-right: 1.5px solid #2c7a7d;
+            padding-right: 48px;
+            align-items: flex-start;
+        }
+        .nav-col {
+            align-items: flex-start;
+            padding-left: 32px;
+            padding-right: 32px;
+            border-right: 1.5px solid #2c7a7d;
+        }
+        .company-col {
+            align-items: flex-start;
+            padding-left: 48px;
+        }
+        .pro-footer-title {
+            font-weight: 700;
+            font-size: 1.25em;
+            margin-bottom: 6px;
+            color: #fff;
+            letter-spacing: 0.02em;
+        }
+        .company-title {
+            margin-top: 8px;
+            margin-bottom: 0;
+        }
+        .pro-footer-contact a {
+            color: #b6e2e6;
+            text-decoration: underline;
+            font-weight: 500;
+            margin-right: 18px;
+            transition: color 0.2s;
+        }
+        .pro-footer-contact a:hover, .pro-footer-col.nav-col a:hover {
+            color: #ff7043;
+        }
+        .pro-footer-logo {
+            margin-bottom: 8px;
+        }
+        .pro-footer-desc {
+            color: #e0e6ea;
+            font-size: 1em;
+            margin-top: 0;
+            line-height: 1.5;
+        }
+        .pro-footer-col.nav-col a {
+            color: #b6e2e6;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 6px;
+            transition: color 0.2s;
+            font-size: 1em;
+        }
+        .pro-footer-col.nav-col a:not(:last-child) {
+            margin-bottom: 8px;
+        }
+        .pro-footer, footer {
+            flex-shrink: 0;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #374656;
+            color: white;
+        }
+        
+        /* Desktop nav: progressively smaller text/gaps before hamburger layout */
+        @media (max-width: 1240px) {
+            nav.desktop-nav { gap: 28px; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.84em; }
+            .nav-chevron { width: 13px; height: 13px; margin-left: 5px; }
+        }
+        @media (max-width: 1120px) {
+            nav.desktop-nav { gap: 20px; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.8em; }
+            .dropdown-menu { top: 36px; }
+            .dropdown-menu a { font-size: 1em; padding: 10px 22px; }
+        }
+        @media (max-width: 1040px) {
+            nav.desktop-nav { gap: 14px; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.76em; letter-spacing: 0.015em; }
+            .nav-chevron { width: 12px; height: 12px; margin-left: 4px; }
+        }
+        @media (max-width: 1000px) {
+            nav.desktop-nav { gap: 9px; }
+            nav.desktop-nav a, .desktop-nav .nav-dropdown-wrapper > a { font-size: 0.72em; letter-spacing: 0.01em; padding: 2px 4px; }
+            .nav-chevron { width: 11px; height: 11px; margin-left: 3px; }
+            .dropdown-menu { min-width: 188px; top: 34px; }
+            .dropdown-menu a { font-size: 0.94em; padding: 9px 18px; }
+        }
+        
+        /* Mobile layout (hamburger): switches sooner than 768px */
+        /* Mobile Responsive Breakpoint - hamburger earlier */
+        @media (max-width: 1200px) {
+            /* Show mobile menu toggle */
+            .mobile-menu-toggle {
+                display: flex !important;
+                position: absolute !important;
+                left: 15px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                z-index: 1001 !important;
+            }
+            
+            /* Hide desktop nav */
+            .desktop-nav {
+                display: none !important;
+            }
+            
+            /* Show mobile nav structure */
+            .mobile-nav {
+                display: flex !important;
+            }
+            
+            .mobile-nav.active {
+                left: 0 !important;
+                right: auto !important;
+                transform: none !important;
+                position: fixed !important;
+                margin-left: 0 !important;
+            }
+            
+            /* Typography adjustments */
+            html {
+                font-size: 14px !important;
+            }
+            
+            body {
+                overflow-x: hidden;
+            }
+            
+            /* Header mobile optimization */
+            header {
+                padding: 16px 15px;
+                min-height: 80px;
+                flex-wrap: wrap;
+                gap: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                position: relative;
+            }
+            
+            header img {
+                width: 119px;
+                height: 73px;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            
+            /* Header actions mobile */
+            .header-actions {
+                gap: 10px;
+                margin-left: auto;
+                margin-right: 15px;
+            }
+            
+            .sign-in-btn {
+                font-size: 0.9em;
+                padding: 6px 20px;
+                margin-left: 0;
+            }
+            
+            #cart-icon-link .cart-circle {
+                width: 55px !important;
+                height: 55px !important;
+            }
+            
+            #cart-icon {
+                width: 30px !important;
+                height: 30px !important;
+            }
+            
+            /* Hide desktop sign-in/logout buttons on mobile */
+            #logout-btn,
+            .sign-in-btn {
+                display: none !important;
+            }
+            
+            /* Footer mobile - hide navigation column */
+            .pro-footer-col.nav-col {
+                display: none !important;
+            }
+            
+            /* Footer mobile - match homepage layout (two columns side-by-side) */
+            .pro-footer {
+                gap: 20px !important;
+                padding: 30px 20px 15px 20px !important;
+                flex-direction: row !important;
+                align-items: flex-start !important;
+                text-align: left !important;
+            }
+            
+            /* Reset column constraints for mobile */
+            .pro-footer-col {
+                min-width: unset !important;
+                max-width: unset !important;
+                padding: 0 !important;
+                align-items: flex-start !important;
+                text-align: left !important;
+            }
+            
+            /* Address column - branding centered in column */
+            .pro-footer-col.address-col {
+                padding-right: 0 !important;
+                border-right: 1.5px solid #2c7a7d !important;
+                align-items: center !important;
+                text-align: center !important;
+            }
+            .pro-footer-col.address-col .pro-footer-logo {
+                display: flex !important;
+                justify-content: center !important;
+                width: 100% !important;
+            }
+            .pro-footer-col.address-col .pro-footer-title {
+                text-align: center !important;
+                width: 100% !important;
+            }
+            .pro-footer-col.address-col .pro-footer-contact {
+                align-items: center !important;
+                text-align: center !important;
+            }
+            
+            /* Company column - add left padding for spacing */
+            .pro-footer-col.company-col {
+                padding-left: 20px !important;
+                border-right: none !important;
+            }
+            
+            /* Contact info - stack vertically */
+            .pro-footer-contact {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            
+            /* Contact links - remove horizontal margin */
+            .pro-footer-contact a {
+                margin-right: 0 !important;
+            }
+            
+            /* Footer copyright - consistent padding */
+            footer {
+                padding: 20px !important;
+                padding-bottom: 20px !important;
+                margin-bottom: 0 !important;
+            }
+            
+            /* Prevent white space below footer */
+            html, body {
+                margin-bottom: 0 !important;
+                padding-bottom: 0 !important;
+            }
+            
+            .pro-footer, footer {
+                margin-bottom: 0 !important;
+            }
+        }
+        
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            nav a {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .sign-in-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+    </style>
+    <script>
+      // Phone formatter: Phone Number
+      window.updatePhoneSplitFields = window.updatePhoneSplitFields || function(inputEl) {
+        if (!inputEl) return;
+        const id = inputEl.id || inputEl.name;
+        if (!id) return;
+        const digits = (inputEl.value || "").replace(/\D/g, "").slice(0, 10);
+        const match = id.match(/^(.*)_([0-9]+)$/);
+        const base = match ? match[1] : id;
+        const suffix = match ? "_" + match[2] : "";
+        const codeField = document.getElementById(base + "_code" + suffix);
+        const noCodeField = document.getElementById(base + "_no_code" + suffix);
+        if (!codeField && !noCodeField) return;
+        const area = digits.slice(0, 3);
+        const rest = digits.slice(3);
+        const codeValue = area ? "(" + area + ")" : "";
+        let noCodeValue = "";
+        if (rest.length > 0) {
+          if (rest.length <= 3) {
+            noCodeValue = rest;
+          } else {
+            noCodeValue = rest.slice(0, 3) + "-" + rest.slice(3, 7);
+          }
+        }
+        if (codeField) codeField.value = codeValue;
+        if (noCodeField) noCodeField.value = noCodeValue;
+      };
+      window.formatPhoneInput = window.formatPhoneInput || function(inputEl) {
+        if (!inputEl) return;
+        const digits = (inputEl.value || "").replace(/\D/g, "").slice(0, 10);
+        let formatted = "";
+        if (digits.length > 0) {
+          formatted += "(" + digits.slice(0, Math.min(3, digits.length));
+          if (digits.length >= 3) formatted += ")";
+        }
+        if (digits.length > 3) {
+          formatted += "-" + digits.slice(3, Math.min(6, digits.length));
+        }
+        if (digits.length > 6) {
+          formatted += "-" + digits.slice(6, 10);
+        }
+        inputEl.value = formatted;
+        window.updatePhoneSplitFields(inputEl);
+      };
+    </script>
+    <link rel="stylesheet" href="../../Pages/sidecart-unified.css">
+
+<style id="sc100-packet-styles">
+  :root {
+    --packet-bg: #d5dde8;
+    --packet-card: #ffffff;
+    --packet-border: #8fa3bd;
+    --packet-header: #dfeaf8;
+    --packet-ink: #203149;
+    --packet-muted: #52657d;
+    --packet-blue: #1f67d2;
+    --packet-blue-dark: #174ea6;
+    --packet-danger: #9b1c1c;
+  }
+  body { background: var(--packet-bg) !important; }
+  #questions.packet-page { background: var(--packet-bg); padding: 28px 16px 56px; }
+  #box.packet-shell { width: min(1040px, 100%); margin: 0 auto !important; padding: 0 !important; }
+  #customForm { width: 100%; }
+  .packet-hero { margin: 0 auto 22px; text-align: center; }
+  .packet-hero h1 { margin: 0; color: var(--packet-ink); font-size: clamp(1.65rem, 3vw, 2.45rem); line-height: 1.18; }
+  .packet-section { background: var(--packet-card); border: 2px solid var(--packet-border); border-radius: 16px; margin: 18px auto; overflow: hidden; box-shadow: 0 8px 22px rgba(31,49,73,.10); }
+  .packet-section-header { margin: 0; padding: 16px 20px; background: var(--packet-header); border-bottom: 2px solid var(--packet-border); color: var(--packet-ink); font-size: 1.18rem; text-align: center; }
+  .packet-section-body { padding: 22px; }
+  .question-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
+  .question-card { display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 0; }
+  .question-card.full { grid-column: 1 / -1; }
+  .question-card h3, .question-card label.question-label { display: block; margin: 0 0 8px; color: var(--packet-ink); font-size: 1rem; font-weight: 700; line-height: 1.4; }
+  .help-text { margin: 0 0 10px; color: var(--packet-muted); font-size: .9rem; line-height: 1.45; max-width: 650px; }
+  .packet-control { width: min(100%, 420px); min-height: 46px; border: 2px solid #6f849c !important; border-radius: 9px; background: #fff !important; color: #17263a; padding: 10px 12px; box-sizing: border-box; font: inherit; text-align: left; }
+  select.packet-control { text-align: center; cursor: pointer; }
+  textarea.packet-control { min-height: 108px; resize: vertical; }
+  .packet-control:focus { outline: 3px solid rgba(31,103,210,.22); border-color: var(--packet-blue) !important; }
+  .party-card { border: 2px solid #b7c5d8; border-radius: 14px; margin: 0 0 18px; background: #f8fafc; overflow: hidden; }
+  .party-card:last-child { margin-bottom: 0; }
+  .party-title { margin: 0; padding: 12px 16px; text-align: center; color: var(--packet-ink); background: #edf3fb; border-bottom: 1px solid #b7c5d8; font-size: 1.05rem; }
+  .party-body { padding: 18px; }
+  .conditional-panel { grid-column: 1 / -1; background: #f0f5fb; border: 1px solid #9fb2ca; border-radius: 12px; padding: 18px; }
+  .conditional-panel.is-hidden, .is-hidden { display: none !important; }
+  .conditional-panel h4 { margin: 0 0 16px; color: var(--packet-ink); text-align: center; }
+  .packet-note { margin: 12px auto 0; max-width: 760px; padding: 12px 14px; border-left: 5px solid var(--packet-blue); background: #eef5ff; color: var(--packet-ink); line-height: 1.45; }
+  .packet-warning { border-left-color: #c27b00; background: #fff7e5; }
+  .packet-summary { margin: 0; padding-left: 22px; color: var(--packet-ink); line-height: 1.7; }
+  .packet-summary strong { color: var(--packet-blue-dark); }
+  .submit-row { display: flex; justify-content: center; margin-top: 24px; }
+  .packet-submit { border: 0; border-radius: 10px; background: linear-gradient(135deg, #2f7bff, #0d4ed8); color: #fff; padding: 14px 32px; font-size: 1rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 18px rgba(13,78,216,.24); }
+  .packet-submit:hover { background: linear-gradient(135deg, #246ae2, #083ea9); }
+  .packet-submit:disabled { opacity: .62; cursor: wait; }
+  .packet-status { margin: 14px auto 0; min-height: 24px; max-width: 720px; text-align: center; color: var(--packet-ink); font-weight: 700; }
+  .packet-status.error { color: var(--packet-danger); }
+  .manual-signature-list { margin: 8px auto 0; max-width: 720px; text-align: left; color: var(--packet-ink); line-height: 1.6; }
+  @media (max-width: 760px) {
+    #questions.packet-page { padding: 18px 10px 38px; }
+    .packet-section-body, .party-body { padding: 16px 12px; }
+    .question-grid { grid-template-columns: 1fr; }
+    .question-card.full, .conditional-panel { grid-column: 1; }
+    .packet-control { width: min(100%, 420px); }
+  }
+</style>
+
+</head>
+<body>
+<script>window.__FORM_SKIP_SIGNIN_GATE__=true;</script>
+<script>
+/*──────── mirror a dropdown → textbox and checkbox ────────*/
+function dropdownMirror(selectEl, baseName){
+    const wrap = document.getElementById("dropdowntext_"+baseName);
+    if(!wrap) {
+        return;
+    }
+    const val = selectEl.value.trim();
+    if(!val) {
+        // When value is cleared, we need to dispatch events for any checkboxes that were removed
+        const existingCheckboxes = wrap.querySelectorAll('input[type="checkbox"]');
+        const removedCheckboxIds = [];
+        existingCheckboxes.forEach(checkbox => {
+            removedCheckboxIds.push(checkbox.id);
+        });
+        wrap.innerHTML = "";
+        // Dispatch events for removed checkboxes so conditional logic can re-evaluate
+        if (removedCheckboxIds.length > 0) {
+            const lastUnderscoreIndex = baseName.lastIndexOf('_');
+            if (lastUnderscoreIndex !== -1) {
+                const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+                if (/^[0-9]+$/.test(potentialEntryNumber)) {
+                    const entryNumber = parseInt(potentialEntryNumber);
+                    removedCheckboxIds.forEach(checkboxId => {
+                        const triggerDropdownEvent = new CustomEvent('triggerDropdownChanged', {
+                            detail: {
+                                entryNumber: entryNumber,
+                                checkboxId: checkboxId,
+                                baseName: baseName,
+                                removed: true
+                            }
+                        });
+                        window.dispatchEvent(triggerDropdownEvent);
+                    });
+                }
+            }
+        }
+        return;
+    }
+    const textId = baseName + "_dropdown";
+    const textField = document.getElementById(textId);
+    if(textField) {
+        textField.value = val;
+        textField.style.display = "none";
+    }
+    const existingCheckboxes = wrap.querySelectorAll("div");
+    existingCheckboxes.forEach(div => div.remove());
+    // Sanitize option value: replace all non-word characters (including spaces) with underscores
+    const idSuffix = val.replace(/[^A-Za-z0-9_]+/g, "_").toLowerCase().replace(/^_+|_+$/g, '');
+    // Check if baseName ends with an entry number (for numbered dropdowns or trigger sequence dropdowns)
+    const lastUnderscoreIndex = baseName.lastIndexOf('_');
+    let checkboxId;
+    if (lastUnderscoreIndex !== -1) {
+        const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+        if (/^[0-9]+$/.test(potentialEntryNumber)) {
+            const baseWithoutEntry = baseName.substring(0, lastUnderscoreIndex);
+            const underscoreCount = (baseWithoutEntry.match(/_/g) || []).length;
+            if (underscoreCount >= 1) {
+                checkboxId = baseWithoutEntry + "_" + idSuffix + "_" + potentialEntryNumber;
+            } else {
+                const fieldName = baseWithoutEntry;
+                const entryNumber = potentialEntryNumber;
+                checkboxId = fieldName + "_" + idSuffix + "_" + entryNumber;
+            }
+        } else {
+            checkboxId = baseName + "_" + idSuffix;
+        }
+    } else {
+        checkboxId = baseName + "_" + idSuffix;
+    }
+    const checkboxDiv = document.createElement("div");
+    checkboxDiv.style.display = "none";
+    checkboxDiv.innerHTML = "<input type='checkbox' id='" + checkboxId + "' name='" + checkboxId + "' checked>" +
+                     "<label for='" + checkboxId + "'> " + baseName + "_" + idSuffix + "</label>";
+    wrap.appendChild(checkboxDiv);
+    const newCheckbox = document.getElementById(checkboxId);
+    if (newCheckbox) {
+        setTimeout(() => {
+            const changeEvent = new Event('change', { bubbles: true });
+            newCheckbox.dispatchEvent(changeEvent);
+            const lastUnderscoreIndex = baseName.lastIndexOf('_');
+            if (lastUnderscoreIndex !== -1) {
+                const potentialEntryNumber = baseName.substring(lastUnderscoreIndex + 1);
+                if (/^[0-9]+$/.test(potentialEntryNumber)) {
+                    const entryNumber = parseInt(potentialEntryNumber);
+                    const triggerDropdownEvent = new CustomEvent('triggerDropdownChanged', {
+                        detail: {
+                            entryNumber: entryNumber,
+                            checkboxId: checkboxId,
+                            baseName: baseName
+                        }
+                    });
+                    window.dispatchEvent(triggerDropdownEvent);
+                }
+            }
+        }, 50);
+        const linkedCheckboxesArray = (typeof linkedCheckboxes !== 'undefined' && linkedCheckboxes) ? linkedCheckboxes : [];
+        if (linkedCheckboxesArray && linkedCheckboxesArray.length > 0) {
+            linkedCheckboxesArray.forEach(linkedCheckboxGroup => {
+                const checkboxIds = linkedCheckboxGroup.checkboxes || [];
+                if (checkboxIds.includes(checkboxId)) {
+                    const linkedCheckboxId = linkedCheckboxGroup.linkedCheckboxId;
+                    newCheckbox.addEventListener('change', function() {
+                        if (typeof window.updateAllLinkedCheckboxes === 'function') {
+                            window.updateAllLinkedCheckboxes();
+                        }
+                    });
+                }
+            });
+        }
+        if (typeof window.updateAllLinkedCheckboxes === 'function') {
+            setTimeout(() => {
+                const verifyCheckbox = document.getElementById(checkboxId);
+                if (verifyCheckbox) {
+                    window.updateAllLinkedCheckboxes();
+                    if (typeof window.updateAllInverseCheckboxes === 'function') {
+                        window.updateAllInverseCheckboxes();
+                    }
+                }
+            }, 200);
+        }
+    }
+    if (typeof handleLinkedDropdowns === 'function') {
+        handleLinkedDropdowns(baseName, val);
+    }
+}
+</script>
+<header>
+    <!-- Mobile hamburger menu button -->
+    <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <!-- Logo -->
+    <img src="logo.png" alt="Form-Star Logo" width="130" height="80" onclick="location.href='../../index.html';">
+    
+    <!-- Desktop Navigation -->
+    <nav class="desktop-nav">
+        <a href="../../index.html">Home
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <div class="nav-dropdown-wrapper" id="forms-dropdown-wrapper">
+            <a href="#" id="forms-nav-link">Forms
+                <span class="nav-chevron forms-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+            <div class="dropdown-menu" id="forms-dropdown-menu">
+                <a href="../../Pages/forms.html">My Forms</a>
+                <a href="../../Pages/FreeForm.html">Free Form</a>
+                <a href="../../Pages/Immigration.html">Immigration</a>
+                <a href="../../Pages/smallclaims.html">Small Claims</a>
+                <a href="../../Pages/Other.html">Other</a>
+            </div>
+        </div>
+        <a href="../../Pages/about.html">About Us
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <a href="../../Pages/contact.html">Contact Us
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <a href="../../Pages/FAQ.html">FAQ
+            <span class="nav-chevron"><svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+    </nav>
+    
+    <!-- Mobile Navigation Menu -->
+    <nav class="mobile-nav" id="mobile-nav">
+        <a href="../../index.html">Home</a>
+        <div class="mobile-nav-section">
+            <a href="#" class="mobile-nav-toggle" id="mobile-forms-toggle">Forms <span>▼</span></a>
+            <div class="mobile-nav-submenu" id="mobile-forms-menu">
+                <a href="../../Pages/forms.html">My Forms</a>
+                <a href="../../Pages/FreeForm.html">Free Form</a>
+                <a href="../../Pages/Immigration.html">Immigration</a>
+                <a href="../../Pages/smallclaims.html">Small Claims</a>
+                <a href="../../Pages/Other.html">Other</a>
+            </div>
+        </div>
+        <a href="../../Pages/about.html">About Us</a>
+        <a href="../../Pages/contact.html">Contact Us</a>
+        <a href="../../Pages/FAQ.html">FAQ</a>
+        <div class="mobile-nav-section" id="mobile-auth-section" style="display: none;">
+            <a href="#" id="mobile-logout-btn" class="mobile-nav-logout">Log Out</a>
+        </div>
+    </nav>
+    
+    <!-- Header Actions (Sign In Button and Cart) -->
+    <div class="header-actions">
+        <a href="../../Pages/account.html" class="sign-in-btn" id="sign-in-btn">Sign In</a>
+        <a href="#" class="sign-in-btn" id="logout-btn" style="display:none;">Log Out</a>
+        <a href="#" id="cart-icon-link" style="display: inline-flex; align-items: center; text-decoration: none; position: relative;">
+            <span class="cart-circle">
+                <svg id="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="10" cy="21" r="1.5"/>
+                    <circle cx="18" cy="21" r="1.5"/>
+                    <path d="M2.5 4H5l2.68 13.39a2 2 0 0 0 2 1.61h7.72a2 2 0 0 0 2-1.61L21.5 7H6.16"/>
+                </svg>
+                <span id="cart-count-badge" style="display: none; position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; background: #e74c3c; color: #fff; border-radius: 50%; font-size: 1em; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(44,62,80,0.13); z-index: 2; text-align: center;"></span>
+            </span>
+        </a>
+    </div>
+</header>
+
+    <!-- Sliding Cart Menu -->
+    <div class="cart-overlay" id="cart-overlay">
+        <div class="cart-side-menu" id="cart-side-menu">
+            <div class="cart-header">
+                <h2>Cart</h2>
+                <button class="cart-close-btn" id="cart-close-btn" type="button" aria-label="Close cart">&times;</button>
+            </div>
+            <div class="cart-content" id="cart-content">
+                <div class="cart-items-list" id="cart-items-list" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+<div id="pdfPreview" style="display:none;">
+    <iframe id="pdfFrame" style="display:none"></iframe>
+</div>
+
+<!-- Firebase includes -->
+<script src="https://js.stripe.com/v3/"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="/Pages/cart.js"></script>
+
+<script>
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDS-tSSn7fdLBgwzfHQ_1MPG1w8S_4qb04",
+    authDomain: "formwiz-3f4fd.firebaseapp.com",
+    projectId: "formwiz-3f4fd",
+    storageBucket: "formwiz-3f4fd.firebasestorage.app",
+    messagingSenderId: "404259212529",
+    appId: "1:404259212529:web:15a33bce82383b21cfed50",
+    measurementId: "G-P07YEN0HPD"
+};
+
+// Initialize Firebase
+if (typeof firebase !== "undefined" && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const auth = firebase.auth();
+
+// Auth state management
+if (typeof firebase !== "undefined" && firebase.apps.length > 0) {
+    if (typeof isUserLoggedIn === "undefined") { var isUserLoggedIn = false; }
+    if (typeof userId === "undefined") { var userId = null; }
+    auth.onAuthStateChanged(function(user) {
+        isUserLoggedIn = !!user;
+        userId = user ? user.uid : null;
+        updateAuthButtons(user);
+        updateCartCountBadge();
+    });
+} else {
+    // Fallback for when Firebase is not available
+}
+
+// Function to update button display based on auth state
+function updateAuthButtons(user) {
+    const signInBtn = document.getElementById("sign-in-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    
+    if (user) {
+        if (signInBtn) signInBtn.style.display = "none";
+        if (logoutBtn) logoutBtn.style.display = "inline-block";
+    } else {
+        if (signInBtn) signInBtn.style.display = "inline-block";
+        if (logoutBtn) logoutBtn.style.display = "none";
+    }
+}
+
+// Update cart count badge in header
+function updateCartCountBadge() {
+    const cartCountElement = document.getElementById("cart-count-badge");
+    if (cartCountElement) {
+        let count = 0;
+        
+        // Try to get count from getCartCount function first
+        if (typeof getCartCount === "function") {
+            count = getCartCount();
+        } else {
+            // Fallback to localStorage
+            try {
+                const cartData = localStorage.getItem("formwiz_cart");
+                if (cartData) {
+                    const cart = JSON.parse(cartData);
+                    count = Array.isArray(cart) ? cart.length : 0;
+                }
+            } catch (e) {
+                count = 0;
+            }
+        }
+        
+        // Always update the text content, even if count is 0
+        cartCountElement.textContent = count;
+        
+        if (count > 0) {
+            cartCountElement.style.display = "flex";
+        } else {
+            cartCountElement.style.display = "none";
+        }
+    }
+}
+
+// Initialize cart count badge on page load
+document.addEventListener("DOMContentLoaded", function() {
+    updateCartCountBadge();
+    // Update cart count every 5 seconds
+    setInterval(updateCartCountBadge, 5000);
+    // Restore uploaded files from storage
+    if (typeof restoreUploadedFilesFromStorage === "function") {
+      restoreUploadedFilesFromStorage();
+    }
+});
+</script>
+
+<div style="width: 80%; max-width: 800px; margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: none;">
+    <h3 style="text-align: center; margin-bottom: 15px; color: #2c3e50;">Your Information</h3>
+    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+        <div style="flex: 1;">
+            <label for="user_firstname" style="display: block; margin-bottom: 5px; font-weight: bold;">First Name</label>
+            <input type="text" form="customForm" id="user_firstname" name="user_firstname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="flex: 1;">
+            <label for="user_lastname" style="display: block; margin-bottom: 5px; font-weight: bold;">Last Name</label>
+            <input type="text" form="customForm" id="user_lastname" name="user_lastname" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+    </div>
+    <div style="margin-bottom: 15px;">
+        <label for="user_email" style="display: block; margin-bottom: 5px; font-weight: bold;">Email Address</label>
+        <input type="email" form="customForm" id="user_email" name="user_email" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+    <div style="margin-bottom: 15px;">
+        <label for="user_phone" style="display: block; margin-bottom: 5px; font-weight: bold;">Phone Number</label>
+        <input type="tel" form="customForm" id="user_phone" name="user_phone" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+    <div style="margin-bottom: 15px;">
+        <label for="user_street" style="display: block; margin-bottom: 5px; font-weight: bold;">Street Address</label>
+        <input type="text" form="customForm" id="user_street" name="user_street" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+        <div style="flex: 2;">
+            <label for="user_city" style="display: block; margin-bottom: 5px; font-weight: bold;">City</label>
+            <input type="text" form="customForm" id="user_city" name="user_city" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="flex: 1;">
+            <label for="user_state" style="display: block; margin-bottom: 5px; font-weight: bold;">State</label>
+            <input type="text" form="customForm" id="user_state" name="user_state" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="flex: 1;">
+            <label for="user_zip" style="display: block; margin-bottom: 5px; font-weight: bold;">ZIP</label>
+            <input type="text" form="customForm" id="user_zip" name="user_zip" maxlength="5" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+    </div>
+</div>
+
+<div id="questions" class="packet-page">
+  <main id="box" class="packet-shell">
+    <form id="customForm" novalidate>
+      <div class="packet-hero"><h1>Small Claims Court Filing Packet (SC-100)</h1></div>
+
+      <section class="packet-section" aria-labelledby="court-heading">
+        <h2 class="packet-section-header" id="court-heading">Court and packet size</h2>
+        <div class="packet-section-body question-grid">
+          <div class="question-card full">
+            <label class="question-label" for="court_name_ui">What is the name of the court where you are filing?</label>
+            <input class="packet-control" id="court_name_ui" type="text" placeholder="Superior Court of California, County of..." required>
+          </div>
+          <div class="question-card full">
+            <label class="question-label" for="court_address_ui">What is the court's street address?</label>
+            <textarea class="packet-control" id="court_address_ui" placeholder="Street address, city, state, and ZIP code" required></textarea>
+          </div>
+          <div class="question-card">
+            <label class="question-label" for="plaintiff_count">How many plaintiffs are filing this claim?</label>
+            <p class="help-text">Count yourself and anyone else filing with you.</p>
+            <select class="packet-control" id="plaintiff_count" required>
+              <option value="">Select a number</option>
+              <option value="1">1 plaintiff</option><option value="2">2 plaintiffs</option><option value="3">3 plaintiffs</option>
+              <option value="4">4 plaintiffs</option><option value="5">5 plaintiffs</option><option value="6">6 plaintiffs</option>
+            </select>
+          </div>
+          <div class="question-card">
+            <label class="question-label" for="defendant_count">How many defendants are you suing?</label>
+            <select class="packet-control" id="defendant_count" required>
+              <option value="">Select a number</option>
+              <option value="1">1 defendant</option><option value="2">2 defendants</option><option value="3">3 defendants</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="packet-section" id="plaintiffs_section" aria-labelledby="plaintiffs-heading">
+        <h2 class="packet-section-header" id="plaintiffs-heading">Plaintiffs</h2>
+        <div class="packet-section-body" id="plaintiff_cards">
+          <p class="packet-note">Choose the number of plaintiffs above to add their questions.</p>
+        </div>
+      </section>
+
+      <section class="packet-section" id="defendants_section" aria-labelledby="defendants-heading">
+        <h2 class="packet-section-header" id="defendants-heading">Defendants</h2>
+        <div class="packet-section-body" id="defendant_cards">
+          <p class="packet-note">Choose the number of defendants above to add their questions.</p>
+        </div>
+      </section>
+
+      <section class="packet-section is-hidden" id="military_attachment_panel" aria-labelledby="military-heading">
+        <h2 class="packet-section-header" id="military-heading">Military service details</h2>
+        <div class="packet-section-body question-grid">
+          <div class="question-card full">
+            <label class="question-label" for="military_details">What do you know about the defendant's active military service?</label>
+            <p class="help-text">Include the branch of service and any facts you know. This answer will be placed on a separate declaration.</p>
+            <textarea class="packet-control" id="military_details" required></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="packet-section" aria-labelledby="claim-heading">
+        <h2 class="packet-section-header" id="claim-heading">Your claim</h2>
+        <div class="packet-section-body question-grid">
+          <div class="question-card">
+            <label class="question-label" for="amount_claimed_ui">How much money are you asking for?</label>
+            <input class="packet-control" id="amount_claimed_ui" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+          </div>
+          <div class="question-card">
+            <label class="question-label" for="incident_mode">Did this happen on one date or over a period of time?</label>
+            <select class="packet-control" id="incident_mode" required>
+              <option value="">Select one</option><option value="date">One date</option><option value="period">A period of time</option>
+            </select>
+          </div>
+          <div class="question-card full">
+            <label class="question-label" for="claim_reason">Why does the defendant owe you this money?</label>
+            <p class="help-text">Use plain facts: what happened, what was promised, and what was not paid or returned.</p>
+            <textarea class="packet-control" id="claim_reason" required></textarea>
+          </div>
+          <div class="conditional-panel is-hidden" id="incident_date_panel">
+            <div class="question-card">
+              <label class="question-label" for="incident_date_ui">What date did this happen?</label>
+              <input class="packet-control" id="incident_date_ui" type="date" required>
+            </div>
+          </div>
+          <div class="conditional-panel is-hidden" id="incident_period_panel">
+            <div class="question-grid">
+              <div class="question-card"><label class="question-label" for="incident_start_ui">When did it start?</label><input class="packet-control" id="incident_start_ui" type="date" required></div>
+              <div class="question-card"><label class="question-label" for="incident_end_ui">When did it end?</label><input class="packet-control" id="incident_end_ui" type="date" required></div>
+            </div>
+          </div>
+          <div class="question-card full">
+            <label class="question-label" for="claim_calculation">How did you calculate the amount you are asking for?</label>
+            <p class="help-text">List the charges, payments, property value, or other amounts that make up your total.</p>
+            <textarea class="packet-control" id="claim_calculation" required></textarea>
+          </div>
+          <div class="question-card full">
+            <label class="question-label" for="calculation_extra">Do you need more space to explain your calculation?</label>
+            <select class="packet-control" id="calculation_extra" required><option value="">Select Yes or No</option><option value="yes">Yes</option><option value="no">No</option></select>
+          </div>
+          <div class="conditional-panel is-hidden" id="calculation_extra_panel">
+            <div class="question-card">
+              <label class="question-label" for="calculation_continuation">Add the rest of your calculation here.</label>
+              <textarea class="packet-control" id="calculation_continuation" required></textarea>
+            </div>
+          </div>
+          <div class="question-card">
+            <label class="question-label" for="demand_made">Did you ask the defendant to pay you before filing this claim?</label>
+            <select class="packet-control" id="demand_made" required><option value="">Select Yes or No</option><option value="yes">Yes</option><option value="no">No</option></select>
+          </div>
+          <div class="question-card">
+            <label class="question-label" for="payday_lender">Is any plaintiff a licensed payday lender?</label>
+            <p class="help-text">Choose No if no plaintiff makes payday or deferred-deposit loans.</p>
+            <select class="packet-control" id="payday_lender" required><option value="">Select Yes or No</option><option value="yes">Yes</option><option value="no">No</option></select>
+          </div>
+          <div class="conditional-panel is-hidden" id="no_demand_panel">
+            <div class="question-card"><label class="question-label" for="no_demand_reason">Why did you not ask the defendant to pay before filing?</label><textarea class="packet-control" id="no_demand_reason" required></textarea></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="packet-section" aria-labelledby="filing-heading">
+        <h2 class="packet-section-header" id="filing-heading">Why this courthouse can hear the case</h2>
+        <div class="packet-section-body question-grid">
+          <div class="question-card full">
+            <label class="question-label" for="venue_reason">Why are you filing at this courthouse?</label>
+            <select class="packet-control" id="venue_reason" required>
+              <option value="">Select the best answer</option>
+              <option value="regular">The defendant lives or does business in this court's area</option>
+              <option value="personal">A personal or business contract was made, signed, performed, or broken in this court's area</option>
+              <option value="retail">This is a retail installment contract and the buyer lives or signed the contract in this court's area</option>
+              <option value="vehicle">This is a vehicle finance sale and the buyer lives or signed the contract in this court's area</option>
+              <option value="other">Another reason</option>
+            </select>
+          </div>
+          <div class="conditional-panel is-hidden" id="venue_other_panel">
+            <div class="question-card"><label class="question-label" for="venue_other_text">What is the other reason?</label><textarea class="packet-control" id="venue_other_text" required></textarea></div>
+          </div>
+          <div class="question-card">
+            <label class="question-label" for="venue_zip">What ZIP code connects the case to this courthouse?</label>
+            <input class="packet-control" id="venue_zip" inputmode="numeric" maxlength="10" required>
+          </div>
+          <div class="question-card">
+            <label class="question-label" for="attorney_fee_dispute">Is this claim about a fee dispute between an attorney and a client?</label>
+            <select class="packet-control" id="attorney_fee_dispute" required><option value="">Select Yes or No</option><option value="yes">Yes</option><option value="no">No</option></select>
+          </div>
+          <div class="question-card">
+            <label class="question-label" for="suing_public_entity">Are you suing a government agency or other public entity?</label>
+            <select class="packet-control" id="suing_public_entity" required><option value="">Select Yes or No</option><option value="yes">Yes</option><option value="no">No</option></select>
+          </div>
+          <div class="question-card">
+            <label class="question-label" for="prior_claims">Have you filed more than 12 other small claims in California during the past 12 months?</label>
+            <select class="packet-control" id="prior_claims" required><option value="">Select Yes or No</option><option value="yes">Yes</option><option value="no">No</option></select>
+          </div>
+          <div class="conditional-panel is-hidden" id="public_entity_panel">
+            <div class="question-grid">
+              <div class="question-card full"><label class="question-label" for="public_written_claim">Did you first file a written claim with that public entity?</label><select class="packet-control" id="public_written_claim" required><option value="">Select Yes or No</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+              <div class="question-card full is-hidden" id="public_claim_date_panel"><label class="question-label" for="public_claim_date_ui">What date did you file the written claim?</label><input class="packet-control" id="public_claim_date_ui" type="date" required></div>
+            </div>
+          </div>
+          <div class="question-card full">
+            <label class="question-label" for="declaration_date_ui">What date are you completing this packet?</label>
+            <input class="packet-control" id="declaration_date_ui" type="date" required>
+          </div>
+        </div>
+      </section>
+
+      <section class="packet-section" aria-labelledby="review-heading">
+        <h2 class="packet-section-header" id="review-heading">Packet review</h2>
+        <div class="packet-section-body">
+          <ul class="packet-summary" id="packet_summary"><li>Answer the packet-size questions to see which PDFs will be generated.</li></ul>
+          <div class="packet-note packet-warning">
+            The PDF fields provided do not include signature boxes. After downloading, review every page and sign and date every place the court form requires.
+          </div>
+          <ul class="manual-signature-list">
+            <li>Sign both SC-100 copies where required.</li>
+            <li>Sign each SC-103 fictitious business name attachment that is generated.</li>
+            <li>Sign each MC-031 declaration that is generated.</li>
+          </ul>
+          <div class="submit-row"><button class="packet-submit" id="packet_submit" type="submit">Submit Form</button></div>
+          <div class="packet-status" id="packet_status" role="status" aria-live="polite"></div>
+        </div>
+      </section>
+    </form>
+  </main>
+</div>
+
+<script id="sc100-packet-logic">
+(() => {
+  'use strict';
+
+  const FIELD_SETS = {"fictitious_business_name_1":["business_name","business_address","business_type_other_specify","business_address_county","fictitious_business_name_statement_number","fictitious_business_name_statement_expiration_date","declaration_date","declarant_name_and_title","county_specific_court_information_url","judicial_council_of_california_text","is_covid_19_dispute","attached_sc100_form","attached_sc120_form","business_type_corporation","business_type_individual","business_type_association","business_type_limited_liability_company","business_type_partnership","business_type_other"],"fictitious_business_name_2":["business_name(2)","business_address(2)","business_type_other_specify(2)","business_address_county(2)","fictitious_business_name_statement_number(2)","fictitious_business_name_statement_expiration_date(2)","declaration_date(2)","declarant_name_and_title(2)","county_specific_court_information_url(2)","judicial_council_of_california_text(2)","is_covid_19_dispute(2)","attached_sc100_form(2)","attached_sc120_form(2)","business_type_corporation(2)","business_type_individual(2)","business_type_association(2)","business_type_limited_liability_company(2)","business_type_partnership(2)","business_type_other(2)"],"fictitious_business_name_3":["business_name(3)","business_address(3)","business_type_other_specify(3)","business_address_county(3)","fictitious_business_name_statement_number(3)","fictitious_business_name_statement_expiration_date(3)","declaration_date(3)","declarant_name_and_title(3)","county_specific_court_information_url(3)","judicial_council_of_california_text(3)","is_covid_19_dispute(3)","attached_sc100_form(3)","attached_sc120_form(3)","business_type_corporation(3)","business_type_individual(3)","business_type_association(3)","business_type_limited_liability_company(3)","business_type_partnership(3)","business_type_other(3)"],"fictitious_business_name_4":["business_name(4)","business_address(4)","business_type_other_specify(4)","business_address_county(4)","fictitious_business_name_statement_number(4)","fictitious_business_name_statement_expiration_date(4)","declaration_date(4)","declarant_name_and_title(4)","county_specific_court_information_url(4)","judicial_council_of_california_text(4)","is_covid_19_dispute(4)","attached_sc100_form(4)","attached_sc120_form(4)","business_type_corporation(4)","business_type_individual(4)","business_type_association(4)","business_type_limited_liability_company(4)","business_type_partnership(4)","business_type_other(4)"],"fictitious_business_name_5":["business_name(5)","business_address(5)","business_type_other_specify(5)","business_address_county(5)","fictitious_business_name_statement_number(5)","fictitious_business_name_statement_expiration_date(5)","declaration_date(5)","declarant_name_and_title(5)","county_specific_court_information_url(5)","judicial_council_of_california_text(5)","is_covid_19_dispute(5)","attached_sc100_form(5)","attached_sc120_form(5)","business_type_corporation(5)","business_type_individual(5)","business_type_association(5)","business_type_limited_liability_company(5)","business_type_partnership(5)","business_type_other(5)"],"item_3_calculation_overflow":["form_number","plaintiff_or_petitioner_name","defendant_or_respondent_name","declaration_line_1","declaration_line_2","declaration_line_3","declaration_line_4","declaration_line_5","declaration_line_6","declaration_line_7","declaration_line_8","declaration_line_9","declaration_line_10","declaration_line_11","declaration_line_12","declaration_line_13","declaration_line_14","declaration_line_15","declaration_line_16","declaration_line_17","declaration_line_18","declaration_line_19","declaration_line_20","declaration_date","other_role_specify","form_footer","attorney_for","role_plaintiff","role_petitioner","role_defendant","role_respondent","role_other"],"active_military_defendants":["form_number","declarant_name","declaration_text","defendant_name_1","defendant_name_2","defendant_name_3","declaration_date","other_role_specify","form_footer","attorney_for","role_plaintiff","role_petitioner","role_defendant","role_respondent","role_other"],"additional_parties_1":["attached_to_sc100","other_plaintiff_name_2","other_plaintiff_street_address_2","other_plaintiff_phone_2","other_plaintiff_city_2","other_plaintiff_state_2","other_plaintiff_zip_code_2","other_plaintiff_business_yes_2","other_plaintiff_business_no_2","other_plaintiff_name_3","other_plaintiff_street_address_3","other_plaintiff_phone_3","other_plaintiff_city_3","other_plaintiff_state_3","other_plaintiff_zip_code_3","other_plaintiff_business_yes_3","other_plaintiff_business_no_3","more_than_four_plaintiffs","other_defendant_name_2","other_defendant_street_address_2","other_defendant_phone_2","other_defendant_city_2","other_defendant_state_2","other_defendant_zip_code_2","authorized_agent_name_2","authorized_agent_job_title_2","authorized_agent_street_address_2","authorized_agent_city_2","authorized_agent_state_2","authorized_agent_zip_code_2","more_than_two_defendants","claim_over_2500","claim_under_2500","declaration_date"],"additional_parties_2":["attached_to_sc100(2)","other_plaintiff_name_2(2)","other_plaintiff_street_address_2(2)","other_plaintiff_phone_2(2)","other_plaintiff_city_2(2)","other_plaintiff_state_2(2)","other_plaintiff_zip_code_2(2)","other_plaintiff_business_yes_2(2)","other_plaintiff_business_no_2(2)","other_plaintiff_name_3(2)","other_plaintiff_street_address_3(2)","other_plaintiff_phone_3(2)","other_plaintiff_city_3(2)","other_plaintiff_state_3(2)","other_plaintiff_zip_code_3(2)","other_plaintiff_business_yes_3(2)","other_plaintiff_business_no_3(2)","more_than_four_plaintiffs(2)","other_defendant_name_2(2)","other_defendant_street_address_2(2)","other_defendant_phone_2(2)","other_defendant_city_2(2)","other_defendant_state_2(2)","other_defendant_zip_code_2(2)","authorized_agent_name_2(2)","authorized_agent_job_title_2(2)","authorized_agent_street_address_2(2)","authorized_agent_city_2(2)","authorized_agent_state_2(2)","authorized_agent_zip_code_2(2)","more_than_two_defendants(2)","claim_over_2500(2)","claim_under_2500(2)","declaration_date(2)"],"main_claim_copy_1":["court_name","court_address","plaintiff_name","plaintiff_phone","plaintiff_street_address","plaintiff_city","plaintiff_state","plaintiff_zip_code","plaintiff_email","additional_plaintiff_name_1","additional_plaintiff_phone_1","additional_plaintiff_street_address_1","additional_plaintiff_city_1","additional_plaintiff_state_1","additional_plaintiff_zip_code_1","defendant_name_1","defendant_phone_1","defendant_street_address_1","defendant_city_1","defendant_state_1","defendant_zip_code_1","defendant_agent_name_1","defendant_agent_job_title_1","defendant_agent_street_address_1","defendant_agent_city_1","defendant_agent_state_1","defendant_agent_zip_code_1","defendant_military_name","amount_claimed","reason_money_owed_line1","reason_money_owed_line2","reason_money_owed_line3","reason_money_owed_line4","reason_money_owed_line5","reason_money_owed_line6","incident_date","incident_period_start","incident_period_end","calculation_of_money_owed_line1","calculation_of_money_owed_line2","calculation_of_money_owed_line3","calculation_of_money_owed_line4","reason_no_demand_letter_line1","reason_no_demand_letter_line2","reason_no_demand_letter_line3","reason_no_demand_letter_line4","other_reason_for_filing_at_courthouse_line1","other_reason_for_filing_at_courthouse_line2","venue_zip_code","public_entity_claim_date","signature_date","second_plaintiff_name","more_than_two_plaintiffs","plaintiff_doing_business_as","plaintiff_is_payday_lender","more_than_one_defendant","defendant_on_active_military_duty","calculation_of_money_owed_overlimit","demand_letter_sent_yes","demand_letter_sent_no","venue_reason_defendant_lives_or_business","venue_reason_personal_contract","venue_reason_retail_installment_contract","venue_reason_vehicle_finance_sale","venue_reason_other","attorney_client_fee_dispute_yes","suing_public_entity_yes","suing_public_entity_no","public_entity_written_claim_filed","filed_more_than_twelve_small_claims_yes","filed_more_than_twelve_small_claims_no","claim_amount_under_2500","claim_amount_over_2500"],"main_claim_copy_2":["court_name","court_address","plaintiff_name","plaintiff_phone","plaintiff_street_address","plaintiff_city","plaintiff_state","plaintiff_zip_code","plaintiff_email","additional_plaintiff_name_1","additional_plaintiff_phone_1","additional_plaintiff_street_address_1","additional_plaintiff_city_1","additional_plaintiff_state_1","additional_plaintiff_zip_code_1","more_than_two_plaintiffs","plaintiff_fictitious_business_name","plaintiff_is_payday_lender","defendant_name_1","defendant_phone_1","defendant_street_address_1","defendant_city_1","defendant_state_1","defendant_zip_code_1","defendant_agent_name_1","defendant_agent_job_title_1","defendant_agent_street_address_1","defendant_agent_city_1","defendant_agent_state_1","defendant_agent_zip_code_1","more_than_one_defendant","defendant_on_active_military_duty","defendant_military_name","amount_claimed","reason_for_claim_line_1","reason_for_claim_line_2","reason_for_claim_line_3","reason_for_claim_line_4","reason_for_claim_line_5","reason_for_claim_line_6","incident_date","incident_period_start","incident_period_end","calculation_of_amount_owed_line_1","calculation_of_amount_owed_line_2","calculation_of_amount_owed_line_3","calculation_of_amount_owed_line_4","calculation_of_amount_owed_overlimit","demand_letter_sent_yes","demand_letter_sent_no","reason_no_demand_letter_line_1","reason_no_demand_letter_line_2","reason_no_demand_letter_line_3","reason_no_demand_letter_line_4","venue_regular_claim","venue_personal_claim","venue_retail_claim","venue_vehicle_claim","venue_other_checkbox","venue_other_explanation_line_1","venue_other_explanation_line_2","venue_zip_code","attorney_fee_dispute_yes","suing_public_entity_yes","suing_public_entity_no","public_entity_written_claim","public_entity_claim_date","filed_more_than_12_claims_yes","filed_more_than_12_claims_no","claim_over_2500","claim_under_2500","signature_date","additional_plaintiff_signature_name_1"]};
+  const ALLOWED = Object.fromEntries(Object.entries(FIELD_SETS).map(([role, names]) => [role, new Set(names)]));
+  const form = document.getElementById('customForm');
+  const byId = id => document.getElementById(id);
+  const val = id => (byId(id)?.value || '').trim();
+  const yes = id => val(id) === 'yes';
+  const count = id => Number.parseInt(val(id), 10) || 0;
+  const today = () => new Date().toISOString().slice(0, 10);
+  const formatDate = value => {
+    if (!value) return '';
+    const parts = value.split('-');
+    return parts.length === 3 ? `${parts[1]}/${parts[2]}/${parts[0]}` : value;
+  };
+  const formatMoney = value => {
+    const amount = Number(value);
+    return Number.isFinite(amount) ? amount.toFixed(2) : '';
+  };
+  const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+  const escapeAttr = escapeHtml;
+  const setStatus = (message, isError = false) => {
+    const node = byId('packet_status');
+    node.textContent = message;
+    node.classList.toggle('error', isError);
+  };
+
+  function question(label, control, help = '', full = false) {
+    return `<div class="question-card${full ? ' full' : ''}"><label class="question-label">${label}</label>${help ? `<p class="help-text">${help}</p>` : ''}${control}</div>`;
+  }
+  function input(id, placeholder = '', type = 'text', required = true) {
+    return `<input class="packet-control" id="${id}" type="${type}" placeholder="${escapeAttr(placeholder)}"${required ? ' required' : ''}>`;
+  }
+  function select(id, options, required = true) {
+    return `<select class="packet-control" id="${id}"${required ? ' required' : ''}><option value="">Select one</option>${options.map(([value, label]) => `<option value="${escapeAttr(value)}">${escapeHtml(label)}</option>`).join('')}</select>`;
+  }
+
+  function capture(prefix, total) {
+    const data = [];
+    for (let i = 1; i <= total; i += 1) {
+      const entry = {};
+      document.querySelectorAll(`[id^="${prefix}${i}_"]`).forEach(el => { entry[el.id] = el.value; });
+      data.push(entry);
+    }
+    return data;
+  }
+
+  function restore(snapshot) {
+    snapshot.forEach(entry => Object.entries(entry).forEach(([id, value]) => { if (byId(id)) byId(id).value = value; }));
+  }
+
+  function plaintiffCard(i) {
+    const dbaTypes = [['individual','Individual'],['corporation','Corporation'],['partnership','Partnership'],['llc','Limited liability company'],['association','Association'],['other','Other']];
+    return `<article class="party-card" id="plaintiff_card_${i}">
+      <h3 class="party-title">Plaintiff ${i}${i === 1 ? ' (you or the lead plaintiff)' : ''}</h3>
+      <div class="party-body question-grid">
+        ${question(`What is Plaintiff ${i}'s full legal name?`, input(`p${i}_name`, 'Full legal name'), '', true)}
+        ${question(`What is Plaintiff ${i}'s phone number?`, input(`p${i}_phone`, '(555) 555-5555', 'tel'))}
+        ${i === 1 ? question(`What is Plaintiff 1's email address?`, input('p1_email', 'name@example.com', 'email', false), 'This is optional.') : ''}
+        ${question(`What is Plaintiff ${i}'s street address?`, input(`p${i}_street`, 'Street address'), '', true)}
+        ${question(`What city does Plaintiff ${i} live in?`, input(`p${i}_city`, 'City'))}
+        ${question(`What state does Plaintiff ${i} live in?`, input(`p${i}_state`, 'CA'))}
+        ${question(`What is Plaintiff ${i}'s ZIP code?`, input(`p${i}_zip`, '95060'))}
+        ${question(`Does Plaintiff ${i} use a business name that is different from their legal name?`, select(`p${i}_dba`, [['yes','Yes'],['no','No']]), 'Examples include a store name, trade name, or DBA.', true)}
+        <div class="conditional-panel is-hidden" id="p${i}_dba_panel">
+          <h4>Business name details for Plaintiff ${i}</h4>
+          <div class="question-grid">
+            ${question('What business name do they use?', input(`p${i}_business_name`, 'Business or DBA name'), '', true)}
+            ${question('What is the business street address?', input(`p${i}_business_address`, 'Street, city, state, and ZIP'), '', true)}
+            ${question('What kind of business is it?', select(`p${i}_business_type`, dbaTypes), '', true)}
+            <div class="question-card is-hidden" id="p${i}_business_other_panel"><label class="question-label">What other type of business is it?</label>${input(`p${i}_business_other`, 'Describe the business type')}</div>
+            ${question('In which county was the fictitious business name statement filed?', input(`p${i}_fbs_county`, 'County'), '', true)}
+            ${question('What is the statement number?', input(`p${i}_fbs_number`, 'Statement number'), '', true)}
+            ${question('When does the statement expire?', input(`p${i}_fbs_expiration`, '', 'date'), '', true)}
+            ${question('What is the name and title of the person declaring this information?', input(`p${i}_declarant`, 'Name and job title'), '', true)}
+          </div>
+        </div>
+      </div>
+    </article>`;
+  }
+
+  function defendantCard(i) {
+    return `<article class="party-card" id="defendant_card_${i}">
+      <h3 class="party-title">Defendant ${i}</h3>
+      <div class="party-body question-grid">
+        ${question(`Is Defendant ${i} a person or an organization?`, select(`d${i}_type`, [['person','A person'],['organization','A business, government agency, or other organization']]), '', true)}
+        ${question(`What is Defendant ${i}'s full legal name?`, input(`d${i}_name`, 'Person or organization name'), '', true)}
+        ${question(`What is Defendant ${i}'s phone number?`, input(`d${i}_phone`, '(555) 555-5555', 'tel'))}
+        ${question(`What is Defendant ${i}'s street address?`, input(`d${i}_street`, 'Street address'), '', true)}
+        ${question(`What city is Defendant ${i} in?`, input(`d${i}_city`, 'City'))}
+        ${question(`What state is Defendant ${i} in?`, input(`d${i}_state`, 'CA'))}
+        ${question(`What is Defendant ${i}'s ZIP code?`, input(`d${i}_zip`, '95060'))}
+        <div class="conditional-panel is-hidden" id="d${i}_agent_panel">
+          <h4>Person authorized to receive legal papers for Defendant ${i}</h4>
+          <div class="question-grid">
+            ${question('What is the authorized agent\'s name?', input(`d${i}_agent_name`, 'Full name'), '', true)}
+            ${question('What is the authorized agent\'s job title?', input(`d${i}_agent_title`, 'Job title'))}
+            ${question('What is the authorized agent\'s street address?', input(`d${i}_agent_street`, 'Street address'), '', true)}
+            ${question('What city is the authorized agent in?', input(`d${i}_agent_city`, 'City'))}
+            ${question('What state is the authorized agent in?', input(`d${i}_agent_state`, 'CA'))}
+            ${question('What is the authorized agent\'s ZIP code?', input(`d${i}_agent_zip`, '95060'))}
+          </div>
+        </div>
+        <div class="conditional-panel is-hidden" id="d${i}_military_panel">
+          <div class="question-card"><label class="question-label">Is Defendant ${i} currently on active military duty?</label>${select(`d${i}_military`, [['yes','Yes'],['no','No']])}</div>
+        </div>
+      </div>
+    </article>`;
+  }
+
+  function renderPlaintiffs() {
+    const current = document.querySelectorAll('[id^="plaintiff_card_"]').length;
+    const snapshot = capture('p', current);
+    const total = count('plaintiff_count');
+    byId('plaintiff_cards').innerHTML = total ? Array.from({length: total}, (_, index) => plaintiffCard(index + 1)).join('') : '<p class="packet-note">Choose the number of plaintiffs above to add their questions.</p>';
+    restore(snapshot);
+    syncVisibility();
+  }
+
+  function renderDefendants() {
+    const current = document.querySelectorAll('[id^="defendant_card_"]').length;
+    const snapshot = capture('d', current);
+    const total = count('defendant_count');
+    byId('defendant_cards').innerHTML = total ? Array.from({length: total}, (_, index) => defendantCard(index + 1)).join('') : '<p class="packet-note">Choose the number of defendants above to add their questions.</p>';
+    restore(snapshot);
+    syncVisibility();
+  }
+
+  function showPanel(id, show, clearWhenHidden = true) {
+    const panel = byId(id);
+    if (!panel) return;
+    panel.classList.toggle('is-hidden', !show);
+    panel.querySelectorAll('input, select, textarea').forEach(el => {
+      el.disabled = !show;
+      if (!show && clearWhenHidden) {
+        if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
+        else el.value = '';
+      }
+    });
+  }
+
+  function syncVisibility() {
+    for (let i = 1; i <= count('plaintiff_count'); i += 1) {
+      showPanel(`p${i}_dba_panel`, val(`p${i}_dba`) === 'yes');
+      showPanel(`p${i}_business_other_panel`, val(`p${i}_business_type`) === 'other');
+    }
+    let anyMilitary = false;
+    for (let i = 1; i <= count('defendant_count'); i += 1) {
+      const isOrganization = val(`d${i}_type`) === 'organization';
+      showPanel(`d${i}_agent_panel`, isOrganization);
+      showPanel(`d${i}_military_panel`, val(`d${i}_type`) === 'person');
+      if (val(`d${i}_type`) === 'person' && val(`d${i}_military`) === 'yes') anyMilitary = true;
+    }
+    showPanel('military_attachment_panel', anyMilitary);
+    showPanel('incident_date_panel', val('incident_mode') === 'date');
+    showPanel('incident_period_panel', val('incident_mode') === 'period');
+    showPanel('calculation_extra_panel', yes('calculation_extra'));
+    showPanel('no_demand_panel', val('demand_made') === 'no');
+    showPanel('venue_other_panel', val('venue_reason') === 'other');
+    showPanel('public_entity_panel', yes('suing_public_entity'));
+    showPanel('public_claim_date_panel', yes('suing_public_entity') && yes('public_written_claim'));
+    updateSummary();
+  }
+
+  function readPlaintiff(i) {
+    return {
+      index: i, name: val(`p${i}_name`), phone: val(`p${i}_phone`), email: val(`p${i}_email`),
+      street: val(`p${i}_street`), city: val(`p${i}_city`), state: val(`p${i}_state`), zip: val(`p${i}_zip`),
+      dba: val(`p${i}_dba`) === 'yes', businessName: val(`p${i}_business_name`), businessAddress: val(`p${i}_business_address`),
+      businessType: val(`p${i}_business_type`), businessOther: val(`p${i}_business_other`), fbsCounty: val(`p${i}_fbs_county`),
+      fbsNumber: val(`p${i}_fbs_number`), fbsExpiration: formatDate(val(`p${i}_fbs_expiration`)), declarant: val(`p${i}_declarant`)
+    };
+  }
+  function readDefendant(i) {
+    return {
+      index: i, type: val(`d${i}_type`), name: val(`d${i}_name`), phone: val(`d${i}_phone`), street: val(`d${i}_street`),
+      city: val(`d${i}_city`), state: val(`d${i}_state`), zip: val(`d${i}_zip`),
+      agentName: val(`d${i}_agent_name`), agentTitle: val(`d${i}_agent_title`), agentStreet: val(`d${i}_agent_street`),
+      agentCity: val(`d${i}_agent_city`), agentState: val(`d${i}_agent_state`), agentZip: val(`d${i}_agent_zip`),
+      military: val(`d${i}_type`) === 'person' && val(`d${i}_military`) === 'yes'
+    };
+  }
+  function getCase() {
+    return {
+      courtName: val('court_name_ui'), courtAddress: val('court_address_ui'),
+      plaintiffs: Array.from({length: count('plaintiff_count')}, (_, index) => readPlaintiff(index + 1)),
+      defendants: Array.from({length: count('defendant_count')}, (_, index) => readDefendant(index + 1)),
+      amount: formatMoney(val('amount_claimed_ui')), incidentMode: val('incident_mode'), incidentDate: formatDate(val('incident_date_ui')),
+      incidentStart: formatDate(val('incident_start_ui')), incidentEnd: formatDate(val('incident_end_ui')), reason: val('claim_reason'),
+      calculation: val('claim_calculation'), calculationExtra: yes('calculation_extra'), calculationContinuation: val('calculation_continuation'),
+      demandMade: yes('demand_made'), noDemandReason: val('no_demand_reason'), paydayLender: yes('payday_lender'),
+      venueReason: val('venue_reason'), venueOther: val('venue_other_text'), venueZip: val('venue_zip'),
+      attorneyFeeDispute: yes('attorney_fee_dispute'), suingPublicEntity: yes('suing_public_entity'),
+      publicWrittenClaim: yes('public_written_claim'), publicClaimDate: formatDate(val('public_claim_date_ui')),
+      priorClaims: yes('prior_claims'), declarationDate: formatDate(val('declaration_date_ui')), militaryDetails: val('military_details')
+    };
+  }
+
+  function wrapLines(value, maxLines, maxChars) {
+    const words = String(value || '').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+    const lines = [];
+    let line = '';
+    words.forEach(word => {
+      if (!line) line = word;
+      else if ((line + ' ' + word).length <= maxChars) line += ' ' + word;
+      else if (lines.length < maxLines - 1) { lines.push(line); line = word; }
+      else line += ' ' + word;
+    });
+    if (line && lines.length < maxLines) lines.push(line);
+    return Array.from({length: maxLines}, (_, index) => lines[index] || '');
+  }
+
+  function newPayload(role, token, filename) { return {role, token, filename, fields: new Map()}; }
+  function add(payload, name, value) {
+    if (!value) return;
+    if (!ALLOWED[payload.role]?.has(name)) throw new Error(`Adapter ${payload.role} attempted unknown PDF field: ${name}`);
+    payload.fields.set(name, String(value));
+  }
+  function mark(payload, name, condition) { if (condition) add(payload, name, 'on'); }
+
+  function addCommonSc100(payload, c) {
+    const p1 = c.plaintiffs[0] || {};
+    const p2 = c.plaintiffs[1] || {};
+    const d1 = c.defendants[0] || {};
+    add(payload, 'court_name', c.courtName); add(payload, 'court_address', c.courtAddress);
+    add(payload, 'plaintiff_name', p1.name); add(payload, 'plaintiff_phone', p1.phone); add(payload, 'plaintiff_street_address', p1.street);
+    add(payload, 'plaintiff_city', p1.city); add(payload, 'plaintiff_state', p1.state); add(payload, 'plaintiff_zip_code', p1.zip); add(payload, 'plaintiff_email', p1.email);
+    add(payload, 'additional_plaintiff_name_1', p2.name); add(payload, 'additional_plaintiff_phone_1', p2.phone); add(payload, 'additional_plaintiff_street_address_1', p2.street);
+    add(payload, 'additional_plaintiff_city_1', p2.city); add(payload, 'additional_plaintiff_state_1', p2.state); add(payload, 'additional_plaintiff_zip_code_1', p2.zip);
+    mark(payload, 'more_than_two_plaintiffs', c.plaintiffs.length > 2); mark(payload, 'plaintiff_is_payday_lender', c.paydayLender);
+    add(payload, 'defendant_name_1', d1.name); add(payload, 'defendant_phone_1', d1.phone); add(payload, 'defendant_street_address_1', d1.street);
+    add(payload, 'defendant_city_1', d1.city); add(payload, 'defendant_state_1', d1.state); add(payload, 'defendant_zip_code_1', d1.zip);
+    add(payload, 'defendant_agent_name_1', d1.agentName); add(payload, 'defendant_agent_job_title_1', d1.agentTitle); add(payload, 'defendant_agent_street_address_1', d1.agentStreet);
+    add(payload, 'defendant_agent_city_1', d1.agentCity); add(payload, 'defendant_agent_state_1', d1.agentState); add(payload, 'defendant_agent_zip_code_1', d1.agentZip);
+    mark(payload, 'more_than_one_defendant', c.defendants.length > 1); mark(payload, 'defendant_on_active_military_duty', c.defendants.some(d => d.military));
+    add(payload, 'defendant_military_name', (c.defendants.find(d => d.military) || {}).name);
+    add(payload, 'amount_claimed', c.amount); add(payload, 'incident_date', c.incidentMode === 'date' ? c.incidentDate : '');
+    add(payload, 'incident_period_start', c.incidentMode === 'period' ? c.incidentStart : ''); add(payload, 'incident_period_end', c.incidentMode === 'period' ? c.incidentEnd : '');
+    mark(payload, 'demand_letter_sent_yes', c.demandMade); mark(payload, 'demand_letter_sent_no', !c.demandMade);
+    add(payload, 'venue_zip_code', c.venueZip); mark(payload, 'suing_public_entity_yes', c.suingPublicEntity); mark(payload, 'suing_public_entity_no', !c.suingPublicEntity);
+    add(payload, 'public_entity_claim_date', c.publicClaimDate); add(payload, 'signature_date', c.declarationDate);
+  }
+
+  function buildSc100(copy, c) {
+    const role = copy === 1 ? 'main_claim_copy_1' : 'main_claim_copy_2';
+    const payload = newPayload(role, `sc100_copy${copy}`, `SC-100_Copy_${copy}.pdf`);
+    addCommonSc100(payload, c);
+    const hasDba = c.plaintiffs.slice(0, 2).some(p => p.dba);
+    mark(payload, copy === 1 ? 'plaintiff_doing_business_as' : 'plaintiff_fictitious_business_name', hasDba);
+    const reasonNames = copy === 1 ? Array.from({length: 6}, (_, i) => `reason_money_owed_line${i + 1}`) : Array.from({length: 6}, (_, i) => `reason_for_claim_line_${i + 1}`);
+    wrapLines(c.reason, 6, 74).forEach((line, i) => add(payload, reasonNames[i], line));
+    const calculationNames = copy === 1 ? Array.from({length: 4}, (_, i) => `calculation_of_money_owed_line${i + 1}`) : Array.from({length: 4}, (_, i) => `calculation_of_amount_owed_line_${i + 1}`);
+    wrapLines(c.calculation, 4, 74).forEach((line, i) => add(payload, calculationNames[i], line));
+    mark(payload, copy === 1 ? 'calculation_of_money_owed_overlimit' : 'calculation_of_amount_owed_overlimit', c.calculationExtra);
+    const noDemandNames = copy === 1 ? Array.from({length: 4}, (_, i) => `reason_no_demand_letter_line${i + 1}`) : Array.from({length: 4}, (_, i) => `reason_no_demand_letter_line_${i + 1}`);
+    wrapLines(c.noDemandReason, 4, 74).forEach((line, i) => add(payload, noDemandNames[i], line));
+    if (copy === 1) {
+      mark(payload, 'venue_reason_defendant_lives_or_business', c.venueReason === 'regular'); mark(payload, 'venue_reason_personal_contract', c.venueReason === 'personal');
+      mark(payload, 'venue_reason_retail_installment_contract', c.venueReason === 'retail'); mark(payload, 'venue_reason_vehicle_finance_sale', c.venueReason === 'vehicle'); mark(payload, 'venue_reason_other', c.venueReason === 'other');
+      wrapLines(c.venueOther, 2, 74).forEach((line, i) => add(payload, `other_reason_for_filing_at_courthouse_line${i + 1}`, line));
+      mark(payload, 'attorney_client_fee_dispute_yes', c.attorneyFeeDispute); mark(payload, 'public_entity_written_claim_filed', c.publicWrittenClaim);
+      mark(payload, 'filed_more_than_twelve_small_claims_yes', c.priorClaims); mark(payload, 'filed_more_than_twelve_small_claims_no', !c.priorClaims);
+      mark(payload, 'claim_amount_over_2500', Number(c.amount) > 2500); mark(payload, 'claim_amount_under_2500', Number(c.amount) <= 2500);
+      add(payload, 'second_plaintiff_name', c.plaintiffs[1]?.name);
+    } else {
+      mark(payload, 'venue_regular_claim', c.venueReason === 'regular'); mark(payload, 'venue_personal_claim', c.venueReason === 'personal');
+      mark(payload, 'venue_retail_claim', c.venueReason === 'retail'); mark(payload, 'venue_vehicle_claim', c.venueReason === 'vehicle'); mark(payload, 'venue_other_checkbox', c.venueReason === 'other');
+      wrapLines(c.venueOther, 2, 74).forEach((line, i) => add(payload, `venue_other_explanation_line_${i + 1}`, line));
+      mark(payload, 'attorney_fee_dispute_yes', c.attorneyFeeDispute); mark(payload, 'public_entity_written_claim', c.publicWrittenClaim);
+      mark(payload, 'filed_more_than_12_claims_yes', c.priorClaims); mark(payload, 'filed_more_than_12_claims_no', !c.priorClaims);
+      mark(payload, 'claim_over_2500', Number(c.amount) > 2500); mark(payload, 'claim_under_2500', Number(c.amount) <= 2500);
+      add(payload, 'additional_plaintiff_signature_name_1', c.plaintiffs[1]?.name);
+    }
+    return payload;
+  }
+
+  function withSuffix(base, instance) { return instance === 1 ? base : `${base}(2)`; }
+  function buildSc100A(instance, c) {
+    const role = `additional_parties_${instance}`;
+    const payload = newPayload(role, `sc100a_${instance}`, `SC-100A_Additional_Parties_${instance}.pdf`);
+    mark(payload, withSuffix('attached_to_sc100', instance), true);
+    const plaintiffStart = instance === 1 ? 2 : 4;
+    [0, 1].forEach(offset => {
+      const p = c.plaintiffs[plaintiffStart + offset];
+      if (!p) return;
+      const slot = offset === 0 ? 2 : 3;
+      add(payload, withSuffix(`other_plaintiff_name_${slot}`, instance), p.name); add(payload, withSuffix(`other_plaintiff_street_address_${slot}`, instance), p.street);
+      add(payload, withSuffix(`other_plaintiff_phone_${slot}`, instance), p.phone); add(payload, withSuffix(`other_plaintiff_city_${slot}`, instance), p.city);
+      add(payload, withSuffix(`other_plaintiff_state_${slot}`, instance), p.state); add(payload, withSuffix(`other_plaintiff_zip_code_${slot}`, instance), p.zip);
+      mark(payload, withSuffix(`other_plaintiff_business_yes_${slot}`, instance), p.dba); mark(payload, withSuffix(`other_plaintiff_business_no_${slot}`, instance), !p.dba);
+    });
+    mark(payload, withSuffix('more_than_four_plaintiffs', instance), instance === 1 && c.plaintiffs.length > 4);
+    const d = c.defendants[instance];
+    if (d) {
+      add(payload, withSuffix('other_defendant_name_2', instance), d.name); add(payload, withSuffix('other_defendant_street_address_2', instance), d.street);
+      add(payload, withSuffix('other_defendant_phone_2', instance), d.phone); add(payload, withSuffix('other_defendant_city_2', instance), d.city);
+      add(payload, withSuffix('other_defendant_state_2', instance), d.state); add(payload, withSuffix('other_defendant_zip_code_2', instance), d.zip);
+      add(payload, withSuffix('authorized_agent_name_2', instance), d.agentName); add(payload, withSuffix('authorized_agent_job_title_2', instance), d.agentTitle);
+      add(payload, withSuffix('authorized_agent_street_address_2', instance), d.agentStreet); add(payload, withSuffix('authorized_agent_city_2', instance), d.agentCity);
+      add(payload, withSuffix('authorized_agent_state_2', instance), d.agentState); add(payload, withSuffix('authorized_agent_zip_code_2', instance), d.agentZip);
+    }
+    mark(payload, withSuffix('more_than_two_defendants', instance), instance === 1 && c.defendants.length > 2);
+    mark(payload, withSuffix('claim_over_2500', instance), Number(c.amount) > 2500); mark(payload, withSuffix('claim_under_2500', instance), Number(c.amount) <= 2500);
+    add(payload, withSuffix('declaration_date', instance), c.declarationDate);
+    return payload;
+  }
+
+  function buildSc103(sequence, plaintiff, c) {
+    // The payload includes five distinct SC-103 field adapters. A sixth DBA
+    // plaintiff safely reuses the first blank SC-103 template with a fresh
+    // FormData payload and a unique output filename.
+    const slot = ((sequence - 1) % 5) + 1;
+    const role = `fictitious_business_name_${slot}`;
+    const suffix = slot === 1 ? '' : `(${slot})`;
+    const payload = newPayload(role, `sc103_${slot}`, `SC-103_Plaintiff_${plaintiff.index}.pdf`);
+    const field = base => `${base}${suffix}`;
+    add(payload, field('business_name'), plaintiff.businessName); add(payload, field('business_address'), plaintiff.businessAddress);
+    add(payload, field('business_type_other_specify'), plaintiff.businessOther); add(payload, field('business_address_county'), plaintiff.fbsCounty);
+    add(payload, field('fictitious_business_name_statement_number'), plaintiff.fbsNumber); add(payload, field('fictitious_business_name_statement_expiration_date'), plaintiff.fbsExpiration);
+    add(payload, field('declaration_date'), c.declarationDate); add(payload, field('declarant_name_and_title'), plaintiff.declarant);
+    mark(payload, field('attached_sc100_form'), true);
+    const typeMap = {corporation:'business_type_corporation', individual:'business_type_individual', association:'business_type_association', llc:'business_type_limited_liability_company', partnership:'business_type_partnership', other:'business_type_other'};
+    if (typeMap[plaintiff.businessType]) mark(payload, field(typeMap[plaintiff.businessType]), true);
+    return payload;
+  }
+
+  function buildGeneralDeclaration(c) {
+    const payload = newPayload('item_3_calculation_overflow', 'mc031_item3', 'MC-031_Item_3_Calculation.pdf');
+    add(payload, 'form_number', 'SC-100, Item 3'); add(payload, 'plaintiff_or_petitioner_name', c.plaintiffs.map(p => p.name).join('; '));
+    add(payload, 'defendant_or_respondent_name', c.defendants.map(d => d.name).join('; '));
+    wrapLines(c.calculationContinuation, 20, 88).forEach((line, i) => add(payload, `declaration_line_${i + 1}`, line));
+    add(payload, 'declaration_date', c.declarationDate); mark(payload, 'role_plaintiff', true);
+    return payload;
+  }
+
+  function buildMilitaryDeclaration(c) {
+    const payload = newPayload('active_military_defendants', 'mc031_military', 'MC-031_Military_Service.pdf');
+    const active = c.defendants.filter(d => d.military);
+    add(payload, 'form_number', 'SC-100, Item 1'); add(payload, 'declarant_name', c.plaintiffs[0]?.name); add(payload, 'declaration_text', c.militaryDetails);
+    active.slice(0, 3).forEach((d, i) => add(payload, `defendant_name_${i + 1}`, d.name));
+    add(payload, 'declaration_date', c.declarationDate); mark(payload, 'role_plaintiff', true);
+    return payload;
+  }
+
+  function buildPacket() {
+    const c = getCase();
+    const packet = [buildSc100(1, c), buildSc100(2, c)];
+    if (c.plaintiffs.length > 2 || c.defendants.length > 1) packet.push(buildSc100A(1, c));
+    if (c.plaintiffs.length > 4 || c.defendants.length > 2) packet.push(buildSc100A(2, c));
+    c.plaintiffs.filter(p => p.dba).forEach((p, index) => packet.push(buildSc103(index + 1, p, c)));
+    if (c.calculationExtra) packet.push(buildGeneralDeclaration(c));
+    if (c.defendants.some(d => d.military)) packet.push(buildMilitaryDeclaration(c));
+    packet.forEach(item => item.fields.forEach((value, name) => {
+      if (!ALLOWED[item.role].has(name)) throw new Error(`Unknown field ${name} in ${item.filename}`);
+      if (value !== 'on' && typeof value !== 'string') throw new Error(`Invalid value for ${name}`);
+    }));
+    return packet;
+  }
+
+  function plannedPacketLabels() {
+    const pCount = count('plaintiff_count');
+    const dCount = count('defendant_count');
+    const labels = ['2 copies of Form SC-100'];
+    if (pCount > 2 || dCount > 1) labels.push('1 Form SC-100A for additional parties');
+    if (pCount > 4 || dCount > 2) labels.push('a second Form SC-100A for additional parties');
+    const dbaCount = Array.from({length: pCount}, (_, i) => val(`p${i + 1}_dba`) === 'yes').filter(Boolean).length;
+    if (dbaCount) labels.push(`${dbaCount} Form${dbaCount === 1 ? '' : 's'} SC-103 for business names`);
+    if (yes('calculation_extra')) labels.push('1 Form MC-031 for the continued calculation');
+    const militaryCount = Array.from({length: dCount}, (_, i) => val(`d${i + 1}_military`) === 'yes').filter(Boolean).length;
+    if (militaryCount) labels.push('1 Form MC-031 for active military service details');
+    return labels;
+  }
+
+  function updateSummary() {
+    const summary = byId('packet_summary');
+    if (!summary) return;
+    const pCount = count('plaintiff_count');
+    const dCount = count('defendant_count');
+    if (!pCount || !dCount) { summary.innerHTML = '<li>Answer the packet-size questions to see which PDFs will be generated.</li>'; return; }
+    const labels = plannedPacketLabels();
+    summary.innerHTML = `<li><strong>${labels.reduce((total, label) => total + (Number.parseInt(label, 10) || 1), 0)} PDF files planned</strong></li>${labels.map(label => `<li>${escapeHtml(label)}</li>`).join('')}<li>The completed files will download together in one ZIP file.</li>`;
+  }
+
+  function validateForm() {
+    const firstInvalid = Array.from(form.querySelectorAll('input, select, textarea')).find(el => !el.disabled && !el.checkValidity());
+    if (firstInvalid) {
+      firstInvalid.reportValidity();
+      firstInvalid.scrollIntoView({behavior: 'smooth', block: 'center'});
+      return false;
+    }
+    const c = getCase();
+    if (c.publicWrittenClaim && !c.publicClaimDate) { setStatus('Enter the date you filed the written claim with the public entity.', true); return false; }
+    return true;
+  }
+
+  function crc32(bytes) {
+    let crc = 0xffffffff;
+    for (const byte of bytes) {
+      crc ^= byte;
+      for (let k = 0; k < 8; k += 1) crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
+    }
+    return (crc ^ 0xffffffff) >>> 0;
+  }
+  function le16(value) { return new Uint8Array([value & 255, (value >>> 8) & 255]); }
+  function le32(value) { return new Uint8Array([value & 255, (value >>> 8) & 255, (value >>> 16) & 255, (value >>> 24) & 255]); }
+  function joinBytes(parts) {
+    const total = parts.reduce((sum, part) => sum + part.length, 0);
+    const out = new Uint8Array(total); let offset = 0;
+    parts.forEach(part => { out.set(part, offset); offset += part.length; });
+    return out;
+  }
+  function dosStamp(date = new Date()) {
+    const time = (date.getHours() << 11) | (date.getMinutes() << 5) | Math.floor(date.getSeconds() / 2);
+    const day = (date.getFullYear() - 1980) << 9 | ((date.getMonth() + 1) << 5) | date.getDate();
+    return {time, day};
+  }
+  async function makeZip(files) {
+    const encoder = new TextEncoder();
+    const localParts = []; const centralParts = []; let offset = 0;
+    const stamp = dosStamp();
+    for (const file of files) {
+      const name = encoder.encode(file.name); const data = new Uint8Array(await file.blob.arrayBuffer()); const crc = crc32(data);
+      const local = joinBytes([le32(0x04034b50), le16(20), le16(0x0800), le16(0), le16(stamp.time), le16(stamp.day), le32(crc), le32(data.length), le32(data.length), le16(name.length), le16(0), name, data]);
+      const central = joinBytes([le32(0x02014b50), le16(20), le16(20), le16(0x0800), le16(0), le16(stamp.time), le16(stamp.day), le32(crc), le32(data.length), le32(data.length), le16(name.length), le16(0), le16(0), le16(0), le16(0), le32(0), le32(offset), name]);
+      localParts.push(local); centralParts.push(central); offset += local.length;
+    }
+    const central = joinBytes(centralParts);
+    const end = joinBytes([le32(0x06054b50), le16(0), le16(0), le16(files.length), le16(files.length), le32(central.length), le32(offset), le16(0)]);
+    return new Blob([...localParts, central, end], {type: 'application/zip'});
+  }
+
+  async function fillPdf(item) {
+    const fd = new FormData();
+    item.fields.forEach((value, name) => fd.append(name, value));
+    const response = await fetch('/edit_pdf?pdf=' + encodeURIComponent(item.token), {method: 'POST', body: fd, credentials: 'include'});
+    if (!response.ok) throw new Error(`${item.filename}: ${await response.text()}`);
+    const blob = await response.blob();
+    if (!blob.size) throw new Error(`${item.filename}: the server returned an empty file`);
+    return {name: item.filename, blob};
+  }
+
+  async function submitPacket(event) {
+    event.preventDefault();
+    setStatus('');
+    if (!validateForm()) return;
+    const button = byId('packet_submit');
+    button.disabled = true;
+    try {
+      const packet = buildPacket();
+      const completed = [];
+      for (let i = 0; i < packet.length; i += 1) {
+        setStatus(`Filling PDF ${i + 1} of ${packet.length}: ${packet[i].filename}`);
+        completed.push(await fillPdf(packet[i]));
+      }
+      setStatus('Packaging the completed PDFs...');
+      const zip = await makeZip(completed);
+      const url = URL.createObjectURL(zip);
+      const link = document.createElement('a');
+      link.href = url; link.download = 'SC-100_Filing_Packet.zip'; document.body.appendChild(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      setStatus(`Done. Downloaded ${completed.length} completed PDF files in one ZIP file.`);
+    } catch (error) {
+      console.error(error);
+      setStatus('The packet could not be completed: ' + error.message, true);
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  function setValue(id, value) {
+    const el = byId(id); if (!el) return;
+    el.value = value; el.dispatchEvent(new Event('change', {bubbles: true}));
+  }
+  function fillMaximumPath() {
+    setValue('court_name_ui', 'Superior Court of California, County of Santa Cruz');
+    setValue('court_address_ui', '1 Second Street, Watsonville, CA 95076');
+    setValue('plaintiff_count', '6'); renderPlaintiffs();
+    setValue('defendant_count', '3'); renderDefendants();
+    const plaintiffNames = ['Jordan Rivera', 'Harbor Repair LLC', 'Summit Supply Inc.', 'Pacific Design Partners', 'Coastal Services Association', 'Redwood Market Group'];
+    const businessTypes = ['individual', 'llc', 'corporation', 'partnership', 'association', 'other'];
+    for (let i = 1; i <= 6; i += 1) {
+      setValue(`p${i}_name`, plaintiffNames[i - 1]); setValue(`p${i}_phone`, `(831) 555-01${String(i).padStart(2, '0')}`);
+      setValue(`p${i}_street`, `${100 + i} Ocean View Avenue`); setValue(`p${i}_city`, 'Santa Cruz'); setValue(`p${i}_state`, 'CA'); setValue(`p${i}_zip`, `9506${i}`);
+      if (i === 1) setValue('p1_email', 'jordan.rivera@example.test');
+      setValue(`p${i}_dba`, 'yes');
+      syncVisibility();
+      setValue(`p${i}_business_name`, i === 1 ? 'Rivera Repair Studio' : `${plaintiffNames[i - 1]} Services`);
+      setValue(`p${i}_business_address`, `${200 + i} Commerce Street, Santa Cruz, CA 95060`);
+      setValue(`p${i}_business_type`, businessTypes[i - 1]);
+      syncVisibility();
+      if (businessTypes[i - 1] === 'other') setValue(`p${i}_business_other`, 'Cooperative');
+      setValue(`p${i}_fbs_county`, 'Santa Cruz');
+      setValue(`p${i}_fbs_number`, `FBN-2026-${1000 + i}`);
+      setValue(`p${i}_fbs_expiration`, '2031-08-26');
+      setValue(`p${i}_declarant`, `${plaintiffNames[i - 1]} Authorized Representative`);
+    }
+    for (let i = 1; i <= 3; i += 1) {
+      setValue(`d${i}_type`, i < 3 ? 'organization' : 'person'); syncVisibility(); setValue(`d${i}_name`, i === 1 ? 'Northstar Construction Inc.' : i === 2 ? 'County Transit Agency' : 'Taylor Morgan');
+      setValue(`d${i}_phone`, `(408) 555-02${String(i).padStart(2, '0')}`); setValue(`d${i}_street`, `${300 + i} Market Street`); setValue(`d${i}_city`, 'San Jose'); setValue(`d${i}_state`, 'CA'); setValue(`d${i}_zip`, `9511${i}`);
+      if (i < 3) { setValue(`d${i}_agent_name`, i === 1 ? 'Morgan Lee' : 'Casey Chen'); setValue(`d${i}_agent_title`, 'Authorized Agent'); setValue(`d${i}_agent_street`, `${400 + i} Service Road`); setValue(`d${i}_agent_city`, 'San Jose'); setValue(`d${i}_agent_state`, 'CA'); setValue(`d${i}_agent_zip`, `9512${i}`); }
+      else setValue('d3_military', 'yes');
+    }
+    syncVisibility();
+    setValue('military_details', 'Defendant Taylor Morgan is believed to be serving on active duty with the United States Navy. The plaintiff learned this from the defendant during communications about the unpaid amount.');
+    setValue('amount_claimed_ui', '9875.50'); setValue('incident_mode', 'period'); syncVisibility(); setValue('incident_start_ui', '2026-01-15'); setValue('incident_end_ui', '2026-06-30');
+    setValue('claim_reason', 'The defendants agreed in writing to pay for repair work and replacement materials. The work was completed and invoices were delivered, but the remaining balance has not been paid.');
+    setValue('claim_calculation', 'Unpaid labor $5,200.00 plus replacement materials $3,925.50 plus permitted filing and service costs estimated at $750.00.');
+    setValue('calculation_extra', 'yes'); syncVisibility(); setValue('calculation_continuation', 'The labor amount includes 80 hours at $65 per hour. Material invoices total $3,925.50. Payments already received were credited before calculating the requested balance.');
+    setValue('demand_made', 'no'); syncVisibility(); setValue('no_demand_reason', 'The defendants stopped responding and the plaintiff did not have a reliable address for a final demand until preparing this claim.');
+    setValue('payday_lender', 'yes'); setValue('venue_reason', 'other'); syncVisibility(); setValue('venue_other_text', 'The property and repair work at issue are located in this court area.'); setValue('venue_zip', '95076');
+    setValue('attorney_fee_dispute', 'yes'); setValue('suing_public_entity', 'yes'); syncVisibility(); setValue('public_written_claim', 'yes'); syncVisibility(); setValue('public_claim_date_ui', '2026-07-10');
+    setValue('prior_claims', 'yes'); setValue('declaration_date_ui', today());
+    syncVisibility(); updateSummary();
+    setStatus('Maximum Path loaded. Review or edit the fictional answers before submitting.');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  form.addEventListener('submit', submitPacket);
+  byId('plaintiff_count').addEventListener('change', renderPlaintiffs);
+  byId('defendant_count').addEventListener('change', renderDefendants);
+  form.addEventListener('change', syncVisibility);
+  form.addEventListener('input', updateSummary);
+  setValue('declaration_date_ui', today());
+
+  let maximumChordFired = false;
+  document.addEventListener('keydown', event => {
+    if (event.ctrlKey && event.shiftKey && !maximumChordFired) {
+      maximumChordFired = true; event.preventDefault(); fillMaximumPath();
+    }
+  });
+  document.addEventListener('keyup', event => { if (!event.ctrlKey || !event.shiftKey) maximumChordFired = false; });
+
+  window.__SC100_PACKET_DEBUG__ = {buildPacket, getCase, fillMaximumPath, fieldSets: FIELD_SETS};
+  syncVisibility();
+})();
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+  var mobileNav = document.getElementById('mobile-nav');
+  var mobileFormsToggle = document.getElementById('mobile-forms-toggle');
+  var mobileFormsMenu = document.getElementById('mobile-forms-menu');
+  var body = document.body;
+  function toggleMobileMenu() {
+    if (!mobileMenuToggle || !mobileNav) return;
+    mobileMenuToggle.classList.toggle('active');
+    mobileNav.classList.toggle('active');
+    body.classList.toggle('menu-open');
+  }
+  if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener('click', function(e) { e.preventDefault(); toggleMobileMenu(); });
+  }
+  if (mobileFormsToggle && mobileFormsMenu) {
+    mobileFormsToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      mobileFormsToggle.classList.toggle('active');
+      mobileFormsMenu.classList.toggle('active');
+    });
+  }
+  var formsWrapper = document.getElementById('forms-dropdown-wrapper');
+  var formsMenu = document.getElementById('forms-dropdown-menu');
+  var formsLink = document.getElementById('forms-nav-link');
+  if (formsWrapper && formsMenu && formsLink) {
+    var dropdownOpen = false;
+    function openDropdown() { dropdownOpen = true; formsMenu.style.display = 'flex'; }
+    function closeDropdown() { dropdownOpen = false; formsMenu.style.display = 'none'; }
+    formsLink.addEventListener('click', function(e) { e.preventDefault(); dropdownOpen ? closeDropdown() : openDropdown(); });
+    document.addEventListener('click', function(e) {
+      if (!formsWrapper.contains(e.target)) closeDropdown();
+    });
+  }
+});
+</script>
+<div id="signinRequiredModal" class="signin-modal-overlay" style="display:none;">
+  <div class="signin-modal">
+    <h2>Sign In Required</h2>
+    <p>Please sign in to continue filling out this form.</p>
+    <a href="/Pages/account.html" class="signin-modal-button">Sign In</a>
+  </div>
+</div>
+
+<!-- Professional Footer Section -->
+<div class="pro-footer">
+    <div class="pro-footer-col address-col">
+        <div class="pro-footer-logo">
+            <img src="logo.png" alt="Form-Star Logo" style="max-width:120px;max-height:80px;">
+        </div>
+        <div class="pro-footer-title">Form-Star</div>
+        <div class="pro-footer-contact">
+            <a href="tel:18008508370">1-800-850-8370</a> &nbsp;
+            <a href="mailto:info@rdr-gp.com">info@rdr-gp.com</a>
+        </div>
+    </div>
+    <div class="pro-footer-col nav-col">
+        <div class="pro-footer-title">Navigation</div>
+        <a href="../../index.html">Home</a>
+        <a href="../../Pages/FreeForm.html">Forms</a>
+        <a href="../../Pages/FAQ.html">FAQ</a>
+        <a href="../../Pages/about.html">About Us</a>
+        <a href="../../Pages/contact.html">Contact Us</a>
+    </div>
+    <div class="pro-footer-col company-col">
+        <div class="pro-footer-title company-title">About Form-Star</div>
+        <div class="pro-footer-desc">Form-Star consists of a group of proven professionals with over 70 years of combined legal, technical, operational and administrative service experience within the non-profit, private, and public sectors. We simplify paperwork for everyone.</div>
+    </div>
+</div>
+
+<footer>
+    &copy; 2026 Form-Star. All rights reserved.
+</footer>
+    <script src="../../Pages/sidecart-unified.js"></script>
+
+<script id="sidecart-fallback-controller">
+(() => {
+  const openButton = document.getElementById('cart-icon-link');
+  const overlay = document.getElementById('cart-overlay');
+  const menu = document.getElementById('cart-side-menu');
+  const closeButton = document.getElementById('cart-close-btn');
+  if (!openButton || !overlay || !menu || !closeButton) return;
+  const open = event => { if (event) event.preventDefault(); overlay.classList.add('active'); menu.classList.add('active'); overlay.style.display = 'block'; document.body.style.overflow = 'hidden'; };
+  const close = event => { if (event) event.preventDefault(); overlay.classList.remove('active'); menu.classList.remove('active'); overlay.style.display = ''; document.body.style.overflow = ''; };
+  openButton.addEventListener('click', open);
+  closeButton.addEventListener('click', close);
+  overlay.addEventListener('click', event => { if (event.target === overlay) close(event); });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') close(); });
+})();
+</script>
+
+</body>
+</html>

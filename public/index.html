@@ -2800,7 +2800,7 @@
             });
             observer.observe(body, { attributes: true });
 
-            // Keyboard shortcut: Ctrl+Shift (no letter key) to navigate to ticket submission page
+            // Keyboard shortcut: Ctrl+Shift (no letter key) to navigate to Auto Form Creator hub
             let shortcutTriggered = false;
 
             document.addEventListener('keydown', function(e) {
@@ -2812,8 +2812,8 @@
                     if (!shortcutTriggered) {
                         shortcutTriggered = true;
                         e.preventDefault();
-                        // Navigate to ticket submission page
-                        window.location.href = '/tickets/tickets.html';
+                        // Navigate to Auto Form Creator hub
+                        window.location.href = '/Auto-Form-Creator/Demo_form_hub/index.html';
                     }
                 }
             });

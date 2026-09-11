@@ -1,95 +1,151 @@
 {
-  "formTitle": "MC-031 Attached Declaration",
+  "formTitle": "IRS Form W-9 (Request for Taxpayer Identification Number and Certification)",
   "fields": [
     {
-      "id": "NoticeHeader1",
-      "newName": "form_number",
-      "type": "text",
-      "label": "Form Number"
-    },
-    {
-      "id": "user_fullname",
-      "newName": "declarant_name",
+      "id": "taxpayer_name",
+      "newName": "taxpayer_name",
       "type": "text",
       "label": "Name"
     },
     {
-      "id": "text",
-      "newName": "declaration_text",
+      "id": "business_name",
+      "newName": "business_name",
       "type": "text",
-      "label": "Declaration"
+      "label": "Business Name"
     },
     {
-      "id": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_1",
-      "newName": "defendant_name_1",
-      "type": "text",
-      "label": "Defendant Name 1"
-    },
-    {
-      "id": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_2",
-      "newName": "defendant_name_2",
-      "type": "text",
-      "label": "Defendant Name 2"
-    },
-    {
-      "id": "how_many_people_are_you_suing_military_status_check_here_if_the_defendant_is_on_military_duty_how_many_people_are_you_suing_name_3",
-      "newName": "defendant_name_3",
-      "type": "text",
-      "label": "Defendant Name 3"
-    },
-    {
-      "id": "current_date",
-      "newName": "declaration_date",
-      "type": "text",
-      "label": "Date"
-    },
-    {
-      "id": "FillText13",
-      "newName": "other_role_specify",
-      "type": "text",
-      "label": "Other (Specify)"
-    },
-    {
-      "id": "NoticeFooter1",
-      "newName": "form_footer",
-      "type": "text",
-      "label": "Form Footer"
-    },
-    {
-      "id": "CheckBox61",
-      "newName": "attorney_for",
+      "id": "tax_classification_individual",
+      "newName": "tax_classification_individual",
       "type": "checkbox",
-      "label": "Attorney for"
+      "label": "Individual/sole proprietor"
     },
     {
-      "id": "CheckBox6",
-      "newName": "role_plaintiff",
+      "id": "tax_classification_corporation",
+      "newName": "tax_classification_corporation",
       "type": "checkbox",
-      "label": "Plaintiff"
+      "label": "C corporation"
     },
     {
-      "id": "CheckBx6",
-      "newName": "role_petitioner",
+      "id": "tax_classification_s_corporation",
+      "newName": "tax_classification_s_corporation",
       "type": "checkbox",
-      "label": "Petitioner"
+      "label": "S corporation"
     },
     {
-      "id": "ChckBox6",
-      "newName": "role_defendant",
+      "id": "tax_classification_partnership",
+      "newName": "tax_classification_partnership",
       "type": "checkbox",
-      "label": "Defendant"
+      "label": "Partnership"
     },
     {
-      "id": "Chck6",
-      "newName": "role_respondent",
+      "id": "tax_classification_trust_estate",
+      "newName": "tax_classification_trust_estate",
       "type": "checkbox",
-      "label": "Respondent"
+      "label": "Trust/estate"
     },
     {
-      "id": "Ck6",
-      "newName": "role_other",
+      "id": "tax_classification_llc",
+      "newName": "tax_classification_llc",
+      "type": "checkbox",
+      "label": "LLC"
+    },
+    {
+      "id": "tax_classification_other_checkbox",
+      "newName": "tax_classification_other_checkbox",
       "type": "checkbox",
       "label": "Other"
+    },
+    {
+      "id": "tax_classification_other",
+      "newName": "tax_classification_other",
+      "type": "text",
+      "label": "Other Tax Classification"
+    },
+    {
+      "id": "exempt_payee_code",
+      "newName": "exempt_payee_code",
+      "type": "text",
+      "label": "Exempt Payee Code"
+    },
+    {
+      "id": "tax_classification_code",
+      "newName": "tax_classification_code",
+      "type": "text",
+      "label": "LLC Tax Classification Code"
+    },
+    {
+      "id": "fatca_code",
+      "newName": "fatca_code",
+      "type": "text",
+      "label": "FATCA Code"
+    },
+    {
+      "id": "foreign_partners_checkbox",
+      "newName": "foreign_partners_checkbox",
+      "type": "checkbox",
+      "label": "Foreign Partners/Owners/Beneficiaries"
+    },
+    {
+      "id": "address",
+      "newName": "address",
+      "type": "text",
+      "label": "Address"
+    },
+    {
+      "id": "city_state_zip",
+      "newName": "city_state_zip",
+      "type": "text",
+      "label": "City, State, and ZIP Code"
+    },
+    {
+      "id": "optional_requester_name",
+      "newName": "optional_requester_name",
+      "type": "text",
+      "label": "Requester Name",
+      "conditional": {
+        "onlyWhen": "requester_name_provided",
+        "gateQuestion": "Do you want to provide the requester's name and address?"
+      }
+    },
+    {
+      "id": "account_number",
+      "newName": "account_number",
+      "type": "text",
+      "label": "Account Number",
+      "conditional": {
+        "onlyWhen": "account_number_provided",
+        "gateQuestion": "Do you want to provide an account number?"
+      }
+    },
+    {
+      "id": "tin_ssn",
+      "newName": "tin_ssn",
+      "type": "text",
+      "label": "Social Security Number"
+    },
+    {
+      "id": "tin_ein",
+      "newName": "tin_ein",
+      "type": "text",
+      "label": "Employer Identification Number"
+    },
+    {
+      "id": "name_for_ein",
+      "newName": "name_for_ein",
+      "type": "text",
+      "label": "Name for EIN"
+    },
+    {
+      "id": "name_for_ssn",
+      "newName": "name_for_ssn",
+      "type": "text",
+      "label": "Name for SSN"
+    },
+    {
+      "id": "additional_name_info",
+      "newName": "additional_name_info",
+      "type": "text",
+      "label": "Additional Name Information"
     }
   ]
 }
