@@ -71,3 +71,8 @@ firebase.json
 # Temporary files
 *.tmp
 *.temp
+# Credentials and history-rewrite leftovers: never commit
+replacetext.txt
+New Text Document.txt
+password.txt
+firebaseAdminKey.json
